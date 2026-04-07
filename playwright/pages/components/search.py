@@ -48,7 +48,9 @@ class SearchComponent(BasePage):
         Get the date range from the date range picker.
         """
         self.date_button.click()
-        self.wait_for_timeout(900)  # wait for values to load
+        self.wait_for_timeout(1500)  # wait for values to load
+        # Ensure values are populated before reading
+        self.start_date_picker.locator('input').wait_for(state='visible')
         start_date = self.start_date_picker.locator('input').input_value() or ''
         end_date = self.end_date_picker.locator('input').input_value() or ''
         self.date_button.click()  # close the date picker
@@ -84,9 +86,11 @@ class SearchComponent(BasePage):
         """
         self.date_button.click()
         self.get_radio_input(date).click()
+        self.wait_for_timeout(300)
 
         self.location_button.click()
         self.get_radio_input(location).click()
+        self.wait_for_timeout(300)
 
         self.filter_button.click()
         if isinstance(filter_parameter, str):
@@ -142,10 +146,12 @@ class SearchComponent(BasePage):
         self.date_button.click()
         self.wait_for_timeout(500)  # wait for values to load
         self.filter_reset.click()
-        self.wait_for_timeout(900)  # wait for date reset
+        self.wait_for_timeout(1500)  # wait for date reset
         self.location_button.click()
         self.wait_for_timeout(500)  # wait for values to load
         self.filter_reset.click()
+        self.wait_for_timeout(1500)  # wait for location reset
         self.filter_button.click()
         self.wait_for_timeout(500)  # wait for values to load
         self.filter_reset.click()
+        self.wait_for_timeout(1500)  # wait for other filters reset
