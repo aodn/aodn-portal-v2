@@ -60,40 +60,6 @@ const DrawRect: React.FC<DrawControlProps> = ({
   const [hasSelectedFeatures, setHasSelectedFeatures] = useState(false);
   const activeToolRef = useRef<SelectionTool>("bbox");
 
-  const handleIconClick = () => {
-    if (showTooltip) {
-      // If tooltip is showing, close it but keep draw mode active
-      setShowTooltip(false);
-    } else {
-      mapDraw.changeMode(DRAW_RECTANGLE_MODE);
-      setShowTooltip(true);
-    }
-    setActiveTool("bbox");
-    activeToolRef.current = "bbox";
-    setShowPolygonTooltip(false);
-  };
-
-  const handleCloseTooltip = () => {
-    setShowTooltip(false);
-  };
-
-  const handlePolygonClick = () => {
-    if (showPolygonTooltip) {
-      // If tooltip is showing, close it but keep draw mode active
-      setShowPolygonTooltip(false);
-    } else {
-      mapDraw.changeMode(DRAW_POLYGON_MODE);
-      setShowPolygonTooltip(true);
-    }
-    setActiveTool("polygon");
-    activeToolRef.current = "polygon";
-    setShowTooltip(false);
-  };
-
-  const handleClosePolygonTooltip = () => {
-    setShowPolygonTooltip(false);
-  };
-
   const mapDraw = useMemo<MapboxDraw>(
     () =>
       new MapboxDraw({
@@ -109,6 +75,40 @@ const DrawRect: React.FC<DrawControlProps> = ({
       }),
     []
   );
+
+  const handleIconClick = useCallback(() => {
+    if (showTooltip) {
+      // If tooltip is showing, close it but keep draw mode active
+      setShowTooltip(false);
+    } else {
+      mapDraw.changeMode(DRAW_RECTANGLE_MODE);
+      setShowTooltip(true);
+    }
+    setActiveTool("bbox");
+    activeToolRef.current = "bbox";
+    setShowPolygonTooltip(false);
+  }, [mapDraw, showTooltip]);
+
+  const handleCloseTooltip = useCallback(() => {
+    setShowTooltip(false);
+  }, []);
+
+  const handlePolygonClick = useCallback(() => {
+    if (showPolygonTooltip) {
+      // If tooltip is showing, close it but keep draw mode active
+      setShowPolygonTooltip(false);
+    } else {
+      mapDraw.changeMode(DRAW_POLYGON_MODE);
+      setShowPolygonTooltip(true);
+    }
+    setActiveTool("polygon");
+    activeToolRef.current = "polygon";
+    setShowTooltip(false);
+  }, [mapDraw, showPolygonTooltip]);
+
+  const handleClosePolygonTooltip = useCallback(() => {
+    setShowPolygonTooltip(false);
+  }, []);
 
   // Converts map features to BBoxCondition or PolygonCondition objects and updates the context
   const syncMapFeaturesToContext = useCallback(
@@ -168,8 +168,9 @@ const DrawRect: React.FC<DrawControlProps> = ({
     [getAndSetDownloadConditions]
   );
 
-  const anchorRef = useRef(null);
-  const polygonAnchorRef = useRef(null);
+  const [anchorRef, setAnchorRef] = useState<HTMLButtonElement | null>(null);
+  const [polygonAnchorRef, setPolygonAnchorRef] =
+    useState<HTMLButtonElement | null>(null);
   const popperRef = useRef<HTMLDivElement>(null);
 
   const { syncHasSelected } = usePolygonCursorHint({
@@ -180,15 +181,18 @@ const DrawRect: React.FC<DrawControlProps> = ({
     hasSelectedFeatures,
   });
 
-  const handleClickOutside = useCallback((event: MouseEvent) => {
-    if (!popperRef.current || !anchorRef.current) {
-      return;
-    }
-    if (!popperRef.current.contains(event.target as Node)) {
-      setShowTooltip(false);
-      setShowPolygonTooltip(false);
-    }
-  }, []);
+  const handleClickOutside = useCallback(
+    (event: MouseEvent) => {
+      if (!popperRef.current || !anchorRef) {
+        return;
+      }
+      if (!popperRef.current.contains(event.target as Node)) {
+        setShowTooltip(false);
+        setShowPolygonTooltip(false);
+      }
+    },
+    [anchorRef]
+  );
 
   const handleTrashClick = useCallback(() => {
     if (!hasFeatures) return;
@@ -381,7 +385,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
           aria-label="draw-rect-menu"
           id={MENU_ID}
           data-testid={MENU_ID}
-          ref={anchorRef}
+          ref={setAnchorRef}
           onClick={handleIconClick}
           sx={switcherIconButtonSx(isDrawingMode && activeTool === "bbox")}
         >
@@ -393,7 +397,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
 
       <MenuTooltip
         open={showTooltip}
-        anchorEl={anchorRef.current}
+        anchorEl={anchorRef}
         title="Bounding Box Selection"
         description="Use bounding box tool to draw a rectangle as selection."
         icon={<BboxTooltipIcon />}
@@ -408,7 +412,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
           aria-label="polygon-selection-menu"
           id={POLYGON_MENU_ID}
           data-testid={POLYGON_MENU_ID}
-          ref={polygonAnchorRef}
+          ref={setPolygonAnchorRef}
           onClick={handlePolygonClick}
           sx={switcherIconButtonSx(isDrawingMode && activeTool === "polygon")}
         >
@@ -422,7 +426,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
 
       <MenuTooltip
         open={showPolygonTooltip}
-        anchorEl={polygonAnchorRef.current}
+        anchorEl={polygonAnchorRef}
         title="Polygon Selection"
         description="Use polygon tool to draw several points to complete a selection."
         icon={<PolygonSelectionTooltipIcon />}

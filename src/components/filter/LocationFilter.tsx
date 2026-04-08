@@ -1,4 +1,10 @@
-import React, { FC, useCallback, useEffect, useState } from "react";
+import React, {
+  FC,
+  startTransition,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import {
   Box,
   FormControl,
@@ -147,12 +153,14 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
   }, [handleClosePopup]);
 
   useEffect(() => {
-    setSelectedOption((prevOption) => {
-      const matchedLocation = findMatch(
-        componentParam.polygon,
-        locationOptions
-      );
-      return prevOption === matchedLocation ? prevOption : matchedLocation;
+    startTransition(() => {
+      setSelectedOption((prevOption) => {
+        const matchedLocation = findMatch(
+          componentParam.polygon,
+          locationOptions
+        );
+        return prevOption === matchedLocation ? prevOption : matchedLocation;
+      });
     });
   }, [componentParam.polygon]);
 

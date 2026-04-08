@@ -33,9 +33,9 @@ class BasePage:
         """Get the current page URL"""
         return self.page.url
 
-    def get_by_id(self, id: str) -> Locator:
+    def get_by_id(self, identity: str) -> Locator:
         """Return a locator by id attribute"""
-        return self.page.locator(f'#{id}')
+        return self.page.locator(f'#{identity}')
 
     def get_button(self, text: str, exact: bool = True) -> Locator:
         """Return button element by text"""
@@ -142,7 +142,7 @@ class BasePage:
 
     def perform_action_and_get_api_url(
         self, action: Callable[[], None]
-    ) -> Tuple[str, str]:
+    ) -> Tuple[str, str] | None:
         """
         Perform an action (e.g., click search, zoom/drag map) and return the API URLs
         used for the request.

@@ -6,6 +6,7 @@ import {
   useMemo,
   useRef,
   useState,
+  startTransition,
 } from "react";
 import { HexagonLayer } from "@deck.gl/aggregation-layers";
 import MapContext from "../MapContext";
@@ -23,7 +24,6 @@ import { CloudOptimizedFeature } from "../../../common/store/CloudOptimizedDefin
 import _ from "lodash";
 import { SelectItem } from "../../../common/dropdown/CommonSelect";
 import MapLayerSelect from "../component/MapLayerSelect";
-import { useDetailPageContext } from "../../../../pages/detail-page/context/detail-page-context";
 import { playwrightTestIds } from "../../../common/constants";
 
 const MAPBOX_OVERLAY_HEXAGON_LAYER = "mapbox-overlay-hexagon-layer";
@@ -39,7 +39,7 @@ const COLOR_RANGE: Color[] = [
 // Extract unique keys from feature collection for dropdown options
 export const extractHexbinOptions = (
   featureCollection?: FeatureCollection<Point, CloudOptimizedFeature>
-): SelectItem<string>[] => {
+): SelectItem[] => {
   if (!featureCollection?.features?.length) return [];
 
   const uniqueKeys = new Set<string>();
@@ -284,28 +284,29 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
 
   // Extract hexbin options from feature collection
   useEffect(() => {
-    if (!sortedFeatureCollection) {
-      setIsFetchingHexbinOptions(false);
-      return;
-    }
-
-    setIsFetchingHexbinOptions(true);
-
-    // Extract options from sorted feature collection
-    const options = extractHexbinOptions(sortedFeatureCollection);
-
-    if (options.length > 0) {
-      setHexbinOptions(options);
-
-      // Set first option as default if none selected
-      if (!selectedCoKey) {
-        handleSelectHexbin(options[0].value);
+    startTransition(() => {
+      if (!sortedFeatureCollection) {
+        setIsFetchingHexbinOptions(false);
+        return;
       }
-    } else {
-      setHexbinOptions([]);
-    }
+      setIsFetchingHexbinOptions(true);
 
-    setIsFetchingHexbinOptions(false);
+      // Extract options from sorted feature collection
+      const options = extractHexbinOptions(sortedFeatureCollection);
+
+      if (options.length > 0) {
+        setHexbinOptions(options);
+
+        // Set first option as default if none selected
+        if (!selectedCoKey) {
+          handleSelectHexbin(options[0].value);
+        }
+      } else {
+        setHexbinOptions([]);
+      }
+
+      setIsFetchingHexbinOptions(false);
+    });
   }, [sortedFeatureCollection, selectedCoKey, handleSelectHexbin]);
 
   useEffect(() => {

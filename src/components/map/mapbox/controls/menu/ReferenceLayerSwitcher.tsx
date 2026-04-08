@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState, useCallback, MouseEvent } from "react";
 import {
   ControlProps,
   EVENT_MAP,
@@ -73,12 +73,15 @@ const ReferenceLayerSwitcher: React.FC<ReferenceLayerSwitcherProps> = ({
   const [overlaysChecked, setOverlaysChecked] = useState<Map<string, boolean>>(
     new Map(layers?.map((i) => [i.id, !!i.default]))
   );
-  const anchorRef = useRef(null);
-  const [open, setOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
-  const handleToggle = useCallback(() => {
-    setOpen((prevOpen) => !prevOpen);
-  }, [setOpen]);
+  const handleToggle = useCallback((event: MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl((prev) => (prev === null ? event.currentTarget : null));
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setAnchorEl(null);
+  }, []);
 
   const toggleOverlay = useCallback((layerId: string, visible: boolean) => {
     setOverlaysChecked((values) => {
@@ -92,11 +95,11 @@ const ReferenceLayerSwitcher: React.FC<ReferenceLayerSwitcherProps> = ({
     // the menu
     const handleEvent = (evt: MenuClickedEvent) => {
       if (evt.component.type !== ReferenceLayerSwitcher) {
-        setOpen(false);
+        setAnchorEl(null);
       }
     };
 
-    const handleMapEvent = () => setOpen(false);
+    const handleMapEvent = () => setAnchorEl(null);
 
     eventEmitter.on(EVENT_MENU.CLICKED, handleEvent);
     eventEmitter.on(EVENT_MAP.CLICKED, handleMapEvent);
@@ -108,7 +111,7 @@ const ReferenceLayerSwitcher: React.FC<ReferenceLayerSwitcherProps> = ({
       eventEmitter.off(EVENT_MAP.MOVE_START, handleMapEvent);
     };
   }, []);
-
+  const open = Boolean(anchorEl);
   return (
     <>
       <MenuHintTooltip hint="Reference Layers" disable={open}>
@@ -116,7 +119,6 @@ const ReferenceLayerSwitcher: React.FC<ReferenceLayerSwitcherProps> = ({
           aria-label="reference-show-hide-menu"
           id={MENU_ID}
           data-testid={MENU_ID}
-          ref={anchorRef}
           onClick={handleToggle}
           sx={switcherIconButtonSx(open)}
         >
@@ -126,7 +128,7 @@ const ReferenceLayerSwitcher: React.FC<ReferenceLayerSwitcherProps> = ({
       <Popper
         id="reference-popper-id"
         open={open}
-        anchorEl={anchorRef.current}
+        anchorEl={anchorEl}
         role={undefined}
         placement="left-start"
         disablePortal
@@ -143,7 +145,7 @@ const ReferenceLayerSwitcher: React.FC<ReferenceLayerSwitcherProps> = ({
           // Dynamic size so menu is big enough to have no text wrap, whiteSpace : nowrap
         }
         <Box sx={switcherMenuBoxSx}>
-          <MenuTitle title="Reference Layers" onClose={handleToggle} />
+          <MenuTitle title="Reference Layers" onClose={handleClose} />
           <Divider />
           <Box sx={switcherMenuContentBoxSx}>
             <FormControl component="fieldset">

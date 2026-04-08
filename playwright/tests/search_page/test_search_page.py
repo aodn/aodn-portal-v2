@@ -191,9 +191,15 @@ def test_buttons_disappear_on_mobile(mobile_page: Page) -> None:
     landing_page.load()
     landing_page.search.click_search_button()
     search_page.wait_for_search_to_complete()
+    search_page.wait_for_page_stabilization()
+    if search_page.main_map.is_visible():
+        search_page.map.wait_for_map_idle()
 
     search_page.result_view_button.click()
     search_page.full_map_view_button.click()
+    search_page.wait_for_page_stabilization()
+    search_page.map.wait_for_map_idle()
+
     expect(search_page.result_sort_button).not_to_be_visible()
     expect(search_page.result_view_button).not_to_be_visible()
     expect(search_page.bookmark_list_head).not_to_be_visible()
@@ -214,6 +220,7 @@ def test_search_result_layout_remains_intact_after_reload(
     landing_page.load()
     landing_page.search.click_search_button()
     search_page.wait_for_search_to_complete()
+    search_page.map.wait_for_map_idle()
 
     # switch to full list view
     search_page.result_view_button.click()
@@ -224,6 +231,7 @@ def test_search_result_layout_remains_intact_after_reload(
     search_page.go_to_landing_page()
     landing_page.search.click_search_button()
     search_page.wait_for_search_to_complete()
+
     expect(search_page.result_list).to_be_visible()
     expect(search_page.main_map).not_to_be_visible()
 

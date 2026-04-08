@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import {
   IAssociatedRecord,
@@ -37,7 +37,7 @@ const generateRecordBy = (
 const AssociatedRecordsPanel = () => {
   const context = useDetailPageContext();
   const links = context.collection?.links;
-  const [isLoading, setIsLoading] = useState(true);
+  const isLoading = !context.collection;
 
   const associatedRecords: IAssociatedRecordGroup = useMemo(() => {
     const parents: IAssociatedRecord[] = [];
@@ -71,14 +71,6 @@ const AssociatedRecordsPanel = () => {
 
     return { parent: parents?.[0], children, siblings };
   }, [links]);
-
-  useEffect(() => {
-    if (!context.collection) {
-      setIsLoading(true);
-    } else {
-      setIsLoading(false);
-    }
-  }, [context.collection]);
 
   const lists: NavigatablePanelChild[] = useMemo(
     () => [

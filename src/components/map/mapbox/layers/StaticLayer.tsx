@@ -4,6 +4,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import MapContext from "../MapContext";
@@ -55,7 +56,7 @@ const StaticLayer: FC<Partial<StaticLayersProps>> = ({
   features,
 }) => {
   const { map } = useContext(MapContext);
-  const [_, setCreated] = useState<boolean>(false);
+  const isCreatedRef = useRef<boolean>(false);
 
   const [sourceId, layerId, layerLabelId] = useMemo(() => {
     const sourceId = `static-geojson-${map?.getContainer().id}-source-${id}`;
@@ -102,6 +103,7 @@ const StaticLayer: FC<Partial<StaticLayersProps>> = ({
         "text-halo-width": 2,
       },
     });
+    isCreatedRef.current = true;
   }, [map, layerId, sourceId, layerLabelId, features, id, label]);
 
   // This is use to handle base map change that set style will default remove all layer, which is
@@ -116,11 +118,11 @@ const StaticLayer: FC<Partial<StaticLayersProps>> = ({
   useEffect(() => {
     if (map === null) return;
 
-    // Only create once, the strict mode cause twice call.
-    setCreated((value) => {
-      if (!value) createLayer();
-      return true;
-    });
+    // Only create once, the strict mode causes twice call.
+    if (!isCreatedRef.current) {
+      createLayer();
+      return;
+    }
 
     return () => {
       // Always remember to clean up resources

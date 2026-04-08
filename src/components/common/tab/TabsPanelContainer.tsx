@@ -1,5 +1,6 @@
 import React, {
   FC,
+  startTransition,
   SyntheticEvent,
   useCallback,
   useEffect,
@@ -76,7 +77,7 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
   );
 
   useEffect(() => {
-    if (tabValue) setValue(tabValue);
+    if (tabValue) startTransition(() => setValue(tabValue));
   }, [tabValue]);
 
   if (!tabs?.length) return;

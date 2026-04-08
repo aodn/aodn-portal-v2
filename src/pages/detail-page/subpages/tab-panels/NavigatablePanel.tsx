@@ -1,10 +1,8 @@
 import { Box, CircularProgress, Grid, useTheme } from "@mui/material";
 import React, {
-  createRef,
   FC,
   ReactNode,
   useCallback,
-  useEffect,
   useLayoutEffect,
   useRef,
   useState,
@@ -31,9 +29,7 @@ interface NavigatablePanelProps {
 interface VerticalIndicatorProps {
   diamondSize?: number;
   index?: number;
-  itemRefs: React.MutableRefObject<
-    Array<React.RefObject<HTMLDivElement | null>>
-  >;
+  itemRefs: Array<React.RefObject<HTMLDivElement | null>>;
 }
 
 const VerticalIndicator: FC<VerticalIndicatorProps> = ({
@@ -41,104 +37,78 @@ const VerticalIndicator: FC<VerticalIndicatorProps> = ({
   index = 0,
   itemRefs,
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState<number>(0);
-  const [activeY, setActiveY] = useState<number>(0);
+  const [metrics, setMetrics] = useState({ totalHeight: 0, activeY: 0 });
   const theme = useTheme();
 
   useLayoutEffect(() => {
-    // Dynamic calculate the true height given all the itemRefs
-    // useLayoutEffect runs synchronously immediately after React has performed all DOM mutations.
-    // This can be useful if you need to make DOM measurements (like getting the scroll position or other
-    // styles for an element) and then make DOM mutations or trigger a synchronous re-render by updating state.
-    const updateHeight = () => {
+    const updateMetrics = () => {
       let totalHeight = 0;
-      itemRefs.current.forEach((ref) => {
-        if (ref.current) {
-          totalHeight += ref.current.offsetHeight;
+      let activeY = 0;
+
+      itemRefs.forEach((ref, i) => {
+        const element = ref.current;
+        if (!element) return;
+
+        // If this is the active index, find its center point
+        if (i === index) {
+          activeY = totalHeight + element.offsetHeight / 2;
         }
+
+        totalHeight += element.offsetHeight;
       });
-      setHeight(totalHeight);
+
+      setMetrics({ totalHeight, activeY });
     };
 
-    // Add resize observers to each item ref to handle size changes
-    const resizeObservers: ResizeObserver[] = [];
-    // Must use timer here because we need to wait for DOM calculation
-    // to get the height of each component.
-    const timer = setTimeout(updateHeight, 10);
+    // Initialize measurements
+    updateMetrics();
 
-    if (itemRefs) {
-      itemRefs.current.forEach((ref) => {
-        if (ref.current) {
-          const observer = new ResizeObserver(updateHeight);
-          observer.observe(ref.current);
-          resizeObservers.push(observer);
-        }
-      });
-    }
+    // Observe every item for size changes
+    const observers = itemRefs.map((ref) => {
+      if (!ref.current) return null;
+      const observer = new ResizeObserver(updateMetrics);
+      observer.observe(ref.current);
+      return observer;
+    });
 
     return () => {
-      clearTimeout(timer);
-      resizeObservers.forEach((observer) => observer.disconnect()); // Cleanup on unmount
+      observers.forEach((obs) => obs?.disconnect());
     };
-  }, [itemRefs]);
-
-  useEffect(() => {
-    // Set initial activeY to the middle of the first item
-    const target = itemRefs.current[index]?.current;
-    if (target) {
-      let itemAboveHeight = 0;
-      for (let i = 0; i < index; i++) {
-        if (itemRefs.current[i].current) {
-          const k = itemRefs.current[i].current;
-          if (k) {
-            itemAboveHeight += k.offsetHeight;
-          }
-        }
-      }
-      setActiveY(itemAboveHeight + target.offsetHeight / 2);
-    } else {
-      // Fallback if first item is not available
-      setActiveY(0);
-    }
+    // Re-run if the index changes or the refs array changes
   }, [itemRefs, index]);
 
-  // Diamond height is equal to width (20px by default)
+  const { totalHeight, activeY } = metrics;
   const diamondCenterOffset = diamondSize / 2;
-  const grey500 = theme.palette.grey500;
-  const main = theme.palette.primary.main;
 
   return (
     <Box
-      ref={containerRef}
       sx={{
         position: "relative",
         width: `${diamondSize}px`,
-        height: `${height}px`,
+        height: `${totalHeight}px`,
       }}
     >
       <svg
         width={diamondSize}
-        height={height}
+        height={totalHeight}
         style={{ position: "absolute", left: 0 }}
       >
-        {/* Full vertical line */}
         <line
           x1={diamondSize / 2}
           y1={diamondSize / 2}
           x2={diamondSize / 2}
-          y2={height - diamondSize / 2}
-          stroke={grey500}
+          y2={totalHeight - diamondSize / 2}
+          stroke={theme.palette.grey[500]}
           strokeWidth="1"
         />
-        {/* Diamond positioned with center at activeY */}
         <g
+          // Use the calculated activeY from the state
           transform={`translate(0, ${activeY - diamondCenterOffset})`}
-          style={{ transition: "transform 0.1s ease" }}
+          style={{ transition: "transform 0.3s ease-in-out" }}
         >
           <polygon
             points={`${diamondSize / 2},0 0,${diamondSize / 2} ${diamondSize / 2},${diamondSize} ${diamondSize},${diamondSize / 2}`}
-            fill={main}
+            fill={theme.palette.primary.main}
           />
         </g>
       </svg>
@@ -157,22 +127,13 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   const { isUnderLaptop } = useBreakpoint();
 
   // Create an array of refs with the same size as the menu list which is the size of childrenList
-  const menuRefs = useRef(
-    Array(childrenList.length)
-      .fill(null)
-      .map(() => createRef<HTMLDivElement>())
+  const [menuRefs] = useState<React.RefObject<HTMLDivElement | null>[]>(
+    childrenList.map(() => React.createRef())
   );
 
   // Create an array of refs with the same size as the item list which is size of childrenList
-  const contentRefs = useRef(
-    Array(childrenList.length)
-      .fill(null)
-      .map(() => createRef<HTMLDivElement | null>())
-  );
-
-  const getRefBy = useCallback(
-    (index: number) => contentRefs.current[index],
-    [contentRefs]
+  const [contentRefs] = useState<React.RefObject<HTMLDivElement | null>[]>(
+    childrenList.map(() => React.createRef())
   );
 
   const handleScroll = useCallback(
@@ -183,7 +144,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
 
       let newIndex = 0;
       let minDiff = Infinity;
-      contentRefs.current.forEach((ref, idx) => {
+      contentRefs.forEach((ref, idx) => {
         if (ref.current) {
           const diff = Math.abs(ref.current.offsetTop - scrollPosition);
           if (diff < minDiff) {
@@ -196,13 +157,13 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
       // the navigate will trigger scroll, so we end up here
       setSelectedIndex(newIndex);
     },
-    []
+    [contentRefs]
   );
 
   const onNavigate = useCallback(
     (index: number) => {
       return () => {
-        const ref = getRefBy(index);
+        const ref = contentRefs[index];
         const bpRef = basePointRef.current;
         const ssRef = scrollableSectionRef.current;
 
@@ -218,7 +179,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
         }
       };
     },
-    [getRefBy]
+    [contentRefs]
   );
 
   return isLoading ? (
@@ -248,7 +209,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
                     key={index}
                     title={child.title}
                     onClick={onNavigate(index)}
-                    ref={menuRefs.current[index]}
+                    ref={menuRefs[index]}
                   />
                 );
               })}
@@ -293,7 +254,7 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
           return (
             <Box
               key={index}
-              ref={getRefBy(index)}
+              ref={contentRefs[index]}
               data-testid={`section-box-${index + 1}`} // Add test ID for parent Box
             >
               {child.component({ selected: selectedIndex === index })}

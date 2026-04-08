@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, startTransition, useEffect, useMemo, useState } from "react";
 import {
   AccordionDetails,
   AccordionSummary,
@@ -43,11 +43,7 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
   }, [downloadConditions]);
 
   useEffect(() => {
-    if (subsettingSelectionCount > 0) {
-      setAccordionExpanded(true);
-    } else {
-      setAccordionExpanded(false);
-    }
+    startTransition(() => setAccordionExpanded(subsettingSelectionCount > 0));
   }, [subsettingSelectionCount]);
 
   return (

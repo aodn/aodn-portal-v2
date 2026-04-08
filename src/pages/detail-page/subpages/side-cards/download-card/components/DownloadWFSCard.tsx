@@ -1,7 +1,6 @@
 import { FC, useCallback, useContext, useEffect, useState } from "react";
 import {
   Alert,
-  Box,
   Grid,
   LinearProgress,
   Snackbar,
@@ -64,6 +63,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
   removeDownloadCondition,
   onWFSAvailabilityChange,
 }) => {
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const {
     downloadingStatus,
     downloadedBytes,
@@ -76,7 +76,6 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
     useWFSEstimateSize();
   const dispatch = useAppDispatch();
   const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
-  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [dataSelectOptions, setDataSelectOptions] = useState<SelectItem[]>([]);
   const [selectedDataItem, setSelectedDataItem] = useState<string | undefined>(
     undefined

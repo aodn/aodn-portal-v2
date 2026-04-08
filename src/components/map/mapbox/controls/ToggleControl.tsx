@@ -1,7 +1,7 @@
 import { IControl, Map } from "mapbox-gl";
 import { createRoot, Root } from "react-dom/client";
 import MapContext from "../MapContext";
-import React, { useContext, useEffect, useState } from "react";
+import React, { startTransition, useContext, useEffect, useState } from "react";
 import { IconButton } from "@mui/material";
 import { borderRadius } from "../../../../styles/constants";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
@@ -139,16 +139,18 @@ const ToggleControl = ({
   useEffect(() => {
     if (map === null) return;
     // Only create once
-    setControl((prev) => {
-      if (!prev) {
-        const n = new ToggleControlClass({
-          showFullMap: showFullMap,
-          onToggleClicked: onToggleClicked,
-        });
-        map?.addControl(n, "top-left");
-        return n;
-      }
-      return prev;
+    startTransition(() => {
+      setControl((prev) => {
+        if (!prev) {
+          const n = new ToggleControlClass({
+            showFullMap: showFullMap,
+            onToggleClicked: onToggleClicked,
+          });
+          map?.addControl(n, "top-left");
+          return n;
+        }
+        return prev;
+      });
     });
   }, [map, showFullMap, onToggleClicked]);
 

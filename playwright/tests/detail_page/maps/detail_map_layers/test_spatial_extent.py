@@ -29,6 +29,7 @@ def test_map_shows_only_spatial_extent_layer(
 
     detail_page.load(uuid)
     detail_page.detail_map.wait_for_map_loading()
+    detail_page.detail_map.wait_for_map_idle()
 
     # Ensure that the Spatial Extent option is displayed in the layers menu
     detail_page.detail_map.layers_menu.click()

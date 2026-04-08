@@ -4,7 +4,6 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import { Box, Fade, Paper, Popper, ClickAwayListener } from "@mui/material";
@@ -45,7 +44,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
   const dispatch = useAppDispatch();
   const { isMobile, isTablet } = useBreakpoint();
   const [open, setOpen] = useState(false);
-  const boxRef = useRef<HTMLDivElement>(null);
+  const [boxRef, setBoxRef] = useState<HTMLDivElement | null>(null);
   const [activeButton, setActiveButton] = useState<SearchbarButtonNames>(
     SearchbarButtonNames.Filter
   );
@@ -57,7 +56,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
   const { ref, width: searchbarWidth } = useElementSize();
   const redirectSearch = useRedirectSearch();
   const { scrollToElement } = useScrollToElement({
-    ref: boxRef,
+    ref: { current: boxRef },
     offset: (isMobile ? HEADER_HEIGHT_MOBILE : HEADER_HEIGHT) + 5,
   });
   const urlParamState: ParameterState | undefined = useMemo(() => {
@@ -67,7 +66,13 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
       return unFlattenToParameterState(param);
     }
     return undefined;
-  }, [location?.search]);
+  }, [location.search]);
+
+  const boxRefCallback = useCallback((node: HTMLDivElement | null) => {
+    if (node !== null) {
+      setBoxRef(node);
+    }
+  }, []);
 
   const handleScrollToTop = useCallback(() => {
     scrollToElement();
@@ -116,13 +121,16 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
 
   const handleClosePopup = useCallback(() => setOpen(false), [setOpen]);
 
-  const handleClickAway = useCallback((event: MouseEvent | TouchEvent) => {
-    // Check if the click target is part of the search bar or buttons
-    if (boxRef.current?.contains(event.target as Node)) {
-      return;
-    }
-    setOpen(false);
-  }, []);
+  const handleClickAway = useCallback(
+    (event: MouseEvent | TouchEvent) => {
+      // Check if the click target is part of the search bar or buttons
+      if (boxRef?.contains(event.target as Node)) {
+        return;
+      }
+      setOpen(false);
+    },
+    [boxRef]
+  );
 
   // Sync URL to Redux on initial load/navigation
   useEffect(() => {
@@ -135,7 +143,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
   }, [dispatch, urlParamState]);
 
   return (
-    <Box width="100%" ref={boxRef}>
+    <Box width="100%" ref={boxRefCallback}>
       <Paper
         id="searchbar-paper"
         ref={ref}
@@ -212,7 +220,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
             zIndex: 99,
           }}
           open={open}
-          anchorEl={boxRef.current}
+          anchorEl={boxRef}
           placement="bottom-end"
           disablePortal
           transition

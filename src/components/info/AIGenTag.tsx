@@ -1,4 +1,4 @@
-import { FC, useCallback, useRef, useState } from "react";
+import { FC, useCallback, MouseEvent, useState } from "react";
 import { Box, IconButton, Popover, Typography } from "@mui/material";
 import AIGenIcon from "../icon/AIGenIcon";
 import { InfoContentType, InfoStatusType } from "./InfoDefinition";
@@ -14,23 +14,27 @@ interface AIGenTagProps {
 }
 
 const AIGenTag: FC<AIGenTagProps> = ({ infoContent }) => {
-  const buttonRef = useRef<HTMLButtonElement | null>(null);
-  const [open, setOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
-  const handleClick = useCallback(() => {
-    setOpen(true);
+  const handleClick = useCallback((event: MouseEvent<HTMLButtonElement>) => {
+    // 2. Set the current target as the anchor
+    setAnchorEl(event.currentTarget);
     disableScroll();
   }, []);
 
   const handleClose = useCallback(() => {
-    setOpen(false);
+    // 3. Clear the anchor to close
+    setAnchorEl(null);
     enableScroll();
   }, []);
+
+  // 4. "open" is derived: if we have an anchor, it's open
+  const open = Boolean(anchorEl);
+
   return (
     <>
       <IconButton
-        ref={buttonRef}
-        onClick={handleClick}
+        onClick={handleClick} // Pass the event to handleClick
         sx={{ padding: 0, bgcolor: "transparent" }}
         data-testid="AIGenTag-icon"
       >
@@ -39,7 +43,7 @@ const AIGenTag: FC<AIGenTagProps> = ({ infoContent }) => {
       <Popover
         elevation={2}
         open={open}
-        anchorEl={buttonRef.current}
+        anchorEl={anchorEl}
         onClose={handleClose}
         anchorOrigin={{
           vertical: "top",

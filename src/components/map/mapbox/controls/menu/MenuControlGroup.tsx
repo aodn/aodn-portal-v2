@@ -2,8 +2,9 @@ import React, {
   FC,
   cloneElement,
   isValidElement,
+  useCallback,
   Children,
-  useRef,
+  useState,
 } from "react";
 import { Grid, SxProps, Theme } from "@mui/material";
 
@@ -18,8 +19,14 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
   children,
   className = "menu-control-group",
 }) => {
-  const ref = useRef<HTMLDivElement>(null);
-
+  const [containerNode, setContainerNode] = useState<HTMLDivElement | null>(
+    null
+  );
+  const containerRefCallback = useCallback((node: HTMLDivElement | null) => {
+    if (node !== null) {
+      setContainerNode(node);
+    }
+  }, []);
   // Define the styles to apply to children
   const childStyles: SxProps<Theme> = {
     // Target the mapboxgl-ctrl-group class on the child's rendered div
@@ -43,7 +50,7 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
     <Grid
       container
       direction="column"
-      ref={ref}
+      ref={containerRefCallback}
       sx={{
         width: "42px",
         bgcolor: "#FFF",
@@ -54,17 +61,18 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
         py: "2px",
       }}
     >
-      {Children.toArray(children).map((child, index) => {
-        if (isValidElement(child)) {
-          return cloneElement<any>(child, {
-            key: child.key || index,
-            className: className,
-            parentRef: ref,
-            sx: childStyles,
-          });
-        }
-        return child;
-      })}
+      {containerNode &&
+        Children.toArray(children).map((child, index) => {
+          if (isValidElement(child)) {
+            return cloneElement<any>(child, {
+              key: child.key || index,
+              className: className,
+              parentRef: { current: containerNode },
+              sx: childStyles,
+            });
+          }
+          return child;
+        })}
     </Grid>
   );
 };

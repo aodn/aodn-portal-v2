@@ -2,6 +2,7 @@ import {
   Dispatch,
   FC,
   SetStateAction,
+  startTransition,
   useCallback,
   useContext,
   useEffect,
@@ -305,10 +306,10 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
         ]
       : [];
   }, [
-    config.urlParams?.BBOX,
+    config.urlParams.BBOX,
     config.urlParams.END_DATE,
     config.urlParams.LAYERS,
-    config.urlParams?.MODE,
+    config.urlParams.MODE,
     config.urlParams.START_DATE,
     config.urlParams.TIME,
     config.uuid,
@@ -589,8 +590,6 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     if (!collection) return;
 
     setMapLoading?.(ProgressType.CIRCLE);
-    setIsFetchingWmsLayers(true);
-    onWMSAvailabilityChange?.(true); // Show the loading status again
 
     const fetchLayers = () => {
       const layerName = getWmsLayerNames(collection)?.[0] || "";
@@ -677,8 +676,12 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
         setMapLoading?.(undefined);
       }
     };
+    startTransition(() => {
+      setIsFetchingWmsLayers(true);
+      onWMSAvailabilityChange?.(true); // Show the loading status again
 
-    fetchLayers();
+      fetchLayers();
+    });
   }, [
     collection,
     dispatch,

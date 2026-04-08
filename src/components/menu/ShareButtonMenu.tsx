@@ -1,5 +1,4 @@
-import { FC, ReactNode, useCallback, useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { FC, ReactNode, useCallback, useState, MouseEvent } from "react";
 import {
   Box,
   IconButton,
@@ -28,7 +27,7 @@ import {
 interface ShareMenuItem {
   name: string;
   icon?: ReactNode;
-  handler: (event: React.MouseEvent<HTMLElement>) => void;
+  handler: (event: MouseEvent<HTMLElement>) => void;
 }
 
 export interface CopyLinkConfig {
@@ -62,6 +61,16 @@ interface ShareButtonProps {
   sx?: SxProps;
 }
 
+// Generate share URL with UTM parameters for Google Analytics tracking
+// Uses URL API to safely handle existing query parameters (e.g., ?tab=summary)
+const copyUrlDefault = () => {
+  const url = new URL(window.location.href);
+  url.searchParams.set("utm_source", "portal"); // Track source as 'portal'
+  url.searchParams.set("utm_medium", "share_link"); // Track medium as 'share_link'
+  return url.toString();
+  // We need to update the url when the location changes
+};
+
 const ShareButtonMenu: FC<ShareButtonProps> = ({
   hideText = false,
   onClose,
@@ -69,35 +78,22 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({
 }) => {
   const { checkIsCopied, copyToClipboard, clearClipboard } =
     useClipboardContext();
-  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const location = useLocation();
 
-  // Generate share URL with UTM parameters for Google Analytics tracking
-  // Uses URL API to safely handle existing query parameters (e.g., ?tab=summary)
-  const copyUrlDefault = useMemo(() => {
-    const url = new URL(window.location.href);
-    url.searchParams.set("utm_source", "portal"); // Track source as 'portal'
-    url.searchParams.set("utm_medium", "share_link"); // Track medium as 'share_link'
-    return url.toString();
-    // We need to update the url when the location changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location]);
-
-  const handleClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
-    setIsOpen(true);
+  const handleClick = useCallback((event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
     disableScroll();
   }, []);
 
   const handleClose = useCallback(() => {
-    setIsOpen(false);
+    setAnchorEl(null);
     enableScroll();
     clearClipboard();
     onClose && onClose();
   }, [clearClipboard, onClose]);
 
+  const open = Boolean(anchorEl);
   return (
     <>
       <Box
@@ -112,7 +108,7 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({
           flexDirection: "column",
           height: "100%",
           width: "100%",
-          bgcolor: isHovered || isOpen ? color.brightBlue.dark : "#fff",
+          bgcolor: isHovered || open ? color.brightBlue.dark : "#fff",
           borderRadius: borderRadius.small,
           ":hover": { cursor: "pointer" },
           ...sx,
@@ -120,7 +116,7 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({
       >
         <IconButton
           sx={{
-            color: isHovered || isOpen ? "#fff" : color.brightBlue.dark,
+            color: isHovered || open ? "#fff" : color.brightBlue.dark,
             ":hover": {
               bgcolor: "transparent",
             },
@@ -131,7 +127,7 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({
         {!hideText && (
           <Typography
             fontSize={fontSize.icon}
-            color={isHovered || isOpen ? "#fff" : fontColor.blue.medium}
+            color={isHovered || open ? "#fff" : fontColor.blue.medium}
             fontWeight={fontWeight.bold}
             p={0}
           >
@@ -141,7 +137,7 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({
       </Box>
       <Menu
         anchorEl={anchorEl}
-        open={isOpen}
+        open={open}
         onClose={handleClose}
         elevation={1}
         disablePortal
@@ -167,8 +163,8 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({
         }}
       >
         {getItems({
-          isCopied: checkIsCopied(copyUrlDefault),
-          copyUrl: copyUrlDefault,
+          isCopied: checkIsCopied(copyUrlDefault()),
+          copyUrl: copyUrlDefault(),
           copyToClipboard,
         }).map((item, index) => (
           <MenuItem key={index} onClick={item.handler} data-testid="copy-link">

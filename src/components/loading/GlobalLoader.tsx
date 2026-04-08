@@ -1,4 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  startTransition,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import loadingManager from "./LoadingManager";
 import { EventName } from "./enum/EventName";
 import CircleLoader from "./CircleLoader";
@@ -8,16 +13,13 @@ interface GlobalLoaderProps {
 }
 
 const GlobalLoader: React.FC<GlobalLoaderProps> = ({ children }) => {
-  const loadingBuffer = useMemo((): string[] => [], []);
+  const [loadingBuffer, _] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const checkState = useCallback(() => {
-    if (loadingBuffer.length > 0) {
-      setIsLoading(true);
-    }
-    if (loadingBuffer.length === 0) {
-      setIsLoading(false);
-    }
+    startTransition(() => {
+      setIsLoading(loadingBuffer.length > 0);
+    });
   }, [loadingBuffer]);
 
   const startLoadingHandler = useCallback(

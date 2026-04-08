@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  MouseEvent,
+  useState,
+  startTransition,
+} from "react";
 import {
   ControlProps,
   EVENT_MAP,
@@ -54,19 +60,24 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
   layers,
   onEvent,
 }) => {
-  const anchorRef = useRef(null);
-  const [open, setOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [currentLayer, setCurrentLayer] = useState<LayerName | undefined>(
     layers.find((layer) => layer.selected)?.id
   );
 
-  const handleToggle = useCallback(() => {
-    setOpen((prevOpen) => !prevOpen);
-  }, [setOpen]);
+  const handleToggle = useCallback((event: MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl((prev) => (prev === null ? event.currentTarget : null));
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setAnchorEl(null);
+  }, []);
 
   useEffect(() => {
-    const selected = layers.filter((layer) => layer.selected);
-    setCurrentLayer(selected[0]?.id || layers[0]?.id);
+    startTransition(() => {
+      const selected = layers.filter((layer) => layer.selected);
+      setCurrentLayer(selected[0]?.id || layers[0]?.id);
+    });
   }, [layers]);
 
   useEffect(() => {
@@ -74,11 +85,11 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
     // the menu
     const handleEvent = (evt: MenuClickedEvent) => {
       if (evt.component.type !== MapLayerSwitcher) {
-        setOpen(false);
+        setAnchorEl(null);
       }
     };
 
-    const handleMapEvent = () => setOpen(false);
+    const handleMapEvent = () => setAnchorEl(null);
 
     eventEmitter.on(EVENT_MENU.CLICKED, handleEvent);
     eventEmitter.on(EVENT_MAP.MOVE_START, handleMapEvent);
@@ -91,13 +102,13 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
     };
   }, []);
 
+  const open = Boolean(anchorEl);
   return (
     <>
       <MenuHintTooltip hint="Layer Styles" disable={open}>
         <IconButton
           aria-label={ComponentId.MapLayerSwitcher.Menu}
           id={ComponentId.MapLayerSwitcher.MenuButton}
-          ref={anchorRef}
           onClick={handleToggle}
           sx={switcherIconButtonSx(open)}
         >
@@ -107,7 +118,7 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
       <Popper
         id={ComponentId.MapLayerSwitcher.PopperId}
         open={open}
-        anchorEl={anchorRef.current}
+        anchorEl={anchorEl}
         role={undefined}
         placement="left-start"
         disablePortal
@@ -124,7 +135,7 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
           // Dynamic size so menu is big enough to have no text wrap, whiteSpace : nowrap
         }
         <Box sx={switcherMenuBoxSx}>
-          <MenuTitle title="Layer Styles" onClose={handleToggle} />
+          <MenuTitle title="Layer Styles" onClose={handleClose} />
           <Divider />
           <Box sx={switcherMenuContentBoxSx}>
             <FormControl component="fieldset">

@@ -1,4 +1,11 @@
-import { FC, useCallback, useContext, useEffect, useState } from "react";
+import {
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+} from "react";
 import MapContext from "../MapContext";
 import { TestHelper } from "../../../common/test/helper";
 
@@ -15,7 +22,7 @@ const MapboxWorldLayersDef = {
 
 const MapboxWorldLayer: FC = () => {
   const { map } = useContext(MapContext);
-  const [created, setCreated] = useState<boolean>(false);
+  const isCreatedRef = useRef<boolean>(false);
 
   const createLayer = useCallback(() => {
     if (map?.getSource(sourceId)) return true;
@@ -58,6 +65,7 @@ const MapboxWorldLayer: FC = () => {
         "text-halo-width": 1,
       },
     });
+    isCreatedRef.current = true;
   }, [map]);
 
   // This is use to handle base map change that set style will default remove all layer, which is
@@ -73,10 +81,9 @@ const MapboxWorldLayer: FC = () => {
     if (map === null) return;
 
     // Only create once, the strict mode cause twice call.
-    setCreated((value) => {
-      if (!value) createLayer();
-      return true;
-    });
+    if (!isCreatedRef.current) {
+      createLayer();
+    }
 
     return () => {
       // Always remember to clean up resources

@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  startTransition,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import dayjs from "dayjs";
 import { Grid, Stack, Typography } from "@mui/material";
 import { dateToValue, valueToDate } from "../../../utils/DateUtils";
@@ -147,21 +153,23 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
   );
 
   useEffect(() => {
-    const newDateRangeStamp = [
-      dateToValue(
-        dayjs(
-          currentMinDate ? currentMinDate : minDate,
-          dateDefault.DATE_FORMAT
-        )
-      ),
-      dateToValue(
-        dayjs(
-          currentMaxDate ? currentMaxDate : maxDate,
-          dateDefault.DATE_FORMAT
-        )
-      ),
-    ];
-    setDateRangeStamp(newDateRangeStamp);
+    startTransition(() => {
+      const newDateRangeStamp = [
+        dateToValue(
+          dayjs(
+            currentMinDate ? currentMinDate : minDate,
+            dateDefault.DATE_FORMAT
+          )
+        ),
+        dateToValue(
+          dayjs(
+            currentMaxDate ? currentMaxDate : maxDate,
+            dateDefault.DATE_FORMAT
+          )
+        ),
+      ];
+      setDateRangeStamp(newDateRangeStamp);
+    });
   }, [currentMinDate, currentMaxDate, minDate, maxDate]);
 
   return (

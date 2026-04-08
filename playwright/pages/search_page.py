@@ -104,6 +104,8 @@ class SearchPage(BasePage):
 
         Returns:
             Dictionary with parameter names as keys and validation results as values
+            :param expected_filters:
+            :param url:
         """
         validation_results = SearchFilterValidatorFactory.validate(
             url, expected_filters

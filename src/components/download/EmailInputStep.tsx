@@ -1,4 +1,12 @@
-import React from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  ChangeEvent,
+  useCallback,
+  useState,
+  useEffect,
+  startTransition,
+} from "react";
 import {
   Box,
   Typography,
@@ -13,16 +21,14 @@ import { ClearIcon } from "../../assets/icons/download/clear";
 
 interface EmailInputStepProps {
   isUnderLaptop: boolean;
-  emailInputRef: React.RefObject<HTMLInputElement>;
   email: string;
   emailError?: string;
   dataUsage: DataUsageInformation;
   onDataUsageChange: (dataUsage: DataUsageInformation) => void;
   onClearEmail: () => void;
-  setEmailError: (error: string) => void;
+  setEmail: Dispatch<SetStateAction<string>>;
+  setEmailError: Dispatch<SetStateAction<string>>;
 }
-
-const EMAIL_VALIDATION_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const textFieldStyles = {
   container: { my: "8px" },
@@ -51,51 +57,79 @@ const adornmentStyles = {
   },
 };
 
+const createErrorMessage = (
+  emailHasError: boolean,
+  emailError: string | undefined
+) => {
+  if (!emailHasError) return null;
+
+  return (
+    <Typography
+      variant="body1Medium"
+      sx={{
+        color: portalTheme.palette.error.main,
+        px: "20px",
+      }}
+    >
+      {emailError}
+    </Typography>
+  );
+};
+
+const createDownloadInstructions = () => (
+  <Box sx={{ mx: "20px", my: "8px" }}>
+    <Typography variant="body2Regular">
+      Processing dataset download may take some time. It is varied by the size
+      of the dataset, the selected conditions, and the server load (may take
+      several seconds to several hours or even more). Please provide your email
+      address to receive the download link and necessary information.
+    </Typography>
+  </Box>
+);
+
 const EmailInputStep: React.FC<EmailInputStepProps> = ({
   isUnderLaptop,
-  emailInputRef,
   email,
   emailError,
   dataUsage,
   onDataUsageChange,
   onClearEmail,
+  setEmail,
   setEmailError,
 }) => {
-  const getCurrentInputValue = () => {
-    return emailInputRef.current?.value || "";
-  };
+  const [localEmail, setLocalEmail] = useState(email);
 
-  const emailHasValue =
-    getCurrentInputValue().trim().length > 0 || email.trim().length > 0;
+  useEffect(() => {
+    startTransition(() => setLocalEmail(email));
+  }, [email]);
+
+  const emailHasValue = localEmail.trim().length > 0;
   const emailHasError = !!emailError;
   const shouldShowClearButton = emailHasValue && !emailHasError;
 
-  const updateEmailValue = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const updateEmailValue = (event: ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value;
-
-    if (emailHasError && newValue.trim()) {
-      const isValidEmailFormat = EMAIL_VALIDATION_REGEX.test(newValue.trim());
-      if (isValidEmailFormat) {
-        setEmailError("");
-      }
-    }
+    setLocalEmail(newValue);
+    setEmail(newValue);
+    setEmailError("");
   };
 
   const handleClearEmail = () => {
-    if (emailInputRef.current) {
-      emailInputRef.current.value = "";
-    }
+    setEmail("");
     onClearEmail();
   };
 
-  const createErrorAdornment = () => (
-    <InputAdornment position="end" sx={adornmentStyles.wrapper}>
-      <InformationIcon
-        color={portalTheme.palette.error.main}
-        height={30}
-        width={30}
-      />
-    </InputAdornment>
+  const createErrorAdornment = useCallback(
+    () => (
+      <InputAdornment position="end" sx={adornmentStyles.wrapper}>
+        <InformationIcon
+          color={portalTheme.palette.error.main}
+          height={30}
+          width={30}
+        />
+      </InputAdornment>
+    ),
+    []
   );
 
   const createClearAdornment = () => (
@@ -117,7 +151,7 @@ const EmailInputStep: React.FC<EmailInputStepProps> = ({
     return undefined;
   };
 
-  const EmailTextField = () => (
+  const createEmailTextField = () => (
     <TextField
       required
       id="email"
@@ -127,10 +161,9 @@ const EmailInputStep: React.FC<EmailInputStepProps> = ({
       type="email"
       fullWidth
       variant={emailHasError ? "outlined" : "standard"}
-      inputRef={emailInputRef}
       error={emailHasError}
       onChange={updateEmailValue}
-      defaultValue={email}
+      value={localEmail}
       InputProps={{
         endAdornment: getInputEndAdornment(),
       }}
@@ -146,40 +179,13 @@ const EmailInputStep: React.FC<EmailInputStepProps> = ({
     />
   );
 
-  const ErrorMessage = () => {
-    if (!emailHasError) return null;
-
-    return (
-      <Typography
-        variant="body1Medium"
-        sx={{
-          color: portalTheme.palette.error.main,
-          px: "20px",
-        }}
-      >
-        {emailError}
-      </Typography>
-    );
-  };
-
-  const DownloadInstructions = () => (
-    <Box sx={{ mx: "20px", my: "8px" }}>
-      <Typography variant="body2Regular">
-        Processing dataset download may take some time. It is varied by the size
-        of the dataset, the selected conditions, and the server load (may take
-        several seconds to several hours or even more). Please provide your
-        email address to receive the download link and necessary information.
-      </Typography>
-    </Box>
-  );
-
   return (
     <Box sx={{ pl: isUnderLaptop ? 1 : 2 }}>
       <Typography variant="title1Medium">Email Address</Typography>
 
-      <EmailTextField />
-      <ErrorMessage />
-      <DownloadInstructions />
+      {createEmailTextField()}
+      {createErrorMessage(emailHasError, emailError)}
+      {createDownloadInstructions()}
 
       <DataUsageForm
         isUnderLaptop={isUnderLaptop}

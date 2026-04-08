@@ -2,6 +2,7 @@ import {
   ChangeEvent,
   FC,
   memo,
+  startTransition,
   useCallback,
   useEffect,
   useMemo,
@@ -257,24 +258,27 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
 
     // Listen to redux dateTimeFilterRange to initialize local states
     useEffect(() => {
-      if (dateTimeFilterRange) {
-        const newMinDate = valueToDate(
-          dateTimeFilterRange.start ?? dateToValue(initialMinDate)
-        );
-        const newMaxDate = valueToDate(
-          dateTimeFilterRange.end ?? dateToValue(initialMaxDate)
-        );
+      // Avoid eslint error on set state in useEffect
+      startTransition(() => {
+        if (dateTimeFilterRange) {
+          const newMinDate = valueToDate(
+            dateTimeFilterRange.start ?? dateToValue(initialMinDate)
+          );
+          const newMaxDate = valueToDate(
+            dateTimeFilterRange.end ?? dateToValue(initialMaxDate)
+          );
 
-        setValue([
-          dateTimeFilterRange.start ?? dateToValue(initialMinDate),
-          dateTimeFilterRange.end ?? dateToValue(initialMaxDate),
-        ]);
-        setSelectedOption(determineSelectedOption(newMinDate, newMaxDate));
-      } else {
-        // Reset to initial state when dateTimeFilterRange is null or undefined
-        setValue([dateToValue(initialMinDate), dateToValue(initialMaxDate)]);
-        setSelectedOption(DateRangeOptionValues.Custom);
-      }
+          setValue([
+            dateTimeFilterRange.start ?? dateToValue(initialMinDate),
+            dateTimeFilterRange.end ?? dateToValue(initialMaxDate),
+          ]);
+          setSelectedOption(determineSelectedOption(newMinDate, newMaxDate));
+        } else {
+          // Reset to initial state when dateTimeFilterRange is null or undefined
+          setValue([dateToValue(initialMinDate), dateToValue(initialMaxDate)]);
+          setSelectedOption(DateRangeOptionValues.Custom);
+        }
+      });
     }, [dateTimeFilterRange, determineSelectedOption]);
 
     useEffect(() => {

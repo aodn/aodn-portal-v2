@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useState } from "react";
 import Button from "@mui/material/Button";
-import MenuItem from "@mui/material/MenuItem";
+import MenuItemUi from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import StyledMenu from "./StyledMenu";
 import { disableScroll, enableScroll } from "../../utils/ScrollUtils";
@@ -61,9 +61,9 @@ const PlainMenu: FC<PlainMenuProps> = ({ menu }: PlainMenuProps) => {
       {menu.items.length > 0 && (
         <StyledMenu anchorEl={anchorEl} open={isOpen} onClose={handleClose}>
           {menu.items.map((item, index) => (
-            <MenuItem onClick={handleMenuItemClick(item)} key={index}>
+            <MenuItemUi onClick={handleMenuItemClick(item)} key={index}>
               {item.name}
-            </MenuItem>
+            </MenuItemUi>
           ))}
         </StyledMenu>
       )}

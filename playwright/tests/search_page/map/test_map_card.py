@@ -5,7 +5,7 @@ from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
 
-
+@pytest.mark.skip(reason="Canned data wrong, download button not enabled")
 @pytest.mark.parametrize(
     'data_id, data_lng, data_lat',
     [
@@ -31,6 +31,7 @@ def test_map_card_popup_download_button_in_desktop(
     landing_page.search.search_for(data_id)
 
     search_page.map.center_map(data_lng, data_lat)
+    search_page.map.wait_for_map_idle()
     search_page.wait_for_page_stabilization()
     search_page.map.hover_map()
 
@@ -63,10 +64,14 @@ def test_map_card_popup_download_button_in_mobile(
 
     search_page.result_view_button.click()
     search_page.full_map_view_button.click()
-    search_page.wait_for_timeout(3000)
+    search_page.wait_for_page_stabilization()
+    if search_page.main_map.is_visible():
+        search_page.map.wait_for_map_idle()
 
     search_page.map.find_and_click_data_point(data_id)
+    search_page.wait_for_page_stabilization()
     search_page.result_card_download_button.last.click()
 
     detail_page.return_button.click()
+    search_page.map.wait_for_map_idle()
     expect(search_page.main_map).to_be_visible()

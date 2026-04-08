@@ -9,7 +9,7 @@ interface DetailSubtabProps {
 }
 
 const DetailSubtabBtn = forwardRef<HTMLDivElement | null, DetailSubtabProps>(
-  ({ id, title, onClick }, ref: ForwardedRef<HTMLDivElement>) => {
+  ({ id, title, onClick }, ref: ForwardedRef<HTMLDivElement | null>) => {
     return (
       <Box
         ref={ref} // Must set ref to be the container ref

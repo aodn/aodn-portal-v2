@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  startTransition,
+} from "react";
 import { useLocation } from "react-router-dom";
 
 interface UseScrollToSectionProps {
@@ -31,10 +37,10 @@ const useScrollToSection = ({
     const section = searchParams.get("section");
 
     if (section !== sectionId) {
-      setHasScrolled(false);
+      startTransition(() => setHasScrolled(false));
     }
 
-    scrollToSection();
+    startTransition(() => scrollToSection());
 
     // Attempt to scroll again after a short delay
     // In case the first scroll attempt fails because the content or ref isn't ready

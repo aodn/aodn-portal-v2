@@ -45,7 +45,6 @@ const DownloadDialog = ({
   const { isUnderLaptop } = useBreakpoint();
 
   const {
-    emailInputRef,
     activeStep,
     isProcessing,
     isSuccess,
@@ -63,6 +62,7 @@ const DownloadDialog = ({
     handleFormSubmit,
     getProcessStatusText,
     getStepperButtonTitle,
+    setEmail,
     setEmailError,
   } = useDownloadDialog(isOpen, setIsOpen);
 
@@ -141,12 +141,12 @@ const DownloadDialog = ({
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <EmailInputStep
               isUnderLaptop={isUnderLaptop}
-              emailInputRef={emailInputRef}
               email={email}
               dataUsage={dataUsage}
               onDataUsageChange={handleDataUsageChange}
               emailError={emailError}
               onClearEmail={handleClearEmail}
+              setEmail={setEmail}
               setEmailError={setEmailError}
             />
           </Box>
@@ -158,11 +158,7 @@ const DownloadDialog = ({
     return (
       <Box sx={{ flex: 1 }}>
         <Box sx={{ flex: 1 }}>
-          <input
-            type="hidden"
-            name="email"
-            value={email || emailInputRef.current?.value || ""}
-          />
+          <input type="hidden" name="email" value={email || ""} />
           <LicenseContent />
         </Box>
       </Box>
