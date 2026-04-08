@@ -52,7 +52,7 @@ const DataList: React.FC<DataListProps> = ({
   const dataAccessItems = sortedLinks?.map((link: ILink, index: number) => (
     <>
       <CollapseItem
-        key={link.href} // need unique key
+        key={index} // need unique key
         titleComponent={linkTitleComponent(index, link)}
         isOpen
       >
