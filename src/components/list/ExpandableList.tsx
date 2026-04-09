@@ -62,12 +62,13 @@ const ExpandableList: React.FC<ExpandableListProps> = ({
         <NaList title={title ? title : ""} />
       ) : (
         <Grid item container md={12} data-testid={`collapse-list-${title}`}>
-          {childrenList.map((child) => {
+          {childrenList.map((child: ReactNode, index: number) => {
             showingCollapseCount++;
             if (!isShowingMore && showingCollapseCount > 5) {
               return null;
             }
-            return child;
+            // Avoid missing key error in console so warp with Fragment
+            return <React.Fragment key={index}>{child}</React.Fragment>;
           })}
           {childrenList.length > 5 && (
             <ShowMoreDetailBtn
