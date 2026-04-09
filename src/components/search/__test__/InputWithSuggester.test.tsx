@@ -116,6 +116,9 @@ describe("InputWithSuggester", () => {
 
         return waitFor(() => {
           expect(input).toHaveValue("imos sst"); // or whatever exact value your mock returns
+
+          // Make sure redux also updated the searchText
+          expect(store.getState().paramReducer.searchText).toBe("imos sst");
         });
       });
     });
