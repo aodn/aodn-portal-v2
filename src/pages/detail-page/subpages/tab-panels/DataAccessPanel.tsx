@@ -204,7 +204,8 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
           return createCompactPanel(
             collection?.id,
             "Data Access",
-            collection?.getDataAccessLinks()
+            // only put downloadable links
+            collection?.getDownloadLinks()
           );
       }
 
