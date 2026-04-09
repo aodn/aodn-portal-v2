@@ -161,15 +161,20 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
 
   const handleInputChange = useCallback(
     (_: any, newInputValue: string) => {
+      // 1. Update local state IMMEDIATELY
+      setInputValue(newInputValue);
+
+      // 2. Trigger the debounced API call for suggestions
       if (newInputValue?.length > 0) {
         debounceRefreshOptions(newInputValue);
+      } else {
+        setOptions([]); // Clear options if input is empty
       }
-      setTimeout(() => {
-        // Must use setTimeout so that update can be outside this cycle
-        // otherwise the text will not update correctly
-        setInputValue(newInputValue);
-        dispatch(updateSearchText(newInputValue));
-      }, 0);
+
+      // 3. Update Redux (Synchronously or via Debounce)
+      // If you don't need Redux to know the value on every single keystroke,
+      // consider debouncing this too.
+      dispatch(updateSearchText(newInputValue));
     },
     [debounceRefreshOptions, dispatch]
   );
@@ -217,8 +222,11 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   }, [isSearchbarActive, searchInput, setShouldExpandSearchbar]);
 
   useEffect(() => {
-    setInputValue(searchInput);
-  }, [searchInput]);
+    // Only update local state if Redux state is different from what's currently on screen
+    if (searchInput !== inputValue) {
+      setInputValue(searchInput);
+    }
+  }, [inputValue, searchInput]);
 
   // Input suggester popper
   const CustomPopper = useCallback(
@@ -300,6 +308,12 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
       includeInputInList
       disablePortal
       onInputChange={handleInputChange}
+      onChange={(_: any, newValue: string | null) => {
+        if (newValue !== null) {
+          setInputValue(newValue);
+          dispatch(updateSearchText(newValue));
+        }
+      }}
       sx={{
         bgcolor: "#fff",
         borderRadius: borderRadius.small,
