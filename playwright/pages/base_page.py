@@ -65,9 +65,11 @@ class BasePage:
         """Return element by text"""
         return self.page.get_by_text(text, exact=exact)
 
-    def click_text(self, text: str, exact: bool = False) -> None:
+    def click_text(self, text: str, exact: bool = False, timeout: float = 5000) -> None:
         """Click on the given text"""
-        self.get_text(text, exact=exact).click()
+        locator = self.get_text(text, exact=exact)
+        locator.wait_for(state="visible", timeout=timeout)
+        locator.click()
 
     def get_tab(self, text: str) -> Locator:
         """Return tab element by text"""
