@@ -51,7 +51,7 @@ jobs:
 
       - name: Configure AWS credentials
         id: aws_auth
-        uses: aws-actions/configure-aws-credentials@v6.0.0
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           audience: sts.amazonaws.com
           aws-region: ${{ vars.AWS_REGION }}
@@ -109,7 +109,7 @@ jobs:
           path: ${{ env.DIST }}
 
       - name: Generate App Token
-        uses: actions/create-github-app-token@v3.0.0
+        uses: actions/create-github-app-token@v3
         id: app-token
         with:
           app-id: ${{ vars.DEPLOY_APP_ID }}
@@ -126,7 +126,7 @@ jobs:
 
       - name: Configure AWS credentials
         id: aws_auth
-        uses: aws-actions/configure-aws-credentials@v6.0.0
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           audience: sts.amazonaws.com
           aws-region: ${{ vars.AWS_REGION }}
