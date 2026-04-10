@@ -2,13 +2,21 @@ import React, {
   Dispatch,
   FC,
   ReactNode,
+  SyntheticEvent,
   useCallback,
   useEffect,
   useRef,
   useState,
 } from "react";
 import { useSelector } from "react-redux";
-import { Autocomplete, Box, Paper, Popper, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  AutocompleteInputChangeReason,
+  Box,
+  Paper,
+  Popper,
+  TextField,
+} from "@mui/material";
 import {
   ParameterState,
   updateSearchText,
@@ -83,9 +91,12 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   const { isMobile } = useBreakpoint();
   const [isSearchbarActive, setIsSearchbarActive] = useState(false);
   const [options, setOptions] = useState<OptionType[]>([]);
+
+  // Redux is the "Single Source of Truth" for the final value
   const searchInput = useSelector(
     (state: RootState) => state.paramReducer.searchText
   );
+  // local state tracks what the user is currently typing
   const [inputValue, setInputValue] = useState<string | undefined>(searchInput);
 
   const refreshOptions = useCallback(
@@ -160,21 +171,33 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   }, [debounceRefreshOptions]);
 
   const handleInputChange = useCallback(
-    (_: any, newInputValue: string) => {
+    (
+      event: SyntheticEvent,
+      newInputValue: string,
+      reason: AutocompleteInputChangeReason
+    ) => {
       // 1. Update local state IMMEDIATELY
-      setInputValue(newInputValue);
+      setInputValue((old) => (old !== newInputValue ? newInputValue : old));
 
-      // 2. Trigger the debounced API call for suggestions
-      if (newInputValue?.length > 0) {
-        debounceRefreshOptions(newInputValue);
-      } else {
+      if (reason === "input") {
+        // 2. Trigger the debounced API call for suggestions
+        if (newInputValue?.length > 0) {
+          debounceRefreshOptions(newInputValue);
+        } else {
+          setOptions([]); // Clear options if input is empty
+        }
+
+        // 3. Update Redux (Synchronously or via Debounce)
+        // If you don't need Redux to know the value on every single keystroke,
+        // consider debouncing this too.
+        dispatch(updateSearchText(newInputValue));
+      } else if (reason === "clear") {
+        // Press the cross-button in the text field
+        dispatch(updateSearchText(""));
         setOptions([]); // Clear options if input is empty
+        // Do not minimized it if user just press clear button
+        setIsSearchbarActive(true);
       }
-
-      // 3. Update Redux (Synchronously or via Debounce)
-      // If you don't need Redux to know the value on every single keystroke,
-      // consider debouncing this too.
-      dispatch(updateSearchText(newInputValue));
     },
     [debounceRefreshOptions, dispatch]
   );
@@ -214,11 +237,9 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   // Listen to isSearchbarActive | searchInput.length to update shouldExpandSearchbar with Header
   // Searchbar will keep expanded if searchbar is active or there exists a text input
   useEffect(() => {
-    if (isSearchbarActive || (searchInput && searchInput.length > 0)) {
-      setShouldExpandSearchbar?.(true);
-    } else {
-      setShouldExpandSearchbar?.(false);
-    }
+    setShouldExpandSearchbar?.(
+      isSearchbarActive || (searchInput !== undefined && searchInput.length > 0)
+    );
   }, [isSearchbarActive, searchInput, setShouldExpandSearchbar]);
 
   useEffect(() => {

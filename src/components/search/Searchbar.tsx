@@ -1,6 +1,7 @@
 import React, {
   Dispatch,
   FC,
+  KeyboardEvent,
   useCallback,
   useEffect,
   useMemo,
@@ -32,6 +33,7 @@ import {
   ParameterState,
   unFlattenToParameterState,
   updateParameterStates,
+  updateSearchText,
 } from "../common/store/componentParamReducer";
 import { useAppDispatch } from "../common/store/hooks";
 
@@ -80,7 +82,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
 
   const handleEnterPressed = useCallback(
     (
-      event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>,
+      event: KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>,
       isSearchbarFocused: boolean
     ) => {
       // TODO: a more user-friendly way to execute 'enter' press function is to delay the search to wait for pendingSearch turn to true
@@ -88,10 +90,11 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
       // considering the debounce (300ms) and fetchSuggesterOptions(quite fast according to experience with edge) is not very long
       // we may implement this later if gap is too big
       if (event.key === "Enter" && !isSearchbarFocused && !pendingSearch) {
+        dispatch(updateSearchText(event.currentTarget.value));
         redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
       }
     },
-    [pendingSearch, redirectSearch]
+    [dispatch, pendingSearch, redirectSearch]
   );
 
   const handleClickButton = useCallback(
