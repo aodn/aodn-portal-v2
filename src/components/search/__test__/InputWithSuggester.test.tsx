@@ -129,6 +129,8 @@ describe("InputWithSuggester", () => {
     const input = screen.getByTestId("input-with-suggester");
 
     // 1. Type something to make the clear button appear
+    await user.click(input);
+    await user.clear(input);
     await user.type(input, "wave");
 
     await waitFor(() => {
