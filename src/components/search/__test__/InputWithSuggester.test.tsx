@@ -154,4 +154,41 @@ describe("InputWithSuggester", () => {
     // Check that the listbox is gone (since options are cleared on 'clear' reason)
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
   });
+
+  it("deactivates the searchbar when it loses focus (onBlur)", async () => {
+    const user = userEvent.setup();
+    const input = screen.getByTestId("input-with-suggester");
+
+    // 1. Focus the input and type something to make it active
+    await user.click(input);
+    await user.type(input, "wave");
+
+    // Verify it is currently active
+    await waitFor(() => {
+      expect(mockSetShouldExpandSearchbar).toHaveBeenCalledWith(true);
+    });
+
+    // 2. Tab away to trigger loss of focus (blur)
+    // Alternatively: await user.click(document.body);
+    await user.tab();
+
+    // 3. Verify the searchbar still active if you have text
+    await waitFor(() => {
+      // We look for the last call to ensure it ended up as false
+      expect(mockSetShouldExpandSearchbar).toHaveBeenLastCalledWith(true);
+    });
+
+    // Find and click the clear button (MUI uses 'aria-label="Clear"'), this time if
+    // lost focus the searchbar should not expand
+    const clearButton = screen.getByLabelText("Clear");
+    await user.click(clearButton);
+    await user.tab();
+    await waitFor(() => {
+      // We look for the last call to ensure it ended up as false
+      expect(mockSetShouldExpandSearchbar).toHaveBeenLastCalledWith(false);
+    });
+
+    // 4. Verify suggestions are cleared (as per your handleSearchbarClose logic)
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+  });
 });
