@@ -146,9 +146,11 @@ def test_sort_and_view_states_persist_with_url(
 
     search_page.result_sort_button.click()
     search_page.click_text(sort_type.display_name, exact=True)
+    search_page.wait_for_page_stabilization()
 
     search_page.result_view_button.click()
     search_page.click_text(view_type.display_name, exact=True)
+    search_page.wait_for_page_stabilization()
 
     # Use the current page URL and open a new tab with the same URL
     current_url = search_page.url
