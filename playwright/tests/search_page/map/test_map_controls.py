@@ -52,6 +52,8 @@ def test_map_reference_layers(
 
     search_page.map.reference_layer_menu.click()
     search_page.click_text(layer_text)
+    search_page.wait_for_page_stabilization()
+
     layer_id = layer_factory.get_layer_id(layer_type)
     assert search_page.map.is_map_layer_visible(layer_id) is True
 

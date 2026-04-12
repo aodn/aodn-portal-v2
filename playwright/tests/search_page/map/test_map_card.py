@@ -65,11 +65,14 @@ def test_map_card_popup_download_button_in_mobile(
     search_page.result_view_button.click()
     search_page.full_map_view_button.click()
     search_page.wait_for_page_stabilization()
-    if search_page.main_map.is_visible():
-        search_page.map.wait_for_map_idle()
+    search_page.main_map.wait_for(state='visible')
+    search_page.map.wait_for_map_idle()
 
     search_page.map.find_and_click_data_point(data_id)
-    search_page.result_card_download_button.last.click()
+
+    popup_download_btn = search_page.page.locator('#card-popup').get_by_test_id('result-card-button-Download').last
+    popup_download_btn.wait_for(state='visible')
+    popup_download_btn.click()
     search_page.wait_for_page_stabilization()
 
     detail_page.return_button.click()
