@@ -66,7 +66,7 @@ const StaticLayer: FC<Partial<StaticLayersProps>> = ({
   }, [id, map]);
 
   const createLayer = useCallback(() => {
-    if (map?.getSource(sourceId)) return true;
+    if (!features || map?.getSource(sourceId)) return;
 
     map?.addSource(sourceId, {
       type: "geojson",
@@ -118,10 +118,10 @@ const StaticLayer: FC<Partial<StaticLayersProps>> = ({
   useEffect(() => {
     if (map === null) return;
 
-    // Only create once, the strict mode causes twice call.
+    // Only create once, the strict mode causes twice call, do not put
+    // return here as we need to destroy the layer.
     if (!isCreatedRef.current) {
       createLayer();
-      return;
     }
 
     return () => {
@@ -131,6 +131,7 @@ const StaticLayer: FC<Partial<StaticLayersProps>> = ({
           map?.removeLayer(layerLabelId);
           map?.removeLayer(layerId);
           map?.removeSource(sourceId);
+          isCreatedRef.current = false;
         }
       } catch (error) {
         // OK to ignore error here
@@ -160,8 +161,8 @@ const StaticLayer: FC<Partial<StaticLayersProps>> = ({
 // A shortcut for Australian marine parks
 const MarineParkLayer: FC<StaticLayersProps> = (props) => {
   const [data, setData] = useState<
-    FeatureCollection<Polygon> | FeatureCollection<MultiPolygon>
-  >();
+    FeatureCollection<Polygon> | FeatureCollection<MultiPolygon> | undefined
+  >(undefined);
 
   // Data orginated from here, we store a copy in the following path and useEffect to load it so we do not need to bundle it to the package which make is very big
   // https://data.gov.au/dataset/ds-dcceew-https%3A%2F%2Fwww.arcgis.com%2Fhome%2Fitem.html%3Fid%3D2b3eb1d42b8d4319900cf4777f0a83b9%26sublayer%3D0/details?q=marine%20park

@@ -41,11 +41,12 @@ def test_sort_and_view_states_persist_across_page(
 
     landing_page.load()
     landing_page.search.click_search_button()
-    search_page.page.wait_for_timeout(5000)
+    search_page.wait_for_page_stabilization()
 
     # Change the sort and view types
     search_page.result_sort_button.click()
     search_page.click_text(sort_type.display_name, exact=True)
+
     search_page.result_view_button.click()
     search_page.click_text(view_type.display_name, exact=True)
 
@@ -109,11 +110,11 @@ def test_sort_and_view_states_persist_after_map_toggle(
     search_page.result_view_button.click()
     search_page.wait_for_page_stabilization()
     search_page.click_text(view_type.display_name, exact=True)
+    search_page.wait_for_page_stabilization()
     if view_type == SearchViewLayouts.GRID:
         expect(search_page.result_grid).to_be_visible()
 
     search_page.map_toggle_button.click()
-    search_page.wait_for_page_stabilization()
     search_page.map.wait_for_map_idle()
 
     search_page.map_toggle_button.click()
@@ -145,9 +146,11 @@ def test_sort_and_view_states_persist_with_url(
     search_page.wait_for_page_stabilization()
 
     search_page.result_sort_button.click()
+    search_page.wait_for_page_stabilization()
     search_page.click_text(sort_type.display_name, exact=True)
 
     search_page.result_view_button.click()
+    search_page.wait_for_page_stabilization()
     search_page.click_text(view_type.display_name, exact=True)
 
     # Use the current page URL and open a new tab with the same URL
