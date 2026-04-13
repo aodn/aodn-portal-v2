@@ -10,7 +10,7 @@ interface HealthCheckerProps {
 const HealthChecker: React.FC<HealthCheckerProps> = ({ children }) => {
   const dispatch = useAppDispatch();
   // Track health status: null = checking, true = healthy, false = unhealthy
-  const [isHealthyState, setIsHealthyState] = useState<boolean | null>(null);
+  const [isHealthy, setIsHealthy] = useState<boolean>(true);
 
   const checkHealthStatus = useCallback(async (): Promise<boolean> => {
     try {
@@ -30,13 +30,13 @@ const HealthChecker: React.FC<HealthCheckerProps> = ({ children }) => {
     let isMounted = true;
 
     const checkHealth = async () => {
-      const healthy = await checkHealthStatus();
+      const healthStatus = await checkHealthStatus();
       if (isMounted) {
-        setIsHealthyState(healthy);
+        setIsHealthy(healthStatus);
       }
     };
 
-    checkHealth(); // initial check
+    checkHealth().then(); // initial check
     const interval = setInterval(checkHealth, 30000); // every 30s
 
     return () => {
@@ -47,7 +47,7 @@ const HealthChecker: React.FC<HealthCheckerProps> = ({ children }) => {
 
   // While checking health status, render children (optimistic)
   // This prevents flickering on initial load
-  if (isHealthyState === null || isHealthyState === true) {
+  if (isHealthy) {
     return <>{children}</>;
   }
 
