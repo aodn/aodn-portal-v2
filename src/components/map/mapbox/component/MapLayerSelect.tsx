@@ -84,6 +84,7 @@ const MapLayerSelect: FC<MapLayerSelectProps> = ({
             p: "12px",
           }}
           gap={1}
+          data-testid="layer-select-loading"
         >
           <Typography
             sx={{
