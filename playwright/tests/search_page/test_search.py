@@ -347,7 +347,7 @@ def test_repeated_search_action(
     search_page.click_text(view_type.display_name, exact=True)
     search_page.wait_for_page_stabilization()
 
-    def search_and_wait():
+    def search_and_wait() -> None:
         search_page.search.click_search_button()
         search_page.wait_for_search_to_complete()
         if search_page.main_map.is_visible():
