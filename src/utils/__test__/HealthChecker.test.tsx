@@ -29,9 +29,7 @@ describe("HealthChecker", () => {
     };
 
     // mockDispatch should return an object having unwrap() that resolves to healthy
-    mockDispatch.mockReturnValueOnce({
-      unwrap: () => Promise.resolve(healthy),
-    });
+    mockDispatch.mockReturnValue({ unwrap: () => Promise.resolve(healthy) });
 
     render(
       <HealthChecker>
@@ -39,7 +37,10 @@ describe("HealthChecker", () => {
       </HealthChecker>
     );
 
-    // Assert that children appear (HealthChecker will call the thunk once)
+    // Children should be visible initially (optimistic rendering)
+    expect(screen.getByText("CHILDREN")).toBeInTheDocument();
+
+    // After health check completes, children should still be visible
     await waitFor(() =>
       expect(screen.getByText("CHILDREN")).toBeInTheDocument()
     );
@@ -51,9 +52,7 @@ describe("HealthChecker", () => {
       components: { ogcApiHealth: { status: "DOWN" } },
     };
 
-    mockDispatch.mockReturnValueOnce({
-      unwrap: () => Promise.resolve(unhealthy),
-    });
+    mockDispatch.mockReturnValue({ unwrap: () => Promise.resolve(unhealthy) });
 
     render(
       <HealthChecker>
@@ -61,14 +60,17 @@ describe("HealthChecker", () => {
       </HealthChecker>
     );
 
-    // Expect degraded placeholder
+    // Initially children are shown (optimistic)
+    expect(screen.getByText("CHILDREN")).toBeInTheDocument();
+
+    // After health check completes, degraded page should be shown
     await waitFor(() =>
       expect(screen.getByText("DEGRADED_PAGE")).toBeInTheDocument()
     );
   });
 
   test("shows degraded page when dispatch throws", async () => {
-    mockDispatch.mockReturnValueOnce({
+    mockDispatch.mockReturnValue({
       unwrap: () => Promise.reject(new Error("fail")),
     });
 
@@ -78,6 +80,10 @@ describe("HealthChecker", () => {
       </HealthChecker>
     );
 
+    // Initially children are shown (optimistic)
+    expect(screen.getByText("CHILDREN")).toBeInTheDocument();
+
+    // After health check fails, degraded page should be shown
     await waitFor(() =>
       expect(screen.getByText("DEGRADED_PAGE")).toBeInTheDocument()
     );
