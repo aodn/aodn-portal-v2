@@ -30,6 +30,7 @@ const HeaderIconMenu: FC = () => {
   return (
     <>
       <IconButton
+        edge="end"
         onClick={handleClick}
         sx={{
           backgroundColor: "transparent",
