@@ -8,6 +8,15 @@ import ErrorBoundary from "./ErrorBoundary";
 import { pageDefault } from "../components/common/constants";
 import HealthChecker from "./HealthChecker";
 import DegradedPage from "../pages/error-page/DegradedPage";
+import React from "react";
+
+// Helper to conditionally wrap a page with HealthChecker based on the mode
+const wrapWithHealthChecker = (node: React.ReactNode) =>
+  import.meta.env.MODE !== "playwright-local" ? (
+    <HealthChecker>{node}</HealthChecker>
+  ) : (
+    node
+  );
 
 export const searchLoader = ({ request }: { request: Request }) => {
   const url = new URL(request.url);
@@ -26,10 +35,7 @@ const router = createBrowserRouter([
   {
     path: pageDefault.landing,
     element: (
-      <ErrorBoundary>
-        {import.meta.env.MODE !== "playwright-local" && <HealthChecker />}
-        <LandingPage />
-      </ErrorBoundary>
+      <ErrorBoundary>{wrapWithHealthChecker(<LandingPage />)}</ErrorBoundary>
     ),
     children: [],
   },
@@ -37,20 +43,14 @@ const router = createBrowserRouter([
     path: pageDefault.search,
     loader: searchLoader,
     element: (
-      <ErrorBoundary>
-        {import.meta.env.MODE !== "playwright-local" && <HealthChecker />}
-        <SearchPage />
-      </ErrorBoundary>
+      <ErrorBoundary>{wrapWithHealthChecker(<SearchPage />)}</ErrorBoundary>
     ),
     children: [],
   },
   {
     path: `${pageDefault.details}/:uuid`,
     element: (
-      <ErrorBoundary>
-        {import.meta.env.MODE !== "playwright-local" && <HealthChecker />}
-        <DetailsPage />
-      </ErrorBoundary>
+      <ErrorBoundary>{wrapWithHealthChecker(<DetailsPage />)}</ErrorBoundary>
     ),
     children: [],
   },

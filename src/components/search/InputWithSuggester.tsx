@@ -234,6 +234,11 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     [handleEnterPressed]
   );
 
+  const handleBlur = useCallback(() => {
+    // Logic to deactivate the search bar
+    setIsSearchbarActive(false);
+  }, [setIsSearchbarActive]);
+
   // Listen to isSearchbarActive | searchInput.length to update shouldExpandSearchbar with Header
   // Searchbar will keep expanded if searchbar is active or there exists a text input
   useEffect(() => {
@@ -320,6 +325,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
       PopperComponent={CustomPopper}
       PaperComponent={CustomPaper}
       open={isSearchbarActive && options.length > 0}
+      onBlur={handleBlur}
       onOpen={handleSearchbarOpen}
       onClose={handleSearchbarClose}
       value={inputValue}
