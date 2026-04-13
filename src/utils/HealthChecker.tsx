@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../components/common/store/hooks";
 import { fetchSystemHealthNoStore } from "../components/common/store/searchReducer";
 import DegradedPage from "../pages/error-page/DegradedPage";
@@ -22,6 +21,7 @@ const HealthChecker: React.FC<HealthCheckerProps> = ({ children }) => {
       ).toUpperCase();
       return status === "UP" && ogcStatus === "UP";
     } catch (err) {
+      console.error("Error checking system health:", err);
       return false;
     }
   }, [dispatch]);
