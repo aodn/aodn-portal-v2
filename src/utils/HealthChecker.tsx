@@ -43,7 +43,7 @@ const HealthChecker: React.FC<HealthCheckerProps> = ({ children }) => {
     return () => clearInterval(interval);
   }, [dispatch, isHealthy, children]);
 
-  return componentToRender; // render children or degraded component
+  return <>{componentToRender}</>; // render children or degraded component
 };
 
 export default HealthChecker;
