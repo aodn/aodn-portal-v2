@@ -6,11 +6,13 @@ export const MenuIcon = ({
   ...prop
 }: SvgIconProps) => (
   <SvgIcon
+    data-testid="MenuIcon"
     width={width}
     height={height}
     viewBox="0 0 30 30"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
+    {...prop}
   >
     <path
       d="M4.6875 8.4375H25.3125M4.6875 15H25.3125M15 21.5625H25.3125"
