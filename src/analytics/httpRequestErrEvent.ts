@@ -28,12 +28,20 @@ type HttpErrorPayload = {
   status_text: string;
   message: string;
   details?: string;
+  retry_count: number;
 };
 
 type BackendErrorBody = {
   message?: string;
   details?: string;
 };
+
+// axios-retry stores state under this key on the request config
+type AxiosRetryState = { retryCount?: number };
+const getRetryCount = (error: AxiosError): number =>
+  (error.config as { ["axios-retry"]?: AxiosRetryState } | undefined)?.[
+    "axios-retry"
+  ]?.retryCount ?? 0;
 
 const truncate = (value: unknown): string => {
   if (value === undefined || value === null) return "";
@@ -54,6 +62,7 @@ const fromAxiosResponse = (
   status_text: truncate(error.response!.statusText),
   message: truncate(error.response!.data?.message),
   details: truncate(error.response!.data?.details),
+  retry_count: getRetryCount(error),
 });
 
 const fromAxiosNetworkError = (error: AxiosError): HttpErrorPayload => ({
@@ -62,6 +71,7 @@ const fromAxiosNetworkError = (error: AxiosError): HttpErrorPayload => ({
   status: 0,
   status_text: error.code ?? "NETWORK_ERROR",
   message: truncate(error.message),
+  retry_count: getRetryCount(error),
 });
 
 const fromUnknownError = (error: unknown): HttpErrorPayload => ({
@@ -70,6 +80,7 @@ const fromUnknownError = (error: unknown): HttpErrorPayload => ({
   status: 0,
   status_text: "UNKNOWN_ERROR",
   message: truncate((error as Error)?.message),
+  retry_count: 0,
 });
 
 const buildPayload = (error: unknown): HttpErrorPayload => {

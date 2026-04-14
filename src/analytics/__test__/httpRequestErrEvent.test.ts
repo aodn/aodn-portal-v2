@@ -15,6 +15,7 @@ import {
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import axios from "axios";
+import axiosRetry from "axios-retry";
 import { trackHttpRequestError } from "../httpRequestErrEvent";
 import { AnalyticsEvent } from "../analyticsEvents";
 
@@ -68,6 +69,7 @@ describe("trackHttpRequestError", () => {
           status: 500,
           message: "boom",
           details: "stacktrace here",
+          retry_count: 0,
         })
       );
     });
@@ -91,7 +93,33 @@ describe("trackHttpRequestError", () => {
       expect(mockedTrackCustomEvent).toHaveBeenCalledTimes(1);
       expect(mockedTrackCustomEvent).toHaveBeenCalledWith(
         AnalyticsEvent.HTTP_REQUEST_ERRORS,
-        expect.objectContaining({ status: 0, method: "GET" })
+        expect.objectContaining({ status: 0, method: "GET", retry_count: 0 })
+      );
+    });
+  });
+
+  describe("when axios-retry retries before giving up", () => {
+    it("records how many retries happened in retry_count", async () => {
+      let hits = 0;
+      server.use(
+        http.get(`${BASE_URL}/flaky`, () => {
+          hits += 1;
+          return HttpResponse.json({ message: "nope" }, { status: 500 });
+        })
+      );
+
+      const retryingClient = axios.create();
+      axiosRetry(retryingClient, { retries: 2, retryDelay: () => 0 });
+
+      await retryingClient
+        .get(`${BASE_URL}/flaky`)
+        .catch(trackHttpRequestError);
+
+      expect(hits).toBe(3); // 1 original + 2 retries
+      expect(mockedTrackCustomEvent).toHaveBeenCalledTimes(1);
+      expect(mockedTrackCustomEvent).toHaveBeenCalledWith(
+        AnalyticsEvent.HTTP_REQUEST_ERRORS,
+        expect.objectContaining({ status: 500, retry_count: 2 })
       );
     });
   });
