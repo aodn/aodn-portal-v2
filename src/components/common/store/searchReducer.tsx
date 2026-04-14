@@ -583,7 +583,7 @@ const fetchSystemHealthNoStore = createAsyncThunk<
   Health,
   void,
   { rejectValue: ErrorResponse }
->("system/fetchSystemHealthNoStore", async (thunkApi: any) =>
+>("system/fetchSystemHealthNoStore", async (_, thunkApi) =>
   ogcAxiosWithRetry
     .get<Health>("/ogc/manage/health")
     .then((response) => response.data)
