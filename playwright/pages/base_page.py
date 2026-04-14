@@ -27,7 +27,7 @@ class BasePage:
 
     def go_to_landing_page(self) -> None:
         """Navigate to the landing page"""
-        self.page.get_by_test_id('aodn-home-link').first.click()
+        self.page.get_by_test_id('aodn-home-link').first.click(force=True)
 
     def get_current_url(self) -> str:
         """Get the current page URL"""

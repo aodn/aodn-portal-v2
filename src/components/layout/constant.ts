@@ -25,4 +25,4 @@ export const AODN_SITE_LOGO_HEIGHT = "72px";
 export const AODN_SITE_LOGO_HEIGHT_MOBILE = "50px";
 
 export const HEADER_HEIGHT = 150;
-export const HEADER_HEIGHT_MOBILE = 85;
+export const HEADER_HEIGHT_MOBILE = 80;

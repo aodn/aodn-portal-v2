@@ -63,9 +63,9 @@ class SearchComponent(BasePage):
         )
 
     def assert_toggle_button_pressed(
-        self, name: str, pressed: bool = True
+        self, name: str, pressed: bool = True, exact: bool = True
     ) -> None:
-        button = self.get_button(name)
+        button = self.get_button(name, exact=exact)
         expected_value = 'true' if pressed else 'false'
         expect(button).to_have_attribute('aria-pressed', expected_value)
 
@@ -86,33 +86,41 @@ class SearchComponent(BasePage):
         """
         self.date_button.click()
         self.get_radio_input(date).click()
-        self.wait_for_timeout(300)
+        expect(self.get_radio_input(date)).to_be_checked()
 
         self.location_button.click()
         self.get_radio_input(location).click()
-        self.wait_for_timeout(300)
+        expect(self.get_radio_input(location)).to_be_checked()
 
         self.filter_button.click()
+        expect(self.searchbar_popup).to_be_visible()
         if isinstance(filter_parameter, str):
             self.get_button(filter_parameter, exact=False).click()
+            self.assert_toggle_button_pressed(filter_parameter, exact=False)
         else:
             for parameter in filter_parameter:
                 self.get_button(parameter, exact=False).click()
+                self.assert_toggle_button_pressed(parameter, exact=False)
 
         self.filter_platform_tab.click()
         if isinstance(filter_platform, str):
             self.get_button(filter_platform).click()
+            self.assert_toggle_button_pressed(filter_platform)
         else:
             for platform in filter_platform:
                 self.get_button(platform).click()
+                self.assert_toggle_button_pressed(platform)
 
         self.filter_organisation_tab.click()
         self.get_button(filter_organisation).click()
+        self.assert_toggle_button_pressed(filter_organisation)
 
         self.filter_data_tab.click()
         self.get_button(filter_data).click()
+        self.assert_toggle_button_pressed(filter_data)
         if filter_data_download != '':
             self.get_button(filter_data_download).click()
+            self.assert_toggle_button_pressed(filter_data_download)
 
     def assert_search_state_persisted(
         self,

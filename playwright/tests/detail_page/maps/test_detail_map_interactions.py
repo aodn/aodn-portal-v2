@@ -178,7 +178,7 @@ def test_map_layer_persists_after_tab_navigation(
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(uuid)
-    detail_page.detail_map.wait_for_map_loading()
+    detail_page.detail_map.wait_for_map_idle()
 
     # Ensure that the Hex Grid and GeoServer options are displayed in the layers menu
     detail_page.detail_map.layers_menu.click()
