@@ -77,7 +77,8 @@ const Header: FC = () => {
       <SectionContainer
         sectionAreaStyle={{
           backgroundColor: "#fff",
-          paddingY: padding.medium,
+          height: isMobile ? "80px" : undefined,
+          paddingY: isMobile ? 0 : padding.medium,
         }}
         contentAreaStyle={{
           flexDirection: isMobile ? "column" : "row",
@@ -96,7 +97,7 @@ const Header: FC = () => {
           alignItems="center"
           justifyContent="space-between"
           width="100%"
-          sx={{ flex: 1 }}
+          sx={{ flex: 1, pl: isMobile ? "12px" : 0 }}
         >
           <AODNSiteLogo />
           {isLandingPage && !isMobile && (
