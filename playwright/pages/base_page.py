@@ -85,6 +85,10 @@ class BasePage:
         """Click on the given heading"""
         self.get_heading(text).click()
 
+    def click_menu_item(self, menu_name: str) -> None:
+        """Click on the given menu item"""
+        self.page.get_by_test_id(f'menuitem-{menu_name}').click()
+
     def get_radio_input(self, text: str) -> Locator:
         """Return the radio input element based on the visible label text"""
         return self.page.locator(

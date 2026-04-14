@@ -41,20 +41,18 @@ def test_sort_and_view_states_persist_across_page(
 
     landing_page.load()
     landing_page.search.click_search_button()
-    search_page.page.wait_for_timeout(5000)
 
     # Change the sort and view types
     search_page.result_sort_button.click()
-    search_page.click_text(sort_type.display_name, exact=True)
+    search_page.click_menu_item(sort_type.test_id)
     search_page.result_view_button.click()
-    search_page.click_text(view_type.display_name, exact=True)
+    search_page.click_menu_item(view_type.test_id)
 
     # Go to the landing page and return to check if the states persist
     search_page.go_to_landing_page()
     assert landing_page.is_loaded()
 
     landing_page.search.click_search_button()
-    search_page.wait_for_search_to_complete()
     expect(
         search_page.get_result_sort_button(sort_type.test_id)
     ).to_be_visible()
