@@ -1,43 +1,58 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useCallback, useEffect, useState } from "react";
 import { useAppDispatch } from "../components/common/store/hooks";
 import { fetchSystemHealthNoStore } from "../components/common/store/searchReducer";
-import { pageDefault } from "../components/common/constants";
+import DegradedPage from "../pages/error-page/DegradedPage";
 
-const HealthChecker = () => {
-  const navigate = useNavigate();
+interface HealthCheckerProps {
+  children?: React.ReactNode;
+}
+
+const HealthChecker: React.FC<HealthCheckerProps> = ({ children }) => {
   const dispatch = useAppDispatch();
-  const [_, setIsHealthy] = useState(true);
+  // Track health status: null = checking, true = healthy, false = unhealthy
+  const [isHealthy, setIsHealthy] = useState<boolean>(true);
+
+  const checkHealthStatus = useCallback(async (): Promise<boolean> => {
+    try {
+      const health = await dispatch(fetchSystemHealthNoStore()).unwrap();
+      const status = (health.status || "UNKNOWN").toUpperCase();
+      const ogcStatus = (
+        health.components?.ogcApiHealth?.status || "UNKNOWN"
+      ).toUpperCase();
+      return status === "UP" && ogcStatus === "UP";
+    } catch (err) {
+      console.error("Error checking system health:", err);
+      return false;
+    }
+  }, [dispatch]);
 
   useEffect(() => {
-    const checkHealth = () =>
-      dispatch(fetchSystemHealthNoStore())
-        .unwrap()
-        .then((health) => {
-          const status = health.status?.toUpperCase() || "UNKNOWN";
+    let isMounted = true;
 
-          if (
-            status !== "UP" ||
-            health.components.ogcApiHealth.status !== "UP"
-          ) {
-            setIsHealthy(false);
-            navigate(pageDefault.degraded, { replace: true });
-          } else {
-            setIsHealthy(true);
-          }
-        })
-        .catch(() => {
-          setIsHealthy(false);
-          navigate(pageDefault.degraded, { replace: true });
-        });
+    const checkHealth = async () => {
+      const healthStatus = await checkHealthStatus();
+      if (isMounted) {
+        setIsHealthy(healthStatus);
+      }
+    };
 
-    checkHealth(); // initial check
+    checkHealth().then(); // initial check
     const interval = setInterval(checkHealth, 30000); // every 30s
 
-    return () => clearInterval(interval);
-  }, [navigate, dispatch]);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [checkHealthStatus]);
 
-  return null; // invisible component
+  // While checking health status, render children (optimistic)
+  // This prevents flickering on initial load
+  if (isHealthy) {
+    return <>{children}</>;
+  }
+
+  // System is unhealthy
+  return <DegradedPage />;
 };
 
 export default HealthChecker;

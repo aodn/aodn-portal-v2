@@ -25,7 +25,7 @@ import DownloadSelect from "./DownloadSelect";
 const downloadFormats = [
   { label: "NetCDFs", value: "netcdf" },
   { label: "CSV", value: "csv" },
-  // { label: "GeoTIFF", value: "geotiff" }, // todo: now only works for some of the datasets
+  { label: "GeoTIFF", value: "geotiff" },
 ];
 
 interface DownloadCardProps extends DownloadCondition {
