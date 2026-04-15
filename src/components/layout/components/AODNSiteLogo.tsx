@@ -17,10 +17,14 @@ const AODNSiteLogo = () => {
       sx={{
         display: "flex",
         alignItems: "center",
-        justifyContent: "center",
+        justifyContent: "flex-start",
         height: isMobile ? AODN_SITE_LOGO_HEIGHT_MOBILE : AODN_SITE_LOGO_HEIGHT,
-        minWidth: "320px",
+        minWidth: isMobile ? "0" : "320px",
         cursor: "pointer",
+        "& svg": {
+          maxWidth: "100%",
+          height: "auto",
+        },
       }}
       href={pageDefault.landing}
       onClick={(e) => {

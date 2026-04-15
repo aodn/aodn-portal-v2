@@ -1,7 +1,7 @@
 import { FC, useCallback, useState } from "react";
 import { IconButton, Menu } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import MenuIcon from "@mui/icons-material/Menu";
+import { MenuIcon } from "../../../assets/icons/header/MenuIcon";
 import {
   borderRadius,
   color,
@@ -30,6 +30,7 @@ const HeaderIconMenu: FC = () => {
   return (
     <>
       <IconButton
+        edge="end"
         onClick={handleClick}
         sx={{
           backgroundColor: "transparent",
