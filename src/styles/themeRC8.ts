@@ -34,7 +34,8 @@ const rc8ThemeOptions: ThemeOptions = {
       },
       // Laptop
       [defaultTheme.breakpoints.between("md", "lg")]: {
-        fontSize: "64px",
+        fontSize: "40px",
+        lineHeight: "40px",
       },
       // Desktop
       [defaultTheme.breakpoints.between("lg", "xl")]: {
