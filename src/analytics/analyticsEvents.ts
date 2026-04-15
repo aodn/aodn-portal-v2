@@ -19,4 +19,5 @@ export enum AnalyticsEvent {
   WEB_VITALS_LCP = "web_vitals_lcp", // Largest Contentful Paint
   WEB_VITALS_INP = "web_vitals_inp", // Interaction to Next Paint
   WEB_VITALS_CLS = "web_vitals_cls", // Cumulative Layout Shift
+  HTTP_REQUEST_ERRORS = "http_request_errors",
 }
