@@ -89,7 +89,7 @@ def test_search_result_sort(
         )
 
     search_page.result_sort_button.click()
-    search_page.click_text(sort_type.display_name, exact=True)
+    search_page.click_menu_item(sort_type.test_id)
     search_page.wait_for_timeout(1000)  # Wait for the results to update
 
     updated_first_title = search_page.first_result_title.inner_text()
@@ -338,14 +338,12 @@ def test_repeated_search_action(
     search_page = SearchPage(desktop_page)
     landing_page.load()
     landing_page.search.click_search_button()
-    search_page.wait_for_search_to_complete()
-    if search_page.main_map.is_visible():
-        search_page.map.wait_for_map_idle()
+    search_page.wait_for_page_stabilization()
 
     # Set view type
     search_page.result_view_button.click()
-    search_page.click_text(view_type.display_name, exact=True)
-    search_page.wait_for_page_stabilization()
+    search_page.click_menu_item(view_type.test_id)
+    # search_page.wait_for_page_stabilization()
 
     def search_and_wait() -> None:
         search_page.search.click_search_button()
