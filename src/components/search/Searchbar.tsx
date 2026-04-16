@@ -35,7 +35,7 @@ import {
   updateParameterStates,
   updateSearchText,
 } from "../common/store/componentParamReducer";
-import { useAppDispatch } from "../common/store/hooks";
+import { useAppDispatch, useAppSelector } from "../common/store/hooks";
 
 interface SearchbarProps {
   setShouldExpandSearchbar?: Dispatch<React.SetStateAction<boolean>>;
@@ -44,7 +44,9 @@ interface SearchbarProps {
 const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
   const location = useLocation();
   const dispatch = useAppDispatch();
+  const searchInput = useAppSelector((state) => state.paramReducer.searchText);
   const { isMobile, isTablet } = useBreakpoint();
+  const isTooLong = searchInput && searchInput.length >= 8;
   const [open, setOpen] = useState(false);
   const [boxRef, setBoxRef] = useState<HTMLDivElement | null>(null);
   const [activeButton, setActiveButton] = useState<SearchbarButtonNames>(
@@ -154,7 +156,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
         sx={{
           display: "flex",
           flexDirection: {
-            xs: location.pathname === pageDefault.search ? "row" : "column",
+            xs: isTooLong ? "column" : "row",
             sm: "row",
           },
           alignItems: "center",
@@ -180,14 +182,12 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
           activeButton={activeButton}
           handleClickButton={handleClickButton}
           shouldExpandAllButtons={shouldExpandAllButtons}
-          shouldShrinkAllButtons={
-            isMobile && location.pathname === pageDefault.search
-          }
+          shouldShrinkAllButtons={isMobile && !isTooLong}
           isPopupOpen={open}
           sx={{
             pr: gap.md,
             width:
-              isMobile && location.pathname === pageDefault.landing
+              isMobile && location.pathname === pageDefault.landing && isTooLong
                 ? "100%"
                 : "auto",
           }}
