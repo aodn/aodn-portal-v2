@@ -18,6 +18,7 @@ import Searchbar from "../../search/Searchbar";
 import {
   PAGE_CONTENT_MAX_WIDTH,
   PAGE_CONTENT_WIDTH_ABOVE_LAPTOP,
+  PAGE_CONTENT_WIDTH_UNDER_LAPTOP,
   SEARCHBAR_CONTENT_WIDTH,
 } from "../constant";
 import {
@@ -76,13 +77,16 @@ const Header: FC = () => {
       <SectionContainer
         sectionAreaStyle={{
           backgroundColor: "#fff",
-          paddingY: padding.medium,
+          height: isMobile ? "80px" : undefined,
+          paddingY: isMobile ? 0 : padding.medium,
         }}
         contentAreaStyle={{
           flexDirection: isMobile ? "column" : "row",
           width: isSearchResultPage
             ? SEARCHBAR_CONTENT_WIDTH
-            : PAGE_CONTENT_WIDTH_ABOVE_LAPTOP,
+            : isUnderLaptop
+              ? PAGE_CONTENT_WIDTH_UNDER_LAPTOP
+              : PAGE_CONTENT_WIDTH_ABOVE_LAPTOP,
           maxWidth: isSearchResultPage
             ? SEARCHBAR_CONTENT_WIDTH
             : PAGE_CONTENT_MAX_WIDTH,
@@ -93,7 +97,7 @@ const Header: FC = () => {
           alignItems="center"
           justifyContent="space-between"
           width="100%"
-          sx={{ flex: 1 }}
+          sx={{ flex: 1, pl: isMobile ? "12px" : 0 }}
         >
           <AODNSiteLogo />
           {isLandingPage && !isMobile && (

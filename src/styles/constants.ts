@@ -41,32 +41,15 @@ const padding = {
   triple: "45px",
   quadruple: "60px",
 };
-
+// Should only remove, do not add, use theme please
 const fontSize = {
-  AODNSiteLogoText: "17px",
-  AODNSiteLogoTextMobile: "14px",
-  bannerTitleExtraLarge: "64px",
-  bannerTitleLarge: "48px",
-  bannerTitleMedium: "36px",
-  bannerTitleSmall: "28px",
-  bannerSubtitle: "16px",
-  bannerSubtitleSmall: "10px",
-  mapMenuItem: 14,
-  mapMenuSubItem: 13,
-  detailPageHeading: "20px",
-  detailPageHeadingMobile: "14px",
   newsHeading: "40px",
   newsTitle: "20px",
-  slideCardTitle: "16px",
-  slideCardSubTitle: "14px",
-  newsLabel: "16px",
   newsInfo: "14px",
   subscription: "14px",
   icon: "10px",
   label: "12px",
   info: "14px",
-  resultCardTitle: "14px",
-  resultCardTitleUnderLaptop: "12px",
   resultCardContent: "12px",
   resultCardContentUnderLaptop: "12px",
 };
