@@ -173,6 +173,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
           setShouldExpandSearchbar={setShouldExpandSearchbar}
           setShouldExpandAllButtons={setShouldExpandAllButtons}
           suggesterWidth={searchbarWidth}
+          containerRef={boxRef}
         />
         <SearchbarButtonGroup
           pendingSearch={pendingSearch}

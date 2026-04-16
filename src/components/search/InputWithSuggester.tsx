@@ -38,6 +38,7 @@ import useBreakpoint from "../../hooks/useBreakpoint";
 import { portalTheme } from "../../styles";
 
 interface InputWithSuggesterProps {
+  containerRef?: HTMLDivElement | null;
   handleEnterPressed?: (
     event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>,
     isSearchbarFocused: boolean
@@ -85,6 +86,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   setShouldExpandSearchbar,
   setShouldExpandAllButtons,
   suggesterWidth = 0,
+  containerRef,
 }) => {
   const location = useLocation();
   const dispatch = useAppDispatch();
@@ -260,6 +262,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
       return (
         <Popper
           {...props}
+          anchorEl={containerRef || props.anchorEl}
           placement="bottom-start"
           modifiers={[
             {
@@ -280,7 +283,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
         />
       );
     },
-    [suggesterWidth]
+    [suggesterWidth, containerRef]
   );
 
   // Input suggester paper
