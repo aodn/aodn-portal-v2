@@ -32,6 +32,7 @@ import {
   getMultiPolygonFrom,
 } from "../../../utils/DownloadConditionUtils";
 import { trackSearchResultParameters } from "../../../analytics/searchParamsEvent";
+import { trackHttpRequestError } from "../../../analytics/httpRequestErrEvent";
 import {
   MapFeatureRequest,
   MapFeatureResponse,
@@ -155,6 +156,17 @@ axiosRetry(ogcAxiosWithRetry, {
     return isRetryableError(error);
   },
 });
+
+// Centralized HTTP error tracking — fires once per final failure
+// (after retries), so every request through this instance is covered.
+ogcAxiosWithRetry.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    trackHttpRequestError(error);
+    return Promise.reject(error);
+  }
+);
+
 /**
  Define search functions
  */

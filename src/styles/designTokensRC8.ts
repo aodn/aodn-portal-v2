@@ -14,6 +14,7 @@
  * @version RC8
  */
 
+import { fontStyle } from "@mui/system";
 import { FONT_FAMILIES } from "./fontsRC8";
 
 export const designTokensRC8 = {
@@ -32,7 +33,7 @@ export const designTokensRC8 = {
       // Slogan styles - Size: 64, Line Height: 96
       slogan1: {
         fontFamily: FONT_FAMILIES.poppins,
-        fontSize: "64px",
+        fontStyle: "normal",
         fontWeight: 500,
         lineHeight: "96px",
         color: "#090C02",
@@ -41,10 +42,18 @@ export const designTokensRC8 = {
       // Slogan styles - Size: 48, Line Height: 72
       slogan2: {
         fontFamily: FONT_FAMILIES.poppins,
-        fontSize: "48px",
-        fontWeight: 300,
+        fontStyle: "normal",
+        fontWeight: 275,
         lineHeight: "72px",
         color: "#090C02",
+      },
+
+      // Slogan styles - Size: 48, Line Height: 72
+      slogan3: {
+        fontFamily: FONT_FAMILIES.openSans,
+        fontWeight: 400,
+        lineHeight: "22px",
+        color: "#3C3C3C",
       },
 
       // Heading styles - Size: 40, Line Height: 48
