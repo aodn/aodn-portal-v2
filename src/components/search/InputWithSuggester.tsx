@@ -17,6 +17,7 @@ import {
   Popper,
   TextField,
 } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 import {
   ParameterState,
   updateSearchText,
@@ -302,14 +303,12 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
             "& .MuiAutocomplete-option": {
               color: "#000",
               borderRadius: borderRadius.small,
-              "&[aria-selected='true']": {
-                backgroundColor: color.blue.xLight,
-              },
               "&.Mui-focused": {
                 backgroundColor: `${color.blue.xLight} !important`,
               },
-              "&:hover": {
-                backgroundColor: color.blue.xLight,
+              "&.Mui-focused svg": {
+                // show only on focused
+                display: "block",
               },
             },
           }}
@@ -381,6 +380,13 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
             }}
           />
         </Box>
+      )}
+      renderOption={(props, option) => (
+        <li {...props}>
+          {option}
+          {/* hidden by default, shown on focus, check sx in CustomPaper */}
+          <SearchIcon sx={{ display: "none", ml: "auto" }} />
+        </li>
       )}
     />
   );
