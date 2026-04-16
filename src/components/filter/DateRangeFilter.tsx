@@ -11,6 +11,7 @@ import {
 import dayjs, { Dayjs } from "dayjs";
 import {
   Box,
+  Divider,
   FormControl,
   FormControlLabel,
   Grid,
@@ -54,6 +55,7 @@ import useBreakpoint from "../../hooks/useBreakpoint";
 enum DateRangeOptionValues {
   Custom = "custom",
   LastYear = 1,
+  LastThreeYears = 3,
   LastFiveYears = 5,
   LastTenYears = 10,
 }
@@ -69,6 +71,7 @@ interface DateRangeOption {
 const dateRangeOptions: DateRangeOption[] = [
   { label: "Custom", value: DateRangeOptionValues.Custom },
   { label: "Last Year", value: DateRangeOptionValues.LastYear },
+  { label: "Last 3 Years", value: DateRangeOptionValues.LastThreeYears },
   { label: "Last 5 Years", value: DateRangeOptionValues.LastFiveYears },
   { label: "Last 10 Years", value: DateRangeOptionValues.LastTenYears },
 ];
@@ -342,50 +345,6 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
               <CloseIcon sx={{ fontSize: fontSize.info }} />
             </IconButton>
           </Box>
-          <Grid
-            item
-            xs={isMobile || isTablet ? 12 : 2}
-            display="flex"
-            justifyContent="center"
-            alignItems="start"
-          >
-            <Box
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-              p={padding.large}
-              pt={isMobile || isTablet ? padding.large : padding.triple}
-            >
-              <FormControl>
-                <RadioGroup
-                  defaultValue={DateRangeOptionValues.Custom}
-                  value={selectedOption}
-                  onChange={handleRadioChange}
-                  sx={{
-                    flexDirection: { xs: "column", sm: "row", md: "column" },
-                  }}
-                >
-                  {dateRangeOptions.map((item) => (
-                    <FormControlLabel
-                      value={item.value}
-                      control={<Radio />}
-                      label={item.label}
-                      key={item.value}
-                      data-testid={`radio-${item.label}`}
-                      sx={{
-                        ".MuiFormControlLabel-label": {
-                          fontFamily: fontFamily.general,
-                          fontSize: fontSize.info,
-                          padding: 0,
-                        },
-                      }}
-                    />
-                  ))}
-                </RadioGroup>
-              </FormControl>
-            </Box>
-          </Grid>
-
           <Grid item xs={isMobile || isTablet ? 12 : 10}>
             <Grid
               container
@@ -512,6 +471,58 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
                 </Grid>
               </Grid>
             </Grid>
+          </Grid>
+          {(isMobile || isTablet) && (
+            <Grid item xs={12}>
+              <Divider />
+            </Grid>
+          )}
+          <Grid
+            item
+            xs={isMobile || isTablet ? 12 : 2}
+            display="flex"
+            justifyContent="flex-start"
+            alignItems="flex-start"
+          >
+            <Box
+              display="flex"
+              flexDirection="column"
+              justifyContent="flex-start"
+              alignItems="flex-start"
+              p={padding.large}
+              pt={isMobile || isTablet ? padding.large : padding.triple}
+            >
+              <Typography mb={2} fontSize={fontSize.info}>
+                Filter by
+              </Typography>
+              <FormControl>
+                <RadioGroup
+                  defaultValue={DateRangeOptionValues.Custom}
+                  value={selectedOption}
+                  onChange={handleRadioChange}
+                  sx={{
+                    flexDirection: { xs: "column", sm: "row", md: "column" },
+                  }}
+                >
+                  {dateRangeOptions.map((item) => (
+                    <FormControlLabel
+                      value={item.value}
+                      control={<Radio />}
+                      label={item.label}
+                      key={item.value}
+                      data-testid={`radio-${item.label}`}
+                      sx={{
+                        ".MuiFormControlLabel-label": {
+                          fontFamily: fontFamily.general,
+                          fontSize: fontSize.info,
+                          padding: 0,
+                        },
+                      }}
+                    />
+                  ))}
+                </RadioGroup>
+              </FormControl>
+            </Box>
           </Grid>
         </Grid>
       </LocalizationProvider>
