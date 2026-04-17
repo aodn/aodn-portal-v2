@@ -22,7 +22,7 @@ def test_map_shows_geoserver_layer_with_timeSlider_and_drawRect_support(
     This test uses a dataset with a WMS link and GeoServer map fields that support time and map subsetting.
     It verifies that the GeoServer layer appears on the map with time slider and draw rectangle functionality.
     This test ensures that:
-    1. The WMS link header is visible in the UI
+    1. The WMS link header is visible in the UI (no more needed. In the side bar -> data acces card only show downloadable links)
     2. A GeoServer layer is added to the map and is visible
     3. Both the time slider and the draw rectangle button are visible on the map
     """
@@ -75,7 +75,9 @@ def test_map_shows_geoserver_layer_with_only_timeSlider_support(
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(uuid)
-    expect(detail_page.wms_link_header).to_be_visible()
+    
+    # hide this line because in the Data Access side panel only show downloadable links
+    # expect(detail_page.wms_link_header).to_be_visible()
 
     # Ensure that the GeoServer option is displayed in the layers menu
     detail_page.detail_map.wait_for_map_idle()
@@ -120,6 +122,7 @@ def test_map_shows_geoserver_layer_with_only_drawRect_support(
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(uuid)
+    # hide this line because in the Data Access side panel only show downloadable links
     expect(detail_page.wms_link_header).to_be_visible()
 
     # Ensure that the GeoServer option is displayed in the layers menu
@@ -170,6 +173,7 @@ def test_map_shows_geoserver_layer_without_timeSlider_and_drawRect_support(
 
     detail_page.load(uuid)
     detail_page.detail_map.wait_for_map_idle()
+    # hide this line because in the Data Access side panel only show downloadable links
     expect(detail_page.wms_link_header).to_be_visible()
 
     # Ensure that the GeoServer option is displayed in the layers menu
