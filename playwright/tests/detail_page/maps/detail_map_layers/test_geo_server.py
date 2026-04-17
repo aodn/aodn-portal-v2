@@ -123,7 +123,7 @@ def test_map_shows_geoserver_layer_with_only_drawRect_support(
 
     detail_page.load(uuid)
     # hide this line because in the Data Access side panel only show downloadable links
-    expect(detail_page.wms_link_header).to_be_visible()
+    # expect(detail_page.wms_link_header).to_be_visible()
 
     # Ensure that the GeoServer option is displayed in the layers menu
     detail_page.detail_map.wait_for_map_idle()
@@ -174,7 +174,7 @@ def test_map_shows_geoserver_layer_without_timeSlider_and_drawRect_support(
     detail_page.load(uuid)
     detail_page.detail_map.wait_for_map_idle()
     # hide this line because in the Data Access side panel only show downloadable links
-    expect(detail_page.wms_link_header).to_be_visible()
+    # expect(detail_page.wms_link_header).to_be_visible()
 
     # Ensure that the GeoServer option is displayed in the layers menu
     detail_page.detail_map.layers_menu.click()
