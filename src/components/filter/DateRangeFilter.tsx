@@ -16,6 +16,7 @@ import {
   FormControlLabel,
   Grid,
   IconButton,
+  InputAdornment,
   Radio,
   RadioGroup,
   Typography,
@@ -411,7 +412,13 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
             xs={isMobile || isTablet ? 12 : 10}
             sx={{ order: isMobile || isTablet ? 1 : 2 }}
           >
-            <Grid container p={padding.large} pt={padding.triple}>
+            <Grid
+              container
+              pt={padding.triple}
+              pb={padding.large}
+              pl={padding.triple}
+              pr={padding.triple}
+            >
               <Grid
                 item
                 xs={12}
@@ -434,7 +441,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
                   >
                     <Typography
                       variant="title1Medium"
-                      sx={{ textAlign: "left" }}
+                      sx={{ textAlign: "left", minWidth: "85px" }}
                     >
                       Start&nbsp;Date
                     </Typography>
@@ -453,6 +460,20 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
                           width: 22,
                           height: 22,
                         } as any,
+                        textField: {
+                          InputProps: {
+                            // This forces an icon to appear on the far right on ALL screens
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                <CalendarIcon
+                                  width={22}
+                                  height={22}
+                                  color={theme.palette.grey600}
+                                />
+                              </InputAdornment>
+                            ),
+                          },
+                        },
                       }}
                     />
                   </Box>
@@ -466,7 +487,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
                   >
                     <Typography
                       variant="title1Medium"
-                      sx={{ textAlign: "left" }}
+                      sx={{ textAlign: "left", minWidth: "85px" }}
                     >
                       End&nbsp;Date
                     </Typography>
@@ -485,6 +506,20 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
                           width: 22,
                           height: 22,
                         } as any,
+                        textField: {
+                          InputProps: {
+                            // This forces an icon to appear on the far right on ALL screens
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                <CalendarIcon
+                                  width={22}
+                                  height={22}
+                                  color={theme.palette.grey600}
+                                />
+                              </InputAdornment>
+                            ),
+                          },
+                        },
                       }}
                     />
                   </Box>

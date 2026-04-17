@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from "react";
 import { axisClasses, BarSeriesType, BarChart } from "@mui/x-charts";
 import { OGCCollections } from "../store/OGCCollectionDefinitions";
 import { color } from "../../../styles/constants";
+import { legendClasses } from "@mui/x-charts/ChartsLegend";
 
 interface TimeRangeBarChartProps {
   imosDataIds: string[];
@@ -276,6 +277,10 @@ const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
       sx={{
         [`.${axisClasses.left} .${axisClasses.label}`]: {
           transform: "translate(-20px, 0)",
+        },
+        [`.${legendClasses.mark}`]: {
+          rx: 4,
+          ry: 4,
         },
       }}
       series={series}
