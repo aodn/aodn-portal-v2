@@ -12,7 +12,7 @@ const StyledSlider = styled(Slider)<PlainSliderProps>(({
 }) => {
   const [labelPositioning, labelPositioningMobile] = useMemo(() => {
     const labelPositioning = {
-      top: is_vertical ? "calc(100% + 1px)" : "calc(100% + 5.5px)",
+      top: is_vertical ? "calc(100% + 1px)" : "-30px",
       left: is_vertical ? "calc(100% + 25px)" : "50%",
       transform: is_vertical ? "none" : "translateX(-50%)",
     };
