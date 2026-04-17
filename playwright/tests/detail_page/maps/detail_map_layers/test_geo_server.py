@@ -30,7 +30,8 @@ def test_map_shows_geoserver_layer_with_timeSlider_and_drawRect_support(
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(uuid)
-    expect(detail_page.wms_link_header).to_be_visible()
+    # hide this line because in the Data Access side panel only show downloadable links
+    # expect(detail_page.wms_link_header).to_be_visible()
 
     # Ensure that the GeoServer option is displayed in the layers menu
     detail_page.detail_map.wait_for_map_idle()
