@@ -75,7 +75,7 @@ def test_map_shows_geoserver_layer_with_only_timeSlider_support(
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(uuid)
-    
+
     # hide this line because in the Data Access side panel only show downloadable links
     # expect(detail_page.wms_link_header).to_be_visible()
 
