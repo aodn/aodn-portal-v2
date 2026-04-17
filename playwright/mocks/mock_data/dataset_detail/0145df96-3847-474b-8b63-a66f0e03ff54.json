@@ -222,6 +222,7 @@
       "type": "",
       "title": "SHAPE-ZIP",
       "ai:group": "Data Access > wfs",
+      "ai:role": ["download"],
       "description": "DATA ACCESS - This OGC WFS service returns the data (Statewide marine habitats 2023) in Shapefile format"
     },
     {

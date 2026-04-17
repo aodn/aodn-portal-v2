@@ -77,4 +77,22 @@ describe("Search Reducer Function Test", () => {
     expect(sp.text).equals("temperature");
     expect(sp.filter).contains("(parameter_vocabs='temperature')");
   });
+  it("should include both assets_summary and links_airole_contains filter when hasCOData is true", () => {
+    const param: ParameterState = {
+      hasCOData: true,
+      dateTimeFilterRange: {},
+      searchText: "",
+    };
+
+    const result = createSearchParamFrom(param);
+
+    // Verify both CO data and download link filters are included with OR
+    expect(result.filter).toContain("assets_summary IS NOT NULL");
+    expect(result.filter).toContain("links_airole_contains='download'");
+    expect(result.filter).toContain("OR");
+    // Verify they are wrapped in parentheses as OR condition
+    expect(result.filter).toContain(
+      "(assets_summary IS NOT NULL) OR links_airole_contains='download'"
+    );
+  });
 });
