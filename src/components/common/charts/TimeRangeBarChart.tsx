@@ -129,24 +129,36 @@ const determineXWithBucketsBy = (
       });
     }
   }
+  const imosDataSet = new Set(imosDataIds);
+  const defaultEndTime = Date.now() * 2;
+
   totalDataset.collections.forEach((collection) => {
+    // Determine this once per collection instead of per interval
+    const isImosOnly = collection.id ? imosDataSet.has(collection.id) : false;
+
     collection.extent?.temporal?.interval?.forEach((interval) => {
       const start = interval[0] ? new Date(interval[0]).getTime() : null;
-      // Some big further date if not specified.
+      if (!start) return;
+
       const end = interval[1]
         ? new Date(interval[1]).getTime()
-        : new Date().getTime() * 2;
-      const isImosOnly = collection.id && imosDataIds.includes(collection.id);
-      buckets.forEach((bucket) => {
-        if (start) {
-          if (isIncludedInBucket(start, end, bucket.start, bucket.end)) {
-            if (isImosOnly) {
-              bucket.imosOnlyCount++;
-            }
-            bucket.total++;
-          }
+        : defaultEndTime;
+
+      // Since buckets are ordered chronologically, we can skip and break early
+      for (const bucket of buckets) {
+        if (bucket.end < start) {
+          continue; // Bucket is entirely before our target interval
         }
-      });
+        if (bucket.start > end) {
+          break; // Bucket is entirely after, and all subsequent buckets will also be
+        }
+
+        // If we reach here, there is an overlap
+        if (isImosOnly) {
+          bucket.imosOnlyCount++;
+        }
+        bucket.total++;
+      }
     });
   });
   return { xValues, buckets };

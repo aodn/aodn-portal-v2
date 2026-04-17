@@ -558,6 +558,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
                       value={value}
                       min={dateToValue(initialMinDate)}
                       max={dateToValue(initialMaxDate)}
+                      step={432000000} // 5 days in mils
                       onChange={handleSliderChange}
                       valueLabelDisplay="auto"
                       valueLabelFormat={(value: number) =>
