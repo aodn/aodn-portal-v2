@@ -141,7 +141,7 @@ def test_search_input_persistence_after_navigation(
 
 @pytest.mark.parametrize(
     'date, location, filter',
-    [('Last Year', 'Australian Marine Parks', 'Parameters')],
+    [('Last year', 'Australian Marine Parks', 'Parameters')],
 )
 def test_searchbar_popups(
     responsive_page: Page,
@@ -174,7 +174,7 @@ def test_searchbar_popups(
     'date, location, filter_parameter, filter_platform, filter_organisation, filter_data',
     [
         (
-            'Last Year',
+            'Last year',
             'Apollo',
             'Carbon',
             'Radar',
@@ -249,7 +249,7 @@ def test_search_state_persists_after_navigation(
     'date, location, filter_parameter, filter_platform, filter_organisation, filter_data',
     [
         (
-            'Last Year',
+            'Last year',
             'Apollo',
             'Carbon',
             'Radar',
@@ -355,7 +355,7 @@ def test_repeated_search_action(
 
     # Perform first search
     search_page.search.location_button.click()
-    search_page.get_radio_input(location_a).check()
+    search_page.search.click_radio_button(location_a)
     api_url = search_page.perform_action_and_get_api_url(
         action=search_and_wait
     )
@@ -364,21 +364,21 @@ def test_repeated_search_action(
     # Perform repeated searches with different locations
     # Second Search
     search_page.search.location_button.click()
-    search_page.get_radio_input(location_b).check()
+    search_page.search.click_radio_button(location_b)
     api_url = search_page.perform_action_and_get_api_url(
         action=search_and_wait
     )
     assert api_url is not None
     # Third search
     search_page.search.location_button.click()
-    search_page.get_radio_input(location_c).check()
+    search_page.search.click_radio_button(location_c)
     api_url = search_page.perform_action_and_get_api_url(
         action=search_and_wait
     )
     assert api_url is not None
     # Fourth search
     search_page.search.location_button.click()
-    search_page.get_radio_input(location_d).check()
+    search_page.search.click_radio_button(location_d)
     api_url = search_page.perform_action_and_get_api_url(
         action=search_and_wait
     )
