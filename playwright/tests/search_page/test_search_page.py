@@ -200,8 +200,8 @@ def test_buttons_disappear_on_mobile(mobile_page: Page) -> None:
     search_page.wait_for_page_stabilization()
     search_page.map.wait_for_map_idle()
 
-    expect(search_page.result_sort_button).not_to_be_visible()
-    expect(search_page.result_view_button).not_to_be_visible()
+    expect(search_page.get_by_id('result-sort-button')).not_to_be_visible()
+    expect(search_page.get_by_id('result-layout-button')).not_to_be_visible()
     expect(search_page.bookmark_list_head).not_to_be_visible()
     expect(search_page.map.zoom_in_button).not_to_be_visible()
     expect(search_page.map.zoom_out_button).not_to_be_visible()

@@ -53,6 +53,7 @@ def test_sort_and_view_states_persist_across_page(
 
     # Go to the landing page and return to check if the states persist
     search_page.go_to_landing_page()
+    search_page.wait_for_page_stabilization()
     assert landing_page.is_loaded()
 
     landing_page.search.click_search_button()
