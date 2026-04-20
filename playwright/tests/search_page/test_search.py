@@ -88,7 +88,7 @@ def test_search_result_sort(
             handle_sort_by_modified,
         )
 
-    search_page.result_sort_button.click()
+    search_page.click_result_sort_button()
     search_page.click_text(sort_type.display_name, exact=True)
     search_page.wait_for_timeout(1000)  # Wait for the results to update
 
@@ -201,10 +201,10 @@ def test_search_state_persists_after_navigation(
     state remain intact throughout this process.
     """
     landing_page = LandingPage(responsive_page)
+    landing_page.load()
+
     search_page = SearchPage(responsive_page)
     detail_page = DetailPage(responsive_page)
-
-    landing_page.load()
 
     # Set search state
     landing_page.search.set_search_state(
