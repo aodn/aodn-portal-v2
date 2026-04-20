@@ -225,7 +225,9 @@
       "href": "https://thredds.aodn.org.au/thredds/catalog/IMOS/SOOP/SOOP-BA/catalog.html",
       "rel": "related",
       "type": "text/html",
-      "title": "Data Link"
+      "title": "Data Link",
+      "ai:group": "Data Access",
+      "ai:role": ["download"]
     },
     {
       "href": "/metadata/8edf509b-1481-48fd-b9c5-b95b42247f82",

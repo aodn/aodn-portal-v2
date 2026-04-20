@@ -17,6 +17,7 @@ import {
   Popper,
   TextField,
 } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 import {
   ParameterState,
   updateSearchText,
@@ -38,6 +39,7 @@ import useBreakpoint from "../../hooks/useBreakpoint";
 import { portalTheme } from "../../styles";
 
 interface InputWithSuggesterProps {
+  containerRef?: HTMLDivElement | null;
   handleEnterPressed?: (
     event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>,
     isSearchbarFocused: boolean
@@ -85,6 +87,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   setShouldExpandSearchbar,
   setShouldExpandAllButtons,
   suggesterWidth = 0,
+  containerRef,
 }) => {
   const location = useLocation();
   const dispatch = useAppDispatch();
@@ -260,6 +263,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
       return (
         <Popper
           {...props}
+          anchorEl={containerRef || props.anchorEl}
           placement="bottom-start"
           modifiers={[
             {
@@ -280,7 +284,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
         />
       );
     },
-    [suggesterWidth]
+    [suggesterWidth, containerRef]
   );
 
   // Input suggester paper
@@ -299,14 +303,12 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
             "& .MuiAutocomplete-option": {
               color: "#000",
               borderRadius: borderRadius.small,
-              "&[aria-selected='true']": {
-                backgroundColor: color.blue.xLight,
-              },
               "&.Mui-focused": {
                 backgroundColor: `${color.blue.xLight} !important`,
               },
-              "&:hover": {
-                backgroundColor: color.blue.xLight,
+              "&.Mui-focused svg": {
+                // show only on focused
+                display: "block",
               },
             },
           }}
@@ -378,6 +380,13 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
             }}
           />
         </Box>
+      )}
+      renderOption={(props, option) => (
+        <li {...props}>
+          {option}
+          {/* hidden by default, shown on focus, check sx in CustomPaper */}
+          <SearchIcon sx={{ display: "none", ml: "auto" }} />
+        </li>
       )}
     />
   );
