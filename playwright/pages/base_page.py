@@ -97,7 +97,7 @@ class BasePage:
         """Click the radio input directly bypassing visibility/overlap issues"""
         locator = self.get_radio_input(text)
         locator.wait_for(state="visible", timeout=timeout)
-        locator.check(force=True)
+        locator.check()
 
     def get_collapse_list(self, item_list: str) -> Locator:
         """Returns collapse list container element"""
