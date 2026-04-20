@@ -70,13 +70,13 @@ class SearchPage(BasePage):
 
     def click_result_view_button(self) -> None:
         # Cannot use click directly because there is a auto-scroll feature
-        # and in case with sticky header, it cause the screen to keep scoll and 
+        # and in case with sticky header, it cause the screen to keep scoll and
         # break the test
         self.get_by_id('result-layout-button').dispatch_event("mousedown")
 
     def click_result_sort_button(self) -> None:
         # Cannot use click directly because there is a auto-scroll feature
-        # and in case with sticky header, it cause the screen to keep scoll and 
+        # and in case with sticky header, it cause the screen to keep scoll and
         # break the test
         self.get_by_id('result-sort-button').dispatch_event("mousedown")
 
