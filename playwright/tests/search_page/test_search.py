@@ -343,7 +343,7 @@ def test_repeated_search_action(
         search_page.map.wait_for_map_idle()
 
     # Set view type
-    search_page.result_view_button.click()
+    search_page.click_result_view_button()
     search_page.click_text(view_type.display_name, exact=True)
     search_page.wait_for_page_stabilization()
 

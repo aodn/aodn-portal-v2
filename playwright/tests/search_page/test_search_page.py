@@ -38,7 +38,7 @@ def test_grid_and_map_view(desktop_page: Page) -> None:
     landing_page.search.click_search_button()
     search_page.wait_for_page_stabilization()
 
-    search_page.result_view_button.click()
+    search_page.click_result_view_button()
     search_page.grid_and_map_view_button.click()
     expect(search_page.result_grid).to_be_visible()
     expect(search_page.result_card_grid).not_to_have_count(0)
@@ -57,7 +57,7 @@ def test_full_map_view(responsive_page: Page) -> None:
     search_page.wait_for_page_stabilization()
 
     expect(search_page.result_list).to_be_visible()
-    search_page.result_view_button.click()
+    search_page.click_result_view_button()
     search_page.full_map_view_button.click()
     expect(search_page.result_list).not_to_be_visible()
 
@@ -75,7 +75,7 @@ def test_full_list_view(desktop_page: Page) -> None:
     search_page.wait_for_page_stabilization()
 
     expect(search_page.main_map).to_be_visible()
-    search_page.result_view_button.click()
+    search_page.click_result_view_button()
     search_page.full_list_view_button.click()
     expect(search_page.main_map).not_to_be_visible()
     expect(search_page.result_list).to_be_visible()
@@ -173,7 +173,7 @@ def test_view_options_on_mobile(mobile_page: Page) -> None:
     landing_page.search.click_search_button()
     search_page.wait_for_search_to_complete()
 
-    search_page.result_view_button.click()
+    search_page.click_result_view_button()
     expect(search_page.full_map_view_button).to_be_visible()
     expect(search_page.full_list_view_button).to_be_visible()
     expect(search_page.list_and_map_view_button).not_to_be_visible()
@@ -195,7 +195,7 @@ def test_buttons_disappear_on_mobile(mobile_page: Page) -> None:
     if search_page.main_map.is_visible():
         search_page.map.wait_for_map_idle()
 
-    search_page.result_view_button.click()
+    search_page.click_result_view_button()
     search_page.full_map_view_button.click()
     search_page.wait_for_page_stabilization()
     search_page.map.wait_for_map_idle()
@@ -223,7 +223,7 @@ def test_search_result_layout_remains_intact_after_reload(
     search_page.map.wait_for_map_idle()
 
     # switch to full list view
-    search_page.result_view_button.click()
+    search_page.click_result_view_button()
     search_page.full_list_view_button.click()
     search_page.wait_for_search_to_complete()
 

@@ -237,7 +237,7 @@ def test_search_api_request_urls_after_map_state_change(
 
     # Change map state
     if not search_page.main_map.is_visible():
-        search_page.result_view_button.click()
+        search_page.click_result_view_button()
         search_page.full_map_view_button.click()
 
     def zoom_in_and_wait():
