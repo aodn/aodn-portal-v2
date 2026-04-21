@@ -19,6 +19,8 @@ import {
   InputAdornment,
   Radio,
   RadioGroup,
+  TextField,
+  TextFieldProps,
   Typography,
 } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -461,27 +463,35 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
                       minDate={initialMinDate}
                       maxDate={valueToDate(value[1])}
                       onChange={(date) => handleMinDateChange(date as Dayjs)}
-                      slots={{ openPickerIcon: CalendarIcon }}
+                      slots={{
+                        openPickerIcon: CalendarIcon,
+                        textField: (props: any) => (
+                          <TextField
+                            {...props}
+                            InputProps={{
+                              ...props.InputProps,
+                              // Only mobile screen have issue with the endAdornment hidden
+                              endAdornment: isMobile ? (
+                                <InputAdornment position="end">
+                                  <CalendarIcon
+                                    width={22}
+                                    height={22}
+                                    color={theme.palette.grey600}
+                                  />
+                                </InputAdornment>
+                              ) : (
+                                props.InputProps?.endAdornment
+                              ),
+                            }}
+                          />
+                        ),
+                      }}
                       slotProps={{
                         openPickerIcon: {
                           color: theme.palette.grey600,
                           width: 22,
                           height: 22,
                         } as any,
-                        textField: {
-                          InputProps: {
-                            // This forces an icon to appear on the far right on ALL screens
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <CalendarIcon
-                                  width={22}
-                                  height={22}
-                                  color={theme.palette.grey600}
-                                />
-                              </InputAdornment>
-                            ),
-                          },
-                        },
                       }}
                     />
                   </Box>
@@ -507,27 +517,35 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
                       minDate={valueToDate(value[0])}
                       maxDate={initialMaxDate}
                       onChange={(date) => handleMaxDateChange(date as Dayjs)}
-                      slots={{ openPickerIcon: CalendarIcon }}
+                      slots={{
+                        openPickerIcon: CalendarIcon,
+                        textField: (props: any) => (
+                          <TextField
+                            {...props}
+                            InputProps={{
+                              ...props.InputProps,
+                              // Only mobile screen have issue with the endAdornment hidden
+                              endAdornment: isMobile ? (
+                                <InputAdornment position="end">
+                                  <CalendarIcon
+                                    width={22}
+                                    height={22}
+                                    color={theme.palette.grey600}
+                                  />
+                                </InputAdornment>
+                              ) : (
+                                props.InputProps?.endAdornment
+                              ),
+                            }}
+                          />
+                        ),
+                      }}
                       slotProps={{
                         openPickerIcon: {
                           color: theme.palette.grey600,
                           width: 22,
                           height: 22,
                         } as any,
-                        textField: {
-                          InputProps: {
-                            // This forces an icon to appear on the far right on ALL screens
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <CalendarIcon
-                                  width={22}
-                                  height={22}
-                                  color={theme.palette.grey600}
-                                />
-                              </InputAdornment>
-                            ),
-                          },
-                        },
                       }}
                     />
                   </Box>
