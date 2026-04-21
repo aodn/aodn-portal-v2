@@ -296,7 +296,15 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
                   {dateRangeOptions.map((item) => (
                     <FormControlLabel
                       value={item.value}
-                      control={<Radio />}
+                      control={
+                        <Radio
+                          sx={{
+                            "&.Mui-checked": {
+                              color: theme.palette.secondary2,
+                            }, // e.g., '#ff0000'
+                          }}
+                        />
+                      }
                       label={item.label}
                       key={item.value}
                       data-testid={`radio-${item.label}`}
