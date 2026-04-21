@@ -192,6 +192,7 @@ export const designTokensRC8 = {
 
       // Secondary
       secondary1: "#54BCEB",
+      secondary2: "#52BDEC",
 
       // Neutral series
       neutral1: "#090C02",

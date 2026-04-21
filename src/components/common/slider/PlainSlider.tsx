@@ -42,7 +42,7 @@ const StyledSlider = styled(Slider)<PlainSliderProps>(({
       },
     "& .MuiSlider-track": {
       boxShadow: "0 0 3px 1px rgba(0, 0, 0, 0.10) inset",
-      backgroundColor: portalTheme.palette.primary1,
+      backgroundColor: portalTheme.palette.secondary2,
       opacity: 0.7,
       border: "none",
       height: "8px",
