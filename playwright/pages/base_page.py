@@ -92,6 +92,15 @@ class BasePage:
     def click_menu_item(self, menu_name: str) -> None:
         """Click on the given menu item"""
         self.page.get_by_test_id(f'menuitem-{menu_name}').click()
+        # Close the menu popover after clicking the menu item to prevent it from blocking other elements
+        try:
+            popover = self.get_by_id('menu-')
+            popover.evaluate_all(
+                "els => els.forEach(el => el.style.display = 'none')"
+            )
+        except Exception:
+            # If the popover is not found or already closed, we can ignore the error
+            pass
 
     def get_radio_input(self, text: str) -> Locator:
         """Return the radio input element based on the visible label text"""
