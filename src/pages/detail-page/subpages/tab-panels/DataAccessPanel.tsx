@@ -125,7 +125,7 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
                     ...portalTheme.typography.body1Medium,
                   }}
                 >
-                  {TITLE.has(key) ? TITLE.get(key) : "Misc Link"}
+                  {TITLE.has(key) ? TITLE.get(key) : "Downloadable Link"}
                   {!item || item.length === 0 ? (
                     <NaList title={title ? title : ""} />
                   ) : (
