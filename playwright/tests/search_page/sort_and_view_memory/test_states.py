@@ -45,20 +45,18 @@ def test_sort_and_view_states_persist_across_page(
 
     # Change the sort and view types
     search_page.result_sort_button.click()
-    search_page.click_text(sort_type.display_name, exact=True)
+    search_page.click_menu_item(sort_type.test_id)
     search_page.wait_for_search_to_complete()
 
     search_page.result_view_button.click()
-    search_page.click_text(view_type.display_name, exact=True)
+    search_page.click_menu_item(view_type.test_id)
     search_page.wait_for_page_stabilization()
-
 
     # Go to the landing page and return to check if the states persist
     search_page.go_to_landing_page()
     assert landing_page.is_loaded()
 
     landing_page.search.click_search_button()
-    search_page.wait_for_search_to_complete()
     expect(
         search_page.get_result_sort_button(sort_type.test_id)
     ).to_be_visible()
@@ -107,11 +105,11 @@ def test_sort_and_view_states_persist_after_map_toggle(
     search_page.map.wait_for_map_idle()
 
     search_page.result_sort_button.click()
-    search_page.click_text(sort_type.display_name, exact=True)
+    search_page.click_menu_item(sort_type.test_id)
     search_page.wait_for_search_to_complete()
 
     search_page.result_view_button.click()
-    search_page.click_text(view_type.display_name, exact=True)
+    search_page.click_menu_item(view_type.test_id)
     search_page.wait_for_page_stabilization()
     if view_type == SearchViewLayouts.GRID:
         expect(search_page.result_grid).to_be_visible()
@@ -148,11 +146,11 @@ def test_sort_and_view_states_persist_with_url(
     search_page.wait_for_page_stabilization()
 
     search_page.result_sort_button.click()
-    search_page.click_text(sort_type.display_name, exact=True)
+    search_page.click_menu_item(sort_type.test_id)
     search_page.wait_for_search_to_complete()
 
     search_page.result_view_button.click()
-    search_page.click_text(view_type.display_name, exact=True)
+    search_page.click_menu_item(view_type.test_id)
     search_page.wait_for_page_stabilization()
 
     # Use the current page URL and open a new tab with the same URL
@@ -194,7 +192,7 @@ def test_view_states_for_screen_resize(
     search_page.wait_for_search_to_complete()
 
     search_page.result_view_button.click()
-    search_page.click_text(view_type.display_name, exact=True)
+    search_page.click_menu_item(view_type.test_id)
 
     desktop_page.set_viewport_size(DesktopDevices.SMALL)
     desktop_page.wait_for_timeout(500)  # Wait for the viewport to resize
@@ -231,7 +229,7 @@ def test_view_states_for_paste_url_screen_resize(
 
     search_page.map.wait_for_map_idle()
     search_page.result_view_button.click()
-    search_page.click_text(view_type.display_name, exact=True)
+    search_page.click_menu_item(view_type.test_id)
 
     # Use the current page URL and open a new tab with the same URL
     current_url = search_page.url

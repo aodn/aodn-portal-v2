@@ -74,7 +74,7 @@ def test_search_api_request_urls_across_page(
         download_service_available=filter_data_download is not None,
     )
 
-    def search_and_wait():
+    def search_and_wait() -> None:
         landing_page.search.click_search_button()
         search_page.wait_for_page_stabilization()
         if search_page.main_map.is_visible():
@@ -191,7 +191,7 @@ def test_search_api_request_urls_after_map_state_change(
     )
 
     # Perform search and capture the API URL
-    def search_and_wait():
+    def search_and_wait() -> None:
         landing_page.search.click_search_button()
         if search_page.main_map.is_visible():
             search_page.map.wait_for_map_idle()
@@ -240,7 +240,7 @@ def test_search_api_request_urls_after_map_state_change(
         search_page.result_view_button.click()
         search_page.full_map_view_button.click()
 
-    def zoom_in_and_wait():
+    def zoom_in_and_wait() -> None:
         search_page.map.zoom_in()
         search_page.map.wait_for_map_idle()
 
@@ -333,7 +333,7 @@ def test_search_api_request_urls_reflect_parameter_updates(
     )
 
     # Perform search and capture the API URL
-    def search_and_wait():
+    def search_and_wait() -> None:
         landing_page.search.click_search_button()
         landing_page.page.wait_for_timeout(2000)
         if search_page.main_map.is_visible():

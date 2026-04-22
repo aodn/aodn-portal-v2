@@ -18,6 +18,7 @@ class Map(BasePage):
 
         # Page locators
         self.progress_indicator = page.get_by_test_id('map-loading')
+        self.layer_select_loading = page.get_by_test_id('layer-select-loading')
         self.full_screen_toggle_button = self.get_by_id(
             'map-toggle-control-button'
         )
@@ -60,6 +61,18 @@ class Map(BasePage):
             # assume the search is complete and ignore the exception.
             pass
         self.progress_indicator.wait_for(state='hidden', timeout=30 * 1000)
+
+    def wait_for_layer_select_loading(self) -> None:
+        """
+        Waits for the map layer select loading to appear and then disappear.
+        """
+        try:
+            self.layer_select_loading.wait_for(state='visible', timeout=2000)
+        except TimeoutError:
+            # If the layer_select_loading doesn't appear within the timeout,
+            # assume the loading is complete and ignore the exception.
+            pass
+        self.layer_select_loading.wait_for(state='hidden', timeout=30 * 1000)
 
     def hover_map(self) -> None:
         """Move the mouse cursor to the center of the map"""

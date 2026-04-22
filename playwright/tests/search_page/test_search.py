@@ -89,7 +89,7 @@ def test_search_result_sort(
         )
 
     search_page.result_sort_button.click()
-    search_page.click_text(sort_type.display_name, exact=True)
+    search_page.click_menu_item(sort_type.test_id)
     search_page.wait_for_timeout(1000)  # Wait for the results to update
 
     updated_first_title = search_page.first_result_title.inner_text()
@@ -338,16 +338,14 @@ def test_repeated_search_action(
     search_page = SearchPage(desktop_page)
     landing_page.load()
     landing_page.search.click_search_button()
-    search_page.wait_for_search_to_complete()
-    if search_page.main_map.is_visible():
-        search_page.map.wait_for_map_idle()
+    search_page.wait_for_page_stabilization()
 
     # Set view type
     search_page.result_view_button.click()
-    search_page.click_text(view_type.display_name, exact=True)
-    search_page.wait_for_page_stabilization()
+    search_page.click_menu_item(view_type.test_id)
+    # search_page.wait_for_page_stabilization()
 
-    def search_and_wait():
+    def search_and_wait() -> None:
         search_page.search.click_search_button()
         search_page.wait_for_search_to_complete()
         if search_page.main_map.is_visible():
@@ -356,30 +354,22 @@ def test_repeated_search_action(
     # Perform first search
     search_page.search.location_button.click()
     search_page.get_radio_input(location_a).check()
-    api_url = search_page.perform_action_and_get_api_url(
-        action=search_and_wait
-    )
+    api_url = search_page.perform_action_and_get_api_url(action=search_and_wait)
     assert api_url is not None
 
     # Perform repeated searches with different locations
     # Second Search
     search_page.search.location_button.click()
     search_page.get_radio_input(location_b).check()
-    api_url = search_page.perform_action_and_get_api_url(
-        action=search_and_wait
-    )
+    api_url = search_page.perform_action_and_get_api_url(action=search_and_wait)
     assert api_url is not None
     # Third search
     search_page.search.location_button.click()
     search_page.get_radio_input(location_c).check()
-    api_url = search_page.perform_action_and_get_api_url(
-        action=search_and_wait
-    )
+    api_url = search_page.perform_action_and_get_api_url(action=search_and_wait)
     assert api_url is not None
     # Fourth search
     search_page.search.location_button.click()
     search_page.get_radio_input(location_d).check()
-    api_url = search_page.perform_action_and_get_api_url(
-        action=search_and_wait
-    )
+    api_url = search_page.perform_action_and_get_api_url(action=search_and_wait)
     assert api_url is not None
