@@ -132,7 +132,7 @@ def test_search_api_request_urls_across_page(
     'date, location, filter_parameters, filter_platforms, filter_organisation, filter_data, filter_data_download',
     [
         (
-            'Last Year',
+            'Last year',
             'Apollo',
             ['Carbon', 'Water Pressure'],
             ['Radar', 'Float'],
@@ -270,7 +270,7 @@ def test_search_api_request_urls_after_map_state_change(
             'IMOS',
             DataSettingsFilter.DELAYED,
             'Yes',
-            'Last Year',
+            'Last year',
             'Jervis',
             ['Oxygen'],
             ['Glider', 'Vessel'],
