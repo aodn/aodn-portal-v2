@@ -465,26 +465,6 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
                       onChange={(date) => handleMinDateChange(date as Dayjs)}
                       slots={{
                         openPickerIcon: CalendarIcon,
-                        textField: (props: any) => (
-                          <TextField
-                            {...props}
-                            InputProps={{
-                              ...props.InputProps,
-                              // Only mobile screen have issue with the endAdornment hidden
-                              endAdornment: isMobile ? (
-                                <InputAdornment position="end">
-                                  <CalendarIcon
-                                    width={22}
-                                    height={22}
-                                    color={theme.palette.grey600}
-                                  />
-                                </InputAdornment>
-                              ) : (
-                                props.InputProps?.endAdornment
-                              ),
-                            }}
-                          />
-                        ),
                       }}
                       slotProps={{
                         openPickerIcon: {
@@ -519,26 +499,6 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
                       onChange={(date) => handleMaxDateChange(date as Dayjs)}
                       slots={{
                         openPickerIcon: CalendarIcon,
-                        textField: (props: any) => (
-                          <TextField
-                            {...props}
-                            InputProps={{
-                              ...props.InputProps,
-                              // Only mobile screen have issue with the endAdornment hidden
-                              endAdornment: isMobile ? (
-                                <InputAdornment position="end">
-                                  <CalendarIcon
-                                    width={22}
-                                    height={22}
-                                    color={theme.palette.grey600}
-                                  />
-                                </InputAdornment>
-                              ) : (
-                                props.InputProps?.endAdornment
-                              ),
-                            }}
-                          />
-                        ),
                       }}
                       slotProps={{
                         openPickerIcon: {
