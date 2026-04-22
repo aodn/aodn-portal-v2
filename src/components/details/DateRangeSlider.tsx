@@ -28,22 +28,25 @@ const paperStyle = {
       color: theme.palette.text2,
       padding: 0,
     },
-    ".MuiPickersYear-yearButton.Mui-selected": {
-      color: "#fff",
-      backgroundColor: theme.palette.primary1,
-    },
+    ".MuiPickersYear-yearButton.Mui-selected, .MuiPickersYear-yearButton.Mui-selected:hover, .MuiPickersYear-yearButton.Mui-selected:focus":
+      {
+        color: "#fff !important",
+        backgroundColor: `${theme.palette.primary1} !important`,
+      },
     ".MuiPickersMonth-monthButton": {
       color: theme.palette.text2,
       padding: 0,
     },
-    ".MuiPickersMonth-monthButton.Mui-selected": {
-      color: "#fff",
-      backgroundColor: theme.palette.primary1,
-    },
-    ".MuiPickersDay-root.Mui-selected": {
-      color: "#fff",
-      backgroundColor: theme.palette.primary1,
-    },
+    ".MuiPickersMonth-monthButton.Mui-selected, .MuiPickersMonth-monthButton.Mui-selected:hover, .MuiPickersMonth-monthButton.Mui-selected:focus":
+      {
+        color: "#fff !important",
+        backgroundColor: `${theme.palette.primary1} !important`,
+      },
+    ".MuiPickersDay-root.Mui-selected, .MuiPickersDay-root.Mui-selected:hover, .MuiPickersDay-root.Mui-selected:focus":
+      {
+        color: "#fff !important",
+        backgroundColor: `${theme.palette.primary1} !important`,
+      },
   },
   popper: {
     disablePortal: true,
