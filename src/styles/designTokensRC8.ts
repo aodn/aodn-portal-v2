@@ -14,7 +14,6 @@
  * @version RC8
  */
 
-import { fontStyle } from "@mui/system";
 import { FONT_FAMILIES } from "./fontsRC8";
 
 export const designTokensRC8 = {

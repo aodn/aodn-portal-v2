@@ -47,6 +47,7 @@ import { dateToValue, valueToDate } from "../../utils/DateUtils";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import theme from "../../styles/themeRC8";
 import { CalendarIcon } from "../../assets/icons/search/calendar";
+import { DEFAULT_DATE_PICKER_SLOT } from "../details/DateRangeSlider";
 
 enum DateRangeOptionValues {
   Custom = "custom",
@@ -467,6 +468,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
                         openPickerIcon: CalendarIcon,
                       }}
                       slotProps={{
+                        ...DEFAULT_DATE_PICKER_SLOT,
                         openPickerIcon: {
                           color: theme.palette.grey600,
                           width: 22,
@@ -501,6 +503,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
                         openPickerIcon: CalendarIcon,
                       }}
                       slotProps={{
+                        ...DEFAULT_DATE_PICKER_SLOT,
                         openPickerIcon: {
                           color: theme.palette.grey600,
                           width: 22,
