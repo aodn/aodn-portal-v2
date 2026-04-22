@@ -141,7 +141,7 @@ def test_search_input_persistence_after_navigation(
 
 @pytest.mark.parametrize(
     'date, location, filter',
-    [('Last Year', 'Australian Marine Parks', 'Parameters')],
+    [('Last year', 'Australian Marine Parks', 'Parameters')],
 )
 def test_searchbar_popups(
     responsive_page: Page,
@@ -174,7 +174,7 @@ def test_searchbar_popups(
     'date, location, filter_parameter, filter_platform, filter_organisation, filter_data',
     [
         (
-            'Last Year',
+            'Last year',
             'Apollo',
             'Carbon',
             'Radar',
@@ -249,7 +249,7 @@ def test_search_state_persists_after_navigation(
     'date, location, filter_parameter, filter_platform, filter_organisation, filter_data',
     [
         (
-            'Last Year',
+            'Last year',
             'Apollo',
             'Carbon',
             'Radar',
