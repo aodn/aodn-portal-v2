@@ -385,7 +385,8 @@
       "rel": "related",
       "type": "text/html",
       "title": "NetCDF files via THREDDS catalog",
-      "ai:group": "Data Access > thredds"
+      "ai:group": "Data Access > thredds",
+      "ai:role": ["download"]
     },
     {
       "href": "http://content.aodn.org.au/Documents/IMOS/Facilities/ocean_radar/QC_procedures_for_IMOS_Ocean_Radar_manual_LATEST.pdf",

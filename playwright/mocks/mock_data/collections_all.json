@@ -44,7 +44,8 @@
           "rel": "wfs",
           "type": "",
           "title": "imos:asset_map",
-          "ai:group": "Data Access > wfs"
+          "ai:group": "Data Access > wfs",
+          "ai:role": ["download"]
         },
         {
           "href": "https://help.aodn.org.au/web-services/ogc-wfs/",

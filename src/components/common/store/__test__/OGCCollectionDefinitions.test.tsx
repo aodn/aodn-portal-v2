@@ -147,6 +147,7 @@ describe("OGCCollection", () => {
           type: "text/html",
           title: "Data Link",
           "ai:group": "Data Access",
+          "ai:role": ["download"],
           getIcon: () => "mocked-link-icon.png",
         },
         {
@@ -169,12 +170,15 @@ describe("OGCCollection", () => {
       const dataAccessLinks = collection.getDataAccessLinks();
       const documentLinks = collection.getDocumentLinks();
       const otherLinks = collection.getOtherLinks();
+      const downloadLinks = collection.getDownloadLinks();
 
       expect(dataAccessLinks).toHaveLength(1);
       expect(dataAccessLinks?.[0].title).toBe("Data Link");
       expect(documentLinks).toHaveLength(1);
       expect(documentLinks?.[0].title).toBe("Document Link");
       expect(otherLinks).toBeUndefined();
+      expect(downloadLinks).toHaveLength(1);
+      expect(downloadLinks?.[0].title).toBe("Data Link");
     });
 
     it("should return undefined when no links match the AI group", () => {
