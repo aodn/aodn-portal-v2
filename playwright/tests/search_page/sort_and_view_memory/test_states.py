@@ -54,7 +54,6 @@ def test_sort_and_view_states_persist_across_page(
 
     # Go to the landing page and return to check if the states persist
     search_page.go_to_landing_page()
-    search_page.wait_for_page_stabilization()
     assert landing_page.is_loaded()
 
     landing_page.search.click_search_button()
@@ -76,7 +75,7 @@ def test_sort_and_view_states_persist_across_page(
     ).to_be_visible()
 
     # Select full map view and toggle to check if the states persist
-    search_page.click_result_view_button()
+    search_page.result_view_button.click()
     search_page.full_map_view_button.click()
     search_page.map.wait_for_search_loading()
     search_page.map_toggle_button.click()
@@ -102,6 +101,7 @@ def test_sort_and_view_states_persist_after_map_toggle(
 
     landing_page.load()
     landing_page.search.click_search_button()
+    search_page.wait_for_page_stabilization()
     search_page.map.wait_for_map_idle()
 
     search_page.result_sort_button.click()
@@ -111,7 +111,6 @@ def test_sort_and_view_states_persist_after_map_toggle(
     search_page.result_view_button.click()
     search_page.click_menu_item(view_type.test_id)
     search_page.wait_for_page_stabilization()
-
     if view_type == SearchViewLayouts.GRID:
         expect(search_page.result_grid).to_be_visible()
 

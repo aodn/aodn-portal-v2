@@ -141,7 +141,7 @@ def test_search_input_persistence_after_navigation(
 
 @pytest.mark.parametrize(
     'date, location, filter',
-    [('Last year', 'Australian Marine Parks', 'Parameters')],
+    [('Last Year', 'Australian Marine Parks', 'Parameters')],
 )
 def test_searchbar_popups(
     responsive_page: Page,
@@ -174,7 +174,7 @@ def test_searchbar_popups(
     'date, location, filter_parameter, filter_platform, filter_organisation, filter_data',
     [
         (
-            'Last year',
+            'Last Year',
             'Apollo',
             'Carbon',
             'Radar',
@@ -201,10 +201,10 @@ def test_search_state_persists_after_navigation(
     state remain intact throughout this process.
     """
     landing_page = LandingPage(responsive_page)
-    landing_page.load()
-
     search_page = SearchPage(responsive_page)
     detail_page = DetailPage(responsive_page)
+
+    landing_page.load()
 
     # Set search state
     landing_page.search.set_search_state(
@@ -249,7 +249,7 @@ def test_search_state_persists_after_navigation(
     'date, location, filter_parameter, filter_platform, filter_organisation, filter_data',
     [
         (
-            'Last year',
+            'Last Year',
             'Apollo',
             'Carbon',
             'Radar',

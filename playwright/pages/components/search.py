@@ -85,11 +85,11 @@ class SearchComponent(BasePage):
         for download.
         """
         self.date_button.click()
-        self.click_radio_button(date)
+        self.get_radio_input(date).click()
         expect(self.get_radio_input(date)).to_be_checked()
 
         self.location_button.click()
-        self.click_radio_button(location)
+        self.get_radio_input(location).click()
         expect(self.get_radio_input(location)).to_be_checked()
 
         self.filter_button.click()

@@ -41,6 +41,8 @@ class SearchPage(BasePage):
         self.loading = self.result_list.get_by_test_id('loading-progress')
 
         # buttons
+        self.result_sort_button = self.get_by_id('result-sort-button')
+        self.result_view_button = self.get_by_id('result-layout-button')
         self.list_and_map_view_button = page.get_by_test_id('menuitem-LIST')
         self.grid_and_map_view_button = page.get_by_test_id('menuitem-GRID')
         self.full_map_view_button = page.get_by_test_id('menuitem-FULL_MAP')
@@ -67,18 +69,6 @@ class SearchPage(BasePage):
         """Scroll to the bottom of the result list"""
         self.result_list.hover()
         self.page.mouse.wheel(0, delta_y)
-
-    def click_result_view_button(self) -> None:
-        # Cannot use click directly because there is a auto-scroll feature
-        # and in case with sticky header, it cause the screen to keep scoll and
-        # break the test
-        self.get_by_id('result-layout-button').dispatch_event("mousedown")
-
-    def click_result_sort_button(self) -> None:
-        # Cannot use click directly because there is a auto-scroll feature
-        # and in case with sticky header, it cause the screen to keep scoll and
-        # break the test
-        self.get_by_id('result-sort-button').dispatch_event("mousedown")
 
     def click_show_more_results(self) -> None:
         """Update api route and then click "Show more results" button"""

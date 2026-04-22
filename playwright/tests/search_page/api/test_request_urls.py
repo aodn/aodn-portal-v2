@@ -14,7 +14,7 @@ from pages.search_page import SearchPage
     'date, location, filter_parameters, filter_platforms, filter_organisation, filter_data, filter_data_download',
     [
         (
-            'Last 5 years',
+            'Last 5 Years',
             'Arafura',
             ['Carbon', 'Air Quality'],
             ['Radar', 'Vessel'],
@@ -132,7 +132,7 @@ def test_search_api_request_urls_across_page(
     'date, location, filter_parameters, filter_platforms, filter_organisation, filter_data, filter_data_download',
     [
         (
-            'Last year',
+            'Last Year',
             'Apollo',
             ['Carbon', 'Water Pressure'],
             ['Radar', 'Float'],
@@ -237,7 +237,7 @@ def test_search_api_request_urls_after_map_state_change(
 
     # Change map state
     if not search_page.main_map.is_visible():
-        search_page.click_result_view_button()
+        search_page.result_view_button.click()
         search_page.full_map_view_button.click()
 
     def zoom_in_and_wait() -> None:
@@ -263,14 +263,14 @@ def test_search_api_request_urls_after_map_state_change(
     'updated_platforms, updated_organisation, updated_data, updated_data_download',
     [
         (
-            'Last 5 years',
+            'Last 5 Years',
             'Arafura',
             ['Carbon', 'Air Quality'],
             ['Radar'],
             'IMOS',
             DataSettingsFilter.DELAYED,
             'Yes',
-            'Last year',
+            'Last Year',
             'Jervis',
             ['Oxygen'],
             ['Glider', 'Vessel'],
