@@ -30,7 +30,7 @@ const paperStyle = {
     },
     ".MuiPickersYear-yearButton.Mui-selected, .MuiPickersYear-yearButton.Mui-selected:hover, .MuiPickersYear-yearButton.Mui-selected:focus":
       {
-        color: "#fff !important",
+        color: "#fff",
         backgroundColor: `${theme.palette.primary1}`,
       },
     ".MuiPickersMonth-monthButton": {
@@ -39,12 +39,12 @@ const paperStyle = {
     },
     ".MuiPickersMonth-monthButton.Mui-selected, .MuiPickersMonth-monthButton.Mui-selected:hover, .MuiPickersMonth-monthButton.Mui-selected:focus":
       {
-        color: "#fff !important",
+        color: "#fff",
         backgroundColor: `${theme.palette.primary1}`,
       },
     ".MuiPickersDay-root.Mui-selected, .MuiPickersDay-root.Mui-selected:hover, .MuiPickersDay-root.Mui-selected:focus":
       {
-        color: "#fff !important",
+        color: "#fff",
         backgroundColor: `${theme.palette.primary1}`,
       },
   },
