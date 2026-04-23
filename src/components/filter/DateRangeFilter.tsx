@@ -508,7 +508,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(
                           color: theme.palette.grey600,
                           width: 22,
                           height: 22,
-                        } as any,
+                        },
                       }}
                     />
                   </Box>
