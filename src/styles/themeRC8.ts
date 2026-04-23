@@ -170,6 +170,7 @@ const rc8ThemeOptions: ThemeOptions = {
     primary5: designTokens.colours.product.primary5,
     primary6: designTokens.colours.product.primary6,
     secondary1: designTokens.colours.product.secondary1,
+    secondary2: designTokens.colours.product.secondary2,
     neutral1: designTokens.colours.product.neutral1,
     neutral2: designTokens.colours.product.neutral2,
     neutral3: designTokens.colours.product.neutral3,

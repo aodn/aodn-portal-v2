@@ -14,7 +14,7 @@ from pages.search_page import SearchPage
     'date, location, filter_parameters, filter_platforms, filter_organisation, filter_data, filter_data_download',
     [
         (
-            'Last 5 Years',
+            'Last 5 years',
             'Arafura',
             ['Carbon', 'Air Quality'],
             ['Radar', 'Vessel'],
@@ -132,7 +132,7 @@ def test_search_api_request_urls_across_page(
     'date, location, filter_parameters, filter_platforms, filter_organisation, filter_data, filter_data_download',
     [
         (
-            'Last Year',
+            'Last year',
             'Apollo',
             ['Carbon', 'Water Pressure'],
             ['Radar', 'Float'],
@@ -263,14 +263,14 @@ def test_search_api_request_urls_after_map_state_change(
     'updated_platforms, updated_organisation, updated_data, updated_data_download',
     [
         (
-            'Last 5 Years',
+            'Last 5 years',
             'Arafura',
             ['Carbon', 'Air Quality'],
             ['Radar'],
             'IMOS',
             DataSettingsFilter.DELAYED,
             'Yes',
-            'Last Year',
+            'Last year',
             'Jervis',
             ['Oxygen'],
             ['Glider', 'Vessel'],

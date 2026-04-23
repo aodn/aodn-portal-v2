@@ -14,7 +14,6 @@
  * @version RC8
  */
 
-import { fontStyle } from "@mui/system";
 import { FONT_FAMILIES } from "./fontsRC8";
 
 export const designTokensRC8 = {
@@ -192,6 +191,7 @@ export const designTokensRC8 = {
 
       // Secondary
       secondary1: "#54BCEB",
+      secondary2: "#52BDEC",
 
       // Neutral series
       neutral1: "#090C02",

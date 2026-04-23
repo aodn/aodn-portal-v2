@@ -12,7 +12,7 @@ const StyledSlider = styled(Slider)<PlainSliderProps>(({
 }) => {
   const [labelPositioning, labelPositioningMobile] = useMemo(() => {
     const labelPositioning = {
-      top: is_vertical ? "calc(100% + 1px)" : "calc(100% + 5.5px)",
+      top: is_vertical ? "calc(100% + 1px)" : "-30px",
       left: is_vertical ? "calc(100% + 25px)" : "50%",
       transform: is_vertical ? "none" : "translateX(-50%)",
     };
@@ -27,7 +27,7 @@ const StyledSlider = styled(Slider)<PlainSliderProps>(({
 
   return {
     "& .MuiSlider-valueLabel": {
-      ...portalTheme.typography.body1Medium,
+      ...portalTheme.typography.body2Regular,
       backgroundColor: "transparent",
       ...labelPositioning,
       opacity: 0, // Hide text by default
@@ -42,7 +42,7 @@ const StyledSlider = styled(Slider)<PlainSliderProps>(({
       },
     "& .MuiSlider-track": {
       boxShadow: "0 0 3px 1px rgba(0, 0, 0, 0.10) inset",
-      backgroundColor: portalTheme.palette.primary1,
+      backgroundColor: portalTheme.palette.secondary2,
       opacity: 0.7,
       border: "none",
       height: "8px",

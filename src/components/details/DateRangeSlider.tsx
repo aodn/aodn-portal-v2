@@ -14,65 +14,73 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { dateDefault } from "../common/constants";
+import theme from "../../styles/themeRC8";
+
+const paperStyle = {
+  sx: {
+    ".MuiDateCalendar-root": {
+      backgroundColor: "#fff",
+    },
+    ".MuiPickersCalendarHeader-root": {
+      marginTop: "8px",
+    },
+    ".MuiPickersYear-yearButton": {
+      color: theme.palette.text2,
+      padding: 0,
+    },
+    ".MuiPickersYear-yearButton.Mui-selected, .MuiPickersYear-yearButton.Mui-selected:hover, .MuiPickersYear-yearButton.Mui-selected:focus":
+      {
+        color: "#fff",
+        backgroundColor: `${theme.palette.primary1}`,
+      },
+    ".MuiPickersMonth-monthButton": {
+      color: theme.palette.text2,
+      padding: 0,
+    },
+    ".MuiPickersMonth-monthButton.Mui-selected, .MuiPickersMonth-monthButton.Mui-selected:hover, .MuiPickersMonth-monthButton.Mui-selected:focus":
+      {
+        color: "#fff",
+        backgroundColor: `${theme.palette.primary1}`,
+      },
+    ".MuiPickersDay-root.Mui-selected, .MuiPickersDay-root.Mui-selected:hover, .MuiPickersDay-root.Mui-selected:focus":
+      {
+        color: "#fff",
+        backgroundColor: `${theme.palette.primary1}`,
+      },
+  },
+  popper: {
+    disablePortal: true,
+    sx: {
+      zIndex: 1400,
+      "& .MuiPaper-root": {
+        transform: "none !important",
+      },
+      "& .MuiPickersPopper-paper": {
+        transformOrigin: "top left",
+      },
+    },
+    modifiers: [
+      {
+        name: "preventOverflow",
+        enabled: true,
+        options: {
+          altAxis: true,
+          boundary: "clippingParents",
+        },
+      },
+      {
+        name: "offset",
+        options: {
+          offset: [0, 8],
+        },
+      },
+    ],
+  },
+};
 
 export const DEFAULT_DATE_PICKER_SLOT = {
-  desktopPaper: {
-    sx: {
-      ".MuiDateCalendar-root": {
-        borderRadius: borderRadius.small,
-        border: `${border.sm} ${color.blue.darkSemiTransparent}`,
-        backgroundColor: "#fff",
-      },
-      ".MuiPickersCalendarHeader-root": {
-        marginTop: "8px",
-      },
-      ".MuiPickersYear-yearButton": {
-        color: fontColor.gray.dark,
-        padding: 0,
-      },
-      ".MuiPickersYear-yearButton.Mui-selected": {
-        color: "#fff",
-        backgroundColor: color.blue.dark,
-      },
-      ".MuiPickersMonth-monthButton": {
-        color: fontColor.gray.dark,
-        padding: 0,
-      },
-
-      ".MuiPickersMonth-monthButton.Mui-selected": {
-        color: "#fff",
-        backgroundColor: color.blue.dark,
-      },
-    },
-    popper: {
-      disablePortal: true,
-      sx: {
-        zIndex: 1400,
-        "& .MuiPaper-root": {
-          transform: "none !important",
-        },
-        "& .MuiPickersPopper-paper": {
-          transformOrigin: "top left",
-        },
-      },
-      modifiers: [
-        {
-          name: "preventOverflow",
-          enabled: true,
-          options: {
-            altAxis: true,
-            boundary: "clippingParents",
-          },
-        },
-        {
-          name: "offset",
-          options: {
-            offset: [0, 8],
-          },
-        },
-      ],
-    },
-  },
+  desktopPaper: paperStyle,
+  mobilePaper: paperStyle,
 };
 
 const initialMinDate: Dayjs = dayjs(dateDefault.min);

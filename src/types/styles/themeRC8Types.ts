@@ -109,6 +109,7 @@ declare module "@mui/material/styles" {
     primary5: string;
     primary6: string;
     secondary1: string;
+    secondary2: string;
     neutral1: string;
     neutral2: string;
     neutral3: string;
@@ -134,6 +135,7 @@ declare module "@mui/material/styles" {
     primary5?: string;
     primary6?: string;
     secondary1?: string;
+    secondary2?: string;
     neutral1?: string;
     neutral2?: string;
     neutral3?: string;
