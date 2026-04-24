@@ -3,6 +3,7 @@ import React, {
   startTransition,
   useCallback,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import {
@@ -39,6 +40,69 @@ import { simplify, booleanEqual, bbox, bboxPolygon } from "@turf/turf";
 import { MapDefaultConfig } from "../map/mapbox/constants";
 import { TestHelper } from "../common/test/helper";
 import { cqlDefaultFilters, PolygonOperation } from "../common/cqlFilters";
+import useBreakpoint from "../../hooks/useBreakpoint";
+import ReactMap from "../map/mapbox/Map";
+import MapContext from "../map/mapbox/MapContext";
+import Controls from "../map/mapbox/controls/Controls";
+import NavigationControl from "../map/mapbox/controls/NavigationControl";
+import { LngLatBounds } from "mapbox-gl";
+import ScaleControl from "../map/mapbox/controls/ScaleControl";
+import DisplayCoordinate from "../map/mapbox/controls/DisplayCoordinate";
+import MenuControlGroup from "../map/mapbox/controls/menu/MenuControlGroup";
+import BaseMapSwitcher from "../map/mapbox/controls/menu/BaseMapSwitcher";
+import MenuControl from "../map/mapbox/controls/menu/MenuControl";
+import DrawRect from "../map/mapbox/controls/menu/DrawRect";
+
+const MAP_ID = "location-filter-map";
+
+// Selected area layer
+const SelectedAreaLayer: FC<{ area: Feature<Polygon> | undefined }> = ({
+  area,
+}) => {
+  const { map } = React.useContext(MapContext);
+
+  useEffect(() => {
+    if (!map) return;
+
+    const sourceId = "selected-area-source";
+    const layerId = "selected-area-layer";
+
+    const addLayer = () => {
+      if (!map.getSource(sourceId)) {
+        map.addSource(sourceId, {
+          type: "geojson",
+          data: area || { type: "FeatureCollection", features: [] },
+        });
+
+        map.addLayer({
+          id: layerId,
+          type: "fill",
+          source: sourceId,
+          paint: {
+            "fill-color": "rgba(66,100,251, 0.3)",
+            "fill-outline-color": "#0000ff",
+          },
+        });
+      } else {
+        (map.getSource(sourceId) as any).setData(
+          area || { type: "FeatureCollection", features: [] }
+        );
+      }
+    };
+
+    if (map.isStyleLoaded()) {
+      addLayer();
+    } else {
+      map.once("styledata", addLayer);
+    }
+
+    return () => {
+      map.off("styledata", addLayer);
+    };
+  }, [map, area]);
+
+  return null;
+};
 
 interface LocationOptionType {
   value: string;
@@ -112,6 +176,7 @@ fetch(marineParkDefault.geojson)
 
 const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
   const dispatch = useAppDispatch();
+  const { isMobile } = useBreakpoint();
   const componentParam: ParameterState = getComponentState(store.getState());
   const [selectedOption, setSelectedOption] = useState<string | undefined>(
     "none"
@@ -152,6 +217,14 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
     handleClosePopup();
   }, [handleClosePopup]);
 
+  const handleFeaturesChange = useCallback(
+    (
+      newFeatures: Feature<Polygon>[],
+      removeFeature: (id: string) => void
+    ) => {},
+    []
+  );
+
   useEffect(() => {
     startTransition(() => {
       setSelectedOption((prevOption) => {
@@ -164,6 +237,28 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
     });
   }, [componentParam.polygon]);
 
+  const mapBbox = useMemo(() => {
+    const selectedLocation = locationOptions?.find(
+      (o) => o.value === selectedOption
+    );
+    const area = selectedLocation?.geo?.features[0];
+    if (area) {
+      const areaBbox = bbox(area);
+      return new LngLatBounds(
+        [areaBbox[0], areaBbox[1]],
+        [areaBbox[2], areaBbox[3]]
+      );
+    }
+    return undefined;
+  }, [selectedOption]);
+
+  const selectedArea = useMemo(() => {
+    const selectedLocation = locationOptions?.find(
+      (o) => o.value === selectedOption
+    );
+    return selectedLocation?.geo?.features[0];
+  }, [selectedOption]);
+
   if (locationOptions.length === 0) return null;
 
   return (
@@ -171,11 +266,10 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
       sx={{
         position: "relative",
         display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "column",
+        flexDirection: isMobile ? "column" : "row",
         width: "100%",
         padding: padding.large,
+        gap: padding.large,
       }}
     >
       <Box
@@ -209,37 +303,75 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
           <CloseIcon sx={{ fontSize: fontSize.info }} />
         </IconButton>
       </Box>
-      <Typography
-        pt={padding.large}
-        fontSize={fontSize.info}
-        fontWeight={fontWeight.bold}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          flex: isMobile ? 1 : "0 0 300px",
+        }}
       >
-        Australian Marine Parks
-      </Typography>
-      <FormControl sx={{ maxHeight: "300px", overflowY: "auto", flex: 1 }}>
-        <RadioGroup
-          defaultValue={locationOptions[0].value}
-          value={selectedOption}
-          onChange={handleRadioChange}
+        <Typography
+          pt={isMobile ? 0 : padding.large}
+          fontSize={fontSize.info}
+          fontWeight={fontWeight.bold}
         >
-          {locationOptions.map((item) => (
-            <FormControlLabel
-              value={item.value}
-              control={<Radio />}
-              label={item.label}
-              key={item.value}
-              data-testid={`radio-${item.label}`}
-              sx={{
-                ".MuiFormControlLabel-label": {
-                  fontFamily: fontFamily.general,
-                  fontSize: fontSize.info,
-                  padding: 0,
-                },
-              }}
-            />
-          ))}
-        </RadioGroup>
-      </FormControl>
+          Australian Marine Parks
+        </Typography>
+        <FormControl
+          sx={{
+            maxHeight: isMobile ? "200px" : "400px",
+            overflowY: "auto",
+            flex: 1,
+          }}
+        >
+          <RadioGroup
+            defaultValue={locationOptions[0].value}
+            value={selectedOption}
+            onChange={handleRadioChange}
+          >
+            {locationOptions.map((item) => (
+              <FormControlLabel
+                value={item.value}
+                control={<Radio />}
+                label={item.label}
+                key={item.value}
+                data-testid={`radio-${item.label}`}
+                sx={{
+                  ".MuiFormControlLabel-label": {
+                    fontFamily: fontFamily.general,
+                    fontSize: fontSize.info,
+                    padding: 0,
+                  },
+                }}
+              />
+            ))}
+          </RadioGroup>
+        </FormControl>
+      </Box>
+      {!isMobile && (
+        <Box
+          id={MAP_ID}
+          sx={{ flex: 1, minHeight: "400px", position: "relative" }}
+        >
+          <ReactMap
+            panelId={MAP_ID}
+            bbox={mapBbox}
+            zoom={MapDefaultConfig.ZOOM - 1}
+          >
+            <Controls>
+              <NavigationControl />
+              <ScaleControl />
+              <DisplayCoordinate />
+              <MenuControlGroup>
+                <MenuControl menu={<BaseMapSwitcher />} />
+                <MenuControl
+                  menu={<DrawRect onChangeFeatures={handleFeaturesChange} />}
+                />
+              </MenuControlGroup>
+            </Controls>
+          </ReactMap>
+        </Box>
+      )}
       <TestHelper
         id="selected-location"
         getSelectedLocationIntersects={() => {

@@ -31,7 +31,7 @@ interface DrawControlProps extends ControlProps {
     features: Feature<Polygon>[],
     removeFeature: (id: string) => void
   ) => void;
-  features: Feature<Polygon>[];
+  features?: Feature<Polygon>[];
 }
 
 const MENU_ID = "draw-rect-menu-button";
@@ -44,7 +44,7 @@ type SelectionTool = "bbox" | "polygon";
 const DrawRect: React.FC<DrawControlProps> = ({
   map,
   onChangeFeatures,
-  features,
+  features = [],
 }) => {
   const [isDrawingMode, setIsDrawingMode] = useState<boolean>(false);
   const [isDirectSelectMode, setIsDirectSelectMode] = useState(false);

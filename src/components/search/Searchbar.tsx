@@ -209,11 +209,11 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
           ]}
           style={{
             width:
-              activeButton === SearchbarButtonNames.Location
+              activeButton === SearchbarButtonNames.Location && isMobile
                 ? "300px"
                 : searchbarWidth,
             minWidth:
-              activeButton === SearchbarButtonNames.Location
+              activeButton === SearchbarButtonNames.Location && isMobile
                 ? 0
                 : isMobile
                   ? POPUP_MIN_WIDTH_MOBILE
