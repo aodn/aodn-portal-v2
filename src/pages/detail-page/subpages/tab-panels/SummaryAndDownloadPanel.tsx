@@ -58,6 +58,8 @@ import { DateSliderPoint } from "../../../../components/common/slider/DateSlider
 import { dateToValue } from "../../../../utils/DateUtils";
 import { portalTheme } from "../../../../styles";
 import { GeoserverFieldsResponse } from "../../../../components/common/store/GeoserverDefinitions";
+import * as turf from "@turf/turf";
+import _ from "lodash";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -426,6 +428,47 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     [setSelectedWmsLayer]
   );
 
+  const handleFeaturesChange = useCallback(
+    (newFeatures: Feature<Polygon>[], removeFeature: (id: string) => void) => {
+      const bboxConditions: BBoxCondition[] = [];
+      const polygonConditions: PolygonCondition[] = [];
+
+      newFeatures.forEach((feature) => {
+        const id = String(feature.id);
+        const selectionType = feature.properties?.selectionType || "bbox";
+        const removeCallback = () => removeFeature(id);
+
+        if (selectionType === "polygon") {
+          const coords = feature.geometry.coordinates[0];
+          // Remove closing duplicate point if present
+          const vertices =
+            coords.length > 1 &&
+            coords[0][0] === coords[coords.length - 1][0] &&
+            coords[0][1] === coords[coords.length - 1][1]
+              ? coords.slice(0, -1)
+              : coords;
+          polygonConditions.push(
+            new PolygonCondition(
+              id,
+              vertices as [number, number][],
+              removeCallback
+            )
+          );
+        } else {
+          const bbox = turf.bbox(feature);
+          bboxConditions.push(new BBoxCondition(id, bbox, removeCallback));
+        }
+      });
+
+      getAndSetDownloadConditions(DownloadConditionType.BBOX, bboxConditions);
+      getAndSetDownloadConditions(
+        DownloadConditionType.POLYGON,
+        polygonConditions
+      );
+    },
+    [getAndSetDownloadConditions]
+  );
+
   return (
     collection && (
       <Grid container>
@@ -531,9 +574,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       visible={checkSubsettingSupport(SubsettingType.DrawRect)}
                       menu={
                         <DrawRect
-                          getAndSetDownloadConditions={
-                            getAndSetDownloadConditions
-                          }
+                          onChangeFeatures={handleFeaturesChange}
                           features={drawFeatures}
                         />
                       }

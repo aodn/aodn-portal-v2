@@ -11,12 +11,7 @@ import MapboxDraw from "@mapbox/mapbox-gl-draw";
 
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-import {
-  BBoxCondition,
-  PolygonCondition,
-  DownloadConditionType,
-  IDownloadCondition,
-} from "../../../../../pages/detail-page/context/DownloadDefinitions";
+
 import _ from "lodash";
 import { Box, IconButton } from "@mui/material";
 import DrawRectangle from "./DrawRectangle";
@@ -32,10 +27,10 @@ import { PolygonSelectionIcon } from "../../../../../assets/icons/map/polygon_se
 import usePolygonCursorHint from "../../../../../hooks/usePolygonCursorHint";
 
 interface DrawControlProps extends ControlProps {
-  getAndSetDownloadConditions: (
-    type: DownloadConditionType,
-    conditions: IDownloadCondition[]
-  ) => IDownloadCondition[];
+  onChangeFeatures?: (
+    features: Feature<Polygon>[],
+    removeFeature: (id: string) => void
+  ) => void;
   features: Feature<Polygon>[];
 }
 
@@ -48,7 +43,7 @@ type SelectionTool = "bbox" | "polygon";
 
 const DrawRect: React.FC<DrawControlProps> = ({
   map,
-  getAndSetDownloadConditions,
+  onChangeFeatures,
   features,
 }) => {
   const [isDrawingMode, setIsDrawingMode] = useState<boolean>(false);
@@ -110,62 +105,32 @@ const DrawRect: React.FC<DrawControlProps> = ({
     setShowPolygonTooltip(false);
   }, []);
 
-  // Converts map features to BBoxCondition or PolygonCondition objects and updates the context
+  // Pass map features to the caller via onChangeFeatures
   const syncMapFeaturesToContext = useCallback(
     (mapDraw: MapboxDraw) => {
-      const features = mapDraw.getAll().features;
-      const bboxConditions: BBoxCondition[] = [];
-      const polygonConditions: PolygonCondition[] = [];
+      const features = mapDraw
+        .getAll()
+        .features.filter(
+          (feature) => feature.geometry.type === "Polygon"
+        ) as Feature<Polygon>[];
 
-      features
-        .filter((feature) => feature.geometry.type === "Polygon")
-        .forEach((feature) => {
-          const polygon = feature.geometry as Polygon;
-          const id = _.toString(feature.id);
-          const selectionType = feature.properties?.selectionType || "bbox";
+      const removeFeature = (id: string) => {
+        try {
+          mapDraw.delete(id);
+        } catch (error) {
+          // Ok to ignore the error as this happens when user try to delete a download condition when map is off
+          console.warn(
+            "Failed to delete feature from map, but ok to ignore:",
+            error
+          );
+        }
+      };
 
-          const removeCallback = () => {
-            try {
-              mapDraw.delete(id);
-            } catch (error) {
-              // Ok to ignore the error as this happens when user try to delete a download condition when map is off
-              console.warn(
-                "Failed to delete feature from map, but ok to ignore:",
-                error
-              );
-            }
-          };
-
-          if (selectionType === "polygon") {
-            const coords = polygon.coordinates[0];
-            // Remove closing duplicate point if present
-            const vertices =
-              coords.length > 1 &&
-              coords[0][0] === coords[coords.length - 1][0] &&
-              coords[0][1] === coords[coords.length - 1][1]
-                ? coords.slice(0, -1)
-                : coords;
-            polygonConditions.push(
-              new PolygonCondition(
-                id,
-                vertices as [number, number][],
-                removeCallback
-              )
-            );
-          } else {
-            const bbox = turf.bbox(polygon);
-            bboxConditions.push(new BBoxCondition(id, bbox, removeCallback));
-          }
-        });
-
-      getAndSetDownloadConditions(DownloadConditionType.BBOX, bboxConditions);
-      getAndSetDownloadConditions(
-        DownloadConditionType.POLYGON,
-        polygonConditions
-      );
-      return [...bboxConditions, ...polygonConditions];
+      if (onChangeFeatures) {
+        onChangeFeatures(features, removeFeature);
+      }
     },
-    [getAndSetDownloadConditions]
+    [onChangeFeatures]
   );
 
   const [anchorRef, setAnchorRef] = useState<HTMLButtonElement | null>(null);
