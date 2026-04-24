@@ -1,4 +1,5 @@
 import React, {
+  startTransition,
   useCallback,
   useEffect,
   useMemo,
@@ -6,7 +7,6 @@ import React, {
   useState,
 } from "react";
 import { Polygon, Feature } from "geojson";
-import * as turf from "@turf/turf";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -174,9 +174,9 @@ const DrawRect: React.FC<DrawControlProps> = ({
       }
     }
 
-    setTimeout(() => {
+    startTransition(() => {
       syncMapFeaturesToContext(mapDraw);
-    }, 0);
+    });
   }, [mapDraw, hasFeatures, syncMapFeaturesToContext]);
 
   useEffect(() => {
