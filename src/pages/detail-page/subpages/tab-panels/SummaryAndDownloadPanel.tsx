@@ -189,7 +189,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   >([]);
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
-  const [_, setWMSFields] = useState<GeoserverFieldsResponse[]>([]);
+  const [_wmsFields, setWMSFields] = useState<GeoserverFieldsResponse[]>([]);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(false);
   const [drawRectSupport, setDrawRectSupportSupport] = useState<boolean>(false);
   const [discreteTimeSliderValues, setDiscreteTimeSliderValues] = useState<
