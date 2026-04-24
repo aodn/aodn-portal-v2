@@ -36,7 +36,7 @@ interface DrawControlProps extends ControlProps {
     type: DownloadConditionType,
     conditions: IDownloadCondition[]
   ) => IDownloadCondition[];
-  downloadConditions: IDownloadCondition[];
+  features: Feature<Polygon>[];
 }
 
 const MENU_ID = "draw-rect-menu-button";
@@ -49,7 +49,7 @@ type SelectionTool = "bbox" | "polygon";
 const DrawRect: React.FC<DrawControlProps> = ({
   map,
   getAndSetDownloadConditions,
-  downloadConditions,
+  features,
 }) => {
   const [isDrawingMode, setIsDrawingMode] = useState<boolean>(false);
   const [isDirectSelectMode, setIsDirectSelectMode] = useState(false);
@@ -311,60 +311,16 @@ const DrawRect: React.FC<DrawControlProps> = ({
   // Effect for init map draw features (bbox rectangles and polygons)
   useEffect(() => {
     if (!map || !mapDraw) return;
-    const existingBboxConditions = downloadConditions.filter(
-      (condition) => condition.type === DownloadConditionType.BBOX
-    ) as BBoxCondition[];
 
-    const existingPolygonConditions = downloadConditions.filter(
-      (condition) => condition.type === DownloadConditionType.POLYGON
-    ) as PolygonCondition[];
-
-    const features = mapDraw.getAll().features;
-    const totalConditions =
-      existingBboxConditions.length + existingPolygonConditions.length;
+    const mapFeatures = mapDraw.getAll().features;
 
     // We only need to update map features when count in context and map are different
-    const shouldUpdate = features.length !== totalConditions;
+    const shouldUpdate = mapFeatures.length !== features.length;
 
     if (shouldUpdate) {
       mapDraw.deleteAll();
 
-      // Restore bbox conditions as rectangular features
-      existingBboxConditions.forEach((condition) => {
-        const [west, south, east, north] = condition.bbox;
-        const feature: Feature<Polygon> = {
-          type: "Feature",
-          geometry: {
-            type: "Polygon",
-            coordinates: [
-              [
-                [west, north],
-                [east, north],
-                [east, south],
-                [west, south],
-                [west, north],
-              ],
-            ],
-          },
-          properties: { selectionType: "bbox" },
-        };
-        mapDraw.add(feature);
-      });
-
-      // Restore polygon conditions as polygon features
-      existingPolygonConditions.forEach((condition) => {
-        const closedCoords = [
-          ...condition.coordinates,
-          condition.coordinates[0],
-        ];
-        const feature: Feature<Polygon> = {
-          type: "Feature",
-          geometry: {
-            type: "Polygon",
-            coordinates: [closedCoords],
-          },
-          properties: { selectionType: "polygon" },
-        };
+      features.forEach((feature) => {
         mapDraw.add(feature);
       });
 
@@ -373,7 +329,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
         syncMapFeaturesToContext(mapDraw);
       }, 0);
     }
-  }, [downloadConditions, syncMapFeaturesToContext, map, mapDraw]);
+  }, [features, syncMapFeaturesToContext, map, mapDraw]);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>

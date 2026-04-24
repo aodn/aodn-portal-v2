@@ -27,9 +27,11 @@ import {
   DownloadConditionType,
   DownloadServiceType,
   SubsettingType,
+  BBoxCondition,
+  PolygonCondition,
 } from "../../context/DownloadDefinitions";
 import { dateDefault } from "../../../../components/common/constants";
-import { FeatureCollection, Point } from "geojson";
+import { FeatureCollection, Point, Feature, Polygon } from "geojson";
 import DisplayCoordinate from "../../../../components/map/mapbox/controls/DisplayCoordinate";
 import HexbinLayer from "../../../../components/map/mapbox/layers/HexbinLayer";
 import GeoServerLayer, {
@@ -265,6 +267,52 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     return [conditionStart, conditionEnd];
   }, [downloadConditions]);
 
+  const drawFeatures = useMemo(() => {
+    const existingBboxConditions = downloadConditions.filter(
+      (condition) => condition.type === DownloadConditionType.BBOX
+    ) as BBoxCondition[];
+
+    const existingPolygonConditions = downloadConditions.filter(
+      (condition) => condition.type === DownloadConditionType.POLYGON
+    ) as PolygonCondition[];
+
+    const features: Feature<Polygon>[] = [];
+
+    existingBboxConditions.forEach((condition) => {
+      const [west, south, east, north] = condition.bbox;
+      features.push({
+        type: "Feature",
+        geometry: {
+          type: "Polygon",
+          coordinates: [
+            [
+              [west, north],
+              [east, north],
+              [east, south],
+              [west, south],
+              [west, north],
+            ],
+          ],
+        },
+        properties: { selectionType: "bbox" },
+      });
+    });
+
+    existingPolygonConditions.forEach((condition) => {
+      const closedCoords = [...condition.coordinates, condition.coordinates[0]];
+      features.push({
+        type: "Feature",
+        geometry: {
+          type: "Polygon",
+          coordinates: [closedCoords],
+        },
+        properties: { selectionType: "polygon" },
+      });
+    });
+
+    return features;
+  }, [downloadConditions]);
+
   const geoServerLayerConfig = useMemo(() => {
     return discreteTimeSliderValues
       ? {
@@ -486,7 +534,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                           getAndSetDownloadConditions={
                             getAndSetDownloadConditions
                           }
-                          downloadConditions={downloadConditions}
+                          features={drawFeatures}
                         />
                       }
                     />
