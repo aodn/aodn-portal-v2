@@ -290,9 +290,9 @@ const DrawRect: React.FC<DrawControlProps> = ({
       });
 
       // Recreate conditions with new onRemove callback referencing new feature id
-      setTimeout(() => {
+      startTransition(() => {
         syncMapFeaturesToContext(mapDraw);
-      }, 0);
+      });
     }
   }, [features, syncMapFeaturesToContext, map, mapDraw]);
 
