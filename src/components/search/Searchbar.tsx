@@ -208,18 +208,12 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
             },
           ]}
           style={{
-            width:
-              activeButton === SearchbarButtonNames.Location && isMobile
-                ? "300px"
-                : searchbarWidth,
-            minWidth:
-              activeButton === SearchbarButtonNames.Location && isMobile
-                ? 0
-                : isMobile
-                  ? POPUP_MIN_WIDTH_MOBILE
-                  : isTablet
-                    ? POPUP_MIN_WIDTH_TABLET
-                    : POPUP_MIN_WIDTH_LAPTOP,
+            width: searchbarWidth,
+            minWidth: isMobile
+              ? searchbarWidth
+              : isTablet
+                ? POPUP_MIN_WIDTH_TABLET
+                : POPUP_MIN_WIDTH_LAPTOP,
             borderRadius: borderRadius.small,
             zIndex: 99,
           }}

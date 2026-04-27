@@ -269,6 +269,7 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
         flexDirection: isMobile ? "column" : "row",
         width: "100%",
         padding: padding.large,
+        pt: padding.triple,
         gap: padding.large,
       }}
     >
@@ -310,11 +311,7 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
           flex: isMobile ? 1 : "0 0 300px",
         }}
       >
-        <Typography
-          pt={isMobile ? 0 : padding.large}
-          fontSize={fontSize.info}
-          fontWeight={fontWeight.bold}
-        >
+        <Typography fontSize={fontSize.info} fontWeight={fontWeight.bold}>
           Australian Marine Parks
         </Typography>
         <FormControl
