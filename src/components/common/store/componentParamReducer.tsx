@@ -3,7 +3,7 @@
  * to preserve value between pages. The number below must be unique across the whole application
  */
 import { bboxPolygon } from "@turf/turf";
-import { Feature, Polygon, GeoJsonProperties } from "geojson";
+import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from "geojson";
 import { DatasetFrequency, DatasetStatus } from "./searchReducer";
 import { MapDefaultConfig } from "../../map/mapbox/constants";
 import { SearchResultLayoutEnum } from "../buttons/ResultListLayoutButton";
@@ -62,7 +62,7 @@ export interface DateTimeFilterRange {
 
 export interface ParameterState {
   bbox?: Feature<Polygon>;
-  polygon?: Feature<Polygon>;
+  polygon?: Feature<Polygon | MultiPolygon>;
   datasetGroup?: string;
   hasCOData?: boolean;
   includeNoGeometry?: boolean;
@@ -126,7 +126,7 @@ const updatePlatform = (platform: Array<string>): ActionType => {
 };
 
 const updateFilterPolygon = (
-  polygon: Feature<Polygon, GeoJsonProperties> | undefined
+  polygon: Feature<Polygon | MultiPolygon, GeoJsonProperties> | undefined
 ): ActionType => {
   return {
     type: UPDATE_POLYGON_FILTER_VARIABLE,

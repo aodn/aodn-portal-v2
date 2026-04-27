@@ -4,7 +4,7 @@
  */
 import dayjs from "dayjs";
 import { dateDefault } from "./constants";
-import { Feature, Polygon, GeoJsonProperties } from "geojson";
+import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from "geojson";
 import * as wellknown from "wellknown";
 import { Vocab } from "./store/componentParamReducer";
 import { DatasetFrequency, DatasetStatus } from "./store/searchReducer";
@@ -16,7 +16,7 @@ type SingleArgumentFunction<T, R> = (p: T) => R;
 type DualArgumentFunction<I, J, R> = (i: I, j: J) => R;
 
 export type PolygonOperation = SingleArgumentFunction<
-  Feature<Polygon, GeoJsonProperties>,
+  Feature<Polygon | MultiPolygon, GeoJsonProperties>,
   string
 >;
 export type TemporalAfterOrBefore = SingleArgumentFunction<number, string>;

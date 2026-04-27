@@ -15,11 +15,7 @@ import SearchbarButtonGroup, {
 } from "./SearchbarButtonGroup";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import useElementSize from "../../hooks/useElementSize";
-import {
-  POPUP_MIN_WIDTH_LAPTOP,
-  POPUP_MIN_WIDTH_MOBILE,
-  POPUP_MIN_WIDTH_TABLET,
-} from "./constants";
+import { POPUP_MIN_WIDTH_LAPTOP, POPUP_MIN_WIDTH_TABLET } from "./constants";
 import DateRangeFilter from "../filter/DateRangeFilter";
 import { useLocation } from "react-router-dom";
 import { pageDefault, pageReferer } from "../common/constants";

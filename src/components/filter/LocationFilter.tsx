@@ -8,11 +8,15 @@ import React, {
 } from "react";
 import {
   Box,
+  Checkbox,
   FormControl,
   FormControlLabel,
+  FormGroup,
   IconButton,
+  MenuItem,
   Radio,
   RadioGroup,
+  Select,
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
@@ -21,7 +25,6 @@ import {
   color,
   fontFamily,
   fontSize,
-  fontWeight,
   gap,
   padding,
 } from "../../styles/constants";
@@ -34,9 +37,15 @@ import {
   updateFilterPolygon,
   updateZoom,
 } from "../common/store/componentParamReducer";
-import { useAppDispatch } from "../common/store/hooks";
-import store, { getComponentState } from "../common/store/store";
-import { simplify, booleanEqual, bbox, bboxPolygon } from "@turf/turf";
+import { useAppDispatch, useAppSelector } from "../common/store/hooks";
+import {
+  bbox,
+  bboxPolygon,
+  booleanEqual,
+  featureCollection,
+  simplify,
+  union,
+} from "@turf/turf";
 import { MapDefaultConfig } from "../map/mapbox/constants";
 import { TestHelper } from "../common/test/helper";
 import { cqlDefaultFilters, PolygonOperation } from "../common/cqlFilters";
@@ -52,13 +61,56 @@ import MenuControlGroup from "../map/mapbox/controls/menu/MenuControlGroup";
 import BaseMapSwitcher from "../map/mapbox/controls/menu/BaseMapSwitcher";
 import MenuControl from "../map/mapbox/controls/menu/MenuControl";
 import DrawRect from "../map/mapbox/controls/menu/DrawRect";
+import theme from "../../styles/themeRC8";
 
 const MAP_ID = "location-filter-map";
 
-// Selected area layer
-const SelectedAreaLayer: FC<{ area: Feature<Polygon> | undefined }> = ({
-  area,
-}) => {
+const MARINE_PARK_GROUP_VALUE = "australian-marine-parks";
+
+type LocationFilterMode = "country" | "ocean" | "marinePark" | "mapBoundary";
+
+interface LocationOptionType {
+  value: string;
+  label: string;
+  geo?: FeatureCollection<Polygon>;
+}
+
+interface LocationFilterProps {
+  handleClosePopup: () => void;
+}
+
+const loadMarineParkOptions = async (): Promise<LocationOptionType[]> => {
+  const response = await fetch(marineParkDefault.geojson);
+  const json: FeatureCollection<Polygon> = await response.json();
+  const grouped = _.groupBy(
+    json.features,
+    (feature) => feature.properties?.RESNAME
+  );
+  const collections = Object.values(grouped).map<FeatureCollection<Polygon>>(
+    (features) => ({
+      type: "FeatureCollection",
+      features: features as Feature<Polygon>[],
+    })
+  );
+
+  return collections
+    .map<LocationOptionType>((value) => {
+      value.features[0] = simplify(value.features[0], {
+        tolerance: 0.05,
+        highQuality: false,
+      });
+      return {
+        label: value.features[0].properties?.RESNAME,
+        value: "" + value.features[0].properties?.OBJECTID,
+        geo: value,
+      };
+    })
+    .sort((a, b) => (a.label ?? "").localeCompare(b.label ?? ""));
+};
+
+const SelectedAreaLayer: FC<{
+  areas: FeatureCollection<Polygon> | undefined;
+}> = ({ areas }) => {
   const { map } = React.useContext(MapContext);
 
   useEffect(() => {
@@ -68,10 +120,14 @@ const SelectedAreaLayer: FC<{ area: Feature<Polygon> | undefined }> = ({
     const layerId = "selected-area-layer";
 
     const addLayer = () => {
+      const data = areas?.features?.length
+        ? areas
+        : { type: "FeatureCollection" as const, features: [] };
+
       if (!map.getSource(sourceId)) {
         map.addSource(sourceId, {
           type: "geojson",
-          data: area || { type: "FeatureCollection", features: [] },
+          data,
         });
 
         map.addLayer({
@@ -84,9 +140,9 @@ const SelectedAreaLayer: FC<{ area: Feature<Polygon> | undefined }> = ({
           },
         });
       } else {
-        (map.getSource(sourceId) as any).setData(
-          area || { type: "FeatureCollection", features: [] }
-        );
+        (
+          map.getSource(sourceId) as { setData: (d: typeof data) => void }
+        ).setData(data);
       }
     };
 
@@ -99,118 +155,102 @@ const SelectedAreaLayer: FC<{ area: Feature<Polygon> | undefined }> = ({
     return () => {
       map.off("styledata", addLayer);
     };
-  }, [map, area]);
+  }, [map, areas]);
 
   return null;
 };
 
-interface LocationOptionType {
-  value: string;
-  label: string;
-  geo?: FeatureCollection<Polygon>;
-}
-
-interface LocationFilterProps {
-  handleClosePopup: () => void;
-}
-
-const locationOptions: LocationOptionType[] = [];
-
-const DEFAULT_LOCATION = {
-  label: "None",
-  value: "none",
-  geo: undefined,
-};
-// Given a polygon find the item in the location type option that matches
-// the feature geometry
-const findMatch = (
-  polygon: Feature<Polygon> | undefined,
-  locations: LocationOptionType[]
-): string => {
-  const o = locations.find(
-    (l) =>
-      l.geo?.features[0] && polygon && booleanEqual(l.geo?.features[0], polygon)
-  );
-  return o ? o.value : "none";
-};
-
-fetch(marineParkDefault.geojson)
-  .then((response) => response.json())
-  .then((json: FeatureCollection<Polygon>) => {
-    // Regroup the Features by name and create a new array or FeatureCollection
-    const grouped = _.groupBy(
-      json.features,
-      (feature) => feature.properties?.RESNAME
-    );
-    return Object.values(grouped).map<FeatureCollection<Polygon>>(
-      (features) => ({
-        type: "FeatureCollection",
-        features: features as Feature<Polygon>[],
-      })
-    );
-  })
-  .then((values: Array<FeatureCollection<Polygon>>) => {
-    // Create the drop-down list items
-    const l = values
-      .map<LocationOptionType>((value) => {
-        // simplify the polygon here, otherwise too big of url for query
-        value.features[0] = simplify(value.features[0], {
-          tolerance: 0.05,
-          highQuality: false,
-        });
-        const option: LocationOptionType = {
-          label: value.features[0].properties?.RESNAME,
-          value: "" + value.features[0].properties?.OBJECTID,
-          geo: value,
-        };
-        return option;
-      })
-      .sort((a, b) => a.label.localeCompare(b.label));
-
-    locationOptions.push(DEFAULT_LOCATION);
-    locationOptions.push(...l);
-  })
-  .catch((error) => {
-    console.error("Error fetching JSON in LocationFilter:", error);
-  });
-
 const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
   const dispatch = useAppDispatch();
   const { isMobile } = useBreakpoint();
-  const componentParam: ParameterState = getComponentState(store.getState());
-  const [selectedOption, setSelectedOption] = useState<string | undefined>(
-    "none"
-  );
+  const componentParam: ParameterState = useAppSelector((s) => s.paramReducer);
+  const [filterMode, setFilterMode] =
+    useState<LocationFilterMode>("marinePark");
+  const [marineParkOptions, setMarineParkOptions] = useState<
+    LocationOptionType[]
+  >([]);
+  const [selectedMarineParkValues, setSelectedMarineParkValues] = useState<
+    Set<string>
+  >(new Set());
 
-  // TODO: need to update redux as well if ogcapi support this query
-  const handleRadioChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const l = locationOptions?.find((o) => o.value === event.target.value);
-      if (l && l.geo?.features) {
-        // The marineParkDefault is a boundary json so only 1 feature found.
-        const area = l.geo.features[0];
-        dispatch(updateFilterPolygon(area));
-        // Set focus to that area by moving the bbox of the map
-        // if users selected filter by particular area.
-        const areaBbox = bbox(area);
+  useEffect(() => {
+    let cancelled = false;
+    loadMarineParkOptions()
+      .then((opts) => {
+        if (!cancelled) setMarineParkOptions(opts);
+      })
+      .catch((error) => {
+        console.error("Error fetching JSON in LocationFilter:", error);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const applyMarineParkSelection = useCallback(
+    (next: Set<string>) => {
+      const features = marineParkOptions
+        .filter((o) => next.has(o.value))
+        .map((o) => o.geo!.features[0]);
+
+      if (features.length === 0) {
+        dispatch(updateFilterPolygon(undefined));
+        return;
+      }
+      if (features.length === 1) {
+        dispatch(updateFilterPolygon(features[0]));
+        const areaBbox = bbox(features[0]);
         dispatch(updateFilterBBox(bboxPolygon(areaBbox)));
         dispatch(
           updateZoom(
             (MapDefaultConfig.MIN_ZOOM + MapDefaultConfig.MAX_ZOOM) / 2
           )
         );
-        setSelectedOption(event.target.value);
-      } else {
+        return;
+      }
+      const merged = union(featureCollection(features));
+      if (merged) {
+        dispatch(updateFilterPolygon(merged));
+        const areaBbox = bbox(merged);
+        dispatch(updateFilterBBox(bboxPolygon(areaBbox)));
+        dispatch(
+          updateZoom(
+            (MapDefaultConfig.MIN_ZOOM + MapDefaultConfig.MAX_ZOOM) / 2
+          )
+        );
+      }
+    },
+    [dispatch, marineParkOptions]
+  );
+
+  const handleFilterModeChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const mode = event.target.value as LocationFilterMode;
+      setFilterMode(mode);
+      if (mode !== "marinePark") {
+        setSelectedMarineParkValues(new Set());
         dispatch(updateFilterPolygon(undefined));
-        setSelectedOption(DEFAULT_LOCATION.value);
       }
     },
     [dispatch]
   );
 
+  const handleMarineParkCheckboxChange = useCallback(
+    (parkValue: string, checked: boolean) => {
+      setSelectedMarineParkValues((prev) => {
+        const next = new Set(prev);
+        if (checked) next.add(parkValue);
+        else next.delete(parkValue);
+        applyMarineParkSelection(next);
+        return next;
+      });
+    },
+    [applyMarineParkSelection]
+  );
+
   const handleClear = useCallback(() => {
     dispatch(updateFilterPolygon(undefined));
-    setSelectedOption(DEFAULT_LOCATION.value);
+    setSelectedMarineParkValues(new Set());
   }, [dispatch]);
 
   const handleClose = useCallback(() => {
@@ -219,47 +259,75 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
 
   const handleFeaturesChange = useCallback(
     (
-      newFeatures: Feature<Polygon>[],
-      removeFeature: (id: string) => void
+      _newFeatures: Feature<Polygon>[],
+      _removeFeature: (id: string) => void
     ) => {},
     []
   );
 
   useEffect(() => {
-    startTransition(() => {
-      setSelectedOption((prevOption) => {
-        const matchedLocation = findMatch(
-          componentParam.polygon,
-          locationOptions
-        );
-        return prevOption === matchedLocation ? prevOption : matchedLocation;
-      });
-    });
-  }, [componentParam.polygon]);
-
-  const mapBbox = useMemo(() => {
-    const selectedLocation = locationOptions?.find(
-      (o) => o.value === selectedOption
+    if (filterMode !== "marinePark" || marineParkOptions.length === 0) return;
+    const p = componentParam.polygon;
+    if (!p) {
+      startTransition(() => setSelectedMarineParkValues(new Set()));
+      return;
+    }
+    const exact = marineParkOptions.find(
+      (o) =>
+        o.geo?.features[0] &&
+        booleanEqual(o.geo.features[0], p as Feature<Polygon>)
     );
-    const area = selectedLocation?.geo?.features[0];
-    if (area) {
-      const areaBbox = bbox(area);
-      return new LngLatBounds(
-        [areaBbox[0], areaBbox[1]],
-        [areaBbox[2], areaBbox[3]]
+    if (exact) {
+      startTransition(() =>
+        setSelectedMarineParkValues(new Set([exact.value]))
       );
     }
-    return undefined;
-  }, [selectedOption]);
+  }, [componentParam.polygon, filterMode, marineParkOptions]);
 
-  const selectedArea = useMemo(() => {
-    const selectedLocation = locationOptions?.find(
-      (o) => o.value === selectedOption
-    );
-    return selectedLocation?.geo?.features[0];
-  }, [selectedOption]);
+  const highlightCollection = useMemo(():
+    | FeatureCollection<Polygon>
+    | undefined => {
+    if (filterMode !== "marinePark" || selectedMarineParkValues.size === 0) {
+      return undefined;
+    }
+    const feats = marineParkOptions
+      .filter((o) => selectedMarineParkValues.has(o.value))
+      .map((o) => o.geo!.features[0]);
+    if (feats.length === 0) return undefined;
+    return { type: "FeatureCollection", features: feats };
+  }, [filterMode, marineParkOptions, selectedMarineParkValues]);
 
-  if (locationOptions.length === 0) return null;
+  const mapBbox = useMemo(() => {
+    if (filterMode !== "marinePark" || selectedMarineParkValues.size === 0) {
+      return undefined;
+    }
+    const feats = marineParkOptions
+      .filter((o) => selectedMarineParkValues.has(o.value))
+      .map((o) => o.geo!.features[0]);
+    if (feats.length === 0) return undefined;
+    const bounds =
+      feats.length === 1 ? bbox(feats[0]) : bbox(featureCollection(feats));
+    return new LngLatBounds([bounds[0], bounds[1]], [bounds[2], bounds[3]]);
+  }, [filterMode, marineParkOptions, selectedMarineParkValues]);
+
+  const mergedPolygonForTests = useMemo(() => {
+    if (filterMode !== "marinePark") return undefined;
+    const feats = marineParkOptions
+      .filter((o) => selectedMarineParkValues.has(o.value))
+      .map((o) => o.geo!.features[0]);
+    if (feats.length === 0) return undefined;
+    if (feats.length === 1) return feats[0];
+    return union(featureCollection(feats)) ?? undefined;
+  }, [filterMode, marineParkOptions, selectedMarineParkValues]);
+
+  if (marineParkOptions.length === 0) return null;
+
+  const modeRadios: { value: LocationFilterMode; label: string }[] = [
+    { value: "country", label: "By country" },
+    { value: "ocean", label: "By ocean or sea name" },
+    { value: "marinePark", label: "By marine park" },
+    { value: "mapBoundary", label: "By map boundary" },
+  ];
 
   return (
     <Box
@@ -304,39 +372,38 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
           <CloseIcon sx={{ fontSize: fontSize.info }} />
         </IconButton>
       </Box>
+
       <Box
         sx={{
           display: "flex",
           flexDirection: "column",
-          flex: isMobile ? 1 : "0 0 300px",
+          flex: isMobile ? 1 : "0 0 200px",
+          gap: gap.sm,
         }}
       >
-        <Typography fontSize={fontSize.info} fontWeight={fontWeight.bold}>
-          Australian Marine Parks
-        </Typography>
-        <FormControl
-          sx={{
-            maxHeight: isMobile ? "200px" : "400px",
-            overflowY: "auto",
-            flex: 1,
-          }}
-        >
-          <RadioGroup
-            defaultValue={locationOptions[0].value}
-            value={selectedOption}
-            onChange={handleRadioChange}
-          >
-            {locationOptions.map((item) => (
+        <Typography variant="title1Medium">Filter by</Typography>
+        <FormControl>
+          <RadioGroup value={filterMode} onChange={handleFilterModeChange}>
+            {modeRadios.map((m) => (
               <FormControlLabel
-                value={item.value}
-                control={<Radio />}
-                label={item.label}
-                key={item.value}
-                data-testid={`radio-${item.label}`}
+                key={m.value}
+                value={m.value}
+                control={
+                  <Radio
+                    sx={{
+                      "&.Mui-checked": {
+                        color: theme.palette.secondary2,
+                      },
+                    }}
+                  />
+                }
+                label={m.label}
+                data-testid={`filter-mode-${m.value}`}
                 sx={{
                   ".MuiFormControlLabel-label": {
                     fontFamily: fontFamily.general,
                     fontSize: fontSize.info,
+                    color: theme.palette.primary1,
                     padding: 0,
                   },
                 }}
@@ -345,6 +412,103 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
           </RadioGroup>
         </FormControl>
       </Box>
+
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          flex: isMobile ? 1 : "0 0 280px",
+          gap: gap.md,
+          minWidth: 0,
+          minHeight: 0,
+        }}
+      >
+        {filterMode === "marinePark" && (
+          <>
+            <FormControl size="small" fullWidth>
+              <Select
+                value={MARINE_PARK_GROUP_VALUE}
+                displayEmpty
+                data-testid="marine-park-region-select"
+              >
+                <MenuItem value={MARINE_PARK_GROUP_VALUE}>
+                  Australian Marine Parks
+                </MenuItem>
+              </Select>
+            </FormControl>
+            <Box
+              data-testid="marine-park-checkbox-scroll"
+              sx={{
+                width: "100%",
+                maxHeight: isMobile ? "200px" : "360px",
+                minHeight: 0,
+                overflowY: "auto",
+                overflowX: "hidden",
+              }}
+            >
+              <FormGroup
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  flexWrap: "nowrap",
+                  alignItems: "stretch",
+                  width: "100%",
+                }}
+              >
+                {marineParkOptions.map((item) => (
+                  <FormControlLabel
+                    key={item.value}
+                    control={
+                      <Checkbox
+                        checked={selectedMarineParkValues.has(item.value)}
+                        onChange={(_, checked) =>
+                          handleMarineParkCheckboxChange(item.value, checked)
+                        }
+                        data-testid={`checkbox-park-${item.value}`}
+                        sx={{
+                          "&.Mui-checked": {
+                            color: theme.palette.secondary2,
+                          },
+                        }}
+                      />
+                    }
+                    label={item.label}
+                    sx={{
+                      marginLeft: 0,
+                      marginRight: 0,
+                      alignItems: "flex-start",
+                      width: "100%",
+                      ".MuiFormControlLabel-label": {
+                        fontFamily: fontFamily.general,
+                        fontSize: fontSize.info,
+                        color: theme.palette.primary1,
+                        whiteSpace: "normal",
+                        wordBreak: "break-word",
+                      },
+                    }}
+                  />
+                ))}
+              </FormGroup>
+            </Box>
+          </>
+        )}
+        {filterMode === "country" && (
+          <Typography variant="body2" color="text.secondary" sx={{ pr: 1 }}>
+            Country and region filters will be available in a future update.
+          </Typography>
+        )}
+        {filterMode === "ocean" && (
+          <Typography variant="body2" color="text.secondary" sx={{ pr: 1 }}>
+            Ocean and sea filters will be available in a future update.
+          </Typography>
+        )}
+        {filterMode === "mapBoundary" && (
+          <Typography variant="body2" color="text.secondary" sx={{ pr: 1 }}>
+            Use the rectangle tool on the map to define a search region.
+          </Typography>
+        )}
+      </Box>
+
       {!isMobile && (
         <Box
           id={MAP_ID}
@@ -355,6 +519,7 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
             bbox={mapBbox}
             zoom={MapDefaultConfig.ZOOM - 1}
           >
+            <SelectedAreaLayer areas={highlightCollection} />
             <Controls>
               <NavigationControl />
               <ScaleControl />
@@ -369,17 +534,16 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
           </ReactMap>
         </Box>
       )}
+
       <TestHelper
         id="selected-location"
         getSelectedLocationIntersects={() => {
-          const selectedLocation = locationOptions?.find(
-            (o) => o.value === selectedOption
-          );
-          const area = selectedLocation?.geo?.features[0];
           const funcIntersectPolygon = cqlDefaultFilters.get(
             "INTERSECT_POLYGON"
           ) as PolygonOperation;
-          return area ? funcIntersectPolygon(area) : undefined;
+          return mergedPolygonForTests
+            ? funcIntersectPolygon(mergedPolygonForTests)
+            : undefined;
         }}
       />
     </Box>
