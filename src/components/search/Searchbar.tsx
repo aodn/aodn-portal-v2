@@ -15,7 +15,12 @@ import SearchbarButtonGroup, {
 } from "./SearchbarButtonGroup";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import useElementSize from "../../hooks/useElementSize";
-import { POPUP_MIN_WIDTH_LAPTOP, POPUP_MIN_WIDTH_TABLET } from "./constants";
+import {
+  POPUP_MIN_WIDTH_DESKTOP,
+  POPUP_MIN_WIDTH_LAPTOP,
+  POPUP_MIN_WIDTH_TABLET,
+  POPUP_MIN_WIDTH_XL,
+} from "./constants";
 import DateRangeFilter from "../filter/DateRangeFilter";
 import { useLocation } from "react-router-dom";
 import { pageDefault, pageReferer } from "../common/constants";
@@ -205,14 +210,25 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
           ]}
           style={{
             width: searchbarWidth,
-            minWidth: isMobile
-              ? searchbarWidth
-              : isTablet
-                ? POPUP_MIN_WIDTH_TABLET
-                : POPUP_MIN_WIDTH_LAPTOP,
             borderRadius: borderRadius.small,
             zIndex: 99,
+            ...(isMobile
+              ? { minWidth: searchbarWidth }
+              : isTablet
+                ? { minWidth: POPUP_MIN_WIDTH_TABLET }
+                : {}),
           }}
+          sx={
+            !isMobile && !isTablet
+              ? {
+                  minWidth: {
+                    md: `min(${POPUP_MIN_WIDTH_LAPTOP}px, calc(100vw - 32px))`,
+                    lg: `min(${POPUP_MIN_WIDTH_DESKTOP}px, calc(100vw - 48px))`,
+                    xl: `min(${POPUP_MIN_WIDTH_XL}px, calc(100vw - 64px))`,
+                  },
+                }
+              : undefined
+          }
           open={open}
           anchorEl={boxRef}
           placement="bottom-end"

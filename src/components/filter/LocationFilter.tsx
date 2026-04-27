@@ -62,6 +62,7 @@ import BaseMapSwitcher from "../map/mapbox/controls/menu/BaseMapSwitcher";
 import MenuControl from "../map/mapbox/controls/menu/MenuControl";
 import DrawRect from "../map/mapbox/controls/menu/DrawRect";
 import theme from "../../styles/themeRC8";
+import { cssFontFamilyToMapboxTextFont } from "../../utils/MapUtils";
 
 const MAP_ID = "location-filter-map";
 
@@ -118,6 +119,7 @@ const SelectedAreaLayer: FC<{
 
     const sourceId = "selected-area-source";
     const layerId = "selected-area-layer";
+    const labelLayerId = "selected-area-label-layer";
 
     const addLayer = () => {
       const data = areas?.features?.length
@@ -137,6 +139,28 @@ const SelectedAreaLayer: FC<{
           paint: {
             "fill-color": "rgba(66,100,251, 0.3)",
             "fill-outline-color": "#0000ff",
+          },
+        });
+
+        map.addLayer({
+          id: labelLayerId,
+          type: "symbol",
+          source: sourceId,
+          layout: {
+            "symbol-placement": "point",
+            "text-field": ["coalesce", ["get", "name"], ["get", "RESNAME"], ""],
+            "text-font": cssFontFamilyToMapboxTextFont(
+              theme.typography.body2Regular.fontFamily,
+              { fontWeight: theme.typography.body2Regular.fontWeight }
+            ),
+            "text-size": 14,
+            "text-anchor": "center",
+            "text-allow-overlap": true,
+          },
+          paint: {
+            "text-color": "#FFFFFF",
+            "text-halo-color": "#000000",
+            "text-halo-width": 1.2,
           },
         });
       } else {
@@ -159,6 +183,13 @@ const SelectedAreaLayer: FC<{
 
   return null;
 };
+
+const modeRadios: { value: LocationFilterMode; label: string }[] = [
+  { value: "country", label: "By country" },
+  { value: "ocean", label: "By ocean or sea name" },
+  { value: "marinePark", label: "By marine park" },
+  { value: "mapBoundary", label: "By map boundary" },
+];
 
 const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
   const dispatch = useAppDispatch();
@@ -292,7 +323,17 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
     }
     const feats = marineParkOptions
       .filter((o) => selectedMarineParkValues.has(o.value))
-      .map((o) => o.geo!.features[0]);
+      .map((o) => {
+        const feature = o.geo!.features[0];
+        return {
+          ...feature,
+          properties: {
+            ...feature.properties,
+            // Keep an explicit display label for map symbol rendering.
+            name: feature.properties?.RESNAME ?? o.label,
+          },
+        };
+      });
     if (feats.length === 0) return undefined;
     return { type: "FeatureCollection", features: feats };
   }, [filterMode, marineParkOptions, selectedMarineParkValues]);
@@ -321,13 +362,6 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
   }, [filterMode, marineParkOptions, selectedMarineParkValues]);
 
   if (marineParkOptions.length === 0) return null;
-
-  const modeRadios: { value: LocationFilterMode; label: string }[] = [
-    { value: "country", label: "By country" },
-    { value: "ocean", label: "By ocean or sea name" },
-    { value: "marinePark", label: "By marine park" },
-    { value: "mapBoundary", label: "By map boundary" },
-  ];
 
   return (
     <Box
