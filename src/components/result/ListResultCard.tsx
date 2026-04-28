@@ -142,8 +142,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
           ? `${border.sm} ${color.blue.darkSemiTransparent}`
           : "none",
         borderRadius: borderRadius.small,
-        paddingX: padding.medium,
-        paddingY: padding.small,
+        padding: "12px 12px 12px 20px",
         ...sx,
       }}
       onMouseEnter={() => setShowButtons(true)}
@@ -154,22 +153,16 @@ const ListResultCard: FC<ListResultCardProps> = ({
         ref={menuRef}
         onClick={(type: OpenType | undefined) => onClickDetail?.(uuid, type)}
       />
-      <Box position="absolute" top={gap.md} right={gap.md}>
+      <Box position="absolute" top={"12px"} right={"12px"}>
         <BookmarkButton dataset={content} />
       </Box>
-      <Box
-        display="flex"
-        flexDirection="column"
-        flex={1}
-        height="100%"
-        mr={gap.sm}
-      >
+      <Box display="flex" flexDirection="column" flex={1} height="100%">
         <Box maxHeight={isSimplified ? "100%" : "80%"}>
           <CardHeader
             sx={{
               height: "auto",
               maxHeight: 45,
-              width: "95%",
+              width: "100%",
               p: 0,
               "& .MuiCardHeader-action": {
                 margin: 0,
@@ -207,8 +200,8 @@ const ListResultCard: FC<ListResultCardProps> = ({
                     width: "auto",
                     maxWidth: "200px",
                     height: LIST_CARD_TITLE_HEIGHT,
-                    pr: padding.double,
-                    pl: padding.large,
+                    pr: "32px",
+                    pl: "10px",
                   }}
                 />
               )
@@ -242,7 +235,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
                     hasDocumentTag || hasAiUpdateFrequency
                       ? "4" // show less text for document records on responsive page
                       : isSimplified
-                        ? "5" //defalt with 5 lines
+                        ? "5" //default with 5 lines
                         : isSelectedDataset || showButtons
                           ? "4" // if mouse hovering or clicked, show 4 lines
                           : "5",
