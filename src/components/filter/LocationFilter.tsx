@@ -738,13 +738,24 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
           px: isMobile ? "12px" : "28px",
         }}
       >
-        {modeRadios.map((m) => (
-          <StyledTab
-            key={m.value}
-            label={m.label}
-            sx={{ textTransform: "none" }}
-          />
-        ))}
+        {modeRadios.map((m) => {
+          let hasSelection = false;
+          if (m.value === "marinePark")
+            hasSelection = selectedMarineParkValues.size > 0;
+          if (m.value === "marineEcoregion")
+            hasSelection = selectedMarineEcoregionValues.size > 0;
+          if (m.value === "allenCoralAtlas")
+            hasSelection = selectedAllenCoralAtlasValues.size > 0;
+
+          return (
+            <StyledTab
+              key={m.value}
+              label={m.label}
+              showBadge={hasSelection}
+              sx={{ textTransform: "none" }}
+            />
+          );
+        })}
       </StyledTabs>
 
       <Box
