@@ -12,9 +12,7 @@ import Controls from "../../../../components/map/mapbox/controls/Controls";
 import NavigationControl from "../../../../components/map/mapbox/controls/NavigationControl";
 import ScaleControl from "../../../../components/map/mapbox/controls/ScaleControl";
 import MapBox from "../../../../components/map/mapbox/Map";
-import Layers, {
-  createStaticLayers,
-} from "../../../../components/map/mapbox/layers/Layers";
+import Layers from "../../../../components/map/mapbox/layers/Layers";
 import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
 import DrawRect from "../../../../components/map/mapbox/controls/menu/DrawRect";
 import { LngLatBounds, MapEvent } from "mapbox-gl";
@@ -60,6 +58,7 @@ import { portalTheme } from "../../../../styles";
 import { GeoserverFieldsResponse } from "../../../../components/common/store/GeoserverDefinitions";
 import * as turf from "@turf/turf";
 import _ from "lodash";
+import { createStaticLayers } from "../../../../components/map/mapbox/layers/StaticLayer";
 
 const mapContainerId = "map-detail-container-id";
 

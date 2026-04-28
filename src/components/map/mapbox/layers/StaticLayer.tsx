@@ -16,6 +16,7 @@ import {
   marineEcoregionOfWorldDefault,
   marineParkDefault,
 } from "../../../common/constants";
+import MapboxWorldLayer, { MapboxWorldLayersDef } from "./MapboxWorldLayer";
 
 export interface StaticLayersProps {
   id: string;
@@ -49,6 +50,40 @@ const StaticLayersDef = {
     label: "ECOREGION",
   },
 };
+
+// Use to create a static layer on a map, you need to add a menu item to select those layers,
+// refer to a map section
+const createStaticLayers = (ids: Array<string>) => (
+  <>
+    {ids.map((id) => {
+      switch (id) {
+        case StaticLayersDef.ALLEN_CORAL_ATLAS.id: {
+          return (
+            <MarineParkLayer
+              key={"s" + id}
+              {...StaticLayersDef.ALLEN_CORAL_ATLAS}
+            />
+          );
+        }
+        case StaticLayersDef.AUSTRALIA_MARINE_PARKS.id: {
+          return (
+            <MarineParkLayer
+              key={"s" + id}
+              {...StaticLayersDef.AUSTRALIA_MARINE_PARKS}
+            />
+          );
+        }
+        case StaticLayersDef.MEOW.id: {
+          return <MarineParkLayer key={"s" + id} {...StaticLayersDef.MEOW} />;
+        }
+        case MapboxWorldLayersDef.WORLD.id:
+          return (
+            <MapboxWorldLayer key={"mb" + MapboxWorldLayersDef.WORLD.id} />
+          );
+      }
+    })}
+  </>
+);
 
 const StaticLayer: FC<Partial<StaticLayersProps>> = ({
   id,
@@ -158,6 +193,7 @@ const StaticLayer: FC<Partial<StaticLayersProps>> = ({
     <React.Fragment />
   );
 };
+
 // A shortcut for Australian marine parks
 const MarineParkLayer: FC<StaticLayersProps> = (props) => {
   const [data, setData] = useState<
@@ -187,4 +223,4 @@ const MarineParkLayer: FC<StaticLayersProps> = (props) => {
 };
 
 // Export need layers
-export { MarineParkLayer, StaticLayersDef };
+export { MarineParkLayer, StaticLayersDef, createStaticLayers };

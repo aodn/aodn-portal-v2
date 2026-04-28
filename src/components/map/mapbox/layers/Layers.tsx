@@ -1,8 +1,6 @@
 import { Dispatch, PropsWithChildren, SetStateAction } from "react";
 import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson";
 import { LngLatBounds, MapMouseEvent, LngLat, Map as Mapbox } from "mapbox-gl";
-import { MarineParkLayer, StaticLayersDef } from "./StaticLayer";
-import MapboxWorldLayer, { MapboxWorldLayersDef } from "./MapboxWorldLayer";
 import * as turf from "@turf/turf";
 import { TabNavigation } from "../../../../hooks/useTabNavigation";
 import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
@@ -27,39 +25,6 @@ export interface LayerBasicType<P = GeoJsonProperties> {
   setDrawRectSupportSupport?: Dispatch<SetStateAction<boolean>>;
   collection?: OGCCollection;
 }
-// Use to create a static layer on a map, you need to add a menu item to select those layers,
-// refer to a map section
-const createStaticLayers = (ids: Array<string>) => (
-  <>
-    {ids.map((id) => {
-      switch (id) {
-        case StaticLayersDef.ALLEN_CORAL_ATLAS.id: {
-          return (
-            <MarineParkLayer
-              key={"s" + id}
-              {...StaticLayersDef.ALLEN_CORAL_ATLAS}
-            />
-          );
-        }
-        case StaticLayersDef.AUSTRALIA_MARINE_PARKS.id: {
-          return (
-            <MarineParkLayer
-              key={"s" + id}
-              {...StaticLayersDef.AUSTRALIA_MARINE_PARKS}
-            />
-          );
-        }
-        case StaticLayersDef.MEOW.id: {
-          return <MarineParkLayer key={"s" + id} {...StaticLayersDef.MEOW} />;
-        }
-        case MapboxWorldLayersDef.WORLD.id:
-          return (
-            <MapboxWorldLayer key={"mb" + MapboxWorldLayersDef.WORLD.id} />
-          );
-      }
-    })}
-  </>
-);
 
 const normalizeLongitude = (lng: number) =>
   ((((lng + 180) % 360) + 360) % 360) - 180;
@@ -181,7 +146,6 @@ const Layers = (props: PropsWithChildren<LayerBasicType>) => {
 export default Layers;
 
 export {
-  createStaticLayers,
   defaultMouseEnterEventHandler,
   defaultMouseLeaveEventHandler,
   findSuitableVisiblePoint,
