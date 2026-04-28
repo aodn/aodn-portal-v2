@@ -8,8 +8,10 @@ import React, {
   useState,
 } from "react";
 import MapContext from "../MapContext";
-import { FeatureCollection, MultiPolygon, Polygon } from "geojson";
+import { Feature, FeatureCollection, MultiPolygon, Polygon } from "geojson";
 import { stringToColor } from "../../../common/colors/colorsUtils";
+import { simplify } from "@turf/turf";
+import _ from "lodash";
 import { TestHelper } from "../../../common/test/helper";
 import {
   allenCoralAtlasDefault,
@@ -51,6 +53,54 @@ const StaticLayersDef = {
   },
 };
 
+// Cache for processed GeoJSON data to prevent redundant fetches
+const dataCache: Record<string, any> = {};
+
+const loadAndProcessGeoJSON = async (
+  url: string,
+  groupKey: string,
+  labelKey: string,
+  idKey: string,
+  shouldSimplify = false
+) => {
+  const cacheKey = `${url}_${shouldSimplify}`;
+  if (dataCache[cacheKey]) return dataCache[cacheKey];
+
+  const response = await fetch(url);
+  const json: FeatureCollection<Polygon | MultiPolygon> = await response.json();
+
+  const grouped = _.groupBy(
+    json.features,
+    (feature) => feature.properties?.[groupKey]
+  );
+
+  const options = Object.values(grouped)
+    .map((features) => {
+      const firstFeature = features[0] as Feature<Polygon | MultiPolygon>;
+      const geometry = shouldSimplify
+        ? (simplify(firstFeature, {
+            tolerance: 0.05,
+            highQuality: false,
+          }) as Feature<Polygon | MultiPolygon>)
+        : firstFeature;
+
+      const collection: FeatureCollection<Polygon | MultiPolygon> = {
+        type: "FeatureCollection",
+        features: [geometry],
+      };
+
+      return {
+        label: firstFeature.properties?.[labelKey],
+        value: "" + firstFeature.properties?.[idKey],
+        geo: collection,
+      };
+    })
+    .sort((a, b) => (a.label ?? "").localeCompare(b.label ?? ""));
+
+  dataCache[cacheKey] = options;
+  return options;
+};
+
 // Use to create a static layer on a map, you need to add a menu item to select those layers,
 // refer to a map section
 const createStaticLayers = (ids: Array<string>) => (
@@ -59,7 +109,7 @@ const createStaticLayers = (ids: Array<string>) => (
       switch (id) {
         case StaticLayersDef.ALLEN_CORAL_ATLAS.id: {
           return (
-            <MarineParkLayer
+            <MapBoundaryLayer
               key={"s" + id}
               {...StaticLayersDef.ALLEN_CORAL_ATLAS}
             />
@@ -67,14 +117,14 @@ const createStaticLayers = (ids: Array<string>) => (
         }
         case StaticLayersDef.AUSTRALIA_MARINE_PARKS.id: {
           return (
-            <MarineParkLayer
+            <MapBoundaryLayer
               key={"s" + id}
               {...StaticLayersDef.AUSTRALIA_MARINE_PARKS}
             />
           );
         }
         case StaticLayersDef.MEOW.id: {
-          return <MarineParkLayer key={"s" + id} {...StaticLayersDef.MEOW} />;
+          return <MapBoundaryLayer key={"s" + id} {...StaticLayersDef.MEOW} />;
         }
         case MapboxWorldLayersDef.WORLD.id:
           return (
@@ -195,7 +245,7 @@ const StaticLayer: FC<Partial<StaticLayersProps>> = ({
 };
 
 // A shortcut for Australian marine parks
-const MarineParkLayer: FC<StaticLayersProps> = (props) => {
+const MapBoundaryLayer: FC<StaticLayersProps> = (props) => {
   const [data, setData] = useState<
     FeatureCollection<Polygon> | FeatureCollection<MultiPolygon> | undefined
   >(undefined);
@@ -203,14 +253,27 @@ const MarineParkLayer: FC<StaticLayersProps> = (props) => {
   // Data orginated from here, we store a copy in the following path and useEffect to load it so we do not need to bundle it to the package which make is very big
   // https://data.gov.au/dataset/ds-dcceew-https%3A%2F%2Fwww.arcgis.com%2Fhome%2Fitem.html%3Fid%3D2b3eb1d42b8d4319900cf4777f0a83b9%26sublayer%3D0/details?q=marine%20park
   useEffect(() => {
-    fetch(props.geojson)
-      .then((response) => response.json())
-      .then(
-        (json: FeatureCollection<Polygon> | FeatureCollection<MultiPolygon>) =>
-          setData(json)
-      )
-      .catch((error) => console.error("Error fetching JSON:", error));
-  }, [props.geojson]);
+    const fetcher =
+      props.id === StaticLayersDef.AUSTRALIA_MARINE_PARKS.id
+        ? fetchMarineParkOptions
+        : props.id === StaticLayersDef.MEOW.id
+          ? fetchMarineEcoregionOptions
+          : props.id === StaticLayersDef.ALLEN_CORAL_ATLAS.id
+            ? fetchAllenCoralAtlasOptions
+            : null;
+
+    if (fetcher) {
+      fetcher()
+        .then((options: any[]) => {
+          const allFeatures = options.map((o) => o.geo.features[0]);
+          setData({
+            type: "FeatureCollection",
+            features: allFeatures,
+          });
+        })
+        .catch((error) => console.error("Error fetching shared JSON:", error));
+    }
+  }, [props.id]);
 
   return (
     <StaticLayer
@@ -222,5 +285,38 @@ const MarineParkLayer: FC<StaticLayersProps> = (props) => {
   );
 };
 
+const fetchMarineParkOptions = (shouldSimplify = false) =>
+  loadAndProcessGeoJSON(
+    StaticLayersDef.AUSTRALIA_MARINE_PARKS.geojson,
+    "RESNAME",
+    "RESNAME",
+    "OBJECTID",
+    shouldSimplify
+  );
+
+const fetchMarineEcoregionOptions = (shouldSimplify = false) =>
+  loadAndProcessGeoJSON(
+    StaticLayersDef.MEOW.geojson,
+    "ECOREGION",
+    "ECOREGION",
+    "ECO_CODE",
+    shouldSimplify
+  );
+
+const fetchAllenCoralAtlasOptions = (shouldSimplify = false) =>
+  loadAndProcessGeoJSON(
+    StaticLayersDef.ALLEN_CORAL_ATLAS.geojson,
+    "ECOREGION",
+    "ECOREGION",
+    "OBJECTID",
+    shouldSimplify
+  );
+
 // Export need layers
-export { MarineParkLayer, StaticLayersDef, createStaticLayers };
+export {
+  StaticLayersDef,
+  createStaticLayers,
+  fetchMarineParkOptions,
+  fetchMarineEcoregionOptions,
+  fetchAllenCoralAtlasOptions,
+};

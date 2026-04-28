@@ -10,45 +10,24 @@ import React, {
 import {
   Box,
   Checkbox,
-  FormControl,
   FormControlLabel,
   FormGroup,
   IconButton,
-  MenuItem,
-  Select,
-  Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ReplayIcon from "@mui/icons-material/Replay";
-import {
-  color,
-  fontFamily,
-  fontSize,
-  gap,
-  padding,
-} from "../../styles/constants";
-import {
-  allenCoralAtlasDefault,
-  marineEcoregionOfWorldDefault,
-  marineParkDefault,
-} from "../common/constants";
-import { Feature, FeatureCollection, Polygon } from "geojson";
-import _ from "lodash";
+import { color, fontSize, gap, padding } from "../../styles/constants";
 import {
   ParameterState,
-  updateFilterBBox,
   updateFilterPolygon,
-  updateZoom,
 } from "../common/store/componentParamReducer";
-import { useAppDispatch, useAppSelector } from "../common/store/hooks";
+import { useAppDispatch } from "../common/store/hooks";
+import { bbox, booleanEqual, featureCollection, union } from "@turf/turf";
 import {
-  bbox,
-  bboxPolygon,
-  booleanEqual,
-  featureCollection,
-  simplify,
-  union,
-} from "@turf/turf";
+  fetchAllenCoralAtlasOptions,
+  fetchMarineEcoregionOptions,
+  fetchMarineParkOptions,
+} from "../map/mapbox/layers/StaticLayer";
 import { MapDefaultConfig } from "../map/mapbox/constants";
 import { TestHelper } from "../common/test/helper";
 import { cqlDefaultFilters, PolygonOperation } from "../common/cqlFilters";
@@ -69,6 +48,8 @@ import { cssFontFamilyToMapboxTextFont } from "../../utils/MapUtils";
 import { portalTheme } from "../../styles";
 import StyledTabs from "../common/tab/StyledTabs";
 import StyledTab from "../common/tab/StyledTab";
+import store, { getComponentState } from "../common/store/store";
+import { Feature, FeatureCollection, Polygon } from "geojson";
 
 const MAP_ID = "location-filter-map";
 
@@ -85,93 +66,6 @@ interface LocationOptionType {
 interface LocationFilterProps {
   handleClosePopup: () => void;
 }
-
-const loadMarineParkOptions = async (): Promise<LocationOptionType[]> => {
-  const response = await fetch(marineParkDefault.geojson);
-  const json: FeatureCollection<Polygon> = await response.json();
-  const grouped = _.groupBy(
-    json.features,
-    (feature) => feature.properties?.RESNAME
-  );
-  const collections = Object.values(grouped).map<FeatureCollection<Polygon>>(
-    (features) => ({
-      type: "FeatureCollection",
-      features: features as Feature<Polygon>[],
-    })
-  );
-
-  return collections
-    .map<LocationOptionType>((value) => {
-      value.features[0] = simplify(value.features[0], {
-        tolerance: 0.05,
-        highQuality: false,
-      });
-      return {
-        label: value.features[0].properties?.RESNAME,
-        value: "" + value.features[0].properties?.OBJECTID,
-        geo: value,
-      };
-    })
-    .sort((a, b) => (a.label ?? "").localeCompare(b.label ?? ""));
-};
-
-const loadMarineEcoregionOptions = async (): Promise<LocationOptionType[]> => {
-  const response = await fetch(marineEcoregionOfWorldDefault.geojson);
-  const json: FeatureCollection<Polygon> = await response.json();
-  const grouped = _.groupBy(
-    json.features,
-    (feature) => feature.properties?.ECOREGION
-  );
-  const collections = Object.values(grouped).map<FeatureCollection<Polygon>>(
-    (features) => ({
-      type: "FeatureCollection",
-      features: features as Feature<Polygon>[],
-    })
-  );
-
-  return collections
-    .map<LocationOptionType>((value) => {
-      value.features[0] = simplify(value.features[0], {
-        tolerance: 0.05,
-        highQuality: false,
-      });
-      return {
-        label: value.features[0].properties?.ECOREGION,
-        value: "" + value.features[0].properties?.ECO_CODE,
-        geo: value,
-      };
-    })
-    .sort((a, b) => (a.label ?? "").localeCompare(b.label ?? ""));
-};
-
-const loadAllenCoralAtlasOptions = async (): Promise<LocationOptionType[]> => {
-  const response = await fetch(allenCoralAtlasDefault.geojson);
-  const json: FeatureCollection<Polygon> = await response.json();
-  const grouped = _.groupBy(
-    json.features,
-    (feature) => feature.properties?.ECOREGION
-  );
-  const collections = Object.values(grouped).map<FeatureCollection<Polygon>>(
-    (features) => ({
-      type: "FeatureCollection",
-      features: features as Feature<Polygon>[],
-    })
-  );
-
-  return collections
-    .map<LocationOptionType>((value) => {
-      value.features[0] = simplify(value.features[0], {
-        tolerance: 0.05,
-        highQuality: false,
-      });
-      return {
-        label: value.features[0].properties?.ECOREGION,
-        value: "" + value.features[0].properties?.OBJECTID,
-        geo: value,
-      };
-    })
-    .sort((a, b) => (a.label ?? "").localeCompare(b.label ?? ""));
-};
 
 const SelectedAreaLayer: FC<{
   areas: FeatureCollection<Polygon> | undefined;
@@ -284,7 +178,10 @@ const LocationCheckboxList: FC<{
               data-testid={`checkbox-item-${item.value}`}
               sx={{
                 "&.Mui-checked": {
-                  color: theme.palette.secondary2,
+                  color: theme.palette.primary1,
+                },
+                "&:not(.Mui-checked)": {
+                  color: theme.palette.primary1,
                 },
               }}
             />
@@ -296,9 +193,9 @@ const LocationCheckboxList: FC<{
             alignItems: "flex-start",
             width: "100%",
             ".MuiFormControlLabel-label": {
-              fontFamily: fontFamily.general,
-              fontSize: fontSize.info,
-              color: theme.palette.primary1,
+              fontFamily: theme.typography.slogan3.fontFamily,
+              fontSize: theme.typography.slogan3.fontSize,
+              color: theme.palette.text2,
               whiteSpace: "normal",
               wordBreak: "break-word",
             },
@@ -318,7 +215,6 @@ const modeRadios: { value: LocationFilterMode; label: string }[] = [
 const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
   const dispatch = useAppDispatch();
   const { isMobile } = useBreakpoint();
-  const componentParam: ParameterState = useAppSelector((s) => s.paramReducer);
   const [filterMode, setFilterMode] =
     useState<LocationFilterMode>("marinePark");
   const [marineParkOptions, setMarineParkOptions] = useState<
@@ -338,23 +234,24 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
   const [selectedAllenCoralAtlasValues, setSelectedAllenCoralAtlasValues] =
     useState<Set<string>>(new Set());
 
+  const componentParam: ParameterState = getComponentState(store.getState());
   useEffect(() => {
     let cancelled = false;
-    loadMarineParkOptions()
+    fetchMarineParkOptions(true)
       .then((opts) => {
         if (!cancelled) setMarineParkOptions(opts);
       })
       .catch((error) => {
         console.error("Error fetching Marine Park JSON:", error);
       });
-    loadMarineEcoregionOptions()
+    fetchMarineEcoregionOptions(true)
       .then((opts) => {
         if (!cancelled) setMarineEcoregionOptions(opts);
       })
       .catch((error) => {
         console.error("Error fetching Marine Ecoregion JSON:", error);
       });
-    loadAllenCoralAtlasOptions()
+    fetchAllenCoralAtlasOptions(true)
       .then((opts) => {
         if (!cancelled) setAllenCoralAtlasOptions(opts);
       })
@@ -389,28 +286,13 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
       if (allFeatures.length === 0) {
         dispatch(updateFilterPolygon(undefined));
         return;
-      }
-      if (allFeatures.length === 1) {
+      } else if (allFeatures.length === 1) {
         dispatch(updateFilterPolygon(allFeatures[0]));
-        const areaBbox = bbox(allFeatures[0]);
-        dispatch(updateFilterBBox(bboxPolygon(areaBbox)));
-        dispatch(
-          updateZoom(
-            (MapDefaultConfig.MIN_ZOOM + MapDefaultConfig.MAX_ZOOM) / 2
-          )
-        );
-        return;
-      }
-      const merged = union(featureCollection(allFeatures));
-      if (merged) {
-        dispatch(updateFilterPolygon(merged));
-        const areaBbox = bbox(merged);
-        dispatch(updateFilterBBox(bboxPolygon(areaBbox)));
-        dispatch(
-          updateZoom(
-            (MapDefaultConfig.MIN_ZOOM + MapDefaultConfig.MAX_ZOOM) / 2
-          )
-        );
+      } else {
+        const merged = union(featureCollection(allFeatures));
+        if (merged) {
+          dispatch(updateFilterPolygon(merged));
+        }
       }
     },
     [
