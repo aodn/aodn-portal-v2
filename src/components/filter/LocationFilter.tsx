@@ -1,5 +1,6 @@
 import React, {
   FC,
+  SyntheticEvent,
   startTransition,
   useCallback,
   useEffect,
@@ -14,8 +15,6 @@ import {
   FormGroup,
   IconButton,
   MenuItem,
-  Radio,
-  RadioGroup,
   Select,
   Typography,
 } from "@mui/material";
@@ -28,7 +27,11 @@ import {
   gap,
   padding,
 } from "../../styles/constants";
-import { marineParkDefault } from "../common/constants";
+import {
+  allenCoralAtlasDefault,
+  marineEcoregionOfWorldDefault,
+  marineParkDefault,
+} from "../common/constants";
 import { Feature, FeatureCollection, Polygon } from "geojson";
 import _ from "lodash";
 import {
@@ -63,12 +66,15 @@ import MenuControl from "../map/mapbox/controls/menu/MenuControl";
 import DrawRect from "../map/mapbox/controls/menu/DrawRect";
 import theme from "../../styles/themeRC8";
 import { cssFontFamilyToMapboxTextFont } from "../../utils/MapUtils";
+import { portalTheme } from "../../styles";
+import StyledTabs from "../common/tab/StyledTabs";
+import StyledTab from "../common/tab/StyledTab";
 
 const MAP_ID = "location-filter-map";
 
 const MARINE_PARK_GROUP_VALUE = "australian-marine-parks";
 
-type LocationFilterMode = "country" | "ocean" | "marinePark" | "mapBoundary";
+type LocationFilterMode = "marineEcoregion" | "allenCoralAtlas" | "marinePark";
 
 interface LocationOptionType {
   value: string;
@@ -102,6 +108,64 @@ const loadMarineParkOptions = async (): Promise<LocationOptionType[]> => {
       });
       return {
         label: value.features[0].properties?.RESNAME,
+        value: "" + value.features[0].properties?.OBJECTID,
+        geo: value,
+      };
+    })
+    .sort((a, b) => (a.label ?? "").localeCompare(b.label ?? ""));
+};
+
+const loadMarineEcoregionOptions = async (): Promise<LocationOptionType[]> => {
+  const response = await fetch(marineEcoregionOfWorldDefault.geojson);
+  const json: FeatureCollection<Polygon> = await response.json();
+  const grouped = _.groupBy(
+    json.features,
+    (feature) => feature.properties?.ECOREGION
+  );
+  const collections = Object.values(grouped).map<FeatureCollection<Polygon>>(
+    (features) => ({
+      type: "FeatureCollection",
+      features: features as Feature<Polygon>[],
+    })
+  );
+
+  return collections
+    .map<LocationOptionType>((value) => {
+      value.features[0] = simplify(value.features[0], {
+        tolerance: 0.05,
+        highQuality: false,
+      });
+      return {
+        label: value.features[0].properties?.ECOREGION,
+        value: "" + value.features[0].properties?.ECO_CODE,
+        geo: value,
+      };
+    })
+    .sort((a, b) => (a.label ?? "").localeCompare(b.label ?? ""));
+};
+
+const loadAllenCoralAtlasOptions = async (): Promise<LocationOptionType[]> => {
+  const response = await fetch(allenCoralAtlasDefault.geojson);
+  const json: FeatureCollection<Polygon> = await response.json();
+  const grouped = _.groupBy(
+    json.features,
+    (feature) => feature.properties?.ECOREGION
+  );
+  const collections = Object.values(grouped).map<FeatureCollection<Polygon>>(
+    (features) => ({
+      type: "FeatureCollection",
+      features: features as Feature<Polygon>[],
+    })
+  );
+
+  return collections
+    .map<LocationOptionType>((value) => {
+      value.features[0] = simplify(value.features[0], {
+        tolerance: 0.05,
+        highQuality: false,
+      });
+      return {
+        label: value.features[0].properties?.ECOREGION,
         value: "" + value.features[0].properties?.OBJECTID,
         geo: value,
       };
@@ -184,11 +248,71 @@ const SelectedAreaLayer: FC<{
   return null;
 };
 
+const LocationCheckboxList: FC<{
+  options: LocationOptionType[];
+  selectedValues: Set<string>;
+  onToggle: (value: string, checked: boolean) => void;
+  testId: string;
+  isMobile?: boolean;
+}> = ({ options, selectedValues, onToggle, testId, isMobile }) => (
+  <Box
+    data-testid={testId}
+    sx={{
+      width: "100%",
+      maxHeight: isMobile ? "calc(100vh - 380px)" : "450px",
+      minHeight: 0,
+      overflowY: "auto",
+      overflowX: "hidden",
+    }}
+  >
+    <FormGroup
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        flexWrap: "nowrap",
+        alignItems: "stretch",
+        width: "100%",
+      }}
+    >
+      {options.map((item) => (
+        <FormControlLabel
+          key={item.value}
+          control={
+            <Checkbox
+              checked={selectedValues.has(item.value)}
+              onChange={(_, checked) => onToggle(item.value, checked)}
+              data-testid={`checkbox-item-${item.value}`}
+              sx={{
+                "&.Mui-checked": {
+                  color: theme.palette.secondary2,
+                },
+              }}
+            />
+          }
+          label={item.label}
+          sx={{
+            marginLeft: 0,
+            marginRight: 0,
+            alignItems: "flex-start",
+            width: "100%",
+            ".MuiFormControlLabel-label": {
+              fontFamily: fontFamily.general,
+              fontSize: fontSize.info,
+              color: theme.palette.primary1,
+              whiteSpace: "normal",
+              wordBreak: "break-word",
+            },
+          }}
+        />
+      ))}
+    </FormGroup>
+  </Box>
+);
+
 const modeRadios: { value: LocationFilterMode; label: string }[] = [
-  { value: "country", label: "By country" },
-  { value: "ocean", label: "By ocean or sea name" },
-  { value: "marinePark", label: "By marine park" },
-  { value: "mapBoundary", label: "By map boundary" },
+  { value: "marinePark", label: "Australian Marine Parks" },
+  { value: "allenCoralAtlas", label: "Allen Coral Atlas" },
+  { value: "marineEcoregion", label: "Marine Ecoregions of the World" },
 ];
 
 const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
@@ -203,6 +327,16 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
   const [selectedMarineParkValues, setSelectedMarineParkValues] = useState<
     Set<string>
   >(new Set());
+  const [marineEcoregionOptions, setMarineEcoregionOptions] = useState<
+    LocationOptionType[]
+  >([]);
+  const [selectedMarineEcoregionValues, setSelectedMarineEcoregionValues] =
+    useState<Set<string>>(new Set());
+  const [allenCoralAtlasOptions, setAllenCoralAtlasOptions] = useState<
+    LocationOptionType[]
+  >([]);
+  const [selectedAllenCoralAtlasValues, setSelectedAllenCoralAtlasValues] =
+    useState<Set<string>>(new Set());
 
   useEffect(() => {
     let cancelled = false;
@@ -211,26 +345,54 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
         if (!cancelled) setMarineParkOptions(opts);
       })
       .catch((error) => {
-        console.error("Error fetching JSON in LocationFilter:", error);
+        console.error("Error fetching Marine Park JSON:", error);
+      });
+    loadMarineEcoregionOptions()
+      .then((opts) => {
+        if (!cancelled) setMarineEcoregionOptions(opts);
+      })
+      .catch((error) => {
+        console.error("Error fetching Marine Ecoregion JSON:", error);
+      });
+    loadAllenCoralAtlasOptions()
+      .then((opts) => {
+        if (!cancelled) setAllenCoralAtlasOptions(opts);
+      })
+      .catch((error) => {
+        console.error("Error fetching Allen Coral Atlas JSON:", error);
       });
     return () => {
       cancelled = true;
     };
   }, []);
 
-  const applyMarineParkSelection = useCallback(
-    (next: Set<string>) => {
-      const features = marineParkOptions
-        .filter((o) => next.has(o.value))
+  const applyCombinedGeoSelections = useCallback(
+    (parks: Set<string>, ecoregions: Set<string>, coralAtlas: Set<string>) => {
+      const parkFeatures = marineParkOptions
+        .filter((o) => parks.has(o.value))
         .map((o) => o.geo!.features[0]);
 
-      if (features.length === 0) {
+      const ecoregionFeatures = marineEcoregionOptions
+        .filter((o) => ecoregions.has(o.value))
+        .map((o) => o.geo!.features[0]);
+
+      const coralFeatures = allenCoralAtlasOptions
+        .filter((o) => coralAtlas.has(o.value))
+        .map((o) => o.geo!.features[0]);
+
+      const allFeatures = [
+        ...parkFeatures,
+        ...ecoregionFeatures,
+        ...coralFeatures,
+      ];
+
+      if (allFeatures.length === 0) {
         dispatch(updateFilterPolygon(undefined));
         return;
       }
-      if (features.length === 1) {
-        dispatch(updateFilterPolygon(features[0]));
-        const areaBbox = bbox(features[0]);
+      if (allFeatures.length === 1) {
+        dispatch(updateFilterPolygon(allFeatures[0]));
+        const areaBbox = bbox(allFeatures[0]);
         dispatch(updateFilterBBox(bboxPolygon(areaBbox)));
         dispatch(
           updateZoom(
@@ -239,7 +401,7 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
         );
         return;
       }
-      const merged = union(featureCollection(features));
+      const merged = union(featureCollection(allFeatures));
       if (merged) {
         dispatch(updateFilterPolygon(merged));
         const areaBbox = bbox(merged);
@@ -251,19 +413,20 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
         );
       }
     },
-    [dispatch, marineParkOptions]
+    [
+      dispatch,
+      marineParkOptions,
+      marineEcoregionOptions,
+      allenCoralAtlasOptions,
+    ]
   );
 
   const handleFilterModeChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const mode = event.target.value as LocationFilterMode;
+    (_: SyntheticEvent, newValue: number) => {
+      const mode = modeRadios[newValue].value;
       setFilterMode(mode);
-      if (mode !== "marinePark") {
-        setSelectedMarineParkValues(new Set());
-        dispatch(updateFilterPolygon(undefined));
-      }
     },
-    [dispatch]
+    []
   );
 
   const handleMarineParkCheckboxChange = useCallback(
@@ -272,16 +435,68 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
         const next = new Set(prev);
         if (checked) next.add(parkValue);
         else next.delete(parkValue);
-        applyMarineParkSelection(next);
+        applyCombinedGeoSelections(
+          next,
+          selectedMarineEcoregionValues,
+          selectedAllenCoralAtlasValues
+        );
         return next;
       });
     },
-    [applyMarineParkSelection]
+    [
+      applyCombinedGeoSelections,
+      selectedMarineEcoregionValues,
+      selectedAllenCoralAtlasValues,
+    ]
+  );
+
+  const handleMarineEcoregionCheckboxChange = useCallback(
+    (ecoregionValue: string, checked: boolean) => {
+      setSelectedMarineEcoregionValues((prev) => {
+        const next = new Set(prev);
+        if (checked) next.add(ecoregionValue);
+        else next.delete(ecoregionValue);
+        applyCombinedGeoSelections(
+          selectedMarineParkValues,
+          next,
+          selectedAllenCoralAtlasValues
+        );
+        return next;
+      });
+    },
+    [
+      applyCombinedGeoSelections,
+      selectedMarineParkValues,
+      selectedAllenCoralAtlasValues,
+    ]
+  );
+
+  const handleAllenCoralAtlasCheckboxChange = useCallback(
+    (coralValue: string, checked: boolean) => {
+      setSelectedAllenCoralAtlasValues((prev) => {
+        const next = new Set(prev);
+        if (checked) next.add(coralValue);
+        else next.delete(coralValue);
+        applyCombinedGeoSelections(
+          selectedMarineParkValues,
+          selectedMarineEcoregionValues,
+          next
+        );
+        return next;
+      });
+    },
+    [
+      applyCombinedGeoSelections,
+      selectedMarineParkValues,
+      selectedMarineEcoregionValues,
+    ]
   );
 
   const handleClear = useCallback(() => {
     dispatch(updateFilterPolygon(undefined));
     setSelectedMarineParkValues(new Set());
+    setSelectedMarineEcoregionValues(new Set());
+    setSelectedAllenCoralAtlasValues(new Set());
   }, [dispatch]);
 
   const handleClose = useCallback(() => {
@@ -297,90 +512,198 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
   );
 
   useEffect(() => {
-    if (filterMode !== "marinePark" || marineParkOptions.length === 0) return;
     const p = componentParam.polygon;
     if (!p) {
-      startTransition(() => setSelectedMarineParkValues(new Set()));
+      if (filterMode === "marinePark") {
+        startTransition(() => setSelectedMarineParkValues(new Set()));
+      } else if (filterMode === "marineEcoregion") {
+        startTransition(() => setSelectedMarineEcoregionValues(new Set()));
+      } else if (filterMode === "allenCoralAtlas") {
+        startTransition(() => setSelectedAllenCoralAtlasValues(new Set()));
+      }
       return;
     }
-    const exact = marineParkOptions.find(
-      (o) =>
-        o.geo?.features[0] &&
-        booleanEqual(o.geo.features[0], p as Feature<Polygon>)
-    );
-    if (exact) {
+
+    // Try to find matching parks
+    const matchingParks = marineParkOptions
+      .filter(
+        (o) =>
+          o.geo?.features[0] &&
+          booleanEqual(o.geo.features[0], p as Feature<Polygon>)
+      )
+      .map((o) => o.value);
+
+    // Try to find matching ecoregions
+    const matchingEcoregions = marineEcoregionOptions
+      .filter(
+        (o) =>
+          o.geo?.features[0] &&
+          booleanEqual(o.geo.features[0], p as Feature<Polygon>)
+      )
+      .map((o) => o.value);
+
+    // Try to find matching coral atlas regions
+    const matchingCoralAtlas = allenCoralAtlasOptions
+      .filter(
+        (o) =>
+          o.geo?.features[0] &&
+          booleanEqual(o.geo.features[0], p as Feature<Polygon>)
+      )
+      .map((o) => o.value);
+
+    if (matchingParks.length > 0) {
       startTransition(() =>
-        setSelectedMarineParkValues(new Set([exact.value]))
+        setSelectedMarineParkValues(new Set(matchingParks))
       );
     }
-  }, [componentParam.polygon, filterMode, marineParkOptions]);
+    if (matchingEcoregions.length > 0) {
+      startTransition(() =>
+        setSelectedMarineEcoregionValues(new Set(matchingEcoregions))
+      );
+    }
+    if (matchingCoralAtlas.length > 0) {
+      startTransition(() =>
+        setSelectedAllenCoralAtlasValues(new Set(matchingCoralAtlas))
+      );
+    }
+  }, [
+    componentParam.polygon,
+    marineParkOptions,
+    marineEcoregionOptions,
+    allenCoralAtlasOptions,
+    filterMode,
+  ]);
 
   const highlightCollection = useMemo(():
     | FeatureCollection<Polygon>
     | undefined => {
-    if (filterMode !== "marinePark" || selectedMarineParkValues.size === 0) {
-      return undefined;
+    const allFeats: Feature<Polygon>[] = [];
+
+    if (selectedMarineParkValues.size > 0) {
+      marineParkOptions
+        .filter((o) => selectedMarineParkValues.has(o.value))
+        .forEach((o) => {
+          const feature = o.geo!.features[0];
+          allFeats.push({
+            ...feature,
+            properties: {
+              ...feature.properties,
+              name: feature.properties?.RESNAME ?? o.label,
+            },
+          });
+        });
     }
-    const feats = marineParkOptions
-      .filter((o) => selectedMarineParkValues.has(o.value))
-      .map((o) => {
-        const feature = o.geo!.features[0];
-        return {
-          ...feature,
-          properties: {
-            ...feature.properties,
-            // Keep an explicit display label for map symbol rendering.
-            name: feature.properties?.RESNAME ?? o.label,
-          },
-        };
-      });
-    if (feats.length === 0) return undefined;
-    return { type: "FeatureCollection", features: feats };
-  }, [filterMode, marineParkOptions, selectedMarineParkValues]);
+
+    if (selectedMarineEcoregionValues.size > 0) {
+      marineEcoregionOptions
+        .filter((o) => selectedMarineEcoregionValues.has(o.value))
+        .forEach((o) => {
+          const feature = o.geo!.features[0];
+          allFeats.push({
+            ...feature,
+            properties: {
+              ...feature.properties,
+              name: feature.properties?.ECOREGION ?? o.label,
+            },
+          });
+        });
+    }
+
+    if (selectedAllenCoralAtlasValues.size > 0) {
+      allenCoralAtlasOptions
+        .filter((o) => selectedAllenCoralAtlasValues.has(o.value))
+        .forEach((o) => {
+          const feature = o.geo!.features[0];
+          allFeats.push({
+            ...feature,
+            properties: {
+              ...feature.properties,
+              name: feature.properties?.ECOREGION ?? o.label,
+            },
+          });
+        });
+    }
+
+    if (allFeats.length === 0) return undefined;
+    return { type: "FeatureCollection", features: allFeats };
+  }, [
+    marineParkOptions,
+    selectedMarineParkValues,
+    marineEcoregionOptions,
+    selectedMarineEcoregionValues,
+    allenCoralAtlasOptions,
+    selectedAllenCoralAtlasValues,
+  ]);
 
   const mapBbox = useMemo(() => {
-    if (filterMode !== "marinePark" || selectedMarineParkValues.size === 0) {
-      return undefined;
-    }
-    const feats = marineParkOptions
+    const parkFeats = marineParkOptions
       .filter((o) => selectedMarineParkValues.has(o.value))
       .map((o) => o.geo!.features[0]);
-    if (feats.length === 0) return undefined;
+
+    const ecoregionFeats = marineEcoregionOptions
+      .filter((o) => selectedMarineEcoregionValues.has(o.value))
+      .map((o) => o.geo!.features[0]);
+
+    const coralFeats = allenCoralAtlasOptions
+      .filter((o) => selectedAllenCoralAtlasValues.has(o.value))
+      .map((o) => o.geo!.features[0]);
+
+    const allFeats = [...parkFeats, ...ecoregionFeats, ...coralFeats];
+
+    if (allFeats.length === 0) return undefined;
     const bounds =
-      feats.length === 1 ? bbox(feats[0]) : bbox(featureCollection(feats));
+      allFeats.length === 1
+        ? bbox(allFeats[0])
+        : bbox(featureCollection(allFeats));
     return new LngLatBounds([bounds[0], bounds[1]], [bounds[2], bounds[3]]);
-  }, [filterMode, marineParkOptions, selectedMarineParkValues]);
+  }, [
+    marineParkOptions,
+    selectedMarineParkValues,
+    marineEcoregionOptions,
+    selectedMarineEcoregionValues,
+    allenCoralAtlasOptions,
+    selectedAllenCoralAtlasValues,
+  ]);
 
   const mergedPolygonForTests = useMemo(() => {
-    if (filterMode !== "marinePark") return undefined;
-    const feats = marineParkOptions
+    const parkFeats = marineParkOptions
       .filter((o) => selectedMarineParkValues.has(o.value))
       .map((o) => o.geo!.features[0]);
-    if (feats.length === 0) return undefined;
-    if (feats.length === 1) return feats[0];
-    return union(featureCollection(feats)) ?? undefined;
-  }, [filterMode, marineParkOptions, selectedMarineParkValues]);
+
+    const ecoregionFeats = marineEcoregionOptions
+      .filter((o) => selectedMarineEcoregionValues.has(o.value))
+      .map((o) => o.geo!.features[0]);
+
+    const coralFeats = allenCoralAtlasOptions
+      .filter((o) => selectedAllenCoralAtlasValues.has(o.value))
+      .map((o) => o.geo!.features[0]);
+
+    const allFeats = [...parkFeats, ...ecoregionFeats, ...coralFeats];
+
+    if (allFeats.length === 0) return undefined;
+    if (allFeats.length === 1) return allFeats[0];
+    return union(featureCollection(allFeats)) ?? undefined;
+  }, [
+    marineParkOptions,
+    selectedMarineParkValues,
+    marineEcoregionOptions,
+    selectedMarineEcoregionValues,
+    allenCoralAtlasOptions,
+    selectedAllenCoralAtlasValues,
+  ]);
 
   if (marineParkOptions.length === 0) return null;
 
   return (
-    <Box
-      sx={{
-        position: "relative",
-        display: "flex",
-        flexDirection: isMobile ? "column" : "row",
-        width: "100%",
-        padding: padding.large,
-        pt: padding.triple,
-        gap: padding.large,
-      }}
-    >
+    <Box sx={{ position: "relative", width: "100%" }}>
       <Box
         sx={{
-          position: "absolute",
-          top: gap.md,
-          right: gap.md,
-          zIndex: 2,
+          display: "flex",
+          justifyContent: "flex-end",
+          backgroundColor: portalTheme.palette.primary6,
+          pt: "12px",
+          pr: "12px",
+          gap: "8px",
         }}
       >
         <IconButton
@@ -407,167 +730,97 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
         </IconButton>
       </Box>
 
-      <Box
+      <StyledTabs
+        value={modeRadios.findIndex((m) => m.value === filterMode)}
+        onChange={handleFilterModeChange}
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          flex: isMobile ? 1 : "0 0 200px",
-          gap: gap.sm,
+          backgroundColor: portalTheme.palette.primary6,
+          px: isMobile ? "12px" : "28px",
         }}
       >
-        <Typography variant="title1Medium">Filter by</Typography>
-        <FormControl>
-          <RadioGroup value={filterMode} onChange={handleFilterModeChange}>
-            {modeRadios.map((m) => (
-              <FormControlLabel
-                key={m.value}
-                value={m.value}
-                control={
-                  <Radio
-                    sx={{
-                      "&.Mui-checked": {
-                        color: theme.palette.secondary2,
-                      },
-                    }}
-                  />
-                }
-                label={m.label}
-                data-testid={`filter-mode-${m.value}`}
-                sx={{
-                  ".MuiFormControlLabel-label": {
-                    fontFamily: fontFamily.general,
-                    fontSize: fontSize.info,
-                    color: theme.palette.primary1,
-                    padding: 0,
-                  },
-                }}
-              />
-            ))}
-          </RadioGroup>
-        </FormControl>
-      </Box>
+        {modeRadios.map((m) => (
+          <StyledTab
+            key={m.value}
+            label={m.label}
+            sx={{ textTransform: "none" }}
+          />
+        ))}
+      </StyledTabs>
 
       <Box
         sx={{
           display: "flex",
-          flexDirection: "column",
-          flex: isMobile ? 1 : "0 0 280px",
-          gap: gap.md,
-          minWidth: 0,
-          minHeight: 0,
+          flexDirection: isMobile ? "column" : "row",
+          width: "100%",
+          padding: padding.large,
+          gap: padding.large,
         }}
       >
-        {filterMode === "marinePark" && (
-          <>
-            <FormControl size="small" fullWidth>
-              <Select
-                value={MARINE_PARK_GROUP_VALUE}
-                displayEmpty
-                data-testid="marine-park-region-select"
-              >
-                <MenuItem value={MARINE_PARK_GROUP_VALUE}>
-                  Australian Marine Parks
-                </MenuItem>
-              </Select>
-            </FormControl>
-            <Box
-              data-testid="marine-park-checkbox-scroll"
-              sx={{
-                width: "100%",
-                maxHeight: isMobile ? "200px" : "360px",
-                minHeight: 0,
-                overflowY: "auto",
-                overflowX: "hidden",
-              }}
-            >
-              <FormGroup
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  flexWrap: "nowrap",
-                  alignItems: "stretch",
-                  width: "100%",
-                }}
-              >
-                {marineParkOptions.map((item) => (
-                  <FormControlLabel
-                    key={item.value}
-                    control={
-                      <Checkbox
-                        checked={selectedMarineParkValues.has(item.value)}
-                        onChange={(_, checked) =>
-                          handleMarineParkCheckboxChange(item.value, checked)
-                        }
-                        data-testid={`checkbox-park-${item.value}`}
-                        sx={{
-                          "&.Mui-checked": {
-                            color: theme.palette.secondary2,
-                          },
-                        }}
-                      />
-                    }
-                    label={item.label}
-                    sx={{
-                      marginLeft: 0,
-                      marginRight: 0,
-                      alignItems: "flex-start",
-                      width: "100%",
-                      ".MuiFormControlLabel-label": {
-                        fontFamily: fontFamily.general,
-                        fontSize: fontSize.info,
-                        color: theme.palette.primary1,
-                        whiteSpace: "normal",
-                        wordBreak: "break-word",
-                      },
-                    }}
-                  />
-                ))}
-              </FormGroup>
-            </Box>
-          </>
-        )}
-        {filterMode === "country" && (
-          <Typography variant="body2" color="text.secondary" sx={{ pr: 1 }}>
-            Country and region filters will be available in a future update.
-          </Typography>
-        )}
-        {filterMode === "ocean" && (
-          <Typography variant="body2" color="text.secondary" sx={{ pr: 1 }}>
-            Ocean and sea filters will be available in a future update.
-          </Typography>
-        )}
-        {filterMode === "mapBoundary" && (
-          <Typography variant="body2" color="text.secondary" sx={{ pr: 1 }}>
-            Use the rectangle tool on the map to define a search region.
-          </Typography>
-        )}
-      </Box>
-
-      {!isMobile && (
         <Box
-          id={MAP_ID}
-          sx={{ flex: 1, minHeight: "400px", position: "relative" }}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            flex: isMobile ? 1 : "0 0 280px",
+            gap: gap.md,
+            minWidth: 0,
+            minHeight: 0,
+          }}
         >
-          <ReactMap
-            panelId={MAP_ID}
-            bbox={mapBbox}
-            zoom={MapDefaultConfig.ZOOM - 1}
-          >
-            <SelectedAreaLayer areas={highlightCollection} />
-            <Controls>
-              <NavigationControl />
-              <ScaleControl />
-              <DisplayCoordinate />
-              <MenuControlGroup>
-                <MenuControl menu={<BaseMapSwitcher />} />
-                <MenuControl
-                  menu={<DrawRect onChangeFeatures={handleFeaturesChange} />}
-                />
-              </MenuControlGroup>
-            </Controls>
-          </ReactMap>
+          {filterMode === "marinePark" && (
+            <LocationCheckboxList
+              options={marineParkOptions}
+              selectedValues={selectedMarineParkValues}
+              onToggle={handleMarineParkCheckboxChange}
+              testId="marine-park-checkbox-scroll"
+              isMobile={isMobile}
+            />
+          )}
+          {filterMode === "marineEcoregion" && (
+            <LocationCheckboxList
+              options={marineEcoregionOptions}
+              selectedValues={selectedMarineEcoregionValues}
+              onToggle={handleMarineEcoregionCheckboxChange}
+              testId="marine-ecoregion-checkbox-scroll"
+              isMobile={isMobile}
+            />
+          )}
+          {filterMode === "allenCoralAtlas" && (
+            <LocationCheckboxList
+              options={allenCoralAtlasOptions}
+              selectedValues={selectedAllenCoralAtlasValues}
+              onToggle={handleAllenCoralAtlasCheckboxChange}
+              testId="allen-coral-atlas-checkbox-scroll"
+              isMobile={isMobile}
+            />
+          )}
         </Box>
-      )}
+
+        {!isMobile && (
+          <Box
+            id={MAP_ID}
+            sx={{ flex: 1, minHeight: "400px", position: "relative" }}
+          >
+            <ReactMap
+              panelId={MAP_ID}
+              bbox={mapBbox}
+              zoom={MapDefaultConfig.ZOOM - 1}
+            >
+              <SelectedAreaLayer areas={highlightCollection} />
+              <Controls>
+                <NavigationControl />
+                <ScaleControl />
+                <DisplayCoordinate />
+                <MenuControlGroup>
+                  <MenuControl menu={<BaseMapSwitcher />} />
+                  <MenuControl
+                    menu={<DrawRect onChangeFeatures={handleFeaturesChange} />}
+                  />
+                </MenuControlGroup>
+              </Controls>
+            </ReactMap>
+          </Box>
+        )}
+      </Box>
 
       <TestHelper
         id="selected-location"
