@@ -20,13 +20,13 @@ jobs:
       id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Enable Corepack
         run: corepack enable
 
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '20'
 
@@ -38,20 +38,20 @@ jobs:
         id: build_website_staging
         run: yarn staging
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
             name: build-staging
             path: ${{ env.DIST }}
             retention-days: 1
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: build-staging
           path: ${{ env.DIST }}
 
       - name: Configure AWS credentials
         id: aws_auth
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           audience: sts.amazonaws.com
           aws-region: ${{ vars.AWS_REGION }}
@@ -79,13 +79,13 @@ jobs:
       id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Enable Corepack
         run: corepack enable
 
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '20'
 
@@ -97,19 +97,19 @@ jobs:
         id: build_website_production
         run: yarn prod
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
             name: build-production
             path: ${{ env.DIST }}
             retention-days: 1
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: build-production
           path: ${{ env.DIST }}
 
       - name: Generate App Token
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@v3
         id: app-token
         with:
           app-id: ${{ vars.DEPLOY_APP_ID }}
@@ -126,7 +126,7 @@ jobs:
 
       - name: Configure AWS credentials
         id: aws_auth
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           audience: sts.amazonaws.com
           aws-region: ${{ vars.AWS_REGION }}
