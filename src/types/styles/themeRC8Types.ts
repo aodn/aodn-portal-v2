@@ -64,6 +64,7 @@ declare module "@mui/material/styles" {
   interface TypographyVariants {
     slogan1: React.CSSProperties;
     slogan2: React.CSSProperties;
+    slogan3: React.CSSProperties;
     heading1: React.CSSProperties;
     heading2: React.CSSProperties;
     heading3: React.CSSProperties;
@@ -78,6 +79,7 @@ declare module "@mui/material/styles" {
   interface TypographyVariantsOptions {
     slogan1?: React.CSSProperties;
     slogan2?: React.CSSProperties;
+    slogan3?: React.CSSProperties;
     heading1?: React.CSSProperties;
     heading2?: React.CSSProperties;
     heading3?: React.CSSProperties;
@@ -107,6 +109,7 @@ declare module "@mui/material/styles" {
     primary5: string;
     primary6: string;
     secondary1: string;
+    secondary2: string;
     neutral1: string;
     neutral2: string;
     neutral3: string;
@@ -132,6 +135,7 @@ declare module "@mui/material/styles" {
     primary5?: string;
     primary6?: string;
     secondary1?: string;
+    secondary2?: string;
     neutral1?: string;
     neutral2?: string;
     neutral3?: string;
@@ -145,6 +149,7 @@ declare module "@mui/material/Typography/Typography" {
   interface TypographyPropsVariantOverrides {
     slogan1: true;
     slogan2: true;
+    slogan3: true;
     heading1: true;
     heading2: true;
     heading3: true;

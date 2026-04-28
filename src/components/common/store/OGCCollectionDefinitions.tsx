@@ -29,6 +29,7 @@ export interface ILink {
   type: string;
   title: string;
   "ai:group"?: string;
+  "ai:role"?: string[];
   description?: string;
   getIcon?: () => string | ComponentType<SVGProps<SVGSVGElement>>;
 }
@@ -314,6 +315,13 @@ export class OGCCollection {
     this.getLinksByAIGroup(AIGroup.OTHER);
   getAllAIGroupedLinks = (): ILink[] | undefined =>
     this.links?.filter((link) => link["ai:group"] !== undefined);
+  // Get all downloadable links, whose link.ai:role contains "download"
+  getDownloadLinks = (): ILink[] | undefined => {
+    const result = this.links?.filter((link) =>
+      link["ai:role"]?.some((role) => role.toLowerCase() === "download")
+    );
+    return result?.length ? result : undefined;
+  };
   // A feature call summary is provided if you do cloud optimized data download
   hasSummaryFeature = () => this.links?.some((link) => link.rel === "summary");
   getDatasetType = () => {

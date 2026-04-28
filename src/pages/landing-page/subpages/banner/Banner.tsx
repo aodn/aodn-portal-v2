@@ -1,12 +1,7 @@
 import { useState } from "react";
 import { Box, Dialog, Stack, Tooltip, Typography } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
-import {
-  fontSize,
-  fontWeight,
-  gap,
-  padding,
-} from "../../../../styles/constants";
+import { padding } from "../../../../styles/constants";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 import bannerImage1 from "@/assets/images/banner_image_1.png";
 import bannerImage2 from "@/assets/images/banner_image_2.png";
@@ -23,45 +18,31 @@ const renderBannerText = () => {
         data-testid="hero-text"
       >
         <Typography
+          variant="slogan2"
           sx={{
-            fontSize: {
-              xs: fontSize.bannerTitleSmall,
-              sm: fontSize.bannerTitleMedium,
-              xl: fontSize.bannerTitleLarge,
-            },
-            letterSpacing: gap.xs,
-            fontWeight: fontWeight.light,
             color: portalTheme.palette.text2,
             textAlign: "left",
-            padding: 0,
+            p: padding.nil,
           }}
         >
           IMOS Australian
         </Typography>
         <Typography
+          variant="slogan1"
           sx={{
-            fontSize: {
-              xs: fontSize.bannerTitleMedium,
-              sm: fontSize.bannerTitleLarge,
-              xl: fontSize.bannerTitleExtraLarge,
-            },
-            letterSpacing: gap.xs,
-            fontWeight: fontWeight.bold,
             color: portalTheme.palette.text2,
             textAlign: "left",
-            padding: 0,
-            mt: -2,
+            p: padding.nil,
           }}
         >
           Ocean Data Portal
         </Typography>
         <Typography
+          variant="slogan3"
           sx={{
-            ...portalTheme.typography.heading4,
             color: portalTheme.palette.text2,
             whiteSpace: "wrap",
-            p: 0,
-            pr: padding.small,
+            p: padding.nil,
           }}
         >
           &quot;Open access to Australian marine and climate science

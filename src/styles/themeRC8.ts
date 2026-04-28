@@ -1,8 +1,10 @@
 import { createTheme, ThemeOptions } from "@mui/material/styles";
 import { designTokensRC8 as designTokens } from "./designTokensRC8";
 
-// Type definitions are in rc8ThemeTypes.ts to extend Material-UI theme interfaces
+// We create this just to get the helper methods
+const defaultTheme = createTheme();
 
+// Type definitions are in rc8ThemeTypes.ts to extend Material-UI theme interfaces
 const rc8ThemeOptions: ThemeOptions = {
   designTokens: designTokens,
 
@@ -12,8 +14,113 @@ const rc8ThemeOptions: ThemeOptions = {
       designTokens.typography.fontFamily.openSans,
     ].join(","),
 
-    slogan1: designTokens.typography.variants.slogan1,
-    slogan2: designTokens.typography.variants.slogan2,
+    slogan1: {
+      // Default
+      ...designTokens.typography.variants.slogan1,
+      // Mobile
+      [defaultTheme.breakpoints.down("sm")]: {
+        fontSize: "36px",
+        lineHeight: "40px",
+      },
+      // Tablet
+      [defaultTheme.breakpoints.between("sm", "md")]: {
+        fontSize: "36px",
+        lineHeight: "40px",
+      },
+      // Underlaptop
+      [defaultTheme.breakpoints.down("md")]: {
+        fontSize: "36px",
+        lineHeight: "40px",
+      },
+      // Laptop
+      [defaultTheme.breakpoints.between("md", "lg")]: {
+        fontSize: "40px",
+        lineHeight: "40px",
+      },
+      // Desktop
+      [defaultTheme.breakpoints.between("lg", "xl")]: {
+        fontSize: "64px",
+      },
+      // Above desktop
+      [defaultTheme.breakpoints.up("lg")]: {
+        fontSize: "64px",
+      },
+      // 4K
+      [defaultTheme.breakpoints.up("xl")]: {
+        fontSize: "64px",
+      },
+    },
+    slogan2: {
+      // Default
+      ...designTokens.typography.variants.slogan2,
+      // Mobile
+      [defaultTheme.breakpoints.down("sm")]: {
+        fontSize: "30px",
+        lineHeight: "44px",
+      },
+      // Tablet
+      [defaultTheme.breakpoints.between("sm", "md")]: {
+        fontSize: "30px",
+        lineHeight: "44px",
+      },
+      // Underlaptop
+      [defaultTheme.breakpoints.down("md")]: {
+        fontSize: "30px",
+        lineHeight: "44px",
+      },
+      // Laptop
+      [defaultTheme.breakpoints.between("md", "lg")]: {
+        fontSize: "36px",
+      },
+      // Desktop
+      [defaultTheme.breakpoints.between("lg", "xl")]: {
+        fontSize: "36px",
+      },
+      // Above desktop
+      [defaultTheme.breakpoints.up("lg")]: {
+        fontSize: "48px",
+      },
+      // 4K
+      [defaultTheme.breakpoints.up("xl")]: {
+        fontSize: "48px",
+      },
+    },
+    slogan3: {
+      // Default
+      ...designTokens.typography.variants.slogan3,
+      // Mobile
+      [defaultTheme.breakpoints.down("sm")]: {
+        // Use default
+      },
+      // Tablet
+      [defaultTheme.breakpoints.between("sm", "md")]: {
+        fontSize: "15px",
+      },
+      // Underlaptop
+      [defaultTheme.breakpoints.down("md")]: {
+        fontSize: "15px",
+      },
+      // Laptop
+      [defaultTheme.breakpoints.between("md", "lg")]: {
+        fontSize: "16px",
+        lineHeight: "22px",
+      },
+      // Desktop
+      [defaultTheme.breakpoints.between("lg", "xl")]: {
+        fontSize: "16px",
+        lineHeight: "22px",
+      },
+      // Above desktop
+      [defaultTheme.breakpoints.up("lg")]: {
+        fontSize: "16px",
+        lineHeight: "22px",
+      },
+      // 4K
+      [defaultTheme.breakpoints.up("xl")]: {
+        fontSize: "16px",
+        lineHeight: "22px",
+      },
+    },
     heading1: designTokens.typography.variants.heading1,
     heading2: designTokens.typography.variants.heading2,
     heading3: designTokens.typography.variants.heading3,
@@ -63,6 +170,7 @@ const rc8ThemeOptions: ThemeOptions = {
     primary5: designTokens.colours.product.primary5,
     primary6: designTokens.colours.product.primary6,
     secondary1: designTokens.colours.product.secondary1,
+    secondary2: designTokens.colours.product.secondary2,
     neutral1: designTokens.colours.product.neutral1,
     neutral2: designTokens.colours.product.neutral2,
     neutral3: designTokens.colours.product.neutral3,

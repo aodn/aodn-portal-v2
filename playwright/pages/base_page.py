@@ -27,7 +27,7 @@ class BasePage:
 
     def go_to_landing_page(self) -> None:
         """Navigate to the landing page"""
-        self.page.get_by_test_id('aodn-home-link').first.click()
+        self.page.get_by_test_id('aodn-home-link').first.click(force=True)
 
     def get_current_url(self) -> str:
         """Get the current page URL"""
@@ -65,10 +65,12 @@ class BasePage:
         """Return element by text"""
         return self.page.get_by_text(text, exact=exact)
 
-    def click_text(self, text: str, exact: bool = False, timeout: float = 5000) -> None:
+    def click_text(
+        self, text: str, exact: bool = False, timeout: float = 5000
+    ) -> None:
         """Click on the given text"""
         locator = self.get_text(text, exact=exact)
-        locator.wait_for(state="visible", timeout=timeout)
+        locator.wait_for(state='visible', timeout=timeout)
         locator.click()
 
     def get_tab(self, text: str) -> Locator:
@@ -86,6 +88,19 @@ class BasePage:
     def click_heading(self, text: str) -> None:
         """Click on the given heading"""
         self.get_heading(text).click()
+
+    def click_menu_item(self, menu_name: str) -> None:
+        """Click on the given menu item"""
+        self.page.get_by_test_id(f'menuitem-{menu_name}').click()
+        # Close the menu popover after clicking the menu item to prevent it from blocking other elements
+        try:
+            popover = self.get_by_id('menu-')
+            popover.evaluate_all(
+                "els => els.forEach(el => el.style.display = 'none')"
+            )
+        except Exception:
+            # If the popover is not found or already closed, we can ignore the error
+            pass
 
     def get_radio_input(self, text: str) -> Locator:
         """Return the radio input element based on the visible label text"""
@@ -144,7 +159,7 @@ class BasePage:
 
     def perform_action_and_get_api_url(
         self, action: Callable[[], None]
-    ) -> Tuple[str, str] | None:
+    ) -> Tuple[str, str]:
         """
         Perform an action (e.g., click search, zoom/drag map) and return the API URLs
         used for the request.

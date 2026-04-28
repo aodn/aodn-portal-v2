@@ -27,9 +27,11 @@ import {
   DownloadConditionType,
   DownloadServiceType,
   SubsettingType,
+  BBoxCondition,
+  PolygonCondition,
 } from "../../context/DownloadDefinitions";
 import { dateDefault } from "../../../../components/common/constants";
-import { FeatureCollection, Point } from "geojson";
+import { FeatureCollection, Point, Feature, Polygon } from "geojson";
 import DisplayCoordinate from "../../../../components/map/mapbox/controls/DisplayCoordinate";
 import HexbinLayer from "../../../../components/map/mapbox/layers/HexbinLayer";
 import GeoServerLayer, {
@@ -56,6 +58,8 @@ import { DateSliderPoint } from "../../../../components/common/slider/DateSlider
 import { dateToValue } from "../../../../utils/DateUtils";
 import { portalTheme } from "../../../../styles";
 import { GeoserverFieldsResponse } from "../../../../components/common/store/GeoserverDefinitions";
+import * as turf from "@turf/turf";
+import _ from "lodash";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -185,7 +189,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   >([]);
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
-  const [_, setWMSFields] = useState<GeoserverFieldsResponse[]>([]);
+  const [_wmsFields, setWMSFields] = useState<GeoserverFieldsResponse[]>([]);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(false);
   const [drawRectSupport, setDrawRectSupportSupport] = useState<boolean>(false);
   const [discreteTimeSliderValues, setDiscreteTimeSliderValues] = useState<
@@ -263,6 +267,52 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     );
     const conditionEnd = dayjs(dateRangeCondition.end, dateDefault.DATE_FORMAT);
     return [conditionStart, conditionEnd];
+  }, [downloadConditions]);
+
+  const drawFeatures = useMemo(() => {
+    const existingBboxConditions = downloadConditions.filter(
+      (condition) => condition.type === DownloadConditionType.BBOX
+    ) as BBoxCondition[];
+
+    const existingPolygonConditions = downloadConditions.filter(
+      (condition) => condition.type === DownloadConditionType.POLYGON
+    ) as PolygonCondition[];
+
+    const features: Feature<Polygon>[] = [];
+
+    existingBboxConditions.forEach((condition) => {
+      const [west, south, east, north] = condition.bbox;
+      features.push({
+        type: "Feature",
+        geometry: {
+          type: "Polygon",
+          coordinates: [
+            [
+              [west, north],
+              [east, north],
+              [east, south],
+              [west, south],
+              [west, north],
+            ],
+          ],
+        },
+        properties: { selectionType: "bbox" },
+      });
+    });
+
+    existingPolygonConditions.forEach((condition) => {
+      const closedCoords = [...condition.coordinates, condition.coordinates[0]];
+      features.push({
+        type: "Feature",
+        geometry: {
+          type: "Polygon",
+          coordinates: [closedCoords],
+        },
+        properties: { selectionType: "polygon" },
+      });
+    });
+
+    return features;
   }, [downloadConditions]);
 
   const geoServerLayerConfig = useMemo(() => {
@@ -378,6 +428,47 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
     [setSelectedWmsLayer]
   );
 
+  const handleFeaturesChange = useCallback(
+    (newFeatures: Feature<Polygon>[], removeFeature: (id: string) => void) => {
+      const bboxConditions: BBoxCondition[] = [];
+      const polygonConditions: PolygonCondition[] = [];
+
+      newFeatures.forEach((feature) => {
+        const id = String(feature.id);
+        const selectionType = feature.properties?.selectionType || "bbox";
+        const removeCallback = () => removeFeature(id);
+
+        if (selectionType === "polygon") {
+          const coords = feature.geometry.coordinates[0];
+          // Remove closing duplicate point if present
+          const vertices =
+            coords.length > 1 &&
+            coords[0][0] === coords[coords.length - 1][0] &&
+            coords[0][1] === coords[coords.length - 1][1]
+              ? coords.slice(0, -1)
+              : coords;
+          polygonConditions.push(
+            new PolygonCondition(
+              id,
+              vertices as [number, number][],
+              removeCallback
+            )
+          );
+        } else {
+          const bbox = turf.bbox(feature);
+          bboxConditions.push(new BBoxCondition(id, bbox, removeCallback));
+        }
+      });
+
+      getAndSetDownloadConditions(DownloadConditionType.BBOX, bboxConditions);
+      getAndSetDownloadConditions(
+        DownloadConditionType.POLYGON,
+        polygonConditions
+      );
+    },
+    [getAndSetDownloadConditions]
+  );
+
   return (
     collection && (
       <Grid container>
@@ -483,10 +574,8 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
                       visible={checkSubsettingSupport(SubsettingType.DrawRect)}
                       menu={
                         <DrawRect
-                          getAndSetDownloadConditions={
-                            getAndSetDownloadConditions
-                          }
-                          downloadConditions={downloadConditions}
+                          onChangeFeatures={handleFeaturesChange}
+                          features={drawFeatures}
                         />
                       }
                     />

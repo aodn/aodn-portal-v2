@@ -442,35 +442,40 @@
       "rel": "data",
       "type": "",
       "title": "DATA ACCESS - derived products (binary habitat extents, seagrass species composition, composite habitat map)",
-      "ai:group": "Data Access"
+      "ai:group": "Data Access",
+      "ai:role": ["download"]
     },
     {
       "href": "https://data.imas.utas.edu.au/attachments/08067a15-2615-4b3e-9b04-23f6a08abb75/occurrence_probability",
       "rel": "data",
       "type": "",
       "title": "DATA ACCESS - probability of occurrence for each habitat class",
-      "ai:group": "Data Access"
+      "ai:group": "Data Access",
+      "ai:role": ["download"]
     },
     {
       "href": "https://data.imas.utas.edu.au/attachments/08067a15-2615-4b3e-9b04-23f6a08abb75/percent_cover",
       "rel": "data",
       "type": "",
       "title": "DATA ACCESS - percent cover for each habitat class",
-      "ai:group": "Data Access"
+      "ai:group": "Data Access",
+      "ai:role": ["download"]
     },
     {
       "href": "https://data.imas.utas.edu.au/attachments/08067a15-2615-4b3e-9b04-23f6a08abb75/raw",
       "rel": "data",
       "type": "",
       "title": "DATA ACCESS - fractional cover detection products (multiband probability and % cover for all habitat classes)",
-      "ai:group": "Data Access"
+      "ai:group": "Data Access",
+      "ai:role": ["download"]
     },
     {
       "href": "https://geoserver.imas.utas.edu.au/geoserver/NESP/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=MaC_3_6_Furneaux_mapped_extent&outputFormat=SHAPE-ZIP",
       "rel": "data",
       "type": "",
       "title": "Vector mask of field-validated vs unvalidated regions of the prediction area (.shp)",
-      "ai:group": "Data Access > wfs"
+      "ai:group": "Data Access > wfs",
+      "ai:role": ["download"]
     },
     {
       "href": "https://geoserver.imas.utas.edu.au/geoserver/NESP/wms",

@@ -98,9 +98,9 @@ describe("DateRangeFilter", () => {
     renderComponent();
 
     expect(screen.getByText("Custom")).toBeInTheDocument();
-    expect(screen.getByText("Last Year")).toBeInTheDocument();
-    expect(screen.getByText("Last 5 Years")).toBeInTheDocument();
-    expect(screen.getByText("Last 10 Years")).toBeInTheDocument();
+    expect(screen.getByText("Last year")).toBeInTheDocument();
+    expect(screen.getByText("Last 5 years")).toBeInTheDocument();
+    expect(screen.getByText("Last 10 years")).toBeInTheDocument();
     expect(screen.getByText("Start Date")).toBeInTheDocument();
     expect(screen.getByText("End Date")).toBeInTheDocument();
 
@@ -109,11 +109,11 @@ describe("DateRangeFilter", () => {
     expect(radioButtons[0]).toBeChecked(); // Custom option should be selected by default
   });
 
-  it("updates radio selection and dispatches date range update for Last Year", () => {
+  it("updates radio selection and dispatches date range update for Last year", () => {
     renderComponent();
     const user = userEvent.setup();
 
-    const lastYearRadio = screen.getByLabelText("Last Year");
+    const lastYearRadio = screen.getByLabelText("Last year");
     user.click(lastYearRadio);
 
     return waitFor(() => expect(lastYearRadio).toBeChecked()).then(() =>
@@ -235,7 +235,7 @@ describe("DateRangeFilter", () => {
   });
 
   it("updates selected option based on Redux state changes", () => {
-    // Create a store with a different date range (e.g., Last 5 Years)
+    // Create a store with a different date range (e.g., Last 5 years)
     const fiveYearsAgo = dayjs().subtract(5, "year");
     const newState = {
       paramReducer: {
@@ -249,7 +249,7 @@ describe("DateRangeFilter", () => {
     renderComponent();
 
     return waitFor(() => {
-      expect(screen.getByLabelText("Last 5 Years")).toBeChecked();
+      expect(screen.getByLabelText("Last 5 years")).toBeChecked();
     });
   });
 

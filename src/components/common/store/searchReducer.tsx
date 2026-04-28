@@ -32,6 +32,7 @@ import {
   getMultiPolygonFrom,
 } from "../../../utils/DownloadConditionUtils";
 import { trackSearchResultParameters } from "../../../analytics/searchParamsEvent";
+import { trackHttpRequestError } from "../../../analytics/httpRequestErrEvent";
 import {
   MapFeatureRequest,
   MapFeatureResponse,
@@ -155,6 +156,17 @@ axiosRetry(ogcAxiosWithRetry, {
     return isRetryableError(error);
   },
 });
+
+// Centralized HTTP error tracking — fires once per final failure
+// (after retries), so every request through this instance is covered.
+ogcAxiosWithRetry.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    trackHttpRequestError(error);
+    return Promise.reject(error);
+  }
+);
+
 /**
  Define search functions
  */
@@ -650,9 +662,15 @@ const createSearchParamFrom = (
   }
 
   if (i.hasCOData) {
-    // If this field is not null, that means we have indexed cloud optimized data
-    const f = cqlDefaultFilters.get("IS_NOT_NULL") as IsNotNull;
-    p.filter = appendFilter(p.filter, f("assets_summary"));
+    // Filter records that have cloud optimized data OR have a downloadable link
+    const coDataFilter = (cqlDefaultFilters.get("IS_NOT_NULL") as IsNotNull)(
+      "assets_summary"
+    );
+    const downloadLinkFilter = "links_airole_contains='download'";
+    p.filter = appendFilter(
+      p.filter,
+      `(${coDataFilter} OR ${downloadLinkFilter})`
+    );
   }
 
   if (i.updateFreq) {

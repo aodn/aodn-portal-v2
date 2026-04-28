@@ -26,13 +26,12 @@ def test_drawing_shape_adds_download_filter(
     """
     detail_page = DetailPage(desktop_page)
     detail_page.load(uuid)
-    detail_page.detail_map.wait_for_map_idle()
+    detail_page.detail_map.wait_for_layer_select_loading()
 
     # Draw a rectangle on the map
     detail_page.detail_map.draw_rect_menu_button.click()
     detail_page.detail_map.hover_map()
     detail_page.detail_map.click_map()
-    detail_page.detail_map.wait_for_map_idle()
     x, y = detail_page.detail_map.calculate_mouse_coordinates(
         right=100, down=100
     )
@@ -178,7 +177,7 @@ def test_map_layer_persists_after_tab_navigation(
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(uuid)
-    detail_page.detail_map.wait_for_map_loading()
+    detail_page.detail_map.wait_for_map_idle()
 
     # Ensure that the Hex Grid and GeoServer options are displayed in the layers menu
     detail_page.detail_map.layers_menu.click()

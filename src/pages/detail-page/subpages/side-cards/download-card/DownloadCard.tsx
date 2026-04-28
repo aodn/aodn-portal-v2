@@ -77,9 +77,9 @@ const DownloadCard: FC = () => {
             onWFSAvailabilityChange={onWFSAvailabilityChange}
           />
         );
-      case DownloadServiceType.Unavailable:
+      // hide download card if no CO download or WFS download
       default:
-        return <DownloadNotAvailableCard />;
+        return null;
     }
   }, [
     collection,
@@ -93,9 +93,12 @@ const DownloadCard: FC = () => {
   ]);
 
   return (
-    <SideCardContainer title="Download Service" px={0} py={0}>
-      {downloadCard}
-    </SideCardContainer>
+    // Return null when download service is unavailable, removing the card entirely
+    downloadService === DownloadServiceType.Unavailable ? null : (
+      <SideCardContainer title="Download Service" px={0} py={0}>
+        {downloadCard}
+      </SideCardContainer>
+    )
   );
 };
 

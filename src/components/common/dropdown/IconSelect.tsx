@@ -11,9 +11,7 @@ import {
   isValidElement,
   ReactElement,
   ReactNode,
-  startTransition,
   useCallback,
-  useEffect,
   useState,
 } from "react";
 import { CommonSelectProps, SelectItem } from "./CommonSelect";
@@ -162,16 +160,20 @@ const IconSelect = <T extends string | number = string>({
   isIconOnly = false,
   selectSx: sx,
 }: IconSelectProps<T>) => {
-  const [selectedItem, setSelectedItem] = useState<T | null>(value ?? null);
+  const isControlled = value !== undefined;
+  const [internalValue, setInternalValue] = useState<T | null>(value ?? null);
+  const selectedItem = isControlled ? (value ?? null) : internalValue;
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const handleOnChange = useCallback(
     (event: SelectChangeEvent<T>) => {
-      const selectedItem = event.target.value as T;
-      setSelectedItem(selectedItem);
-      onSelectCallback?.(selectedItem);
+      const newSelectedItem = event.target.value as T;
+      if (!isControlled) {
+        setInternalValue(newSelectedItem);
+      }
+      onSelectCallback?.(newSelectedItem);
     },
-    [onSelectCallback]
+    [onSelectCallback, isControlled]
   );
 
   const handleOpenState = useCallback(
@@ -183,10 +185,6 @@ const IconSelect = <T extends string | number = string>({
   );
 
   const config = mergeWithDefaults(defaultColorConfig, colorConfig);
-
-  useEffect(() => {
-    if (value) startTransition(() => setSelectedItem(value));
-  }, [value]);
 
   return (
     <FormControl fullWidth>

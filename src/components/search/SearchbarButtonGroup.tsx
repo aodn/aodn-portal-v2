@@ -276,8 +276,8 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         onClick={handleSearchClick}
         showText={false}
         buttonSx={{
-          width: "48px",
-          height: "48px",
+          width: shouldShrinkAllButtons && isUnderLaptop ? "42px" : "48px",
+          height: shouldShrinkAllButtons && isUnderLaptop ? "42px" : "48px",
           color: "#FFF",
           backgroundColor: portalTheme.palette.primary2,
           borderRadius: "8px",
