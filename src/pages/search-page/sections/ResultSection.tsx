@@ -94,7 +94,14 @@ const ResultSection: FC<ResultSectionProps> = ({
           />
         )}
       </Box>
-      <Box sx={{ flex: 1, height: "100%", overflowY: "auto", pr: 1 }}>
+      <Box
+        sx={{
+          flex: 1,
+          height: "100%",
+          overflowY: "auto",
+          pr: isUnderLaptop ? 0 : 1,
+        }}
+      >
         <ResultCards
           layout={currentLayout}
           contents={reduxContents}

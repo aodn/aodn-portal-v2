@@ -9,10 +9,11 @@ import ResultListSortButton, {
   ResultListSortButtonType,
   SortResultEnum,
 } from "../common/buttons/ResultListSortButton";
-import { ICON_SELECT_DEFAULT_HEIGHT } from "../common/dropdown/IconSelect";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import ShareButtonMenu from "../menu/ShareButtonMenu";
 import { portalTheme } from "../../styles";
+
+export const SIMPLE_FILTER_DEFAULT_HEIGHT = 40;
 
 export interface ResultPanelSimpleFilterType
   extends ResultListLayoutButtonType<SearchResultLayoutEnum>,
@@ -48,7 +49,7 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   currentSort,
   onChangeSorting,
 }) => {
-  const { isUnderLaptop, isMobile, isLaptop } = useBreakpoint();
+  const { isUnderLaptop } = useBreakpoint();
 
   return (
     <Stack sx={sx} direction="row" spacing={1} width="100%" flexWrap="nowrap">
@@ -59,43 +60,26 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
           justifyContent: "center",
           alignItems: "center",
           overflow: "hidden",
-          height: "40px",
+          height: SIMPLE_FILTER_DEFAULT_HEIGHT,
           border: `0.5px solid ${portalTheme.palette.grey500}`,
           borderRadius: "6px",
           bgcolor: portalTheme.palette.primary6,
-          px: isUnderLaptop ? (isMobile ? "0" : "4px") : "20px",
-          py: "10px",
-          flexShrink: 0,
+          flexGrow: 1,
         }}
         data-testid="show-result-count"
       >
-        <Typography
-          variant="title2Regular"
-          whiteSpace="nowrap"
-          sx={{
-            fontSize: "16px",
-          }}
-          px={2}
-        >
+        <Typography variant="title2Regular" whiteSpace="nowrap" px={2}>
           {renderShowingResultsText(total, count, isUnderLaptop)}
         </Typography>
       </Paper>
-      <Stack
-        flexDirection="row"
-        flex={1}
-        gap={1}
-        flexWrap="nowrap"
-        minWidth={0}
-      >
+      <Stack flexDirection="row" flex={1} gap={1} flexWrap="nowrap">
         <ResultListSortButton
           onChangeSorting={onChangeSorting}
           currentSort={currentSort}
-          isIconOnly={isLaptop}
         />
         <ResultListLayoutButton
           onChangeLayout={onChangeLayout}
           currentLayout={currentLayout}
-          isIconOnly={isLaptop}
           excludeOptions={
             isUnderLaptop
               ? [SearchResultLayoutEnum.GRID, SearchResultLayoutEnum.LIST]
@@ -106,8 +90,8 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
           <ShareButtonMenu
             hideText
             sx={{
-              maxHeight: ICON_SELECT_DEFAULT_HEIGHT,
-              maxWidth: ICON_SELECT_DEFAULT_HEIGHT * 2,
+              maxHeight: SIMPLE_FILTER_DEFAULT_HEIGHT,
+              maxWidth: SIMPLE_FILTER_DEFAULT_HEIGHT * 2,
             }}
           />
         )}

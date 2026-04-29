@@ -581,7 +581,7 @@ const SearchPage = () => {
             md: SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_ABOVE_LAPTOP,
           },
           overflowX: "hidden",
-          padding: "24px",
+          padding: isUnderLaptop ? "10px" : "24px",
           bgcolor: color.blue.light,
         }}
         gap={

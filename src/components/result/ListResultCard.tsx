@@ -4,16 +4,11 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  Stack,
   Tooltip,
   Typography,
 } from "@mui/material";
-import {
-  border,
-  borderRadius,
-  color,
-  gap,
-  padding,
-} from "../../styles/constants";
+import { border, borderRadius, color, padding } from "../../styles/constants";
 import { FC, Fragment, SyntheticEvent, useRef, useState } from "react";
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
@@ -130,7 +125,6 @@ const ListResultCard: FC<ListResultCardProps> = ({
       id={`result-card-${uuid}`}
       elevation={isSelectedDataset ? 2 : 0}
       sx={{
-        position: "relative",
         display: "flex",
         flexDirection: "row",
         justifyContent: "center",
@@ -153,9 +147,6 @@ const ListResultCard: FC<ListResultCardProps> = ({
         ref={menuRef}
         onClick={(type: OpenType | undefined) => onClickDetail?.(uuid, type)}
       />
-      <Box position="absolute" top={"12px"} right={"12px"}>
-        <BookmarkButton dataset={content} />
-      </Box>
       <Box display="flex" flexDirection="column" flex={1} height="100%">
         <Box maxHeight={isSimplified ? "100%" : "80%"}>
           <CardHeader
@@ -193,18 +184,20 @@ const ListResultCard: FC<ListResultCardProps> = ({
               </Typography>
             }
             action={
-              isSimplified ? null : (
-                <OrganizationLogo
-                  logo={findIcon()}
-                  sx={{
-                    width: "auto",
-                    maxWidth: "200px",
-                    height: LIST_CARD_TITLE_HEIGHT,
-                    pr: "32px",
-                    pl: "10px",
-                  }}
-                />
-              )
+              <Stack direction="row" alignItems="center" gap={1}>
+                {!isSimplified && (
+                  <OrganizationLogo
+                    logo={findIcon()}
+                    sx={{
+                      width: "auto",
+                      maxWidth: "200px",
+                      height: LIST_CARD_TITLE_HEIGHT,
+                      pl: "10px",
+                    }}
+                  />
+                )}
+                <BookmarkButton dataset={content} />
+              </Stack>
             }
           />
           <CardContent
