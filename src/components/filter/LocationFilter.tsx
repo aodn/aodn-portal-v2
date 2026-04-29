@@ -157,18 +157,16 @@ const LocationCheckboxList: FC<{
     data-testid={testId}
     sx={{
       width: "100%",
-      maxHeight: isMobile ? "calc(100vh - 380px)" : "450px",
+      maxHeight: isMobile ? "calc(100vh - 360px)" : "400px",
       minHeight: 0,
       overflowY: "auto",
       overflowX: "hidden",
       scrollbarColor: `${theme.palette.primary1} ${alpha(theme.palette.primary1, 0.1)}`,
       "&::-webkit-scrollbar-thumb": {
         backgroundColor: theme.palette.primary1,
-        borderRadius: "4px",
       },
       "&::-webkit-scrollbar-track": {
         backgroundColor: alpha(theme.palette.primary1, 0.1),
-        borderRadius: "4px",
       },
     }}
   >
