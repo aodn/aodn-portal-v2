@@ -34,8 +34,6 @@ def test_map_card_popup_download_button_in_desktop(
     search_page.map.center_map(data_lng, data_lat)
     search_page.wait_for_page_stabilization()
     search_page.map.hover_map()
-
-    search_page.map.wait_for_map_idle()
     search_page.result_card_download_button.last.click()
 
     detail_page.return_button.click()
@@ -61,10 +59,11 @@ def test_map_card_popup_download_button_in_mobile(
 
     landing_page.load()
     landing_page.search.search_for(data_id)
+    search_page.wait_for_search_to_complete()
 
     search_page.result_view_button.click()
     search_page.full_map_view_button.click()
-    search_page.wait_for_page_stabilization()
+    search_page.map.wait_for_search_loading()
     expect(search_page.main_map).to_be_visible(timeout=30000)
     search_page.map.wait_for_map_idle()
 
@@ -77,7 +76,7 @@ def test_map_card_popup_download_button_in_mobile(
     )
     popup_download_btn.wait_for(state='visible')
     popup_download_btn.click()
-    search_page.wait_for_page_stabilization()
+    search_page.wait_for_load_state('load')
 
     detail_page.return_button.click()
     search_page.map.wait_for_map_idle()
