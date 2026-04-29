@@ -19,6 +19,9 @@ import {
   marineParkDefault,
 } from "../../../common/constants";
 import MapboxWorldLayer, { MapboxWorldLayersDef } from "./MapboxWorldLayer";
+import { cssFontFamilyToMapboxTextFont } from "../../../../utils/MapUtils";
+import { useTheme } from "@mui/material";
+import { SymbolLayerSpecification } from "mapbox-gl";
 
 export interface StaticLayersProps {
   id: string;
@@ -28,6 +31,20 @@ export interface StaticLayersProps {
   termsOfUse: string;
   features?: FeatureCollection;
 }
+
+const STATIC_LAYER_LABEL_PAINT: SymbolLayerSpecification["paint"] = {
+  "text-color": "#ffffff",
+  "text-halo-color": "#000000",
+  "text-halo-width": 2,
+};
+
+const STATIC_LAYER_LABEL_LAYOUT: SymbolLayerSpecification["layout"] = {
+  "text-offset": [0, 1.25],
+  "text-anchor": "center",
+  "text-allow-overlap": false,
+  "text-ignore-placement": false,
+  "symbol-placement": "point",
+};
 
 const StaticLayersDef = {
   AUSTRALIA_MARINE_PARKS: {
@@ -141,6 +158,7 @@ const StaticLayer: FC<Partial<StaticLayersProps>> = ({
   features,
 }) => {
   const { map } = useContext(MapContext);
+  const theme = useTheme();
   const isCreatedRef = useRef<boolean>(false);
 
   const [sourceId, layerId, layerLabelId] = useMemo(() => {
@@ -175,21 +193,17 @@ const StaticLayer: FC<Partial<StaticLayersProps>> = ({
       type: "symbol",
       source: sourceId,
       layout: {
+        ...STATIC_LAYER_LABEL_LAYOUT,
+        "text-font": cssFontFamilyToMapboxTextFont(
+          theme.typography.body2Regular.fontFamily,
+          { fontWeight: theme.typography.body2Regular.fontWeight }
+        ),
         "text-field": ["get", label],
-        "text-offset": [0, 1.25],
-        "text-anchor": "top",
-        "text-allow-overlap": false,
-        "text-ignore-placement": false,
-        "symbol-placement": "point",
       },
-      paint: {
-        "text-color": "#ffffff",
-        "text-halo-color": "#000000",
-        "text-halo-width": 2,
-      },
+      paint: STATIC_LAYER_LABEL_PAINT,
     });
     isCreatedRef.current = true;
-  }, [map, layerId, sourceId, layerLabelId, features, id, label]);
+  }, [map, layerId, sourceId, layerLabelId, features, id, label, theme]);
 
   // This is use to handle base map change that set style will default remove all layer, which is
   // the behavior of mapbox, this useEffect, add the layer back based on user event
@@ -319,4 +333,6 @@ export {
   fetchMarineParkOptions,
   fetchMarineEcoregionOptions,
   fetchAllenCoralAtlasOptions,
+  STATIC_LAYER_LABEL_PAINT,
+  STATIC_LAYER_LABEL_LAYOUT,
 };

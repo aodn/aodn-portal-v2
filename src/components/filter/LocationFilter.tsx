@@ -27,6 +27,8 @@ import {
   fetchAllenCoralAtlasOptions,
   fetchMarineEcoregionOptions,
   fetchMarineParkOptions,
+  STATIC_LAYER_LABEL_LAYOUT,
+  STATIC_LAYER_LABEL_PAINT,
 } from "../map/mapbox/layers/StaticLayer";
 import { MapDefaultConfig } from "../map/mapbox/constants";
 import { TestHelper } from "../common/test/helper";
@@ -50,6 +52,7 @@ import StyledTabs from "../common/tab/StyledTabs";
 import StyledTab from "../common/tab/StyledTab";
 import store, { getComponentState } from "../common/store/store";
 import { Feature, FeatureCollection, Polygon } from "geojson";
+import { stringToColor } from "../common/colors/colorsUtils";
 
 const MAP_ID = "location-filter-map";
 
@@ -95,8 +98,8 @@ const SelectedAreaLayer: FC<{
           type: "fill",
           source: sourceId,
           paint: {
-            "fill-color": "rgba(66,100,251, 0.3)",
-            "fill-outline-color": "#0000ff",
+            "fill-color": stringToColor(layerId),
+            "fill-outline-color": "black",
           },
         });
 
@@ -105,21 +108,14 @@ const SelectedAreaLayer: FC<{
           type: "symbol",
           source: sourceId,
           layout: {
-            "symbol-placement": "point",
-            "text-field": ["coalesce", ["get", "name"], ["get", "RESNAME"], ""],
+            ...STATIC_LAYER_LABEL_LAYOUT,
+            "text-field": ["get", "name"],
             "text-font": cssFontFamilyToMapboxTextFont(
               theme.typography.body2Regular.fontFamily,
               { fontWeight: theme.typography.body2Regular.fontWeight }
             ),
-            "text-size": 14,
-            "text-anchor": "center",
-            "text-allow-overlap": true,
           },
-          paint: {
-            "text-color": "#FFFFFF",
-            "text-halo-color": "#000000",
-            "text-halo-width": 1.2,
-          },
+          paint: STATIC_LAYER_LABEL_PAINT,
         });
       } else {
         (
