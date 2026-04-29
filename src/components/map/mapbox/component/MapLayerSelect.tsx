@@ -145,6 +145,7 @@ const MapLayerSelect: FC<MapLayerSelectProps> = ({
             onSelectCallback={handleSelectItem}
             menuProps={menuProps}
             selectSx={selectProps}
+            dataTestId="layer-select-dropdown"
           />
         </Stack>
       ) : null}
