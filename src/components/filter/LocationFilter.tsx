@@ -229,6 +229,7 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
   >([]);
   const [selectedAllenCoralAtlasValues, setSelectedAllenCoralAtlasValues] =
     useState<Set<string>>(new Set());
+  const [drawFeatures, setDrawFeatures] = useState<Feature<Polygon>[]>([]);
 
   const componentParam: ParameterState = getComponentState(store.getState());
   useEffect(() => {
@@ -260,7 +261,12 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
   }, []);
 
   const applyCombinedGeoSelections = useCallback(
-    (parks: Set<string>, ecoregions: Set<string>, coralAtlas: Set<string>) => {
+    (
+      parks: Set<string>,
+      ecoregions: Set<string>,
+      coralAtlas: Set<string>,
+      draws: Feature<Polygon>[]
+    ) => {
       const parkFeatures = marineParkOptions
         .filter((o) => parks.has(o.value))
         .map((o) => o.geo!.features[0]);
@@ -277,6 +283,7 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
         ...parkFeatures,
         ...ecoregionFeatures,
         ...coralFeatures,
+        ...draws,
       ];
 
       if (allFeatures.length === 0) {
@@ -316,7 +323,8 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
         applyCombinedGeoSelections(
           next,
           selectedMarineEcoregionValues,
-          selectedAllenCoralAtlasValues
+          selectedAllenCoralAtlasValues,
+          drawFeatures
         );
         return next;
       });
@@ -325,6 +333,7 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
       applyCombinedGeoSelections,
       selectedMarineEcoregionValues,
       selectedAllenCoralAtlasValues,
+      drawFeatures,
     ]
   );
 
@@ -337,7 +346,8 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
         applyCombinedGeoSelections(
           selectedMarineParkValues,
           next,
-          selectedAllenCoralAtlasValues
+          selectedAllenCoralAtlasValues,
+          drawFeatures
         );
         return next;
       });
@@ -346,6 +356,7 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
       applyCombinedGeoSelections,
       selectedMarineParkValues,
       selectedAllenCoralAtlasValues,
+      drawFeatures,
     ]
   );
 
@@ -358,7 +369,8 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
         applyCombinedGeoSelections(
           selectedMarineParkValues,
           selectedMarineEcoregionValues,
-          next
+          next,
+          drawFeatures
         );
         return next;
       });
@@ -367,6 +379,7 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
       applyCombinedGeoSelections,
       selectedMarineParkValues,
       selectedMarineEcoregionValues,
+      drawFeatures,
     ]
   );
 
@@ -382,11 +395,21 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
   }, [handleClosePopup]);
 
   const handleFeaturesChange = useCallback(
-    (
-      _newFeatures: Feature<Polygon>[],
-      _removeFeature: (id: string) => void
-    ) => {},
-    []
+    (newFeatures: Feature<Polygon>[], removeFeature: (id: string) => void) => {
+      setDrawFeatures(newFeatures);
+      applyCombinedGeoSelections(
+        selectedMarineParkValues,
+        selectedMarineEcoregionValues,
+        selectedAllenCoralAtlasValues,
+        newFeatures
+      );
+    },
+    [
+      applyCombinedGeoSelections,
+      selectedMarineParkValues,
+      selectedMarineEcoregionValues,
+      selectedAllenCoralAtlasValues,
+    ]
   );
 
   useEffect(() => {
@@ -694,15 +717,20 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
               bbox={mapBbox}
               zoom={MapDefaultConfig.ZOOM - 1}
             >
-              <SelectedAreaLayer areas={highlightCollection} />
               <Controls>
+                <SelectedAreaLayer areas={highlightCollection} />
                 <NavigationControl />
                 <ScaleControl />
                 <DisplayCoordinate />
                 <MenuControlGroup>
                   <MenuControl menu={<BaseMapSwitcher />} />
                   <MenuControl
-                    menu={<DrawRect onChangeFeatures={handleFeaturesChange} />}
+                    menu={
+                      <DrawRect
+                        features={drawFeatures}
+                        onChangeFeatures={handleFeaturesChange}
+                      />
+                    }
                   />
                 </MenuControlGroup>
               </Controls>
