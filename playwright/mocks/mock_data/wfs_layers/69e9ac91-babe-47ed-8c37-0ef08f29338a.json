@@ -1,0 +1,18 @@
+[
+  {
+    "name": "seamap:footprints_multires_bathymetry_composite_EEZ",
+    "title": "Spatial footprints and gridded resolution of source data used to generate bathymetry composite surfaces by depth zone (Aus EEZ)",
+    "keywords": {
+      "keyword": [
+        "features",
+        "SYNTHESIS_multiresolution_bathy_composite_footprints"
+      ]
+    },
+    "defaultCRS": "urn:ogc:def:crs:EPSG::3112",
+    "wgs84BoundingBox": {
+      "lowerCorner": "-175.61936188088495 -59.683150615179684",
+      "upperCorner": "179.66398048447186 -3.0708595692586074"
+    },
+    "abstract": ""
+  }
+]
