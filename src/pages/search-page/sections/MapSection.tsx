@@ -1,6 +1,7 @@
 import React, { memo, useState } from "react";
 import { MapEvent } from "mapbox-gl";
 import { Paper, SxProps, Theme } from "@mui/material";
+import { borderRadius } from "../../../styles/constants";
 import Map, { MapBasicType } from "../../../components/map/mapbox/Map";
 import Controls from "../../../components/map/mapbox/controls/Controls";
 import ToggleControl, {
@@ -124,6 +125,8 @@ const MapSection: React.FC<MapSectionProps> = memo(
           position: "relative",
           height: "100%",
           width: "100%",
+          borderRadius: borderRadius.small,
+          overflow: "hidden",
           ...sx,
         }}
       >

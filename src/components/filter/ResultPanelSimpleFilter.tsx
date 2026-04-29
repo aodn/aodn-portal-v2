@@ -48,7 +48,7 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   currentSort,
   onChangeSorting,
 }) => {
-  const { isUnderLaptop, isMobile } = useBreakpoint();
+  const { isUnderLaptop, isMobile, isLaptop } = useBreakpoint();
 
   return (
     <Stack sx={sx} direction="row" spacing={1} width="100%" flexWrap="nowrap">
@@ -90,12 +90,12 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
         <ResultListSortButton
           onChangeSorting={onChangeSorting}
           currentSort={currentSort}
-          isIconOnly={isMobile}
+          isIconOnly={isLaptop}
         />
         <ResultListLayoutButton
           onChangeLayout={onChangeLayout}
           currentLayout={currentLayout}
-          isIconOnly={isMobile}
+          isIconOnly={isLaptop}
           excludeOptions={
             isUnderLaptop
               ? [SearchResultLayoutEnum.GRID, SearchResultLayoutEnum.LIST]

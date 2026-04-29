@@ -585,7 +585,7 @@ const SearchPage = () => {
           bgcolor: color.blue.light,
         }}
         gap={
-          layout === SearchResultLayoutEnum.FULL_MAP || isUnderLaptop ? 0 : 2
+          layout === SearchResultLayoutEnum.FULL_MAP || isUnderLaptop ? 0 : 1
         }
       >
         <Box
