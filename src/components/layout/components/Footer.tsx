@@ -34,6 +34,7 @@ import { useLocation } from "react-router-dom";
 import { pageDefault } from "../../common/constants";
 import { NorthIcon } from "../../../assets/icons/footer/arrowUp";
 import { BlueskyLogoIcon } from "../../../assets/icons/footer/bluesky";
+import { PAGE_CONTENT_WIDTH_LANDING } from "../constant";
 
 interface IconContainerProps {
   children: JSX.Element;
@@ -60,7 +61,11 @@ const Footer: FC = () => {
   const { pathname } = useLocation();
 
   return (
-    <SectionContainer>
+    <SectionContainer
+      contentAreaStyle={{
+        width: PAGE_CONTENT_WIDTH_LANDING,
+      }}
+    >
       <Grid container paddingY={{ xs: padding.medium, sm: padding.quadruple }}>
         <Grid
           item

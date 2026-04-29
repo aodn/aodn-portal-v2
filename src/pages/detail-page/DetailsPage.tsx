@@ -6,6 +6,7 @@ import SideSection from "./subpages/SideSection";
 import { DetailPageProvider } from "./context/detail-page-provider";
 import ContentSection from "./subpages/ContentSection";
 import SectionContainer from "../../components/layout/components/SectionContainer";
+import { PAGE_CONTENT_WIDTH_DETAIL } from "../../components/layout/constant";
 import { LngLatBounds, MapMouseEvent } from "mapbox-gl";
 import { useCallback, useState } from "react";
 
@@ -28,6 +29,7 @@ const DetailsPage = () => {
             paddingY: padding.large,
             backgroundColor: color.blue.light,
           }}
+          contentAreaStyle={{ width: PAGE_CONTENT_WIDTH_DETAIL }}
         >
           <Grid container spacing={2}>
             <Grid item xs={12}>
