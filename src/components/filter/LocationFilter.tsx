@@ -14,6 +14,7 @@ import {
   FormControlLabel,
   FormGroup,
   IconButton,
+  alpha,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ReplayIcon from "@mui/icons-material/Replay";
@@ -160,6 +161,15 @@ const LocationCheckboxList: FC<{
       minHeight: 0,
       overflowY: "auto",
       overflowX: "hidden",
+      scrollbarColor: `${theme.palette.primary1} ${alpha(theme.palette.primary1, 0.1)}`,
+      "&::-webkit-scrollbar-thumb": {
+        backgroundColor: theme.palette.primary1,
+        borderRadius: "4px",
+      },
+      "&::-webkit-scrollbar-track": {
+        backgroundColor: alpha(theme.palette.primary1, 0.1),
+        borderRadius: "4px",
+      },
     }}
   >
     <FormGroup
@@ -196,9 +206,9 @@ const LocationCheckboxList: FC<{
             alignItems: "flex-start",
             width: "100%",
             ".MuiFormControlLabel-label": {
-              fontFamily: theme.typography.slogan3.fontFamily,
-              fontSize: theme.typography.slogan3.fontSize,
-              color: theme.palette.text2,
+              fontFamily: theme.typography.fontFamily,
+              fontSize: theme.typography.fontSize,
+              color: theme.palette.neutral1,
               whiteSpace: "normal",
               wordBreak: "break-word",
             },
@@ -456,79 +466,6 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
     ]
   );
 
-  useEffect(() => {
-    const p = componentParam.polygon;
-    if (!p) {
-      if (filterMode === "marinePark") {
-        startTransition(() => setSelectedMarineParkValues(new Set()));
-      } else if (filterMode === "marineEcoregion") {
-        startTransition(() => setSelectedMarineEcoregionValues(new Set()));
-      } else if (filterMode === "allenCoralAtlas") {
-        startTransition(() => setSelectedAllenCoralAtlasValues(new Set()));
-      }
-      startTransition(() => setDrawFeatures([]));
-      return;
-    }
-
-    const polygonProperties = p.properties;
-    // Only run fallback matching if we don't have our "ID Injection" properties
-    if (
-      !polygonProperties?.selectedMarineParks &&
-      !polygonProperties?.selectedMarineEcoregions &&
-      !polygonProperties?.selectedAllenCoralAtlas &&
-      !polygonProperties?.drawFeatures
-    ) {
-      // Try to find matching parks
-      const matchingParks = marineParkOptions
-        .filter(
-          (o) =>
-            o.geo?.features[0] &&
-            booleanEqual(o.geo.features[0], p as Feature<Polygon>)
-        )
-        .map((o) => o.value);
-
-      // Try to find matching ecoregions
-      const matchingEcoregions = marineEcoregionOptions
-        .filter(
-          (o) =>
-            o.geo?.features[0] &&
-            booleanEqual(o.geo.features[0], p as Feature<Polygon>)
-        )
-        .map((o) => o.value);
-
-      // Try to find matching coral atlas regions
-      const matchingCoralAtlas = allenCoralAtlasOptions
-        .filter(
-          (o) =>
-            o.geo?.features[0] &&
-            booleanEqual(o.geo.features[0], p as Feature<Polygon>)
-        )
-        .map((o) => o.value);
-
-      if (matchingParks.length > 0) {
-        startTransition(() =>
-          setSelectedMarineParkValues(new Set(matchingParks))
-        );
-      }
-      if (matchingEcoregions.length > 0) {
-        startTransition(() =>
-          setSelectedMarineEcoregionValues(new Set(matchingEcoregions))
-        );
-      }
-      if (matchingCoralAtlas.length > 0) {
-        startTransition(() =>
-          setSelectedAllenCoralAtlasValues(new Set(matchingCoralAtlas))
-        );
-      }
-    }
-  }, [
-    componentParam.polygon,
-    marineParkOptions,
-    marineEcoregionOptions,
-    allenCoralAtlasOptions,
-    filterMode,
-  ]);
-
   const highlightCollection = useMemo(():
     | FeatureCollection<Polygon>
     | undefined => {
@@ -671,6 +608,31 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
     selectedAllenCoralAtlasValues,
     drawFeatures,
   ]);
+
+  useEffect(() => {
+    startTransition(() => {
+      const polygonProperties = componentParam.polygon?.properties;
+
+      if (polygonProperties?.selectedMarineParks) {
+        setSelectedMarineParkValues(
+          new Set(polygonProperties.selectedMarineParks)
+        );
+      }
+      if (polygonProperties?.selectedMarineEcoregions) {
+        setSelectedMarineEcoregionValues(
+          new Set(polygonProperties.selectedMarineEcoregions)
+        );
+      }
+      if (polygonProperties?.selectedAllenCoralAtlas) {
+        setSelectedAllenCoralAtlasValues(
+          new Set(polygonProperties.selectedAllenCoralAtlas)
+        );
+      }
+      if (polygonProperties?.drawFeatures) {
+        setDrawFeatures(polygonProperties.drawFeatures);
+      }
+    });
+  }, [componentParam.polygon, filterMode]);
 
   if (marineParkOptions.length === 0) return null;
 

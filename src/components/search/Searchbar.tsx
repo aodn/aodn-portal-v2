@@ -142,11 +142,11 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
   useEffect(() => {
     if (urlParamState) {
       dispatch(updateParameterStates(urlParamState));
-    } else {
-      // If url param state is undefined, clear the component param state
+    } else if (location.pathname === pageDefault.landing) {
+      // Only clear if we are explicitly on the landing page
       dispatch(clearComponentParam());
     }
-  }, [dispatch, urlParamState]);
+  }, [dispatch, urlParamState, location.pathname]);
 
   return (
     <Box width="100%" ref={boxRefCallback}>
