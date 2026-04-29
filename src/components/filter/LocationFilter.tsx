@@ -5,6 +5,7 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import {
@@ -21,7 +22,7 @@ import {
   ParameterState,
   updateFilterPolygon,
 } from "../common/store/componentParamReducer";
-import { useAppDispatch } from "../common/store/hooks";
+import { useAppDispatch, useAppSelector } from "../common/store/hooks";
 import { bbox, booleanEqual, featureCollection, union } from "@turf/turf";
 import {
   fetchAllenCoralAtlasOptions,
@@ -45,13 +46,11 @@ import MenuControlGroup from "../map/mapbox/controls/menu/MenuControlGroup";
 import BaseMapSwitcher from "../map/mapbox/controls/menu/BaseMapSwitcher";
 import MenuControl from "../map/mapbox/controls/menu/MenuControl";
 import DrawRect from "../map/mapbox/controls/menu/DrawRect";
-import theme from "../../styles/themeRC8";
 import { cssFontFamilyToMapboxTextFont } from "../../utils/MapUtils";
-import { portalTheme } from "../../styles";
+import { portalTheme as theme } from "../../styles";
 import StyledTabs from "../common/tab/StyledTabs";
 import StyledTab from "../common/tab/StyledTab";
-import store, { getComponentState } from "../common/store/store";
-import { Feature, FeatureCollection, Polygon } from "geojson";
+import { Feature, FeatureCollection, MultiPolygon, Polygon } from "geojson";
 import { stringToColor } from "../common/colors/colorsUtils";
 
 const MAP_ID = "location-filter-map";
@@ -123,6 +122,11 @@ const SelectedAreaLayer: FC<{
         ).setData(data);
       }
     };
+    const onStyleData = () => {
+      if (!map.getSource(sourceId)) {
+        addLayer();
+      }
+    };
 
     if (map.isStyleLoaded()) {
       addLayer();
@@ -130,7 +134,10 @@ const SelectedAreaLayer: FC<{
       map.once("styledata", addLayer);
     }
 
+    map.on("styledata", onStyleData);
+
     return () => {
+      map.off("styledata", onStyleData);
       map.off("styledata", addLayer);
     };
   }, [map, areas]);
@@ -210,7 +217,7 @@ const modeRadios: { value: LocationFilterMode; label: string }[] = [
 
 const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
   const dispatch = useAppDispatch();
-  const { isMobile } = useBreakpoint();
+  const componentParam: ParameterState = useAppSelector((s) => s.paramReducer);
   const [filterMode, setFilterMode] =
     useState<LocationFilterMode>("marinePark");
   const [marineParkOptions, setMarineParkOptions] = useState<
@@ -218,20 +225,35 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
   >([]);
   const [selectedMarineParkValues, setSelectedMarineParkValues] = useState<
     Set<string>
-  >(new Set());
+  >(
+    () => new Set(componentParam.polygon?.properties?.selectedMarineParks || [])
+  );
   const [marineEcoregionOptions, setMarineEcoregionOptions] = useState<
     LocationOptionType[]
   >([]);
   const [selectedMarineEcoregionValues, setSelectedMarineEcoregionValues] =
-    useState<Set<string>>(new Set());
+    useState<Set<string>>(
+      () =>
+        new Set(
+          componentParam.polygon?.properties?.selectedMarineEcoregions || []
+        )
+    );
   const [allenCoralAtlasOptions, setAllenCoralAtlasOptions] = useState<
     LocationOptionType[]
   >([]);
   const [selectedAllenCoralAtlasValues, setSelectedAllenCoralAtlasValues] =
-    useState<Set<string>>(new Set());
-  const [drawFeatures, setDrawFeatures] = useState<Feature<Polygon>[]>([]);
+    useState<Set<string>>(
+      () =>
+        new Set(
+          componentParam.polygon?.properties?.selectedAllenCoralAtlas || []
+        )
+    );
+  const [drawFeatures, setDrawFeatures] = useState<Feature<Polygon>[]>(
+    () => componentParam.polygon?.properties?.drawFeatures || []
+  );
+  const removeFeatureRef = useRef<((id: string) => void) | null>(null);
 
-  const componentParam: ParameterState = getComponentState(store.getState());
+  const { isMobile } = useBreakpoint();
   useEffect(() => {
     let cancelled = false;
     fetchMarineParkOptions(true)
@@ -289,13 +311,26 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
       if (allFeatures.length === 0) {
         dispatch(updateFilterPolygon(undefined));
         return;
-      } else if (allFeatures.length === 1) {
-        dispatch(updateFilterPolygon(allFeatures[0]));
+      }
+
+      let merged: Feature<Polygon | MultiPolygon> | undefined;
+      if (allFeatures.length === 1) {
+        merged = { ...allFeatures[0] };
       } else {
-        const merged = union(featureCollection(allFeatures));
-        if (merged) {
-          dispatch(updateFilterPolygon(merged));
-        }
+        merged = union(featureCollection(allFeatures)) ?? undefined;
+      }
+
+      if (merged) {
+        // Inject IDs into properties for restoration
+        merged.properties = {
+          ...merged.properties,
+          selectedMarineParks: Array.from(parks),
+          selectedMarineEcoregions: Array.from(ecoregions),
+          selectedAllenCoralAtlas: Array.from(coralAtlas),
+          drawFeatures: draws,
+        };
+
+        dispatch(updateFilterPolygon(merged));
       }
     },
     [
@@ -388,7 +423,15 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
     setSelectedMarineParkValues(new Set());
     setSelectedMarineEcoregionValues(new Set());
     setSelectedAllenCoralAtlasValues(new Set());
-  }, [dispatch]);
+
+    // Clear drawn features from map and state
+    if (removeFeatureRef.current) {
+      drawFeatures.forEach((f) => {
+        if (f.id) removeFeatureRef.current!(String(f.id));
+      });
+    }
+    startTransition(() => setDrawFeatures([]));
+  }, [dispatch, drawFeatures]);
 
   const handleClose = useCallback(() => {
     handleClosePopup();
@@ -396,6 +439,7 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
 
   const handleFeaturesChange = useCallback(
     (newFeatures: Feature<Polygon>[], removeFeature: (id: string) => void) => {
+      removeFeatureRef.current = removeFeature;
       setDrawFeatures(newFeatures);
       applyCombinedGeoSelections(
         selectedMarineParkValues,
@@ -422,50 +466,60 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
       } else if (filterMode === "allenCoralAtlas") {
         startTransition(() => setSelectedAllenCoralAtlasValues(new Set()));
       }
+      startTransition(() => setDrawFeatures([]));
       return;
     }
 
-    // Try to find matching parks
-    const matchingParks = marineParkOptions
-      .filter(
-        (o) =>
-          o.geo?.features[0] &&
-          booleanEqual(o.geo.features[0], p as Feature<Polygon>)
-      )
-      .map((o) => o.value);
+    const polygonProperties = p.properties;
+    // Only run fallback matching if we don't have our "ID Injection" properties
+    if (
+      !polygonProperties?.selectedMarineParks &&
+      !polygonProperties?.selectedMarineEcoregions &&
+      !polygonProperties?.selectedAllenCoralAtlas &&
+      !polygonProperties?.drawFeatures
+    ) {
+      // Try to find matching parks
+      const matchingParks = marineParkOptions
+        .filter(
+          (o) =>
+            o.geo?.features[0] &&
+            booleanEqual(o.geo.features[0], p as Feature<Polygon>)
+        )
+        .map((o) => o.value);
 
-    // Try to find matching ecoregions
-    const matchingEcoregions = marineEcoregionOptions
-      .filter(
-        (o) =>
-          o.geo?.features[0] &&
-          booleanEqual(o.geo.features[0], p as Feature<Polygon>)
-      )
-      .map((o) => o.value);
+      // Try to find matching ecoregions
+      const matchingEcoregions = marineEcoregionOptions
+        .filter(
+          (o) =>
+            o.geo?.features[0] &&
+            booleanEqual(o.geo.features[0], p as Feature<Polygon>)
+        )
+        .map((o) => o.value);
 
-    // Try to find matching coral atlas regions
-    const matchingCoralAtlas = allenCoralAtlasOptions
-      .filter(
-        (o) =>
-          o.geo?.features[0] &&
-          booleanEqual(o.geo.features[0], p as Feature<Polygon>)
-      )
-      .map((o) => o.value);
+      // Try to find matching coral atlas regions
+      const matchingCoralAtlas = allenCoralAtlasOptions
+        .filter(
+          (o) =>
+            o.geo?.features[0] &&
+            booleanEqual(o.geo.features[0], p as Feature<Polygon>)
+        )
+        .map((o) => o.value);
 
-    if (matchingParks.length > 0) {
-      startTransition(() =>
-        setSelectedMarineParkValues(new Set(matchingParks))
-      );
-    }
-    if (matchingEcoregions.length > 0) {
-      startTransition(() =>
-        setSelectedMarineEcoregionValues(new Set(matchingEcoregions))
-      );
-    }
-    if (matchingCoralAtlas.length > 0) {
-      startTransition(() =>
-        setSelectedAllenCoralAtlasValues(new Set(matchingCoralAtlas))
-      );
+      if (matchingParks.length > 0) {
+        startTransition(() =>
+          setSelectedMarineParkValues(new Set(matchingParks))
+        );
+      }
+      if (matchingEcoregions.length > 0) {
+        startTransition(() =>
+          setSelectedMarineEcoregionValues(new Set(matchingEcoregions))
+        );
+      }
+      if (matchingCoralAtlas.length > 0) {
+        startTransition(() =>
+          setSelectedAllenCoralAtlasValues(new Set(matchingCoralAtlas))
+        );
+      }
     }
   }, [
     componentParam.polygon,
@@ -525,6 +579,18 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
         });
     }
 
+    if (drawFeatures.length > 0) {
+      drawFeatures.forEach((f) => {
+        allFeats.push({
+          ...f,
+          properties: {
+            ...f.properties,
+            name: f.properties?.name ?? "Drawn Area",
+          },
+        });
+      });
+    }
+
     if (allFeats.length === 0) return undefined;
     return { type: "FeatureCollection", features: allFeats };
   }, [
@@ -534,6 +600,7 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
     selectedMarineEcoregionValues,
     allenCoralAtlasOptions,
     selectedAllenCoralAtlasValues,
+    drawFeatures,
   ]);
 
   const mapBbox = useMemo(() => {
@@ -549,7 +616,12 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
       .filter((o) => selectedAllenCoralAtlasValues.has(o.value))
       .map((o) => o.geo!.features[0]);
 
-    const allFeats = [...parkFeats, ...ecoregionFeats, ...coralFeats];
+    const allFeats = [
+      ...parkFeats,
+      ...ecoregionFeats,
+      ...coralFeats,
+      ...drawFeatures,
+    ];
 
     if (allFeats.length === 0) return undefined;
     const bounds =
@@ -564,6 +636,7 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
     selectedMarineEcoregionValues,
     allenCoralAtlasOptions,
     selectedAllenCoralAtlasValues,
+    drawFeatures,
   ]);
 
   const mergedPolygonForTests = useMemo(() => {
@@ -579,7 +652,12 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
       .filter((o) => selectedAllenCoralAtlasValues.has(o.value))
       .map((o) => o.geo!.features[0]);
 
-    const allFeats = [...parkFeats, ...ecoregionFeats, ...coralFeats];
+    const allFeats = [
+      ...parkFeats,
+      ...ecoregionFeats,
+      ...coralFeats,
+      ...drawFeatures,
+    ];
 
     if (allFeats.length === 0) return undefined;
     if (allFeats.length === 1) return allFeats[0];
@@ -591,6 +669,7 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
     selectedMarineEcoregionValues,
     allenCoralAtlasOptions,
     selectedAllenCoralAtlasValues,
+    drawFeatures,
   ]);
 
   if (marineParkOptions.length === 0) return null;
@@ -601,7 +680,7 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
         sx={{
           display: "flex",
           justifyContent: "flex-end",
-          backgroundColor: portalTheme.palette.primary6,
+          backgroundColor: theme.palette.primary6,
           pt: "12px",
           pr: "12px",
           gap: "8px",
@@ -635,7 +714,7 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
         value={modeRadios.findIndex((m) => m.value === filterMode)}
         onChange={handleFilterModeChange}
         sx={{
-          backgroundColor: portalTheme.palette.primary6,
+          backgroundColor: theme.palette.primary6,
           px: isMobile ? "12px" : "28px",
         }}
       >
