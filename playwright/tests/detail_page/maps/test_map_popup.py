@@ -30,8 +30,8 @@ def test_map_popup_from_summary(
     """
     detail_page = DetailPage(desktop_page)
     detail_page.load(uuid)
+    detail_page.detail_map.wait_for_layer_select_loading()
 
-    detail_page.detail_map.wait_for_map_idle()
     detail_page.detail_map.zoom_to_level(9)
     detail_page.detail_map.center_map(data_lng, data_lat)
     detail_page.detail_map.wait_for_map_idle()
