@@ -3,6 +3,7 @@ from playwright.sync_api import Page, expect
 
 from core.enums.map_layers.layer_style import LayerStyle
 from core.factories.layer import LayerFactory
+from mocks.routes import Routes
 from pages.detail_page import DetailPage
 from utils.map_utils import (
     are_coordinates_equal,
@@ -205,3 +206,42 @@ def test_map_layer_persists_after_tab_navigation(
         )
         is True
     )
+
+
+@pytest.mark.parametrize(
+    'uuid, first_data_title, last_data_title, last_data_value',
+    [
+        (
+            '69e9ac91-babe-47ed-8c37-0ef08f29338a',
+            'Hillshaded multi-resolution aspect-slope composite for the Aus EEZ',
+            'Hillshaded multi-resolution bathymetric slope composite for the Aus EEZ',
+            'AusEEZ_bathy_slope_composite_multires',
+        ),
+    ],
+)
+def test_layer_selection_triggers_correct_wms_map_tile_request(
+    responsive_page: Page,
+    uuid: str,
+    first_data_title: str,
+    last_data_title: str,
+    last_data_value: str,
+) -> None:
+    """
+    Verifies that selecting a layer from the dataset selection dropdown triggers
+    a WMS map tile request with the correct layer data value.
+    """
+    detail_page = DetailPage(responsive_page)
+    detail_page.load(uuid)
+    detail_page.detail_map.wait_for_layer_select_loading()
+
+    detail_page.dataset_selection_dropdown.click()
+    expect(detail_page.get_text(first_data_title).first).to_be_visible()
+    expect(detail_page.get_text(last_data_title)).to_be_visible()
+
+    # Verify that selecting the last layer triggers a map tile request with the correct layer parameter
+    with responsive_page.expect_response(Routes.WMS_MAP_TILE) as response_info:
+        detail_page.get_text(last_data_title).click()
+        response = response_info.value
+        assert (
+            last_data_value in response.url
+        ), f'Unexpected URL: {response.url}'
