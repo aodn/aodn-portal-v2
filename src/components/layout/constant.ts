@@ -36,7 +36,7 @@ export const PAGE_CONTENT_WIDTH_LANDING = {
 export const PAGE_CONTENT_WIDTH_DETAIL = {
   xs: "calc(100% - 30px)", // mobile
   sm: "calc(100% - 30px)", // tablet
-  md: "calc(100% - 80px)", // laptop
+  md: "calc(100% - 100px)", // laptop
   lg: "calc(100% - 150px)", // desktop+
 };
 

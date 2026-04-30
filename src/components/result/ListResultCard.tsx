@@ -295,6 +295,8 @@ const ListResultCard: FC<ListResultCardProps> = ({
             <CardActions
               sx={{
                 backgroundColor: "white",
+                p: 0,
+                mt: "8px",
               }}
             >
               <ResultCardButtonGroup

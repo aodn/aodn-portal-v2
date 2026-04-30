@@ -59,8 +59,8 @@ const HeaderButton: FC<HeaderButtonProps> = ({ children, onClick, sx }) => (
       alignItems: "center",
       borderRadius: "8px",
       cursor: "pointer",
-      minWidth: "40px",
-      minHeight: "40px",
+      minWidth: { xs: "40px", md: "30px", lg: "40px" },
+      minHeight: { xs: "40px", md: "30px", lg: "40px" },
       height: { xs: "auto", sm: "100%" },
       ...sx,
     }}
@@ -80,7 +80,7 @@ const renderGoBackButton = (onClick: () => void, referer: string) => {
       aria-label="go-back button"
       sx={{
         position: { xs: "unset", md: "absolute" },
-        left: { xs: "unset", md: "-50px" },
+        left: { xs: "unset", md: "-42px", lg: "-50px" },
         top: { xs: "unset", md: "5%" },
       }}
       onClick={onClick}

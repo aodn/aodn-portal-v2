@@ -28,17 +28,21 @@ interface ResultPanelSimpleFilterProps extends ResultPanelSimpleFilterType {}
 const renderShowingResultsText = (
   total: number,
   count: number,
-  isUnderLaptop: boolean
+  isAboveDesktop: boolean,
+  isMobile: boolean,
+  currentLayout: SearchResultLayoutEnum | undefined
 ) =>
   total === 0
     ? "No result found"
     : total === 1
-      ? isUnderLaptop
-        ? "1 of total 1 result"
-        : "Showing 1 of total 1 result"
-      : isUnderLaptop
-        ? `1 - ${count} of ${formatNumber(total)} results`
-        : `Showing 1 - ${count} of ${formatNumber(total)} results`;
+      ? isAboveDesktop ||
+        (currentLayout === SearchResultLayoutEnum.FULL_LIST && !isMobile)
+        ? "Showing 1 of total 1 result"
+        : "1 of total 1 result"
+      : isAboveDesktop ||
+          (currentLayout === SearchResultLayoutEnum.FULL_LIST && !isMobile)
+        ? `Showing 1 - ${count} of ${formatNumber(total)} results`
+        : `1 - ${count} of ${formatNumber(total)} results`;
 
 const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   count,
@@ -49,7 +53,7 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   currentSort,
   onChangeSorting,
 }) => {
-  const { isUnderLaptop } = useBreakpoint();
+  const { isAboveDesktop, isUnderLaptop, isMobile } = useBreakpoint();
 
   return (
     <Stack sx={sx} direction="row" spacing={1} width="100%" flexWrap="nowrap">
@@ -69,17 +73,33 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
         data-testid="show-result-count"
       >
         <Typography variant="title2Regular" whiteSpace="nowrap" px={2}>
-          {renderShowingResultsText(total, count, isUnderLaptop)}
+          {renderShowingResultsText(
+            total,
+            count,
+            isAboveDesktop,
+            isMobile,
+            currentLayout
+          )}
         </Typography>
       </Paper>
       <Stack flexDirection="row" flex={1} gap={1} flexWrap="nowrap">
         <ResultListSortButton
           onChangeSorting={onChangeSorting}
           currentSort={currentSort}
+          isIconOnly={
+            isAboveDesktop && currentLayout !== SearchResultLayoutEnum.FULL_LIST
+              ? false
+              : undefined
+          }
         />
         <ResultListLayoutButton
           onChangeLayout={onChangeLayout}
           currentLayout={currentLayout}
+          isIconOnly={
+            isAboveDesktop && currentLayout !== SearchResultLayoutEnum.FULL_LIST
+              ? false
+              : undefined
+          }
           excludeOptions={
             isUnderLaptop
               ? [SearchResultLayoutEnum.GRID, SearchResultLayoutEnum.LIST]
