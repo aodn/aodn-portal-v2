@@ -7,7 +7,7 @@ import {
   useRef,
 } from "react";
 import { Button, SxProps, Tooltip, Typography } from "@mui/material";
-import { color, padding } from "../../../styles/constants";
+import { color } from "../../../styles/constants";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 import { OpenType } from "../../../hooks/useTabNavigation";
 import { portalTheme } from "../../../styles";
@@ -105,7 +105,6 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
         {hasText && (
           <Typography
             pt={0}
-            pl={padding.extraSmall}
             mt={-0.5}
             whiteSpace="nowrap"
             sx={buttonStyles}

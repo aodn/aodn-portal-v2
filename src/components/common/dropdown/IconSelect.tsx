@@ -14,12 +14,14 @@ import {
   useCallback,
   useState,
 } from "react";
+import useElementSize from "../../../hooks/useElementSize";
 import { CommonSelectProps, SelectItem } from "./CommonSelect";
 import { borderRadius, color, margin } from "../../../styles/constants";
 import { IconProps } from "../../icon/types";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 import { disableScroll, enableScroll } from "../../../utils/ScrollUtils";
 import { portalTheme } from "../../../styles";
+import { SIMPLE_FILTER_DEFAULT_HEIGHT } from "../../filter/ResultPanelSimpleFilter";
 
 interface IconSelectColorConfig {
   defaultColor: string;
@@ -28,6 +30,7 @@ interface IconSelectColorConfig {
   defaultBgColor: string;
   selectedBgColor: string;
 }
+
 const defaultColorConfig = {
   defaultColor: portalTheme.palette.text1,
   displayColor: portalTheme.palette.primary1,
@@ -36,13 +39,14 @@ const defaultColorConfig = {
   selectedBgColor: portalTheme.palette.primary1,
 };
 
+const ICON_ONLY_MAX_WIDTH_DEFAULT = 80;
+
 export interface IconSelectProps<T = string> extends CommonSelectProps<T> {
   selectName: string;
   colorConfig?: IconSelectColorConfig;
   isIconOnly?: boolean;
+  iconOnlyWidthThreshold?: number;
 }
-
-export const ICON_SELECT_DEFAULT_HEIGHT = 40;
 
 const getSelectedItem = <T extends string | number>(
   value: T,
@@ -87,14 +91,11 @@ const renderSelectValue = (
 ) => {
   return (
     <Box
-      display={isIconOnly ? "block" : "flex"}
+      display="flex"
       justifyContent={isIconOnly ? "center" : "flex-start"}
       alignItems="center"
       flexWrap="nowrap"
       gap={isIconOnly ? 0 : 1}
-      //temp fix for mobile
-      ml={isIconOnly ? "-3.2px" : 0}
-      mt={isIconOnly ? "1px" : 0}
     >
       {renderIcon(icon, color, iconBgColor, isIconOnly)}
       {!isIconOnly && label && (
@@ -157,13 +158,22 @@ const IconSelect = <T extends string | number = string>({
   colorConfig,
   onSelectCallback,
   dataTestId: testId,
-  isIconOnly = false,
+  isIconOnly,
+  iconOnlyWidthThreshold,
   selectSx: sx,
 }: IconSelectProps<T>) => {
   const isControlled = value !== undefined;
   const [internalValue, setInternalValue] = useState<T | null>(value ?? null);
   const selectedItem = isControlled ? (value ?? null) : internalValue;
   const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  // Determine if it should be "icon only" based on the prop or the width threshold
+  const { ref: containerRef, width: containerWidth } = useElementSize();
+  const effectiveIconOnly =
+    isIconOnly ??
+    (iconOnlyWidthThreshold !== undefined
+      ? containerWidth < iconOnlyWidthThreshold
+      : false);
 
   const handleOnChange = useCallback(
     (event: SelectChangeEvent<T>) => {
@@ -187,13 +197,13 @@ const IconSelect = <T extends string | number = string>({
   const config = mergeWithDefaults(defaultColorConfig, colorConfig);
 
   return (
-    <FormControl fullWidth>
+    <FormControl fullWidth ref={containerRef}>
       <Select
         value={selectedItem || items[0]?.value}
         renderValue={(value) =>
           selectedItem
-            ? selectedValue(value, items, config, isIconOnly)
-            : defaultValue(selectName, items, config, isIconOnly)
+            ? selectedValue(value, items, config, effectiveIconOnly)
+            : defaultValue(selectName, items, config, effectiveIconOnly)
         }
         id={testId}
         data-testid={`${testId}${value ? `-${value}` : ""}`}
@@ -215,7 +225,8 @@ const IconSelect = <T extends string | number = string>({
         }}
         sx={{
           padding: 0,
-          height: ICON_SELECT_DEFAULT_HEIGHT,
+          minWidth: SIMPLE_FILTER_DEFAULT_HEIGHT,
+          height: SIMPLE_FILTER_DEFAULT_HEIGHT,
           border: `0.5px solid ${portalTheme.palette.grey500}`,
           borderRadius: borderRadius.small,
           backgroundColor: selectedItem
@@ -224,6 +235,13 @@ const IconSelect = <T extends string | number = string>({
           "& fieldset": {
             border: "none",
           },
+          ...(effectiveIconOnly && {
+            maxWidth: iconOnlyWidthThreshold ?? ICON_ONLY_MAX_WIDTH_DEFAULT,
+            "& .MuiSelect-select": {
+              paddingRight: "0 !important",
+              padding: 0,
+            },
+          }),
           ...sx,
         }}
       >

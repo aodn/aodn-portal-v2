@@ -35,6 +35,8 @@ const MAP_VIEW_SELECT = [
   },
 ];
 
+const ICON_ONLY_WIDTH_THRESHOLD = 130;
+
 export interface ResultListLayoutButtonType<T> {
   currentLayout:
     | Exclude<SearchResultLayoutEnum, SearchResultLayoutEnum.FULL_MAP>
@@ -66,6 +68,7 @@ const ResultListLayoutButton: FC<
       onSelectCallback={onChangeLayout}
       value={currentLayout}
       isIconOnly={isIconOnly}
+      iconOnlyWidthThreshold={ICON_ONLY_WIDTH_THRESHOLD}
     />
   );
 };

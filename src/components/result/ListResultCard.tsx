@@ -4,16 +4,11 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  Stack,
   Tooltip,
   Typography,
 } from "@mui/material";
-import {
-  border,
-  borderRadius,
-  color,
-  gap,
-  padding,
-} from "../../styles/constants";
+import { border, borderRadius, color, padding } from "../../styles/constants";
 import { FC, Fragment, SyntheticEvent, useRef, useState } from "react";
 import OrganizationLogo from "../logo/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
@@ -130,7 +125,6 @@ const ListResultCard: FC<ListResultCardProps> = ({
       id={`result-card-${uuid}`}
       elevation={isSelectedDataset ? 2 : 0}
       sx={{
-        position: "relative",
         display: "flex",
         flexDirection: "row",
         justifyContent: "center",
@@ -142,8 +136,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
           ? `${border.sm} ${color.blue.darkSemiTransparent}`
           : "none",
         borderRadius: borderRadius.small,
-        paddingX: padding.medium,
-        paddingY: padding.small,
+        padding: "12px 12px 12px 20px",
         ...sx,
       }}
       onMouseEnter={() => setShowButtons(true)}
@@ -154,22 +147,13 @@ const ListResultCard: FC<ListResultCardProps> = ({
         ref={menuRef}
         onClick={(type: OpenType | undefined) => onClickDetail?.(uuid, type)}
       />
-      <Box position="absolute" top={gap.md} right={gap.md}>
-        <BookmarkButton dataset={content} />
-      </Box>
-      <Box
-        display="flex"
-        flexDirection="column"
-        flex={1}
-        height="100%"
-        mr={gap.sm}
-      >
+      <Box display="flex" flexDirection="column" flex={1} height="100%">
         <Box maxHeight={isSimplified ? "100%" : "80%"}>
           <CardHeader
             sx={{
               height: "auto",
               maxHeight: 45,
-              width: "95%",
+              width: "100%",
               p: 0,
               "& .MuiCardHeader-action": {
                 margin: 0,
@@ -200,18 +184,20 @@ const ListResultCard: FC<ListResultCardProps> = ({
               </Typography>
             }
             action={
-              isSimplified ? null : (
-                <OrganizationLogo
-                  logo={findIcon()}
-                  sx={{
-                    width: "auto",
-                    maxWidth: "200px",
-                    height: LIST_CARD_TITLE_HEIGHT,
-                    pr: padding.double,
-                    pl: padding.large,
-                  }}
-                />
-              )
+              <Stack direction="row" alignItems="center" gap={1}>
+                {!isSimplified && (
+                  <OrganizationLogo
+                    logo={findIcon()}
+                    sx={{
+                      width: "auto",
+                      maxWidth: "200px",
+                      height: LIST_CARD_TITLE_HEIGHT,
+                      pl: "10px",
+                    }}
+                  />
+                )}
+                <BookmarkButton dataset={content} />
+              </Stack>
             }
           />
           <CardContent
@@ -242,7 +228,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
                     hasDocumentTag || hasAiUpdateFrequency
                       ? "4" // show less text for document records on responsive page
                       : isSimplified
-                        ? "5" //defalt with 5 lines
+                        ? "5" //default with 5 lines
                         : isSelectedDataset || showButtons
                           ? "4" // if mouse hovering or clicked, show 4 lines
                           : "5",
@@ -309,6 +295,8 @@ const ListResultCard: FC<ListResultCardProps> = ({
             <CardActions
               sx={{
                 backgroundColor: "white",
+                p: 0,
+                mt: "8px",
               }}
             >
               <ResultCardButtonGroup

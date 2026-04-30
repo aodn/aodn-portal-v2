@@ -137,7 +137,7 @@ const borderRadius = {
   filter: "10px",
   menu: "8px",
   menuTop: "8px 8px 0 0",
-  small: "5px",
+  small: "6px",
   medium: "8px",
   large: "10px",
   xlg: "15px",

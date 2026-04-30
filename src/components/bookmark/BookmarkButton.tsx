@@ -2,7 +2,7 @@ import React, { FC, useCallback, useEffect, useState } from "react";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import { IconButton, Tooltip } from "@mui/material";
-import { color, gap } from "../../styles/constants";
+import { color } from "../../styles/constants";
 import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
 import {
   addItem,
@@ -105,7 +105,8 @@ const BookmarkButton: FC<BookmarkButtonProps> = ({
         <IconButton
           onClick={(event) => onClickBookmark(event, dataset)}
           sx={{
-            padding: gap.sm,
+            padding: 0,
+            alignSelf: "flex-start",
             ":hover": {
               scale: "105%",
             },

@@ -17,7 +17,10 @@ import BookmarkListButton, {
 } from "../../../components/result/BookmarkListButton";
 import { SearchResultLayoutEnum } from "../../../components/common/buttons/ResultListLayoutButton";
 import useBreakpoint from "../../../hooks/useBreakpoint";
-import { SEARCH_PAGE_RESULT_SECTION_CONTAINER_MIN_WIDTH } from "../constants";
+import {
+  SEARCH_PAGE_RESULT_SECTION_CONTAINER_MAX_WIDTH,
+  SEARCH_PAGE_RESULT_SECTION_CONTAINER_MIN_WIDTH,
+} from "../constants";
 
 interface ResultSectionProps
   extends Partial<ResultPanelSimpleFilterType>,
@@ -42,7 +45,7 @@ const ResultSection: FC<ResultSectionProps> = ({
   onClickCard,
   onDeselectDataset,
 }) => {
-  const { isUnderLaptop } = useBreakpoint();
+  const { isUnderLaptop, isLaptop } = useBreakpoint();
   const reduxContents = useSelector<RootState, CollectionsQueryType>(
     getSearchQueryResult
   );
@@ -56,7 +59,9 @@ const ResultSection: FC<ResultSectionProps> = ({
         width:
           showFullList || isUnderLaptop
             ? "100%"
-            : SEARCH_PAGE_RESULT_SECTION_CONTAINER_MIN_WIDTH,
+            : isLaptop
+              ? SEARCH_PAGE_RESULT_SECTION_CONTAINER_MIN_WIDTH
+              : SEARCH_PAGE_RESULT_SECTION_CONTAINER_MAX_WIDTH,
         height: "100%",
         display: "flex",
         flexDirection: "column",
@@ -89,7 +94,14 @@ const ResultSection: FC<ResultSectionProps> = ({
           />
         )}
       </Box>
-      <Box sx={{ flex: 1, height: "100%", overflowY: "auto" }}>
+      <Box
+        sx={{
+          flex: 1,
+          height: "100%",
+          overflowY: "auto",
+          pr: isUnderLaptop ? 0 : 1,
+        }}
+      >
         <ResultCards
           layout={currentLayout}
           contents={reduxContents}

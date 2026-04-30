@@ -1,12 +1,6 @@
 import { Box, Stack, SxProps } from "@mui/material";
 import { ReactNode } from "react";
-import {
-  PAGE_CONTENT_MAX_WIDTH,
-  PAGE_CONTENT_MIN_WIDTH,
-  PAGE_CONTENT_WIDTH_ABOVE_LAPTOP,
-  PAGE_CONTENT_WIDTH_UNDER_LAPTOP,
-} from "../constant";
-import useBreakpoint from "../../../hooks/useBreakpoint";
+import { PAGE_CONTENT_MAX_WIDTH, PAGE_CONTENT_MIN_WIDTH } from "../constant";
 
 interface SectionContainerProps {
   children: ReactNode;
@@ -19,7 +13,6 @@ const SectionContainer = ({
   contentAreaStyle,
   sectionAreaStyle,
 }: SectionContainerProps) => {
-  const { isUnderLaptop } = useBreakpoint();
   return (
     <Box
       sx={{
@@ -35,9 +28,7 @@ const SectionContainer = ({
           justifyContent: "center",
           alignItems: "center",
           minWidth: PAGE_CONTENT_MIN_WIDTH,
-          width: isUnderLaptop
-            ? PAGE_CONTENT_WIDTH_UNDER_LAPTOP
-            : PAGE_CONTENT_WIDTH_ABOVE_LAPTOP,
+          width: "100%",
           maxWidth: PAGE_CONTENT_MAX_WIDTH,
           ...contentAreaStyle,
         }}
