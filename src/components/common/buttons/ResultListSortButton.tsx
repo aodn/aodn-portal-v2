@@ -35,6 +35,8 @@ const SORT_SELECT = [
   },
 ];
 
+const ICON_ONLY_WIDTH_THRESHOLD = 130;
+
 export interface ResultListSortButtonType<T> {
   currentSort: SortResultEnum | undefined;
   onChangeSorting?: (sort: T) => void;
@@ -56,6 +58,7 @@ const ResultListSortButton: FC<ResultListSortButtonProps<SortResultEnum>> = ({
       onSelectCallback={onChangeSorting}
       value={currentSort}
       isIconOnly={isIconOnly}
+      iconOnlyWidthThreshold={ICON_ONLY_WIDTH_THRESHOLD}
     />
   );
 };

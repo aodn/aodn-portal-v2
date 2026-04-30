@@ -17,8 +17,7 @@ import { pageDefault } from "../../common/constants";
 import Searchbar from "../../search/Searchbar";
 import {
   PAGE_CONTENT_MAX_WIDTH,
-  PAGE_CONTENT_WIDTH_ABOVE_LAPTOP,
-  PAGE_CONTENT_WIDTH_UNDER_LAPTOP,
+  PAGE_CONTENT_WIDTH_HEADER,
   SEARCHBAR_CONTENT_WIDTH,
 } from "../constant";
 import {
@@ -64,7 +63,7 @@ const Header: FC = () => {
             alignItems: "end",
             width: isSearchResultPage
               ? SEARCHBAR_CONTENT_WIDTH
-              : PAGE_CONTENT_WIDTH_ABOVE_LAPTOP,
+              : PAGE_CONTENT_WIDTH_HEADER,
             maxWidth: isSearchResultPage
               ? SEARCHBAR_CONTENT_WIDTH
               : PAGE_CONTENT_MAX_WIDTH,
@@ -84,9 +83,7 @@ const Header: FC = () => {
           flexDirection: isMobile ? "column" : "row",
           width: isSearchResultPage
             ? SEARCHBAR_CONTENT_WIDTH
-            : isUnderLaptop
-              ? PAGE_CONTENT_WIDTH_UNDER_LAPTOP
-              : PAGE_CONTENT_WIDTH_ABOVE_LAPTOP,
+            : PAGE_CONTENT_WIDTH_HEADER,
           maxWidth: isSearchResultPage
             ? SEARCHBAR_CONTENT_WIDTH
             : PAGE_CONTENT_MAX_WIDTH,

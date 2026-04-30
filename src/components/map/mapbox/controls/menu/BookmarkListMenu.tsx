@@ -9,6 +9,7 @@ import BookmarkListAccordionGroup, {
 } from "../../../../bookmark/BookmarkListAccordionGroup";
 import { BOOKMARK_LIST_WIDTH_MAP } from "../../../../result/constants";
 import { BookmarkIcon } from "../../../../../assets/icons/map/bookmark";
+import useBreakpoint from "../../../../../hooks/useBreakpoint";
 
 export interface BookmarkListMenuBasicType
   extends ControlProps,
@@ -20,8 +21,9 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
   onDeselectDataset,
   tabNavigation,
 }) => {
+  const { isAboveDesktop } = useBreakpoint();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const [open, setOpen] = useState<boolean>(true);
+  const [open, setOpen] = useState<boolean>(isAboveDesktop);
 
   useEffect(() => {
     // Other menu button clicked, close this menu item
