@@ -28,7 +28,7 @@ const pageReferer = {
 };
 
 const marineParkDefault = {
-  geojson: "/data/Australian_Marine_Parks_boundaries.json",
+  geojson: "/api/v1/ogc/ext/static/Australian_Marine_Parks_boundaries.json",
   acknowledge:
     "Anyone can see this content, refer to /data/README.md for source",
   termsOfUse:
@@ -36,7 +36,7 @@ const marineParkDefault = {
 };
 
 const marineEcoregionOfWorldDefault = {
-  geojson: "/data/Meow.json",
+  geojson: "/api/v1/ogc/ext/static/Meow.json",
   acknowledge:
     "Anyone can see this content, refer to /data/README.md for source",
   termsOfUse:
@@ -44,7 +44,7 @@ const marineEcoregionOfWorldDefault = {
 };
 
 const allenCoralAtlasDefault = {
-  geojson: "/data/Allen_Coral_Atlas.json",
+  geojson: "/api/v1/ogc/ext/static/Allen_Coral_Atlas.json",
   acknowledge:
     "Allen Coral Atlas (2020). Imagery, maps and monitoring of the world's tropical coral reefs. doi.org/10.5281/zenodo.3833242 For more information on citation and attribution: https://github.com/CoralMapping/AllenCoralAtlas We would love to hear about any use of our data. Please tell us about it at: support@allencoralatlas.org",
   termsOfUse:

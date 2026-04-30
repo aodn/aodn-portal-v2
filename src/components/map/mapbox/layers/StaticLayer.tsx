@@ -46,7 +46,7 @@ const STATIC_LAYER_LABEL_LAYOUT: SymbolLayerSpecification["layout"] = {
   "symbol-placement": "point",
 };
 
-const StaticLayersDef = {
+const StaticLayersDef: Record<string, StaticLayersProps> = {
   AUSTRALIA_MARINE_PARKS: {
     id: "static-australia-marine-parks",
     name: "Australian Marine Parks",

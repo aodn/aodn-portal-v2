@@ -225,6 +225,7 @@ const modeRadios: { value: LocationFilterMode; label: string }[] = [
 
 const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
   const dispatch = useAppDispatch();
+  // Must use useAppSelector instead of useMemo to subscribe to state changes
   const componentParam: ParameterState = useAppSelector((s) => s.paramReducer);
   const [filterMode, setFilterMode] =
     useState<LocationFilterMode>("marinePark");
