@@ -91,6 +91,25 @@ const AdditionalInfoPanel = () => {
       });
     });
 
+    // Group "Descriptive Keyword" entries together; keep all other titles as-is
+    const descriptiveKeywords = keywords.filter(
+      (kw) => kw.title === "Descriptive Keyword"
+    );
+    const otherKeywords = keywords.filter(
+      (kw) => kw.title !== "Descriptive Keyword"
+    );
+    keywords =
+      descriptiveKeywords.length > 0
+        ? [
+            ...otherKeywords,
+            {
+              title: descriptiveKeywords[0].title,
+              description: descriptiveKeywords[0].description,
+              content: descriptiveKeywords.flatMap((kw) => kw.content),
+            },
+          ]
+        : otherKeywords;
+
     keywords = _.sortBy(keywords, (item) => {
       return item.title ? item.title : "\uffff";
     });
