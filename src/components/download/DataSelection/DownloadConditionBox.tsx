@@ -3,13 +3,13 @@ import {
   DownloadConditionType,
   IDownloadCondition,
   IDownloadConditionCallback,
-} from "../../pages/detail-page/context/DownloadDefinitions";
+} from "../../../pages/detail-page/context/DownloadDefinitions";
 import { Box, Grid, IconButton, Typography, useTheme } from "@mui/material";
-import { CloseIcon } from "../../assets/icons/download/close";
-import { portalTheme } from "../../styles";
-import { BboxSelectionIcon } from "../../assets/icons/download/bbox_selection";
-import { PolygonSelectionIcon } from "../../assets/icons/map/polygon_selection";
-import { TimeRangeIcon } from "../../assets/icons/download/time_range";
+import { CloseIcon } from "../../../assets/icons/download/close";
+import { portalTheme } from "../../../styles";
+import { BboxSelectionIcon } from "../../../assets/icons/download/bbox_selection";
+import { PolygonSelectionIcon } from "../../../assets/icons/map/polygon_selection";
+import { TimeRangeIcon } from "../../../assets/icons/download/time_range";
 
 interface DownloadConditionBoxProps
   extends IDownloadCondition,

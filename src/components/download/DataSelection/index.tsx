@@ -1,8 +1,8 @@
 import { FC, useCallback, useMemo } from "react";
 import { Box, SxProps } from "@mui/material";
-import BBoxConditionBox from "../box/BBoxConditionBox";
-import PolygonConditionBox from "../box/PolygonConditionBox";
-import DateRangeConditionBox from "../box/DateRangeConditionBox";
+import BBoxConditionBox from "./BBoxConditionBox";
+import PolygonConditionBox from "./PolygonConditionBox";
+import DateRangeConditionBox from "./DateRangeConditionBox";
 import {
   BBoxCondition,
   PolygonCondition,
@@ -11,7 +11,7 @@ import {
   IDownloadCondition,
   IDownloadConditionCallback,
   type DownloadCondition,
-} from "../../pages/detail-page/context/DownloadDefinitions";
+} from "../../../pages/detail-page/context/DownloadDefinitions";
 
 interface DataSelectionComponentProps extends DownloadCondition {
   sx?: SxProps;

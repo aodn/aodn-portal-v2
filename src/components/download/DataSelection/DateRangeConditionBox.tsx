@@ -2,12 +2,12 @@ import DownloadConditionBox from "./DownloadConditionBox";
 import {
   DateRangeCondition,
   DownloadConditionType,
-} from "../../pages/detail-page/context/DownloadDefinitions";
+} from "../../../pages/detail-page/context/DownloadDefinitions";
 import React, { useMemo } from "react";
 import { Typography } from "@mui/material";
-import { portalTheme } from "../../styles";
+import { portalTheme } from "../../../styles";
 import dayjs from "dayjs";
-import { dateDefault } from "../common/constants";
+import { dateDefault } from "../../common/constants";
 
 interface DateRangeConditionBoxProps {
   dateRangeCondition: DateRangeCondition;

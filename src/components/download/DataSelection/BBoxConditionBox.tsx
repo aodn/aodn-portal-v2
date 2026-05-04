@@ -2,7 +2,7 @@ import React from "react";
 import {
   BBoxCondition,
   DownloadConditionType,
-} from "../../pages/detail-page/context/DownloadDefinitions";
+} from "../../../pages/detail-page/context/DownloadDefinitions";
 import DownloadConditionBox from "./DownloadConditionBox";
 import { Grid } from "@mui/material";
 import BBoxItem from "./BBoxItem";

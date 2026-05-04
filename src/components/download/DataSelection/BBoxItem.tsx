@@ -1,7 +1,7 @@
 import React from "react";
 import { Typography } from "@mui/material";
 import _ from "lodash";
-import { portalTheme } from "../../styles";
+import { portalTheme } from "../../../styles";
 
 interface BBoxItemProps {
   label: string;

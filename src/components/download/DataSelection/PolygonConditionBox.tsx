@@ -2,10 +2,10 @@ import React from "react";
 import {
   PolygonCondition,
   DownloadConditionType,
-} from "../../pages/detail-page/context/DownloadDefinitions";
+} from "../../../pages/detail-page/context/DownloadDefinitions";
 import DownloadConditionBox from "./DownloadConditionBox";
 import { Box, Typography } from "@mui/material";
-import { portalTheme } from "../../styles";
+import { portalTheme } from "../../../styles";
 
 interface PolygonConditionProps {
   polygonCondition: PolygonCondition;
