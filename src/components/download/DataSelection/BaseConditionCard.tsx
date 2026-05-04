@@ -11,7 +11,7 @@ import { BboxSelectionIcon } from "../../../assets/icons/download/bbox_selection
 import { PolygonSelectionIcon } from "../../../assets/icons/map/polygon_selection";
 import { TimeRangeIcon } from "../../../assets/icons/download/time_range";
 
-interface DownloadConditionBoxProps
+interface BaseConditionCardProps
   extends IDownloadCondition,
     IDownloadConditionCallback {
   children: React.ReactNode;
@@ -63,7 +63,7 @@ const getTitle = (type: DownloadConditionType) => {
   }
 };
 
-const DownloadConditionBox: React.FC<DownloadConditionBoxProps> = ({
+const BaseConditionCard: React.FC<BaseConditionCardProps> = ({
   type,
   children,
   removeCallback,
@@ -113,4 +113,4 @@ const DownloadConditionBox: React.FC<DownloadConditionBoxProps> = ({
   );
 };
 
-export default DownloadConditionBox;
+export default BaseConditionCard;

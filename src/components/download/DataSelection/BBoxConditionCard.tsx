@@ -3,24 +3,40 @@ import {
   BBoxCondition,
   DownloadConditionType,
 } from "../../../pages/detail-page/context/DownloadDefinitions";
-import DownloadConditionBox from "./DownloadConditionBox";
-import { Grid } from "@mui/material";
-import BBoxItem from "./BBoxItem";
+import BaseConditionCard from "./BaseConditionCard";
+import { Grid, Typography } from "@mui/material";
+import _ from "lodash";
+import { portalTheme } from "../../../styles";
 
-interface BBoxConditionProps {
+interface BBoxConditionCardProps {
   bboxCondition: BBoxCondition;
   onRemove?: () => void;
   disable?: boolean;
 }
 
-const BBoxConditionBox: React.FC<BBoxConditionProps> = ({
+const BBoxItem: React.FC<{ label: string; value: number }> = ({
+  label,
+  value,
+}) => (
+  <Typography
+    sx={{
+      ...portalTheme.typography.body2Regular,
+      color: portalTheme.palette.text2,
+      padding: 0,
+    }}
+  >
+    {label}: {_.round(value, 2)}
+  </Typography>
+);
+
+const BBoxConditionCard: React.FC<BBoxConditionCardProps> = ({
   onRemove,
   bboxCondition,
   disable,
 }) => {
   const bbox = bboxCondition.bbox;
   return (
-    <DownloadConditionBox
+    <BaseConditionCard
       id={bboxCondition.id}
       type={DownloadConditionType.BBOX}
       removeCallback={() => onRemove && onRemove()}
@@ -45,8 +61,8 @@ const BBoxConditionBox: React.FC<BBoxConditionProps> = ({
           <BBoxItem label={"E"} value={bbox[2]} />
         </Grid>
       </Grid>
-    </DownloadConditionBox>
+    </BaseConditionCard>
   );
 };
 
-export default BBoxConditionBox;
+export default BBoxConditionCard;

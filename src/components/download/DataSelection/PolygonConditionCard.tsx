@@ -3,17 +3,17 @@ import {
   PolygonCondition,
   DownloadConditionType,
 } from "../../../pages/detail-page/context/DownloadDefinitions";
-import DownloadConditionBox from "./DownloadConditionBox";
+import BaseConditionCard from "./BaseConditionCard";
 import { Box, Typography } from "@mui/material";
 import { portalTheme } from "../../../styles";
 
-interface PolygonConditionProps {
+interface PolygonConditionCardProps {
   polygonCondition: PolygonCondition;
   onRemove?: () => void;
   disable?: boolean;
 }
 
-const PolygonConditionBox: React.FC<PolygonConditionProps> = ({
+const PolygonConditionCard: React.FC<PolygonConditionCardProps> = ({
   onRemove,
   polygonCondition,
   disable,
@@ -21,7 +21,7 @@ const PolygonConditionBox: React.FC<PolygonConditionProps> = ({
   const vertices = polygonCondition.coordinates;
 
   return (
-    <DownloadConditionBox
+    <BaseConditionCard
       id={polygonCondition.id}
       type={DownloadConditionType.POLYGON}
       removeCallback={() => onRemove && onRemove()}
@@ -46,8 +46,8 @@ const PolygonConditionBox: React.FC<PolygonConditionProps> = ({
           </li>
         ))}
       </Box>
-    </DownloadConditionBox>
+    </BaseConditionCard>
   );
 };
 
-export default PolygonConditionBox;
+export default PolygonConditionCard;
