@@ -29,7 +29,13 @@ import {
   PolygonCondition,
 } from "../../context/DownloadDefinitions";
 import { dateDefault } from "../../../../components/common/constants";
-import { FeatureCollection, Point, Feature, Polygon } from "geojson";
+import {
+  FeatureCollection,
+  Point,
+  Feature,
+  Polygon,
+  MultiPolygon,
+} from "geojson";
 import DisplayCoordinate from "../../../../components/map/mapbox/controls/DisplayCoordinate";
 import HexbinLayer from "../../../../components/map/mapbox/layers/HexbinLayer";
 import GeoServerLayer, {
@@ -277,7 +283,7 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
       (condition) => condition.type === DownloadConditionType.POLYGON
     ) as PolygonCondition[];
 
-    const features: Feature<Polygon>[] = [];
+    const features: Feature<Polygon | MultiPolygon>[] = [];
 
     existingBboxConditions.forEach((condition) => {
       const [west, south, east, north] = condition.bbox;
@@ -428,7 +434,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   );
 
   const handleFeaturesChange = useCallback(
-    (newFeatures: Feature<Polygon>[], removeFeature: (id: string) => void) => {
+    (
+      newFeatures: Feature<Polygon | MultiPolygon>[],
+      removeFeature: (id: string) => void
+    ) => {
       const bboxConditions: BBoxCondition[] = [];
       const polygonConditions: PolygonCondition[] = [];
 

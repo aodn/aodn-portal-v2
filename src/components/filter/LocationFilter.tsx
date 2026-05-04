@@ -29,6 +29,7 @@ import {
   fetchAllenCoralAtlasOptions,
   fetchMarineEcoregionOptions,
   fetchMarineParkOptions,
+  BoundaryProperties,
   STATIC_LAYER_LABEL_LAYOUT,
   STATIC_LAYER_LABEL_PAINT,
 } from "../map/mapbox/layers/StaticLayer";
@@ -61,9 +62,10 @@ const MARINE_PARK_GROUP_VALUE = "australian-marine-parks";
 type LocationFilterMode = "marineEcoregion" | "allenCoralAtlas" | "marinePark";
 
 interface LocationOptionType {
+  boundaryName: string;
   value: string;
   label: string;
-  geo?: FeatureCollection<Polygon>;
+  geo?: FeatureCollection<Polygon | MultiPolygon, BoundaryProperties>;
 }
 
 interface LocationFilterProps {
@@ -71,7 +73,7 @@ interface LocationFilterProps {
 }
 
 const SelectedAreaLayer: FC<{
-  areas: FeatureCollection<Polygon> | undefined;
+  areas: FeatureCollection<Polygon | MultiPolygon> | undefined;
 }> = ({ areas }) => {
   const { map } = React.useContext(MapContext);
 
@@ -257,29 +259,29 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
           componentParam.polygon?.properties?.selectedAllenCoralAtlas || []
         )
     );
-  const [drawFeatures, setDrawFeatures] = useState<Feature<Polygon>[]>(
-    () => componentParam.polygon?.properties?.drawFeatures || []
-  );
+  const [drawFeatures, setDrawFeatures] = useState<
+    Feature<Polygon | MultiPolygon>[]
+  >(() => componentParam.polygon?.properties?.drawFeatures || []);
   const removeFeatureRef = useRef<((id: string) => void) | null>(null);
 
   const { isMobile } = useBreakpoint();
   useEffect(() => {
     let cancelled = false;
-    fetchMarineParkOptions(true)
+    fetchMarineParkOptions(false)
       .then((opts) => {
         if (!cancelled) setMarineParkOptions(opts);
       })
       .catch((error) => {
         console.error("Error fetching Marine Park JSON:", error);
       });
-    fetchMarineEcoregionOptions(true)
+    fetchMarineEcoregionOptions(false)
       .then((opts) => {
         if (!cancelled) setMarineEcoregionOptions(opts);
       })
       .catch((error) => {
         console.error("Error fetching Marine Ecoregion JSON:", error);
       });
-    fetchAllenCoralAtlasOptions(true)
+    fetchAllenCoralAtlasOptions(false)
       .then((opts) => {
         if (!cancelled) setAllenCoralAtlasOptions(opts);
       })
@@ -296,7 +298,7 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
       parks: Set<string>,
       ecoregions: Set<string>,
       coralAtlas: Set<string>,
-      draws: Feature<Polygon>[]
+      draws: Feature<Polygon | MultiPolygon>[]
     ) => {
       const parkFeatures = marineParkOptions
         .filter((o) => parks.has(o.value))
@@ -447,7 +449,10 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
   }, [handleClosePopup]);
 
   const handleFeaturesChange = useCallback(
-    (newFeatures: Feature<Polygon>[], removeFeature: (id: string) => void) => {
+    (
+      newFeatures: Feature<Polygon | MultiPolygon>[],
+      removeFeature: (id: string) => void
+    ) => {
       removeFeatureRef.current = removeFeature;
       setDrawFeatures(newFeatures);
       applyCombinedGeoSelections(
@@ -466,9 +471,9 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
   );
 
   const highlightCollection = useMemo(():
-    | FeatureCollection<Polygon>
+    | FeatureCollection<Polygon | MultiPolygon>
     | undefined => {
-    const allFeats: Feature<Polygon>[] = [];
+    const allFeats: Feature<Polygon | MultiPolygon>[] = [];
 
     if (selectedMarineParkValues.size > 0) {
       marineParkOptions

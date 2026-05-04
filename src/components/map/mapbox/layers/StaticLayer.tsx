@@ -8,7 +8,13 @@ import React, {
   useState,
 } from "react";
 import MapContext from "../MapContext";
-import { Feature, FeatureCollection, MultiPolygon, Polygon } from "geojson";
+import {
+  Feature,
+  FeatureCollection,
+  MultiPolygon,
+  Polygon,
+  GeoJsonProperties,
+} from "geojson";
 import { stringToColor } from "../../../common/colors/colorsUtils";
 import { simplify } from "@turf/turf";
 import _ from "lodash";
@@ -26,11 +32,22 @@ import { SymbolLayerSpecification } from "mapbox-gl";
 export interface StaticLayersProps {
   id: string;
   name: string;
+  boundaryName: string;
   label: string;
   geojson: string;
   termsOfUse: string;
   features?: FeatureCollection;
 }
+
+/**
+ * Properties injected into GeoJSON features for boundary selection.
+ * Extends GeoJsonProperties (non-null part) by including metadata for the boundary.
+ */
+export type BoundaryProperties = {
+  boundaryName: string;
+  label: string;
+  value: string;
+} & GeoJsonProperties;
 
 const STATIC_LAYER_LABEL_PAINT: SymbolLayerSpecification["paint"] = {
   "text-color": "#ffffff",
@@ -50,6 +67,7 @@ const StaticLayersDef: Record<string, StaticLayersProps> = {
   AUSTRALIA_MARINE_PARKS: {
     id: "static-australia-marine-parks",
     name: "Australian Marine Parks",
+    boundaryName: "AUSTRALIAN_MARINE_PARKS",
     geojson: marineParkDefault.geojson,
     termsOfUse: marineParkDefault.termsOfUse,
     label: "RESNAME",
@@ -57,6 +75,7 @@ const StaticLayersDef: Record<string, StaticLayersProps> = {
   ALLEN_CORAL_ATLAS: {
     id: "static-allen-coral-atlas",
     name: "Allen Coral Atlas",
+    boundaryName: "CORAL_ATLAS",
     geojson: allenCoralAtlasDefault.geojson,
     termsOfUse: allenCoralAtlasDefault.termsOfUse,
     label: "ECOREGION",
@@ -64,6 +83,7 @@ const StaticLayersDef: Record<string, StaticLayersProps> = {
   MEOW: {
     id: "static-meow",
     name: "Marine Ecoregion of the World",
+    boundaryName: "MEOW",
     geojson: marineEcoregionOfWorldDefault.geojson,
     termsOfUse: marineEcoregionOfWorldDefault.termsOfUse,
     label: "ECOREGION",
@@ -75,6 +95,7 @@ const dataCache: Record<string, any> = {};
 
 const loadAndProcessGeoJSON = async (
   url: string,
+  boundaryName: string,
   groupKey: string,
   labelKey: string,
   idKey: string,
@@ -101,14 +122,34 @@ const loadAndProcessGeoJSON = async (
           }) as Feature<Polygon | MultiPolygon>)
         : firstFeature;
 
-      const collection: FeatureCollection<Polygon | MultiPolygon> = {
+      const label = firstFeature.properties?.[labelKey];
+      const value = "" + firstFeature.properties?.[idKey];
+
+      const enhancedFeature: Feature<
+        Polygon | MultiPolygon,
+        BoundaryProperties
+      > = {
+        ...geometry,
+        properties: {
+          ...geometry.properties,
+          boundaryName,
+          label,
+          value,
+        },
+      };
+
+      const collection: FeatureCollection<
+        Polygon | MultiPolygon,
+        BoundaryProperties
+      > = {
         type: "FeatureCollection",
-        features: [geometry],
+        features: [enhancedFeature],
       };
 
       return {
-        label: firstFeature.properties?.[labelKey],
-        value: "" + firstFeature.properties?.[idKey],
+        boundaryName,
+        label,
+        value,
         geo: collection,
       };
     })
@@ -302,6 +343,7 @@ const MapBoundaryLayer: FC<StaticLayersProps> = (props) => {
 const fetchMarineParkOptions = (shouldSimplify = false) =>
   loadAndProcessGeoJSON(
     StaticLayersDef.AUSTRALIA_MARINE_PARKS.geojson,
+    StaticLayersDef.AUSTRALIA_MARINE_PARKS.boundaryName,
     "RESNAME",
     "RESNAME",
     "OBJECTID",
@@ -311,6 +353,7 @@ const fetchMarineParkOptions = (shouldSimplify = false) =>
 const fetchMarineEcoregionOptions = (shouldSimplify = false) =>
   loadAndProcessGeoJSON(
     StaticLayersDef.MEOW.geojson,
+    StaticLayersDef.MEOW.boundaryName,
     "ECOREGION",
     "ECOREGION",
     "ECO_CODE",
@@ -320,6 +363,7 @@ const fetchMarineEcoregionOptions = (shouldSimplify = false) =>
 const fetchAllenCoralAtlasOptions = (shouldSimplify = false) =>
   loadAndProcessGeoJSON(
     StaticLayersDef.ALLEN_CORAL_ATLAS.geojson,
+    StaticLayersDef.ALLEN_CORAL_ATLAS.boundaryName,
     "ECOREGION",
     "ECOREGION",
     "OBJECTID",

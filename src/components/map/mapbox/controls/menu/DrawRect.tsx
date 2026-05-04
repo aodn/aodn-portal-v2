@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Polygon, Feature } from "geojson";
+import { Polygon, Feature, MultiPolygon } from "geojson";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -28,10 +28,10 @@ import usePolygonCursorHint from "../../../../../hooks/usePolygonCursorHint";
 
 interface DrawControlProps extends ControlProps {
   onChangeFeatures?: (
-    features: Feature<Polygon>[],
+    features: Feature<Polygon | MultiPolygon>[],
     removeFeature: (id: string) => void
   ) => void;
-  features?: Feature<Polygon>[];
+  features?: Feature<Polygon | MultiPolygon>[];
 }
 
 const MENU_ID = "draw-rect-menu-button";
@@ -111,8 +111,10 @@ const DrawRect: React.FC<DrawControlProps> = ({
       const features = mapDraw
         .getAll()
         .features.filter(
-          (feature) => feature.geometry.type === "Polygon"
-        ) as Feature<Polygon>[];
+          (feature) =>
+            feature.geometry.type === "Polygon" ||
+            feature.geometry.type === "MultiPolygon"
+        ) as Feature<Polygon | MultiPolygon>[];
 
       const removeFeature = (id: string) => {
         try {
