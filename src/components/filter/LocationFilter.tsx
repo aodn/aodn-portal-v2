@@ -24,7 +24,7 @@ import {
   updateFilterPolygon,
 } from "../common/store/componentParamReducer";
 import { useAppDispatch, useAppSelector } from "../common/store/hooks";
-import { bbox, booleanEqual, featureCollection, union } from "@turf/turf";
+import { bbox, featureCollection, union } from "@turf/turf";
 import {
   fetchAllenCoralAtlasOptions,
   fetchMarineEcoregionOptions,
@@ -56,8 +56,6 @@ import { Feature, FeatureCollection, MultiPolygon, Polygon } from "geojson";
 import { stringToColor } from "../common/colors/colorsUtils";
 
 const MAP_ID = "location-filter-map";
-
-const MARINE_PARK_GROUP_VALUE = "australian-marine-parks";
 
 type LocationFilterMode = "marineEcoregion" | "allenCoralAtlas" | "marinePark";
 
@@ -544,42 +542,6 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
     drawFeatures,
   ]);
 
-  const mapBbox = useMemo(() => {
-    const parkFeats = marineParkOptions
-      .filter((o) => selectedMarineParkValues.has(o.value))
-      .map((o) => o.geo!.features[0]);
-
-    const ecoregionFeats = marineEcoregionOptions
-      .filter((o) => selectedMarineEcoregionValues.has(o.value))
-      .map((o) => o.geo!.features[0]);
-
-    const coralFeats = allenCoralAtlasOptions
-      .filter((o) => selectedAllenCoralAtlasValues.has(o.value))
-      .map((o) => o.geo!.features[0]);
-
-    const allFeats = [
-      ...parkFeats,
-      ...ecoregionFeats,
-      ...coralFeats,
-      ...drawFeatures,
-    ];
-
-    if (allFeats.length === 0) return undefined;
-    const bounds =
-      allFeats.length === 1
-        ? bbox(allFeats[0])
-        : bbox(featureCollection(allFeats));
-    return new LngLatBounds([bounds[0], bounds[1]], [bounds[2], bounds[3]]);
-  }, [
-    marineParkOptions,
-    selectedMarineParkValues,
-    marineEcoregionOptions,
-    selectedMarineEcoregionValues,
-    allenCoralAtlasOptions,
-    selectedAllenCoralAtlasValues,
-    drawFeatures,
-  ]);
-
   const mergedPolygonForTests = useMemo(() => {
     const parkFeats = marineParkOptions
       .filter((o) => selectedMarineParkValues.has(o.value))
@@ -757,11 +719,7 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
             id={MAP_ID}
             sx={{ flex: 1, minHeight: "400px", position: "relative" }}
           >
-            <ReactMap
-              panelId={MAP_ID}
-              bbox={mapBbox}
-              zoom={MapDefaultConfig.ZOOM - 1}
-            >
+            <ReactMap panelId={MAP_ID} zoom={0}>
               <Controls>
                 <SelectedAreaLayer areas={highlightCollection} />
                 <NavigationControl />
