@@ -1,8 +1,8 @@
 import { Button, CircularProgress } from "@mui/material";
 import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
-import { portalTheme } from "../../../styles";
-import { SuccessIcon } from "../../../assets/icons/download/success";
-import { CancelIcon } from "../../../assets/icons/download/cancel";
+import { portalTheme } from "../../../../styles";
+import { SuccessIcon } from "../../../../assets/icons/download/success";
+import { CancelIcon } from "../../../../assets/icons/download/cancel";
 
 type ButtonStatus = "default" | "loading" | "completed" | "error";
 

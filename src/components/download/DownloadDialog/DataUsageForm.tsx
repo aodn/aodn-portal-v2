@@ -8,7 +8,7 @@ import {
   FormLabel,
   Typography,
 } from "@mui/material";
-import { portalTheme } from "../../styles";
+import { portalTheme } from "../../../styles";
 
 interface FormFieldConfig {
   key: string;

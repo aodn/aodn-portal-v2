@@ -8,16 +8,16 @@ import {
   useTheme,
   Divider,
 } from "@mui/material";
-import DataSelection from "./DataSelection";
-import LicenseContent from "./LicenseContent";
-import { useDownloadDialog } from "../../hooks/useDownloadDialog";
+import DataSelection from "../DataSelection";
+import LicenseStep from "./LicenseStep";
+import { useDownloadDialog } from "../../../hooks/useDownloadDialog";
 import EmailInputStep from "./EmailInputStep";
-import { DialogHeader } from "./DialogHeader";
-import DialogStepper from "./stepper/DialogStepper";
+import { Header } from "./Header";
+import Stepper from "./stepper/Stepper";
 import StepperButton from "./stepper/StepperButton";
-import useBreakpoint from "../../hooks/useBreakpoint";
-import { DownloadCondition } from "../../pages/detail-page/context/DownloadDefinitions";
-import { disableScroll, enableScroll } from "../../utils/ScrollUtils";
+import useBreakpoint from "../../../hooks/useBreakpoint";
+import { DownloadCondition } from "../../../pages/detail-page/context/DownloadDefinitions";
+import { disableScroll, enableScroll } from "../../../utils/ScrollUtils";
 
 interface DownloadDialogProps extends DownloadCondition {
   isOpen: boolean;
@@ -159,7 +159,7 @@ const DownloadDialog = ({
       <Box sx={{ flex: 1 }}>
         <Box sx={{ flex: 1 }}>
           <input type="hidden" name="email" value={email || ""} />
-          <LicenseContent />
+          <LicenseStep />
         </Box>
       </Box>
     );
@@ -197,7 +197,7 @@ const DownloadDialog = ({
       data-testid="download-dialog"
     >
       {/* Dialog Header */}
-      <DialogHeader onClose={handleIsClose} />
+      <Header onClose={handleIsClose} />
 
       {/* Stepper Section */}
       <Box
@@ -209,7 +209,7 @@ const DownloadDialog = ({
           zIndex: 1,
         }}
       >
-        <DialogStepper
+        <Stepper
           steps={steps}
           activeStep={activeStep}
           onStepClick={handleStepClick}

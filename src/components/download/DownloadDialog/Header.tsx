@@ -1,12 +1,12 @@
-import { portalTheme } from "../../styles";
-import { CancelIcon } from "../../assets/icons/download/cancel";
+import { portalTheme } from "../../../styles";
+import { CancelIcon } from "../../../assets/icons/download/cancel";
 import { Box, DialogTitle, IconButton, Typography } from "@mui/material";
 
-interface DialogHeaderProps {
+interface HeaderProps {
   onClose: () => void;
 }
 
-export const DialogHeader = ({ onClose }: DialogHeaderProps) => {
+export const Header = ({ onClose }: HeaderProps) => {
   return (
     <DialogTitle
       sx={{

@@ -2,20 +2,20 @@ import {
   Box,
   Step,
   StepLabel,
-  Stepper,
+  Stepper as MuiStepper,
   Typography,
   useTheme,
   useMediaQuery,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
-import { portalTheme } from "../../../styles";
+import { portalTheme } from "../../../../styles";
 
 interface StepItem {
   number: number;
   label: string;
 }
 
-interface DialogStepperProps {
+interface StepperProps {
   steps: StepItem[] | string[];
   activeStep: number;
   onStepClick?: (step: number) => void;
@@ -23,13 +23,13 @@ interface DialogStepperProps {
   testId?: string;
 }
 
-const DialogStepper = ({
+const Stepper = ({
   steps,
   activeStep,
   onStepClick,
   sx = {},
   testId = "dialog-stepper",
-}: DialogStepperProps) => {
+}: StepperProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -123,7 +123,7 @@ const DialogStepper = ({
   };
 
   return (
-    <Stepper
+    <MuiStepper
       activeStep={activeStep}
       data-testid={testId}
       sx={{
@@ -145,8 +145,8 @@ const DialogStepper = ({
           </StepLabel>
         </Step>
       ))}
-    </Stepper>
+    </MuiStepper>
   );
 };
 
-export default DialogStepper;
+export default Stepper;
