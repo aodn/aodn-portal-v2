@@ -1,8 +1,8 @@
 import { FC, useCallback, useMemo } from "react";
 import { Box, SxProps } from "@mui/material";
-import BBoxConditionBox from "../box/BBoxConditionBox";
-import PolygonConditionBox from "../box/PolygonConditionBox";
-import DateRangeConditionBox from "../box/DateRangeConditionBox";
+import BBoxConditionCard from "./BBoxConditionCard";
+import PolygonConditionCard from "./PolygonConditionCard";
+import DateRangeConditionCard from "./DateRangeConditionCard";
 import {
   BBoxCondition,
   PolygonCondition,
@@ -11,7 +11,7 @@ import {
   IDownloadCondition,
   IDownloadConditionCallback,
   type DownloadCondition,
-} from "../../pages/detail-page/context/DownloadDefinitions";
+} from "../../../pages/detail-page/context/DownloadDefinitions";
 
 interface DataSelectionComponentProps extends DownloadCondition {
   sx?: SxProps;
@@ -60,7 +60,7 @@ const DataSelection: FC<DataSelectionComponentProps> = ({
     <Box sx={{ gap: 2, ...sx }}>
       {bboxConditions.map((bboxCondition, index) => {
         return (
-          <BBoxConditionBox
+          <BBoxConditionCard
             key={index}
             bboxCondition={bboxCondition}
             onRemove={() => handleRemove(bboxCondition)}
@@ -70,7 +70,7 @@ const DataSelection: FC<DataSelectionComponentProps> = ({
       })}
       {polygonConditions.map((polygonCondition, index) => {
         return (
-          <PolygonConditionBox
+          <PolygonConditionCard
             key={index}
             polygonCondition={polygonCondition}
             onRemove={() => handleRemove(polygonCondition)}
@@ -80,7 +80,7 @@ const DataSelection: FC<DataSelectionComponentProps> = ({
       })}
       {dateRangeCondition.map((dateRangeCondition, index) => {
         return (
-          <DateRangeConditionBox
+          <DateRangeConditionCard
             key={index}
             dateRangeCondition={dateRangeCondition}
             onRemove={() => handleRemove(dateRangeCondition)}

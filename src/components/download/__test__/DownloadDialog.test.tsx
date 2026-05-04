@@ -32,28 +32,11 @@ vi.mock("@/hooks/useDownloadDialog", () => ({
 }));
 
 // Mock other components
-vi.mock("@/components/download/stepper/StepperButton", () => ({
+vi.mock("@/components/download/DownloadDialog/stepper/StepperButton", () => ({
   default: ({ title, onClick, disabled }: any) => (
     <button onClick={onClick} disabled={disabled} data-testid="stepper-button">
       {title}
     </button>
-  ),
-}));
-
-vi.mock("@/components/download/stepper/StyledStepper", () => ({
-  default: ({ steps, activeStep, onStepClick }: any) => (
-    <div data-testid="dialog-stepper">
-      {steps.map((step: any, index: number) => (
-        <button
-          key={step.number}
-          onClick={() => onStepClick(index)}
-          data-testid={`step-${index}`}
-          className={activeStep === index ? "active" : ""}
-        >
-          {step.label}
-        </button>
-      ))}
-    </div>
   ),
 }));
 
@@ -63,11 +46,11 @@ vi.mock("@/components/download/DataSelection", () => ({
   ),
 }));
 
-vi.mock("@/components/download/LicenseContent", () => ({
+vi.mock("@/components/download/DownloadDialog/LicenseStep", () => ({
   default: () => <div data-testid="license-content">License Content</div>,
 }));
 
-vi.mock("@/components/download/EmailInputStep", () => ({
+vi.mock("@/components/download/DownloadDialog/EmailInputStep", () => ({
   default: ({ isMobile, emailInputRef, dataUsage, onDataUsageChange }: any) => (
     <div data-testid="email-input-step">
       <input
@@ -78,15 +61,6 @@ vi.mock("@/components/download/EmailInputStep", () => ({
       <div>Email Input Step</div>
     </div>
   ),
-}));
-
-vi.mock("@/components/download/ValidationSnackbar", () => ({
-  ValidationSnackbar: ({ snackbar, onClose }: any) =>
-    snackbar.open ? (
-      <button data-testid="validation-snackbar" onClick={onClose}>
-        {snackbar.message}
-      </button>
-    ) : null,
 }));
 
 const mockProps = {

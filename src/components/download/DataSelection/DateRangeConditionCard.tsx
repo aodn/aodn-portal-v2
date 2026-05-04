@@ -1,21 +1,21 @@
-import DownloadConditionBox from "./DownloadConditionBox";
+import BaseConditionCard from "./BaseConditionCard";
 import {
   DateRangeCondition,
   DownloadConditionType,
-} from "../../pages/detail-page/context/DownloadDefinitions";
+} from "../../../pages/detail-page/context/DownloadDefinitions";
 import React, { useMemo } from "react";
 import { Typography } from "@mui/material";
-import { portalTheme } from "../../styles";
+import { portalTheme } from "../../../styles";
 import dayjs from "dayjs";
-import { dateDefault } from "../common/constants";
+import { dateDefault } from "../../common/constants";
 
-interface DateRangeConditionBoxProps {
+interface DateRangeConditionCardProps {
   dateRangeCondition: DateRangeCondition;
   onRemove?: () => void;
   disable?: boolean;
 }
 
-const DateRangeConditionBox: React.FC<DateRangeConditionBoxProps> = ({
+const DateRangeConditionCard: React.FC<DateRangeConditionCardProps> = ({
   onRemove,
   dateRangeCondition,
   disable,
@@ -26,7 +26,7 @@ const DateRangeConditionBox: React.FC<DateRangeConditionBoxProps> = ({
   );
   const end = useMemo(() => dateRangeCondition.end, [dateRangeCondition.end]);
   return (
-    <DownloadConditionBox
+    <BaseConditionCard
       id={dateRangeCondition.id}
       type={DownloadConditionType.DATE_RANGE}
       removeCallback={() => onRemove && onRemove()}
@@ -45,8 +45,8 @@ const DateRangeConditionBox: React.FC<DateRangeConditionBoxProps> = ({
           " - " +
           dayjs(end).format(dateDefault.DISPLAY_FORMAT)}
       </Typography>
-    </DownloadConditionBox>
+    </BaseConditionCard>
   );
 };
 
-export default DateRangeConditionBox;
+export default DateRangeConditionCard;

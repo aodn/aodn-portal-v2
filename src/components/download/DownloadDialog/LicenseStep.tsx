@@ -1,12 +1,12 @@
 import { Box, Typography } from "@mui/material";
 import { useMemo } from "react";
-import CopyButton from "../../components/common/buttons/CopyButton";
-import { useDetailPageContext } from "../../pages/detail-page/context/detail-page-context";
-import { portalTheme } from "../../styles";
-import { trackCustomEvent } from "../../analytics/customEventTracker";
-import { AnalyticsEvent } from "../../analytics/analyticsEvents";
+import CopyButton from "../../../components/common/buttons/CopyButton";
+import { useDetailPageContext } from "../../../pages/detail-page/context/detail-page-context";
+import { portalTheme } from "../../../styles";
+import { trackCustomEvent } from "../../../analytics/customEventTracker";
+import { AnalyticsEvent } from "../../../analytics/analyticsEvents";
 
-const LicenseContent = () => {
+const LicenseStep = () => {
   const context = useDetailPageContext();
 
   const citationText = useMemo(
@@ -175,4 +175,4 @@ const LicenseContent = () => {
   );
 };
 
-export default LicenseContent;
+export default LicenseStep;

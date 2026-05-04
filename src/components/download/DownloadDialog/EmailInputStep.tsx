@@ -15,9 +15,9 @@ import {
   IconButton,
 } from "@mui/material";
 import DataUsageForm, { DataUsageInformation } from "./DataUsageForm";
-import { portalTheme } from "../../styles";
-import { InformationIcon } from "../../assets/icons/download/information";
-import { ClearIcon } from "../../assets/icons/download/clear";
+import { portalTheme } from "../../../styles";
+import { InformationIcon } from "../../../assets/icons/download/information";
+import { ClearIcon } from "../../../assets/icons/download/clear";
 
 interface EmailInputStepProps {
   isUnderLaptop: boolean;
