@@ -30,8 +30,8 @@ import { useTheme } from "@mui/material";
 import { SymbolLayerSpecification } from "mapbox-gl";
 
 export enum BoundaryName {
-  AUSTRALIAN_MARINE_PARKS = "AUSTRALIAN_MARINE_PARKS",
-  CORAL_ATLAS = "CORAL_ATLAS",
+  AUSTRALIAN_MARINE_PARKS = "AMP",
+  CORAL_ATLAS = "ACA",
   MEOW = "MEOW",
 }
 
