@@ -16,6 +16,8 @@ const paramLookup: Map<string, string> = new Map<string, string>([
   ["polygon.properties.OBJECTID", "P6"],
   ["polygon.properties.SHAPEAREA", "P7"],
   ["polygon.properties.SHAPELEN", "P8"],
+  ["polygon.properties.drawFeatures", "P9"],
+  ["polygon.properties.selectionType", "P10"],
 ]);
 
 const paramReverseLookup = new Map(
