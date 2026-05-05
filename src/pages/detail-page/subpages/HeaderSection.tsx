@@ -10,7 +10,6 @@ import {
   Typography,
   Badge,
 } from "@mui/material";
-import DoneAllIcon from "@mui/icons-material/DoneAll";
 import { useDetailPageContext } from "../context/detail-page-context";
 import imosLogoWithTitle from "@/assets/logos/imos_logo_with_title.png";
 import OrganizationLogo from "../../../components/logo/OrganizationLogo";
@@ -38,11 +37,6 @@ import { DataTestId } from "../../../components/map/mapbox/constants";
 import { ReplyIcon } from "../../../assets/icons/details/back";
 import LabelChip from "../../../components/common/label/LabelChip";
 import AIGenStarIcon from "../../../components/icon/AIGenStarIcon";
-
-enum Status {
-  onGoing = "onGoing",
-  completed = "completed",
-}
 
 interface HeaderButtonProps {
   children: ReactNode;
@@ -133,29 +127,9 @@ const renderOnGoingStatus = () => (
   </RoundCard>
 );
 
-const renderCompletedStatus = () => (
-  <RoundCard
-    sx={{
-      border: `${border.xs} ${color.gray.extraLight}`,
-      backgroundColor: color.blue.extraLightSemiTransparent,
-    }}
-  >
-    <DoneAllIcon sx={{ fontSize: "18px" }} color="primary" />
-    <Typography
-      padding={0}
-      paddingX={padding.extraSmall}
-      variant="title1Medium"
-      color={portalTheme.palette.text1}
-    >
-      Completed
-    </Typography>
-  </RoundCard>
-);
-
 const renderSubTitle = (
   startDate: string | undefined,
   endDate: string | undefined,
-  status: string | undefined,
   scope: string | undefined,
   aiUpdateFrequency: string | undefined
 ) => (
@@ -189,11 +163,7 @@ const renderSubTitle = (
         </Typography>
       </RoundCard>
     )}
-    {!startDate &&
-      !endDate &&
-      (status === Status.completed
-        ? renderCompletedStatus()
-        : renderOnGoingStatus())}
+    {!startDate && !endDate && renderOnGoingStatus()}
     {scope && scope.toLowerCase() === "document" && (
       <RoundCard sx={{ backgroundColor: `${color.success.light}` }}>
         <LabelChip
@@ -260,24 +230,22 @@ const HeaderSection = () => {
   const redirectHome = useRedirectHome();
   const redirectSearch = useRedirectSearch();
 
-  const [title, status, startDate, endDate, scope, aiUpdateFrequency] =
-    useMemo(() => {
-      const title = collection?.title;
-      const status = collection?.getStatus();
-      const extent = collection?.getExtent();
-      const scope = collection?.getScope();
-      const aiUpdateFrequency = collection?.getAiUpdateFrequency();
+  const [title, startDate, endDate, scope, aiUpdateFrequency] = useMemo(() => {
+    const title = collection?.title;
+    const extent = collection?.getExtent();
+    const scope = collection?.getScope();
+    const aiUpdateFrequency = collection?.getAiUpdateFrequency();
 
-      let startDate = undefined;
-      let endDate = undefined;
-      if (extent) {
-        const [s, e] = extent.getOverallTemporal();
-        startDate = s;
-        endDate = e;
-      }
+    let startDate = undefined;
+    let endDate = undefined;
+    if (extent) {
+      const [s, e] = extent.getOverallTemporal();
+      startDate = s;
+      endDate = e;
+    }
 
-      return [title, status, startDate, endDate, scope, aiUpdateFrequency];
-    }, [collection]);
+    return [title, startDate, endDate, scope, aiUpdateFrequency];
+  }, [collection]);
 
   // Capture the referer when the detail page first mounts.
   // Tab switching within the detail page won't overwrite this value.
@@ -367,13 +335,7 @@ const HeaderSection = () => {
                 {title}
               </Typography>
               {!isMobile &&
-                renderSubTitle(
-                  startDate,
-                  endDate,
-                  status,
-                  scope,
-                  aiUpdateFrequency
-                )}
+                renderSubTitle(startDate, endDate, scope, aiUpdateFrequency)}
             </Grid>
             <Grid
               item
@@ -398,13 +360,7 @@ const HeaderSection = () => {
             </Grid>
             {isMobile && (
               <Grid item xs={8} sm={12}>
-                {renderSubTitle(
-                  startDate,
-                  endDate,
-                  status,
-                  scope,
-                  aiUpdateFrequency
-                )}
+                {renderSubTitle(startDate, endDate, scope, aiUpdateFrequency)}
               </Grid>
             )}
           </Grid>
