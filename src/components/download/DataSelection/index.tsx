@@ -1,5 +1,6 @@
 import { FC, useCallback, useMemo } from "react";
 import { Stack, SxProps } from "@mui/material";
+import { Dayjs } from "dayjs";
 import BBoxConditionCard from "./BBoxConditionCard";
 import PolygonConditionCard from "./PolygonConditionCard";
 import DateRangeConditionCard from "./DateRangeConditionCard";
@@ -16,6 +17,7 @@ import {
 interface DataSelectionComponentProps extends DownloadCondition {
   sx?: SxProps;
   disable?: boolean;
+  dateRangeBounds?: { min: Dayjs; max: Dayjs };
 }
 
 /**
@@ -27,6 +29,7 @@ const DataSelection: FC<DataSelectionComponentProps> = ({
   getAndSetDownloadConditions,
   removeDownloadCondition,
   disable,
+  dateRangeBounds,
 }) => {
   const bboxConditions: BBoxCondition[] = useMemo(() => {
     const bboxConditions = downloadConditions.filter(
@@ -97,6 +100,8 @@ const DataSelection: FC<DataSelectionComponentProps> = ({
             handleDateRangeChange(dateRangeCondition, start, end)
           }
           disable={disable}
+          minDate={dateRangeBounds?.min}
+          maxDate={dateRangeBounds?.max}
         />
       ))}
     </Stack>

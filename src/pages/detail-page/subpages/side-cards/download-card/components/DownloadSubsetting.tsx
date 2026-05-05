@@ -10,6 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { Dayjs } from "dayjs";
 import PlainAccordion from "../../../../../../components/common/accordion/PlainAccordion";
 import { portalTheme } from "../../../../../../styles";
 import {
@@ -23,6 +24,7 @@ interface DownloadSubsettingProps extends DownloadCondition {
   hideInfoMessage?: boolean;
   sx?: SxProps;
   disable?: boolean;
+  dateRangeBounds?: { min: Dayjs; max: Dayjs };
 }
 
 const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
@@ -31,6 +33,7 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
   getAndSetDownloadConditions,
   removeDownloadCondition,
   disable,
+  dateRangeBounds,
 }) => {
   const [accordionExpanded, setAccordionExpanded] = useState<boolean>(false);
   // Store the filtered download conditions count
@@ -95,6 +98,7 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
               getAndSetDownloadConditions={getAndSetDownloadConditions}
               removeDownloadCondition={removeDownloadCondition}
               disable={disable}
+              dateRangeBounds={dateRangeBounds}
             />
           </AccordionDetails>
         </PlainAccordion>

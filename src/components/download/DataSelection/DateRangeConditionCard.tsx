@@ -14,7 +14,7 @@ import { TimeRangeTooltipIcon } from "../../../assets/icons/map/tooltip_time_ran
 import { dateDefault } from "../../common/constants";
 
 const formatOrEmpty = (d: Dayjs | null): string =>
-  d?.isValid() ? d.toISOString() : "";
+  d?.isValid() ? d.format("YYYY-MM-DD") : "";
 
 const datePickerSx = {
   border: "none",
@@ -40,6 +40,8 @@ interface DateRangeConditionCardProps {
   onChange: (start: string, end: string) => void;
   onRemove?: () => void;
   disable?: boolean;
+  minDate?: Dayjs;
+  maxDate?: Dayjs;
 }
 
 interface DateRowProps {
@@ -91,6 +93,8 @@ const DateRangeConditionCard: React.FC<DateRangeConditionCardProps> = ({
   onChange,
   dateRangeCondition,
   disable,
+  minDate,
+  maxDate,
 }) => {
   const { start, end } = dateRangeCondition;
 
@@ -126,6 +130,7 @@ const DateRangeConditionCard: React.FC<DateRangeConditionCardProps> = ({
           label="From"
           value={start}
           disabled={disable}
+          minDate={minDate}
           maxDate={dayjs(end)}
           onChange={(next) => {
             if (next?.isValid() && !next.isAfter(dayjs(end))) {
@@ -137,6 +142,7 @@ const DateRangeConditionCard: React.FC<DateRangeConditionCardProps> = ({
           label="To"
           value={end}
           disabled={disable}
+          maxDate={maxDate}
           minDate={dayjs(start)}
           onChange={(next) => {
             if (next?.isValid() && !next.isBefore(dayjs(start))) {
