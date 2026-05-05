@@ -28,7 +28,7 @@ import {
 } from "../../../styles/constants";
 import ShareButtonMenu from "../../../components/menu/ShareButtonMenu";
 import DataUsageIcon from "@mui/icons-material/DataUsage";
-import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
+import { TemporalIcon } from "../../../assets/icons/details/temporal";
 import { pageReferer } from "../../../components/common/constants";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
 import { portalTheme } from "../../../styles";
@@ -160,6 +160,40 @@ const renderSubTitle = (
   aiUpdateFrequency: string | undefined
 ) => (
   <Stack flexDirection="row" flexWrap="wrap" gap={1}>
+    {startDate && (
+      <RoundCard
+        sx={{
+          backgroundColor: "transparent",
+        }}
+      >
+        <Typography
+          padding={0}
+          paddingRight={padding.small}
+          variant="title1Medium"
+          color={portalTheme.palette.text1}
+        >
+          {startDate}
+        </Typography>
+        <TemporalIcon
+          color={color.gray.light}
+          width={fontSize.label}
+          height={fontSize.label}
+        />
+        <Typography
+          padding={0}
+          paddingLeft={padding.small}
+          variant="title1Medium"
+          color={portalTheme.palette.text1}
+        >
+          {endDate ?? "Ongoing"}
+        </Typography>
+      </RoundCard>
+    )}
+    {!startDate &&
+      !endDate &&
+      (status === Status.completed
+        ? renderCompletedStatus()
+        : renderOnGoingStatus())}
     {scope && scope.toLowerCase() === "document" && (
       <RoundCard sx={{ backgroundColor: `${color.success.light}` }}>
         <LabelChip
@@ -216,42 +250,6 @@ const renderSubTitle = (
           </RoundCard>
         </Badge>
       ))}
-    {startDate && (
-      <RoundCard
-        sx={{
-          border: `${border.xs} ${color.gray.extraLight}`,
-          backgroundColor: color.blue.extraLightSemiTransparent,
-        }}
-      >
-        <Typography
-          padding={0}
-          paddingRight={padding.small}
-          variant="title1Medium"
-          color={portalTheme.palette.text1}
-        >
-          {startDate}
-        </Typography>
-        <KeyboardDoubleArrowRightIcon
-          sx={{
-            fontSize: fontSize.label,
-            color: color.gray.light,
-          }}
-        />
-        {endDate && (
-          <Typography
-            padding={0}
-            paddingLeft={padding.small}
-            variant="title1Medium"
-            color={portalTheme.palette.text1}
-          >
-            {endDate}
-          </Typography>
-        )}
-      </RoundCard>
-    )}
-    {status && status === Status.completed
-      ? renderCompletedStatus()
-      : renderOnGoingStatus()}
   </Stack>
 );
 
@@ -364,11 +362,6 @@ const HeaderSection = () => {
                 color={portalTheme.palette.text2}
                 sx={{
                   p: 0,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  display: "-webkit-box",
-                  WebkitLineClamp: "3",
-                  WebkitBoxOrient: "vertical",
                 }}
               >
                 {title}
@@ -396,7 +389,7 @@ const HeaderSection = () => {
                 <OrganizationLogo
                   logo={collection.findIcon()}
                   sx={{
-                    height: isMobile ? "50px" : "80px",
+                    height: isMobile ? "56px" : "80px",
                     paddingX: padding.extraSmall,
                   }}
                   defaultImageSrc={imosLogoWithTitle}
