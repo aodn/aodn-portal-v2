@@ -7,6 +7,8 @@ import {
   useState,
 } from "react";
 import { Stack } from "@mui/material";
+import dayjs from "dayjs";
+import { dateDefault } from "../../../../../../components/common/constants";
 import DownloadDialog from "../../../../../../components/download/DownloadDialog";
 import {
   DownloadCondition,
@@ -43,6 +45,18 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
   setSelectedCoKey,
 }) => {
   const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
+
+  const dateRangeBounds = useMemo(() => {
+    let min = dayjs(dateDefault.min);
+    let max = dayjs(dateDefault.max);
+    const extent = collection?.getExtent();
+    if (extent) {
+      const [s, e] = extent.getOverallTemporal();
+      if (s) min = dayjs(s, dateDefault.DISPLAY_FORMAT);
+      if (e) max = dayjs(e, dateDefault.DISPLAY_FORMAT);
+    }
+    return { min, max };
+  }, [collection]);
 
   // add datasetselection option
   const [selectedDataItem, setSelectedDataItem] = useState<
@@ -175,6 +189,7 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
         downloadConditions={downloadConditions}
         getAndSetDownloadConditions={getAndSetDownloadConditions}
         removeDownloadCondition={removeDownloadCondition}
+        dateRangeBounds={dateRangeBounds}
       />
 
       <DownloadDialog

@@ -1,10 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   DownloadConditionType,
   IDownloadCondition,
   IDownloadConditionCallback,
 } from "../../../pages/detail-page/context/DownloadDefinitions";
-import { Box, Grid, IconButton, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  Collapse,
+  Divider,
+  IconButton,
+  IconButtonProps,
+  Stack,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { CloseIcon } from "../../../assets/icons/download/close";
 import { portalTheme } from "../../../styles";
 import { BboxSelectionIcon } from "../../../assets/icons/download/bbox_selection";
@@ -15,8 +28,22 @@ interface BaseConditionCardProps
   extends IDownloadCondition,
     IDownloadConditionCallback {
   children: React.ReactNode;
+  actions?: React.ReactNode;
   disable?: boolean;
 }
+
+interface ExpandProps extends IconButtonProps {
+  expand: boolean;
+}
+
+const ExpandIconButton = styled(({ expand, ...rest }: ExpandProps) => (
+  <IconButton {...rest} />
+))(({ theme, expand }) => ({
+  transform: expand ? "rotate(0deg)" : "rotate(45deg)",
+  transition: theme.transitions.create("transform", {
+    duration: theme.transitions.duration.shortest,
+  }),
+}));
 
 const iconMap: Partial<Record<DownloadConditionType, React.ComponentType>> = {
   [DownloadConditionType.BBOX]: BboxSelectionIcon,
@@ -26,23 +53,17 @@ const iconMap: Partial<Record<DownloadConditionType, React.ComponentType>> = {
   [DownloadConditionType.DATE_RANGE]: TimeRangeIcon,
 };
 
-const getIcon = (type: DownloadConditionType) => {
+const getIcon = (type: DownloadConditionType, size: number) => {
   const IconComponent = iconMap[type];
-
-  if (!IconComponent) {
-    return null; // or return a default icon
-  }
-
+  if (!IconComponent) return null;
   return (
     <Box
       sx={{
-        width: "30px",
-        height: "30px",
+        width: size,
+        height: size,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        pt: "2px",
-        pr: "4px",
       }}
     >
       <IconComponent />
@@ -66,50 +87,104 @@ const getTitle = (type: DownloadConditionType) => {
 const BaseConditionCard: React.FC<BaseConditionCardProps> = ({
   type,
   children,
+  actions,
   removeCallback,
   disable = false,
 }) => {
-  const theme = useTheme();
+  const [expanded, setExpanded] = useState(true);
+  const toggle = () => setExpanded((prev) => !prev);
+
   return (
-    <Grid
-      container
+    <Card
+      elevation={0}
       sx={{
-        position: "relative",
-        border: `1px solid ${portalTheme.palette.grey600}`,
-        borderRadius: theme.borderRadius.md,
         backgroundColor: portalTheme.palette.primary6,
-        mb: "8px",
-        py: "8px",
-        px: "12px",
+        transition: (theme) =>
+          theme.transitions.create(
+            ["border-color", "box-shadow", "border-radius"],
+            { duration: theme.transitions.duration.shortest }
+          ),
+        border: `1px solid ${
+          expanded ? portalTheme.palette.grey600 : "transparent"
+        }`,
+        borderRadius: expanded ? "6px" : "7px",
+        boxShadow: expanded ? "1px 1px 4px 0 rgba(0, 0, 0, 0.20)" : "none",
       }}
     >
-      <Grid
-        container
-        alignItems="flex-start"
-        spacing={"10px"}
-        sx={{ pr: "16px" }}
-      >
-        <Grid item>{getIcon(type)}</Grid>
-        <Grid item xs>
-          <Typography
-            sx={{
-              ...portalTheme.typography.body1Medium,
-              color: portalTheme.palette.text1,
-              padding: 0,
-              pb: "4px",
-            }}
-          >
-            {getTitle(type)}
-          </Typography>
+      <CardHeader
+        avatar={getIcon(type, 24)}
+        title={getTitle(type)}
+        titleTypographyProps={{
+          variant: "body1Medium",
+          color: portalTheme.palette.text1,
+        }}
+        action={
+          <Stack direction="row" alignItems="center" spacing={0.5}>
+            {removeCallback && (
+              <IconButton
+                onClick={removeCallback}
+                disabled={disable}
+                aria-label="remove"
+                size="small"
+              >
+                <DeleteOutlineIcon
+                  sx={{ color: portalTheme.palette.grey700, fontSize: 18 }}
+                />
+              </IconButton>
+            )}
+            <ExpandIconButton
+              expand={expanded}
+              onClick={toggle}
+              disabled={disable}
+              size="small"
+              aria-expanded={expanded}
+              aria-label={expanded ? "collapse" : "expand"}
+            >
+              <CloseIcon
+                color={portalTheme.palette.grey700}
+                width={12}
+                height={12}
+              />
+            </ExpandIconButton>
+          </Stack>
+        }
+        sx={{
+          py: 1,
+          px: 1.5,
+          "& .MuiCardHeader-avatar": { mr: 1.5 },
+          "& .MuiCardHeader-action": { m: 0, alignSelf: "center" },
+        }}
+      />
+      <Collapse in={expanded} timeout="auto" unmountOnExit>
+        <CardContent
+          sx={{
+            pt: 0.5,
+            pb: 1.5,
+            px: 1.5,
+            "&:last-child": { pb: 1.5 },
+          }}
+        >
           {children}
-        </Grid>
-      </Grid>
-      <Box position="absolute" top={"4px"} right={"4px"}>
-        <IconButton onClick={removeCallback} disabled={disable}>
-          <CloseIcon />
-        </IconButton>
-      </Box>
-    </Grid>
+        </CardContent>
+        {actions && (
+          <>
+            <Divider
+              sx={{ borderBottomWidth: 2, borderColor: "common.white" }}
+            />
+            <CardActions
+              sx={{
+                justifyContent: "center",
+                alignItems: "center",
+                px: 1.5,
+                py: 0.5,
+              }}
+            >
+              {actions}
+            </CardActions>
+          </>
+        )}
+      </Collapse>
+    </Card>
   );
 };
 

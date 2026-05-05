@@ -1,5 +1,6 @@
 import { FC, useCallback, useMemo } from "react";
-import { Box, SxProps } from "@mui/material";
+import { Stack, SxProps } from "@mui/material";
+import { Dayjs } from "dayjs";
 import BBoxConditionCard from "./BBoxConditionCard";
 import PolygonConditionCard from "./PolygonConditionCard";
 import DateRangeConditionCard from "./DateRangeConditionCard";
@@ -16,17 +17,19 @@ import {
 interface DataSelectionComponentProps extends DownloadCondition {
   sx?: SxProps;
   disable?: boolean;
+  dateRangeBounds?: { min: Dayjs; max: Dayjs };
 }
 
 /**
  * DataSelectionComponent - Displays selected data conditions (bbox and date range)
- * Extracted from DownloadCard to be reusable across different components
  */
 const DataSelection: FC<DataSelectionComponentProps> = ({
   sx,
   downloadConditions,
+  getAndSetDownloadConditions,
   removeDownloadCondition,
   disable,
+  dateRangeBounds,
 }) => {
   const bboxConditions: BBoxCondition[] = useMemo(() => {
     const bboxConditions = downloadConditions.filter(
@@ -56,39 +59,52 @@ const DataSelection: FC<DataSelectionComponentProps> = ({
     [removeDownloadCondition]
   );
 
+  const handleDateRangeChange = useCallback(
+    (existing: DateRangeCondition, start: string, end: string) => {
+      getAndSetDownloadConditions(DownloadConditionType.DATE_RANGE, [
+        new DateRangeCondition(
+          existing.id,
+          start,
+          end,
+          existing.removeCallback
+        ),
+      ]);
+    },
+    [getAndSetDownloadConditions]
+  );
+
   return (
-    <Box sx={{ gap: 2, ...sx }}>
-      {bboxConditions.map((bboxCondition, index) => {
-        return (
-          <BBoxConditionCard
-            key={index}
-            bboxCondition={bboxCondition}
-            onRemove={() => handleRemove(bboxCondition)}
-            disable={disable}
-          />
-        );
-      })}
-      {polygonConditions.map((polygonCondition, index) => {
-        return (
-          <PolygonConditionCard
-            key={index}
-            polygonCondition={polygonCondition}
-            onRemove={() => handleRemove(polygonCondition)}
-            disable={disable}
-          />
-        );
-      })}
-      {dateRangeCondition.map((dateRangeCondition, index) => {
-        return (
-          <DateRangeConditionCard
-            key={index}
-            dateRangeCondition={dateRangeCondition}
-            onRemove={() => handleRemove(dateRangeCondition)}
-            disable={disable}
-          />
-        );
-      })}
-    </Box>
+    <Stack spacing={1} sx={sx}>
+      {bboxConditions.map((bboxCondition) => (
+        <BBoxConditionCard
+          key={bboxCondition.id}
+          bboxCondition={bboxCondition}
+          onRemove={() => handleRemove(bboxCondition)}
+          disable={disable}
+        />
+      ))}
+      {polygonConditions.map((polygonCondition) => (
+        <PolygonConditionCard
+          key={polygonCondition.id}
+          polygonCondition={polygonCondition}
+          onRemove={() => handleRemove(polygonCondition)}
+          disable={disable}
+        />
+      ))}
+      {dateRangeCondition.map((dateRangeCondition) => (
+        <DateRangeConditionCard
+          key={dateRangeCondition.id}
+          dateRangeCondition={dateRangeCondition}
+          onRemove={() => handleRemove(dateRangeCondition)}
+          onChange={(start, end) =>
+            handleDateRangeChange(dateRangeCondition, start, end)
+          }
+          disable={disable}
+          minDate={dateRangeBounds?.min}
+          maxDate={dateRangeBounds?.max}
+        />
+      ))}
+    </Stack>
   );
 };
 

@@ -59,6 +59,9 @@ const createMockCollection = (datasetType: DatasetType): OGCCollection => {
       },
     ],
     getDatasetType: () => datasetType,
+    getExtent: () => ({
+      getOverallTemporal: () => ["2020-01-01", "2024-12-31"],
+    }),
   } as unknown as OGCCollection;
 };
 
