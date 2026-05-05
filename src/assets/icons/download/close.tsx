@@ -18,6 +18,7 @@ export const CloseIcon: ComponentType<SVGProps<SVGSVGElement>> = ({
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
+      vectorEffect="non-scaling-stroke"
     />
     <path
       d="M1 11.6562L11 1.65625"
@@ -25,6 +26,7 @@ export const CloseIcon: ComponentType<SVGProps<SVGSVGElement>> = ({
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
+      vectorEffect="non-scaling-stroke"
     />
   </svg>
 );
