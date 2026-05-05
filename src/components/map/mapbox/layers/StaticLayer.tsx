@@ -130,26 +130,12 @@ const loadAndProcessGeoJSON = async (
 
       const label = firstFeature.properties?.[labelKey];
       const value = "" + firstFeature.properties?.[idKey];
-
-      const enhancedFeature: Feature<
-        Polygon | MultiPolygon,
-        BoundaryProperties
-      > = {
-        ...geometry,
-        properties: {
-          ...geometry.properties,
-          boundaryName,
-          label,
-          value,
-        },
-      };
-
       const collection: FeatureCollection<
         Polygon | MultiPolygon,
-        BoundaryProperties
+        GeoJsonProperties
       > = {
         type: "FeatureCollection",
-        features: [enhancedFeature],
+        features: [geometry],
       };
 
       return {

@@ -21,19 +21,21 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import { color, fontSize, gap, padding } from "../../styles/constants";
 import {
   ParameterState,
+  SelectedStaticArea,
   updateFilterPolygon,
+  updateFilterStaticAreas,
 } from "../common/store/componentParamReducer";
 import { useAppDispatch, useAppSelector } from "../common/store/hooks";
-import { bbox, featureCollection, union } from "@turf/turf";
+import { featureCollection, union } from "@turf/turf";
 import {
   fetchAllenCoralAtlasOptions,
   fetchMarineEcoregionOptions,
   fetchMarineParkOptions,
+  BoundaryName,
   BoundaryProperties,
   STATIC_LAYER_LABEL_LAYOUT,
   STATIC_LAYER_LABEL_PAINT,
 } from "../map/mapbox/layers/StaticLayer";
-import { MapDefaultConfig } from "../map/mapbox/constants";
 import { TestHelper } from "../common/test/helper";
 import { cqlDefaultFilters, PolygonOperation } from "../common/cqlFilters";
 import useBreakpoint from "../../hooks/useBreakpoint";
@@ -41,7 +43,6 @@ import ReactMap from "../map/mapbox/Map";
 import MapContext from "../map/mapbox/MapContext";
 import Controls from "../map/mapbox/controls/Controls";
 import NavigationControl from "../map/mapbox/controls/NavigationControl";
-import { LngLatBounds } from "mapbox-gl";
 import ScaleControl from "../map/mapbox/controls/ScaleControl";
 import DisplayCoordinate from "../map/mapbox/controls/DisplayCoordinate";
 import MenuControlGroup from "../map/mapbox/controls/menu/MenuControlGroup";
@@ -229,34 +230,50 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
   const componentParam: ParameterState = useAppSelector((s) => s.paramReducer);
   const [filterMode, setFilterMode] =
     useState<LocationFilterMode>("marinePark");
+
   const [marineParkOptions, setMarineParkOptions] = useState<
     LocationOptionType[]
   >([]);
-  const [selectedMarineParkValues, setSelectedMarineParkValues] = useState<
-    Set<string>
-  >(
-    () => new Set(componentParam.polygon?.properties?.selectedMarineParks || [])
-  );
   const [marineEcoregionOptions, setMarineEcoregionOptions] = useState<
     LocationOptionType[]
   >([]);
-  const [selectedMarineEcoregionValues, setSelectedMarineEcoregionValues] =
-    useState<Set<string>>(
-      () =>
-        new Set(
-          componentParam.polygon?.properties?.selectedMarineEcoregions || []
-        )
-    );
   const [allenCoralAtlasOptions, setAllenCoralAtlasOptions] = useState<
     LocationOptionType[]
   >([]);
+
+  const [selectedMarineParkValues, setSelectedMarineParkValues] = useState<
+    Set<string>
+  >(() => {
+    const parkSet = new Set<string>();
+    componentParam.staticAreas?.forEach((area) => {
+      if (area.boundaryName === BoundaryName.AUSTRALIAN_MARINE_PARKS) {
+        parkSet.add("" + area.value);
+      }
+    });
+    return parkSet;
+  });
+
+  const [selectedMarineEcoregionValues, setSelectedMarineEcoregionValues] =
+    useState<Set<string>>(() => {
+      const ecoregionSet = new Set<string>();
+      componentParam.staticAreas?.forEach((area) => {
+        if (area.boundaryName === BoundaryName.MEOW) {
+          ecoregionSet.add("" + area.value);
+        }
+      });
+      return ecoregionSet;
+    });
+
   const [selectedAllenCoralAtlasValues, setSelectedAllenCoralAtlasValues] =
-    useState<Set<string>>(
-      () =>
-        new Set(
-          componentParam.polygon?.properties?.selectedAllenCoralAtlas || []
-        )
-    );
+    useState<Set<string>>(() => {
+      const coralAtlasSet = new Set<string>();
+      componentParam.staticAreas?.forEach((area) => {
+        if (area.boundaryName === BoundaryName.CORAL_ATLAS) {
+          coralAtlasSet.add("" + area.value);
+        }
+      });
+      return coralAtlasSet;
+    });
   const [drawFeatures, setDrawFeatures] = useState<
     Feature<Polygon | MultiPolygon>[]
   >(() => componentParam.polygon?.properties?.drawFeatures || []);
@@ -291,63 +308,28 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
     };
   }, []);
 
-  const applyCombinedGeoSelections = useCallback(
+  const getStaticAreasFromSets = useCallback(
     (
       parks: Set<string>,
       ecoregions: Set<string>,
-      coralAtlas: Set<string>,
-      draws: Feature<Polygon | MultiPolygon>[]
-    ) => {
-      const parkFeatures = marineParkOptions
-        .filter((o) => parks.has(o.value))
-        .map((o) => o.geo!.features[0]);
-
-      const ecoregionFeatures = marineEcoregionOptions
-        .filter((o) => ecoregions.has(o.value))
-        .map((o) => o.geo!.features[0]);
-
-      const coralFeatures = allenCoralAtlasOptions
-        .filter((o) => coralAtlas.has(o.value))
-        .map((o) => o.geo!.features[0]);
-
-      const allFeatures = [
-        ...parkFeatures,
-        ...ecoregionFeatures,
-        ...coralFeatures,
-        ...draws,
-      ];
-
-      if (allFeatures.length === 0) {
-        dispatch(updateFilterPolygon(undefined));
-        return;
-      }
-
-      let merged: Feature<Polygon | MultiPolygon> | undefined;
-      if (allFeatures.length === 1) {
-        merged = { ...allFeatures[0] };
-      } else {
-        merged = union(featureCollection(allFeatures)) ?? undefined;
-      }
-
-      if (merged) {
-        // Inject IDs into properties for restoration
-        merged.properties = {
-          ...merged.properties,
-          selectedMarineParks: Array.from(parks),
-          selectedMarineEcoregions: Array.from(ecoregions),
-          selectedAllenCoralAtlas: Array.from(coralAtlas),
-          drawFeatures: draws,
-        };
-
-        dispatch(updateFilterPolygon(merged));
-      }
+      coralAtlas: Set<string>
+    ): SelectedStaticArea[] => {
+      const result: SelectedStaticArea[] = [];
+      parks.forEach((v) =>
+        result.push({
+          boundaryName: BoundaryName.AUSTRALIAN_MARINE_PARKS,
+          value: v,
+        })
+      );
+      ecoregions.forEach((v) =>
+        result.push({ boundaryName: BoundaryName.MEOW, value: v })
+      );
+      coralAtlas.forEach((v) =>
+        result.push({ boundaryName: BoundaryName.CORAL_ATLAS, value: v })
+      );
+      return result;
     },
-    [
-      dispatch,
-      marineParkOptions,
-      marineEcoregionOptions,
-      allenCoralAtlasOptions,
-    ]
+    []
   );
 
   const handleFilterModeChange = useCallback(
@@ -364,20 +346,24 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
         const next = new Set(prev);
         if (checked) next.add(parkValue);
         else next.delete(parkValue);
-        applyCombinedGeoSelections(
-          next,
-          selectedMarineEcoregionValues,
-          selectedAllenCoralAtlasValues,
-          drawFeatures
+
+        dispatch(
+          updateFilterStaticAreas(
+            getStaticAreasFromSets(
+              next,
+              selectedMarineEcoregionValues,
+              selectedAllenCoralAtlasValues
+            )
+          )
         );
         return next;
       });
     },
     [
-      applyCombinedGeoSelections,
+      dispatch,
       selectedMarineEcoregionValues,
       selectedAllenCoralAtlasValues,
-      drawFeatures,
+      getStaticAreasFromSets,
     ]
   );
 
@@ -387,20 +373,24 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
         const next = new Set(prev);
         if (checked) next.add(ecoregionValue);
         else next.delete(ecoregionValue);
-        applyCombinedGeoSelections(
-          selectedMarineParkValues,
-          next,
-          selectedAllenCoralAtlasValues,
-          drawFeatures
+
+        dispatch(
+          updateFilterStaticAreas(
+            getStaticAreasFromSets(
+              selectedMarineParkValues,
+              next,
+              selectedAllenCoralAtlasValues
+            )
+          )
         );
         return next;
       });
     },
     [
-      applyCombinedGeoSelections,
+      dispatch,
       selectedMarineParkValues,
       selectedAllenCoralAtlasValues,
-      drawFeatures,
+      getStaticAreasFromSets,
     ]
   );
 
@@ -410,25 +400,31 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
         const next = new Set(prev);
         if (checked) next.add(coralValue);
         else next.delete(coralValue);
-        applyCombinedGeoSelections(
-          selectedMarineParkValues,
-          selectedMarineEcoregionValues,
-          next,
-          drawFeatures
+
+        dispatch(
+          updateFilterStaticAreas(
+            getStaticAreasFromSets(
+              selectedMarineParkValues,
+              selectedMarineEcoregionValues,
+              next
+            )
+          )
         );
         return next;
       });
     },
     [
-      applyCombinedGeoSelections,
+      dispatch,
       selectedMarineParkValues,
       selectedMarineEcoregionValues,
-      drawFeatures,
+      getStaticAreasFromSets,
     ]
   );
 
   const handleClear = useCallback(() => {
     dispatch(updateFilterPolygon(undefined));
+    dispatch(updateFilterStaticAreas([]));
+
     setSelectedMarineParkValues(new Set());
     setSelectedMarineEcoregionValues(new Set());
     setSelectedAllenCoralAtlasValues(new Set());
@@ -453,19 +449,28 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
     ) => {
       removeFeatureRef.current = removeFeature;
       setDrawFeatures(newFeatures);
-      applyCombinedGeoSelections(
-        selectedMarineParkValues,
-        selectedMarineEcoregionValues,
-        selectedAllenCoralAtlasValues,
-        newFeatures
-      );
+
+      if (newFeatures.length === 0) {
+        dispatch(updateFilterPolygon(undefined));
+        return;
+      }
+
+      let merged: Feature<Polygon | MultiPolygon> | undefined;
+      if (newFeatures.length === 1) {
+        merged = { ...newFeatures[0] };
+      } else {
+        merged = union(featureCollection(newFeatures)) ?? undefined;
+      }
+
+      if (merged) {
+        merged.properties = {
+          ...merged.properties,
+          drawFeatures: newFeatures,
+        };
+        dispatch(updateFilterPolygon(merged));
+      }
     },
-    [
-      applyCombinedGeoSelections,
-      selectedMarineParkValues,
-      selectedMarineEcoregionValues,
-      selectedAllenCoralAtlasValues,
-    ]
+    [dispatch]
   );
 
   const highlightCollection = useMemo(():
@@ -577,28 +582,31 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
 
   useEffect(() => {
     startTransition(() => {
-      const polygonProperties = componentParam.polygon?.properties;
+      // Sync static areas
+      const staticAreas = componentParam.staticAreas || [];
+      const parks = new Set<string>();
+      const ecoregions = new Set<string>();
+      const coralAtlas = new Set<string>();
 
-      if (polygonProperties?.selectedMarineParks) {
-        setSelectedMarineParkValues(
-          new Set(polygonProperties.selectedMarineParks)
-        );
-      }
-      if (polygonProperties?.selectedMarineEcoregions) {
-        setSelectedMarineEcoregionValues(
-          new Set(polygonProperties.selectedMarineEcoregions)
-        );
-      }
-      if (polygonProperties?.selectedAllenCoralAtlas) {
-        setSelectedAllenCoralAtlasValues(
-          new Set(polygonProperties.selectedAllenCoralAtlas)
-        );
-      }
-      if (polygonProperties?.drawFeatures) {
-        setDrawFeatures(polygonProperties.drawFeatures);
-      }
+      staticAreas.forEach((area) => {
+        if (area.boundaryName === BoundaryName.AUSTRALIAN_MARINE_PARKS) {
+          parks.add("" + area.value);
+        } else if (area.boundaryName === BoundaryName.MEOW) {
+          ecoregions.add("" + area.value);
+        } else if (area.boundaryName === BoundaryName.CORAL_ATLAS) {
+          coralAtlas.add("" + area.value);
+        }
+      });
+
+      setSelectedMarineParkValues(parks);
+      setSelectedMarineEcoregionValues(ecoregions);
+      setSelectedAllenCoralAtlasValues(coralAtlas);
+
+      // Sync drawn features
+      const drawn = componentParam.polygon?.properties?.drawFeatures || [];
+      setDrawFeatures(drawn);
     });
-  }, [componentParam.polygon, filterMode]);
+  }, [componentParam.staticAreas, componentParam.polygon]);
 
   if (marineParkOptions.length === 0) return null;
 

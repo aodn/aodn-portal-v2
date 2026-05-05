@@ -77,14 +77,14 @@ const checkCount = ({
 
       return count;
 
-    case SearchbarButtonNames.Location:
-      // If the polygon is undefined, then it means no filter
-      // If the polygon is also the default search polygon, it means no filter too
-      // as this is the default
-      return filterObj.polygon &&
-        !booleanEqual(filterObj.polygon, DEFAULT_SEARCH_LOCATION)
-        ? 1
-        : 0;
+    case SearchbarButtonNames.Location: {
+      const hasPolygon =
+        filterObj.polygon &&
+        !booleanEqual(filterObj.polygon, DEFAULT_SEARCH_LOCATION);
+      const hasStaticAreas =
+        filterObj.staticAreas && filterObj.staticAreas.length > 0;
+      return hasPolygon || hasStaticAreas ? 1 : 0;
+    }
 
     default:
       return 0;

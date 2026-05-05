@@ -28,6 +28,8 @@ const UPDATE_ZOOM_VARIABLE = "UPDATE_ZOOM_VARIABLE";
 const UPDATE_HAS_DATA = "UPDATE_HAS_DATA";
 const UPDATE_SORT = "UPDATE_SORT";
 const UPDATE_LAYOUT = "UPDATE_LAYOUT";
+const UPDATE_STATIC_AREAS_FILTER_VARIABLE =
+  "UPDATE_STATIC_AREAS_FILTER_VARIABLE";
 const CLEAR_COMPONENT_PARAM = "CLEAR_COMPONENT_PARAM";
 
 const { WEST_LON, EAST_LON, NORTH_LAT, SOUTH_LAT } =
@@ -61,19 +63,21 @@ export interface DateTimeFilterRange {
 }
 
 export interface ParameterState {
+  datasetGroup?: string;
+  datasetStatus?: DatasetStatus | undefined;
+  dateTimeFilterRange?: DateTimeFilterRange;
   // Usually the viewable area of the map
   bbox?: Feature<Polygon>;
   // Use to remember what user draw on the map
   polygon?: Feature<Polygon | MultiPolygon>;
-  datasetGroup?: string;
+  // User filter using static map areas
+  staticAreas?: Array<SelectedStaticArea>;
   hasCOData?: boolean;
   includeNoGeometry?: boolean;
-  dateTimeFilterRange?: DateTimeFilterRange;
   searchText?: string;
   parameterVocabs?: Array<Vocab>;
   platform?: Array<string>;
   updateFreq?: DatasetFrequency | undefined;
-  datasetStatus?: DatasetStatus | undefined;
   sortby?: string;
   zoom?: number;
   sort?: SortResultEnum;
@@ -90,6 +94,10 @@ export interface Vocab {
   about?: string;
   broader?: Array<Vocab>;
   narrower?: Array<Vocab>;
+}
+export interface SelectedStaticArea {
+  boundaryName: string;
+  value: string;
 }
 
 interface ActionType {
@@ -124,6 +132,15 @@ const updatePlatform = (platform: Array<string>): ActionType => {
   return {
     type: UPDATE_PLATFORM_FILTER_VARIABLE,
     payload: { platform: platform } as ParameterState,
+  };
+};
+
+const updateFilterStaticAreas = (
+  staticAreas: Array<SelectedStaticArea>
+): ActionType => {
+  return {
+    type: UPDATE_STATIC_AREAS_FILTER_VARIABLE,
+    payload: { staticAreas: staticAreas } as ParameterState,
   };
 };
 
@@ -299,6 +316,11 @@ const paramReducer = (
       return {
         ...state,
         platform: action.payload.platform,
+      };
+    case UPDATE_STATIC_AREAS_FILTER_VARIABLE:
+      return {
+        ...state,
+        staticAreas: action.payload.staticAreas,
       };
     case UPDATE_POLYGON_FILTER_VARIABLE:
       return {
@@ -482,7 +504,6 @@ export default paramReducer;
 
 export {
   DEFAULT_SEARCH_LOCATION,
-  UPDATE_DATETIME_FILTER_VARIABLE,
   formatToUrlParam,
   unFlattenToParameterState,
   updateDateTimeFilterRange,
@@ -500,5 +521,6 @@ export {
   updateHasData,
   updateSort,
   updateLayout,
+  updateFilterStaticAreas,
   clearComponentParam,
 };

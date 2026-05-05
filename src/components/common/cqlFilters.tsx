@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 import { dateDefault } from "./constants";
 import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from "geojson";
 import * as wellknown from "wellknown";
-import { Vocab } from "./store/componentParamReducer";
+import { SelectedStaticArea, Vocab } from "./store/componentParamReducer";
 import { DatasetFrequency, DatasetStatus } from "./store/searchReducer";
 import { bbox } from "@turf/turf";
 
@@ -29,6 +29,10 @@ export type UpdateFrequency = SingleArgumentFunction<DatasetFrequency, string>;
 export type DatasetGroup = SingleArgumentFunction<string, string>;
 export type PlatformFilter = SingleArgumentFunction<Array<string>, string>;
 export type Status = SingleArgumentFunction<DatasetStatus, string>;
+export type StaticAreasFilter = SingleArgumentFunction<
+  Array<SelectedStaticArea>,
+  string
+>;
 export type IsNotNull = SingleArgumentFunction<string, string>;
 export type FilterTypes =
   | string
@@ -39,6 +43,7 @@ export type FilterTypes =
   | UpdateFrequency
   | PlatformFilter
   | Status
+  | StaticAreasFilter
   | IsNotNull;
 
 const funcIsNotNull: IsNotNull = (field: string) => `(${field} IS NOT NULL)`;
@@ -69,6 +74,18 @@ const funcIntersectPolygon: PolygonOperation = (
   const geojson = p.geometry as wellknown.GeoJSONGeometry;
   const wkt = wellknown.stringify(geojson);
   return `INTERSECTS(geometry,${wkt})`;
+};
+
+const funcStaticAreas: StaticAreasFilter = (
+  areas: Array<SelectedStaticArea>
+) => {
+  if (!areas || areas.length === 0) return "";
+
+  const queries = areas.map(
+    (area) =>
+      `INTERSECTS(geometry,IBOUNDARY('${area.boundaryName}','${area.value}'))`
+  );
+  return `(${queries.join(" OR ")})`;
 };
 
 const funcBBoxPolygon: PolygonOperation = (p) => {
@@ -130,6 +147,7 @@ cqlDefaultFilters
   .set("UPDATE_FREQUENCY", funcUpdateFrequency)
   .set("STATUS", funcStatus)
   .set("UPDATE_PLATFORM_FILTER_VARIABLES", funcPlatformFilter)
+  .set("STATIC_AREAS", funcStaticAreas)
   .set("IS_NOT_NULL", funcIsNotNull);
 
 export { cqlDefaultFilters };
