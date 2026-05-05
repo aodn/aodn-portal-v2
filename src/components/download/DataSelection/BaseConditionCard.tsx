@@ -14,8 +14,10 @@ import {
   Divider,
   IconButton,
   IconButtonProps,
+  Stack,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { CloseIcon } from "../../../assets/icons/download/close";
 import { portalTheme } from "../../../styles";
 import { BboxSelectionIcon } from "../../../assets/icons/download/bbox_selection";
@@ -86,6 +88,7 @@ const BaseConditionCard: React.FC<BaseConditionCardProps> = ({
   type,
   children,
   actions,
+  removeCallback,
   disable = false,
 }) => {
   const [expanded, setExpanded] = useState(true);
@@ -96,7 +99,6 @@ const BaseConditionCard: React.FC<BaseConditionCardProps> = ({
       elevation={0}
       sx={{
         backgroundColor: portalTheme.palette.primary6,
-        mb: "8px",
         transition: (theme) =>
           theme.transitions.create(
             ["border-color", "box-shadow", "border-radius"],
@@ -117,47 +119,64 @@ const BaseConditionCard: React.FC<BaseConditionCardProps> = ({
           color: portalTheme.palette.text1,
         }}
         action={
-          <ExpandIconButton
-            expand={expanded}
-            onClick={toggle}
-            disabled={disable}
-            aria-expanded={expanded}
-            aria-label={expanded ? "collapse" : "expand"}
-          >
-            <CloseIcon
-              color={portalTheme.palette.grey700}
-              width={12}
-              height={12}
-            />
-          </ExpandIconButton>
+          <Stack direction="row" alignItems="center" spacing={0.5}>
+            {removeCallback && (
+              <IconButton
+                onClick={removeCallback}
+                disabled={disable}
+                aria-label="remove"
+                size="small"
+              >
+                <DeleteOutlineIcon
+                  sx={{ color: portalTheme.palette.grey700, fontSize: 18 }}
+                />
+              </IconButton>
+            )}
+            <ExpandIconButton
+              expand={expanded}
+              onClick={toggle}
+              disabled={disable}
+              size="small"
+              aria-expanded={expanded}
+              aria-label={expanded ? "collapse" : "expand"}
+            >
+              <CloseIcon
+                color={portalTheme.palette.grey700}
+                width={12}
+                height={12}
+              />
+            </ExpandIconButton>
+          </Stack>
         }
         sx={{
-          py: "8px",
-          px: "12px",
-          "& .MuiCardHeader-avatar": { mr: "12px" },
+          py: 1,
+          px: 1.5,
+          "& .MuiCardHeader-avatar": { mr: 1.5 },
           "& .MuiCardHeader-action": { m: 0, alignSelf: "center" },
         }}
       />
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent
           sx={{
-            py: "8px",
-            px: "12px",
-            "&:last-child": { pb: "8px" },
+            pt: 0.5,
+            pb: 1.5,
+            px: 1.5,
+            "&:last-child": { pb: 1.5 },
           }}
         >
           {children}
         </CardContent>
         {actions && (
           <>
-            <Divider sx={{ borderBottomWidth: 2, borderColor: "#FFF" }} />
+            <Divider
+              sx={{ borderBottomWidth: 2, borderColor: "common.white" }}
+            />
             <CardActions
               sx={{
                 justifyContent: "center",
                 alignItems: "center",
-                px: "12px",
-                pb: "8px",
-                pt: 0,
+                px: 1.5,
+                py: 0.5,
               }}
             >
               {actions}
