@@ -63,7 +63,9 @@ const funcTemporalAfter: TemporalAfterOrBefore = (s: number) =>
 const funcTemporalBefore: TemporalAfterOrBefore = (s: number) =>
   `temporal BEFORE ${dayjs(s).format(dateDefault["DATE_TIME_FORMAT"])}`;
 
-const funcIntersectPolygon: PolygonOperation = (p) => {
+const funcIntersectPolygon: PolygonOperation = (
+  p: Feature<Polygon | MultiPolygon, GeoJsonProperties>
+) => {
   const geojson = p.geometry as wellknown.GeoJSONGeometry;
   const wkt = wellknown.stringify(geojson);
   return `INTERSECTS(geometry,${wkt})`;

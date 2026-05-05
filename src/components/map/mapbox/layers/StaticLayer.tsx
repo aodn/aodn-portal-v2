@@ -29,10 +29,16 @@ import { cssFontFamilyToMapboxTextFont } from "../../../../utils/MapUtils";
 import { useTheme } from "@mui/material";
 import { SymbolLayerSpecification } from "mapbox-gl";
 
+export enum BoundaryName {
+  AUSTRALIAN_MARINE_PARKS = "AUSTRALIAN_MARINE_PARKS",
+  CORAL_ATLAS = "CORAL_ATLAS",
+  MEOW = "MEOW",
+}
+
 export interface StaticLayersProps {
   id: string;
   name: string;
-  boundaryName: string;
+  boundaryName: BoundaryName;
   label: string;
   geojson: string;
   termsOfUse: string;
@@ -44,7 +50,7 @@ export interface StaticLayersProps {
  * Extends GeoJsonProperties (non-null part) by including metadata for the boundary.
  */
 export type BoundaryProperties = {
-  boundaryName: string;
+  boundaryName: BoundaryName;
   label: string;
   value: string;
 } & GeoJsonProperties;
@@ -67,7 +73,7 @@ const StaticLayersDef: Record<string, StaticLayersProps> = {
   AUSTRALIA_MARINE_PARKS: {
     id: "static-australia-marine-parks",
     name: "Australian Marine Parks",
-    boundaryName: "AUSTRALIAN_MARINE_PARKS",
+    boundaryName: BoundaryName.AUSTRALIAN_MARINE_PARKS,
     geojson: marineParkDefault.geojson,
     termsOfUse: marineParkDefault.termsOfUse,
     label: "RESNAME",
@@ -75,7 +81,7 @@ const StaticLayersDef: Record<string, StaticLayersProps> = {
   ALLEN_CORAL_ATLAS: {
     id: "static-allen-coral-atlas",
     name: "Allen Coral Atlas",
-    boundaryName: "CORAL_ATLAS",
+    boundaryName: BoundaryName.CORAL_ATLAS,
     geojson: allenCoralAtlasDefault.geojson,
     termsOfUse: allenCoralAtlasDefault.termsOfUse,
     label: "ECOREGION",
@@ -83,7 +89,7 @@ const StaticLayersDef: Record<string, StaticLayersProps> = {
   MEOW: {
     id: "static-meow",
     name: "Marine Ecoregion of the World",
-    boundaryName: "MEOW",
+    boundaryName: BoundaryName.MEOW,
     geojson: marineEcoregionOfWorldDefault.geojson,
     termsOfUse: marineEcoregionOfWorldDefault.termsOfUse,
     label: "ECOREGION",
@@ -95,7 +101,7 @@ const dataCache: Record<string, any> = {};
 
 const loadAndProcessGeoJSON = async (
   url: string,
-  boundaryName: string,
+  boundaryName: BoundaryName,
   groupKey: string,
   labelKey: string,
   idKey: string,

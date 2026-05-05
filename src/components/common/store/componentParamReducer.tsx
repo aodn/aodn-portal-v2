@@ -61,7 +61,9 @@ export interface DateTimeFilterRange {
 }
 
 export interface ParameterState {
+  // Usually the viewable area of the map
   bbox?: Feature<Polygon>;
+  // Use to remember what user draw on the map
   polygon?: Feature<Polygon | MultiPolygon>;
   datasetGroup?: string;
   hasCOData?: boolean;
