@@ -49,7 +49,7 @@ def handle_static_geojson_api(route: Route) -> None:
                         "type": "Polygon",
                         "coordinates": [[]]
                     }
-                } 
+                }
             ]
         }
         route.fulfill(json=mock_geojson)
@@ -99,5 +99,3 @@ def handle_static_geojson_api(route: Route) -> None:
             ]
         }
         route.fulfill(json=mock_geojson)
-
-    
