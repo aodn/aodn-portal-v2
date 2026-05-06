@@ -12,7 +12,6 @@ import ScaleControl from "../../../components/map/mapbox/controls/ScaleControl";
 import MenuControl from "../../../components/map/mapbox/controls/menu/MenuControl";
 import BaseMapSwitcher from "../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
 import Layers, {
-  createStaticLayers,
   LayerBasicType,
 } from "../../../components/map/mapbox/layers/Layers";
 import ClusterLayer from "../../../components/map/mapbox/layers/ClusterLayer";
@@ -38,6 +37,7 @@ import ReferenceLayerSwitcher, {
   staticBaseLayerConfig,
 } from "../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
 import { ProgressType } from "../../../components/map/mapbox/MapContext";
+import { createStaticLayers } from "../../../components/map/mapbox/layers/StaticLayer";
 
 interface MapSectionProps
   extends Partial<MapBasicType>,

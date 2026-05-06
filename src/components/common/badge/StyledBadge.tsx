@@ -17,9 +17,9 @@ type PositionStyle = {
 };
 
 const badgePosition: Record<Position, PositionStyle> = {
-  right: { top: "50%", right: " -10%" },
-  topRight: { top: " 20%", right: " 10%" },
-  left: { top: "50%", left: " -10%" },
+  [Position.Right]: { top: "50%", right: "-10%" },
+  [Position.TopRight]: { top: "20%", right: "10%" },
+  [Position.Left]: { top: "50%", left: "-10%" },
 };
 
 interface StyledBadgeProps {

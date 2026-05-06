@@ -13,6 +13,7 @@ import {
   TemporalDuring,
   UpdateFrequency,
   Status,
+  StaticAreasFilter,
 } from "../cqlFilters";
 import { OGCCollection, OGCCollections } from "./OGCCollectionDefinitions";
 import {
@@ -585,7 +586,7 @@ const fetchSystemHealthNoStore = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >("system/fetchSystemHealthNoStore", async (_, thunkApi) =>
   ogcAxiosWithRetry
-    .get<Health>("/ogc/manage/health")
+    .get<Health>("/ogc/manage/health", { signal: thunkApi.signal })
     .then((response) => response.data)
     .catch(errorHandling(thunkApi))
 );
@@ -715,9 +716,23 @@ const createSearchParamFrom = (
     p.filter = appendFilter(p.filter, f(i.bbox));
   }
 
+  let spatialFilter: string | undefined;
+
+  if (i.staticAreas && i.staticAreas.length > 0) {
+    const f = cqlDefaultFilters.get("STATIC_AREAS") as StaticAreasFilter;
+    spatialFilter = f(i.staticAreas);
+  }
+
   if (i.polygon) {
     const f = cqlDefaultFilters.get("INTERSECT_POLYGON") as PolygonOperation;
-    p.filter = appendFilter(p.filter, f(i.polygon));
+    const polygonFilter = f(i.polygon);
+    spatialFilter = spatialFilter
+      ? `(${spatialFilter} OR ${polygonFilter})`
+      : polygonFilter;
+  }
+
+  if (spatialFilter) {
+    p.filter = appendFilter(p.filter, spatialFilter);
   }
 
   if (i.parameterVocabs && i.parameterVocabs.length > 0) {
