@@ -1,15 +1,9 @@
+import { describe, it, expect, vi, afterEach } from "vitest";
 import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeAll,
-  afterEach,
-  afterAll,
-} from "vitest";
-import { http, HttpResponse } from "msw";
-import { setupServer } from "msw/node";
-import { processWFSDownload, processWFSEstimateSize } from "../searchReducer";
+  processWFSDownload,
+  processWFSEstimateSize,
+  ogcAxiosWithRetry,
+} from "../searchReducer";
 import {
   WFSDownloadRequest,
   DateRangeCondition,
@@ -17,27 +11,15 @@ import {
 } from "../../../../pages/detail-page/context/DownloadDefinitions";
 import { configureStore } from "@reduxjs/toolkit";
 
-const server = setupServer();
-
-beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
-afterEach(() => {
-  server.resetHandlers();
-  vi.clearAllMocks();
-});
-afterAll(() => server.close());
-
 describe("searchReducer async thunks", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("processWFSDownload sends correct request body", async () => {
-    let capturedBody: any;
-    server.use(
-      http.post(
-        "/api/v1/ogc/processes/downloadWfs/execution",
-        async ({ request }) => {
-          capturedBody = await request.json();
-          return new HttpResponse(null, { status: 200 });
-        }
-      )
-    );
+    const spy = vi
+      .spyOn(ogcAxiosWithRetry, "post")
+      .mockResolvedValue({ data: {} } as any);
 
     const mockRequest: WFSDownloadRequest = {
       uuid: "test-uuid",
@@ -54,35 +36,35 @@ describe("searchReducer async thunks", () => {
 
     await store.dispatch(processWFSDownload(mockRequest) as any);
 
-    expect(capturedBody).toEqual({
-      inputs: {
-        uuid: "test-uuid",
-        start_date: "2020-01-01",
-        end_date: "2020-01-02",
-        multi_polygon: "non-specified",
-        layer_name: "test-layer",
-        output_format: "CSV",
-      },
-      outputs: {},
-      subscriber: {
-        successUri: "",
-        inProgressUri: "",
-        failedUri: "",
-      },
-    });
+    expect(spy).toHaveBeenCalledWith(
+      "/ogc/processes/downloadWfs/execution",
+      expect.objectContaining({
+        inputs: {
+          uuid: "test-uuid",
+          start_date: "2020-01-01",
+          end_date: "2020-01-02",
+          multi_polygon: "non-specified",
+          layer_name: "test-layer",
+          output_format: "CSV",
+        },
+        outputs: {},
+        subscriber: {
+          successUri: "",
+          inProgressUri: "",
+          failedUri: "",
+        },
+      }),
+      expect.objectContaining({
+        adapter: "fetch",
+        responseType: "stream",
+      })
+    );
   });
 
   it("processWFSEstimateSize sends correct request body", async () => {
-    let capturedBody: any;
-    server.use(
-      http.post(
-        "/api/v1/ogc/processes/estimateWfsDownload/execution",
-        async ({ request }) => {
-          capturedBody = await request.json();
-          return new HttpResponse(null, { status: 200 });
-        }
-      )
-    );
+    const spy = vi
+      .spyOn(ogcAxiosWithRetry, "post")
+      .mockResolvedValue({ data: {} } as any);
 
     const mockRequest: WFSDownloadRequest = {
       uuid: "test-uuid",
@@ -99,15 +81,22 @@ describe("searchReducer async thunks", () => {
 
     await store.dispatch(processWFSEstimateSize(mockRequest) as any);
 
-    expect(capturedBody).toEqual({
-      inputs: {
-        uuid: "test-uuid",
-        layer_name: "test-layer",
-        start_date: "2020-01-01",
-        end_date: "2020-01-02",
-        output_format: "CSV",
-        multi_polygon: "non-specified",
-      },
-    });
+    expect(spy).toHaveBeenCalledWith(
+      "/ogc/processes/estimateWfsDownload/execution",
+      expect.objectContaining({
+        inputs: {
+          uuid: "test-uuid",
+          layer_name: "test-layer",
+          start_date: "2020-01-01",
+          end_date: "2020-01-02",
+          output_format: "CSV",
+          multi_polygon: "non-specified",
+        },
+      }),
+      expect.objectContaining({
+        adapter: "fetch",
+        responseType: "stream",
+      })
+    );
   });
 });
