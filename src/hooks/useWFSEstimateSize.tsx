@@ -10,6 +10,7 @@ enum EstimateEventName {
   KEEP_ALIVE = "keep-alive",
   WFS_REQUEST_READY = "wfs-request-ready",
   ESTIMATE_COMPLETE = "estimate-complete",
+  ESTIMATE_FAILED = "estimate-failed",
   ERROR = "error",
 }
 
@@ -98,6 +99,7 @@ const useWFSEstimateSize = () => {
               setStatus(EstimateStatus.COMPLETED);
               break;
 
+            case EstimateEventName.ESTIMATE_FAILED:
             case EstimateEventName.ERROR:
               setStatus(EstimateStatus.ERROR);
               break;
