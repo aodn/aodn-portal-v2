@@ -6,7 +6,6 @@ import {
   useMemo,
   useState,
 } from "react";
-import { Stack } from "@mui/material";
 import dayjs from "dayjs";
 import { dateDefault } from "../../../../components/common/constants";
 import DownloadDialog from "./DownloadDialog/DownloadDialog";
@@ -21,8 +20,7 @@ import {
   OGCCollection,
 } from "../../../../components/common/store/OGCCollectionDefinitions";
 import DownloadButton from "../../../../components/common/buttons/DownloadButton";
-import DownloadSubsetting from "./DownloadSubsetting";
-import DownloadSelect from "./DownloadSelect";
+import DownloadServiceCard from "./DownloadServiceCard";
 
 const downloadFormats = [
   { label: "NetCDFs", value: "netcdf" },
@@ -169,29 +167,25 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
   );
 
   return (
-    <Stack direction="column">
-      <Stack sx={{ p: "16px" }} spacing={2}>
-        <DownloadSelect
-          label="Format Selection"
-          items={filteredDownloadFormats}
-          onSelectCallback={onSelectChange}
-        />
-        <DownloadSelect
-          label="Data Selection"
-          items={dataSelectOptions}
-          value={selectedDataItem}
-          onSelectCallback={handleSelectDataItem}
-        />
-        <DownloadButton onDownload={onDownload} />
-      </Stack>
-
-      <DownloadSubsetting
+    <DownloadServiceCard>
+      <DownloadServiceCard.Form
+        formatProps={{
+          items: filteredDownloadFormats,
+          onSelectCallback: onSelectChange,
+        }}
+        dataProps={{
+          items: dataSelectOptions,
+          value: selectedDataItem,
+          onSelectCallback: handleSelectDataItem,
+        }}
+        downloadButton={<DownloadButton onDownload={onDownload} />}
+      />
+      <DownloadServiceCard.Subsetting
         downloadConditions={downloadConditions}
         getAndSetDownloadConditions={getAndSetDownloadConditions}
         removeDownloadCondition={removeDownloadCondition}
         dateRangeBounds={dateRangeBounds}
       />
-
       <DownloadDialog
         isOpen={downloadDialogOpen}
         setIsOpen={setDownloadDialogOpen}
@@ -199,7 +193,7 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
         getAndSetDownloadConditions={getAndSetDownloadConditions}
         removeDownloadCondition={removeDownloadCondition}
       />
-    </Stack>
+    </DownloadServiceCard>
   );
 };
 
