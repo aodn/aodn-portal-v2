@@ -10,7 +10,7 @@ import { portalTheme } from "../../../../styles";
 
 const renderBannerText = () => {
   return (
-    <Box flex={1} mt="-10%">
+    <Box flex={1}>
       <Stack
         direction="column"
         justifyContent="center"
@@ -177,7 +177,7 @@ const Banner = () => {
         justifyContent: "center",
         alignItems: "center",
         width: "100%",
-        paddingY: { xs: padding.medium, sm: padding.large },
+        pb: { xs: padding.medium, sm: padding.large },
       }}
       gap={2}
     >

@@ -80,6 +80,7 @@ const renderListCards: FC<ResultCardsListType> = ({
               xs={12}
               sm={6}
               md={isFullListView ? 6 : 12}
+              lg={isFullListView ? 4 : 12}
               key={index}
               sx={{
                 // Must hardcode, else the box will expand if not enough height

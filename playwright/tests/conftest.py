@@ -18,11 +18,13 @@ def setup_page(
     # Use the browser launch args that include --headed flag
     browser = playwright.chromium.launch(**browser_type_launch_args)
     context_kwargs = device_config.device_config or {}
+
+    # If the device config doesn't specify a viewport, use the one from the device configuration
+    if device_config.viewport and 'viewport' not in context_kwargs:
+        context_kwargs = {**context_kwargs, 'viewport': device_config.viewport}
+
+    # Create a new browser context with the device configuration
     context = browser.new_context(**context_kwargs)
-    if hasattr(context, 'is_mobile'):
-        context.is_mobile = device_config.is_mobile
-    if hasattr(context, 'viewport'):
-        context.viewport = device_config.viewport
     page = context.new_page()
     apply_mock(page)
     return browser, context, page

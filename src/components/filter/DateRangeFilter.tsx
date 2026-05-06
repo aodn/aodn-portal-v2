@@ -47,7 +47,7 @@ import { dateToValue, valueToDate } from "../../utils/DateUtils";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import theme from "../../styles/themeRC8";
 import { CalendarIcon } from "../../assets/icons/search/calendar";
-import { DEFAULT_DATE_PICKER_SLOT } from "../details/DateRangeSlider";
+import { DEFAULT_DATE_PICKER_SLOT } from "../common/datetime/datePickerSlots";
 
 enum DateRangeOptionValues {
   Custom = "custom",

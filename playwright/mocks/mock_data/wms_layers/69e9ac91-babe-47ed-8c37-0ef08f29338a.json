@@ -1,0 +1,208 @@
+[
+  {
+    "queryable": "0",
+    "name": "AusEEZ_bathy_aspectSlope_composite_multires",
+    "title": "Hillshaded multi-resolution aspect-slope composite for the Aus EEZ",
+    "abstract_": "A multi-resolution depth-stratified aspect-slope map from a continuous bathymetry surface for the Aus EEZ.",
+    "keywordList": {},
+    "crs": ["EPSG:9473"],
+    "geographicBoundingBox": {
+      "westBoundLongitude": -180.0,
+      "eastBoundLongitude": 180.0,
+      "southBoundLatitude": -63.623627377696266,
+      "northBoundLatitude": -2.101424600241311
+    },
+    "boundingBoxes": [
+      {
+        "minx": -180.0,
+        "miny": -63.623627377696266,
+        "maxx": 180.0,
+        "maxy": -2.101424600241311,
+        "crs": "CRS:84"
+      },
+      {
+        "minx": -4333776.65588629,
+        "miny": -6691900.35982885,
+        "maxx": 4465467.602282695,
+        "maxy": -884350.3598288503,
+        "crs": "EPSG:9473"
+      }
+    ],
+    "style": {
+      "name": "default-style-AusEEZ_bathy_aspectSlope_composite_multires",
+      "title": "AusEEZ_bathy_aspectSlope_composite_multires style",
+      "abstract_": "Default style for AusEEZ_bathy_aspectSlope_composite_multires layer",
+      "legendURL": {
+        "width": 20,
+        "height": 20,
+        "format": "image/png",
+        "onlineResource": {
+          "type": "simple",
+          "href": "https://geoserver.imas.utas.edu.au/geoserver/bathy_composites/ows?service=WMS&version=1.3.0&request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=AusEEZ_bathy_aspectSlope_composite_multires"
+        }
+      }
+    }
+  },
+  {
+    "queryable": "0",
+    "name": "AusEEZ_bathy_aspect_composite_multires",
+    "title": "Hillshaded multi-resolution bathymetric aspect composite for the Aus EEZ",
+    "abstract_": "A multi-resolution depth-stratified aspect derivative from a continuous bathymetry surface for the Aus EEZ. This layer group displays aspect draped over hillshade.",
+    "keywordList": {},
+    "crs": ["EPSG:9473"],
+    "geographicBoundingBox": {
+      "westBoundLongitude": -180.0,
+      "eastBoundLongitude": 180.0,
+      "southBoundLatitude": -63.623627377696266,
+      "northBoundLatitude": -1.633222562305506
+    },
+    "boundingBoxes": [
+      {
+        "minx": -180.0,
+        "miny": -63.623627377696266,
+        "maxx": 180.0,
+        "maxy": -1.633222562305506,
+        "crs": "CRS:84"
+      },
+      {
+        "minx": -4333776.65588629,
+        "miny": -6691900.35982885,
+        "maxx": 4465467.602282695,
+        "maxy": -833922.7738895584,
+        "crs": "EPSG:9473"
+      }
+    ],
+    "style": {
+      "name": "default-style-AusEEZ_bathy_aspect_composite_multires",
+      "title": "AusEEZ_bathy_aspect_composite_multires style",
+      "abstract_": "Default style for AusEEZ_bathy_aspect_composite_multires layer",
+      "legendURL": {
+        "width": 20,
+        "height": 20,
+        "format": "image/png",
+        "onlineResource": {
+          "type": "simple",
+          "href": "https://geoserver.imas.utas.edu.au/geoserver/bathy_composites/ows?service=WMS&version=1.3.0&request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=AusEEZ_bathy_aspect_composite_multires"
+        }
+      }
+    }
+  },
+  {
+    "queryable": "0",
+    "name": "AusEEZ_bathy_composite_multires",
+    "title": "Hillshaded multi-resolution bathymetry composite for the Aus EEZ",
+    "abstract_": "A multi-resolution depth-stratified continuous bathymetry surface for the Aus EEZ. This layer group displays bathymetry draped over hillshade.",
+    "keywordList": {},
+    "crs": ["EPSG:9473"],
+    "geographicBoundingBox": {
+      "westBoundLongitude": -180.0,
+      "eastBoundLongitude": 180.0,
+      "southBoundLatitude": -63.623627377696266,
+      "northBoundLatitude": -2.101424600241311
+    },
+    "boundingBoxes": [
+      {
+        "minx": -180.0,
+        "miny": -63.623627377696266,
+        "maxx": 180.0,
+        "maxy": -2.101424600241311,
+        "crs": "CRS:84"
+      },
+      {
+        "minx": -4333776.65588629,
+        "miny": -6691900.35982885,
+        "maxx": 4465467.602282695,
+        "maxy": -884350.3598288503,
+        "crs": "EPSG:9473"
+      }
+    ]
+  },
+  {
+    "queryable": "0",
+    "name": "AusEEZ_bathy_hillshade_composite_multires",
+    "title": "Multi-resolution bathymetric hillshade composite for the Aus EEZ",
+    "abstract_": "A multi-resolution depth-stratified hillshade (z-factor 1m) derivative from a continuous bathymetry surface for the Aus EEZ.",
+    "keywordList": {},
+    "crs": ["EPSG:9473"],
+    "geographicBoundingBox": {
+      "westBoundLongitude": -180.0,
+      "eastBoundLongitude": 180.0,
+      "southBoundLatitude": -63.623627377696266,
+      "northBoundLatitude": -2.101424600241311
+    },
+    "boundingBoxes": [
+      {
+        "minx": -180.0,
+        "miny": -63.623627377696266,
+        "maxx": 180.0,
+        "maxy": -2.101424600241311,
+        "crs": "CRS:84"
+      },
+      {
+        "minx": -4333776.65588629,
+        "miny": -6691900.35982885,
+        "maxx": 4465467.602282695,
+        "maxy": -884350.3598288503,
+        "crs": "EPSG:9473"
+      }
+    ],
+    "style": {
+      "name": "default-style-AusEEZ_bathy_hillshade_composite_multires",
+      "title": "AusEEZ_bathy_hillshade_composite_multires style",
+      "abstract_": "Default style for AusEEZ_bathy_hillshade_composite_multires layer",
+      "legendURL": {
+        "width": 20,
+        "height": 20,
+        "format": "image/png",
+        "onlineResource": {
+          "type": "simple",
+          "href": "https://geoserver.imas.utas.edu.au/geoserver/bathy_composites/ows?service=WMS&version=1.3.0&request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=AusEEZ_bathy_hillshade_composite_multires"
+        }
+      }
+    }
+  },
+  {
+    "queryable": "0",
+    "name": "AusEEZ_bathy_slope_composite_multires",
+    "title": "Hillshaded multi-resolution bathymetric slope composite for the Aus EEZ",
+    "abstract_": "A multi-resolution depth-stratified slope derivative from a continuous bathymetry surface for the Aus EEZ.  This layer group displays slope draped over hillshade.",
+    "keywordList": {},
+    "crs": ["EPSG:9473"],
+    "geographicBoundingBox": {
+      "westBoundLongitude": -180.0,
+      "eastBoundLongitude": 180.0,
+      "southBoundLatitude": -63.623627377696266,
+      "northBoundLatitude": -1.633222562305506
+    },
+    "boundingBoxes": [
+      {
+        "minx": -180.0,
+        "miny": -63.623627377696266,
+        "maxx": 180.0,
+        "maxy": -1.633222562305506,
+        "crs": "CRS:84"
+      },
+      {
+        "minx": -4333776.65588629,
+        "miny": -6691900.35982885,
+        "maxx": 4465467.602282695,
+        "maxy": -833922.7738895584,
+        "crs": "EPSG:9473"
+      }
+    ],
+    "style": {
+      "name": "default-style-AusEEZ_bathy_slope_composite_multires",
+      "title": "AusEEZ_bathy_slope_composite_multires style",
+      "abstract_": "Default style for AusEEZ_bathy_slope_composite_multires layer",
+      "legendURL": {
+        "width": 20,
+        "height": 20,
+        "format": "image/png",
+        "onlineResource": {
+          "type": "simple",
+          "href": "https://geoserver.imas.utas.edu.au/geoserver/bathy_composites/ows?service=WMS&version=1.3.0&request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=AusEEZ_bathy_slope_composite_multires"
+        }
+      }
+    }
+  }
+]
