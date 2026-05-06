@@ -1,5 +1,6 @@
 import {
   capitalizeFirstLetter,
+  createFilterString,
   decodeHtmlEntities,
   formatNumber,
   truncateText,
@@ -100,5 +101,26 @@ describe("formatNumber", () => {
     const input = -1234567;
     const output = formatNumber(input);
     expect(output).toBe("-1,234,567");
+  });
+});
+
+describe("createFilterString", () => {
+  it("should return empty string for empty array", () => {
+    expect(createFilterString([])).toBe("");
+  });
+
+  it("should return empty string for non-array input", () => {
+    expect(createFilterString(null as any)).toBe("");
+    expect(createFilterString(undefined as any)).toBe("");
+  });
+
+  it("should create a filter string for a single UUID", () => {
+    expect(createFilterString(["uuid1"])).toBe("id IN ('uuid1')");
+  });
+
+  it("should create a filter string for multiple UUIDs", () => {
+    expect(createFilterString(["uuid1", "uuid2"])).toBe(
+      "id IN ('uuid1','uuid2')"
+    );
   });
 });

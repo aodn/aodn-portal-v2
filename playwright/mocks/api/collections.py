@@ -40,7 +40,7 @@ def handle_collections_popup_api(route: Route) -> None:
     data = load_json_data('collections_all.json')
 
     filters = get_query_params(route, 'filter')
-    match = re.search(pattern=r"id='([^']+)'", string=filters[0])
+    match = re.search(pattern=r"id IN\('([^']+)'\)", string=filters[0])
     data_id = ''
     if match:
         data_id = match.group(1)
