@@ -89,8 +89,8 @@ class SearchComponent(BasePage):
         expect(self.get_radio_input(date)).to_be_checked()
 
         self.location_button.click()
-        self.get_radio_input(location).click()
-        expect(self.get_radio_input(location)).to_be_checked()
+        self.page.get_by_label(location).click()
+        expect(self.page.get_by_label(location)).to_be_checked()
 
         self.filter_button.click()
         expect(self.searchbar_popup).to_be_visible()
@@ -137,7 +137,7 @@ class SearchComponent(BasePage):
 
         self.location_button.click()
         expect(self.searchbar_popup).to_be_visible()
-        expect(self.get_radio_input(location)).to_be_checked()
+        expect(self.page.get_by_label(location)).to_be_checked()
 
         self.filter_button.click()
         self.assert_toggle_button_pressed(filter_parameter)
