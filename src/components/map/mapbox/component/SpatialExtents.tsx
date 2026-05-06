@@ -42,7 +42,7 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
   const getCollectionData = useCallback(
     async (uuid: string) => {
       const param: SearchParameters = {
-        filter: `id='${uuid}'`,
+        filter: `id IN('${uuid}')`,
         properties: "id,geometry",
       };
 
