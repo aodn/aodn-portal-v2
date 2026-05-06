@@ -46,11 +46,15 @@ def test_sort_and_view_states_persist_across_page(
     # Change the sort and view types
     search_page.result_sort_button.click()
     search_page.click_menu_item(sort_type.test_id)
-    search_page.wait_for_search_to_complete()
+    expect(
+        search_page.get_result_sort_button(sort_type.test_id)
+    ).to_be_visible()
 
     search_page.result_view_button.click()
     search_page.click_menu_item(view_type.test_id)
-    search_page.wait_for_page_stabilization()
+    expect(
+        search_page.get_result_view_button(view_type.test_id)
+    ).to_be_visible()
 
     # Go to the landing page and return to check if the states persist
     search_page.go_to_landing_page()
@@ -77,7 +81,7 @@ def test_sort_and_view_states_persist_across_page(
     # Select full map view and toggle to check if the states persist
     search_page.result_view_button.click()
     search_page.full_map_view_button.click()
-    search_page.map.wait_for_search_loading()
+    search_page.wait_for_page_stabilization()
     search_page.map_toggle_button.click()
     expect(
         search_page.get_result_sort_button(sort_type.test_id)

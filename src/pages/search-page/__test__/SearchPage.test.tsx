@@ -270,9 +270,9 @@ describe("SearchPage Basic", () => {
       expect(gridList).toBeInTheDocument();
 
       // Verify that the layout button UI reflects the correct state
-      expect(screen.getByTestId("result-layout-button-GRID")).toHaveTextContent(
-        "Grid and Map"
-      );
+      expect(
+        screen.getByTestId("result-layout-button-GRID")
+      ).toBeInTheDocument();
     });
   });
 

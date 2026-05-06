@@ -1,0 +1,95 @@
+import { afterAll, afterEach, beforeAll, expect, vi } from "vitest";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import AppTheme from "../../../utils/AppTheme";
+import { Provider } from "react-redux";
+import store from "../../../components/common/store/store";
+import { ThemeProvider } from "@mui/material/styles";
+import { DetailPageProvider } from "../context/detail-page-provider";
+import { server } from "../../../__mocks__/server";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import CitationPanel from "../features/CitationPanel";
+
+describe("CitationPanel", async () => {
+  const theme = AppTheme;
+  beforeAll(() => {
+    server.listen();
+  });
+
+  beforeEach(() => {
+    vi.mock("react-router-dom", () => ({
+      ...vi.importActual("react-router-dom"),
+      useLocation: vi.fn(),
+      useParams: vi.fn(),
+      useNavigate: vi.fn(),
+    }));
+
+    vi.mocked(useLocation).mockReturnValue({
+      state: null,
+      hash: "111",
+      key: "default",
+      pathname: "/details/5fc91100-4ade-11dc-8f56-00008a07204e",
+      search: "",
+    });
+
+    vi.mocked(useParams).mockReturnValue({
+      uuid: "5fc91100-4ade-11dc-8f56-00008a07204e",
+    });
+
+    vi.mocked(useNavigate).mockReturnValue(vi.fn());
+  });
+
+  afterEach(() => {
+    cleanup();
+    server.resetHandlers();
+    vi.restoreAllMocks();
+  });
+  afterAll(() => {
+    server.close();
+  });
+
+  beforeEach(() => {
+    render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <DetailPageProvider>
+            <CitationPanel />
+          </DetailPageProvider>
+        </ThemeProvider>
+      </Provider>
+    );
+  });
+
+  test("should render CitationPanel", async () => {
+    // the panel is rendered
+    await waitFor(() => {
+      expect(screen.queryAllByText("License")).toHaveLength(2);
+    });
+
+    // the information is rendered
+    await waitFor(() => {
+      expect(
+        screen.queryAllByText("Australian Institute of Marine Science (AIMS)")
+      ).toHaveLength(3);
+
+      expect(
+        screen.queryByText("Creative Commons Attribution 3.0 Australia License")
+      ).to.exist;
+
+      expect(
+        screen.queryByText("http://creativecommons.org/licenses/by/3.0/au/")
+      ).to.exist;
+
+      expect(
+        screen.queryByText((content) =>
+          content.startsWith(
+            "Attribution: Format for citation of metadata sourced from Australian Institute of Marine Science (AIMS)"
+          )
+        )
+      ).to.exist;
+
+      expect(
+        screen.getByText("Use Limitation: All AIMS data", { exact: false })
+      ).toBeInTheDocument();
+    });
+  });
+});

@@ -1,11 +1,12 @@
 import Layout from "../../components/layout/layout";
 import { Grid } from "@mui/material";
 import { color, padding } from "../../styles/constants";
-import HeaderSection from "./subpages/HeaderSection";
-import SideSection from "./subpages/SideSection";
+import HeaderSection from "./layout/HeaderSection";
+import SideSection from "./layout/SideSection";
 import { DetailPageProvider } from "./context/detail-page-provider";
-import ContentSection from "./subpages/ContentSection";
+import ContentSection from "./layout/ContentSection";
 import SectionContainer from "../../components/layout/components/SectionContainer";
+import { PAGE_CONTENT_WIDTH_DETAIL } from "../../components/layout/constant";
 import { LngLatBounds, MapMouseEvent } from "mapbox-gl";
 import { useCallback, useState } from "react";
 
@@ -28,6 +29,7 @@ const DetailsPage = () => {
             paddingY: padding.large,
             backgroundColor: color.blue.light,
           }}
+          contentAreaStyle={{ width: PAGE_CONTENT_WIDTH_DETAIL }}
         >
           <Grid container spacing={2}>
             <Grid item xs={12}>

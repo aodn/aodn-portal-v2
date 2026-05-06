@@ -194,6 +194,8 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
       new MapboxOverlay({
         interleaved: true,
         layers: [],
+        pickingRadius: 5,
+        getCursor: ({ isHovering }) => (isHovering ? "pointer" : ""),
         onClick: (info) => {
           if (info.picked && info.object && !isDrawModeRectangle(map)) {
             // Remove existing popup

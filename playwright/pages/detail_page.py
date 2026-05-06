@@ -30,6 +30,9 @@ class DetailPage(BasePage):
         self.share_button = self.page.get_by_test_id('share-button')
         self.copy_link = self.page.get_by_test_id('copy-link')
         self.wms_link_header = self.get_text('WMS Service Link')
+        self.dataset_selection_dropdown = self.page.get_by_test_id(
+            'layer-select-dropdown'
+        )
         self.detail_map_popup = self.page.get_by_test_id('map-popup')
         self.download_button = self.page.get_by_test_id('download-button')
         self.cancel_download_button = self.page.get_by_test_id('CancelIcon')

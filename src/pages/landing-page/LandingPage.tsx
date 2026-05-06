@@ -6,6 +6,7 @@ import { color, padding } from "../../styles/constants";
 import Logos from "./subpages/logo-list/LogoList";
 import News from "./subpages/news/News";
 import SectionContainer from "../../components/layout/components/SectionContainer";
+import { PAGE_CONTENT_WIDTH_LANDING } from "../../components/layout/constant";
 import TopicsPanel from "./subpages/topics-panel/TopicsPanel";
 
 const LandingPage: FC = () => {
@@ -17,6 +18,7 @@ const LandingPage: FC = () => {
         }}
         contentAreaStyle={{
           paddingY: padding.double,
+          width: PAGE_CONTENT_WIDTH_LANDING,
         }}
       >
         <Banner />
@@ -29,6 +31,7 @@ const LandingPage: FC = () => {
         }}
         contentAreaStyle={{
           paddingY: padding.double,
+          width: PAGE_CONTENT_WIDTH_LANDING,
         }}
       >
         <TopicsPanel />
@@ -41,12 +44,14 @@ const LandingPage: FC = () => {
 
       <SectionContainer
         sectionAreaStyle={{ backgroundColor: color.blue.extraDark }}
+        contentAreaStyle={{ width: PAGE_CONTENT_WIDTH_LANDING }}
       >
         <News />
       </SectionContainer>
 
       <SectionContainer
         sectionAreaStyle={{ backgroundColor: color.blue.light }}
+        contentAreaStyle={{ width: PAGE_CONTENT_WIDTH_LANDING }}
       >
         <Logos />
       </SectionContainer>
