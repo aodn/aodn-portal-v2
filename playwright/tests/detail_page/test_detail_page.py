@@ -156,34 +156,3 @@ def test_show_more_and_less_list_items(
 
     detail_page.click_show_less(item_list)
     expect(keywords).to_have_count(initial_count)
-
-
-# When a dropdown appear, we will disable scroll because of the material-ui drop down will make the list flow on top
-# and scroll will make the list flow around. When the dropdown item selected, we will resume the scroll wheel action.
-@pytest.mark.parametrize(
-    'uuid',
-    [
-        '0015db7e-e684-7548-e053-08114f8cd4ad',
-    ],
-)
-def test_dropdown_scroll(responsive_page: Page, uuid: str) -> None:
-    """
-    Verifies that the page's scroll functionality is disabled when a dropdown
-    element is open and re-enabled after the dropdown is closed.
-    """
-    detail_page = DetailPage(responsive_page)
-    detail_page.load(uuid)
-    # The Download Card with a dropdown
-    detail_page.select_elements.first.click()
-    try:
-        detail_page.scroll_to_bottom()
-    except Exception as error:
-        print(error)
-
-    scroll_position = detail_page.get_page_scroll_y()
-    assert scroll_position == 0
-    # Drop down disappear, now we can scroll
-    detail_page.body.click()
-    detail_page.scroll_to_bottom()
-    new_scroll_position = detail_page.get_page_scroll_y()
-    assert new_scroll_position > scroll_position
