@@ -9,8 +9,9 @@ from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
 
-
-pytestmark = pytest.mark.skip(reason="Ignoring for now due to INTERSECTS validation issues")
+pytestmark = pytest.mark.skip(
+    reason='Ignoring for now due to INTERSECTS validation issues'
+)
 
 
 @pytest.mark.parametrize(
