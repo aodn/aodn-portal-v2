@@ -94,11 +94,11 @@ vi.mock("../../../hooks/useBreakpoint", () => ({
 }));
 
 // Mock subcomponents to avoid rendering issues
-vi.mock("../sections/ResultSection", () => ({
+vi.mock("../layout/ResultSection", () => ({
   default: () => <div>ResultSection</div>,
 }));
 
-vi.mock("../sections/MapSection", () => ({
+vi.mock("../layout/MapSection", () => ({
   default: () => <div>MapSection</div>,
 }));
 

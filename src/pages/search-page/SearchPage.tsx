@@ -39,8 +39,8 @@ import {
   setTemporaryItem,
 } from "../../components/common/store/bookmarkListReducer";
 import Layout from "../../components/layout/layout";
-import ResultSection from "./sections/ResultSection";
-import MapSection from "./sections/MapSection";
+import ResultSection from "./layout/ResultSection";
+import MapSection from "./layout/MapSection";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/ResultListLayoutButton";
 import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
 import { OGCCollection } from "../../components/common/store/OGCCollectionDefinitions";
