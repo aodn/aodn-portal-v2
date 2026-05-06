@@ -10,10 +10,10 @@ class Routes:
     COLLECTION_CENTROID = f'{PREFIX}/collections?properties=id,centroid&*'
     COLLECTION_ALL = f'{PREFIX}/collections?properties=id,title,description,status,scope,ai_update_frequency,links,assets_summary,bbox&*'
     COLLECTION_POPUP = (
-        f'{PREFIX}/collections?properties=title,description&filter=id*'
+        f'{PREFIX}/collections?properties=title,description&filter=id IN*'
     )
     COLLECTION_SELECTED = (
-        f'{PREFIX}/collections?properties=id,title,description&filter=id*'
+        f'{PREFIX}/collections?properties=id,title,description&filter=id IN*'
     )
     COLLECTION_DETAIL = f'{PREFIX}/collections/*'
     COLLECTION_DETAIL_SUMMARY = f'{PREFIX}/collections/*/items/summary'
