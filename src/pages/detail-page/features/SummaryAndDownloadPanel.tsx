@@ -6,29 +6,11 @@ import React, {
   useState,
 } from "react";
 import { Box, Grid, Stack } from "@mui/material";
-import { padding } from "../../../../styles/constants";
-import { useDetailPageContext } from "../../context/detail-page-context";
-import Controls from "../../../../components/map/mapbox/controls/Controls";
-import NavigationControl from "../../../../components/map/mapbox/controls/NavigationControl";
-import ScaleControl from "../../../../components/map/mapbox/controls/ScaleControl";
-import MapBox from "../../../../components/map/mapbox/Map";
-import Layers from "../../../../components/map/mapbox/layers/Layers";
-import ExpandableTextArea from "../../../../components/list/listItem/subitem/ExpandableTextArea";
-import DrawRect from "../../../../components/map/mapbox/controls/menu/DrawRect";
 import { LngLatBounds, MapEvent } from "mapbox-gl";
 import BaseMapSwitcher from "../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
 import MenuControl from "../../../components/map/mapbox/controls/menu/MenuControl";
 import DateRange from "../../../components/map/mapbox/controls/menu/DateRange";
 import dayjs, { Dayjs } from "dayjs";
-import {
-  DateRangeCondition,
-  DownloadConditionType,
-  DownloadServiceType,
-  SubsettingType,
-  BBoxCondition,
-  PolygonCondition,
-} from "../../context/DownloadDefinitions";
-import { dateDefault } from "../../../../components/common/constants";
 import {
   FeatureCollection,
   Point,
@@ -36,8 +18,6 @@ import {
   Polygon,
   MultiPolygon,
 } from "geojson";
-import DisplayCoordinate from "../../../../components/map/mapbox/controls/DisplayCoordinate";
-import HexbinLayer from "../../../../components/map/mapbox/layers/HexbinLayer";
 import GeoServerLayer, {
   Dimension,
 } from "../../../components/map/mapbox/layers/GeoServerLayer";
@@ -63,7 +43,27 @@ import { dateToValue } from "../../../utils/DateUtils";
 import { portalTheme } from "../../../styles";
 import { GeoserverFieldsResponse } from "../../../components/common/store/GeoserverDefinitions";
 import * as turf from "@turf/turf";
-import _ from "lodash";
+import { dateDefault } from "../../../components/common/constants";
+import {
+  BBoxCondition,
+  DateRangeCondition,
+  DownloadConditionType,
+  DownloadServiceType,
+  PolygonCondition,
+  SubsettingType,
+} from "../context/DownloadDefinitions";
+import ExpandableTextArea from "../../../components/list/listItem/subitem/ExpandableTextArea";
+import Controls from "../../../components/map/mapbox/controls/Controls";
+import NavigationControl from "../../../components/map/mapbox/controls/NavigationControl";
+import ScaleControl from "../../../components/map/mapbox/controls/ScaleControl";
+import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
+import MapBox from "../../../components/map/mapbox/Map";
+import { padding } from "../../../styles/constants";
+import DrawRect from "../../../components/map/mapbox/controls/menu/DrawRect";
+import { Layers } from "@mui/icons-material";
+import { createStaticLayers } from "../../../components/map/mapbox/layers/StaticLayer";
+import HexbinLayer from "../../../components/map/mapbox/layers/HexbinLayer";
+import { useDetailPageContext } from "../context/detail-page-context";
 
 const mapContainerId = "map-detail-container-id";
 
