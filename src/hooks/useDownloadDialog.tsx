@@ -9,7 +9,7 @@ import {
 } from "react";
 import { useParams } from "react-router-dom";
 import { useAppDispatch } from "../components/common/store/hooks";
-import { DataUsageInformation } from "../components/download/DownloadDialog/DataUsageForm";
+import { DataUsageInformation } from "../pages/detail-page/features/download/DownloadDialog/DataUsageForm";
 import { useDetailPageContext } from "../pages/detail-page/context/detail-page-context";
 import {
   getDateConditionFrom,
