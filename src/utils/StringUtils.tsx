@@ -71,7 +71,7 @@ export const createFilterString = (uuids: Array<string>): string => {
   if (!Array.isArray(uuids) || uuids.length === 0) {
     return "";
   }
-  return uuids.map((uuid) => `id='${uuid}'`).join(" or ");
+  return `id IN ('${uuids.join("','")}')`;
 };
 
 export const LINE_BREAK_REGEX = /<br\s*\/?>/gi;
