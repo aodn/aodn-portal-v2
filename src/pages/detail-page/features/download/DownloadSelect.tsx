@@ -116,20 +116,18 @@ const DownloadSelect: FC<DownloadSelectProps> = ({
   dataTestId = "download-select",
 }) => {
   const [open, setOpen] = useState(false);
-  const [internalValue, setInternalValue] = useState<string | undefined>(
-    items[0]?.value
-  );
+  const [internalValue, setInternalValue] = useState<string | undefined>();
 
-  // Keep internal value in sync with `items` when uncontrolled.
-  useEffect(() => {
-    if (value !== undefined) return;
+  // Derive during render — no effect needed. Falls back to items[0] when
+  // the user hasn't picked yet, or when their pick is no longer in items.
+  const currentValue = useMemo(() => {
+    if (value !== undefined) return value;
     if (internalValue && items.some((item) => item.value === internalValue)) {
-      return;
+      return internalValue;
     }
-    setInternalValue(items[0]?.value);
-  }, [items, internalValue, value]);
+    return items[0]?.value;
+  }, [value, internalValue, items]);
 
-  const currentValue = value ?? internalValue;
   const selectedIndex = useMemo(
     () => items.findIndex((item) => item.value === currentValue),
     [items, currentValue]
