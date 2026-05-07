@@ -230,19 +230,19 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
   );
 
   return (
-    <Stack direction="column">
+    <Stack>
       <Stack sx={{ p: "16px" }} spacing={2}>
         <DownloadSelect
+          label="Format Selection"
           disabled={isDownloading}
           items={formatOptions}
-          label="Format Selection"
           value={selectedFormat}
           onSelectCallback={handleSelectFormat}
         />
         <DownloadSelect
+          label="Data Selection"
           disabled={isDownloading}
           items={dataSelectOptions}
-          label="Data Selection"
           value={selectedDataItem}
           onSelectCallback={handleSelectDataItem}
         />
@@ -256,7 +256,6 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
         {isDownloading &&
           renderProgressMessage(formatBytes(downloadedBytes), progressMessage)}
       </Stack>
-
       <DownloadSubsetting
         downloadConditions={downloadConditions}
         getAndSetDownloadConditions={getAndSetDownloadConditions}
@@ -265,7 +264,6 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
         disable={isDownloading}
         sx={{ px: "16px" }}
       />
-
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={snackbarOpen}

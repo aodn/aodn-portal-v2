@@ -169,7 +169,7 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
   );
 
   return (
-    <Stack direction="column">
+    <Stack>
       <Stack sx={{ p: "16px" }} spacing={2}>
         <DownloadSelect
           label="Format Selection"
@@ -184,14 +184,12 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
         />
         <DownloadButton onDownload={onDownload} />
       </Stack>
-
       <DownloadSubsetting
         downloadConditions={downloadConditions}
         getAndSetDownloadConditions={getAndSetDownloadConditions}
         removeDownloadCondition={removeDownloadCondition}
         dateRangeBounds={dateRangeBounds}
       />
-
       <DownloadDialog
         isOpen={downloadDialogOpen}
         setIsOpen={setDownloadDialogOpen}

@@ -53,9 +53,8 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
     <Stack direction="column">
       {!hideInfoMessage && subsettingSelectionCount === 0 && (
         <InfoMessage
-          infoText="Please consider subsetting your download selection using the tools on
-        the map."
-          iconColor={portalTheme.palette.secondary1}
+          infoText="To download data directly please use the selections below, or utilise the map tools to make your selection."
+          iconColor={portalTheme.palette.info.main}
           sx={{ pl: "8px", pr: "16px" }}
         />
       )}

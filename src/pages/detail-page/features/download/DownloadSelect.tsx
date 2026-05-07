@@ -5,7 +5,7 @@ import CommonSelect, {
 import { useTheme } from "@mui/material";
 import { portalTheme } from "../../../../styles";
 
-interface DownloadSelectProps extends CommonSelectProps<string> {}
+type DownloadSelectProps = CommonSelectProps<string>;
 
 const DownloadSelect: FC<DownloadSelectProps> = ({
   disabled,
@@ -31,13 +31,18 @@ const DownloadSelect: FC<DownloadSelectProps> = ({
     () => ({
       PaperProps: {
         sx: {
-          backgroundColor: "#fff",
-          border: "none",
+          backgroundColor: theme.palette.background.paper,
           boxShadow: theme.shadows[5],
           mt: "6px",
+          "& .MuiList-root": {
+            py: "4px",
+          },
           "& .MuiMenuItem-root": {
             ...portalTheme.typography.body1Medium,
-            "&.Mui-selected": {
+            my: "2px",
+            mx: "4px",
+            borderRadius: "4px",
+            "&.Mui-selected, &.Mui-selected:hover": {
               backgroundColor: portalTheme.palette.primary5,
             },
           },
@@ -55,7 +60,11 @@ const DownloadSelect: FC<DownloadSelectProps> = ({
       value={value}
       onSelectCallback={onSelectCallback}
       selectSx={selectSxProps}
-      labelSx={{ ...portalTheme.typography.title1Medium, pb: "9px" }}
+      labelSx={{
+        ...portalTheme.typography.title1Medium,
+        pb: "9px",
+        "&.Mui-focused": { color: portalTheme.typography.title1Medium.color },
+      }}
       menuProps={menuProps}
     />
   );
