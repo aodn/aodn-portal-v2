@@ -44,33 +44,33 @@ def handle_static_geojson_api(route: Route) -> None:
                 {
                     'type': 'Feature',
                     'properties': {
-                        "OBJECTID": 9,
-                        "NETNAME": "South-west",
-                        "RESNAME": "Bremer",
-                        "SHAPEAREA": 0.440281477182048,
-                        "SHAPELEN": 3.1711715618300795
+                        'OBJECTID': 9,
+                        'NETNAME': 'South-west',
+                        'RESNAME': 'Bremer',
+                        'SHAPEAREA': 0.440281477182048,
+                        'SHAPELEN': 3.1711715618300795,
                     },
                     'geometry': {'type': 'Polygon', 'coordinates': [[]]},
                 },
                 {
                     'type': 'Feature',
                     'properties': {
-                        "OBJECTID": 35,
-                        "NETNAME": "South-east",
-                        "RESNAME": "Franklin",
-                        "SHAPEAREA": 0.0715411601491806,
-                        "SHAPELEN": 1.26884606762389
+                        'OBJECTID': 35,
+                        'NETNAME': 'South-east',
+                        'RESNAME': 'Franklin',
+                        'SHAPEAREA': 0.0715411601491806,
+                        'SHAPELEN': 1.26884606762389,
                     },
                     'geometry': {'type': 'Polygon', 'coordinates': [[]]},
                 },
                 {
                     'type': 'Feature',
                     'properties': {
-                        "OBJECTID": 26,
-                        "NETNAME": "South-east",
-                        "RESNAME": "Zeehan",
-                        "SHAPEAREA": 2.1352446181263796,
-                        "SHAPELEN": 8.52800516515881
+                        'OBJECTID': 26,
+                        'NETNAME': 'South-east',
+                        'RESNAME': 'Zeehan',
+                        'SHAPEAREA': 2.1352446181263796,
+                        'SHAPELEN': 8.52800516515881,
                     },
                     'geometry': {'type': 'Polygon', 'coordinates': [[]]},
                 },
