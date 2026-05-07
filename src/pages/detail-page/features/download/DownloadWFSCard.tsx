@@ -20,7 +20,8 @@ import {
 } from "../../context/DownloadDefinitions";
 import InfoMessage from "./InfoMessage";
 import DownloadButton from "../../../../components/common/buttons/DownloadButton";
-import DownloadServiceCard from "./DownloadServiceCard";
+import DownloadSelect from "./DownloadSelect";
+import DownloadSubsetting from "./DownloadSubsetting";
 import { trackCustomEvent } from "../../../../analytics/customEventTracker";
 import { AnalyticsEvent } from "../../../../analytics/analyticsEvents";
 import {
@@ -229,43 +230,39 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
   );
 
   return (
-    <DownloadServiceCard>
-      <DownloadServiceCard.Form
-        disabled={isDownloading}
-        formatProps={{
-          items: formatOptions,
-          value: selectedFormat,
-          onSelectCallback: handleSelectFormat,
-        }}
-        dataProps={{
-          items: dataSelectOptions,
-          value: selectedDataItem,
-          onSelectCallback: handleSelectDataItem,
-        }}
-        downloadButton={
-          <DownloadButton
-            onDownload={handleDownload}
-            isDownloading={isDownloading}
-            isEstimating={isEstimating}
-            estimatedSizeBytes={estimatedSizeBytes}
-            handleCancelDownload={handleCancelDownload}
-          />
-        }
-        progressContent={
-          isDownloading
-            ? renderProgressMessage(
-                formatBytes(downloadedBytes),
-                progressMessage
-              )
-            : null
-        }
-      />
-      <DownloadServiceCard.Subsetting
+    <Stack>
+      <Stack sx={{ p: "16px" }} spacing={2}>
+        <DownloadSelect
+          label="Format Selection"
+          disabled={isDownloading}
+          items={formatOptions}
+          value={selectedFormat}
+          onSelectCallback={handleSelectFormat}
+        />
+        <DownloadSelect
+          label="Data Selection"
+          disabled={isDownloading}
+          items={dataSelectOptions}
+          value={selectedDataItem}
+          onSelectCallback={handleSelectDataItem}
+        />
+        <DownloadButton
+          onDownload={handleDownload}
+          isDownloading={isDownloading}
+          isEstimating={isEstimating}
+          estimatedSizeBytes={estimatedSizeBytes}
+          handleCancelDownload={handleCancelDownload}
+        />
+        {isDownloading
+          ? renderProgressMessage(formatBytes(downloadedBytes), progressMessage)
+          : null}
+      </Stack>
+      <DownloadSubsetting
         downloadConditions={downloadConditions}
         getAndSetDownloadConditions={getAndSetDownloadConditions}
         removeDownloadCondition={removeDownloadCondition}
         hideInfoMessage={isDownloading}
-        disabled={isDownloading}
+        disable={isDownloading}
         sx={{ px: "16px" }}
       />
       <Snackbar
@@ -296,7 +293,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
           {progressMessage || downloadingStatus}
         </Alert>
       </Snackbar>
-    </DownloadServiceCard>
+    </Stack>
   );
 };
 

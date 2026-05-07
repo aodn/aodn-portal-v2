@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import dayjs from "dayjs";
+import { Stack } from "@mui/material";
 import { dateDefault } from "../../../../components/common/constants";
 import DownloadDialog from "./DownloadDialog/DownloadDialog";
 import {
@@ -20,7 +21,8 @@ import {
   OGCCollection,
 } from "../../../../components/common/store/OGCCollectionDefinitions";
 import DownloadButton from "../../../../components/common/buttons/DownloadButton";
-import DownloadServiceCard from "./DownloadServiceCard";
+import DownloadSelect from "./DownloadSelect";
+import DownloadSubsetting from "./DownloadSubsetting";
 
 const downloadFormats = [
   { label: "NetCDFs", value: "netcdf" },
@@ -167,20 +169,22 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
   );
 
   return (
-    <DownloadServiceCard>
-      <DownloadServiceCard.Form
-        formatProps={{
-          items: filteredDownloadFormats,
-          onSelectCallback: onSelectChange,
-        }}
-        dataProps={{
-          items: dataSelectOptions,
-          value: selectedDataItem,
-          onSelectCallback: handleSelectDataItem,
-        }}
-        downloadButton={<DownloadButton onDownload={onDownload} />}
-      />
-      <DownloadServiceCard.Subsetting
+    <Stack>
+      <Stack sx={{ p: "16px" }} spacing={2}>
+        <DownloadSelect
+          label="Format Selection"
+          items={filteredDownloadFormats}
+          onSelectCallback={onSelectChange}
+        />
+        <DownloadSelect
+          label="Data Selection"
+          items={dataSelectOptions}
+          value={selectedDataItem}
+          onSelectCallback={handleSelectDataItem}
+        />
+        <DownloadButton onDownload={onDownload} />
+      </Stack>
+      <DownloadSubsetting
         downloadConditions={downloadConditions}
         getAndSetDownloadConditions={getAndSetDownloadConditions}
         removeDownloadCondition={removeDownloadCondition}
@@ -193,7 +197,7 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
         getAndSetDownloadConditions={getAndSetDownloadConditions}
         removeDownloadCondition={removeDownloadCondition}
       />
-    </DownloadServiceCard>
+    </Stack>
   );
 };
 
