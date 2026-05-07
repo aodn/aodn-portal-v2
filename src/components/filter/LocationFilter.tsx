@@ -198,7 +198,7 @@ const LocationCheckboxList: FC<{
               }}
             />
           }
-          label={item.label}
+          label={item.label || "Unknown"}
           sx={{
             marginLeft: 0,
             marginRight: 0,
@@ -342,81 +342,81 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
 
   const handleMarineParkCheckboxChange = useCallback(
     (parkValue: string, checked: boolean) => {
-      setSelectedMarineParkValues((prev) => {
-        const next = new Set(prev);
-        if (checked) next.add(parkValue);
-        else next.delete(parkValue);
+      const next = new Set(selectedMarineParkValues);
+      if (checked) next.add(parkValue);
+      else next.delete(parkValue);
 
-        dispatch(
-          updateFilterStaticAreas(
-            getStaticAreasFromSets(
-              next,
-              selectedMarineEcoregionValues,
-              selectedAllenCoralAtlasValues
-            )
+      setSelectedMarineParkValues(next);
+
+      dispatch(
+        updateFilterStaticAreas(
+          getStaticAreasFromSets(
+            next,
+            selectedMarineEcoregionValues,
+            selectedAllenCoralAtlasValues
           )
-        );
-        return next;
-      });
+        )
+      );
     },
     [
       dispatch,
       selectedMarineEcoregionValues,
       selectedAllenCoralAtlasValues,
+      selectedMarineParkValues,
       getStaticAreasFromSets,
     ]
   );
 
   const handleMarineEcoregionCheckboxChange = useCallback(
     (ecoregionValue: string, checked: boolean) => {
-      setSelectedMarineEcoregionValues((prev) => {
-        const next = new Set(prev);
-        if (checked) next.add(ecoregionValue);
-        else next.delete(ecoregionValue);
+      const next = new Set(selectedMarineEcoregionValues);
+      if (checked) next.add(ecoregionValue);
+      else next.delete(ecoregionValue);
 
-        dispatch(
-          updateFilterStaticAreas(
-            getStaticAreasFromSets(
-              selectedMarineParkValues,
-              next,
-              selectedAllenCoralAtlasValues
-            )
+      setSelectedMarineEcoregionValues(next);
+
+      dispatch(
+        updateFilterStaticAreas(
+          getStaticAreasFromSets(
+            selectedMarineParkValues,
+            next,
+            selectedAllenCoralAtlasValues
           )
-        );
-        return next;
-      });
+        )
+      );
     },
     [
       dispatch,
       selectedMarineParkValues,
       selectedAllenCoralAtlasValues,
+      selectedMarineEcoregionValues,
       getStaticAreasFromSets,
     ]
   );
 
   const handleAllenCoralAtlasCheckboxChange = useCallback(
     (coralValue: string, checked: boolean) => {
-      setSelectedAllenCoralAtlasValues((prev) => {
-        const next = new Set(prev);
-        if (checked) next.add(coralValue);
-        else next.delete(coralValue);
+      const next = new Set(selectedAllenCoralAtlasValues);
+      if (checked) next.add(coralValue);
+      else next.delete(coralValue);
 
-        dispatch(
-          updateFilterStaticAreas(
-            getStaticAreasFromSets(
-              selectedMarineParkValues,
-              selectedMarineEcoregionValues,
-              next
-            )
+      setSelectedAllenCoralAtlasValues(next);
+
+      dispatch(
+        updateFilterStaticAreas(
+          getStaticAreasFromSets(
+            selectedMarineParkValues,
+            selectedMarineEcoregionValues,
+            next
           )
-        );
-        return next;
-      });
+        )
+      );
     },
     [
       dispatch,
       selectedMarineParkValues,
       selectedMarineEcoregionValues,
+      selectedAllenCoralAtlasValues,
       getStaticAreasFromSets,
     ]
   );
@@ -456,10 +456,21 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
       }
 
       let merged: Feature<Polygon | MultiPolygon> | undefined;
-      if (newFeatures.length === 1) {
+      if (newFeatures.length === 0) {
+        merged = undefined;
+      } else if (newFeatures.length === 1) {
         merged = { ...newFeatures[0] };
       } else {
-        merged = union(featureCollection(newFeatures)) ?? undefined;
+        try {
+          merged = union(featureCollection(newFeatures)) ?? undefined;
+        } catch (e) {
+          console.error(
+            "Turf union failed in handleFeaturesChange:",
+            e,
+            newFeatures
+          );
+          merged = undefined;
+        }
       }
 
       if (merged) {
@@ -480,46 +491,52 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
 
     if (selectedMarineParkValues.size > 0) {
       marineParkOptions
-        .filter((o) => selectedMarineParkValues.has(o.value))
+        .filter((o) => o.geo && selectedMarineParkValues.has(o.value))
         .forEach((o) => {
           const feature = o.geo!.features[0];
-          allFeats.push({
-            ...feature,
-            properties: {
-              ...feature.properties,
-              name: feature.properties?.RESNAME ?? o.label,
-            },
-          });
+          if (feature) {
+            allFeats.push({
+              ...feature,
+              properties: {
+                ...feature.properties,
+                name: feature.properties?.RESNAME ?? o.label,
+              },
+            });
+          }
         });
     }
 
     if (selectedMarineEcoregionValues.size > 0) {
       marineEcoregionOptions
-        .filter((o) => selectedMarineEcoregionValues.has(o.value))
+        .filter((o) => o.geo && selectedMarineEcoregionValues.has(o.value))
         .forEach((o) => {
           const feature = o.geo!.features[0];
-          allFeats.push({
-            ...feature,
-            properties: {
-              ...feature.properties,
-              name: feature.properties?.ECOREGION ?? o.label,
-            },
-          });
+          if (feature) {
+            allFeats.push({
+              ...feature,
+              properties: {
+                ...feature.properties,
+                name: feature.properties?.ECOREGION ?? o.label,
+              },
+            });
+          }
         });
     }
 
     if (selectedAllenCoralAtlasValues.size > 0) {
       allenCoralAtlasOptions
-        .filter((o) => selectedAllenCoralAtlasValues.has(o.value))
+        .filter((o) => o.geo && selectedAllenCoralAtlasValues.has(o.value))
         .forEach((o) => {
           const feature = o.geo!.features[0];
-          allFeats.push({
-            ...feature,
-            properties: {
-              ...feature.properties,
-              name: feature.properties?.ECOREGION ?? o.label,
-            },
-          });
+          if (feature) {
+            allFeats.push({
+              ...feature,
+              properties: {
+                ...feature.properties,
+                name: feature.properties?.ECOREGION ?? o.label,
+              },
+            });
+          }
         });
     }
 
@@ -549,16 +566,19 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
 
   const mergedPolygonForTests = useMemo(() => {
     const parkFeats = marineParkOptions
-      .filter((o) => selectedMarineParkValues.has(o.value))
-      .map((o) => o.geo!.features[0]);
+      .filter((o) => o.geo && selectedMarineParkValues.has(o.value))
+      .map((o) => o.geo!.features[0])
+      .filter(Boolean);
 
     const ecoregionFeats = marineEcoregionOptions
-      .filter((o) => selectedMarineEcoregionValues.has(o.value))
-      .map((o) => o.geo!.features[0]);
+      .filter((o) => o.geo && selectedMarineEcoregionValues.has(o.value))
+      .map((o) => o.geo!.features[0])
+      .filter(Boolean);
 
     const coralFeats = allenCoralAtlasOptions
-      .filter((o) => selectedAllenCoralAtlasValues.has(o.value))
-      .map((o) => o.geo!.features[0]);
+      .filter((o) => o.geo && selectedAllenCoralAtlasValues.has(o.value))
+      .map((o) => o.geo!.features[0])
+      .filter(Boolean);
 
     const allFeats = [
       ...parkFeats,
@@ -569,7 +589,12 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
 
     if (allFeats.length === 0) return undefined;
     if (allFeats.length === 1) return allFeats[0];
-    return union(featureCollection(allFeats)) ?? undefined;
+    try {
+      return union(featureCollection(allFeats)) ?? undefined;
+    } catch (e) {
+      console.error("Turf union failed in mergedPolygonForTests:", e, allFeats);
+      return undefined;
+    }
   }, [
     marineParkOptions,
     selectedMarineParkValues,
