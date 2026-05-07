@@ -60,7 +60,11 @@ const DownloadSelect: FC<DownloadSelectProps> = ({
       value={value}
       onSelectCallback={onSelectCallback}
       selectSx={selectSxProps}
-      labelSx={{ ...portalTheme.typography.title1Medium, pb: "9px" }}
+      labelSx={{
+        ...portalTheme.typography.title1Medium,
+        pb: "9px",
+        "&.Mui-focused": { color: portalTheme.typography.title1Medium.color },
+      }}
       menuProps={menuProps}
     />
   );

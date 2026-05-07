@@ -6,8 +6,8 @@ import {
   useMemo,
   useState,
 } from "react";
-import dayjs from "dayjs";
 import { Stack } from "@mui/material";
+import dayjs from "dayjs";
 import { dateDefault } from "../../../../components/common/constants";
 import DownloadDialog from "./DownloadDialog/DownloadDialog";
 import {
@@ -21,8 +21,8 @@ import {
   OGCCollection,
 } from "../../../../components/common/store/OGCCollectionDefinitions";
 import DownloadButton from "../../../../components/common/buttons/DownloadButton";
-import DownloadSelect from "./DownloadSelect";
 import DownloadSubsetting from "./DownloadSubsetting";
+import DownloadSelect from "./DownloadSelect";
 
 const downloadFormats = [
   { label: "NetCDFs", value: "netcdf" },

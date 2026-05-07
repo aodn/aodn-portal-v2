@@ -20,8 +20,8 @@ import {
 } from "../../context/DownloadDefinitions";
 import InfoMessage from "./InfoMessage";
 import DownloadButton from "../../../../components/common/buttons/DownloadButton";
-import DownloadSelect from "./DownloadSelect";
 import DownloadSubsetting from "./DownloadSubsetting";
+import DownloadSelect from "./DownloadSelect";
 import { trackCustomEvent } from "../../../../analytics/customEventTracker";
 import { AnalyticsEvent } from "../../../../analytics/analyticsEvents";
 import {
@@ -253,9 +253,8 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
           estimatedSizeBytes={estimatedSizeBytes}
           handleCancelDownload={handleCancelDownload}
         />
-        {isDownloading
-          ? renderProgressMessage(formatBytes(downloadedBytes), progressMessage)
-          : null}
+        {isDownloading &&
+          renderProgressMessage(formatBytes(downloadedBytes), progressMessage)}
       </Stack>
       <DownloadSubsetting
         downloadConditions={downloadConditions}
