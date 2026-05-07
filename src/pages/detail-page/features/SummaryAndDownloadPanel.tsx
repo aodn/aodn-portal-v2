@@ -12,9 +12,7 @@ import Controls from "../../../components/map/mapbox/controls/Controls";
 import NavigationControl from "../../../components/map/mapbox/controls/NavigationControl";
 import ScaleControl from "../../../components/map/mapbox/controls/ScaleControl";
 import MapBox from "../../../components/map/mapbox/Map";
-import Layers, {
-  createStaticLayers,
-} from "../../../components/map/mapbox/layers/Layers";
+import Layers from "../../../components/map/mapbox/layers/Layers";
 import ExpandableTextArea from "../../../components/list/listItem/subitem/ExpandableTextArea";
 import DrawRect from "../../../components/map/mapbox/controls/menu/DrawRect";
 import { LngLatBounds, MapEvent } from "mapbox-gl";
@@ -31,7 +29,13 @@ import {
   PolygonCondition,
 } from "../context/DownloadDefinitions";
 import { dateDefault } from "../../../components/common/constants";
-import { FeatureCollection, Point, Feature, Polygon } from "geojson";
+import {
+  FeatureCollection,
+  Point,
+  Feature,
+  Polygon,
+  MultiPolygon,
+} from "geojson";
 import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
 import HexbinLayer from "../../../components/map/mapbox/layers/HexbinLayer";
 import GeoServerLayer, {
@@ -60,6 +64,7 @@ import { portalTheme } from "../../../styles";
 import { GeoserverFieldsResponse } from "../../../components/common/store/GeoserverDefinitions";
 import * as turf from "@turf/turf";
 import _ from "lodash";
+import { createStaticLayers } from "../../../components/map/mapbox/layers/StaticLayer";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -429,7 +434,10 @@ const SummaryAndDownloadPanel: FC<SummaryAndDownloadPanelProps> = ({
   );
 
   const handleFeaturesChange = useCallback(
-    (newFeatures: Feature<Polygon>[], removeFeature: (id: string) => void) => {
+    (
+      newFeatures: Feature<Polygon | MultiPolygon>[],
+      removeFeature: (id: string) => void
+    ) => {
       const bboxConditions: BBoxCondition[] = [];
       const polygonConditions: PolygonCondition[] = [];
 

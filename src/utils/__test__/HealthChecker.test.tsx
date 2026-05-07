@@ -29,7 +29,10 @@ describe("HealthChecker", () => {
     };
 
     // mockDispatch should return an object having unwrap() that resolves to healthy
-    mockDispatch.mockReturnValue({ unwrap: () => Promise.resolve(healthy) });
+    mockDispatch.mockReturnValue({
+      unwrap: () => Promise.resolve(healthy),
+      abort: vi.fn(),
+    });
 
     render(
       <HealthChecker>
@@ -52,7 +55,10 @@ describe("HealthChecker", () => {
       components: { ogcApiHealth: { status: "DOWN" } },
     };
 
-    mockDispatch.mockReturnValue({ unwrap: () => Promise.resolve(unhealthy) });
+    mockDispatch.mockReturnValue({
+      unwrap: () => Promise.resolve(unhealthy),
+      abort: vi.fn(),
+    });
 
     render(
       <HealthChecker>
@@ -72,6 +78,7 @@ describe("HealthChecker", () => {
   test("shows degraded page when dispatch throws", async () => {
     mockDispatch.mockReturnValue({
       unwrap: () => Promise.reject(new Error("fail")),
+      abort: vi.fn(),
     });
 
     render(
@@ -87,5 +94,23 @@ describe("HealthChecker", () => {
     await waitFor(() =>
       expect(screen.getByText("DEGRADED_PAGE")).toBeInTheDocument()
     );
+  });
+  test("skips health check in playwright-local mode", async () => {
+    // Mock import.meta.env.MODE
+    vi.stubEnv("MODE", "playwright-local");
+
+    render(
+      <HealthChecker>
+        <div>CHILDREN</div>
+      </HealthChecker>
+    );
+
+    // Children should be visible
+    expect(screen.getByText("CHILDREN")).toBeInTheDocument();
+
+    // Dispatch should NOT have been called
+    expect(mockDispatch).not.toHaveBeenCalled();
+
+    vi.unstubAllEnvs();
   });
 });

@@ -10,6 +10,50 @@ import { MapDefaultConfig } from "../components/map/mapbox/constants";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { DRAW_RECTANGLE_MODE } from "../components/map/mapbox/controls/menu/DrawRect";
 
+const DEFAULT_MAPBOX_TEXT_FONT = [
+  "Open Sans Regular",
+  "Arial Unicode MS Regular",
+] as const;
+
+const isFontWeightAtLeastMedium = (
+  fontWeight: number | string | undefined
+): boolean => {
+  if (fontWeight === undefined || fontWeight === "") return false;
+  const n =
+    typeof fontWeight === "number"
+      ? fontWeight
+      : Number.parseInt(String(fontWeight), 10);
+  return !Number.isNaN(n) && n >= 500;
+};
+
+/**
+ * Mapbox symbol `layout["text-font"]` must list glyph font names from the active map style,
+ * not browser CSS `font-family` values. This maps common RC8 / token stacks to the Open Sans
+ * and Arial Unicode faces used elsewhere in this app (`MapboxWorldLayer`, `SpatialExtents`, etc.).
+ *
+ * @param cssFontFamily - CSS `font-family` string (may include `var()`, quotes, fallbacks).
+ * @param options.fontWeight - MUI / CSS weight; values ≥ 500 pick a bolder Mapbox stack when available.
+ */
+export const cssFontFamilyToMapboxTextFont = (
+  cssFontFamily: string | undefined,
+  options?: { fontWeight?: number | string }
+): string[] => {
+  const bold = isFontWeightAtLeastMedium(options?.fontWeight);
+  const s = (cssFontFamily ?? "").toLowerCase();
+
+  if (s.includes("din")) {
+    return ["DIN Offc Pro Medium", "Arial Unicode MS Bold"];
+  }
+
+  if (s.includes("open sans") || s.includes("poppins")) {
+    return bold
+      ? ["Open Sans Semibold", "Arial Unicode MS Bold"]
+      : ["Open Sans Regular", "Arial Unicode MS Regular"];
+  }
+
+  return [...DEFAULT_MAPBOX_TEXT_FONT];
+};
+
 // Constants with explanations
 /**
  * Default base zoom level - represents approximately country/region level detail

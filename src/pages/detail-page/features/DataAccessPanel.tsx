@@ -1,5 +1,5 @@
 import { FC, useCallback, useMemo } from "react";
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useDetailPageContext } from "../context/detail-page-context";
 import LinkCard from "../../../components/list/listItem/subitem/LinkCard";
 import { MODE } from "../../../components/list/CommonDef";
@@ -120,14 +120,14 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
             {orderedKeys.map((key) => {
               const item = grouped[key];
               return (
-                <Typography
-                  padding={1}
-                  key={`da-${key}`}
-                  sx={{
-                    ...portalTheme.typography.body1Medium,
-                  }}
-                >
-                  {TITLE.has(key) ? TITLE.get(key) : "Downloadable Link"}
+                <Box padding={1} key={`da-${key}`}>
+                  <Typography
+                    sx={{
+                      ...portalTheme.typography.body1Medium,
+                    }}
+                  >
+                    {TITLE.has(key) ? TITLE.get(key) : "Downloadable Link"}
+                  </Typography>
                   {!item || item.length === 0 ? (
                     <NaList title={title ? title : ""} />
                   ) : (
@@ -140,7 +140,7 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
                       />
                     ))
                   )}
-                </Typography>
+                </Box>
               );
             })}
           </SideCardContainer>

@@ -29,3 +29,5 @@ class Routes:
     DOWNLOAD_DIALOG = f'{PREFIX}/processes/download/execution'
     DOWNLOAD_WFS = f'{PREFIX}/processes/downloadWfs/execution'
     ESTIMATE_WFS_DOWNLOAD = f'{PREFIX}/processes/estimateWfsDownload/execution'
+
+    STATIC_GEOJSON = f'{PREFIX}/ext/static/*.json'

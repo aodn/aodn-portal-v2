@@ -35,17 +35,17 @@ const StyledTab = styled((props: StyledTabProps) => {
       />
     </StyledBadge>
   );
-})(() => ({
+})(({ theme }) => ({
   textTransform: "none",
-  color: portalTheme.palette.text1,
-  border: `1px solid  ${portalTheme.palette.primary2}`,
+  color: theme.palette.text1,
+  border: `1px solid  ${theme.palette.primary2}`,
   borderRadius: "40px",
   "&.Mui-selected": {
     color: "#fff",
-    backgroundColor: portalTheme.palette.primary2,
+    backgroundColor: theme.palette.primary2,
   },
   " &:hover": {
-    backgroundColor: portalTheme.palette.primary2,
+    backgroundColor: theme.palette.primary2,
     color: "#fff",
   },
 }));

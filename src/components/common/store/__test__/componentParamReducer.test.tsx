@@ -90,6 +90,18 @@ describe("Component Reducer Function Test", () => {
     expect(answer5).toEqual(
       "datasetGroup=imos&dateTimeFilterRange.start=12345&dateTimeFilterRange.end=45697&searchText=This%20is%20test&parameterVocabs.0.label=cat1&parameterVocabs.1.label=cat2&polygon.type=Feature&polygon.bbox.0=10&polygon.bbox.1=20&polygon.bbox.2=-10.1&polygon.bbox.3=-20&polygon.geometry.type=Polygon&polygon.geometry.coordinates.0.0.0=10&polygon.geometry.coordinates.0.0.1=20&polygon.geometry.coordinates.0.1.0=-10.1&polygon.geometry.coordinates.0.1.1=20&polygon.geometry.coordinates.0.2.0=-10.1&polygon.geometry.coordinates.0.2.1=-20&polygon.geometry.coordinates.0.3.0=10&polygon.geometry.coordinates.0.3.1=-20&polygon.geometry.coordinates.0.4.0=10&polygon.geometry.coordinates.0.4.1=20"
     );
+
+    const sample6: ParameterState = {
+      staticAreas: [
+        { boundaryName: "boundary1", value: "val1" },
+        { boundaryName: "boundary2", value: "val2" },
+      ],
+    };
+
+    const answer6: string = decodeParam(formatToUrlParam(sample6));
+    expect(answer6).toEqual(
+      "staticAreas.0.boundaryName=boundary1&staticAreas.0.value=val1&staticAreas.1.boundaryName=boundary2&staticAreas.1.value=val2"
+    );
   });
 
   it("Verify unFlattenToParameterState", () => {
@@ -154,5 +166,21 @@ describe("Component Reducer Function Test", () => {
     const answer5: string = formatToUrlParam(sample5);
     const objAnswer5: ParameterState = unFlattenToParameterState(answer5);
     expect(objAnswer5).toEqual(sample5);
+
+    const sample6: ParameterState = {
+      datasetGroup: SearchKeys.IMOS,
+      hasCOData: false,
+      dateTimeFilterRange: {},
+      searchText: "",
+      zoom: MapDefaultConfig.ZOOM,
+      staticAreas: [
+        { boundaryName: "boundary1", value: "val1" },
+        { boundaryName: "boundary2", value: "val2" },
+      ],
+    };
+
+    const answer6: string = formatToUrlParam(sample6);
+    const objAnswer6: ParameterState = unFlattenToParameterState(answer6);
+    expect(objAnswer6).toEqual(sample6);
   });
 });

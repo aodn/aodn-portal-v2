@@ -9,7 +9,7 @@ import fs from "fs";
 export default ({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
 
-  const apiPath = process.env.VITE_API_HOST;
+  const apiPath = process.env.VITE_API_HOST?.replace(/\/$/, "");
 
   const inlineNewRelicPlugin = () => {
     // We need to inline the relic_script in the index.html, you can dynamic include based on env here
@@ -133,6 +133,10 @@ export default ({ mode }) => {
           changeOrigin: true,
         },
         "/api/v1/ogc/ext/autocomplete": {
+          target: apiPath,
+          changeOrigin: true,
+        },
+        "/api/v1/ogc/ext/static": {
           target: apiPath,
           changeOrigin: true,
         },

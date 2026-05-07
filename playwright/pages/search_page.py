@@ -54,6 +54,12 @@ class SearchPage(BasePage):
         self.result_card_download_button = page.get_by_test_id(
             'result-card-button-Download'
         )
+        self.map_popup_download_button = page.locator(
+            '.mapboxgl-popup-content'
+        ).get_by_test_id('result-card-button-Download')
+        self.card_popup_download_button = page.locator(
+            '#card-popup'
+        ).get_by_test_id('result-card-button-Download')
 
     def wait_for_search_to_complete(self) -> None:
         """

@@ -353,23 +353,23 @@ def test_repeated_search_action(
 
     # Perform first search
     search_page.search.location_button.click()
-    search_page.get_radio_input(location_a).check()
+    search_page.get_by_label(location_a).check()
     api_url = search_page.perform_action_and_get_api_url(action=search_and_wait)
     assert api_url is not None
 
     # Perform repeated searches with different locations
     # Second Search
     search_page.search.location_button.click()
-    search_page.get_radio_input(location_b).check()
+    search_page.get_by_label(location_b).check()
     api_url = search_page.perform_action_and_get_api_url(action=search_and_wait)
     assert api_url is not None
     # Third search
     search_page.search.location_button.click()
-    search_page.get_radio_input(location_c).check()
+    search_page.get_by_label(location_c).check()
     api_url = search_page.perform_action_and_get_api_url(action=search_and_wait)
     assert api_url is not None
     # Fourth search
     search_page.search.location_button.click()
-    search_page.get_radio_input(location_d).check()
+    search_page.get_by_label(location_d).check()
     api_url = search_page.perform_action_and_get_api_url(action=search_and_wait)
     assert api_url is not None

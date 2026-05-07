@@ -1,10 +1,52 @@
 import { describe, expect, it, vi } from "vitest";
 import { MapDefaultConfig } from "../../components/map/mapbox/constants";
 import { OGCCollection } from "../../components/common/store/OGCCollectionDefinitions";
-import { fitToBound, overallBoundingBox } from "../MapUtils";
+import {
+  cssFontFamilyToMapboxTextFont,
+  fitToBound,
+  overallBoundingBox,
+} from "../MapUtils";
+import { FONT_FAMILIES } from "../../styles/fontsRC8";
 import { Map as MapboxMap } from "mapbox-gl";
 
 describe("MapUtils", () => {
+  it("cssFontFamilyToMapboxTextFont maps Open Sans token stack to Mapbox glyphs", () => {
+    expect(cssFontFamilyToMapboxTextFont(FONT_FAMILIES.openSans)).toEqual([
+      "Open Sans Regular",
+      "Arial Unicode MS Regular",
+    ]);
+    expect(
+      cssFontFamilyToMapboxTextFont(FONT_FAMILIES.openSans, {
+        fontWeight: 500,
+      })
+    ).toEqual(["Open Sans Semibold", "Arial Unicode MS Bold"]);
+  });
+
+  it("cssFontFamilyToMapboxTextFont maps Poppins token stack to Open Sans Mapbox glyphs", () => {
+    expect(cssFontFamilyToMapboxTextFont(FONT_FAMILIES.poppins)).toEqual([
+      "Open Sans Regular",
+      "Arial Unicode MS Regular",
+    ]);
+  });
+
+  it("cssFontFamilyToMapboxTextFont maps DIN substring to DIN Mapbox stack", () => {
+    expect(cssFontFamilyToMapboxTextFont("DIN Offc Pro, sans-serif")).toEqual([
+      "DIN Offc Pro Medium",
+      "Arial Unicode MS Bold",
+    ]);
+  });
+
+  it("cssFontFamilyToMapboxTextFont falls back when family unknown", () => {
+    expect(cssFontFamilyToMapboxTextFont(undefined)).toEqual([
+      "Open Sans Regular",
+      "Arial Unicode MS Regular",
+    ]);
+    expect(cssFontFamilyToMapboxTextFont("Georgia, serif")).toEqual([
+      "Open Sans Regular",
+      "Arial Unicode MS Regular",
+    ]);
+  });
+
   it("returns default bounding box when collection is undefined", () => {
     const result = overallBoundingBox(undefined);
     expect(result).toEqual([

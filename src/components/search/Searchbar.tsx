@@ -16,9 +16,10 @@ import SearchbarButtonGroup, {
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import useElementSize from "../../hooks/useElementSize";
 import {
+  POPUP_MIN_WIDTH_DESKTOP,
   POPUP_MIN_WIDTH_LAPTOP,
-  POPUP_MIN_WIDTH_MOBILE,
   POPUP_MIN_WIDTH_TABLET,
+  POPUP_MIN_WIDTH_XL,
 } from "./constants";
 import DateRangeFilter from "../filter/DateRangeFilter";
 import { useLocation } from "react-router-dom";
@@ -141,11 +142,11 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
   useEffect(() => {
     if (urlParamState) {
       dispatch(updateParameterStates(urlParamState));
-    } else {
-      // If url param state is undefined, clear the component param state
+    } else if (location.pathname === pageDefault.landing) {
+      // Only clear if we are explicitly on the landing page
       dispatch(clearComponentParam());
     }
-  }, [dispatch, urlParamState]);
+  }, [dispatch, urlParamState, location.pathname]);
 
   return (
     <Box width="100%" ref={boxRefCallback}>
@@ -208,21 +209,26 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
             },
           ]}
           style={{
-            width:
-              activeButton === SearchbarButtonNames.Location
-                ? "300px"
-                : searchbarWidth,
-            minWidth:
-              activeButton === SearchbarButtonNames.Location
-                ? 0
-                : isMobile
-                  ? POPUP_MIN_WIDTH_MOBILE
-                  : isTablet
-                    ? POPUP_MIN_WIDTH_TABLET
-                    : POPUP_MIN_WIDTH_LAPTOP,
+            width: searchbarWidth,
             borderRadius: borderRadius.small,
             zIndex: 99,
+            ...(isMobile
+              ? { minWidth: searchbarWidth }
+              : isTablet
+                ? { minWidth: POPUP_MIN_WIDTH_TABLET }
+                : {}),
           }}
+          sx={
+            !isMobile && !isTablet
+              ? {
+                  minWidth: {
+                    md: `min(${POPUP_MIN_WIDTH_LAPTOP}px, calc(100vw - 32px))`,
+                    lg: `min(${POPUP_MIN_WIDTH_DESKTOP}px, calc(100vw - 48px))`,
+                    xl: `min(${POPUP_MIN_WIDTH_XL}px, calc(100vw - 64px))`,
+                  },
+                }
+              : undefined
+          }
           open={open}
           anchorEl={boxRef}
           placement="bottom-end"
