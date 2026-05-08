@@ -63,6 +63,12 @@ const VerticalIndicator: FC<VerticalIndicatorProps> = ({
     // Initialize measurements
     updateMetrics();
 
+    // Line and diamond positions are derived from each menu item's
+    // offsetHeight, which depends on the rendered font. In builds
+    // fonts load async, so the first measurement uses the fallback font
+    // and produces wrong heights. Remeasure once the real font is ready.
+    document.fonts?.ready.then(updateMetrics);
+
     // Observe every item for size changes
     const observers = itemRefs.map((ref) => {
       if (!ref.current) return null;
