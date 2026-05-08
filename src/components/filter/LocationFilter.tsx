@@ -67,9 +67,7 @@ interface LocationOptionType {
   geo?: FeatureCollection<Polygon | MultiPolygon, BoundaryProperties>;
 }
 
-interface LocationFilterProps {
-  handleClosePopup: () => void;
-}
+interface LocationFilterProps {}
 
 const SelectedAreaLayer: FC<{
   areas: FeatureCollection<Polygon | MultiPolygon> | undefined;
@@ -224,7 +222,7 @@ const modeRadios: { value: LocationFilterMode; label: string }[] = [
   { value: "marineEcoregion", label: "Marine Ecoregions of the World" },
 ];
 
-const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
+const LocationFilter: FC<LocationFilterProps> = () => {
   const dispatch = useAppDispatch();
   // Must use useAppSelector instead of useMemo to subscribe to state changes
   const componentParam: ParameterState = useAppSelector((s) => s.paramReducer);
@@ -444,10 +442,6 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
     startTransition(() => setDrawFeatures([]));
   }, [dispatch, drawFeatures]);
 
-  const handleClose = useCallback(() => {
-    handleClosePopup();
-  }, [handleClosePopup]);
-
   const handleFeaturesChange = useCallback(
     (
       newFeatures: Feature<Polygon | MultiPolygon>[],
@@ -643,40 +637,6 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
 
   return (
     <Box sx={{ position: "relative", width: "100%" }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "flex-end",
-          backgroundColor: theme.palette.primary6,
-          pt: "12px",
-          pr: "12px",
-          gap: "8px",
-        }}
-      >
-        <IconButton
-          onClick={handleClear}
-          sx={{
-            bgcolor: color.gray.extraLight,
-            "&:hover": {
-              bgcolor: color.blue.darkSemiTransparent,
-            },
-          }}
-        >
-          <ReplayIcon sx={{ fontSize: fontSize.info }} />
-        </IconButton>
-        <IconButton
-          onClick={handleClose}
-          sx={{
-            bgcolor: color.gray.extraLight,
-            "&:hover": {
-              bgcolor: color.blue.darkSemiTransparent,
-            },
-          }}
-        >
-          <CloseIcon sx={{ fontSize: fontSize.info }} />
-        </IconButton>
-      </Box>
-
       <StyledTabs
         value={modeRadios.findIndex((m) => m.value === filterMode)}
         onChange={handleFilterModeChange}
