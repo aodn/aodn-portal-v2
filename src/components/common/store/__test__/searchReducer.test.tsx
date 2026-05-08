@@ -1,8 +1,9 @@
 import { describe, it, expect } from "vitest";
 import default_thumbnail from "@/assets/images/default-thumbnail.png";
 import { OGCCollection } from "../OGCCollectionDefinitions";
-import { ParameterState } from "../componentParamReducer";
+import { DateTimeFilterRange, ParameterState } from "../componentParamReducer";
 import { createSearchParamFrom, SearchParameters } from "../searchReducer";
+import dayjs from "dayjs";
 
 describe("Search Reducer Function Test", () => {
   it("Empty links return default thumbnail", () => {
@@ -93,6 +94,22 @@ describe("Search Reducer Function Test", () => {
     // Verify they are wrapped in parentheses as OR condition
     expect(result.filter).toContain(
       "(assets_summary IS NOT NULL) OR links_airole_contains='download'"
+    );
+  });
+  // We need to make sure time is aware otherwise OGC api will throw exception where start = end exactly
+  it("should include time in dateRange, start is 00:00:00 end is 23:59:59", () => {
+    const param: ParameterState = {
+      dateTimeFilterRange: {
+        start: dayjs("2025-05-07T00:00:00").valueOf(),
+        end: dayjs("2025-05-07T23:59:59").valueOf(),
+      } as DateTimeFilterRange,
+    };
+
+    const result = createSearchParamFrom(param);
+
+    // Verify both CO data and download link filters are included with OR
+    expect(result.filter).toContain(
+      "temporal DURING 2025-05-07T00:00:00Z/2025-05-07T23:59:59Z"
     );
   });
 });
