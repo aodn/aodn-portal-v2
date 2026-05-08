@@ -5,6 +5,7 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { Box, Fade, Paper, Popper, ClickAwayListener } from "@mui/material";
@@ -59,6 +60,8 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
   const [pendingSearch, setPendingSearch] = useState<boolean>(false);
   const { ref, width: searchbarWidth } = useElementSize();
   const redirectSearch = useRedirectSearch();
+  const popperRef = useRef<any>(null);
+  const params = useAppSelector((state) => state.paramReducer);
   const { scrollToElement } = useScrollToElement({
     ref: { current: boxRef },
     offset: (isMobile ? HEADER_HEIGHT_MOBILE : HEADER_HEIGHT) + 5,
@@ -120,6 +123,12 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
     }
   }, [dispatch, urlParamState, location.pathname]);
 
+  useEffect(() => {
+    if (open && popperRef.current) {
+      popperRef.current.update();
+    }
+  }, [params, open]);
+
   return (
     <Box width="100%" ref={boxRefCallback}>
       <Paper
@@ -163,6 +172,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
       <ActiveFiltersChips />
       <ClickAwayListener onClickAway={handleClickAway}>
         <Popper
+          popperRef={popperRef}
           modifiers={[
             {
               name: "offset",

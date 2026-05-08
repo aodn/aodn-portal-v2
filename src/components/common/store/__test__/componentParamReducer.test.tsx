@@ -93,8 +93,8 @@ describe("Component Reducer Function Test", () => {
 
     const sample6: ParameterState = {
       staticAreas: [
-        { boundaryName: "boundary1", value: "val1" },
-        { boundaryName: "boundary2", value: "val2" },
+        { label: "label1", boundaryName: "boundary1", value: "val1" },
+        { label: "label2", boundaryName: "boundary2", value: "val2" },
       ],
     };
 
@@ -174,8 +174,8 @@ describe("Component Reducer Function Test", () => {
       searchText: "",
       zoom: MapDefaultConfig.ZOOM,
       staticAreas: [
-        { boundaryName: "boundary1", value: "val1" },
-        { boundaryName: "boundary2", value: "val2" },
+        { label: "label1", boundaryName: "boundary1", value: "val1" },
+        { label: "label2", boundaryName: "boundary2", value: "val2" },
       ],
     };
 
