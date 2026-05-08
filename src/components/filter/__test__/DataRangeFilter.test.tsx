@@ -89,7 +89,7 @@ describe("DateRangeFilter", () => {
     render(
       <Provider store={store}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DateRangeFilter handleClosePopup={handleClosePopup} />
+          <DateRangeFilter />
         </LocalizationProvider>
       </Provider>
     );
@@ -182,28 +182,6 @@ describe("DateRangeFilter", () => {
         )
       );
     });
-  });
-
-  it("resets date range when clear button is clicked", () => {
-    renderComponent();
-    const user = userEvent.setup();
-
-    const clearButton = screen.getByTestId("ReplayIcon").closest("button");
-    user.click(clearButton!);
-
-    return waitFor(() =>
-      expect(store.dispatch).toHaveBeenCalledWith(updateDateTimeFilterRange({}))
-    ).then(() => expect(screen.getByLabelText("Custom")).toBeChecked());
-  });
-
-  it("calls handleClosePopup when close button is clicked", () => {
-    renderComponent();
-    const user = userEvent.setup();
-
-    const closeButton = screen.getByTestId("CloseIcon").closest("button");
-    user.click(closeButton!);
-
-    return waitFor(() => expect(handleClosePopup).toHaveBeenCalled());
   });
 
   it.skip("updates date range when slider is moved", () => {

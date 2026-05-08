@@ -224,7 +224,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
                 <Fade in={true} key={activeButton} timeout={200}>
                   <Box>
                     {activeButton === SearchbarButtonNames.Date && (
-                      <DateRangeFilter handleClosePopup={handleClosePopup} />
+                      <DateRangeFilter />
                     )}
                     {activeButton === SearchbarButtonNames.Location && (
                       <LocationFilter handleClosePopup={handleClosePopup} />
