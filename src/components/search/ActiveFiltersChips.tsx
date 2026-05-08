@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from "../common/store/hooks";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   clearComponentParam,
+  SelectedStaticArea,
   updateDatasetGroup,
   updateDateTimeFilterRange,
   updateFilterPolygon,
@@ -19,6 +20,17 @@ import { dateDefault } from "../common/constants";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import { borderRadius, color, gap } from "../../styles/constants";
 import { TrashIcon } from "../../assets/icons/search/trash";
+import {
+  BoundaryName,
+  fetchAllenCoralAtlasOptions,
+  fetchMarineEcoregionOptions,
+  fetchMarineParkOptions,
+} from "../map/mapbox/layers/StaticLayer";
+
+// Value cached, so no issue to repeatedly fetch them here
+const marineEcoregion = await fetchMarineEcoregionOptions();
+const marinePark = await fetchMarineParkOptions();
+const allenCoralAtlas = await fetchAllenCoralAtlasOptions();
 
 const ActiveFiltersChips: FC = () => {
   const dispatch = useAppDispatch();
@@ -61,9 +73,27 @@ const ActiveFiltersChips: FC = () => {
 
     // Static Areas
     if (params.staticAreas && params.staticAreas.length > 0) {
+      const getLabel = (area: SelectedStaticArea) => {
+        switch (area.boundaryName) {
+          case BoundaryName.MEOW:
+            return (
+              marineEcoregion.find((opt) => opt.value === area.value)?.label ||
+              ""
+            );
+          case BoundaryName.AUSTRALIAN_MARINE_PARKS:
+            return (
+              marinePark.find((opt) => opt.value === area.value)?.label || ""
+            );
+          case BoundaryName.CORAL_ATLAS:
+            return (
+              allenCoralAtlas.find((opt) => opt.value === area.value)?.label ||
+              ""
+            );
+        }
+      };
       params.staticAreas.forEach((area) => {
         chips.push({
-          label: `Area: ${area.label} (${area.boundaryName})`,
+          label: `Area: ${getLabel(area)} (${area.boundaryName})`,
           onDelete: () =>
             dispatch(
               updateFilterStaticAreas(
