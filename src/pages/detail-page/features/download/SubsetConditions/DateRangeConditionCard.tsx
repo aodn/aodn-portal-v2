@@ -114,7 +114,6 @@ const DateRangeConditionCard: React.FC<DateRangeConditionCardProps> = ({
 
   return (
     <BaseConditionCard
-      id={dateRangeCondition.id}
       type={DownloadConditionType.DATE_RANGE}
       removeCallback={onRemove}
       disable={disable}
