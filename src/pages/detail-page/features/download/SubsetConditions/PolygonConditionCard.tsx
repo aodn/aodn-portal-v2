@@ -22,9 +22,8 @@ const PolygonConditionCard: React.FC<PolygonConditionCardProps> = ({
 
   return (
     <BaseConditionCard
-      id={polygonCondition.id}
       type={DownloadConditionType.POLYGON}
-      removeCallback={() => onRemove && onRemove()}
+      removeCallback={onRemove}
       disable={disable}
     >
       <Box

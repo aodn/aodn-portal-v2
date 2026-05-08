@@ -1,9 +1,5 @@
 import React, { useState } from "react";
-import {
-  DownloadConditionType,
-  IDownloadCondition,
-  IDownloadConditionCallback,
-} from "../../../context/DownloadDefinitions";
+import { DownloadConditionType } from "../../../context/DownloadDefinitions";
 import {
   Box,
   Card,
@@ -15,6 +11,8 @@ import {
   IconButton,
   IconButtonProps,
   Stack,
+  SxProps,
+  Theme,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
@@ -24,12 +22,13 @@ import { BboxSelectionIcon } from "../../../../../assets/icons/download/bbox_sel
 import { PolygonSelectionIcon } from "../../../../../assets/icons/map/polygon_selection";
 import { TimeRangeIcon } from "../../../../../assets/icons/download/time_range";
 
-interface BaseConditionCardProps
-  extends IDownloadCondition,
-    IDownloadConditionCallback {
+interface BaseConditionCardProps {
+  type: DownloadConditionType;
   children: React.ReactNode;
   actions?: React.ReactNode;
+  removeCallback?: () => void;
   disable?: boolean;
+  contentSx?: SxProps<Theme>;
 }
 
 interface ExpandProps extends IconButtonProps {
@@ -90,6 +89,7 @@ const BaseConditionCard: React.FC<BaseConditionCardProps> = ({
   actions,
   removeCallback,
   disable = false,
+  contentSx,
 }) => {
   const [expanded, setExpanded] = useState(true);
   const toggle = () => setExpanded((prev) => !prev);
@@ -157,12 +157,15 @@ const BaseConditionCard: React.FC<BaseConditionCardProps> = ({
       />
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent
-          sx={{
-            pt: 0.5,
-            pb: 1.5,
-            px: 1.5,
-            "&:last-child": { pb: 1.5 },
-          }}
+          sx={[
+            {
+              pt: 0.5,
+              pb: 1.5,
+              px: 1.5,
+              "&:last-child": { pb: 1.5 },
+            },
+            ...(Array.isArray(contentSx) ? contentSx : [contentSx]),
+          ]}
         >
           {children}
         </CardContent>
@@ -176,7 +179,7 @@ const BaseConditionCard: React.FC<BaseConditionCardProps> = ({
                 justifyContent: "center",
                 alignItems: "center",
                 px: 1.5,
-                py: 0.5,
+                py: 1,
               }}
             >
               {actions}

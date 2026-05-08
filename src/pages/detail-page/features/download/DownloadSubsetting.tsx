@@ -17,7 +17,7 @@ import {
   DownloadCondition,
   DownloadConditionType,
 } from "../../context/DownloadDefinitions";
-import DataSelection from "./DataSelection/DataSelection";
+import SubsetConditions from "./SubsetConditions/SubsetConditions";
 import InfoMessage from "./InfoMessage";
 
 interface DownloadSubsettingProps extends DownloadCondition {
@@ -92,7 +92,7 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
             </Box>
           </AccordionSummary>
           <AccordionDetails sx={{ pt: "4px" }}>
-            <DataSelection
+            <SubsetConditions
               downloadConditions={downloadConditions}
               getAndSetDownloadConditions={getAndSetDownloadConditions}
               removeDownloadCondition={removeDownloadCondition}

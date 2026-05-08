@@ -8,7 +8,7 @@ import {
   useTheme,
   Divider,
 } from "@mui/material";
-import DataSelection from "../DataSelection/DataSelection";
+import SubsetConditions from "../SubsetConditions/SubsetConditions";
 import LicenseStep from "./LicenseStep";
 import { useDownloadDialog } from "../../../../../hooks/useDownloadDialog";
 import EmailInputStep from "./EmailInputStep";
@@ -79,8 +79,7 @@ const DownloadDialog = ({
     };
   }, [isOpen]);
 
-  // Determine if DataSelection should be shown
-  const shouldShowDataSelection =
+  const shouldShowSubsetConditions =
     hasDownloadConditions && subsettingSelectionCount >= 1;
 
   const getButtonStatus = () => {
@@ -106,12 +105,11 @@ const DownloadDialog = ({
           sx={{
             display: "flex",
             flexDirection: isUnderLaptop ? "column" : "row",
-            gap: isUnderLaptop ? 0 : shouldShowDataSelection ? 3 : 0,
+            gap: isUnderLaptop ? 0 : shouldShowSubsetConditions ? 3 : 0,
             flex: 1,
           }}
         >
-          {/* Only show DataSelection when subsettingSelectionCount >= 1 */}
-          {shouldShowDataSelection && (
+          {shouldShowSubsetConditions && (
             <Box
               sx={{
                 width: isUnderLaptop ? "100%" : "300px",
@@ -125,7 +123,7 @@ const DownloadDialog = ({
               >
                 Data Selection
               </Typography>
-              <DataSelection
+              <SubsetConditions
                 downloadConditions={downloadConditions}
                 getAndSetDownloadConditions={getAndSetDownloadConditions}
                 removeDownloadCondition={removeDownloadCondition}
@@ -133,8 +131,7 @@ const DownloadDialog = ({
             </Box>
           )}
 
-          {/* Only show divider when DataSelection is visible on mobile */}
-          {isUnderLaptop && shouldShowDataSelection && (
+          {isUnderLaptop && shouldShowSubsetConditions && (
             <Divider sx={{ my: 2 }} />
           )}
 

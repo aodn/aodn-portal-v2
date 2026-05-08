@@ -1,6 +1,7 @@
 import { FC, useCallback, useMemo } from "react";
 import { Stack, SxProps } from "@mui/material";
 import { Dayjs } from "dayjs";
+import { BBox } from "geojson";
 import BBoxConditionCard from "./BBoxConditionCard";
 import PolygonConditionCard from "./PolygonConditionCard";
 import DateRangeConditionCard from "./DateRangeConditionCard";
@@ -14,16 +15,13 @@ import {
   type DownloadCondition,
 } from "../../../context/DownloadDefinitions";
 
-interface DataSelectionComponentProps extends DownloadCondition {
+interface SubsetConditionsProps extends DownloadCondition {
   sx?: SxProps;
   disable?: boolean;
   dateRangeBounds?: { min: Dayjs; max: Dayjs };
 }
 
-/**
- * DataSelectionComponent - Displays selected data conditions (bbox and date range)
- */
-const DataSelection: FC<DataSelectionComponentProps> = ({
+const SubsetConditions: FC<SubsetConditionsProps> = ({
   sx,
   downloadConditions,
   getAndSetDownloadConditions,
@@ -73,16 +71,25 @@ const DataSelection: FC<DataSelectionComponentProps> = ({
     [getAndSetDownloadConditions]
   );
 
+  const handleAddBBox = useCallback(
+    (bbox: BBox) => {
+      const id = `bbox-${Date.now()}`;
+      getAndSetDownloadConditions(DownloadConditionType.BBOX, [
+        ...bboxConditions,
+        new BBoxCondition(id, bbox),
+      ]);
+    },
+    [bboxConditions, getAndSetDownloadConditions]
+  );
+
   return (
     <Stack spacing={1} sx={sx}>
-      {bboxConditions.map((bboxCondition) => (
-        <BBoxConditionCard
-          key={bboxCondition.id}
-          bboxCondition={bboxCondition}
-          onRemove={() => handleRemove(bboxCondition)}
-          disable={disable}
-        />
-      ))}
+      <BBoxConditionCard
+        bboxConditions={bboxConditions}
+        onRemove={handleRemove}
+        onAddBBox={handleAddBBox}
+        disable={disable}
+      />
       {polygonConditions.map((polygonCondition) => (
         <PolygonConditionCard
           key={polygonCondition.id}
@@ -108,4 +115,4 @@ const DataSelection: FC<DataSelectionComponentProps> = ({
   );
 };
 
-export default DataSelection;
+export default SubsetConditions;
