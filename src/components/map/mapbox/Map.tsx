@@ -259,12 +259,35 @@ const ReactMap = memo(
         };
       };
 
+      // If the container exists but has zero dimensions it is inside a hidden tab (the `hidden` HTML attribute sets display:none on the ancestor TabPanel).
+      // Initializing Mapbox into a zero-size container corrupts its internal state so defer until the container is visible.
+      const container = document.getElementById(panelId);
+      if (
+        container &&
+        container.offsetWidth === 0 &&
+        container.offsetHeight === 0
+      ) {
+        let mapCleanup: (() => void) | undefined;
+        const ro = new ResizeObserver(() => {
+          if (container.offsetWidth > 0 || container.offsetHeight > 0) {
+            ro.disconnect();
+            mapCleanup = setupMap() ?? undefined;
+          }
+        });
+        ro.observe(container);
+        return () => {
+          ro.disconnect();
+          mapCleanup?.();
+        };
+      }
+
       const cleanup = setupMap();
 
       return () => {
         cleanup?.();
       };
     }, [
+      panelId,
       initializeMap,
       projection,
       debounceOnZoomEvent,
