@@ -63,7 +63,9 @@ class DetailPage(BasePage):
     def is_mobile_viewport(self) -> bool:
         """Return True when the current viewport falls under the mobile breakpoint."""
         viewport = self.page.viewport_size
-        return bool(viewport) and viewport['width'] < self._MOBILE_MAX_WIDTH
+        return (
+            viewport is not None and viewport['width'] < self._MOBILE_MAX_WIDTH
+        )
 
     def go_to_map_tab(self) -> None:
         """

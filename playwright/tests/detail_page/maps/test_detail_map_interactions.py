@@ -112,9 +112,9 @@ def test_spatial_map_click_zooms_detail_map(
 
     # The detail map should now be fitted to the clicked polygon's full bbox
     detail_map_bounds = detail_page.detail_map.get_map_bounds()
-    assert is_bbox_contained_by_map_bounds(target_bbox, detail_map_bounds), (
-        f'Detail map bounds {detail_map_bounds} do not contain clicked bbox {target_bbox}'
-    )
+    assert is_bbox_contained_by_map_bounds(
+        target_bbox, detail_map_bounds
+    ), f'Detail map bounds {detail_map_bounds} do not contain clicked bbox {target_bbox}'
 
 
 @pytest.mark.parametrize(
@@ -243,6 +243,6 @@ def test_layer_selection_triggers_correct_wms_map_tile_request(
     with responsive_page.expect_response(Routes.WMS_MAP_TILE) as response_info:
         detail_page.get_text(last_data_title).click()
         response = response_info.value
-        assert last_data_value in response.url, (
-            f'Unexpected URL: {response.url}'
-        )
+        assert (
+            last_data_value in response.url
+        ), f'Unexpected URL: {response.url}'
