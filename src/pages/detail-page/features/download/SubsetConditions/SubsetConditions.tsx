@@ -1,6 +1,7 @@
 import { FC, useCallback, useMemo } from "react";
 import { Stack, SxProps } from "@mui/material";
 import { Dayjs } from "dayjs";
+import { BBox } from "geojson";
 import BBoxConditionCard from "./BBoxConditionCard";
 import PolygonConditionCard from "./PolygonConditionCard";
 import DateRangeConditionCard from "./DateRangeConditionCard";
@@ -70,16 +71,25 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
     [getAndSetDownloadConditions]
   );
 
+  const handleAddBBox = useCallback(
+    (bbox: BBox) => {
+      const id = `bbox-${Date.now()}`;
+      getAndSetDownloadConditions(DownloadConditionType.BBOX, [
+        ...bboxConditions,
+        new BBoxCondition(id, bbox),
+      ]);
+    },
+    [bboxConditions, getAndSetDownloadConditions]
+  );
+
   return (
     <Stack spacing={1} sx={sx}>
-      {bboxConditions.map((bboxCondition) => (
-        <BBoxConditionCard
-          key={bboxCondition.id}
-          bboxCondition={bboxCondition}
-          onRemove={() => handleRemove(bboxCondition)}
-          disable={disable}
-        />
-      ))}
+      <BBoxConditionCard
+        bboxConditions={bboxConditions}
+        onRemove={handleRemove}
+        onAddBBox={handleAddBBox}
+        disable={disable}
+      />
       {polygonConditions.map((polygonCondition) => (
         <PolygonConditionCard
           key={polygonCondition.id}
