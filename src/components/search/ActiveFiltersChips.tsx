@@ -1,6 +1,7 @@
 import { FC, useCallback, useMemo, useState } from "react";
 import { Box, Chip, Typography, Button, Stack, useTheme } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../common/store/hooks";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   clearComponentParam,
   updateDatasetGroup,
@@ -16,7 +17,8 @@ import {
 import dayjs from "dayjs";
 import { dateDefault } from "../common/constants";
 import useBreakpoint from "../../hooks/useBreakpoint";
-import { color, gap } from "../../styles/constants";
+import { borderRadius, color, gap } from "../../styles/constants";
+import { TrashIcon } from "../../assets/icons/search/trash";
 
 const ActiveFiltersChips: FC = () => {
   const dispatch = useAppDispatch();
@@ -217,20 +219,20 @@ const ActiveFiltersChips: FC = () => {
             key={`${filter.label}-${index}`}
             label={filter.label}
             onDelete={filter.onDelete}
+            deleteIcon={<CloseIcon />}
             size="small"
             sx={{
-              backgroundColor: color.blue.xLight,
-              border: `1px solid ${color.blue.light}`,
-              borderRadius: "6px",
+              backgroundColor: theme.palette.primary5,
+              borderRadius: borderRadius.small,
               "& .MuiChip-label": {
-                px: 1,
-                fontSize: "0.75rem",
-                color: color.blue.dark,
+                color: theme.palette.text2,
               },
               "& .MuiChip-deleteIcon": {
-                fontSize: "1rem",
-                color: color.blue.dark,
-                "&:hover": { color: color.blue.main },
+                color: theme.palette.primary1,
+                backgroundColor: "transparent",
+                "&:hover": {
+                  backgroundColor: "transparent",
+                },
               },
             }}
           />
@@ -240,13 +242,14 @@ const ActiveFiltersChips: FC = () => {
         variant="text"
         size="small"
         onClick={handleClearAll}
+        startIcon={<TrashIcon />}
         sx={{
           ml: 1,
           flexShrink: 0,
           whiteSpace: "nowrap",
           minWidth: "auto",
           textTransform: "none",
-          color: color.blue.main,
+          color: theme.palette.primary1,
           "&:hover": { backgroundColor: "transparent", color: color.blue.dark },
         }}
       >
