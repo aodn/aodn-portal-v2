@@ -68,6 +68,12 @@ import { createStaticLayers } from "../../../components/map/mapbox/layers/Static
 
 const mapContainerId = "map-detail-container-id";
 
+export const HEXBIN_EXCLUDED_COLLECTION_IDS = new Set<string>([
+  // Large Parquet dataset should use spatial extent instead of Hex Grid.
+  // AMSA
+  "2a5739e7-0cb8-444a-b83b-b2bc841b0ce8",
+]);
+
 interface SummaryAndDownloadPanelProps {
   mapFocusArea?: LngLatBounds;
   onMapMoveEnd?: (evt: MapEvent) => void;
@@ -116,15 +122,22 @@ export const buildMapLayerConfig = (
   const layers: LayerSwitcherLayer<LayerName>[] = [];
 
   if (collection) {
+    const isHexbinExcludedDataset = HEXBIN_EXCLUDED_COLLECTION_IDS.has(
+      collection.id
+    );
+    const shouldUseSpatialExtentForSummary =
+      isZarrDataset || isHexbinExcludedDataset;
+
     // Only show hexbin layer when the collection has summary feature and it is NOT a zarr dataset
-    const isSupportHexbin = hasSummaryFeature && !isZarrDataset;
+    const isSupportHexbin =
+      hasSummaryFeature && !shouldUseSpatialExtentForSummary;
 
     // Show spatial extent layer when
     // 1. it is a zarr dataset
     // 2. or no geoserver layer nor hexbin layer
     const isSupportSpatialExtent =
       hasSpatialExtent &&
-      ((hasSummaryFeature && isZarrDataset) ||
+      ((hasSummaryFeature && shouldUseSpatialExtentForSummary) ||
         (!isWMSAvailable && !isSupportHexbin));
 
     // Must be ordered by Hexbin > GeoServer > Spatial extents

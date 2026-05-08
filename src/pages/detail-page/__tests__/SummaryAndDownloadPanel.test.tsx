@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import { FeatureCollection, Point } from "geojson";
 import {
   buildMapLayerConfig,
+  HEXBIN_EXCLUDED_COLLECTION_IDS,
   getMinMaxDateStamps,
 } from "../features/SummaryAndDownloadPanel";
 import { dateDefault } from "../../../components/common/constants";
@@ -184,12 +185,14 @@ describe("buildMapLayerConfig", () => {
   // Helper function to create a mock OGCCollection
   const createMockCollection = (
     overrides: Partial<{
+      id: string;
       hasSummaryFeature: boolean;
       getDatasetType: () => DatasetType | undefined;
       getBBox: () => any;
     }> = {}
   ) => {
     return {
+      id: overrides.id ?? "test-collection-id",
       hasSummaryFeature: vi
         .fn()
         .mockReturnValue(overrides.hasSummaryFeature ?? false),
@@ -258,6 +261,37 @@ describe("buildMapLayerConfig", () => {
       name: "Spatial Extent",
       selected: true, // Should be set to true as it's the only layer
     } as LayerSwitcherLayer<LayerName>);
+  });
+
+  it("does not enable hexbin for excluded parquet datasets", () => {
+    const excludedId = "excluded-parquet-collection-id";
+    HEXBIN_EXCLUDED_COLLECTION_IDS.add(excludedId);
+
+    const mockCollection = createMockCollection({
+      id: excludedId,
+      hasSummaryFeature: true,
+      getDatasetType: () => DatasetType.PARQUET,
+      getBBox: () => [0, 0, 1, 1],
+    });
+
+    try {
+      const result = buildMapLayerConfig(
+        mockCollection,
+        true, // hasSummaryFeature
+        false, // isZarrDataset
+        false, // isWMSAvailable
+        true // hasSpatialExtent
+      );
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toEqual({
+        id: LayerName.SpatialExtent,
+        name: "Spatial Extent",
+        selected: true,
+      } as LayerSwitcherLayer<LayerName>);
+    } finally {
+      HEXBIN_EXCLUDED_COLLECTION_IDS.delete(excludedId);
+    }
   });
 
   it("sets first layer as default when no layer has default set to true", () => {
