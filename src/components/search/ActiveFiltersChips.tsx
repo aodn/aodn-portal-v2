@@ -1,0 +1,259 @@
+import { FC, useCallback, useMemo, useState } from "react";
+import { Box, Chip, Typography, Button, Stack, useTheme } from "@mui/material";
+import { useAppDispatch, useAppSelector } from "../common/store/hooks";
+import {
+  clearComponentParam,
+  updateDatasetGroup,
+  updateDateTimeFilterRange,
+  updateFilterPolygon,
+  updateFilterStaticAreas,
+  updateHasData,
+  updateParameterVocabs,
+  updatePlatform,
+  updateStatus,
+  updateUpdateFreq,
+} from "../common/store/componentParamReducer";
+import dayjs from "dayjs";
+import { dateDefault } from "../common/constants";
+import useBreakpoint from "../../hooks/useBreakpoint";
+import { color, gap } from "../../styles/constants";
+
+const ActiveFiltersChips: FC = () => {
+  const dispatch = useAppDispatch();
+  const { isMobile } = useBreakpoint();
+  const theme = useTheme();
+  const params = useAppSelector((state) => state.paramReducer);
+
+  const handleClearAll = useCallback(() => {
+    dispatch(clearComponentParam());
+  }, [dispatch]);
+
+  const activeFilters = useMemo(() => {
+    const chips: Array<{ label: string; onDelete: () => void }> = [];
+
+    // Date Range
+    if (params.dateTimeFilterRange?.start || params.dateTimeFilterRange?.end) {
+      const start = params.dateTimeFilterRange.start
+        ? dayjs(params.dateTimeFilterRange.start).format(
+            dateDefault.DISPLAY_FORMAT
+          )
+        : "...";
+      const end = params.dateTimeFilterRange.end
+        ? dayjs(params.dateTimeFilterRange.end).format(
+            dateDefault.DISPLAY_FORMAT
+          )
+        : "...";
+      chips.push({
+        label: `Date: ${start} - ${end}`,
+        onDelete: () => dispatch(updateDateTimeFilterRange({})),
+      });
+    }
+
+    // Location (Polygon)
+    if (params.polygon) {
+      chips.push({
+        label: "Spatial Filter",
+        onDelete: () => dispatch(updateFilterPolygon(undefined)),
+      });
+    }
+
+    // Static Areas
+    if (params.staticAreas && params.staticAreas.length > 0) {
+      params.staticAreas.forEach((area) => {
+        chips.push({
+          label: `Area: ${area.label} (${area.boundaryName})`,
+          onDelete: () =>
+            dispatch(
+              updateFilterStaticAreas(
+                params.staticAreas!.filter(
+                  (a) => a.boundaryName !== area.boundaryName
+                )
+              )
+            ),
+        });
+      });
+    }
+
+    // Dataset Group
+    if (params.datasetGroup) {
+      chips.push({
+        label: `Group: ${params.datasetGroup}`,
+        onDelete: () => dispatch(updateDatasetGroup(undefined)),
+      });
+    }
+
+    // Parameter Vocabs
+    if (params.parameterVocabs && params.parameterVocabs.length > 0) {
+      params.parameterVocabs.forEach((vocab) => {
+        chips.push({
+          label: vocab.label,
+          onDelete: () =>
+            dispatch(
+              updateParameterVocabs(
+                params.parameterVocabs!.filter((v) => v.label !== vocab.label)
+              )
+            ),
+        });
+      });
+    }
+
+    // Platforms
+    if (params.platform && params.platform.length > 0) {
+      params.platform.forEach((p) => {
+        chips.push({
+          label: `Platform: ${p}`,
+          onDelete: () =>
+            dispatch(
+              updatePlatform(params.platform!.filter((item) => item !== p))
+            ),
+        });
+      });
+    }
+
+    // Update Frequency
+    if (params.updateFreq) {
+      chips.push({
+        label: `Freq: ${params.updateFreq}`,
+        onDelete: () => dispatch(updateUpdateFreq(undefined)),
+      });
+    }
+
+    // Status
+    if (params.datasetStatus) {
+      chips.push({
+        label: `Status: ${params.datasetStatus}`,
+        onDelete: () => dispatch(updateStatus(undefined)),
+      });
+    }
+
+    // Cloud Optimized
+    if (params.hasCOData) {
+      chips.push({
+        label: "Cloud Optimized",
+        onDelete: () => dispatch(updateHasData(false)),
+      });
+    }
+
+    return chips;
+  }, [params, dispatch]);
+
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    setIsDragging(true);
+    setStartX(e.pageX - e.currentTarget.getBoundingClientRect().left);
+    setScrollLeft(e.currentTarget.scrollLeft);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (!isDragging) return;
+      e.preventDefault();
+      const x = e.pageX - e.currentTarget.getBoundingClientRect().left;
+      const walk = (x - startX) * 2; // Scroll speed
+      e.currentTarget.scrollLeft = scrollLeft - walk;
+    },
+    [isDragging, startX, scrollLeft]
+  );
+
+  if (activeFilters.length === 0) return null;
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        width: "100%",
+        maxWidth: "100%",
+        mt: 1,
+        overflow: "hidden",
+      }}
+    >
+      <Typography
+        variant="body2"
+        sx={{
+          whiteSpace: "nowrap",
+          mr: 1.5,
+          color: color.gray.dark,
+          fontWeight: 500,
+          display: { xs: "none", sm: "block" },
+        }}
+      >
+        Added filters:
+      </Typography>
+      <Stack
+        direction="row"
+        spacing={1}
+        onMouseDown={handleMouseDown}
+        onMouseLeave={handleMouseLeave}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
+        sx={{
+          flex: 1,
+          minWidth: 0,
+          overflowX: "auto",
+          py: 0.5,
+          "&::-webkit-scrollbar": { display: "none" },
+          msOverflowStyle: "none",
+          scrollbarWidth: "none",
+          cursor: isDragging ? "grabbing" : "grab",
+          userSelect: "none", // Prevent text selection while dragging
+          "& *": { cursor: isDragging ? "grabbing" : "inherit" },
+        }}
+      >
+        {activeFilters.map((filter, index) => (
+          <Chip
+            key={`${filter.label}-${index}`}
+            label={filter.label}
+            onDelete={filter.onDelete}
+            size="small"
+            sx={{
+              backgroundColor: color.blue.xLight,
+              border: `1px solid ${color.blue.light}`,
+              borderRadius: "6px",
+              "& .MuiChip-label": {
+                px: 1,
+                fontSize: "0.75rem",
+                color: color.blue.dark,
+              },
+              "& .MuiChip-deleteIcon": {
+                fontSize: "1rem",
+                color: color.blue.dark,
+                "&:hover": { color: color.blue.main },
+              },
+            }}
+          />
+        ))}
+      </Stack>
+      <Button
+        variant="text"
+        size="small"
+        onClick={handleClearAll}
+        sx={{
+          ml: 1,
+          flexShrink: 0,
+          whiteSpace: "nowrap",
+          minWidth: "auto",
+          textTransform: "none",
+          color: color.blue.main,
+          "&:hover": { backgroundColor: "transparent", color: color.blue.dark },
+        }}
+      >
+        Clear all
+      </Button>
+    </Box>
+  );
+};
+
+export default ActiveFiltersChips;

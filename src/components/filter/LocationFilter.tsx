@@ -317,19 +317,30 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
       const result: SelectedStaticArea[] = [];
       parks.forEach((v) =>
         result.push({
+          label: marineParkOptions.find((opt) => opt.value === v)?.label || "",
           boundaryName: BoundaryName.AUSTRALIAN_MARINE_PARKS,
           value: v,
         })
       );
       ecoregions.forEach((v) =>
-        result.push({ boundaryName: BoundaryName.MEOW, value: v })
+        result.push({
+          label:
+            marineEcoregionOptions.find((opt) => opt.value === v)?.label || "",
+          boundaryName: BoundaryName.MEOW,
+          value: v,
+        })
       );
       coralAtlas.forEach((v) =>
-        result.push({ boundaryName: BoundaryName.CORAL_ATLAS, value: v })
+        result.push({
+          label:
+            allenCoralAtlasOptions.find((opt) => opt.value === v)?.label || "",
+          boundaryName: BoundaryName.CORAL_ATLAS,
+          value: v,
+        })
       );
       return result;
     },
-    []
+    [allenCoralAtlasOptions, marineEcoregionOptions, marineParkOptions]
   );
 
   const handleFilterModeChange = useCallback(

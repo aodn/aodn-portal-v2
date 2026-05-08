@@ -96,6 +96,7 @@ export interface Vocab {
   narrower?: Array<Vocab>;
 }
 export interface SelectedStaticArea {
+  label: string;
   boundaryName: string;
   value: string;
 }

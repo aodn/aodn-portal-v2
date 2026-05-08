@@ -37,6 +37,7 @@ import {
   updateSearchText,
 } from "../common/store/componentParamReducer";
 import { useAppDispatch, useAppSelector } from "../common/store/hooks";
+import ActiveFiltersChips from "./ActiveFiltersChips";
 
 interface SearchbarProps {
   setShouldExpandSearchbar?: Dispatch<React.SetStateAction<boolean>>;
@@ -159,6 +160,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
           }}
         />
       </Paper>
+      <ActiveFiltersChips />
       <ClickAwayListener onClickAway={handleClickAway}>
         <Popper
           modifiers={[
