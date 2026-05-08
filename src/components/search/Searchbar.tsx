@@ -47,7 +47,6 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
   const dispatch = useAppDispatch();
   const searchInput = useAppSelector((state) => state.paramReducer.searchText);
   const { isMobile, isTablet } = useBreakpoint();
-  const isTooLong = searchInput && searchInput.length >= 8;
   const [open, setOpen] = useState(false);
   const [boxRef, setBoxRef] = useState<HTMLDivElement | null>(null);
   const [activeButton, setActiveButton] = useState<SearchbarButtonNames>(
@@ -56,7 +55,6 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
   const [shouldExpandAllButtons, setShouldExpandAllButtons] = useState<boolean>(
     location.pathname === pageDefault.landing
   );
-  // set the default value false to allow user do search without typing anything
   const [pendingSearch, setPendingSearch] = useState<boolean>(false);
   const { ref, width: searchbarWidth } = useElementSize();
   const redirectSearch = useRedirectSearch();
@@ -64,76 +62,49 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
     ref: { current: boxRef },
     offset: (isMobile ? HEADER_HEIGHT_MOBILE : HEADER_HEIGHT) + 5,
   });
+
   const urlParamState: ParameterState | undefined = useMemo(() => {
-    // The first char is ? in the search string, so we need to remove it.
     const param = location?.search?.substring(1);
-    if (param && param.length > 0) {
-      return unFlattenToParameterState(param);
-    }
-    return undefined;
+    return param ? unFlattenToParameterState(param) : undefined;
   }, [location.search]);
 
   const boxRefCallback = useCallback((node: HTMLDivElement | null) => {
-    if (node !== null) {
-      setBoxRef(node);
-    }
+    if (node !== null) setBoxRef(node);
   }, []);
-
-  const handleScrollToTop = useCallback(() => {
-    scrollToElement();
-  }, [scrollToElement]);
 
   const handleEnterPressed = useCallback(
     (
       event: KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>,
       isSearchbarFocused: boolean
     ) => {
-      // TODO: a more user-friendly way to execute 'enter' press function is to delay the search to wait for pendingSearch turn to true
-      // instead of prevent user doing search if pendingSearch is false
-      // considering the debounce (300ms) and fetchSuggesterOptions(quite fast according to experience with edge) is not very long
-      // we may implement this later if gap is too big
-      if (event.key === "Enter" && !isSearchbarFocused && !pendingSearch) {
+      if (event.key === "Enter" && !isSearchbarFocused) {
         dispatch(updateSearchText(event.currentTarget.value));
         redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
       }
     },
-    [dispatch, pendingSearch, redirectSearch]
+    [dispatch, redirectSearch]
   );
 
   const handleClickButton = useCallback(
     (button: SearchbarButtonNames) => {
-      handleScrollToTop();
-      if (open) {
-        // If clicking the same button that's currently active, just close the popup
-        if (button === activeButton) {
-          setOpen(false);
-          return;
-        }
-
-        // If switching to a different button, close then reopen
+      scrollToElement();
+      if (open && button === activeButton) {
         setOpen(false);
-        setTimeout(() => {
-          setOpen(true);
-          setActiveButton(button);
-        }, 200);
       } else {
-        // If popup is closed, simply open it
-        setOpen(true);
         setActiveButton(button);
+        setOpen(true);
       }
     },
-    [handleScrollToTop, open, activeButton]
+    [scrollToElement, open, activeButton]
   );
 
-  const handleClosePopup = useCallback(() => setOpen(false), [setOpen]);
+  const handleClosePopup = useCallback(() => setOpen(false), []);
 
   const handleClickAway = useCallback(
     (event: MouseEvent | TouchEvent) => {
-      // Check if the click target is part of the search bar or buttons
-      if (boxRef?.contains(event.target as Node)) {
-        return;
+      if (!boxRef?.contains(event.target as Node)) {
+        setOpen(false);
       }
-      setOpen(false);
     },
     [boxRef]
   );
@@ -156,10 +127,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
         elevation={0}
         sx={{
           display: "flex",
-          flexDirection: {
-            xs: isTooLong ? "column" : "row",
-            sm: "row",
-          },
+          flexDirection: "row",
           alignItems: "center",
           height: "100%",
           border: `${border.sm} ${color.blue.dark}`,
@@ -170,7 +138,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
       >
         <InputWithSuggester
           handleEnterPressed={handleEnterPressed}
-          handleScrollToTop={handleScrollToTop}
+          handleScrollToTop={scrollToElement}
           setPendingSearch={setPendingSearch}
           setActiveButton={setActiveButton}
           setShouldExpandSearchbar={setShouldExpandSearchbar}
@@ -183,14 +151,11 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
           activeButton={activeButton}
           handleClickButton={handleClickButton}
           shouldExpandAllButtons={shouldExpandAllButtons}
-          shouldShrinkAllButtons={isMobile && !isTooLong}
+          shouldShrinkAllButtons={isMobile}
           isPopupOpen={open}
           sx={{
             pr: gap.md,
-            width:
-              isMobile && location.pathname === pageDefault.landing && isTooLong
-                ? "100%"
-                : "auto",
+            width: "auto",
           }}
         />
       </Paper>
@@ -218,17 +183,16 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
                 ? { minWidth: POPUP_MIN_WIDTH_TABLET }
                 : {}),
           }}
-          sx={
-            !isMobile && !isTablet
-              ? {
-                  minWidth: {
-                    md: `min(${POPUP_MIN_WIDTH_LAPTOP}px, calc(100vw - 32px))`,
-                    lg: `min(${POPUP_MIN_WIDTH_DESKTOP}px, calc(100vw - 48px))`,
-                    xl: `min(${POPUP_MIN_WIDTH_XL}px, calc(100vw - 64px))`,
-                  },
-                }
-              : undefined
-          }
+          sx={{
+            ...(!isMobile &&
+              !isTablet && {
+                minWidth: {
+                  md: `min(${POPUP_MIN_WIDTH_LAPTOP}px, calc(100vw - 32px))`,
+                  lg: `min(${POPUP_MIN_WIDTH_DESKTOP}px, calc(100vw - 48px))`,
+                  xl: `min(${POPUP_MIN_WIDTH_XL}px, calc(100vw - 64px))`,
+                },
+              }),
+          }}
           open={open}
           anchorEl={boxRef}
           placement="bottom-end"
@@ -245,15 +209,19 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
                 }}
                 data-testid="searchbar-popup"
               >
-                {activeButton === SearchbarButtonNames.Date && (
-                  <DateRangeFilter handleClosePopup={handleClosePopup} />
-                )}
-                {activeButton === SearchbarButtonNames.Location && (
-                  <LocationFilter handleClosePopup={handleClosePopup} />
-                )}
-                {activeButton === SearchbarButtonNames.Filter && (
-                  <Filters handleClosePopup={handleClosePopup} />
-                )}
+                <Fade in={true} key={activeButton} timeout={200}>
+                  <Box>
+                    {activeButton === SearchbarButtonNames.Date && (
+                      <DateRangeFilter handleClosePopup={handleClosePopup} />
+                    )}
+                    {activeButton === SearchbarButtonNames.Location && (
+                      <LocationFilter handleClosePopup={handleClosePopup} />
+                    )}
+                    {activeButton === SearchbarButtonNames.Filter && (
+                      <Filters handleClosePopup={handleClosePopup} />
+                    )}
+                  </Box>
+                </Fade>
               </Paper>
             </Fade>
           )}
