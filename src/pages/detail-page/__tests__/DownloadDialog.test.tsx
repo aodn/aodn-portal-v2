@@ -48,7 +48,7 @@ vi.mock(
 );
 
 vi.mock(
-  "@/pages/detail-page/features/download/DataSelection/DataSelection",
+  "@/pages/detail-page/features/download/SubsetConditions/SubsetConditions",
   () => ({
     default: () => (
       <div data-testid="data-selection">Data Selection Component</div>

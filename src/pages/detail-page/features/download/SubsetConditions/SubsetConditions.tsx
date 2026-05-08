@@ -14,16 +14,13 @@ import {
   type DownloadCondition,
 } from "../../../context/DownloadDefinitions";
 
-interface DataSelectionComponentProps extends DownloadCondition {
+interface SubsetConditionsProps extends DownloadCondition {
   sx?: SxProps;
   disable?: boolean;
   dateRangeBounds?: { min: Dayjs; max: Dayjs };
 }
 
-/**
- * DataSelectionComponent - Displays selected data conditions (bbox and date range)
- */
-const DataSelection: FC<DataSelectionComponentProps> = ({
+const SubsetConditions: FC<SubsetConditionsProps> = ({
   sx,
   downloadConditions,
   getAndSetDownloadConditions,
@@ -108,4 +105,4 @@ const DataSelection: FC<DataSelectionComponentProps> = ({
   );
 };
 
-export default DataSelection;
+export default SubsetConditions;
