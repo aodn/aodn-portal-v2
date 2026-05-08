@@ -22,8 +22,8 @@ const InfoMessage: FC<InfoMessageProps> = ({ infoText, iconColor, sx }) => {
       <Box sx={{ minWidth: 22, flexShrink: 0, px: "8px" }}>
         <InformationIcon
           color={iconColor ? iconColor : portalTheme.palette.primary1}
-          height={24}
-          width={24}
+          height={30}
+          width={30}
         />
       </Box>
       <Typography
