@@ -4,6 +4,11 @@ import AdditionalInfoPanel from "../features/AdditionalInfoPanel";
 import CitationPanel from "../features/CitationPanel";
 import SummaryAndDownloadPanel from "../features/SummaryAndDownloadPanel";
 import AssociatedRecordsPanel from "../features/AssociatedRecordsPanel";
+import { IconSummary } from "../../../components/icon/tabs/IconSummary";
+import { IconDataAccess } from "../../../components/icon/tabs/IconDataAccess";
+import { IconCitation } from "../../../components/icon/tabs/IconCitation";
+import { IconInformation } from "../../../components/icon/tabs/IconInformation3";
+import { IconRelatedResources } from "../../../components/icon/tabs/IconRelatedResources";
 import { Box, Card } from "@mui/material";
 import { borderRadius } from "../../../styles/constants";
 import { useDetailPageContext } from "../context/detail-page-context";
@@ -34,24 +39,28 @@ const additionalInfoPanelTab: Tab = {
   label: "Additional Information",
   value: detailPageDefault.ADDITIONAL_INFO,
   component: <AdditionalInfoPanel />,
+  icon: <IconInformation />,
 };
 
 const citationPanelTab: Tab = {
   label: "Citation and Usage",
   value: detailPageDefault.CITATION,
   component: <CitationPanel />,
+  icon: <IconCitation />,
 };
 
 const dataAccessPanelTab: Tab = {
   label: "Data Access",
   value: detailPageDefault.DATA_ACCESS,
   component: <DataAccessPanel />,
+  icon: <IconDataAccess />,
 };
 
 const associatedRecordsPanelTab: Tab = {
   label: "Related Resources",
   value: detailPageDefault.ASSOCIATED_RECORDS,
   component: <AssociatedRecordsPanel />,
+  icon: <IconRelatedResources />,
 };
 
 const summaryAndDownloadPanelTab = (
@@ -67,6 +76,7 @@ const summaryAndDownloadPanelTab = (
         onMapMoveEnd={onMapMoveEnd}
       />
     ),
+    icon: <IconSummary />,
   };
 };
 

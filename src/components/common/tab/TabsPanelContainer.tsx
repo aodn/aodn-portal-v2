@@ -18,6 +18,7 @@ export interface Tab {
   value: string;
   component: React.ReactNode;
   showBadge?: boolean;
+  icon?: React.ReactNode;
 }
 
 interface TabPanelProps {
@@ -65,7 +66,7 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
   handleTabChange,
   sx,
 }) => {
-  const { isAboveDesktop } = useBreakpoint();
+  const { isAboveDesktop, isMobile } = useBreakpoint();
   const [value, setValue] = useState(tabValue ?? 0);
 
   const handleChange = useCallback(
@@ -91,15 +92,22 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
         data-testid="tabs-panel-container"
         sx={{ ...sx, px: isAboveDesktop ? "10px" : "8px" }}
       >
-        {tabs.map((tab, index) => (
-          <StyledTab
-            key={index}
-            label={tab.label}
-            {...a11yProps(index)}
-            sx={{ textTransform: "none" }}
-            showBadge={tab.showBadge}
-          />
-        ))}
+        {tabs.map((tab, index) => {
+          const isSelected = index === value;
+          const showIconOnly = isMobile && !isSelected && !!tab.icon;
+          return (
+            <StyledTab
+              key={index}
+              label={showIconOnly ? undefined : tab.label}
+              icon={showIconOnly ? (tab.icon as React.ReactElement) : undefined}
+              aria-label={showIconOnly ? tab.label : undefined}
+              {...a11yProps(index)}
+              sx={{ textTransform: "none" }}
+              showBadge={tab.showBadge}
+              isMobileText={isMobile && !showIconOnly}
+            />
+          );
+        })}
       </StyledTabs>
       <Box sx={sx}>
         {tabs.map((tab, index) => (
