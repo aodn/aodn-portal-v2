@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { Box, Chip, Typography, Button, Stack, useTheme } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../common/store/hooks";
 import CloseIcon from "@mui/icons-material/Close";
@@ -22,21 +22,33 @@ import { borderRadius, color, gap } from "../../styles/constants";
 import { TrashIcon } from "../../assets/icons/search/trash";
 import {
   BoundaryName,
+  BoundaryProperties,
   fetchAllenCoralAtlasOptions,
   fetchMarineEcoregionOptions,
   fetchMarineParkOptions,
 } from "../map/mapbox/layers/StaticLayer";
-
-// Value cached, so no issue to repeatedly fetch them here
-const marineEcoregion = await fetchMarineEcoregionOptions();
-const marinePark = await fetchMarineParkOptions();
-const allenCoralAtlas = await fetchAllenCoralAtlasOptions();
+import { DATA_SETTINGS } from "../filter/tab-filters/DataSettingsFilter";
 
 const ActiveFiltersChips: FC = () => {
   const dispatch = useAppDispatch();
   const { isMobile } = useBreakpoint();
   const theme = useTheme();
   const params = useAppSelector((state) => state.paramReducer);
+
+  const [marineEcoregion, setMarineEcoregion] = useState<BoundaryProperties[]>(
+    []
+  );
+  const [marinePark, setMarinePark] = useState<BoundaryProperties[]>([]);
+  const [allenCoralAtlas, setAllenCoralAtlas] = useState<BoundaryProperties[]>(
+    []
+  );
+
+  useEffect(() => {
+    // Cached value so will return fast
+    fetchMarineEcoregionOptions().then(setMarineEcoregion);
+    fetchMarineParkOptions().then(setMarinePark);
+    fetchAllenCoralAtlasOptions().then(setAllenCoralAtlas);
+  }, []);
 
   const handleClearAll = useCallback(() => {
     dispatch(clearComponentParam());
@@ -145,7 +157,7 @@ const ActiveFiltersChips: FC = () => {
     // Update Frequency
     if (params.updateFreq) {
       chips.push({
-        label: `Freq: ${params.updateFreq}`,
+        label: `Delivery Mode: ${DATA_SETTINGS.dataDeliveryFrequency.find((f) => f.value === params.updateFreq)?.label || params.updateFreq}`,
         onDelete: () => dispatch(updateUpdateFreq(undefined)),
       });
     }
@@ -153,7 +165,7 @@ const ActiveFiltersChips: FC = () => {
     // Status
     if (params.datasetStatus) {
       chips.push({
-        label: `Status: ${params.datasetStatus}`,
+        label: `Status: ${DATA_SETTINGS.dataStatus.find((f) => f.value === params.datasetStatus)?.label || params.datasetStatus}`,
         onDelete: () => dispatch(updateStatus(undefined)),
       });
     }
@@ -167,7 +179,7 @@ const ActiveFiltersChips: FC = () => {
     }
 
     return chips;
-  }, [params, dispatch]);
+  }, [params, dispatch, marineEcoregion, marinePark, allenCoralAtlas]);
 
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);

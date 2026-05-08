@@ -335,7 +335,7 @@ const LocationFilter: FC<LocationFilterProps> = ({ handleClosePopup }) => {
       );
       return result;
     },
-    [allenCoralAtlasOptions, marineEcoregionOptions, marineParkOptions]
+    []
   );
 
   const handleFilterModeChange = useCallback(
