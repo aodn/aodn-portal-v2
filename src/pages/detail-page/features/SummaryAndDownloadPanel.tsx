@@ -15,13 +15,14 @@ import {
 import useBreakpoint from "../../../hooks/useBreakpoint";
 import AIGenTag from "../../../components/info/AIGenTag";
 import { portalTheme } from "../../../styles";
+import { dateDefault } from "../../../components/common/constants";
 
 // Exported for unit tests
 export const getMinMaxDateStamps = (
   featureCollection?: FeatureCollection<Point>
 ): [Dayjs, Dayjs] => {
   if (!featureCollection?.features?.length) {
-    return [dayjs(new Date("01/01/1970")), dayjs(new Date())];
+    return [dayjs(dateDefault.min), dayjs(dateDefault.max)];
   }
 
   let minDate: Dayjs | null = null;
@@ -43,8 +44,8 @@ export const getMinMaxDateStamps = (
   }
 
   return [
-    minDate && minDate.isValid() ? minDate : dayjs(new Date("01/01/1970")),
-    maxDate && maxDate.isValid() ? maxDate : dayjs(new Date()),
+    minDate && minDate.isValid() ? minDate : dayjs(dateDefault.min),
+    maxDate && maxDate.isValid() ? maxDate : dayjs(dateDefault.max),
   ];
 };
 
