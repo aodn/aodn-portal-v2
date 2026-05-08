@@ -230,7 +230,7 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
                       <LocationFilter />
                     )}
                     {activeButton === SearchbarButtonNames.Filter && (
-                      <Filters handleClosePopup={handleClosePopup} />
+                      <Filters />
                     )}
                   </Box>
                 </Fade>
