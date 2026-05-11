@@ -16,7 +16,10 @@ import { Header } from "./Header";
 import Stepper from "./stepper/Stepper";
 import StepperButton from "./stepper/StepperButton";
 import useBreakpoint from "../../../../../hooks/useBreakpoint";
-import { DownloadCondition } from "../../../context/DownloadDefinitions";
+import {
+  DownloadCondition,
+  DownloadConditionType,
+} from "../../../context/DownloadDefinitions";
 import { disableScroll, enableScroll } from "../../../../../utils/ScrollUtils";
 
 interface DownloadDialogProps extends DownloadCondition {
@@ -79,8 +82,18 @@ const DownloadDialog = ({
     };
   }, [isOpen]);
 
+  // Show the section only when there is something visible inside it
+  // (bbox / polygon / date range). Other condition types like FORMAT or KEY
+  // don't render in SubsetConditions and shouldn't keep the section alive.
   const shouldShowSubsetConditions =
-    hasDownloadConditions && subsettingSelectionCount >= 1;
+    hasDownloadConditions &&
+    subsettingSelectionCount >= 1 &&
+    downloadConditions.some(
+      (c) =>
+        c.type === DownloadConditionType.BBOX ||
+        c.type === DownloadConditionType.POLYGON ||
+        c.type === DownloadConditionType.DATE_RANGE
+    );
 
   const getButtonStatus = () => {
     const isFailure = processingStatus && !processingStatus.startsWith("2");
@@ -127,6 +140,7 @@ const DownloadDialog = ({
                 downloadConditions={downloadConditions}
                 getAndSetDownloadConditions={getAndSetDownloadConditions}
                 removeDownloadCondition={removeDownloadCondition}
+                readOnly
               />
             </Box>
           )}

@@ -42,6 +42,7 @@ interface DateRangeConditionCardProps {
   disable?: boolean;
   minDate?: Dayjs;
   maxDate?: Dayjs;
+  readOnly?: boolean;
 }
 
 interface DateRowProps {
@@ -95,6 +96,7 @@ const DateRangeConditionCard: React.FC<DateRangeConditionCardProps> = ({
   disable,
   minDate,
   maxDate,
+  readOnly = false,
 }) => {
   const { start, end } = dateRangeCondition;
 
@@ -117,7 +119,7 @@ const DateRangeConditionCard: React.FC<DateRangeConditionCardProps> = ({
       type={DownloadConditionType.DATE_RANGE}
       removeCallback={onRemove}
       disable={disable}
-      actions={sliderAction}
+      actions={readOnly ? undefined : sliderAction}
     >
       <Stack
         direction="column"
@@ -128,7 +130,7 @@ const DateRangeConditionCard: React.FC<DateRangeConditionCardProps> = ({
         <DateRow
           label="From"
           value={start}
-          disabled={disable}
+          disabled={disable || readOnly}
           minDate={minDate}
           maxDate={dayjs(end)}
           onChange={(next) => {
@@ -140,7 +142,7 @@ const DateRangeConditionCard: React.FC<DateRangeConditionCardProps> = ({
         <DateRow
           label="To"
           value={end}
-          disabled={disable}
+          disabled={disable || readOnly}
           maxDate={maxDate}
           minDate={dayjs(start)}
           onChange={(next) => {

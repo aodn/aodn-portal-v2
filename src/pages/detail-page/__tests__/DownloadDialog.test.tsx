@@ -4,6 +4,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import DownloadDialog from "../features/download/DownloadDialog/DownloadDialog";
+import { BBoxCondition } from "../context/DownloadDefinitions";
 
 // Mock the custom hook
 const mockUseDownloadDialog = {
@@ -224,7 +225,10 @@ describe("DownloadDialog", () => {
 
     render(
       <TestWrapper>
-        <DownloadDialog {...mockProps} />
+        <DownloadDialog
+          {...mockProps}
+          downloadConditions={[new BBoxCondition("bbox-1", [0, 0, 1, 1])]}
+        />
       </TestWrapper>
     );
 
