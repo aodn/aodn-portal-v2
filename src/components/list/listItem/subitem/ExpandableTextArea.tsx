@@ -26,6 +26,7 @@ interface ExpandableTextAreaProps extends CopyButtonConfig {
   showCopyOnHover?: boolean;
   onClickExpand?: () => void;
   showMoreStr?: string;
+  defaultExpanded?: boolean;
   // Configuration for line clamping, allowing different values for different breakpoints
   lineClampConfig?: {
     default?: number;
@@ -42,6 +43,7 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
   showCopyOnHover = false,
   onClickExpand = () => {},
   showMoreStr = "Show More",
+  defaultExpanded = false,
   lineClampConfig = {
     default: LINE_CLAMP_DEFAULT,
     tablet: LINE_CLAMP_DEFAULT_TABLET,
@@ -52,7 +54,7 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
 }) => {
   const { checkIsCopied } = useClipboardContext();
   const { isUnderLaptop, isMobile } = useBreakpoint();
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [needsExpansion, setNeedsExpansion] = useState(false);
   const [hoverOnContent, setHoverOnContent] = useState<boolean>(false);
   const contentRef = useRef<HTMLDivElement>(null);
