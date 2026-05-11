@@ -1,4 +1,4 @@
-import { designTokensRC8 } from "../../styles/designTokensRC8";
+import { designTokensRC8 } from "./designTokensRC8";
 
 declare module "@mui/material/styles" {
   interface Theme {
