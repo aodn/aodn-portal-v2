@@ -398,22 +398,21 @@ const PolygonConditionCard: React.FC<PolygonConditionCardProps> = ({
     ? vertices.length > MIN_VERTICES
     : vertices.length > 0;
 
+  // Adjust state during render (not in an effect) so React re-renders once
+  // with the corrected values — no flicker and no set-state-in-effect lint.
+
   // Clear local draft when a polygon condition arrives (e.g. user drew on map).
-  // Use the stable id so we don't re-run for re-rendered identical conditions.
-  const polygonId = polygonCondition?.id;
-  useEffect(() => {
-    if (polygonId) setPendingVertices([]);
-  }, [polygonId]);
+  if (hasPolygon && pendingVertices.length > 0) {
+    setPendingVertices([]);
+  }
 
   // Reset editing state if the underlying vertex disappears (e.g. polygon
   // replaced externally), which would otherwise leave editingIndex dangling.
-  useEffect(() => {
-    if (editingIndex !== null && editingIndex >= vertices.length) {
-      setEditingIndex(null);
-      setEditLat("");
-      setEditLng("");
-    }
-  }, [editingIndex, vertices.length]);
+  if (editingIndex !== null && editingIndex >= vertices.length) {
+    setEditingIndex(null);
+    setEditLat("");
+    setEditLng("");
+  }
 
   // Auto-focus + select the lat input when entering edit mode.
   useEffect(() => {
