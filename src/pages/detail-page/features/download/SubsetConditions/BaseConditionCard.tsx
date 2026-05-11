@@ -29,6 +29,7 @@ interface BaseConditionCardProps {
   removeCallback?: () => void;
   disable?: boolean;
   contentSx?: SxProps<Theme>;
+  headerDivider?: boolean;
 }
 
 interface ExpandProps extends IconButtonProps {
@@ -90,6 +91,7 @@ const BaseConditionCard: React.FC<BaseConditionCardProps> = ({
   removeCallback,
   disable = false,
   contentSx,
+  headerDivider = false,
 }) => {
   const [expanded, setExpanded] = useState(true);
   const toggle = () => setExpanded((prev) => !prev);
@@ -156,6 +158,9 @@ const BaseConditionCard: React.FC<BaseConditionCardProps> = ({
         }}
       />
       <Collapse in={expanded} timeout="auto" unmountOnExit>
+        {headerDivider && (
+          <Divider sx={{ borderBottomWidth: 2, borderColor: "common.white" }} />
+        )}
         <CardContent
           sx={[
             {

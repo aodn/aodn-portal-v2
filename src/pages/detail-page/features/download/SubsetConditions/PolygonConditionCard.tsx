@@ -542,6 +542,8 @@ const PolygonConditionCard: React.FC<PolygonConditionCardProps> = ({
       removeCallback={onRemove}
       disable={disable}
       actions={readOnly ? undefined : drawAction}
+      headerDivider
+      contentSx={{ pt: 1.5 }}
     >
       <Box data-testid="polygon-condition-box">
         <Stack spacing={1} alignItems="center">
