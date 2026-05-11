@@ -4,7 +4,6 @@ import {
   Button,
   Divider,
   IconButton,
-  InputBase,
   Stack,
   Typography,
 } from "@mui/material";
@@ -16,6 +15,7 @@ import {
   DownloadConditionType,
 } from "../../../context/DownloadDefinitions";
 import BaseConditionCard from "./BaseConditionCard";
+import CoordInput from "./CoordInput";
 import { portalTheme } from "../../../../../styles";
 
 interface BBoxConditionCardProps {
@@ -214,7 +214,7 @@ interface CoordInputProps {
   disabled?: boolean;
 }
 
-const CoordInput: React.FC<CoordInputProps> = ({
+const LabeledCoordInput: React.FC<CoordInputProps> = ({
   label,
   value,
   error,
@@ -239,54 +239,16 @@ const CoordInput: React.FC<CoordInputProps> = ({
       >
         {label}:
       </Typography>
-      <InputBase
+      <CoordInput
         id={inputId}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            onSubmit();
-          }
-        }}
-        placeholder="enter"
+        width={80}
+        error={error}
+        errorMessageId={errorMessageId}
         disabled={disabled}
-        error={Boolean(error)}
-        inputProps={{
-          "aria-label": `${label} coordinate`,
-          "aria-invalid": Boolean(error),
-          "aria-errormessage":
-            error && errorMessageId ? errorMessageId : undefined,
-          inputMode: "decimal",
-        }}
-        sx={{
-          width: 80,
-          height: 28,
-          p: 0,
-          m: 0,
-          backgroundColor: "common.white",
-          borderRadius: "4px",
-          boxShadow: SOFT_SHADOW,
-          outline: error
-            ? `1px solid ${portalTheme.palette.error.main}`
-            : "none",
-          "& .MuiInputBase-input": {
-            ...portalTheme.typography.body2Regular,
-            color: portalTheme.palette.text1,
-            textAlign: "center",
-            p: 0,
-            m: 0,
-            minHeight: 0,
-            height: 28,
-            lineHeight: "28px",
-            boxSizing: "border-box",
-            "&::placeholder": {
-              color: portalTheme.palette.text1,
-              opacity: 1,
-              textAlign: "center",
-            },
-          },
-        }}
+        ariaLabel={`${label} coordinate`}
+        onChange={onChange}
+        onSubmit={onSubmit}
       />
     </Stack>
   );
@@ -418,7 +380,7 @@ const BBoxConditionCard: React.FC<BBoxConditionCardProps> = ({
           alignItems="center"
           sx={{ pt: 0.5, px: 1.5, width: "fit-content", mx: "auto" }}
         >
-          <CoordInput
+          <LabeledCoordInput
             label="N"
             value={draft.N}
             error={errors.N}
@@ -428,7 +390,7 @@ const BBoxConditionCard: React.FC<BBoxConditionCardProps> = ({
             disabled={disable}
           />
           <Stack direction="row" spacing={3}>
-            <CoordInput
+            <LabeledCoordInput
               label="W"
               value={draft.W}
               error={errors.W}
@@ -437,7 +399,7 @@ const BBoxConditionCard: React.FC<BBoxConditionCardProps> = ({
               onSubmit={submitDraft}
               disabled={disable}
             />
-            <CoordInput
+            <LabeledCoordInput
               label="E"
               value={draft.E}
               error={errors.E}
@@ -447,7 +409,7 @@ const BBoxConditionCard: React.FC<BBoxConditionCardProps> = ({
               disabled={disable}
             />
           </Stack>
-          <CoordInput
+          <LabeledCoordInput
             label="S"
             value={draft.S}
             error={errors.S}
