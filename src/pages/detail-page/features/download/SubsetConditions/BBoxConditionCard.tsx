@@ -24,6 +24,7 @@ interface BBoxConditionCardProps {
   onAddBBox?: (bbox: BBox) => void;
   onDrawOnMap?: () => void;
   disable?: boolean;
+  readOnly?: boolean;
 }
 
 type CoordKey = "N" | "S" | "E" | "W";
@@ -260,6 +261,7 @@ const BBoxConditionCard: React.FC<BBoxConditionCardProps> = ({
   onAddBBox,
   onDrawOnMap,
   disable,
+  readOnly = false,
 }) => {
   const [draft, setDraft] = useState<CoordDraft>(EMPTY_DRAFT);
   const [errors, setErrors] = useState<CoordErrors>({});
@@ -317,44 +319,44 @@ const BBoxConditionCard: React.FC<BBoxConditionCardProps> = ({
 
   const showDivider = bboxConditions.length > 0;
 
+  const actionButton = (
+    <Button
+      fullWidth
+      startIcon={
+        <Box
+          sx={{
+            width: 28,
+            height: 28,
+            display: "grid",
+            placeItems: "center",
+            borderRadius: "2px",
+            border: `1px dashed ${portalTheme.palette.primary1}`,
+          }}
+        >
+          <AddIcon sx={{ fontSize: 18, color: portalTheme.palette.grey700 }} />
+        </Box>
+      }
+      onClick={handleActionClick}
+      disabled={actionDisabled}
+      sx={{
+        justifyContent: "center",
+        textTransform: "none",
+        ...portalTheme.typography.body2Regular,
+        color: portalTheme.palette.text1,
+        "& .MuiButton-startIcon": { ml: 0, mr: 1.5 },
+        "&:hover": { backgroundColor: "transparent" },
+      }}
+    >
+      {actionLabel}
+    </Button>
+  );
+
   return (
     <BaseConditionCard
       type={DownloadConditionType.BBOX}
       disable={disable}
       contentSx={{ px: 0 }}
-      actions={
-        <Button
-          fullWidth
-          startIcon={
-            <Box
-              sx={{
-                width: 28,
-                height: 28,
-                display: "grid",
-                placeItems: "center",
-                borderRadius: "2px",
-                border: `1px dashed ${portalTheme.palette.primary1}`,
-              }}
-            >
-              <AddIcon
-                sx={{ fontSize: 18, color: portalTheme.palette.grey700 }}
-              />
-            </Box>
-          }
-          onClick={handleActionClick}
-          disabled={actionDisabled}
-          sx={{
-            justifyContent: "center",
-            textTransform: "none",
-            ...portalTheme.typography.body2Regular,
-            color: portalTheme.palette.text1,
-            "& .MuiButton-startIcon": { ml: 0, mr: 1.5 },
-            "&:hover": { backgroundColor: "transparent" },
-          }}
-        >
-          {actionLabel}
-        </Button>
-      }
+      actions={readOnly ? undefined : actionButton}
     >
       <Stack data-testid="bbox-condition-box">
         <Stack spacing={1.5} sx={{ px: 1.5 }}>
@@ -369,69 +371,71 @@ const BBoxConditionCard: React.FC<BBoxConditionCardProps> = ({
           ))}
         </Stack>
 
-        {showDivider && (
+        {!readOnly && showDivider && (
           <Divider
             sx={{ borderBottomWidth: 2, borderColor: "common.white", my: 1 }}
           />
         )}
 
-        <Stack
-          spacing={1.5}
-          alignItems="center"
-          sx={{ pt: 0.5, px: 1.5, width: "fit-content", mx: "auto" }}
-        >
-          <LabeledCoordInput
-            label="N"
-            value={draft.N}
-            error={errors.N}
-            errorMessageId={errorMessageId}
-            onChange={setField("N")}
-            onSubmit={submitDraft}
-            disabled={disable}
-          />
-          <Stack direction="row" spacing={3}>
+        {!readOnly && (
+          <Stack
+            spacing={1.5}
+            alignItems="center"
+            sx={{ pt: 0.5, px: 1.5, width: "fit-content", mx: "auto" }}
+          >
             <LabeledCoordInput
-              label="W"
-              value={draft.W}
-              error={errors.W}
+              label="N"
+              value={draft.N}
+              error={errors.N}
               errorMessageId={errorMessageId}
-              onChange={setField("W")}
+              onChange={setField("N")}
               onSubmit={submitDraft}
               disabled={disable}
             />
+            <Stack direction="row" spacing={3}>
+              <LabeledCoordInput
+                label="W"
+                value={draft.W}
+                error={errors.W}
+                errorMessageId={errorMessageId}
+                onChange={setField("W")}
+                onSubmit={submitDraft}
+                disabled={disable}
+              />
+              <LabeledCoordInput
+                label="E"
+                value={draft.E}
+                error={errors.E}
+                errorMessageId={errorMessageId}
+                onChange={setField("E")}
+                onSubmit={submitDraft}
+                disabled={disable}
+              />
+            </Stack>
             <LabeledCoordInput
-              label="E"
-              value={draft.E}
-              error={errors.E}
+              label="S"
+              value={draft.S}
+              error={errors.S}
               errorMessageId={errorMessageId}
-              onChange={setField("E")}
+              onChange={setField("S")}
               onSubmit={submitDraft}
               disabled={disable}
             />
+            {errorMessage && (
+              <Typography
+                id={errorMessageId}
+                role="alert"
+                variant="body2Regular"
+                sx={{
+                  color: portalTheme.palette.error.main,
+                  pt: 0.5,
+                }}
+              >
+                {errorMessage}
+              </Typography>
+            )}
           </Stack>
-          <LabeledCoordInput
-            label="S"
-            value={draft.S}
-            error={errors.S}
-            errorMessageId={errorMessageId}
-            onChange={setField("S")}
-            onSubmit={submitDraft}
-            disabled={disable}
-          />
-          {errorMessage && (
-            <Typography
-              id={errorMessageId}
-              role="alert"
-              variant="body2Regular"
-              sx={{
-                color: portalTheme.palette.error.main,
-                pt: 0.5,
-              }}
-            >
-              {errorMessage}
-            </Typography>
-          )}
-        </Stack>
+        )}
       </Stack>
     </BaseConditionCard>
   );

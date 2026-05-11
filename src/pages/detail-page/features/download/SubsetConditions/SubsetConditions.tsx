@@ -18,6 +18,7 @@ import {
 interface SubsetConditionsProps extends DownloadCondition {
   sx?: SxProps;
   disable?: boolean;
+  readOnly?: boolean;
   dateRangeBounds?: { min: Dayjs; max: Dayjs };
 }
 
@@ -27,6 +28,7 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
   getAndSetDownloadConditions,
   removeDownloadCondition,
   disable,
+  readOnly,
   dateRangeBounds,
 }) => {
   const bboxConditions: BBoxCondition[] = useMemo(() => {
@@ -111,13 +113,16 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
 
   return (
     <Stack spacing={1} sx={sx}>
-      <BBoxConditionCard
-        bboxConditions={bboxConditions}
-        onRemove={handleRemove}
-        onAddBBox={handleAddBBox}
-        disable={disable}
-      />
-      {polygonConditions.length === 0 && (
+      {(!readOnly || bboxConditions.length > 0) && (
+        <BBoxConditionCard
+          bboxConditions={bboxConditions}
+          onRemove={handleRemove}
+          onAddBBox={handleAddBBox}
+          disable={disable}
+          readOnly={readOnly}
+        />
+      )}
+      {!readOnly && polygonConditions.length === 0 && (
         <PolygonConditionCard
           onCreate={handlePolygonCreate}
           disable={disable}
@@ -130,6 +135,7 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
           onRemove={() => handleRemove(polygonCondition)}
           onUpdate={(coords) => handlePolygonUpdate(polygonCondition, coords)}
           disable={disable}
+          readOnly={readOnly}
         />
       ))}
       {dateRangeCondition.map((dateRangeCondition) => (
@@ -141,6 +147,7 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
             handleDateRangeChange(dateRangeCondition, start, end)
           }
           disable={disable}
+          readOnly={readOnly}
           minDate={dateRangeBounds?.min}
           maxDate={dateRangeBounds?.max}
         />

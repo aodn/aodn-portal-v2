@@ -369,6 +369,7 @@ interface PolygonConditionCardProps {
   onUpdate?: (coordinates: [number, number][]) => void;
   onCreate?: (coordinates: [number, number][]) => void;
   disable?: boolean;
+  readOnly?: boolean;
 }
 
 const PolygonConditionCard: React.FC<PolygonConditionCardProps> = ({
@@ -377,6 +378,7 @@ const PolygonConditionCard: React.FC<PolygonConditionCardProps> = ({
   onUpdate,
   onCreate,
   disable = false,
+  readOnly = false,
 }) => {
   const [pendingVertices, setPendingVertices] = useState<[number, number][]>(
     []
@@ -539,12 +541,12 @@ const PolygonConditionCard: React.FC<PolygonConditionCardProps> = ({
       type={DownloadConditionType.POLYGON}
       removeCallback={onRemove}
       disable={disable}
-      actions={drawAction}
+      actions={readOnly ? undefined : drawAction}
     >
       <Box data-testid="polygon-condition-box">
         <Stack spacing={1} alignItems="center">
           {vertices.map(([lng, lat], index) =>
-            editingIndex === index ? (
+            !readOnly && editingIndex === index ? (
               <EditVertexRow
                 key={index}
                 lat={editLat}
@@ -561,7 +563,7 @@ const PolygonConditionCard: React.FC<PolygonConditionCardProps> = ({
                 lat={lat}
                 lng={lng}
                 index={index}
-                disabled={disable}
+                disabled={disable || readOnly}
                 onActivate={startEdit}
                 onEdit={startEdit}
                 onRemove={removeVertex}
@@ -590,14 +592,16 @@ const PolygonConditionCard: React.FC<PolygonConditionCardProps> = ({
           </Typography>
         )}
 
-        <AddVertexRow
-          lat={addLat}
-          lng={addLng}
-          disabled={disable}
-          onLatChange={setAddLat}
-          onLngChange={setAddLng}
-          onAdd={addVertex}
-        />
+        {!readOnly && (
+          <AddVertexRow
+            lat={addLat}
+            lng={addLng}
+            disabled={disable}
+            onLatChange={setAddLat}
+            onLngChange={setAddLng}
+            onAdd={addVertex}
+          />
+        )}
       </Box>
     </BaseConditionCard>
   );
