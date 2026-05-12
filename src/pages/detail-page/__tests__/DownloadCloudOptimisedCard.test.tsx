@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach, beforeAll } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Provider } from "react-redux";
 
 beforeAll(() => {
@@ -80,14 +82,16 @@ describe("DownloadCloudOptimisedCard", () => {
     return render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
-          <DownloadCloudOptimisedCard
-            collection={collection}
-            downloadConditions={downloadConditions}
-            getAndSetDownloadConditions={mockGetAndSetDownloadConditions}
-            removeDownloadCondition={mockRemoveDownloadCondition}
-            selectedCoKey={selectedCoKey}
-            setSelectedCoKey={setSelectedCoKey}
-          />
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DownloadCloudOptimisedCard
+              collection={collection}
+              downloadConditions={downloadConditions}
+              getAndSetDownloadConditions={mockGetAndSetDownloadConditions}
+              removeDownloadCondition={mockRemoveDownloadCondition}
+              selectedCoKey={selectedCoKey}
+              setSelectedCoKey={setSelectedCoKey}
+            />
+          </LocalizationProvider>
         </ThemeProvider>
       </Provider>
     );
@@ -102,7 +106,7 @@ describe("DownloadCloudOptimisedCard", () => {
 
     expect(screen.getByText("Format Selection")).toBeInTheDocument();
     expect(screen.getByText("Data Selection")).toBeInTheDocument();
-    expect(screen.getByRole("button")).toBeInTheDocument();
+    expect(screen.getByTestId("download-button")).toBeInTheDocument();
   });
 
   it("should display correct data selection options with labels without extensions", async () => {
@@ -222,12 +226,14 @@ describe("DownloadCloudOptimisedCard", () => {
     render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
-          <DownloadCloudOptimisedCard
-            collection={createMockCollection(DatasetType.ZARR)}
-            downloadConditions={[]}
-            getAndSetDownloadConditions={mockGetAndSetDownloadConditions}
-            removeDownloadCondition={mockRemoveDownloadCondition}
-          />
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DownloadCloudOptimisedCard
+              collection={createMockCollection(DatasetType.ZARR)}
+              downloadConditions={[]}
+              getAndSetDownloadConditions={mockGetAndSetDownloadConditions}
+              removeDownloadCondition={mockRemoveDownloadCondition}
+            />
+          </LocalizationProvider>
         </ThemeProvider>
       </Provider>
     );

@@ -118,6 +118,11 @@ const DateRange: React.FC<DateRangeControlProps> = ({
         setCurrentMinDate(start ?? undefined);
         setCurrentMaxDate(end ?? undefined);
       });
+    } else {
+      startTransition(() => {
+        setCurrentMinDate(undefined);
+        setCurrentMaxDate(undefined);
+      });
     }
   }, [downloadConditions]);
 

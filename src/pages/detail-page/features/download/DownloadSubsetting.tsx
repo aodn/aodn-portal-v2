@@ -63,45 +63,43 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
         sx={{ width: "100%", pt: subsettingSelectionCount === 0 ? "16px" : 0 }}
       />
 
-      {subsettingSelectionCount > 0 && (
-        <PlainAccordion
-          expanded={accordionExpanded}
-          elevation={0}
-          onChange={() => setAccordionExpanded((prevState) => !prevState)}
-        >
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Box display="flex" alignItems="center" gap={3}>
-              <Typography
-                typography="title1Medium"
-                color={portalTheme.palette.text1}
-                p={0}
-              >
-                Download Selection
-              </Typography>
-              <Badge
-                sx={{
-                  "& .MuiBadge-badge": {
-                    backgroundColor: portalTheme.palette.primary1,
-                    ...portalTheme.typography.title2Regular,
-                    color: portalTheme.palette.text3,
-                    pb: "1px",
-                  },
-                }}
-                badgeContent={subsettingSelectionCount}
-              />
-            </Box>
-          </AccordionSummary>
-          <AccordionDetails sx={{ pt: "4px" }}>
-            <SubsetConditions
-              downloadConditions={downloadConditions}
-              getAndSetDownloadConditions={getAndSetDownloadConditions}
-              removeDownloadCondition={removeDownloadCondition}
-              disable={disable}
-              dateRangeBounds={dateRangeBounds}
+      <PlainAccordion
+        expanded={accordionExpanded}
+        elevation={0}
+        onChange={() => setAccordionExpanded((prevState) => !prevState)}
+      >
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Box display="flex" alignItems="center" gap={3}>
+            <Typography
+              typography="title1Medium"
+              color={portalTheme.palette.text1}
+              p={0}
+            >
+              Download Selection
+            </Typography>
+            <Badge
+              sx={{
+                "& .MuiBadge-badge": {
+                  backgroundColor: portalTheme.palette.primary1,
+                  ...portalTheme.typography.title2Regular,
+                  color: portalTheme.palette.text3,
+                  pb: "1px",
+                },
+              }}
+              badgeContent={subsettingSelectionCount}
             />
-          </AccordionDetails>
-        </PlainAccordion>
-      )}
+          </Box>
+        </AccordionSummary>
+        <AccordionDetails sx={{ pt: "4px" }}>
+          <SubsetConditions
+            downloadConditions={downloadConditions}
+            getAndSetDownloadConditions={getAndSetDownloadConditions}
+            removeDownloadCondition={removeDownloadCondition}
+            disable={disable}
+            dateRangeBounds={dateRangeBounds}
+          />
+        </AccordionDetails>
+      </PlainAccordion>
     </Stack>
   );
 };

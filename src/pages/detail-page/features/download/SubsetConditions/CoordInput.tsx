@@ -31,6 +31,7 @@ const INPUT_SX = {
   // typed values are otherwise right-aligned for column scanning.
   "&:placeholder-shown": { textAlign: "center", pr: 0 },
   "&::placeholder": { color: portalTheme.palette.text1, opacity: 1 },
+  "&:focus::placeholder": { color: "transparent", opacity: 0 },
 };
 
 export interface CoordInputProps {

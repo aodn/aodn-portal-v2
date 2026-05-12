@@ -17,6 +17,7 @@ import {
 import BaseConditionCard from "./BaseConditionCard";
 import CoordInput from "./CoordInput";
 import { portalTheme } from "../../../../../styles";
+import { BboxTooltipIcon } from "../../../../../assets/icons/map/tooltip_bbox";
 
 interface BBoxConditionCardProps {
   bboxConditions: BBoxCondition[];
@@ -315,7 +316,7 @@ const BBoxConditionCard: React.FC<BBoxConditionCardProps> = ({
     ? "Add bounding box"
     : "Draw bounding box on map";
 
-  const actionDisabled = disable || (isFormDirty ? !onAddBBox : !onDrawOnMap);
+  const actionDisabled = isFormDirty ? disable || !onAddBBox : !onDrawOnMap;
 
   const showDivider = bboxConditions.length > 0;
 
@@ -323,18 +324,31 @@ const BBoxConditionCard: React.FC<BBoxConditionCardProps> = ({
     <Button
       fullWidth
       startIcon={
-        <Box
-          sx={{
-            width: 28,
-            height: 28,
-            display: "grid",
-            placeItems: "center",
-            borderRadius: "2px",
-            border: `1px dashed ${portalTheme.palette.primary1}`,
-          }}
-        >
-          <AddIcon sx={{ fontSize: 18, color: portalTheme.palette.grey700 }} />
-        </Box>
+        isFormDirty ? (
+          <Box
+            sx={{
+              width: 28,
+              height: 28,
+              display: "grid",
+              placeItems: "center",
+              borderRadius: "2px",
+              border: `2px dashed ${portalTheme.palette.primary1}`,
+            }}
+          >
+            <AddIcon
+              sx={{ fontSize: 18, color: portalTheme.palette.grey700 }}
+            />
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              display: "flex",
+              "& svg": { width: 32, height: 32 },
+            }}
+          >
+            <BboxTooltipIcon />
+          </Box>
+        )
       }
       onClick={handleActionClick}
       disabled={actionDisabled}
@@ -343,8 +357,11 @@ const BBoxConditionCard: React.FC<BBoxConditionCardProps> = ({
         textTransform: "none",
         ...portalTheme.typography.body2Regular,
         color: portalTheme.palette.text1,
-        "& .MuiButton-startIcon": { ml: 0, mr: 1.5 },
+        "& .MuiButton-startIcon": { ml: 0, mr: 2 },
         "&:hover": { backgroundColor: "transparent" },
+        "&.Mui-disabled": isFormDirty
+          ? undefined
+          : { color: portalTheme.palette.text1 },
       }}
     >
       {actionLabel}
