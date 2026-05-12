@@ -146,6 +146,7 @@ const DateRange: React.FC<DateRangeControlProps> = ({
         description="Select specific date or time range to filter the dataset details."
         icon={<TimeRangeTooltipIcon />}
         onClose={handleCloseTooltip}
+        hideIconOnSmallScreen
       />
 
       {open &&

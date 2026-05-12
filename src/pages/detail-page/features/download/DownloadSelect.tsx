@@ -34,6 +34,7 @@ const DownloadSelect: FC<DownloadSelectProps> = ({
           backgroundColor: theme.palette.background.paper,
           boxShadow: theme.shadows[5],
           mt: "6px",
+          maxWidth: "100vw",
           "& .MuiList-root": {
             py: "4px",
           },
@@ -42,6 +43,8 @@ const DownloadSelect: FC<DownloadSelectProps> = ({
             my: "2px",
             mx: "4px",
             borderRadius: "4px",
+            whiteSpace: "normal",
+            wordBreak: "break-word",
             "&.Mui-selected, &.Mui-selected:hover": {
               backgroundColor: portalTheme.palette.primary5,
             },

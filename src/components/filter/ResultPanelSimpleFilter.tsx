@@ -30,19 +30,24 @@ const renderShowingResultsText = (
   count: number,
   isAboveDesktop: boolean,
   isMobile: boolean,
+  isSmallMobile: boolean,
   currentLayout: SearchResultLayoutEnum | undefined
-) =>
-  total === 0
-    ? "No result found"
-    : total === 1
-      ? isAboveDesktop ||
-        (currentLayout === SearchResultLayoutEnum.FULL_LIST && !isMobile)
-        ? "Showing 1 of total 1 result"
-        : "1 of total 1 result"
-      : isAboveDesktop ||
-          (currentLayout === SearchResultLayoutEnum.FULL_LIST && !isMobile)
-        ? `Showing 1 - ${count} of ${formatNumber(total)} results`
-        : `1 - ${count} of ${formatNumber(total)} results`;
+) => {
+  if (total === 0) return "No result found";
+
+  const isLongForm =
+    isAboveDesktop ||
+    (currentLayout === SearchResultLayoutEnum.FULL_LIST && !isMobile);
+
+  if (total === 1) {
+    if (isLongForm) return "Showing 1 of total 1 result";
+    return isSmallMobile ? "1 of total 1" : "1 of total 1 result";
+  }
+
+  const range = `1 - ${count} of ${formatNumber(total)}`;
+  if (isLongForm) return `Showing ${range} results`;
+  return isSmallMobile ? range : `${range} results`;
+};
 
 const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   count,
@@ -53,7 +58,8 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
   currentSort,
   onChangeSorting,
 }) => {
-  const { isAboveDesktop, isUnderLaptop, isMobile } = useBreakpoint();
+  const { isAboveDesktop, isUnderLaptop, isMobile, isSmallMobile } =
+    useBreakpoint();
 
   return (
     <Stack sx={sx} direction="row" spacing={1} width="100%" flexWrap="nowrap">
@@ -78,6 +84,7 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
             count,
             isAboveDesktop,
             isMobile,
+            isSmallMobile,
             currentLayout
           )}
         </Typography>
