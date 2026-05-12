@@ -111,6 +111,27 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
     [polygonConditions, getAndSetDownloadConditions]
   );
 
+  const handleDateRangeCreate = useCallback(
+    (start: string, end: string) => {
+      if (!start && !end) return;
+      const id = `date-range-${Date.now()}`;
+      getAndSetDownloadConditions(DownloadConditionType.DATE_RANGE, [
+        new DateRangeCondition(id, start, end),
+      ]);
+    },
+    [getAndSetDownloadConditions]
+  );
+
+  const initialDateRangeCondition = useMemo(
+    () =>
+      new DateRangeCondition(
+        "date-range-initial",
+        dateRangeBounds?.min.format("YYYY-MM-DD") ?? "",
+        dateRangeBounds?.max.format("YYYY-MM-DD") ?? ""
+      ),
+    [dateRangeBounds]
+  );
+
   return (
     <Stack spacing={1} sx={sx}>
       {(!readOnly || bboxConditions.length > 0) && (
@@ -138,6 +159,15 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
           readOnly={readOnly}
         />
       ))}
+      {!readOnly && dateRangeCondition.length === 0 && (
+        <DateRangeConditionCard
+          dateRangeCondition={initialDateRangeCondition}
+          onChange={handleDateRangeCreate}
+          disable={disable}
+          minDate={dateRangeBounds?.min}
+          maxDate={dateRangeBounds?.max}
+        />
+      )}
       {dateRangeCondition.map((dateRangeCondition) => (
         <DateRangeConditionCard
           key={dateRangeCondition.id}

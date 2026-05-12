@@ -306,7 +306,6 @@ const AddVertexRow: React.FC<AddVertexRowProps> = ({
     alignItems="center"
     justifyContent="center"
     spacing={1.5}
-    sx={{ mt: 1.5 }}
   >
     <Typography
       sx={{
@@ -351,10 +350,10 @@ const AddVertexRow: React.FC<AddVertexRowProps> = ({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          width: 20,
-          height: 20,
+          width: 22,
+          height: 22,
           borderRadius: "30px",
-          border: `1.75px dashed ${portalTheme.palette.primary1}`,
+          border: `2px dashed ${portalTheme.palette.primary1}`,
         }}
       >
         <AddIcon sx={{ fontSize: 18, color: portalTheme.palette.grey700 }} />
@@ -545,7 +544,11 @@ const PolygonConditionCard: React.FC<PolygonConditionCardProps> = ({
       contentSx={{ pt: 1.5 }}
     >
       <Box data-testid="polygon-condition-box">
-        <Stack spacing={1} alignItems="center">
+        <Stack
+          spacing={1}
+          alignItems="center"
+          sx={{ mb: firstVertex ? 1.5 : 0 }}
+        >
           {vertices.map(([lng, lat], index) =>
             !readOnly && editingIndex === index ? (
               <EditVertexRow
@@ -582,7 +585,7 @@ const PolygonConditionCard: React.FC<PolygonConditionCardProps> = ({
             role="alert"
             variant="body2Regular"
             sx={{
-              mt: 1,
+              my: 1,
               display: "block",
               width: "100%",
               textAlign: "center",
