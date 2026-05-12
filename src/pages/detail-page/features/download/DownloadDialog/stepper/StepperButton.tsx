@@ -22,7 +22,7 @@ const COMMON_BUTTON_STYLES = {
   color: portalTheme.palette.text1,
   height: "40px",
   gap: "10px",
-  px: "40px",
+  px: { xs: "10px", sm: "40px" },
   mx: "10px",
   borderRadius: "4px",
   // Prevent text wrapping

@@ -9,6 +9,8 @@ Breakpoints as per UI design:
 
 export const BREAKPOINT = {
   MOBILE: 320,
+  SMALL_MOBILE: 360, // Extra breakpoint for very tight mobile layouts (e.g. iPhone SE)
+  LARGE_MOBILE: 430, // Extra breakpoint for phone layouts
   TABLET: 768,
   LAPTOP: 1024,
   DESKTOP: 1440,

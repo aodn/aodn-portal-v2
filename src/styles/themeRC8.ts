@@ -19,8 +19,8 @@ const rc8ThemeOptions: ThemeOptions = {
       ...designTokens.typography.variants.slogan1,
       // Mobile
       [defaultTheme.breakpoints.down("sm")]: {
-        fontSize: "36px",
-        lineHeight: "40px",
+        fontSize: "28px", // Make slogan1 smaller on mobile to adapt to 320px width
+        lineHeight: "32px",
       },
       // Tablet
       [defaultTheme.breakpoints.between("sm", "md")]: {

@@ -331,6 +331,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
         description="Use bounding box tool to draw a rectangle as selection."
         icon={<BboxTooltipIcon />}
         onClose={handleCloseTooltip}
+        hideIconOnSmallScreen
       />
 
       <MenuHintTooltip
@@ -360,6 +361,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
         description="Use polygon tool to draw several points to complete a selection."
         icon={<PolygonSelectionTooltipIcon />}
         onClose={handleClosePolygonTooltip}
+        hideIconOnSmallScreen
       />
 
       <MenuHintTooltip hint="Clear Area Selection" disable={!hasFeatures}>
