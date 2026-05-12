@@ -64,7 +64,6 @@ interface MapPanelProps {
 const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   const {
     collection,
-    featureCollection,
     downloadConditions,
     getAndSetDownloadConditions,
     lastSelectedMapLayer,
@@ -430,7 +429,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
           />
           {createStaticLayers(staticLayer)}
           <HexbinLayer
-            featureCollection={featureCollection}
+            pmtilesUrl="example.com.test.pmtiles"
             filterStartDate={filterStartDate}
             filterEndDate={filterEndDate}
             visible={

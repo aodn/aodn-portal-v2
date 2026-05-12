@@ -25,6 +25,9 @@ import _ from "lodash";
 import { SelectItem } from "../../../common/dropdown/CommonSelect";
 import MapLayerSelect from "../component/MapLayerSelect";
 import { playwrightTestIds } from "../../../common/constants";
+import { PMTiles } from "pmtiles";
+import { VectorTile } from "@mapbox/vector-tile";
+import Protobuf from "pbf";
 
 const MAPBOX_OVERLAY_HEXAGON_LAYER = "mapbox-overlay-hexagon-layer";
 const COLOR_RANGE: Color[] = [
@@ -35,6 +38,36 @@ const COLOR_RANGE: Color[] = [
   [240, 59, 32],
   [189, 0, 38],
 ];
+
+// Load all features from a PMTiles (MVT) file at its minimum zoom level
+export const loadFeaturesFromPMTiles = async (
+  url: string
+): Promise<FeatureCollection<Point, CloudOptimizedFeature>> => {
+  const pmtiles = new PMTiles(url);
+  const header = await pmtiles.getHeader();
+  const allFeatures: Feature<Point, CloudOptimizedFeature>[] = [];
+
+  const z = header.minZoom;
+  const maxTile = 1 << z; // 2^z tiles per axis
+
+  for (let x = 0; x < maxTile; x++) {
+    for (let y = 0; y < maxTile; y++) {
+      const result = await pmtiles.getZxy(z, x, y);
+      if (!result) continue;
+
+      const tile = new VectorTile(new Protobuf(result.data));
+      for (const layerName of Object.keys(tile.layers)) {
+        const layer = tile.layers[layerName];
+        for (let i = 0; i < layer.length; i++) {
+          const feat = layer.feature(i).toGeoJSON(x, y, z);
+          allFeatures.push(feat as Feature<Point, CloudOptimizedFeature>);
+        }
+      }
+    }
+  }
+
+  return { type: "FeatureCollection", features: allFeatures };
+};
 
 // Extract unique keys from feature collection for dropdown options
 export const extractHexbinOptions = (
@@ -112,6 +145,7 @@ interface HexbinLayerProps extends LayerBasicType<CloudOptimizedFeature> {
   filterEndDate?: dayjs.Dayjs;
   selectedCoKey?: string;
   onSelectCoKey?: (key: string) => void;
+  pmtilesUrl?: string;
 }
 
 // Use binary tree lookup the start and end point, data is assumed sorted by timestamp asc
@@ -169,6 +203,7 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
   visible,
   selectedCoKey,
   onSelectCoKey,
+  pmtilesUrl,
 }) => {
   const { map } = useContext(MapContext);
   const popupRef = useRef<Popup | null>();
@@ -176,11 +211,31 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
 
   const [hexbinOptions, setHexbinOptions] = useState<SelectItem<string>[]>([]);
   const [isFetchingHexbinOptions, setIsFetchingHexbinOptions] = useState(true);
+  const [loadedFeatureCollection, setLoadedFeatureCollection] = useState<
+    FeatureCollection<Point, CloudOptimizedFeature> | undefined
+  >(undefined);
 
-  // Sort it to make later lookup faster
+  // Load features from PMTiles when pmtilesUrl is provided
+  useEffect(() => {
+    if (!pmtilesUrl) return;
+    let cancelled = false;
+    loadFeaturesFromPMTiles(pmtilesUrl)
+      .then((fc) => {
+        if (!cancelled) setLoadedFeatureCollection(fc);
+      })
+      .catch((err) => console.error("Failed to load PMTiles:", err));
+    return () => {
+      cancelled = true;
+    };
+  }, [pmtilesUrl]);
+
+  // Sort it to make later lookup faster; prefer PMTiles-loaded data over prop
   const sortedFeatureCollection = useMemo<
     FeatureCollection<Point, CloudOptimizedFeature>
-  >(() => createSortedFeatures(featureCollection), [featureCollection]);
+  >(
+    () => createSortedFeatures(loadedFeatureCollection ?? featureCollection),
+    [loadedFeatureCollection, featureCollection]
+  );
 
   const handleSelectHexbin = useCallback(
     (key: string) => {
