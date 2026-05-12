@@ -167,7 +167,13 @@ const ReferenceLayerSwitcher: React.FC<ReferenceLayerSwitcherProps> = ({
                       />
                     }
                     label={
-                      <Typography sx={switcherMenuContentLabelTypographySx}>
+                      <Typography
+                        sx={{
+                          ...switcherMenuContentLabelTypographySx,
+                          whiteSpace: "normal",
+                          wordBreak: "break-word",
+                        }}
+                      >
                         {ol.name}
                       </Typography>
                     }

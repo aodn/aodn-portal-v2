@@ -131,7 +131,8 @@ const renderSubTitle = (
   startDate: string | undefined,
   endDate: string | undefined,
   scope: string | undefined,
-  aiUpdateFrequency: string | undefined
+  aiUpdateFrequency: string | undefined,
+  isSmallMobile: boolean
 ) => (
   <Stack flexDirection="row" flexWrap="wrap" gap={1}>
     {startDate && (
@@ -145,6 +146,7 @@ const renderSubTitle = (
           paddingRight={padding.small}
           variant="title1Medium"
           color={portalTheme.palette.text1}
+          sx={{ fontSize: isSmallMobile ? "14px" : undefined }}
         >
           {startDate}
         </Typography>
@@ -158,6 +160,7 @@ const renderSubTitle = (
           paddingLeft={padding.small}
           variant="title1Medium"
           color={portalTheme.palette.text1}
+          sx={{ fontSize: isSmallMobile ? "14px" : undefined }}
         >
           {endDate ?? "Ongoing"}
         </Typography>
@@ -225,7 +228,7 @@ const renderSubTitle = (
 
 const HeaderSection = () => {
   const location = useLocation();
-  const { isUnderLaptop, isTablet, isMobile } = useBreakpoint();
+  const { isUnderLaptop, isTablet, isMobile, isSmallMobile } = useBreakpoint();
   const { collection, isCollectionNotFound } = useDetailPageContext();
   const redirectHome = useRedirectHome();
   const redirectSearch = useRedirectSearch();
@@ -335,7 +338,13 @@ const HeaderSection = () => {
                 {title}
               </Typography>
               {!isMobile &&
-                renderSubTitle(startDate, endDate, scope, aiUpdateFrequency)}
+                renderSubTitle(
+                  startDate,
+                  endDate,
+                  scope,
+                  aiUpdateFrequency,
+                  isSmallMobile
+                )}
             </Grid>
             <Grid
               item
@@ -360,7 +369,13 @@ const HeaderSection = () => {
             </Grid>
             {isMobile && (
               <Grid item xs={8} sm={12}>
-                {renderSubTitle(startDate, endDate, scope, aiUpdateFrequency)}
+                {renderSubTitle(
+                  startDate,
+                  endDate,
+                  scope,
+                  aiUpdateFrequency,
+                  isSmallMobile
+                )}
               </Grid>
             )}
           </Grid>

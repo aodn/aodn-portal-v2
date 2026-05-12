@@ -6,6 +6,7 @@ import {
   switcherMenuContentBoxSx,
   switcherMenuContentLabelTypographySx,
 } from "./MenuControl";
+import useBreakpoint from "../../../../../hooks/useBreakpoint";
 
 interface MenuTooltipProps {
   open: boolean;
@@ -14,6 +15,7 @@ interface MenuTooltipProps {
   description: string;
   icon: React.ReactNode;
   onClose: () => void;
+  hideIconOnSmallScreen?: boolean;
 }
 
 const MenuTooltip: React.FC<MenuTooltipProps> = ({
@@ -23,7 +25,11 @@ const MenuTooltip: React.FC<MenuTooltipProps> = ({
   description,
   icon,
   onClose,
+  hideIconOnSmallScreen = false,
 }) => {
+  const { isLargeMobile } = useBreakpoint();
+  const shouldHideIcon = hideIconOnSmallScreen && isLargeMobile;
+
   return (
     <Popper
       disablePortal
@@ -46,12 +52,12 @@ const MenuTooltip: React.FC<MenuTooltipProps> = ({
             sx={{
               ...switcherMenuContentBoxSx,
               display: "grid",
-              gridTemplateColumns: "auto 1fr",
+              gridTemplateColumns: shouldHideIcon ? "1fr" : "auto 1fr",
               gap: 2,
               alignItems: "start",
             }}
           >
-            <Box sx={{ mt: "4px" }}>{icon}</Box>
+            {!shouldHideIcon && <Box sx={{ mt: "4px" }}>{icon}</Box>}
             <Typography
               sx={{
                 ...switcherMenuContentLabelTypographySx,
