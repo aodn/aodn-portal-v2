@@ -9,12 +9,13 @@ playwright = "^1.51.0"
 pytest-xdist = "^3.5.0"
 python-dotenv = "^1.0.1"
 dynaconf = "^3.2.4"
-pytest-html = "^4.1.1"
+pytest-html-plus = "^1.0.1"
 
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.6.1"
 pytest-repeat = "^0.9.4"
+pytest-rerunfailures = "^16.2"
 
 
 [build-system]
