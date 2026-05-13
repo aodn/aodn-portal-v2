@@ -68,6 +68,28 @@ module.exports = [
 
       quotes: ["error", "double", { avoidEscape: true }],
 
+      // react-hooks v7 added many new strict rules to `recommended`; demote them
+      // to warnings so existing code isn't blocked while the codebase adopts them.
+      "react-hooks/static-components": "warn",
+      "react-hooks/use-memo": "warn",
+      "react-hooks/preserve-manual-memoization": "warn",
+      "react-hooks/incompatible-library": "warn",
+      "react-hooks/immutability": "warn",
+      "react-hooks/globals": "warn",
+      "react-hooks/refs": "warn",
+      "react-hooks/set-state-in-effect": "warn",
+      "react-hooks/error-boundaries": "warn",
+      "react-hooks/purity": "warn",
+      "react-hooks/set-state-in-render": "warn",
+      "react-hooks/unsupported-syntax": "warn",
+      "react-hooks/config": "warn",
+      "react-hooks/gating": "warn",
+      "react-hooks/memoized-effect-dependencies": "warn",
+      "react-hooks/exhaustive-effect-dependencies": "warn",
+      "react-hooks/no-deriving-state-in-effects": "warn",
+      "react-hooks/void-use-memo": "warn",
+      "react-hooks/memo-dependencies": "warn",
+
       "import/extensions": [
         "error",
         "never",

@@ -54,6 +54,14 @@ import * as turf from "@turf/turf";
 import { createStaticLayers } from "../../../components/map/mapbox/layers/StaticLayer";
 import { buildMapLayerConfig } from "./SummaryAndDownloadPanel";
 
+const PMTILES_BASE =
+  "https://havier-example-bucket.s3.ap-southeast-2.amazonaws.com";
+
+// In dev the Vite proxy at /pmtiles/* forwards to S3, avoiding CORS.
+// In production the S3 bucket must have a CORS policy that allows the domain.
+const pmtilesUrl = (key: string) =>
+  import.meta.env.DEV ? `/pmtiles/${key}` : `${PMTILES_BASE}/${key}`;
+
 const mapContainerId = "map-detail-container-id";
 
 interface MapPanelProps {
@@ -429,7 +437,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
           />
           {createStaticLayers(staticLayer)}
           <HexbinLayer
-            pmtilesUrl="example.com.test.pmtiles"
+            pmtilesUrl={pmtilesUrl("wave_buoys_test.pmtiles")}
             filterStartDate={filterStartDate}
             filterEndDate={filterEndDate}
             visible={

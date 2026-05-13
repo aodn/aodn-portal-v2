@@ -152,6 +152,14 @@ export default ({ mode }) => {
           target: apiPath,
           changeOrigin: true,
         },
+        // Proxy PMTiles S3 requests in dev to avoid CORS restrictions.
+        // In production the S3 bucket must have a proper CORS policy instead.
+        "/pmtiles": {
+          target:
+            "https://havier-example-bucket.s3.ap-southeast-2.amazonaws.com",
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/pmtiles/, ""),
+        },
       },
     },
     plugins: [
