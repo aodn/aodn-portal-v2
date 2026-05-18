@@ -28,6 +28,7 @@ def test_map_shows_only_spatial_extent_layer(
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(uuid)
+    detail_page.go_to_map_tab()
     detail_page.detail_map.wait_for_map_loading()
     detail_page.detail_map.wait_for_map_idle()
 
@@ -62,6 +63,7 @@ def test_map_shows_both_geoserver_and_spatial_extent_layer(
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(uuid)
+    detail_page.go_to_map_tab()
     detail_page.detail_map.wait_for_map_loading()
 
     # Ensure that both the GeoServer and Spatial Extent options are displayed in the layers menu
@@ -101,6 +103,7 @@ def test_map_shows_preview_not_available(
     detail_page = DetailPage(responsive_page)
 
     detail_page.load(uuid)
+    detail_page.go_to_map_tab()
     detail_page.detail_map.wait_for_map_idle()
     expect(detail_page.detail_map.announcement_panel).to_have_text(
         'Dataset preview is not available'

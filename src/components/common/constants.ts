@@ -57,6 +57,7 @@ const detailPageDefault = {
   CITATION: "citation",
   DATA_ACCESS: "data-access",
   LINEAGE: "lineage",
+  MAP: "map",
   METADATA_INFORMATION: "metadata-information",
   SUMMARY: "summary",
 };

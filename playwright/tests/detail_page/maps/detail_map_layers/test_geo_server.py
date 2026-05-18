@@ -30,6 +30,7 @@ def test_map_shows_geoserver_layer_with_timeSlider_and_drawRect_support(
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(uuid)
+    detail_page.go_to_map_tab()
     # hide this line because in the Data Access side panel only show downloadable links
     # expect(detail_page.wms_link_header).to_be_visible()
 
@@ -75,6 +76,7 @@ def test_map_shows_geoserver_layer_with_only_timeSlider_support(
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(uuid)
+    detail_page.go_to_map_tab()
 
     # hide this line because in the Data Access side panel only show downloadable links
     # expect(detail_page.wms_link_header).to_be_visible()
@@ -122,6 +124,7 @@ def test_map_shows_geoserver_layer_with_only_drawRect_support(
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(uuid)
+    detail_page.go_to_map_tab()
     # hide this line because in the Data Access side panel only show downloadable links
     # expect(detail_page.wms_link_header).to_be_visible()
 
@@ -172,6 +175,7 @@ def test_map_shows_geoserver_layer_without_timeSlider_and_drawRect_support(
     )
 
     detail_page.load(uuid)
+    detail_page.go_to_map_tab()
     detail_page.detail_map.wait_for_map_idle()
     # hide this line because in the Data Access side panel only show downloadable links
     # expect(detail_page.wms_link_header).to_be_visible()
@@ -217,6 +221,7 @@ def test_data_not_on_whitelist(responsive_page: Page, uuid: str) -> None:
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(uuid)
+    detail_page.go_to_map_tab()
     detail_page.detail_map.wait_for_map_loading()
 
     # Ensure that the Spatial Extent option is displayed in the layers menu

@@ -63,6 +63,17 @@ const VerticalIndicator: FC<VerticalIndicatorProps> = ({
     // Initialize measurements
     updateMetrics();
 
+    // In prod builds fonts/CSS load async; fonts.ready may already be
+    // resolved before the real font is requested. Combine signals so we
+    // remeasure once the final layout is in place.
+    const rafId = requestAnimationFrame(updateMetrics);
+    document.fonts?.ready.then(updateMetrics);
+
+    const handleLoad = () => updateMetrics();
+    if (document.readyState !== "complete") {
+      window.addEventListener("load", handleLoad);
+    }
+
     // Observe every item for size changes
     const observers = itemRefs.map((ref) => {
       if (!ref.current) return null;
@@ -72,6 +83,8 @@ const VerticalIndicator: FC<VerticalIndicatorProps> = ({
     });
 
     return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener("load", handleLoad);
       observers.forEach((obs) => obs?.disconnect());
     };
     // Re-run if the index changes or the refs array changes

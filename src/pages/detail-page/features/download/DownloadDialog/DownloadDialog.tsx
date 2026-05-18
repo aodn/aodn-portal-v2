@@ -8,7 +8,7 @@ import {
   useTheme,
   Divider,
 } from "@mui/material";
-import DataSelection from "../DataSelection/DataSelection";
+import SubsetConditions from "../SubsetConditions/SubsetConditions";
 import LicenseStep from "./LicenseStep";
 import { useDownloadDialog } from "../../../../../hooks/useDownloadDialog";
 import EmailInputStep from "./EmailInputStep";
@@ -16,7 +16,10 @@ import { Header } from "./Header";
 import Stepper from "./stepper/Stepper";
 import StepperButton from "./stepper/StepperButton";
 import useBreakpoint from "../../../../../hooks/useBreakpoint";
-import { DownloadCondition } from "../../../context/DownloadDefinitions";
+import {
+  DownloadCondition,
+  DownloadConditionType,
+} from "../../../context/DownloadDefinitions";
 import { disableScroll, enableScroll } from "../../../../../utils/ScrollUtils";
 
 interface DownloadDialogProps extends DownloadCondition {
@@ -79,9 +82,18 @@ const DownloadDialog = ({
     };
   }, [isOpen]);
 
-  // Determine if DataSelection should be shown
-  const shouldShowDataSelection =
-    hasDownloadConditions && subsettingSelectionCount >= 1;
+  // Show the section only when there is something visible inside it
+  // (bbox / polygon / date range). Other condition types like FORMAT or KEY
+  // don't render in SubsetConditions and shouldn't keep the section alive.
+  const shouldShowSubsetConditions =
+    hasDownloadConditions &&
+    subsettingSelectionCount >= 1 &&
+    downloadConditions.some(
+      (c) =>
+        c.type === DownloadConditionType.BBOX ||
+        c.type === DownloadConditionType.POLYGON ||
+        c.type === DownloadConditionType.DATE_RANGE
+    );
 
   const getButtonStatus = () => {
     const isFailure = processingStatus && !processingStatus.startsWith("2");
@@ -106,12 +118,11 @@ const DownloadDialog = ({
           sx={{
             display: "flex",
             flexDirection: isUnderLaptop ? "column" : "row",
-            gap: isUnderLaptop ? 0 : shouldShowDataSelection ? 3 : 0,
+            gap: isUnderLaptop ? 0 : shouldShowSubsetConditions ? 3 : 0,
             flex: 1,
           }}
         >
-          {/* Only show DataSelection when subsettingSelectionCount >= 1 */}
-          {shouldShowDataSelection && (
+          {shouldShowSubsetConditions && (
             <Box
               sx={{
                 width: isUnderLaptop ? "100%" : "300px",
@@ -125,16 +136,16 @@ const DownloadDialog = ({
               >
                 Data Selection
               </Typography>
-              <DataSelection
+              <SubsetConditions
                 downloadConditions={downloadConditions}
                 getAndSetDownloadConditions={getAndSetDownloadConditions}
                 removeDownloadCondition={removeDownloadCondition}
+                readOnly
               />
             </Box>
           )}
 
-          {/* Only show divider when DataSelection is visible on mobile */}
-          {isUnderLaptop && shouldShowDataSelection && (
+          {isUnderLaptop && shouldShowSubsetConditions && (
             <Divider sx={{ my: 2 }} />
           )}
 

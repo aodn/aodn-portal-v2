@@ -73,6 +73,7 @@ export const switcherMenuBoxSx = {
   backgroundColor: grey["resultCard"],
   zIndex: zIndex.MAP_CONTROL,
   width: "260px",
+  maxWidth: "60vw",
 };
 
 export const switcherMenuContentBoxSx = {

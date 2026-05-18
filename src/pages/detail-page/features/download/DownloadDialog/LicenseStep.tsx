@@ -65,6 +65,9 @@ const LicenseStep = () => {
               color: portalTheme.palette.primary1,
               textDecoration: "none",
               display: "block",
+              whiteSpace: "normal",
+              wordBreak: "break-all",
+              overflowWrap: "anywhere",
               "&:hover": {
                 textDecoration: "underline",
               },

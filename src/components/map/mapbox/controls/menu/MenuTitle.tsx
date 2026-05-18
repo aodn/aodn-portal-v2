@@ -3,6 +3,7 @@ import { Box, Typography, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { portalTheme } from "../../../../../styles";
 import { borderRadius } from "../../../../../styles/constants";
+import useBreakpoint from "../../../../../hooks/useBreakpoint";
 
 interface MenuTitleProps {
   title: string;
@@ -20,6 +21,8 @@ export const switcherTitleTypographySx = {
 };
 
 const MenuTitle: React.FC<MenuTitleProps> = ({ title, onClose }) => {
+  const { isSmallMobile } = useBreakpoint();
+
   const handleClose = (e: React.MouseEvent) => {
     e.stopPropagation();
     onClose();
@@ -27,7 +30,16 @@ const MenuTitle: React.FC<MenuTitleProps> = ({ title, onClose }) => {
 
   return (
     <Box sx={switcherTitleTypographySx}>
-      <Typography sx={{ ...portalTheme.typography.title1Medium }}>
+      <Typography
+        sx={{
+          ...portalTheme.typography.title1Medium,
+          ...(isSmallMobile && {
+            whiteSpace: "normal",
+            px: "32px", // Reserve space for close button on small screens
+            textAlign: "center",
+          }),
+        }}
+      >
         {title}
       </Typography>
       <IconButton

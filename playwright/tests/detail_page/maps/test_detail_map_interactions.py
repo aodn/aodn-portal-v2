@@ -232,6 +232,7 @@ def test_layer_selection_triggers_correct_wms_map_tile_request(
     """
     detail_page = DetailPage(responsive_page)
     detail_page.load(uuid)
+    detail_page.go_to_map_tab()
     detail_page.detail_map.wait_for_layer_select_loading()
 
     detail_page.dataset_selection_dropdown.click()

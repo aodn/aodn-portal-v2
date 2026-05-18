@@ -4,6 +4,7 @@ import { IconButton, Stack } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { useAppDispatch } from "../../../../components/common/store/hooks";
+import useBreakpoint from "../../../../hooks/useBreakpoint";
 import useRedirectSearch from "../../../../hooks/useRedirectSearch";
 import useTopicsPanelSize from "../../../../hooks/useTopicsPanelSize";
 import { useDebounce } from "../../../../hooks/useDebounce";
@@ -56,6 +57,7 @@ interface TopicsPanelProps {}
 const TopicsPanel: FC<TopicsPanelProps> = () => {
   const dispatch = useAppDispatch();
   const redirectSearch = useRedirectSearch();
+  const { isMobile } = useBreakpoint();
   // This is a simple click topic card function that with updates search input text and clear all the filters
   // Can be changed to a function-switcher if any other functions are designed in the future
   const handleClickTopicCard = useCallback(
@@ -311,7 +313,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
 
   return (
     <Box display="flex" justifyContent="space-between" alignItems="center">
-      {!showAllTopics && (
+      {!showAllTopics && !isMobile && (
         <Box
           sx={{
             transform: "translate(-50%, -50%)",
@@ -378,7 +380,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
           ))}
         </Stack>
       </Box>
-      {!showAllTopics && (
+      {!showAllTopics && !isMobile && (
         <Box
           sx={{
             transform: "translate(50%, -50%)",

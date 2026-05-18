@@ -20,7 +20,7 @@ const PlainDatePicker = styled(DatePicker)(() => ({
     border: "none",
   },
   "& input": {
-    fontSize: fontSize.info,
+    fontSize: fontSize.label,
     fontFamily: fontFamily.general,
     color: fontColor.gray.dark,
     fontWeight: fontWeight.regular,

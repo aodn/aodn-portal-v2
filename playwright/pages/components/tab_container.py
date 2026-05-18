@@ -6,6 +6,7 @@ from pages.components.tabs.additional_information import (
 )
 from pages.components.tabs.citation_and_usage import CitationAndUsageTab
 from pages.components.tabs.data_access import DataAccessTab
+from pages.components.tabs.map import MapTab
 from pages.components.tabs.related_resources import RelatedResourcesTab
 from pages.components.tabs.summary import SummaryTab
 
@@ -21,6 +22,7 @@ class TabContainerComponent(BasePage):
 
         # Tabs
         self.summary = SummaryTab(page)
+        self.map = MapTab(page)
         self.data_access = DataAccessTab(page)
         self.citation_and_usage = CitationAndUsageTab(page)
         self.additional_info = AdditionalInformationTab(page)

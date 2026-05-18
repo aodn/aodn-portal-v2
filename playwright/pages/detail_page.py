@@ -51,10 +51,33 @@ class DetailPage(BasePage):
             'date-range-condition-box'
         )
 
+    # Mobile breakpoint matches `theme.breakpoints.down("sm")` (< 768px) used
+    # by the app to decide whether the map lives on its own "Map" tab.
+    _MOBILE_MAX_WIDTH = 768
+
     def load(self, uuid: str) -> None:
         """Load the detail page for the given uuid"""
         url = f'{settings.baseURL}/details/{uuid}'
         self.page.goto(url, wait_until='load')
+
+    def is_mobile_viewport(self) -> bool:
+        """Return True when the current viewport falls under the mobile breakpoint."""
+        viewport = self.page.viewport_size
+        return (
+            viewport is not None and viewport['width'] < self._MOBILE_MAX_WIDTH
+        )
+
+    def go_to_map_tab(self) -> None:
+        """
+        Switch to the map view.
+
+        On mobile the map lives on a dedicated "Map" tab and only mounts once that
+        tab becomes visible; tests must click into it before interacting with the
+        map. On desktop the map is rendered inside the Summary tab so this is a
+        no-op.
+        """
+        if self.is_mobile_viewport():
+            self.tabs.map.tab.click()
 
     def prevent_http_proxy_errors(self) -> None:
         """

@@ -275,28 +275,34 @@ const DrawRect: React.FC<DrawControlProps> = ({
     }
   }, [mapDraw, map, syncMapFeaturesToContext]);
 
+  // Hash of the geometry currently on the map. We use this — instead of the
+  // `features` array reference — as the effect dependency, so the map only
+  // re-syncs when polygons actually change shape (not when the parent
+  // re-renders with identical content).
+  const drawnGeometryHash = useMemo(
+    () =>
+      features
+        .map(
+          (f) =>
+            `${f.geometry.type}|${JSON.stringify(
+              f.geometry.coordinates
+            )}|${f.properties?.selectionType ?? ""}`
+        )
+        .join("§"),
+    [features]
+  );
+
   // Effect for init map draw features (bbox rectangles and polygons)
   useEffect(() => {
     if (!map || !mapDraw) return;
 
-    const mapFeatures = mapDraw.getAll().features;
+    mapDraw.deleteAll();
+    features.forEach((f) => mapDraw.add(f));
 
-    // We only need to update map features when count in context and map are different
-    const shouldUpdate = mapFeatures.length !== features.length;
-
-    if (shouldUpdate) {
-      mapDraw.deleteAll();
-
-      features.forEach((feature) => {
-        mapDraw.add(feature);
-      });
-
-      // Recreate conditions with new onRemove callback referencing new feature id
-      startTransition(() => {
-        syncMapFeaturesToContext(mapDraw);
-      });
-    }
-  }, [features, syncMapFeaturesToContext, map, mapDraw]);
+    // Recreate conditions with new onRemove callback referencing new feature id
+    startTransition(() => syncMapFeaturesToContext(mapDraw));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [drawnGeometryHash, map, mapDraw]);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
@@ -325,6 +331,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
         description="Use bounding box tool to draw a rectangle as selection."
         icon={<BboxTooltipIcon />}
         onClose={handleCloseTooltip}
+        hideIconOnSmallScreen
       />
 
       <MenuHintTooltip
@@ -354,6 +361,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
         description="Use polygon tool to draw several points to complete a selection."
         icon={<PolygonSelectionTooltipIcon />}
         onClose={handleClosePolygonTooltip}
+        hideIconOnSmallScreen
       />
 
       <MenuHintTooltip hint="Clear Area Selection" disable={!hasFeatures}>

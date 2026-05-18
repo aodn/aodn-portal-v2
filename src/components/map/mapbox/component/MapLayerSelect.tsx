@@ -30,7 +30,7 @@ const MapLayerSelect: FC<MapLayerSelectProps> = ({
   loadingText = "Loading Layers...",
 }) => {
   const theme = useTheme();
-  const { isUnderLaptop } = useBreakpoint();
+  const { isUnderLaptop, isLargeMobile } = useBreakpoint();
 
   const selectProps = {
     backgroundColor: "transparent",
@@ -46,8 +46,11 @@ const MapLayerSelect: FC<MapLayerSelectProps> = ({
           border: "none",
           boxShadow: theme.shadows[5],
           mt: "6px",
+          maxWidth: "80vw",
           "& .MuiMenuItem-root": {
             ...portalTheme.typography.body1Medium,
+            whiteSpace: "normal",
+            wordBreak: "break-word",
             "&.Mui-selected": {
               backgroundColor: portalTheme.palette.primary5,
             },
@@ -121,24 +124,28 @@ const MapLayerSelect: FC<MapLayerSelectProps> = ({
             alignItems: "center",
           }}
         >
-          <Typography
-            sx={{
-              ...portalTheme.typography.body1Medium,
-              pt: 0,
-              px: "12px",
-              whiteSpace: "nowrap",
-            }}
-          >
-            Dataset Selection
-          </Typography>
-          <Divider
-            orientation="vertical"
-            flexItem
-            sx={{
-              bgcolor: portalTheme.palette.grey600,
-              my: "6px",
-            }}
-          />
+          {!isLargeMobile && (
+            <>
+              <Typography
+                sx={{
+                  ...portalTheme.typography.body1Medium,
+                  pt: 0,
+                  px: "12px",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Dataset Selection
+              </Typography>
+              <Divider
+                orientation="vertical"
+                flexItem
+                sx={{
+                  bgcolor: portalTheme.palette.grey600,
+                  my: "6px",
+                }}
+              />
+            </>
+          )}
           <CommonSelect
             items={mapLayersOptions}
             value={selectedItem}

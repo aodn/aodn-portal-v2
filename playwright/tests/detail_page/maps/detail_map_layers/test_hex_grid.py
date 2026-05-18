@@ -27,6 +27,7 @@ def test_map_shows_hexgrid_layer(responsive_page: Page, uuid: str) -> None:
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(uuid)
+    detail_page.go_to_map_tab()
     detail_page.detail_map.wait_for_map_idle()
 
     # Ensure that the Hex Grid and GeoServer options are displayed in the layers menu

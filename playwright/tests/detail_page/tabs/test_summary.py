@@ -17,27 +17,46 @@ def test_show_all_and_less_description(
     Verifies that the 'Show All' and 'Show Less' buttons on the detail page
     'Summary' tab correctly expand and collapse the description text.
 
-    The test loads a dataset using its UUID, captures the initial height of
-    the description element, clicks 'Show All' to confirm the description
-    expands to a longer height, and then clicks 'Show Less' to ensure
-    the description returns to its original height, validating the
-    UI's description toggle functionality works correctly.
+    On desktop the description starts collapsed (toggle Show All -> Show Less).
+    On mobile the description starts expanded by design (toggle Show Less ->
+    Show All). Either way, expanding produces a taller element than the
+    collapsed state.
     """
     detail_page = DetailPage(responsive_page)
 
     detail_page.load(uuid)
     summary = detail_page.tabs.summary
 
-    initial_height = detail_page.get_element_height(summary.description.first)
+    if detail_page.is_mobile_viewport():
+        # Mobile starts expanded: collapse first, then re-expand.
+        expanded_height = detail_page.get_element_height(
+            summary.description.first
+        )
 
-    summary.show_all_button.click()
-    assert (
-        detail_page.get_element_height(summary.description.first)
-        > initial_height
-    )
+        summary.show_less_button.click()
+        collapsed_height = detail_page.get_element_height(
+            summary.description.first
+        )
+        assert collapsed_height < expanded_height
 
-    summary.show_less_button.click()
-    assert (
-        detail_page.get_element_height(summary.description.first)
-        == initial_height
-    )
+        summary.show_all_button.click()
+        assert (
+            detail_page.get_element_height(summary.description.first)
+            == expanded_height
+        )
+    else:
+        initial_height = detail_page.get_element_height(
+            summary.description.first
+        )
+
+        summary.show_all_button.click()
+        assert (
+            detail_page.get_element_height(summary.description.first)
+            > initial_height
+        )
+
+        summary.show_less_button.click()
+        assert (
+            detail_page.get_element_height(summary.description.first)
+            == initial_height
+        )
