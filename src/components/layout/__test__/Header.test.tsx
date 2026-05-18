@@ -16,8 +16,10 @@ import AppTheme from "../../../utils/AppTheme";
 import store from "../../common/store/store";
 import { clearComponentParam } from "../../common/store/componentParamReducer";
 import Header from "../components/Header";
+import { SEARCHBAR_EXPANSION_WIDTH_LAPTOP } from "../../search/constants";
 
 const theme = AppTheme;
+const expectedLaptopWidth = `${SEARCHBAR_EXPANSION_WIDTH_LAPTOP * 100}%`;
 
 // Mock useBreakpoint to control laptop vs mobile viewports in our test
 const mockBreakpoint = { isMobile: false, isUnderLaptop: false };
@@ -84,9 +86,9 @@ describe("Header Searchbar Expansion", () => {
     const searchInput = screen.getByPlaceholderText("Search for open data");
     await user.click(searchInput);
 
-    // 3. The search wrapper should expand (min-width becomes 0.7 which resolves to 70% in MUI)
+    // 3. The search wrapper should expand (min-width becomes SEARCHBAR_EXPANSION_WIDTH_LAPTOP which resolves to expectedLaptopWidth in MUI)
     await waitFor(() => {
-      expect(searchWrapper).toHaveStyle({ minWidth: "70%" });
+      expect(searchWrapper).toHaveStyle({ minWidth: expectedLaptopWidth });
     });
 
     // 4. Type text in the input
@@ -95,6 +97,6 @@ describe("Header Searchbar Expansion", () => {
     // 5. Blur the input - because there is text, the searchbar should STAY expanded!
     searchInput.blur();
 
-    expect(searchWrapper).toHaveStyle({ minWidth: "70%" });
+    expect(searchWrapper).toHaveStyle({ minWidth: expectedLaptopWidth });
   });
 });
