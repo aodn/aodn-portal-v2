@@ -1,4 +1,5 @@
 from typing import List, Tuple
+
 from playwright.sync_api import Locator, Page, expect
 
 from pages.base_page import BasePage
@@ -63,7 +64,9 @@ class SearchComponent(BasePage):
 
     def get_popup_button(self, name: str, exact: bool = True) -> Locator:
         """Return button element inside searchbar popup by text"""
-        return self.searchbar_popup.get_by_role('button', name=name, exact=exact)
+        return self.searchbar_popup.get_by_role(
+            'button', name=name, exact=exact
+        )
 
     def assert_toggle_button_pressed(
         self, name: str, pressed: bool = True, exact: bool = True
