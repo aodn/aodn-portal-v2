@@ -236,7 +236,9 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   const [wmsLayers, setWmsLayers] = useState<SelectItem[]>([]);
   const [selectedWmsLayer, setSelectedWmsLayer] = useState<string>(""); // Only handle single wms layer for now. Could be extended to multi-layer in multi-select in future
 
-  const [isFetchingWmsLayers, setIsFetchingWmsLayers] = useState(true);
+  const [isFetchingWmsLayers, setIsFetchingWmsLayers] = useState(
+    collection ? (getWmsLayerNames(collection)?.length || 0) > 0 : true
+  );
 
   const [titleLayerId, sourceLayerId] = useMemo(() => {
     const layerId = getLayerId(map?.getContainer().id);
@@ -677,10 +679,17 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       }
     };
     startTransition(() => {
-      setIsFetchingWmsLayers(true);
-      onWMSAvailabilityChange?.(true); // Show the loading status again
+      const layerName = getWmsLayerNames(collection)?.[0] || "";
+      if (layerName && layerName.trim().length > 0) {
+        setIsFetchingWmsLayers(true);
+        onWMSAvailabilityChange?.(true); // Show the loading status again
 
-      fetchLayers();
+        fetchLayers();
+      } else {
+        setIsFetchingWmsLayers(false);
+        onWMSAvailabilityChange?.(false);
+        setMapLoading?.(undefined);
+      }
     });
   }, [
     collection,
