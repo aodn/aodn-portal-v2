@@ -44,6 +44,10 @@ const Header: FC = () => {
   const [shouldExpandSearchbar, setShouldExpandSearchbar] =
     useState<boolean>(false);
 
+  const [chipsContainer, setChipsContainer] = useState<HTMLDivElement | null>(
+    null
+  );
+
   return (
     <Box
       sx={{
@@ -80,7 +84,8 @@ const Header: FC = () => {
           paddingY: isMobile ? 0 : padding.medium,
         }}
         contentAreaStyle={{
-          flexDirection: isMobile ? "column" : "row",
+          flexDirection: "column",
+          alignItems: "stretch",
           width: isSearchResultPage
             ? SEARCHBAR_CONTENT_WIDTH
             : PAGE_CONTENT_WIDTH_HEADER,
@@ -89,12 +94,19 @@ const Header: FC = () => {
             : PAGE_CONTENT_MAX_WIDTH,
         }}
       >
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-          width="100%"
-          sx={{ flex: 1, pl: isMobile ? "12px" : 0 }}
+        {/* Row 1: Logo on the left, Searchbar & Share button on the right */}
+        <SectionContainer
+          sectionAreaStyle={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            width: "100%",
+          }}
+          contentAreaStyle={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            width: "100%",
+            maxWidth: undefined,
+          }}
         >
           <AODNSiteLogo />
           {isLandingPage && !isMobile && (
@@ -123,44 +135,46 @@ const Header: FC = () => {
             </Box>
           )}
           {isMobile && <HeaderIconMenu />}
-        </Stack>
 
-        {isSearchResultPage && (
-          <Box
-            display="flex"
-            flexDirection="row"
-            alignItems="center"
-            justifyContent="right"
-            gap={2}
-            flex={2}
-          >
-            {!isMobile && (
-              <>
-                <Box
-                  minWidth={
-                    shouldExpandSearchbar
-                      ? isUnderLaptop
-                        ? SEARCHBAR_EXPANSION_WIDTH_TABLET
-                        : SEARCHBAR_EXPANSION_WIDTH_LAPTOP
-                      : "auto"
-                  }
-                >
-                  <Searchbar
-                    setShouldExpandSearchbar={setShouldExpandSearchbar}
-                  />
-                </Box>
+          {isSearchResultPage && !isMobile && (
+            <Box
+              display="flex"
+              flexDirection="row"
+              alignItems="center"
+              justifyContent="right"
+              gap={2}
+            >
+              <Box
+                minWidth={
+                  shouldExpandSearchbar
+                    ? isUnderLaptop
+                      ? SEARCHBAR_EXPANSION_WIDTH_TABLET
+                      : SEARCHBAR_EXPANSION_WIDTH_LAPTOP
+                    : "auto"
+                }
+              >
+                <Searchbar
+                  chipsContainer={chipsContainer}
+                  setShouldExpandSearchbar={setShouldExpandSearchbar}
+                />
+              </Box>
 
-                {!isUnderLaptop && (
-                  <ShareButtonMenu
-                    hideText
-                    sx={{ maxWidth: "40px", borderRadius: borderRadius.circle }}
-                  />
-                )}
-              </>
-            )}
-          </Box>
-        )}
+              {!isUnderLaptop && (
+                <ShareButtonMenu
+                  hideText
+                  sx={{ maxWidth: "40px", borderRadius: borderRadius.circle }}
+                />
+              )}
+            </Box>
+          )}
+        </SectionContainer>
       </SectionContainer>
+      {/* Row 2: Active Filters Chips perfectly aligned under the Searchbar */}
+      {isSearchResultPage && !isMobile && (
+        <SectionContainer topDividerStyle={{ marginTop: "0" }}>
+          <Box ref={setChipsContainer} width="100%" />
+        </SectionContainer>
+      )}
 
       {isSearchResultPage && isMobile && (
         <Box p={padding.extraSmall} pt={0} bgcolor="#fff">

@@ -40,11 +40,17 @@ import {
 import { useAppDispatch, useAppSelector } from "../common/store/hooks";
 import ActiveFiltersChips from "./ActiveFiltersChips";
 
+import { createPortal } from "react-dom";
+
 interface SearchbarProps {
+  chipsContainer?: HTMLElement | null;
   setShouldExpandSearchbar?: Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
+const Searchbar: FC<SearchbarProps> = ({
+  chipsContainer,
+  setShouldExpandSearchbar,
+}) => {
   const location = useLocation();
   const dispatch = useAppDispatch();
   const searchInput = useAppSelector((state) => state.paramReducer.searchText);
@@ -101,8 +107,6 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
     },
     [scrollToElement, open, activeButton]
   );
-
-  const handleClosePopup = useCallback(() => setOpen(false), []);
 
   const handleClickAway = useCallback(
     (event: MouseEvent | TouchEvent) => {
@@ -169,7 +173,6 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
           }}
         />
       </Paper>
-      <ActiveFiltersChips />
       <ClickAwayListener onClickAway={handleClickAway}>
         <Popper
           popperRef={popperRef}
@@ -239,6 +242,11 @@ const Searchbar: FC<SearchbarProps> = ({ setShouldExpandSearchbar }) => {
           )}
         </Popper>
       </ClickAwayListener>
+      {chipsContainer ? (
+        createPortal(<ActiveFiltersChips />, chipsContainer)
+      ) : (
+        <ActiveFiltersChips />
+      )}
     </Box>
   );
 };

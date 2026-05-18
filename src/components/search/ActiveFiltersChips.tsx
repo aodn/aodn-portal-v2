@@ -17,8 +17,7 @@ import {
 } from "../common/store/componentParamReducer";
 import dayjs from "dayjs";
 import { dateDefault } from "../common/constants";
-import useBreakpoint from "../../hooks/useBreakpoint";
-import { borderRadius, color, gap } from "../../styles/constants";
+import { borderRadius, color } from "../../styles/constants";
 import { TrashIcon } from "../../assets/icons/search/trash";
 import {
   BoundaryName,
@@ -31,7 +30,6 @@ import { DATA_SETTINGS } from "../filter/tab-filters/DataSettingsFilter";
 
 const ActiveFiltersChips: FC = () => {
   const dispatch = useAppDispatch();
-  const { isMobile } = useBreakpoint();
   const theme = useTheme();
   const params = useAppSelector((state) => state.paramReducer);
 
@@ -230,7 +228,6 @@ const ActiveFiltersChips: FC = () => {
           whiteSpace: "nowrap",
           mr: 1.5,
           color: color.gray.dark,
-          fontWeight: 500,
           display: { xs: "none", sm: "block" },
         }}
       >
