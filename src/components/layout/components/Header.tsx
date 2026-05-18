@@ -143,6 +143,7 @@ const Header: FC = () => {
               alignItems="center"
               justifyContent="right"
               gap={2}
+              flex={2}
             >
               <Box
                 minWidth={
@@ -152,6 +153,7 @@ const Header: FC = () => {
                       : SEARCHBAR_EXPANSION_WIDTH_LAPTOP
                     : "auto"
                 }
+                data-testid="searchbar-wrapper-box"
               >
                 <Searchbar
                   chipsContainer={chipsContainer}
