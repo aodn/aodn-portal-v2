@@ -169,9 +169,12 @@ const Header: FC = () => {
           )}
         </SectionContainer>
       </SectionContainer>
-      {/* Row 2: Active Filters Chips perfectly aligned under the Searchbar */}
+      {/*
+      Row 2: Active Filters Chips perfectly aligned under the Searchbar.
+      topDividerStyle={{ marginTop: "0" }}, makes the divider visible
+      */}
       {isSearchResultPage && !isMobile && (
-        <SectionContainer topDividerStyle={{ marginTop: "0" }}>
+        <SectionContainer topDividerStyle={{ marginTop: undefined }}>
           <Box ref={setChipsContainer} width="100%" />
         </SectionContainer>
       )}
