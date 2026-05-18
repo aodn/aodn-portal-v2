@@ -1,6 +1,5 @@
 from typing import List, Tuple
-
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Locator, Page, expect
 
 from pages.base_page import BasePage
 from pages.js_scripts.js_utils import (
@@ -62,10 +61,14 @@ class SearchComponent(BasePage):
             self.page, 'getSelectedLocationIntersects', 'selected-location'
         )
 
+    def get_popup_button(self, name: str, exact: bool = True) -> Locator:
+        """Return button element inside searchbar popup by text"""
+        return self.searchbar_popup.get_by_role('button', name=name, exact=exact)
+
     def assert_toggle_button_pressed(
         self, name: str, pressed: bool = True, exact: bool = True
     ) -> None:
-        button = self.get_button(name, exact=exact)
+        button = self.get_popup_button(name, exact=exact)
         expected_value = 'true' if pressed else 'false'
         expect(button).to_have_attribute('aria-pressed', expected_value)
 
@@ -95,31 +98,31 @@ class SearchComponent(BasePage):
         self.filter_button.click()
         expect(self.searchbar_popup).to_be_visible()
         if isinstance(filter_parameter, str):
-            self.get_button(filter_parameter, exact=False).click()
+            self.get_popup_button(filter_parameter, exact=False).click()
             self.assert_toggle_button_pressed(filter_parameter, exact=False)
         else:
             for parameter in filter_parameter:
-                self.get_button(parameter, exact=False).click()
+                self.get_popup_button(parameter, exact=False).click()
                 self.assert_toggle_button_pressed(parameter, exact=False)
 
         self.filter_platform_tab.click()
         if isinstance(filter_platform, str):
-            self.get_button(filter_platform).click()
+            self.get_popup_button(filter_platform).click()
             self.assert_toggle_button_pressed(filter_platform)
         else:
             for platform in filter_platform:
-                self.get_button(platform).click()
+                self.get_popup_button(platform).click()
                 self.assert_toggle_button_pressed(platform)
 
         self.filter_organisation_tab.click()
-        self.get_button(filter_organisation).click()
+        self.get_popup_button(filter_organisation).click()
         self.assert_toggle_button_pressed(filter_organisation)
 
         self.filter_data_tab.click()
-        self.get_button(filter_data).click()
+        self.get_popup_button(filter_data).click()
         self.assert_toggle_button_pressed(filter_data)
         if filter_data_download != '':
-            self.get_button(filter_data_download).click()
+            self.get_popup_button(filter_data_download).click()
             self.assert_toggle_button_pressed(filter_data_download)
 
     def assert_search_state_persisted(
