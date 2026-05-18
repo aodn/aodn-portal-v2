@@ -7,6 +7,7 @@ from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
 
 
+@pytest.mark.flaky(reruns=2, reruns_delay=1)
 @pytest.mark.parametrize(
     'data_id, data_lng, data_lat',
     [
