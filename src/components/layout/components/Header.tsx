@@ -174,7 +174,13 @@ const Header: FC = () => {
       topDividerStyle={{ marginTop: "0" }}, makes the divider visible
       */}
       {isSearchResultPage && !isMobile && (
-        <SectionContainer topDividerStyle={{ marginTop: undefined }}>
+        <SectionContainer
+          topDividerStyle={{ marginTop: undefined }}
+          contentAreaStyle={{
+            width: SEARCHBAR_CONTENT_WIDTH,
+            maxWidth: SEARCHBAR_CONTENT_WIDTH,
+          }}
+        >
           <Box ref={setChipsContainer} width="100%" />
         </SectionContainer>
       )}
