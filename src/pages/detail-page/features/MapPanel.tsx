@@ -83,14 +83,10 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     LayerSwitcherLayer<LayerName>[]
   >([]);
   const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
-  const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(true);
-  if (
-    collection &&
-    isWMSAvailable &&
-    (collection.getWMSLinks()?.length || 0) === 0
-  ) {
-    setIsWMSAvailable(false);
-  }
+  const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(
+    collection ? (collection.getWMSLinks()?.length || 0) > 0 : true
+  );
+
   const [_wmsFields, setWMSFields] = useState<GeoserverFieldsResponse[]>([]);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(false);
   const [drawRectSupport, setDrawRectSupportSupport] = useState<boolean>(false);
