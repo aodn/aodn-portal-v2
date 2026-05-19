@@ -105,47 +105,6 @@ describe("Searchbar", () => {
     expect(screen.getByTestId("SearchIcon")).toBeInTheDocument();
   });
 
-  it("render filter popup when clicking filter button, and close filter popup when clicking close icon", () => {
-    render(
-      <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <Router>
-            <Searchbar />
-          </Router>
-        </ThemeProvider>
-      </Provider>
-    );
-
-    // User click on the filter button
-    const filterButton = screen.getByTestId("filtersBtn");
-    userEvent.click(filterButton);
-
-    // Wait for the filter popup to appear
-    return waitFor(() => screen.getByTestId("searchbar-popup")).then(
-      (popup) => {
-        // Check if the "reset" and "close" buttons are present in the popup
-        expect(within(popup).getByTestId("CloseIcon")).toBeInTheDocument();
-        expect(within(popup).getByTestId("ReplayIcon")).toBeInTheDocument();
-
-        // Check if the first tab - "Parameters" is present in the popup
-        expect(screen.getByText("Parameters")).toBeInTheDocument();
-
-        // User click on the close button
-        const closeButton = within(popup).getByTestId("CloseIcon");
-        userEvent.click(closeButton);
-
-        // Wait for the filter popup to be removed
-        return waitFor(
-          () =>
-            expect(
-              screen.queryByTestId("searchbar-popup")
-            ).not.toBeInTheDocument(),
-          { timeout: 2000 }
-        );
-      }
-    );
-  });
-
   it("should render the filter popup - parameters correctly", () => {
     render(
       <Provider store={store}>
@@ -226,59 +185,6 @@ describe("Searchbar", () => {
         expect(filterButtonBadge).toHaveTextContent("2");
       });
     });
-  });
-
-  it("should clear the selected parameters when click 'reset' button", () => {
-    render(
-      <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <Router>
-            <Searchbar />
-          </Router>
-        </ThemeProvider>
-      </Provider>
-    );
-
-    // User click on the filter button
-    const filterButton = screen.getByTestId("filtersBtn");
-    userEvent.click(filterButton);
-
-    // Wait for the filter popup to appear
-    return waitFor(() => screen.getByTestId("searchbar-popup")).then(
-      (popup) => {
-        const resetButton = within(popup).getByTestId("ReplayIcon");
-        const parameterPanel = screen.getByTestId("tab-panel-Parameters");
-
-        // User click on two parameter buttons "Acoustics" and "Air-Sea Fluxes"
-        const parameterButton = within(parameterPanel).getByRole("button", {
-          name: "Acoustics",
-        });
-        userEvent.click(parameterButton);
-
-        // Wait for the parameter buttons to be selected
-        return waitFor(() => {
-          expect(parameterButton).toHaveAttribute("aria-pressed", "true");
-        }).then(() => {
-          // Check if the filter button badge is updated with the correct number of selected parameters
-          const filterButtonBadge = screen.getByTestId(
-            "searchbar-button-badge-Filter"
-          );
-          const badgeContainer = within(filterButtonBadge).getByText("1");
-
-          // User click on the reset button to clear the selected parameters
-          userEvent.click(resetButton);
-
-          return waitFor(() => {
-            // Check if the parameter button is unselected
-            expect(parameterButton).toHaveAttribute("aria-pressed", "false");
-          }).then(() => {
-            // In MUI Badge, the class "MuiBadge-invisible" is used to hide the badge when the badge content is 0
-            // Check if there is still a badge after clear the filters
-            expect(badgeContainer).toHaveClass("MuiBadge-invisible");
-          });
-        });
-      }
-    );
   });
 
   // Redux to UI flow: make sure the searchbar states are updated correctly across pages given redux states

@@ -15,19 +15,13 @@ import {
   FormControl,
   FormControlLabel,
   Grid,
-  IconButton,
-  InputAdornment,
   Radio,
   RadioGroup,
-  TextField,
-  TextFieldProps,
   Typography,
 } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { color, fontSize, gap, padding } from "../../styles/constants";
-import CloseIcon from "@mui/icons-material/Close";
-import ReplayIcon from "@mui/icons-material/Replay";
+import { color, padding } from "../../styles/constants";
 import { dateDefault } from "../common/constants";
 import { updateDateTimeFilterRange } from "../common/store/componentParamReducer";
 import { useAppDispatch, useAppSelector } from "../common/store/hooks";
@@ -74,511 +68,467 @@ const dateRangeOptions: DateRangeOption[] = [
 const initialMinDate: Dayjs = dayjs(dateDefault.min);
 const initialMaxDate: Dayjs = dayjs(dateDefault.max);
 
-interface DateRangeFilterProps {
-  handleClosePopup: () => void;
-}
+interface DateRangeFilterProps {}
 
-const DateRangeFilter: FC<DateRangeFilterProps> = memo(
-  ({ handleClosePopup }: DateRangeFilterProps) => {
-    const { isMobile, isTablet } = useBreakpoint();
-    const dispatch = useAppDispatch();
+const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
+  const { isMobile, isTablet } = useBreakpoint();
+  const dispatch = useAppDispatch();
 
-    // State from redux
-    const dateTimeFilterRange = useAppSelector(
-      (state) => state.paramReducer.dateTimeFilterRange
-    );
+  // State from redux
+  const dateTimeFilterRange = useAppSelector(
+    (state) => state.paramReducer.dateTimeFilterRange
+  );
 
-    // Local state for date-range-slider
-    const [value, setValue] = useState<number[]>([
-      dateToValue(initialMinDate),
-      dateToValue(initialMaxDate),
-    ]);
+  // Local state for date-range-slider
+  const [value, setValue] = useState<number[]>([
+    dateToValue(initialMinDate),
+    dateToValue(initialMaxDate),
+  ]);
 
-    // Local state for radio group
-    const [selectedOption, setSelectedOption] = useState<DateRangeOptionValues>(
-      DateRangeOptionValues.Custom
-    );
+  // Local state for radio group
+  const [selectedOption, setSelectedOption] = useState<DateRangeOptionValues>(
+    DateRangeOptionValues.Custom
+  );
 
-    // States below are used to store the imos-data ids and all datasets
-    // they will be used in TimeRangeBarChart
-    const [imosDataIds, setImosDataIds] = useState<string[]>([]);
-    const [totalDataset, setTotalDataset] = useState<OGCCollections>(
-      new OGCCollections()
-    );
+  // States below are used to store the imos-data ids and all datasets
+  // they will be used in TimeRangeBarChart
+  const [imosDataIds, setImosDataIds] = useState<string[]>([]);
+  const [totalDataset, setTotalDataset] = useState<OGCCollections>(
+    new OGCCollections()
+  );
 
-    // Memoized derived dates
-    const minDate = useMemo(() => valueToDate(value[0]), [value]);
-    const maxDate = useMemo(() => valueToDate(value[1]), [value]);
+  // Memoized derived dates
+  const minDate = useMemo(() => valueToDate(value[0]), [value]);
+  const maxDate = useMemo(() => valueToDate(value[1]), [value]);
 
-    // Helper to check if given star-end period falls in any of the radio group year-range options
-    const determineSelectedOption = useCallback(
-      (startDate: Dayjs, endDate: Dayjs): DateRangeOptionValues => {
-        // Only consider predefined ranges if the end date is today
-        const today = dayjs();
-        const isEndDateToday = endDate
-          .startOf("day")
-          .isSame(today.startOf("day"));
+  // Helper to check if given star-end period falls in any of the radio group year-range options
+  const determineSelectedOption = useCallback(
+    (startDate: Dayjs, endDate: Dayjs): DateRangeOptionValues => {
+      // Only consider predefined ranges if the end date is today
+      const today = dayjs();
+      const isEndDateToday = endDate
+        .startOf("day")
+        .isSame(today.startOf("day"));
 
-        if (!isEndDateToday) {
-          return DateRangeOptionValues.Custom;
-        }
+      if (!isEndDateToday) {
+        return DateRangeOptionValues.Custom;
+      }
 
-        // Calculate years difference between start date and today
-        const diffInYears = today.diff(startDate, "year", true);
+      // Calculate years difference between start date and today
+      const diffInYears = today.diff(startDate, "year", true);
 
-        // Convert tolerance days to years
-        const toleranceInYears = TOLERANCE_DAYS / 365;
+      // Convert tolerance days to years
+      const toleranceInYears = TOLERANCE_DAYS / 365;
 
-        // Find matching period option
-        for (const option of dateRangeOptions) {
-          if (option.value !== DateRangeOptionValues.Custom) {
-            const yearValue = option.value as number;
-            // Apply tolerance in year calculation
-            if (Math.abs(diffInYears - yearValue) < toleranceInYears) {
-              return option.value;
-            }
+      // Find matching period option
+      for (const option of dateRangeOptions) {
+        if (option.value !== DateRangeOptionValues.Custom) {
+          const yearValue = option.value as number;
+          // Apply tolerance in year calculation
+          if (Math.abs(diffInYears - yearValue) < toleranceInYears) {
+            return option.value;
           }
         }
+      }
 
-        return DateRangeOptionValues.Custom;
-      },
-      []
-    );
+      return DateRangeOptionValues.Custom;
+    },
+    []
+  );
 
-    const handleRadioChange = useCallback(
-      (event: ChangeEvent<HTMLInputElement>) => {
-        const option = event.target.value as DateRangeOptionValues;
-        setSelectedOption(option);
+  const handleRadioChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const option = event.target.value as DateRangeOptionValues;
+      setSelectedOption(option);
 
-        // If it's custom, don't update the date range
-        if (option !== DateRangeOptionValues.Custom) {
-          // Convert option to number for year calculation
-          const years = Number(option);
-          const today = dayjs();
-          const startDate = today.subtract(years, "year");
-          const newValue = [dateToValue(startDate), dateToValue(today)];
-
-          setValue(newValue);
-          dispatch(
-            updateDateTimeFilterRange({
-              start: newValue[0],
-              end: newValue[1],
-            })
-          );
-        }
-      },
-      [dispatch]
-    );
-
-    const handleSliderChange = useCallback(
-      (_: Event, newValue: number | number[]): void => {
-        if (!Array.isArray(newValue)) return;
-        const [newStart, newEnd] = newValue;
-        const newMinDate = valueToDate(newStart);
-        const newMaxDate = valueToDate(newEnd);
+      // If it's custom, don't update the date range
+      if (option !== DateRangeOptionValues.Custom) {
+        // Convert option to number for year calculation
+        const years = Number(option);
+        const today = dayjs();
+        const startDate = today.subtract(years, "year");
+        const newValue = [dateToValue(startDate), dateToValue(today)];
 
         setValue(newValue);
-        setSelectedOption(determineSelectedOption(newMinDate, newMaxDate));
+        dispatch(
+          updateDateTimeFilterRange({
+            start: newValue[0],
+            end: newValue[1],
+          })
+        );
+      }
+    },
+    [dispatch]
+  );
+
+  const handleSliderChange = useCallback(
+    (_: Event, newValue: number | number[]): void => {
+      if (!Array.isArray(newValue)) return;
+      const [newStart, newEnd] = newValue;
+      const newMinDate = valueToDate(newStart);
+      const newMaxDate = valueToDate(newEnd);
+
+      setValue(newValue);
+      setSelectedOption(determineSelectedOption(newMinDate, newMaxDate));
+      dispatch(
+        updateDateTimeFilterRange({
+          start: newStart,
+          end: newEnd,
+        })
+      );
+    },
+    [determineSelectedOption, dispatch]
+  );
+
+  const handleMinDateChange = useCallback(
+    (newMinDate: Dayjs | null) => {
+      // For min date we always set to start of day time 00:00:00
+      const localMinDate = newMinDate
+        ?.set("hour", 0)
+        .set("minute", 0)
+        .set("second", 0);
+
+      if (localMinDate && dateToValue(localMinDate) < dateToValue(maxDate)) {
+        const newStart = dateToValue(localMinDate);
+        setValue([newStart, value[1]]);
+        setSelectedOption(determineSelectedOption(localMinDate, maxDate));
         dispatch(
           updateDateTimeFilterRange({
             start: newStart,
+            end: dateTimeFilterRange?.end,
+          })
+        );
+      }
+    },
+    [
+      dateTimeFilterRange?.end,
+      determineSelectedOption,
+      dispatch,
+      maxDate,
+      value,
+    ]
+  );
+
+  const handleMaxDateChange = useCallback(
+    (newMaxDate: Dayjs | null) => {
+      // For max date we always set to end of day time to 23:59:59
+      const localMaxDate = newMaxDate
+        ?.set("hour", 23)
+        .set("minute", 59)
+        .set("second", 59)
+        .set("millisecond", 0);
+
+      if (localMaxDate && dateToValue(localMaxDate) > dateToValue(minDate)) {
+        const newEnd = dateToValue(localMaxDate);
+        setValue([value[0], newEnd]);
+        setSelectedOption(determineSelectedOption(minDate, localMaxDate));
+        dispatch(
+          updateDateTimeFilterRange({
+            start: dateTimeFilterRange?.start,
             end: newEnd,
           })
         );
-      },
-      [determineSelectedOption, dispatch]
-    );
+      }
+    },
+    [
+      dateTimeFilterRange?.start,
+      determineSelectedOption,
+      dispatch,
+      minDate,
+      value,
+    ]
+  );
 
-    const handleMinDateChange = useCallback(
-      (newMinDate: Dayjs | null) => {
-        // For min date we always set to start of day time 00:00:00
-        const localMinDate = newMinDate
-          ?.set("hour", 0)
-          .set("minute", 0)
-          .set("second", 0);
-
-        if (localMinDate && dateToValue(localMinDate) < dateToValue(maxDate)) {
-          const newStart = dateToValue(localMinDate);
-          setValue([newStart, value[1]]);
-          setSelectedOption(determineSelectedOption(localMinDate, maxDate));
-          dispatch(
-            updateDateTimeFilterRange({
-              start: newStart,
-              end: dateTimeFilterRange?.end,
-            })
-          );
-        }
-      },
-      [
-        dateTimeFilterRange?.end,
-        determineSelectedOption,
-        dispatch,
-        maxDate,
-        value,
-      ]
-    );
-
-    const handleMaxDateChange = useCallback(
-      (newMaxDate: Dayjs | null) => {
-        // For max date we always set to end of day time to 23:59:59
-        const localMaxDate = newMaxDate
-          ?.set("hour", 23)
-          .set("minute", 59)
-          .set("second", 59)
-          .set("millisecond", 0);
-
-        if (localMaxDate && dateToValue(localMaxDate) > dateToValue(minDate)) {
-          const newEnd = dateToValue(localMaxDate);
-          setValue([value[0], newEnd]);
-          setSelectedOption(determineSelectedOption(minDate, localMaxDate));
-          dispatch(
-            updateDateTimeFilterRange({
-              start: dateTimeFilterRange?.start,
-              end: newEnd,
-            })
-          );
-        }
-      },
-      [
-        dateTimeFilterRange?.start,
-        determineSelectedOption,
-        dispatch,
-        minDate,
-        value,
-      ]
-    );
-
-    const handleClear = useCallback(() => {
-      dispatch(updateDateTimeFilterRange({}));
-      setValue([dateToValue(initialMinDate), dateToValue(initialMaxDate)]);
-      setSelectedOption(DateRangeOptionValues.Custom);
-    }, [dispatch]);
-
-    const renderFilterBy = useCallback(
-      (isMobile: boolean, isTablet: boolean) => (
-        <>
-          {(isMobile || isTablet) && (
-            <Grid item xs={12} sx={{ order: 2 }}>
-              <Divider sx={{ borderColor: theme.palette.primary4 }} />
-            </Grid>
-          )}
-          <Grid
-            item
-            xs={isMobile || isTablet ? 12 : 2}
+  const renderFilterBy = useCallback(
+    (isMobile: boolean, isTablet: boolean) => (
+      <>
+        {(isMobile || isTablet) && (
+          <Grid item xs={12} sx={{ order: 2 }}>
+            <Divider sx={{ borderColor: theme.palette.primary4 }} />
+          </Grid>
+        )}
+        <Grid
+          item
+          xs={isMobile || isTablet ? 12 : 2}
+          display="flex"
+          justifyContent="flex-start"
+          alignItems="flex-start"
+          sx={{
+            order: isMobile || isTablet ? 3 : 1,
+            borderRight:
+              isMobile || isTablet
+                ? "none"
+                : `1px solid ${color.gray.extraLight}`,
+          }}
+        >
+          <Box
             display="flex"
+            flexDirection="column"
             justifyContent="flex-start"
             alignItems="flex-start"
-            sx={{
-              order: isMobile || isTablet ? 3 : 1,
-              borderRight:
-                isMobile || isTablet
-                  ? "none"
-                  : `1px solid ${color.gray.extraLight}`,
-            }}
+            p={padding.large}
+            pt={isMobile || isTablet ? padding.large : padding.triple}
           >
-            <Box
-              display="flex"
-              flexDirection="column"
-              justifyContent="flex-start"
-              alignItems="flex-start"
-              p={padding.large}
-              pt={isMobile || isTablet ? padding.large : padding.triple}
-            >
-              <Typography mb={2} variant="title1Medium">
-                Filter by
-              </Typography>
-              <FormControl sx={{ paddingLeft: "20px" }}>
-                <RadioGroup
-                  defaultValue={DateRangeOptionValues.Custom}
-                  value={selectedOption}
-                  onChange={handleRadioChange}
-                  sx={{
-                    flexDirection: { xs: "column", sm: "row", md: "column" },
-                  }}
-                >
-                  {dateRangeOptions.map((item) => (
-                    <FormControlLabel
-                      value={item.value}
-                      control={
-                        <Radio
-                          sx={{
-                            "&.Mui-checked": {
-                              color: theme.palette.secondary2,
-                            }, // e.g., '#ff0000'
-                          }}
-                        />
-                      }
-                      label={item.label}
-                      key={item.value}
-                      data-testid={`radio-${item.label}`}
-                      componentsProps={{
-                        typography: {
-                          variant: "body2Regular", // Ues the custo" variant from themeRC8
-                          sx: { padding: 0 },
-                        },
-                      }}
-                    />
-                  ))}
-                </RadioGroup>
-              </FormControl>
-            </Box>
-          </Grid>
-        </>
-      ),
-      [handleRadioChange, selectedOption]
-    );
-
-    // Listen to redux dateTimeFilterRange to initialize local states
-    useEffect(() => {
-      // Avoid eslint error on set state in useEffect
-      startTransition(() => {
-        if (dateTimeFilterRange) {
-          const newMinDate = valueToDate(
-            dateTimeFilterRange.start ?? dateToValue(initialMinDate)
-          );
-          const newMaxDate = valueToDate(
-            dateTimeFilterRange.end ?? dateToValue(initialMaxDate)
-          );
-
-          setValue([
-            dateTimeFilterRange.start ?? dateToValue(initialMinDate),
-            dateTimeFilterRange.end ?? dateToValue(initialMaxDate),
-          ]);
-          setSelectedOption(determineSelectedOption(newMinDate, newMaxDate));
-        } else {
-          // Reset to initial state when dateTimeFilterRange is null or undefined
-          setValue([dateToValue(initialMinDate), dateToValue(initialMaxDate)]);
-          setSelectedOption(DateRangeOptionValues.Custom);
-        }
-      });
-    }, [dateTimeFilterRange, determineSelectedOption]);
-
-    useEffect(() => {
-      // Find all collection
-      dispatch(
-        fetchResultNoStore({
-          properties: "id,temporal",
-          filter: `${cqlDefaultFilters.get("ALL_TIME_RANGE")}`,
-        })
-      )
-        .unwrap()
-        .then((value: string) => {
-          // Find all id of collection from imosOnly
-          dispatch(
-            fetchResultNoStore({
-              properties: "id,providers",
-              filter: `${cqlDefaultFilters.get("ALL_TIME_RANGE")} AND ${(cqlDefaultFilters.get("DATASET_GROUP") as DatasetGroup)("imos")}`,
-            })
-          )
-            .unwrap()
-            .then((imosOnlyCollection: string) => {
-              const ids = jsonToOGCCollections(
-                imosOnlyCollection
-              ).collections.map((value: OGCCollection) => value.id);
-              setImosDataIds(ids);
-              setTotalDataset(jsonToOGCCollections(value));
-            });
-        });
-    }, [dispatch]);
-
-    return (
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <Grid container position="relative">
-          <Box
-            sx={{
-              position: "absolute",
-              top: gap.sm,
-              right: gap.md,
-              display: "flex",
-              alignItems: "center",
-              gap: gap.sm,
-              zIndex: 10,
-            }}
-          >
-            <IconButton
-              onClick={handleClear}
-              sx={{
-                bgcolor: color.gray.extraLight,
-                "&:hover": {
-                  bgcolor: color.blue.darkSemiTransparent,
-                },
-              }}
-            >
-              <ReplayIcon sx={{ fontSize: fontSize.info }} />
-            </IconButton>
-            <IconButton
-              onClick={handleClosePopup}
-              sx={{
-                bgcolor: color.gray.extraLight,
-                "&:hover": {
-                  bgcolor: color.blue.darkSemiTransparent,
-                },
-              }}
-            >
-              <CloseIcon sx={{ fontSize: fontSize.info }} />
-            </IconButton>
+            <Typography mb={2} variant="title1Medium">
+              Filter by
+            </Typography>
+            <FormControl sx={{ paddingLeft: "20px" }}>
+              <RadioGroup
+                defaultValue={DateRangeOptionValues.Custom}
+                value={selectedOption}
+                onChange={handleRadioChange}
+                sx={{
+                  flexDirection: { xs: "column", sm: "row", md: "column" },
+                }}
+              >
+                {dateRangeOptions.map((item) => (
+                  <FormControlLabel
+                    value={item.value}
+                    control={
+                      <Radio
+                        sx={{
+                          "&.Mui-checked": {
+                            color: theme.palette.secondary2,
+                          }, // e.g., '#ff0000'
+                        }}
+                      />
+                    }
+                    label={item.label}
+                    key={item.value}
+                    data-testid={`radio-${item.label}`}
+                    componentsProps={{
+                      typography: {
+                        variant: "body2Regular", // Ues the custo" variant from themeRC8
+                        sx: { padding: 0 },
+                      },
+                    }}
+                  />
+                ))}
+              </RadioGroup>
+            </FormControl>
           </Box>
+        </Grid>
+      </>
+    ),
+    [handleRadioChange, selectedOption]
+  );
+
+  // Listen to redux dateTimeFilterRange to initialize local states
+  useEffect(() => {
+    // Avoid eslint error on set state in useEffect
+    startTransition(() => {
+      if (dateTimeFilterRange) {
+        const newMinDate = valueToDate(
+          dateTimeFilterRange.start ?? dateToValue(initialMinDate)
+        );
+        const newMaxDate = valueToDate(
+          dateTimeFilterRange.end ?? dateToValue(initialMaxDate)
+        );
+
+        setValue([
+          dateTimeFilterRange.start ?? dateToValue(initialMinDate),
+          dateTimeFilterRange.end ?? dateToValue(initialMaxDate),
+        ]);
+        setSelectedOption(determineSelectedOption(newMinDate, newMaxDate));
+      } else {
+        // Reset to initial state when dateTimeFilterRange is null or undefined
+        setValue([dateToValue(initialMinDate), dateToValue(initialMaxDate)]);
+        setSelectedOption(DateRangeOptionValues.Custom);
+      }
+    });
+  }, [dateTimeFilterRange, determineSelectedOption]);
+
+  useEffect(() => {
+    // Find all collection
+    dispatch(
+      fetchResultNoStore({
+        properties: "id,temporal",
+        filter: `${cqlDefaultFilters.get("ALL_TIME_RANGE")}`,
+      })
+    )
+      .unwrap()
+      .then((value: string) => {
+        // Find all id of collection from imosOnly
+        dispatch(
+          fetchResultNoStore({
+            properties: "id,providers",
+            filter: `${cqlDefaultFilters.get("ALL_TIME_RANGE")} AND ${(cqlDefaultFilters.get("DATASET_GROUP") as DatasetGroup)("imos")}`,
+          })
+        )
+          .unwrap()
+          .then((imosOnlyCollection: string) => {
+            const ids = jsonToOGCCollections(
+              imosOnlyCollection
+            ).collections.map((value: OGCCollection) => value.id);
+            setImosDataIds(ids);
+            setTotalDataset(jsonToOGCCollections(value));
+          });
+      });
+  }, [dispatch]);
+
+  return (
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <Grid container position="relative">
+        <Grid
+          item
+          xs={isMobile || isTablet ? 12 : 10}
+          sx={{ order: isMobile || isTablet ? 1 : 2 }}
+        >
           <Grid
-            item
-            xs={isMobile || isTablet ? 12 : 10}
-            sx={{ order: isMobile || isTablet ? 1 : 2 }}
+            container
+            pt={padding.triple}
+            pb={padding.large}
+            pl={padding.triple}
+            pr={padding.triple}
           >
             <Grid
-              container
-              pt={padding.triple}
-              pb={padding.large}
-              pl={padding.triple}
-              pr={padding.triple}
+              item
+              xs={12}
+              sx={{ display: "flex", justifyContent: "center" }}
             >
-              <Grid
-                item
-                xs={12}
-                sx={{ display: "flex", justifyContent: "center" }}
+              <Box
+                display="flex"
+                flexDirection={isMobile ? "column" : "row"}
+                justifyContent="space-between"
+                width="100%"
+                gap={2}
               >
                 <Box
                   display="flex"
-                  flexDirection={isMobile ? "column" : "row"}
+                  alignItems="center"
                   justifyContent="space-between"
-                  width="100%"
+                  width={{ xs: "100%", md: "auto" }}
                   gap={2}
+                  data-testid="start-date-picker"
                 >
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="space-between"
-                    width={{ xs: "100%", md: "auto" }}
-                    gap={2}
-                    data-testid="start-date-picker"
+                  <Typography
+                    variant="title1Medium"
+                    sx={{ textAlign: "left", minWidth: "85px" }}
                   >
-                    <Typography
-                      variant="title1Medium"
-                      sx={{ textAlign: "left", minWidth: "85px" }}
-                    >
-                      Start&nbsp;Date
-                    </Typography>
-                    <PlainDatePicker
-                      sx={{ maxWidth: { xs: "216px", sm: "none" } }}
-                      views={["year", "month", "day"]}
-                      format={dateDefault.DISPLAY_FORMAT}
-                      value={minDate}
-                      minDate={initialMinDate}
-                      maxDate={valueToDate(value[1])}
-                      onChange={(date) => handleMinDateChange(date as Dayjs)}
-                      slots={{
-                        openPickerIcon: CalendarIcon,
-                      }}
-                      slotProps={{
-                        ...DEFAULT_DATE_PICKER_SLOT,
-                        openPickerIcon: {
-                          color: theme.palette.grey600,
-                          width: 22,
-                          height: 22,
-                        },
-                      }}
-                    />
-                  </Box>
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="space-between"
-                    width={{ xs: "100%", md: "auto" }}
-                    gap={2}
-                    data-testid="end-date-picker"
+                    Start&nbsp;Date
+                  </Typography>
+                  <PlainDatePicker
+                    sx={{ maxWidth: { xs: "216px", sm: "none" } }}
+                    views={["year", "month", "day"]}
+                    format={dateDefault.DISPLAY_FORMAT}
+                    value={minDate}
+                    minDate={initialMinDate}
+                    maxDate={valueToDate(value[1])}
+                    onChange={(date) => handleMinDateChange(date as Dayjs)}
+                    slots={{
+                      openPickerIcon: CalendarIcon,
+                    }}
+                    slotProps={{
+                      ...DEFAULT_DATE_PICKER_SLOT,
+                      openPickerIcon: {
+                        color: theme.palette.grey600,
+                        width: 22,
+                        height: 22,
+                      },
+                    }}
+                  />
+                </Box>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  width={{ xs: "100%", md: "auto" }}
+                  gap={2}
+                  data-testid="end-date-picker"
+                >
+                  <Typography
+                    variant="title1Medium"
+                    sx={{ textAlign: "left", minWidth: "85px" }}
                   >
-                    <Typography
-                      variant="title1Medium"
-                      sx={{ textAlign: "left", minWidth: "85px" }}
-                    >
-                      End&nbsp;Date
-                    </Typography>
-                    <PlainDatePicker
-                      sx={{ maxWidth: { xs: "216px", sm: "none" } }}
-                      views={["year", "month", "day"]}
-                      format={dateDefault.DISPLAY_FORMAT}
-                      value={maxDate}
-                      minDate={valueToDate(value[0])}
-                      maxDate={initialMaxDate}
-                      onChange={(date) => handleMaxDateChange(date as Dayjs)}
-                      slots={{
-                        openPickerIcon: CalendarIcon,
-                      }}
-                      slotProps={{
-                        ...DEFAULT_DATE_PICKER_SLOT,
-                        openPickerIcon: {
-                          color: theme.palette.grey600,
-                          width: 22,
-                          height: 22,
-                        },
-                      }}
-                    />
-                  </Box>
+                    End&nbsp;Date
+                  </Typography>
+                  <PlainDatePicker
+                    sx={{ maxWidth: { xs: "216px", sm: "none" } }}
+                    views={["year", "month", "day"]}
+                    format={dateDefault.DISPLAY_FORMAT}
+                    value={maxDate}
+                    minDate={valueToDate(value[0])}
+                    maxDate={initialMaxDate}
+                    onChange={(date) => handleMaxDateChange(date as Dayjs)}
+                    slots={{
+                      openPickerIcon: CalendarIcon,
+                    }}
+                    slotProps={{
+                      ...DEFAULT_DATE_PICKER_SLOT,
+                      openPickerIcon: {
+                        color: theme.palette.grey600,
+                        width: 22,
+                        height: 22,
+                      },
+                    }}
+                  />
+                </Box>
+              </Box>
+            </Grid>
+            {!isMobile && (
+              <Grid
+                item
+                xs={12}
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+              >
+                <Box sx={{ width: "100%" }}>
+                  <TimeRangeBarChart
+                    imosDataIds={imosDataIds}
+                    totalDataset={totalDataset}
+                    selectedStartDate={minDate.toDate()}
+                    selectedEndDate={maxDate.toDate()}
+                  />
                 </Box>
               </Grid>
-              {!isMobile && (
-                <Grid
-                  item
-                  xs={12}
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                >
-                  <Box sx={{ width: "100%" }}>
-                    <TimeRangeBarChart
-                      imosDataIds={imosDataIds}
-                      totalDataset={totalDataset}
-                      selectedStartDate={minDate.toDate()}
-                      selectedEndDate={maxDate.toDate()}
-                    />
-                  </Box>
-                </Grid>
-              )}
-              <Grid container>
-                <Grid
-                  item
-                  xs={12}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Box sx={{ width: "90%", paddingTop: padding.extraLarge }}>
-                    <PlainSlider
-                      value={value}
-                      min={dateToValue(initialMinDate)}
-                      max={dateToValue(initialMaxDate)}
-                      step={432000000} // 5 days in mils
-                      onChange={handleSliderChange}
-                      valueLabelDisplay="auto"
-                      valueLabelFormat={(value: number) =>
-                        valueToDate(value).format(dateDefault.DISPLAY_FORMAT)
-                      }
-                    />
-                  </Box>
-                </Grid>
-                <Grid
-                  item
-                  xs={12}
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Typography padding={0} variant="body2Regular">
-                    {initialMinDate.format(dateDefault.DISPLAY_FORMAT)}
-                  </Typography>
-                  <Typography padding={0} variant="body2Regular">
-                    {initialMaxDate.format(dateDefault.DISPLAY_FORMAT)}
-                  </Typography>
-                </Grid>
+            )}
+            <Grid container>
+              <Grid
+                item
+                xs={12}
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Box sx={{ width: "90%", paddingTop: padding.extraLarge }}>
+                  <PlainSlider
+                    value={value}
+                    min={dateToValue(initialMinDate)}
+                    max={dateToValue(initialMaxDate)}
+                    step={432000000} // 5 days in mils
+                    onChange={handleSliderChange}
+                    valueLabelDisplay="auto"
+                    valueLabelFormat={(value: number) =>
+                      valueToDate(value).format(dateDefault.DISPLAY_FORMAT)
+                    }
+                  />
+                </Box>
+              </Grid>
+              <Grid
+                item
+                xs={12}
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Typography padding={0} variant="body2Regular">
+                  {initialMinDate.format(dateDefault.DISPLAY_FORMAT)}
+                </Typography>
+                <Typography padding={0} variant="body2Regular">
+                  {initialMaxDate.format(dateDefault.DISPLAY_FORMAT)}
+                </Typography>
               </Grid>
             </Grid>
           </Grid>
-          {renderFilterBy(isMobile, isTablet)}
         </Grid>
-      </LocalizationProvider>
-    );
-  }
-);
+        {renderFilterBy(isMobile, isTablet)}
+      </Grid>
+    </LocalizationProvider>
+  );
+});
 
 DateRangeFilter.displayName = "DateRangeFilter";
 export default DateRangeFilter;

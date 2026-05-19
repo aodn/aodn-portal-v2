@@ -82,7 +82,7 @@ const DATA_SETTINGS: DataSettingsFilterType = {
   dataStatus: [
     {
       value: "onGoing",
-      label: "on Going",
+      label: "On Going",
     },
     {
       value: "completed",
@@ -318,31 +318,10 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
           ))}
         </StyledToggleButtonGroup>
       </Box>
-      {/* <Box>
-        <Typography
-          variant="title1Medium"
-          color={portalTheme.palette.text1}
-          sx={{ padding: "8px 20px" }}
-        >
-          Data Service
-        </Typography>
-        <StyledToggleButtonGroup
-          value={filters.dataService}
-          onChange={handleChange(DataSettingsCategory.dataService)}
-        >
-          {DATA_SETTINGS.dataService.map((item) => (
-            <StyledToggleButton
-              value={item.value}
-              key={item.value}
-              aria-label={item.label}
-            >
-              {item.label}
-            </StyledToggleButton>
-          ))}
-        </StyledToggleButtonGroup>
-      </Box> */}
     </Stack>
   );
 };
 
 export default DataSettingsFilter;
+
+export { DATA_SETTINGS };

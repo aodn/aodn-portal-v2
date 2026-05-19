@@ -3,24 +3,12 @@ import {
   FC,
   SetStateAction,
   startTransition,
-  useCallback,
   useEffect,
   useState,
 } from "react";
-import { Box, IconButton, SxProps } from "@mui/material";
-import {
-  updateHasData,
-  updateDatasetGroup,
-  updateParameterVocabs,
-  updatePlatform,
-  updateUpdateFreq,
-  Vocab,
-  updateStatus,
-} from "../common/store/componentParamReducer";
-import { useAppDispatch, useAppSelector } from "../common/store/hooks";
-import CloseIcon from "@mui/icons-material/Close";
-import ReplayIcon from "@mui/icons-material/Replay";
-import { color, fontSize, gap } from "../../styles/constants";
+import { Box, SxProps } from "@mui/material";
+import { Vocab } from "../common/store/componentParamReducer";
+import { useAppSelector } from "../common/store/hooks";
 import TabsPanelContainer, { Tab } from "../common/tab/TabsPanelContainer";
 import ThemeFilter from "./tab-filters/ThemeFilter";
 import PlatformFilter from "./tab-filters/PlatformFilter";
@@ -55,7 +43,6 @@ export interface TabFilterType {
   setFilters: Dispatch<SetStateAction<Filters>>;
 }
 interface FiltersProps {
-  handleClosePopup: () => void;
   sx?: SxProps;
 }
 
@@ -86,9 +73,7 @@ const checkBadge = (filters: Filters, tabName: FiltersTabs): boolean => {
   }
 };
 
-const FiltersFC: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
-  const dispatch = useAppDispatch();
-
+const FiltersFC: FC<FiltersProps> = ({ sx }) => {
   const {
     parameterVocabs,
     platform,
@@ -151,20 +136,6 @@ const FiltersFC: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
     },
   ];
 
-  const handleClearAll = useCallback(() => {
-    setFilters({});
-    dispatch(updateParameterVocabs([]));
-    dispatch(updateDatasetGroup(undefined));
-    dispatch(updateHasData(undefined));
-    dispatch(updatePlatform([]));
-    dispatch(updateUpdateFreq(undefined));
-    dispatch(updateStatus(undefined));
-  }, [dispatch]);
-
-  const handleClose = useCallback(() => {
-    handleClosePopup();
-  }, [handleClosePopup]);
-
   useEffect(() => {
     startTransition(() => {
       if (parameterVocabs) {
@@ -216,37 +187,6 @@ const FiltersFC: FC<FiltersProps> = ({ handleClosePopup, sx }) => {
   return (
     <>
       <Box sx={{ position: "relative", width: "100%", ...sx }}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: gap.md,
-            right: gap.md,
-            zIndex: 1,
-          }}
-        >
-          <IconButton
-            onClick={handleClearAll}
-            sx={{
-              bgcolor: color.gray.extraLight,
-              "&:hover": {
-                bgcolor: color.blue.darkSemiTransparent,
-              },
-            }}
-          >
-            <ReplayIcon sx={{ fontSize: fontSize.info }} />
-          </IconButton>
-          <IconButton
-            onClick={handleClose}
-            sx={{
-              bgcolor: color.gray.extraLight,
-              "&:hover": {
-                bgcolor: color.blue.darkSemiTransparent,
-              },
-            }}
-          >
-            <CloseIcon sx={{ fontSize: fontSize.info }} />
-          </IconButton>
-        </Box>
         <TabsPanelContainer
           tabs={TABS}
           sx={{
