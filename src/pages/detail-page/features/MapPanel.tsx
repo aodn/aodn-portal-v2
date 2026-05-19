@@ -18,7 +18,7 @@ import { LngLatBounds, MapEvent } from "mapbox-gl";
 import BaseMapSwitcher from "../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
 import MenuControl from "../../../components/map/mapbox/controls/menu/MenuControl";
 import DateRange from "../../../components/map/mapbox/controls/menu/DateRange";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import {
   BBoxCondition,
   DateRangeCondition,
@@ -52,7 +52,10 @@ import { dateToValue } from "../../../utils/DateUtils";
 import { GeoserverFieldsResponse } from "../../../components/common/store/GeoserverDefinitions";
 import * as turf from "@turf/turf";
 import { createStaticLayers } from "../../../components/map/mapbox/layers/StaticLayer";
-import { buildMapLayerConfig } from "./SummaryAndDownloadPanel";
+import {
+  buildMapLayerConfig,
+  getMinMaxDateStamps,
+} from "./SummaryAndDownloadPanel";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -107,14 +110,25 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
           !hasSpatialExtent &&
           !isWMSAvailable;
 
-      let start = dayjs(dateDefault.min);
-      let end = dayjs(dateDefault.max);
+      let start: Dayjs;
+      let end: Dayjs;
 
-      const extent = collection?.getExtent();
-      if (extent) {
-        const [s, e] = extent.getOverallTemporal();
-        start = s === undefined ? start : dayjs(s, dateDefault.DISPLAY_FORMAT);
-        end = e === undefined ? end : dayjs(e, dateDefault.DISPLAY_FORMAT);
+      if (
+        downloadService === DownloadServiceType.CloudOptimised &&
+        featureCollection?.features?.length
+      ) {
+        [start, end] = getMinMaxDateStamps(featureCollection);
+      } else {
+        start = dayjs(dateDefault.min);
+        end = dayjs(dateDefault.max);
+
+        const extent = collection?.getExtent();
+        if (extent) {
+          const [s, e] = extent.getOverallTemporal();
+          start =
+            s === undefined ? start : dayjs(s, dateDefault.DISPLAY_FORMAT);
+          end = e === undefined ? end : dayjs(e, dateDefault.DISPLAY_FORMAT);
+        }
       }
 
       startTransition(() => {
@@ -131,7 +145,13 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       });
 
       return [hasSummaryFeature, noMapPreview, start, end];
-    }, [collection, downloadService, isWMSAvailable, lastSelectedMapLayer]);
+    }, [
+      collection,
+      downloadService,
+      featureCollection,
+      isWMSAvailable,
+      lastSelectedMapLayer,
+    ]);
 
   const [filterStartDate, filterEndDate] = useMemo(() => {
     const dateRangeConditionGeneric = downloadConditions.find(
