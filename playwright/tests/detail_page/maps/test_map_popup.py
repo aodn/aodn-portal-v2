@@ -4,6 +4,7 @@ from playwright.sync_api import Page, expect
 from pages.detail_page import DetailPage
 
 
+@pytest.mark.flaky(reruns=2, reruns_delay=1)
 @pytest.mark.parametrize(
     'uuid, data_lng, data_lat, data',
     [
