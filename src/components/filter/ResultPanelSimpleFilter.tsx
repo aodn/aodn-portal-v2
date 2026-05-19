@@ -94,18 +94,24 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
           onChangeSorting={onChangeSorting}
           currentSort={currentSort}
           isIconOnly={
-            isAboveDesktop && currentLayout !== SearchResultLayoutEnum.FULL_LIST
-              ? false
-              : undefined
+            isMobile
+              ? true
+              : isAboveDesktop &&
+                  currentLayout !== SearchResultLayoutEnum.FULL_LIST
+                ? false
+                : undefined
           }
         />
         <ResultListLayoutButton
           onChangeLayout={onChangeLayout}
           currentLayout={currentLayout}
           isIconOnly={
-            isAboveDesktop && currentLayout !== SearchResultLayoutEnum.FULL_LIST
-              ? false
-              : undefined
+            isMobile
+              ? true
+              : isAboveDesktop &&
+                  currentLayout !== SearchResultLayoutEnum.FULL_LIST
+                ? false
+                : undefined
           }
           excludeOptions={
             isUnderLaptop

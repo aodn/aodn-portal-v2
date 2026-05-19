@@ -106,7 +106,7 @@ const loadAndProcessGeoJSON = async (
   labelKey: string,
   idKey: string,
   shouldSimplify = false
-) => {
+): Promise<Array<BoundaryProperties>> => {
   const cacheKey = `${url}_${shouldSimplify}`;
   if (dataCache[cacheKey]) return dataCache[cacheKey];
 
