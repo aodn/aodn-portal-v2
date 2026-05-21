@@ -16,7 +16,12 @@ import {
   updateParameterVocabs,
   updatePlatform,
   updateUpdateFreq,
+  updateFilterStaticAreas,
 } from "../../common/store/componentParamReducer";
+import {
+  fetchMarineParkOptions,
+  BoundaryName,
+} from "../../map/mapbox/layers/StaticLayer";
 import { server } from "../../../__mocks__/server";
 import { ThemeProvider } from "@mui/material/styles";
 import AppTheme from "../../../utils/AppTheme";
@@ -52,6 +57,7 @@ vi.mock(import("react-router-dom"), async (importOriginal) => {
 });
 
 import { BrowserRouter as Router } from "react-router-dom";
+import * as useRedirectSearchModule from "../../../hooks/useRedirectSearch";
 import Searchbar from "../Searchbar";
 import { PARAMETER_VOCABS } from "../../../__mocks__/data/PARAMETER_VOCABS";
 import { encodeParam } from "../../../utils/UrlUtils";
@@ -279,5 +285,147 @@ describe("Searchbar", () => {
       expect(paramReducer.zoom).toBe(3.5);
       expect(typeof paramReducer.zoom).toBe("number");
     });
+  });
+
+  it("should render active filter chips with correct labels even when loaded from URL parameters (which parses ID to number)", async () => {
+    vi.mocked(fetchMarineParkOptions).mockResolvedValue([
+      {
+        boundaryName: BoundaryName.AUSTRALIAN_MARINE_PARKS,
+        label: "Apollo Marine Park",
+        value: "3",
+      },
+    ]);
+
+    render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <Router>
+            <Searchbar />
+          </Router>
+        </ThemeProvider>
+      </Provider>
+    );
+
+    // Mock staticAreas where value is parsed as a number (3) instead of string ("3")
+    store.dispatch(
+      updateFilterStaticAreas([
+        {
+          boundaryName: BoundaryName.AUSTRALIAN_MARINE_PARKS,
+          value: 3 as any,
+        },
+      ])
+    );
+
+    // Wait for the chip to be rendered with the correct label
+    await waitFor(() => {
+      expect(
+        screen.getByText("Area: Apollo Marine Park (AMP)")
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("should only delete the clicked chip when multiple static areas of the same boundary type are active", async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(fetchMarineParkOptions).mockResolvedValue([
+      {
+        boundaryName: BoundaryName.AUSTRALIAN_MARINE_PARKS,
+        label: "Apollo Marine Park",
+        value: "3",
+      },
+      {
+        boundaryName: BoundaryName.AUSTRALIAN_MARINE_PARKS,
+        label: "Beagle Marine Park",
+        value: "4",
+      },
+    ]);
+
+    render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <Router>
+            <Searchbar />
+          </Router>
+        </ThemeProvider>
+      </Provider>
+    );
+
+    store.dispatch(
+      updateFilterStaticAreas([
+        {
+          boundaryName: BoundaryName.AUSTRALIAN_MARINE_PARKS,
+          value: "3",
+        },
+        {
+          boundaryName: BoundaryName.AUSTRALIAN_MARINE_PARKS,
+          value: "4",
+        },
+      ])
+    );
+
+    // Wait for both chips to be rendered
+    await waitFor(() => {
+      expect(
+        screen.getByText("Area: Apollo Marine Park (AMP)")
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("Area: Beagle Marine Park (AMP)")
+      ).toBeInTheDocument();
+    });
+
+    // Find and click the delete button for "Apollo Marine Park"
+    const apolloChip = screen
+      .getByText("Area: Apollo Marine Park (AMP)")
+      .closest(".MuiChip-root") as HTMLElement;
+    expect(apolloChip).toBeInTheDocument();
+    const deleteButton = within(apolloChip).getByTestId("CloseIcon");
+    await user.click(deleteButton);
+
+    // Apollo Marine Park should be gone, but Beagle Marine Park should remain!
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Area: Apollo Marine Park (AMP)")
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByText("Area: Beagle Marine Park (AMP)")
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("should trigger a search redirect when a chip is deleted", async () => {
+    const user = userEvent.setup();
+    const redirectSearchSpy = vi.fn();
+    vi.spyOn(useRedirectSearchModule, "default").mockReturnValue(
+      redirectSearchSpy
+    );
+
+    render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <Router>
+            <Searchbar />
+          </Router>
+        </ThemeProvider>
+      </Provider>
+    );
+
+    // Dispatch some state, e.g. Cloud Optimized filter (hasCOData)
+    store.dispatch(updateHasData(true));
+
+    // Wait for the chip to render
+    await waitFor(() => {
+      expect(screen.getByText("Cloud Optimized")).toBeInTheDocument();
+    });
+
+    // Find and click the delete button for the Cloud Optimized chip
+    const chip = screen
+      .getByText("Cloud Optimized")
+      .closest(".MuiChip-root") as HTMLElement;
+    expect(chip).toBeInTheDocument();
+    const deleteButton = within(chip).getByTestId("CloseIcon");
+    await user.click(deleteButton);
+
+    // Verify redirectSearch was invoked!
+    expect(redirectSearchSpy).toHaveBeenCalled();
   });
 });
