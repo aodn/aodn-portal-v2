@@ -6,9 +6,8 @@ from typing import List, Optional
 class SearchFilterConfig:
     """Configuration for expected search filter parameters."""
 
-    # Date filters
-    date_time_start: Optional[str] = None
-    date_time_end: Optional[str] = None
+    # Date filter
+    temporal_during: Optional[str] = None
 
     # Spatial filter
     location_intersects: Optional[str] = None

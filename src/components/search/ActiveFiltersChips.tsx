@@ -291,6 +291,7 @@ const ActiveFiltersChips: FC = () => {
           color: theme.palette.primary1,
           "&:hover": { backgroundColor: "transparent", color: color.blue.dark },
         }}
+        data-testid="clear-all-filters"
       >
         Clear all
       </Button>

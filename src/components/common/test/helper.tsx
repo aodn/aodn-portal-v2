@@ -17,6 +17,7 @@ interface TestProps {
   getSpatialExtentLayer?: () => string;
   getMapClickLngLat?: () => LngLat;
   getSelectedLocationIntersects?: () => any;
+  getTemporalDuring?: () => any;
 }
 
 // Use in test only to expose reference that need by test e2e testing.

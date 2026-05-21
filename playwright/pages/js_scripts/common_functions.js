@@ -11,4 +11,7 @@ window.__common_functions = {
   getSelectedLocationIntersects: function (propId) {
     return this.getTestProps(propId).getSelectedLocationIntersects();
   },
+  getTemporalDuring: function (propId) {
+    return this.getTestProps(propId).getTemporalDuring();
+  },
 };
