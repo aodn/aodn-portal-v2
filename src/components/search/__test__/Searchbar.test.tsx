@@ -376,9 +376,9 @@ describe("Searchbar", () => {
     // Find and click the delete button for "Apollo Marine Park"
     const apolloChip = screen
       .getByText("Area: Apollo Marine Park (AMP)")
-      .closest(".MuiChip-root");
+      .closest(".MuiChip-root") as HTMLElement;
     expect(apolloChip).toBeInTheDocument();
-    const deleteButton = within(apolloChip!).getByTestId("CloseIcon");
+    const deleteButton = within(apolloChip).getByTestId("CloseIcon");
     await user.click(deleteButton);
 
     // Apollo Marine Park should be gone, but Beagle Marine Park should remain!
@@ -418,9 +418,11 @@ describe("Searchbar", () => {
     });
 
     // Find and click the delete button for the Cloud Optimized chip
-    const chip = screen.getByText("Cloud Optimized").closest(".MuiChip-root");
+    const chip = screen
+      .getByText("Cloud Optimized")
+      .closest(".MuiChip-root") as HTMLElement;
     expect(chip).toBeInTheDocument();
-    const deleteButton = within(chip!).getByTestId("CloseIcon");
+    const deleteButton = within(chip).getByTestId("CloseIcon");
     await user.click(deleteButton);
 
     // Verify redirectSearch was invoked!
