@@ -16,7 +16,12 @@ import {
   updateParameterVocabs,
   updatePlatform,
   updateUpdateFreq,
+  updateFilterStaticAreas,
 } from "../../common/store/componentParamReducer";
+import {
+  fetchMarineParkOptions,
+  BoundaryName,
+} from "../../map/mapbox/layers/StaticLayer";
 import { server } from "../../../__mocks__/server";
 import { ThemeProvider } from "@mui/material/styles";
 import AppTheme from "../../../utils/AppTheme";
@@ -278,6 +283,43 @@ describe("Searchbar", () => {
       // Verify numeric values
       expect(paramReducer.zoom).toBe(3.5);
       expect(typeof paramReducer.zoom).toBe("number");
+    });
+  });
+
+  it("should render active filter chips with correct labels even when loaded from URL parameters (which parses ID to number)", async () => {
+    vi.mocked(fetchMarineParkOptions).mockResolvedValue([
+      {
+        boundaryName: BoundaryName.AUSTRALIAN_MARINE_PARKS,
+        label: "Apollo Marine Park",
+        value: "3",
+      },
+    ]);
+
+    render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <Router>
+            <Searchbar />
+          </Router>
+        </ThemeProvider>
+      </Provider>
+    );
+
+    // Mock staticAreas where value is parsed as a number (3) instead of string ("3")
+    store.dispatch(
+      updateFilterStaticAreas([
+        {
+          boundaryName: BoundaryName.AUSTRALIAN_MARINE_PARKS,
+          value: 3 as any,
+        },
+      ])
+    );
+
+    // Wait for the chip to be rendered with the correct label
+    await waitFor(() => {
+      expect(
+        screen.getByText("Area: Apollo Marine Park (AMP)")
+      ).toBeInTheDocument();
     });
   });
 });

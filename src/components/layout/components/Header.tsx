@@ -15,6 +15,8 @@ import SectionContainer from "./SectionContainer";
 import HeaderMenu, { HeaderMenuStyle } from "./HeaderMenu";
 import { pageDefault } from "../../common/constants";
 import Searchbar from "../../search/Searchbar";
+import { useAppSelector } from "../../common/store/hooks";
+import { ParameterState } from "../../common/store/componentParamReducer";
 import {
   PAGE_CONTENT_MAX_WIDTH,
   PAGE_CONTENT_WIDTH_HEADER,
@@ -47,6 +49,19 @@ const Header: FC = () => {
   const [chipsContainer, setChipsContainer] = useState<HTMLDivElement | null>(
     null
   );
+
+  const params = useAppSelector((state) => state.paramReducer);
+
+  const hasActiveFilters =
+    !!(params.dateTimeFilterRange?.start || params.dateTimeFilterRange?.end) ||
+    !!params.polygon ||
+    !!(params.staticAreas && params.staticAreas.length > 0) ||
+    !!params.datasetGroup ||
+    !!(params.parameterVocabs && params.parameterVocabs.length > 0) ||
+    !!(params.platform && params.platform.length > 0) ||
+    !!params.updateFreq ||
+    !!params.datasetStatus ||
+    !!params.hasCOData;
 
   return (
     <Box
@@ -175,7 +190,7 @@ const Header: FC = () => {
       Row 2: Active Filters Chips perfectly aligned under the Searchbar.
       topDividerStyle={{ marginTop: "0" }}, makes the divider visible
       */}
-      {isSearchResultPage && !isMobile && (
+      {isSearchResultPage && !isMobile && hasActiveFilters && (
         <SectionContainer
           topDividerStyle={{ marginTop: undefined }}
           contentAreaStyle={{

@@ -87,17 +87,20 @@ const ActiveFiltersChips: FC = () => {
         switch (area.boundaryName) {
           case BoundaryName.MEOW:
             return (
-              marineEcoregion.find((opt) => opt.value === area.value)?.label ||
-              ""
+              marineEcoregion.find(
+                (opt) => String(opt.value) === String(area.value)
+              )?.label || ""
             );
           case BoundaryName.AUSTRALIAN_MARINE_PARKS:
             return (
-              marinePark.find((opt) => opt.value === area.value)?.label || ""
+              marinePark.find((opt) => String(opt.value) === String(area.value))
+                ?.label || ""
             );
           case BoundaryName.CORAL_ATLAS:
             return (
-              allenCoralAtlas.find((opt) => opt.value === area.value)?.label ||
-              ""
+              allenCoralAtlas.find(
+                (opt) => String(opt.value) === String(area.value)
+              )?.label || ""
             );
         }
       };
