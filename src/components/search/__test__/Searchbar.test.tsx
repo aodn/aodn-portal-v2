@@ -322,4 +322,72 @@ describe("Searchbar", () => {
       ).toBeInTheDocument();
     });
   });
+
+  it("should only delete the clicked chip when multiple static areas of the same boundary type are active", async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(fetchMarineParkOptions).mockResolvedValue([
+      {
+        boundaryName: BoundaryName.AUSTRALIAN_MARINE_PARKS,
+        label: "Apollo Marine Park",
+        value: "3",
+      },
+      {
+        boundaryName: BoundaryName.AUSTRALIAN_MARINE_PARKS,
+        label: "Beagle Marine Park",
+        value: "4",
+      },
+    ]);
+
+    render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <Router>
+            <Searchbar />
+          </Router>
+        </ThemeProvider>
+      </Provider>
+    );
+
+    store.dispatch(
+      updateFilterStaticAreas([
+        {
+          boundaryName: BoundaryName.AUSTRALIAN_MARINE_PARKS,
+          value: "3",
+        },
+        {
+          boundaryName: BoundaryName.AUSTRALIAN_MARINE_PARKS,
+          value: "4",
+        },
+      ])
+    );
+
+    // Wait for both chips to be rendered
+    await waitFor(() => {
+      expect(
+        screen.getByText("Area: Apollo Marine Park (AMP)")
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("Area: Beagle Marine Park (AMP)")
+      ).toBeInTheDocument();
+    });
+
+    // Find and click the delete button for "Apollo Marine Park"
+    const apolloChip = screen
+      .getByText("Area: Apollo Marine Park (AMP)")
+      .closest(".MuiChip-root");
+    expect(apolloChip).toBeInTheDocument();
+    const deleteButton = within(apolloChip!).getByTestId("CloseIcon");
+    await user.click(deleteButton);
+
+    // Apollo Marine Park should be gone, but Beagle Marine Park should remain!
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Area: Apollo Marine Park (AMP)")
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByText("Area: Beagle Marine Park (AMP)")
+      ).toBeInTheDocument();
+    });
+  });
 });

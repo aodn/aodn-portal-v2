@@ -111,7 +111,9 @@ const ActiveFiltersChips: FC = () => {
             dispatch(
               updateFilterStaticAreas(
                 params.staticAreas!.filter(
-                  (a) => a.boundaryName !== area.boundaryName
+                  (a) =>
+                    a.boundaryName !== area.boundaryName ||
+                    String(a.value) !== String(area.value)
                 )
               )
             ),
