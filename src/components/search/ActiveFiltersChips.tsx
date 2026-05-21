@@ -16,7 +16,8 @@ import {
   updateUpdateFreq,
 } from "../common/store/componentParamReducer";
 import dayjs from "dayjs";
-import { dateDefault } from "../common/constants";
+import { dateDefault, pageReferer } from "../common/constants";
+import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { borderRadius, color } from "../../styles/constants";
 import { TrashIcon } from "../../assets/icons/search/trash";
 import {
@@ -30,6 +31,7 @@ import { DATA_SETTINGS } from "../filter/tab-filters/DataSettingsFilter";
 
 const ActiveFiltersChips: FC = () => {
   const dispatch = useAppDispatch();
+  const redirectSearch = useRedirectSearch();
   const theme = useTheme();
   const params = useAppSelector((state) => state.paramReducer);
 
@@ -50,7 +52,8 @@ const ActiveFiltersChips: FC = () => {
 
   const handleClearAll = useCallback(() => {
     dispatch(clearComponentParam());
-  }, [dispatch]);
+    redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+  }, [dispatch, redirectSearch]);
 
   const activeFilters = useMemo(() => {
     const chips: Array<{ label: string; onDelete: () => void }> = [];
@@ -69,7 +72,10 @@ const ActiveFiltersChips: FC = () => {
         : "...";
       chips.push({
         label: `Date: ${start} - ${end}`,
-        onDelete: () => dispatch(updateDateTimeFilterRange({})),
+        onDelete: () => {
+          dispatch(updateDateTimeFilterRange({}));
+          redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+        },
       });
     }
 
@@ -77,7 +83,10 @@ const ActiveFiltersChips: FC = () => {
     if (params.polygon) {
       chips.push({
         label: "Spatial Filter",
-        onDelete: () => dispatch(updateFilterPolygon(undefined)),
+        onDelete: () => {
+          dispatch(updateFilterPolygon(undefined));
+          redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+        },
       });
     }
 
@@ -107,7 +116,7 @@ const ActiveFiltersChips: FC = () => {
       params.staticAreas.forEach((area) => {
         chips.push({
           label: `Area: ${getLabel(area)} (${area.boundaryName})`,
-          onDelete: () =>
+          onDelete: () => {
             dispatch(
               updateFilterStaticAreas(
                 params.staticAreas!.filter(
@@ -116,7 +125,9 @@ const ActiveFiltersChips: FC = () => {
                     String(a.value) !== String(area.value)
                 )
               )
-            ),
+            );
+            redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+          },
         });
       });
     }
@@ -125,7 +136,10 @@ const ActiveFiltersChips: FC = () => {
     if (params.datasetGroup) {
       chips.push({
         label: `Group: ${params.datasetGroup}`,
-        onDelete: () => dispatch(updateDatasetGroup(undefined)),
+        onDelete: () => {
+          dispatch(updateDatasetGroup(undefined));
+          redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+        },
       });
     }
 
@@ -134,12 +148,14 @@ const ActiveFiltersChips: FC = () => {
       params.parameterVocabs.forEach((vocab) => {
         chips.push({
           label: vocab.label,
-          onDelete: () =>
+          onDelete: () => {
             dispatch(
               updateParameterVocabs(
                 params.parameterVocabs!.filter((v) => v.label !== vocab.label)
               )
-            ),
+            );
+            redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+          },
         });
       });
     }
@@ -149,10 +165,12 @@ const ActiveFiltersChips: FC = () => {
       params.platform.forEach((p) => {
         chips.push({
           label: `Platform: ${p}`,
-          onDelete: () =>
+          onDelete: () => {
             dispatch(
               updatePlatform(params.platform!.filter((item) => item !== p))
-            ),
+            );
+            redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+          },
         });
       });
     }
@@ -161,7 +179,10 @@ const ActiveFiltersChips: FC = () => {
     if (params.updateFreq) {
       chips.push({
         label: `Delivery Mode: ${DATA_SETTINGS.dataDeliveryFrequency.find((f) => f.value === params.updateFreq)?.label || params.updateFreq}`,
-        onDelete: () => dispatch(updateUpdateFreq(undefined)),
+        onDelete: () => {
+          dispatch(updateUpdateFreq(undefined));
+          redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+        },
       });
     }
 
@@ -169,7 +190,10 @@ const ActiveFiltersChips: FC = () => {
     if (params.datasetStatus) {
       chips.push({
         label: `Status: ${DATA_SETTINGS.dataStatus.find((f) => f.value === params.datasetStatus)?.label || params.datasetStatus}`,
-        onDelete: () => dispatch(updateStatus(undefined)),
+        onDelete: () => {
+          dispatch(updateStatus(undefined));
+          redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+        },
       });
     }
 
@@ -177,12 +201,22 @@ const ActiveFiltersChips: FC = () => {
     if (params.hasCOData) {
       chips.push({
         label: "Cloud Optimized",
-        onDelete: () => dispatch(updateHasData(false)),
+        onDelete: () => {
+          dispatch(updateHasData(false));
+          redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+        },
       });
     }
 
     return chips;
-  }, [params, dispatch, marineEcoregion, marinePark, allenCoralAtlas]);
+  }, [
+    params,
+    dispatch,
+    redirectSearch,
+    marineEcoregion,
+    marinePark,
+    allenCoralAtlas,
+  ]);
 
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);

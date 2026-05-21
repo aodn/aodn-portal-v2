@@ -57,6 +57,7 @@ vi.mock(import("react-router-dom"), async (importOriginal) => {
 });
 
 import { BrowserRouter as Router } from "react-router-dom";
+import * as useRedirectSearchModule from "../../../hooks/useRedirectSearch";
 import Searchbar from "../Searchbar";
 import { PARAMETER_VOCABS } from "../../../__mocks__/data/PARAMETER_VOCABS";
 import { encodeParam } from "../../../utils/UrlUtils";
@@ -389,5 +390,40 @@ describe("Searchbar", () => {
         screen.getByText("Area: Beagle Marine Park (AMP)")
       ).toBeInTheDocument();
     });
+  });
+
+  it("should trigger a search redirect when a chip is deleted", async () => {
+    const user = userEvent.setup();
+    const redirectSearchSpy = vi.fn();
+    vi.spyOn(useRedirectSearchModule, "default").mockReturnValue(
+      redirectSearchSpy
+    );
+
+    render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <Router>
+            <Searchbar />
+          </Router>
+        </ThemeProvider>
+      </Provider>
+    );
+
+    // Dispatch some state, e.g. Cloud Optimized filter (hasCOData)
+    store.dispatch(updateHasData(true));
+
+    // Wait for the chip to render
+    await waitFor(() => {
+      expect(screen.getByText("Cloud Optimized")).toBeInTheDocument();
+    });
+
+    // Find and click the delete button for the Cloud Optimized chip
+    const chip = screen.getByText("Cloud Optimized").closest(".MuiChip-root");
+    expect(chip).toBeInTheDocument();
+    const deleteButton = within(chip!).getByTestId("CloseIcon");
+    await user.click(deleteButton);
+
+    // Verify redirectSearch was invoked!
+    expect(redirectSearchSpy).toHaveBeenCalled();
   });
 });
