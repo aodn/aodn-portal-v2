@@ -3,7 +3,7 @@ import React, {
   FC,
   ReactNode,
   useCallback,
-  useLayoutEffect,
+  useEffect,
   useRef,
   useState,
 } from "react";
@@ -40,7 +40,7 @@ const VerticalIndicator: FC<VerticalIndicatorProps> = ({
   const [metrics, setMetrics] = useState({ totalHeight: 0, activeY: 0 });
   const theme = useTheme();
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const updateMetrics = () => {
       let totalHeight = 0;
       let activeY = 0;
