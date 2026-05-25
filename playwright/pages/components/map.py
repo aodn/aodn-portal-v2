@@ -172,7 +172,7 @@ class Map(BasePage):
         self.page.mouse.up()
 
     def click_map_center(self) -> None:
-        """Click the map at the current position of the mouse"""
+        """Click the map at the center position of the map element"""
         self.hover_map()  # Moves the mouse to the center of the map
         x, y = self.calculate_mouse_coordinates()
         self.page.mouse.click(x, y)
