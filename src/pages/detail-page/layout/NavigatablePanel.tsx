@@ -3,7 +3,7 @@ import React, {
   FC,
   ReactNode,
   useCallback,
-  useLayoutEffect,
+  useEffect,
   useRef,
   useState,
 } from "react";
@@ -40,7 +40,7 @@ const VerticalIndicator: FC<VerticalIndicatorProps> = ({
   const [metrics, setMetrics] = useState({ totalHeight: 0, activeY: 0 });
   const theme = useTheme();
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const updateMetrics = () => {
       let totalHeight = 0;
       let activeY = 0;
@@ -82,10 +82,26 @@ const VerticalIndicator: FC<VerticalIndicatorProps> = ({
       return observer;
     });
 
+    // ResizeObserver does not reliably fire when an ancestor transitions
+    // from `display: none` to visible (the case when a tab panel is shown
+    // for the first time). IntersectionObserver fires on that transition,
+    // so we use it to remeasure once the items actually appear.
+    const intersectionObservers = itemRefs.map((ref) => {
+      if (!ref.current) return null;
+      const observer = new IntersectionObserver((entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          updateMetrics();
+        }
+      });
+      observer.observe(ref.current);
+      return observer;
+    });
+
     return () => {
       cancelAnimationFrame(rafId);
       window.removeEventListener("load", handleLoad);
       observers.forEach((obs) => obs?.disconnect());
+      intersectionObservers.forEach((obs) => obs?.disconnect());
     };
     // Re-run if the index changes or the refs array changes
   }, [itemRefs, index]);

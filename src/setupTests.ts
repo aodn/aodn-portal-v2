@@ -24,6 +24,26 @@ class ResizeObserver {
 
 (global as any).ResizeObserver = ResizeObserver;
 
+class IntersectionObserver {
+  callback: IntersectionObserverCallback;
+
+  constructor(callback: IntersectionObserverCallback) {
+    this.callback = callback;
+  }
+
+  observe() {}
+
+  unobserve() {}
+
+  disconnect() {}
+
+  takeRecords() {
+    return [];
+  }
+}
+
+(global as any).IntersectionObserver = IntersectionObserver;
+
 // A global mock to avoid real layer fetch calls, if you need different return value
 // you can override in the test file
 vi.mock("./components/map/mapbox/layers/StaticLayer", async () => {
