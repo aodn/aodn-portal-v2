@@ -14,7 +14,10 @@ import { ThemeProvider } from "@mui/material/styles";
 import { MemoryRouter } from "react-router-dom";
 import AppTheme from "../../../utils/AppTheme";
 import store from "../../common/store/store";
-import { clearComponentParam } from "../../common/store/componentParamReducer";
+import {
+  clearComponentParam,
+  updateHasData,
+} from "../../common/store/componentParamReducer";
 import Header from "../components/Header";
 import { SEARCHBAR_EXPANSION_WIDTH_LAPTOP } from "../../search/constants";
 
@@ -98,5 +101,33 @@ describe("Header Searchbar Expansion", () => {
     searchInput.blur();
 
     expect(searchWrapper).toHaveStyle({ minWidth: expectedLaptopWidth });
+  });
+
+  it("should hide the filter chips divider when there is no filter set, and show it when a filter is set", async () => {
+    const { container } = render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <MemoryRouter initialEntries={["/search"]}>
+            <Header />
+          </MemoryRouter>
+        </ThemeProvider>
+      </Provider>
+    );
+
+    // 1. Initial State: No filters are set, so there should be no horizontal divider (hr element) inside the layout
+    const dividers = container.querySelectorAll("hr");
+    expect(dividers.length).toBe(0);
+
+    // 2. Set a filter (e.g. updateHasData(true))
+    const { act } = await import("@testing-library/react");
+    act(() => {
+      store.dispatch(updateHasData(true));
+    });
+
+    // 3. Now the divider (<hr>) should be rendered!
+    await waitFor(() => {
+      const updatedDividers = container.querySelectorAll("hr");
+      expect(updatedDividers.length).toBe(1);
+    });
   });
 });

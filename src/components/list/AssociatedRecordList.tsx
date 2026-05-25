@@ -30,7 +30,7 @@ const AssociatedRecordList: React.FC<AssociatedRecordListProps> =
               key={index}
               titleComponent={linkTitleComponent(index, {
                 rel: "",
-                href: `${pageDefault.details}/${record.uuid}`,
+                href: `${window.location.origin}${pageDefault.details}/${record.uuid}`,
                 title: record.title,
                 type: "",
                 description: record.abstract,

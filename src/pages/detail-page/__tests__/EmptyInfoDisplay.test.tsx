@@ -98,7 +98,7 @@ describe("AssociatedRecordsPanel", () => {
     ).then(() => {
       return waitFor(() =>
         screen.findByTestId(
-          "link-card-/details/0887cb5b-b443-4e08-a169-038208109466"
+          `link-card-${window.location.origin}/details/0887cb5b-b443-4e08-a169-038208109466`
         )
       ).then((parentTitle) => {
         expect(parentTitle).to.exist;
