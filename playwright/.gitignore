@@ -167,6 +167,7 @@ cython_debug/
 reports
 html-reports
 report_output
+screenshots
 
 # Playwright traces
 test-results

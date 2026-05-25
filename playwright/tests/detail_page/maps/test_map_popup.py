@@ -4,7 +4,6 @@ from playwright.sync_api import Page, expect
 from pages.detail_page import DetailPage
 
 
-@pytest.mark.flaky(reruns=2, reruns_delay=1)
 @pytest.mark.parametrize(
     'uuid, data_lng, data_lat, data',
     [
@@ -37,8 +36,7 @@ def test_map_popup_from_summary(
     detail_page.detail_map.center_map(data_lng, data_lat)
     detail_page.detail_map.wait_for_map_idle()
 
-    detail_page.detail_map.hover_map()
-    detail_page.detail_map.click_map()
+    detail_page.detail_map.click_map_center()
 
     expect(detail_page.detail_map_popup).to_be_visible()
     expect(detail_page.detail_map_popup).to_contain_text(data)

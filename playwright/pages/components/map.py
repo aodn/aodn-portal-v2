@@ -82,7 +82,7 @@ class Map(BasePage):
         self, left: int = 0, right: int = 0, up: int = 0, down: int = 0
     ) -> tuple[float, float]:
         """
-        Calculate the new mouse coordinates based on the specified distances.
+        Calculate the new mouse coordinates based on the specified distances relative to the map center.
 
         Args:
             left (int, optional): Number of pixels to move to the left. Defaults to 0.
@@ -101,13 +101,8 @@ class Map(BasePage):
             y = bounding_box['y'] + bounding_box['height'] / 2
 
         # Calculate the new coordinates
-        if any([left, right, up, down]):
-            x += right - left  # Combine horizontal movements
-            y += down - up  # Combine vertical movements
-        else:
-            # If no parameters are passed, perform a fixed distance movement
-            x += 150
-            y += 50
+        x += right - left  # Combine horizontal movements
+        y += down - up  # Combine vertical movements
 
         return x, y
 
@@ -133,7 +128,12 @@ class Map(BasePage):
         self.hover_map()  # Moves the mouse to the center of the map
 
         # Calculate the new coordinates
-        x, y = self.calculate_mouse_coordinates(left, right, up, down)
+        x, y = 0.0, 0.0
+        if any([left, right, up, down]):
+            x, y = self.calculate_mouse_coordinates(left, right, up, down)
+        else:
+            # If no parameters are passed, perform a fixed distance movement using default values
+            x, y = self.calculate_mouse_coordinates(0, 150, 0, 50)
 
         # Perform the drag
         self.page.mouse.down()
@@ -170,6 +170,12 @@ class Map(BasePage):
         """Click the map at the current position of the mouse"""
         self.page.mouse.down()
         self.page.mouse.up()
+
+    def click_map_center(self) -> None:
+        """Click the map at the current position of the mouse"""
+        self.hover_map()  # Moves the mouse to the center of the map
+        x, y = self.calculate_mouse_coordinates()
+        self.page.mouse.click(x, y)
 
     def get_map_layers(self) -> str:
         """Get the total number of heatmap layers"""

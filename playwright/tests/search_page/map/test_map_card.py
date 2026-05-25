@@ -7,7 +7,6 @@ from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
 
 
-@pytest.mark.flaky(reruns=2, reruns_delay=1)
 @pytest.mark.parametrize(
     'data_id, data_lng, data_lat',
     [
@@ -42,7 +41,6 @@ def test_map_card_popup_download_button_in_desktop(
     expect(search_page.main_map).to_be_visible()
 
 
-@pytest.mark.flaky(reruns=2, reruns_delay=1)
 @pytest.mark.parametrize(
     'data_id',
     [
