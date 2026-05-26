@@ -43,7 +43,8 @@ export default ({ mode }) => {
           return html.replace("<!-- google-analytics-js -->", "");
         }
 
-        const isNewRelic = `new URLSearchParams(window.location.search).get('nr_synthetic') === 'true'`;
+        const isNewRelic =
+          "new URLSearchParams(window.location.search).get('nr_synthetic') === 'true'";
 
         const gaScript = `
           <script async src="https://www.googletagmanager.com/gtag/js?id=${process.env.VITE_GA_MEASUREMENT_ID}"></script>
