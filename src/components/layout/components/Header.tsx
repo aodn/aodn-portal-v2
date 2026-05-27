@@ -188,11 +188,16 @@ const Header: FC = () => {
       </SectionContainer>
       {/*
       Row 2: Active Filters Chips perfectly aligned under the Searchbar.
-      topDividerStyle={{ marginTop: "0" }}, makes the divider visible
       */}
       {isSearchResultPage && !isMobile && hasActiveFilters && (
         <SectionContainer
-          topDividerStyle={{ marginTop: undefined }}
+          topDividerStyle={{
+            marginTop: 0,
+            borderColor: color.gray.extraLight,
+          }}
+          sectionAreaStyle={{
+            backgroundColor: "#fff",
+          }}
           contentAreaStyle={{
             width: SEARCHBAR_CONTENT_WIDTH,
             maxWidth: SEARCHBAR_CONTENT_WIDTH,

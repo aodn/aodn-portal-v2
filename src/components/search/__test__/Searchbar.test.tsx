@@ -392,7 +392,9 @@ describe("Searchbar", () => {
     });
   });
 
-  it("should trigger a search redirect when a chip is deleted", async () => {
+  it("should trigger a search redirect when a chip is deleted on the search page", async () => {
+    mockLocation.pathname = "/search";
+
     const user = userEvent.setup();
     const redirectSearchSpy = vi.fn();
     vi.spyOn(useRedirectSearchModule, "default").mockReturnValue(
@@ -409,17 +411,17 @@ describe("Searchbar", () => {
       </Provider>
     );
 
-    // Dispatch some state, e.g. Cloud Optimized filter (hasCOData)
+    // Dispatch some state, e.g. Downloadable datasets filter (hasCOData)
     store.dispatch(updateHasData(true));
 
     // Wait for the chip to render
     await waitFor(() => {
-      expect(screen.getByText("Cloud Optimized")).toBeInTheDocument();
+      expect(screen.getByText("Downloadable datasets")).toBeInTheDocument();
     });
 
-    // Find and click the delete button for the Cloud Optimized chip
+    // Find and click the delete button for the Downloadable datasets chip
     const chip = screen
-      .getByText("Cloud Optimized")
+      .getByText("Downloadable datasets")
       .closest(".MuiChip-root") as HTMLElement;
     expect(chip).toBeInTheDocument();
     const deleteButton = within(chip).getByTestId("CloseIcon");
@@ -427,5 +429,46 @@ describe("Searchbar", () => {
 
     // Verify redirectSearch was invoked!
     expect(redirectSearchSpy).toHaveBeenCalled();
+  });
+
+  it("should NOT trigger a search redirect when a chip is deleted on the landing page", async () => {
+    mockLocation.pathname = "/";
+
+    const user = userEvent.setup();
+    const redirectSearchSpy = vi.fn();
+    vi.spyOn(useRedirectSearchModule, "default").mockReturnValue(
+      redirectSearchSpy
+    );
+
+    render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <Router>
+            <Searchbar />
+          </Router>
+        </ThemeProvider>
+      </Provider>
+    );
+
+    store.dispatch(updateHasData(true));
+
+    await waitFor(() => {
+      expect(screen.getByText("Downloadable datasets")).toBeInTheDocument();
+    });
+
+    const chip = screen
+      .getByText("Downloadable datasets")
+      .closest(".MuiChip-root") as HTMLElement;
+    expect(chip).toBeInTheDocument();
+    const deleteButton = within(chip).getByTestId("CloseIcon");
+    await user.click(deleteButton);
+
+    // Chip should be removed but no redirect should occur
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Downloadable datasets")
+      ).not.toBeInTheDocument();
+    });
+    expect(redirectSearchSpy).not.toHaveBeenCalled();
   });
 });

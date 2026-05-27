@@ -1,5 +1,6 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { Box, Chip, Typography, Button, Stack, useTheme } from "@mui/material";
+import { useLocation } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../common/store/hooks";
 import CloseIcon from "@mui/icons-material/Close";
 import {
@@ -16,7 +17,7 @@ import {
   updateUpdateFreq,
 } from "../common/store/componentParamReducer";
 import dayjs from "dayjs";
-import { dateDefault, pageReferer } from "../common/constants";
+import { dateDefault, pageDefault, pageReferer } from "../common/constants";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { borderRadius, color } from "../../styles/constants";
 import { TrashIcon } from "../../assets/icons/search/trash";
@@ -34,6 +35,14 @@ const ActiveFiltersChips: FC = () => {
   const redirectSearch = useRedirectSearch();
   const theme = useTheme();
   const params = useAppSelector((state) => state.paramReducer);
+  const { pathname } = useLocation();
+  const isSearchPage = pathname === pageDefault.search;
+
+  const triggerRedirectIfOnSearchPage = useCallback(() => {
+    if (isSearchPage) {
+      redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+    }
+  }, [isSearchPage, redirectSearch]);
 
   const [marineEcoregion, setMarineEcoregion] = useState<BoundaryProperties[]>(
     []
@@ -52,8 +61,8 @@ const ActiveFiltersChips: FC = () => {
 
   const handleClearAll = useCallback(() => {
     dispatch(clearComponentParam());
-    redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
-  }, [dispatch, redirectSearch]);
+    triggerRedirectIfOnSearchPage();
+  }, [dispatch, triggerRedirectIfOnSearchPage]);
 
   const activeFilters = useMemo(() => {
     const chips: Array<{ label: string; onDelete: () => void }> = [];
@@ -74,7 +83,7 @@ const ActiveFiltersChips: FC = () => {
         label: `Date: ${start} - ${end}`,
         onDelete: () => {
           dispatch(updateDateTimeFilterRange({}));
-          redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+          triggerRedirectIfOnSearchPage();
         },
       });
     }
@@ -85,7 +94,7 @@ const ActiveFiltersChips: FC = () => {
         label: "Spatial Filter",
         onDelete: () => {
           dispatch(updateFilterPolygon(undefined));
-          redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+          triggerRedirectIfOnSearchPage();
         },
       });
     }
@@ -126,7 +135,7 @@ const ActiveFiltersChips: FC = () => {
                 )
               )
             );
-            redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+            triggerRedirectIfOnSearchPage();
           },
         });
       });
@@ -138,7 +147,7 @@ const ActiveFiltersChips: FC = () => {
         label: `Group: ${params.datasetGroup}`,
         onDelete: () => {
           dispatch(updateDatasetGroup(undefined));
-          redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+          triggerRedirectIfOnSearchPage();
         },
       });
     }
@@ -154,7 +163,7 @@ const ActiveFiltersChips: FC = () => {
                 params.parameterVocabs!.filter((v) => v.label !== vocab.label)
               )
             );
-            redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+            triggerRedirectIfOnSearchPage();
           },
         });
       });
@@ -169,7 +178,7 @@ const ActiveFiltersChips: FC = () => {
             dispatch(
               updatePlatform(params.platform!.filter((item) => item !== p))
             );
-            redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+            triggerRedirectIfOnSearchPage();
           },
         });
       });
@@ -181,7 +190,7 @@ const ActiveFiltersChips: FC = () => {
         label: `Delivery Mode: ${DATA_SETTINGS.dataDeliveryFrequency.find((f) => f.value === params.updateFreq)?.label || params.updateFreq}`,
         onDelete: () => {
           dispatch(updateUpdateFreq(undefined));
-          redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+          triggerRedirectIfOnSearchPage();
         },
       });
     }
@@ -192,18 +201,18 @@ const ActiveFiltersChips: FC = () => {
         label: `Status: ${DATA_SETTINGS.dataStatus.find((f) => f.value === params.datasetStatus)?.label || params.datasetStatus}`,
         onDelete: () => {
           dispatch(updateStatus(undefined));
-          redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+          triggerRedirectIfOnSearchPage();
         },
       });
     }
 
-    // Cloud Optimized
+    // Downloadable datasets (hasCOData)
     if (params.hasCOData) {
       chips.push({
-        label: "Cloud Optimized",
+        label: "Downloadable datasets",
         onDelete: () => {
           dispatch(updateHasData(false));
-          redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+          triggerRedirectIfOnSearchPage();
         },
       });
     }
@@ -212,7 +221,7 @@ const ActiveFiltersChips: FC = () => {
   }, [
     params,
     dispatch,
-    redirectSearch,
+    triggerRedirectIfOnSearchPage,
     marineEcoregion,
     marinePark,
     allenCoralAtlas,
