@@ -6,13 +6,22 @@ import React, {
   useMemo,
   startTransition,
 } from "react";
-import {
+
+import type {
   LngLatBounds,
-  Map,
+  Map as MapboxMap,
   MapEvent,
   ProjectionSpecification,
   StyleSpecification,
 } from "mapbox-gl";
+
+import mapboxgl from "mapbox-gl/esm";
+
+// eslint-disable-next-line import/extensions
+import workerUrl from "mapbox-gl/dist/mapbox-gl-csp-worker.js?url";
+
+mapboxgl.workerUrl = workerUrl;
+
 import MapContext, { ProgressType } from "./MapContext";
 import "mapbox-gl/dist/mapbox-gl.css";
 import ERSIWorldImagery from "./styles/ESRIWorldImagery.json";
@@ -72,7 +81,7 @@ const styles = [
 
 const { WEST_LON, EAST_LON, NORTH_LAT, SOUTH_LAT } =
   MapDefaultConfig.BBOX_ENDPOINTS;
-const defaultBbox = new LngLatBounds([
+const defaultBbox = new mapboxgl.LngLatBounds([
   WEST_LON,
   SOUTH_LAT,
   EAST_LON,
@@ -129,7 +138,7 @@ const ReactMap = memo(
     onMoveEvent,
     zoom = MapDefaultConfig.ZOOM,
   }: React.PropsWithChildren<MapProps>) => {
-    const [map, setMap] = useState<Map | null>(null);
+    const [map, setMap] = useState<MapboxMap | null>(null);
     const [loading, setLoading] = useState<ProgressType | undefined>(progress);
     const [containerRef, setContainerRef] = useState<HTMLElement | null>(null);
 
@@ -161,7 +170,7 @@ const ReactMap = memo(
         }
 
         // Create new map instance
-        const newMap = new Map({
+        const newMap = new mapboxgl.Map({
           container: panelId,
           accessToken: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
           style: styles[MapDefaultConfig.DEFAULT_STYLE].style,

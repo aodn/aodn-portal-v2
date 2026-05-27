@@ -79,6 +79,12 @@ module.exports = [
           json: "always",
         },
       ],
+      // Relax some of the new react-hooks rules (introduced in eslint-plugin-react-hooks v7)
+      // These are set to warn to avoid blocking the dev server while we incrementally
+      // address code patterns that trigger them. Keep the essential rules enforced.
+      "react-hooks/set-state-in-effect": "warn",
+      "react-hooks/refs": "warn",
+      "react-hooks/immutability": "warn",
     },
   },
 ];

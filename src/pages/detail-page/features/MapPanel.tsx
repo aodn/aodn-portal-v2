@@ -30,7 +30,6 @@ import {
 import { dateDefault } from "../../../components/common/constants";
 import { Feature, Polygon, MultiPolygon } from "geojson";
 import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
-import HexbinLayer from "../../../components/map/mapbox/layers/HexbinLayer";
 import GeoServerLayer, {
   Dimension,
 } from "../../../components/map/mapbox/layers/GeoServerLayer";
@@ -56,6 +55,8 @@ import {
   buildMapLayerConfig,
   getMinMaxDateStamps,
 } from "./SummaryAndDownloadPanel";
+import MapboxExample from "../../../components/map/mapbox/layers/PMTilesHexLayer";
+import PMTilesHexLayer from "../../../components/map/mapbox/layers/PMTilesHexLayer";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -452,16 +453,11 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
             bbox={mapFocusArea}
           />
           {createStaticLayers(staticLayer)}
-          <HexbinLayer
-            featureCollection={featureCollection}
-            filterStartDate={filterStartDate}
-            filterEndDate={filterEndDate}
-            visible={
-              mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
-              LayerName.Hexbin
-            }
-            selectedCoKey={selectedCoKey}
-            onSelectCoKey={setSelectedCoKey}
+          <PMTilesHexLayer
+          // visible={
+          //   mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
+          //   LayerName.Hexbin
+          // }
           />
           <GeoServerLayer
             geoServerLayerConfig={geoServerLayerConfig}
