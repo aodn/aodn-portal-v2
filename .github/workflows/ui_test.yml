@@ -33,6 +33,6 @@ jobs:
         with:
           name: test-report
           path: |
-            playwright/reports/
+            playwright/html-reports/
             playwright/test-results/
           retention-days: 7
