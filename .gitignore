@@ -20,7 +20,8 @@ dist-ssr
 !.vscode/settings.json
 playwright-report/
 reports/
-playwright/reports/
+report_output/
+html-reports/
 .idea
 .DS_Store
 *.suo

@@ -1,6 +1,7 @@
 import pytest
 from playwright.sync_api import Page, expect
 
+from core.enums.search_view_layouts import SearchViewLayouts
 from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
@@ -61,8 +62,11 @@ def test_map_card_popup_download_button_in_mobile(
     landing_page.search.search_for(data_id)
     search_page.wait_for_search_to_complete()
 
+    expect(
+        search_page.get_result_view_button(SearchViewLayouts.FULL_LIST.test_id)
+    ).to_be_visible()
     search_page.result_view_button.click()
-    search_page.full_map_view_button.click()
+    search_page.click_menu_item(SearchViewLayouts.MAP.test_id)
     search_page.map.wait_for_search_loading()
     expect(search_page.main_map).to_be_visible(timeout=30000)
     search_page.map.wait_for_map_idle()
@@ -70,9 +74,8 @@ def test_map_card_popup_download_button_in_mobile(
     search_page.map.find_and_click_data_point(data_id)
 
     popup_download_btn = search_page.card_popup_download_button.last
-    popup_download_btn.wait_for(state='visible')
     popup_download_btn.click()
-    search_page.wait_for_load_state('load')
+    detail_page.wait_for_load_state('load')
 
     detail_page.return_button.click()
     search_page.map.wait_for_map_idle()

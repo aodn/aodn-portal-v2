@@ -50,6 +50,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
+.pytest_worker_jsons/
 
 # Translations
 *.mo
@@ -164,6 +165,9 @@ cython_debug/
 
 # Test reports
 reports
+html-reports
+report_output
+screenshots
 
 # Playwright traces
 test-results
