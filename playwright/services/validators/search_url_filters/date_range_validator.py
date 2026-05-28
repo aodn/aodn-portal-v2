@@ -34,7 +34,7 @@ class DateRangeValidator(BaseValidator):
         Looks for a 'temporal during' expression and parses its start and end dates.
 
         Returns:
-            str: The extracted date range value.
+            str: The extracted date value.
 
         """
         filter = self._extract_filter_param()
@@ -43,4 +43,4 @@ class DateRangeValidator(BaseValidator):
         if match:
             return f'temporal during {match.group(1)}/{match.group(2)}'
         else:
-            raise ValueError(f'Date range not found in URL: {self.url}')
+            raise ValueError(f'Date filter not found in URL: {self.url}')
