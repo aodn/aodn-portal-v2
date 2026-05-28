@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List
 
 from playwright.sync_api import Locator, Page, expect
 
@@ -28,7 +28,7 @@ class SearchComponent(BasePage):
         self.filter_platform_tab = self.get_tab('Platform')
         self.filter_organisation_tab = self.get_tab('Organisation')
         self.filter_data_tab = self.get_tab('Data')
-        self.filter_reset = page.get_by_test_id('ReplayIcon')
+        self.clear_all_button = page.get_by_test_id('clear-all-filters')
 
     def fill_search_text(self, search_text: str) -> None:
         """Fill up search text"""
@@ -43,19 +43,6 @@ class SearchComponent(BasePage):
         self.fill_search_text(query)
         self.click_search_button()
 
-    def get_date_range(self) -> Tuple[str, str]:
-        """
-        Get the date range from the date range picker.
-        """
-        self.date_button.click()
-        self.wait_for_timeout(1500)  # wait for values to load
-        # Ensure values are populated before reading
-        self.start_date_picker.locator('input').wait_for(state='visible')
-        start_date = self.start_date_picker.locator('input').input_value() or ''
-        end_date = self.end_date_picker.locator('input').input_value() or ''
-        self.date_button.click()  # close the date picker
-        return start_date, end_date
-
     def get_selected_location_intersects(self) -> str:
         """Get the intersects value of the selected location"""
         return execute_common_js(
@@ -66,6 +53,12 @@ class SearchComponent(BasePage):
         """Return button element inside searchbar popup by text"""
         return self.searchbar_popup.get_by_role(
             'button', name=name, exact=exact
+        )
+
+    def get_temporal_during(self) -> str:
+        """Get the temporal during value"""
+        return execute_common_js(
+            self.page, 'getTemporalDuring', 'temporal-during'
         )
 
     def assert_toggle_button_pressed(
@@ -154,18 +147,3 @@ class SearchComponent(BasePage):
         self.filter_data_tab.click()
         self.assert_toggle_button_pressed(filter_data)
         self.filter_button.click()  # close the popup
-
-    def reset_all_filters(self) -> None:
-        """Reset all search filters"""
-        self.date_button.click()
-        self.wait_for_timeout(500)  # wait for values to load
-        self.filter_reset.click()
-        self.wait_for_timeout(1500)  # wait for date reset
-        self.location_button.click()
-        self.wait_for_timeout(500)  # wait for values to load
-        self.filter_reset.click()
-        self.wait_for_timeout(1500)  # wait for location reset
-        self.filter_button.click()
-        self.wait_for_timeout(500)  # wait for values to load
-        self.filter_reset.click()
-        self.wait_for_timeout(1500)  # wait for other filters reset
