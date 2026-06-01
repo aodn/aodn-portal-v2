@@ -29,6 +29,7 @@ import {
   fetchMarineParkOptions,
 } from "../map/mapbox/layers/StaticLayer";
 import { DATA_SETTINGS } from "../filter/tab-filters/DataSettingsFilter";
+import useElementSize from "../../hooks/useElementSize";
 
 const ActiveFiltersChips: FC = () => {
   const dispatch = useAppDispatch();
@@ -227,15 +228,27 @@ const ActiveFiltersChips: FC = () => {
     allenCoralAtlas,
   ]);
 
+  const { ref: scrollRef, width: scrollWidth } = useElementSize();
+  const [isScrollable, setIsScrollable] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    setIsDragging(true);
-    setStartX(e.pageX - e.currentTarget.getBoundingClientRect().left);
-    setScrollLeft(e.currentTarget.scrollLeft);
-  }, []);
+  // Only enable drag-to-scroll affordance when the chips actually overflow.
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) setIsScrollable(el.scrollWidth > el.clientWidth);
+  }, [scrollRef, scrollWidth, activeFilters.length]);
+
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      if (!isScrollable) return;
+      setIsDragging(true);
+      setStartX(e.pageX - e.currentTarget.getBoundingClientRect().left);
+      setScrollLeft(e.currentTarget.scrollLeft);
+    },
+    [isScrollable]
+  );
 
   const handleMouseLeave = useCallback(() => {
     setIsDragging(false);
@@ -282,6 +295,7 @@ const ActiveFiltersChips: FC = () => {
         Added filters:
       </Typography>
       <Stack
+        ref={scrollRef}
         direction="row"
         spacing={1}
         onMouseDown={handleMouseDown}
@@ -296,7 +310,7 @@ const ActiveFiltersChips: FC = () => {
           "&::-webkit-scrollbar": { display: "none" },
           msOverflowStyle: "none",
           scrollbarWidth: "none",
-          cursor: isDragging ? "grabbing" : "grab",
+          cursor: isScrollable ? (isDragging ? "grabbing" : "grab") : "default",
           userSelect: "none", // Prevent text selection while dragging
           "& *": { cursor: isDragging ? "grabbing" : "inherit" },
         }}
