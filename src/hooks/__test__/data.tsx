@@ -199,7 +199,7 @@ const response1 = {
           type: "application/x-ipynb+json",
           title:
             "Access to Jupyter notebook to query Cloud Optimised converted dataset",
-          "ai:group": "Python Notebook",
+          "ai:group": "Code Tutorials",
         },
         {
           href: "https://geonetwork.edge.aodn.org.au:443/geonetwork/images/logos/2976cf80-3906-41aa-8916-4adfbc507438.png",
@@ -228,7 +228,7 @@ const response1 = {
           rel: "related",
           type: "application/x-ipynb+json",
           title: "Python notebook example",
-          "ai:group": "Python Notebook",
+          "ai:group": "Code Tutorials",
         },
         {
           href: "http://localhost:8080/api/v1/ogc/collections/b299cdcd-3dee-48aa-abdd-e0fcdbb9cadc/items/summary",
@@ -388,7 +388,7 @@ const response1 = {
           rel: "related",
           type: "application/x-ipynb+json",
           title: "Python notebook example",
-          "ai:group": "Python Notebook",
+          "ai:group": "Code Tutorials",
         },
         {
           href: "http://localhost:8080/api/v1/ogc/collections/4402cb50-e20a-44ee-93e6-4728259250d2/items/summary",
@@ -469,7 +469,7 @@ const response1 = {
           type: "application/x-ipynb+json",
           title:
             "Notebook on how to manipulate and plot the variables (Python version)",
-          "ai:group": "Python Notebook",
+          "ai:group": "Code Tutorials",
         },
         {
           href: "https://github.com/aodn/imos-user-code-library/blob/master/R/notebooks/ANMN_LTSP_hourlytimeseries_Demo.Rmd",
@@ -518,7 +518,7 @@ const response1 = {
           type: "application/x-ipynb+json",
           title:
             "Access to Jupyter notebook to query Cloud Optimised converted dataset",
-          "ai:group": "Python Notebook",
+          "ai:group": "Code Tutorials",
         },
         {
           href: "https://geonetwork.edge.aodn.org.au:443/geonetwork/images/logos/2976cf80-3906-41aa-8916-4adfbc507438.png",
@@ -666,7 +666,7 @@ const response1 = {
           rel: "related",
           type: "application/x-ipynb+json",
           title: "Python notebook example",
-          "ai:group": "Python Notebook",
+          "ai:group": "Code Tutorials",
         },
         {
           href: "http://localhost:8080/api/v1/ogc/collections/efd8201c-1eca-412e-9ad2-0534e96cea14/items/summary",
@@ -794,7 +794,7 @@ const response1 = {
           type: "application/x-ipynb+json",
           title:
             "Access to Jupyter notebook to query Cloud Optimised converted dataset]",
-          "ai:group": "Python Notebook",
+          "ai:group": "Code Tutorials",
         },
         {
           href: "https://geonetwork.edge.aodn.org.au:443/geonetwork/images/logos/2976cf80-3906-41aa-8916-4adfbc507438.png",
@@ -879,7 +879,7 @@ const response1 = {
           rel: "related",
           type: "application/x-ipynb+json",
           title: "Python notebook example",
-          "ai:group": "Python Notebook",
+          "ai:group": "Code Tutorials",
         },
         {
           href: "http://localhost:8080/api/v1/ogc/collections/78d588ed-79dd-47e2-b806-d39025194e7e/items/summary",
@@ -1009,7 +1009,7 @@ const response1 = {
           type: "application/x-ipynb+json",
           title:
             "Access to Jupyter notebook to query Cloud Optimised converted dataset",
-          "ai:group": "Python Notebook",
+          "ai:group": "Code Tutorials",
         },
         {
           href: "https://geonetwork.edge.aodn.org.au:443/geonetwork/images/logos/2976cf80-3906-41aa-8916-4adfbc507438.png",
@@ -1073,7 +1073,7 @@ const response1 = {
           rel: "related",
           type: "application/x-ipynb+json",
           title: "Python notebook example",
-          "ai:group": "Python Notebook",
+          "ai:group": "Code Tutorials",
         },
         {
           href: "http://localhost:8080/api/v1/ogc/collections/95d6314c-cfc7-40ae-b439-85f14541db71/items/summary",
@@ -1211,7 +1211,7 @@ const response1 = {
           type: "application/x-ipynb+json",
           title:
             "Access to Jupyter notebook to query Cloud Optimised converted dataset",
-          "ai:group": "Python Notebook",
+          "ai:group": "Code Tutorials",
         },
         {
           href: "https://geonetwork.edge.aodn.org.au:443/geonetwork/images/logos/2976cf80-3906-41aa-8916-4adfbc507438.png",
@@ -1275,7 +1275,7 @@ const response1 = {
           rel: "related",
           type: "application/x-ipynb+json",
           title: "Python notebook example",
-          "ai:group": "Python Notebook",
+          "ai:group": "Code Tutorials",
         },
         {
           href: "http://localhost:8080/api/v1/ogc/collections/c317b0fe-02e8-4ff9-96c9-563fd58e82ac/items/summary",
@@ -1382,7 +1382,7 @@ const response1 = {
           type: "application/x-ipynb+json",
           title:
             "Access to Jupyter notebook to query Cloud Optimised converted dataset]",
-          "ai:group": "Python Notebook",
+          "ai:group": "Code Tutorials",
         },
         {
           href: "https://geonetwork.edge.aodn.org.au:443/geonetwork/images/logos/2976cf80-3906-41aa-8916-4adfbc507438.png",
@@ -1698,7 +1698,7 @@ const response1 = {
           rel: "related",
           type: "application/x-ipynb+json",
           title: "Python notebook example",
-          "ai:group": "Python Notebook",
+          "ai:group": "Code Tutorials",
         },
         {
           href: "http://localhost:8080/api/v1/ogc/collections/2d496463-600c-465a-84a1-8a4ab76bd505/items/summary",
@@ -1813,7 +1813,7 @@ const response1 = {
           type: "application/x-ipynb+json",
           title:
             "Access to Jupyter notebook to query Cloud Optimised converted dataset",
-          "ai:group": "Python Notebook",
+          "ai:group": "Code Tutorials",
         },
         {
           href: "https://geonetwork.edge.aodn.org.au:443/geonetwork/images/logos/2976cf80-3906-41aa-8916-4adfbc507438.png",
@@ -2052,7 +2052,7 @@ const response1 = {
           rel: "related",
           type: "application/x-ipynb+json",
           title: "Python notebook example",
-          "ai:group": "Python Notebook",
+          "ai:group": "Code Tutorials",
         },
         {
           href: "http://localhost:8080/api/v1/ogc/collections/35234913-aa3c-48ec-b9a4-77f822f66ef8/items/summary",
@@ -2167,7 +2167,7 @@ const response1 = {
           type: "application/x-ipynb+json",
           title:
             "Access to Jupyter notebook to query Cloud Optimised converted dataset",
-          "ai:group": "Python Notebook",
+          "ai:group": "Code Tutorials",
         },
         {
           href: "https://geonetwork.edge.aodn.org.au:443/geonetwork/images/logos/2976cf80-3906-41aa-8916-4adfbc507438.png",
@@ -2238,7 +2238,7 @@ const response1 = {
           rel: "related",
           type: "application/x-ipynb+json",
           title: "Python notebook example",
-          "ai:group": "Python Notebook",
+          "ai:group": "Code Tutorials",
         },
         {
           href: "http://localhost:8080/api/v1/ogc/collections/19da2ce7-138f-4427-89de-a50c724f5f54/items/summary",
@@ -2415,7 +2415,7 @@ const response1 = {
           rel: "related",
           type: "application/x-ipynb+json",
           title: "Python notebook example",
-          "ai:group": "Python Notebook",
+          "ai:group": "Code Tutorials",
         },
         {
           href: "http://localhost:8080/api/v1/ogc/collections/28f8bfed-ca6a-472a-84e4-42563ce4df3f/items/summary",
@@ -2539,7 +2539,7 @@ const response1 = {
           type: "application/x-ipynb+json",
           title:
             "Access to Jupyter notebook to query Cloud Optimised converted dataset",
-          "ai:group": "Python Notebook",
+          "ai:group": "Code Tutorials",
         },
         {
           href: "https://geonetwork.edge.aodn.org.au:443/geonetwork/images/logos/2976cf80-3906-41aa-8916-4adfbc507438.png",
@@ -2610,7 +2610,7 @@ const response1 = {
           rel: "related",
           type: "application/x-ipynb+json",
           title: "Python notebook example",
-          "ai:group": "Python Notebook",
+          "ai:group": "Code Tutorials",
         },
         {
           href: "http://localhost:8080/api/v1/ogc/collections/ffe8f19c-de4a-4362-89be-7605b2dd6b8c/items/summary",

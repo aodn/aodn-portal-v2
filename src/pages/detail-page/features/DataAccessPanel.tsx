@@ -179,7 +179,7 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
             {...props}
             title={"Code Tutorials"}
             pythonNotebookLinks={getOptimizedPythonNotebookLinks(
-              collection?.getPythonNotebookLinks()
+              collection?.getCodeTutorialLinks()
             )}
           />
         ),
