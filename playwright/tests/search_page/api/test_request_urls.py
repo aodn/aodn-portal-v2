@@ -9,10 +9,6 @@ from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
 
-pytestmark = pytest.mark.skip(
-    reason='Ignoring for now due to INTERSECTS validation issues'
-)
-
 
 @pytest.mark.parametrize(
     'date, location, filter_parameters, filter_platforms, filter_organisation, filter_data, filter_data_download',
@@ -65,11 +61,10 @@ def test_search_api_request_urls_across_page(
         filter_data.label,
         filter_data_download,
     )
-    start_date, end_date = landing_page.search.get_date_range()
+
     # Define expected search filters
     expected_filters = SearchFilterConfig(
-        date_time_start=start_date,
-        date_time_end=end_date,
+        temporal_during=landing_page.search.get_temporal_during(),
         location_intersects=landing_page.search.get_selected_location_intersects(),
         parameter_vocab_labels=filter_parameters,
         platform_vocab_labels=filter_platforms,
@@ -98,11 +93,10 @@ def test_search_api_request_urls_across_page(
     )
 
     # Reset filters
-    search_page.search.reset_all_filters()
+    search_page.search.clear_all_button.click()
     # Define expected search filters after reset
     expected_filters_reset = SearchFilterConfig(
-        date_time_start=None,
-        date_time_end=None,
+        temporal_during=None,
         location_intersects=None,
         parameter_vocab_labels=None,
         platform_vocab_labels=None,
@@ -181,11 +175,9 @@ def test_search_api_request_urls_after_map_state_change(
         filter_data.label,
         filter_data_download,
     )
-    start_date, end_date = landing_page.search.get_date_range()
     # Define expected search filters
     expected_filters = SearchFilterConfig(
-        date_time_start=start_date,
-        date_time_end=end_date,
+        temporal_during=landing_page.search.get_temporal_during(),
         location_intersects=landing_page.search.get_selected_location_intersects(),
         parameter_vocab_labels=filter_parameters,
         platform_vocab_labels=filter_platforms,
@@ -213,11 +205,10 @@ def test_search_api_request_urls_after_map_state_change(
     )
 
     # Reset filters
-    search_page.search.reset_all_filters()
+    search_page.search.clear_all_button.click()
     # Define expected search filters after reset
     expected_filters_reset = SearchFilterConfig(
-        date_time_start=None,
-        date_time_end=None,
+        temporal_during=None,
         location_intersects=None,
         parameter_vocab_labels=None,
         platform_vocab_labels=None,
@@ -323,11 +314,9 @@ def test_search_api_request_urls_reflect_parameter_updates(
         data.label,
         data_download,
     )
-    start_date, end_date = landing_page.search.get_date_range()
     # Define expected search filters
     expected_filters = SearchFilterConfig(
-        date_time_start=start_date,
-        date_time_end=end_date,
+        temporal_during=landing_page.search.get_temporal_during(),
         location_intersects=landing_page.search.get_selected_location_intersects(),
         parameter_vocab_labels=parameters,
         platform_vocab_labels=platforms,
@@ -356,7 +345,7 @@ def test_search_api_request_urls_reflect_parameter_updates(
     )
 
     # Update search state
-    search_page.search.reset_all_filters()  # Reset before update
+    search_page.search.clear_all_button.click()  # Reset before update
     search_page.search.set_search_state(
         updated_date,
         updated_location,
@@ -366,11 +355,9 @@ def test_search_api_request_urls_reflect_parameter_updates(
         updated_data.label,
         updated_data_download,
     )
-    start_date, end_date = search_page.search.get_date_range()
     # Define expected search filters
     expected_updated_filters = SearchFilterConfig(
-        date_time_start=start_date,
-        date_time_end=end_date,
+        temporal_during=search_page.search.get_temporal_during(),
         location_intersects=search_page.search.get_selected_location_intersects(),
         parameter_vocab_labels=updated_parameters,
         platform_vocab_labels=updated_platforms,

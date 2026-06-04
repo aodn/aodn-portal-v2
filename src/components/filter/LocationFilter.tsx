@@ -37,7 +37,7 @@ import {
   STATIC_LAYER_LABEL_PAINT,
 } from "../map/mapbox/layers/StaticLayer";
 import { TestHelper } from "../common/test/helper";
-import { cqlDefaultFilters, PolygonOperation } from "../common/cqlFilters";
+import { cqlDefaultFilters, StaticAreasFilter } from "../common/cqlFilters";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import ReactMap from "../map/mapbox/Map";
 import MapContext from "../map/mapbox/MapContext";
@@ -744,11 +744,16 @@ const LocationFilter: FC<LocationFilterProps> = () => {
       <TestHelper
         id="selected-location"
         getSelectedLocationIntersects={() => {
-          const funcIntersectPolygon = cqlDefaultFilters.get(
-            "INTERSECT_POLYGON"
-          ) as PolygonOperation;
+          const funcStaticAreas = cqlDefaultFilters.get(
+            "STATIC_AREAS"
+          ) as StaticAreasFilter;
+          const staticAreas = getStaticAreasFromSets(
+            selectedMarineParkValues,
+            selectedMarineEcoregionValues,
+            selectedAllenCoralAtlasValues
+          );
           return mergedPolygonForTests
-            ? funcIntersectPolygon(mergedPolygonForTests)
+            ? funcStaticAreas(staticAreas)
             : undefined;
         }}
       />

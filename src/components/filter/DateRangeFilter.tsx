@@ -33,7 +33,11 @@ import {
   fetchResultNoStore,
   jsonToOGCCollections,
 } from "../common/store/searchReducer";
-import { cqlDefaultFilters, DatasetGroup } from "../common/cqlFilters";
+import {
+  cqlDefaultFilters,
+  DatasetGroup,
+  TemporalDuring,
+} from "../common/cqlFilters";
 import TimeRangeBarChart from "../common/charts/TimeRangeBarChart";
 import PlainDatePicker from "../common/datetime/PlainDatePicker";
 import PlainSlider from "../common/slider/PlainSlider";
@@ -42,6 +46,7 @@ import useBreakpoint from "../../hooks/useBreakpoint";
 import theme from "../../styles/themeRC8";
 import { CalendarIcon } from "../../assets/icons/search/calendar";
 import { DEFAULT_DATE_PICKER_SLOT } from "../common/datetime/datePickerSlots";
+import { TestHelper } from "../common/test/helper";
 
 enum DateRangeOptionValues {
   Custom = "custom",
@@ -526,6 +531,16 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
         </Grid>
         {renderFilterBy(isMobile, isTablet)}
       </Grid>
+
+      <TestHelper
+        id="temporal-during"
+        getTemporalDuring={() => {
+          const funcIntersectPolygon = cqlDefaultFilters.get(
+            "BETWEEN_TIME_RANGE"
+          ) as TemporalDuring;
+          return funcIntersectPolygon(value[0], value[1]);
+        }}
+      />
     </LocalizationProvider>
   );
 });

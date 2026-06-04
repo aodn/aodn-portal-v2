@@ -122,7 +122,7 @@ export enum MediaType {
 export enum AIGroup {
   DATA_ACCESS = "Data Access",
   DOCUMENT = "Document",
-  PYTHON_NOTEBOOK = "Python Notebook",
+  CODE_TUTORIAL = "Code Tutorials",
   OTHER = "Other",
 }
 
@@ -309,8 +309,8 @@ export class OGCCollection {
     this.getLinksByAISubgroup(DataAccessSubGroup.WFS);
   getDocumentLinks = (): ILink[] | undefined =>
     this.getLinksByAIGroup(AIGroup.DOCUMENT);
-  getPythonNotebookLinks = (): ILink[] | undefined =>
-    this.getLinksByAIGroup(AIGroup.PYTHON_NOTEBOOK);
+  getCodeTutorialLinks = (): ILink[] | undefined =>
+    this.getLinksByAIGroup(AIGroup.CODE_TUTORIAL);
   getOtherLinks = (): ILink[] | undefined =>
     this.getLinksByAIGroup(AIGroup.OTHER);
   getAllAIGroupedLinks = (): ILink[] | undefined =>

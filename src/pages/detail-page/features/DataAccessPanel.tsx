@@ -60,6 +60,25 @@ const getOptimizedPythonNotebookLinks = (
   return exampleLinks.length > 0 ? exampleLinks : undefined;
 };
 
+// Keep all tutorial links (R Markdown, video, ...), but reduce the Python
+// notebooks to the preferred tier (cloud-optimised, else example).
+const getVisibleTutorialLinks = (
+  links: ILink[] | undefined
+): ILink[] | undefined => {
+  if (!links) return undefined;
+
+  const notebookTitles = [
+    OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE.toLowerCase(),
+    PYTHON_NOTEBOOK_EXAMPLE_LINK_TITLE.toLowerCase(),
+  ];
+  const otherTutorialLinks = links.filter(
+    (link) => !notebookTitles.includes(link.title.toLowerCase())
+  );
+  const preferredNotebookLinks = getOptimizedPythonNotebookLinks(links) ?? [];
+
+  return [...otherTutorialLinks, ...preferredNotebookLinks];
+};
+
 interface DataAccessPanelProps {
   mode?: MODE;
   type?: TYPE;
@@ -178,8 +197,8 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
           <CodeTutorialsList
             {...props}
             title={"Code Tutorials"}
-            pythonNotebookLinks={getOptimizedPythonNotebookLinks(
-              collection?.getPythonNotebookLinks()
+            pythonNotebookLinks={getVisibleTutorialLinks(
+              collection?.getCodeTutorialLinks()
             )}
           />
         ),

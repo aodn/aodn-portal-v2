@@ -33,7 +33,7 @@ class IntersectsValidator(BaseValidator):
         """
         intersects_match = re.search(r'intersects\((.*?)\)\)\)', self.url)
         if intersects_match:
-            return f'intersects({intersects_match.group(1)})))'
+            return f'(intersects({intersects_match.group(1)})))'
         else:
             raise ValueError(
                 f'INTERSECTS expression not found in URL: {self.url}'

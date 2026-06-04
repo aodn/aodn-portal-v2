@@ -1,5 +1,6 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { Box, Chip, Typography, Button, Stack, useTheme } from "@mui/material";
+import { useLocation } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../common/store/hooks";
 import CloseIcon from "@mui/icons-material/Close";
 import {
@@ -16,7 +17,7 @@ import {
   updateUpdateFreq,
 } from "../common/store/componentParamReducer";
 import dayjs from "dayjs";
-import { dateDefault, pageReferer } from "../common/constants";
+import { dateDefault, pageDefault, pageReferer } from "../common/constants";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { borderRadius, color } from "../../styles/constants";
 import { TrashIcon } from "../../assets/icons/search/trash";
@@ -28,12 +29,21 @@ import {
   fetchMarineParkOptions,
 } from "../map/mapbox/layers/StaticLayer";
 import { DATA_SETTINGS } from "../filter/tab-filters/DataSettingsFilter";
+import useElementSize from "../../hooks/useElementSize";
 
 const ActiveFiltersChips: FC = () => {
   const dispatch = useAppDispatch();
   const redirectSearch = useRedirectSearch();
   const theme = useTheme();
   const params = useAppSelector((state) => state.paramReducer);
+  const { pathname } = useLocation();
+  const isSearchPage = pathname === pageDefault.search;
+
+  const triggerRedirectIfOnSearchPage = useCallback(() => {
+    if (isSearchPage) {
+      redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+    }
+  }, [isSearchPage, redirectSearch]);
 
   const [marineEcoregion, setMarineEcoregion] = useState<BoundaryProperties[]>(
     []
@@ -52,8 +62,8 @@ const ActiveFiltersChips: FC = () => {
 
   const handleClearAll = useCallback(() => {
     dispatch(clearComponentParam());
-    redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
-  }, [dispatch, redirectSearch]);
+    triggerRedirectIfOnSearchPage();
+  }, [dispatch, triggerRedirectIfOnSearchPage]);
 
   const activeFilters = useMemo(() => {
     const chips: Array<{ label: string; onDelete: () => void }> = [];
@@ -74,7 +84,7 @@ const ActiveFiltersChips: FC = () => {
         label: `Date: ${start} - ${end}`,
         onDelete: () => {
           dispatch(updateDateTimeFilterRange({}));
-          redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+          triggerRedirectIfOnSearchPage();
         },
       });
     }
@@ -85,7 +95,7 @@ const ActiveFiltersChips: FC = () => {
         label: "Spatial Filter",
         onDelete: () => {
           dispatch(updateFilterPolygon(undefined));
-          redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+          triggerRedirectIfOnSearchPage();
         },
       });
     }
@@ -126,7 +136,7 @@ const ActiveFiltersChips: FC = () => {
                 )
               )
             );
-            redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+            triggerRedirectIfOnSearchPage();
           },
         });
       });
@@ -138,7 +148,7 @@ const ActiveFiltersChips: FC = () => {
         label: `Group: ${params.datasetGroup}`,
         onDelete: () => {
           dispatch(updateDatasetGroup(undefined));
-          redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+          triggerRedirectIfOnSearchPage();
         },
       });
     }
@@ -154,7 +164,7 @@ const ActiveFiltersChips: FC = () => {
                 params.parameterVocabs!.filter((v) => v.label !== vocab.label)
               )
             );
-            redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+            triggerRedirectIfOnSearchPage();
           },
         });
       });
@@ -169,7 +179,7 @@ const ActiveFiltersChips: FC = () => {
             dispatch(
               updatePlatform(params.platform!.filter((item) => item !== p))
             );
-            redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+            triggerRedirectIfOnSearchPage();
           },
         });
       });
@@ -181,7 +191,7 @@ const ActiveFiltersChips: FC = () => {
         label: `Delivery Mode: ${DATA_SETTINGS.dataDeliveryFrequency.find((f) => f.value === params.updateFreq)?.label || params.updateFreq}`,
         onDelete: () => {
           dispatch(updateUpdateFreq(undefined));
-          redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+          triggerRedirectIfOnSearchPage();
         },
       });
     }
@@ -192,18 +202,18 @@ const ActiveFiltersChips: FC = () => {
         label: `Status: ${DATA_SETTINGS.dataStatus.find((f) => f.value === params.datasetStatus)?.label || params.datasetStatus}`,
         onDelete: () => {
           dispatch(updateStatus(undefined));
-          redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+          triggerRedirectIfOnSearchPage();
         },
       });
     }
 
-    // Cloud Optimized
+    // Downloadable datasets (hasCOData)
     if (params.hasCOData) {
       chips.push({
-        label: "Cloud Optimized",
+        label: "Downloadable datasets",
         onDelete: () => {
           dispatch(updateHasData(false));
-          redirectSearch(pageReferer.COMPONENT_COMPLEX_TEXT_REFERER);
+          triggerRedirectIfOnSearchPage();
         },
       });
     }
@@ -212,21 +222,33 @@ const ActiveFiltersChips: FC = () => {
   }, [
     params,
     dispatch,
-    redirectSearch,
+    triggerRedirectIfOnSearchPage,
     marineEcoregion,
     marinePark,
     allenCoralAtlas,
   ]);
 
+  const { ref: scrollRef, width: scrollWidth } = useElementSize();
+  const [isScrollable, setIsScrollable] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    setIsDragging(true);
-    setStartX(e.pageX - e.currentTarget.getBoundingClientRect().left);
-    setScrollLeft(e.currentTarget.scrollLeft);
-  }, []);
+  // Only enable drag-to-scroll affordance when the chips actually overflow.
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) setIsScrollable(el.scrollWidth > el.clientWidth);
+  }, [scrollRef, scrollWidth, activeFilters.length]);
+
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      if (!isScrollable) return;
+      setIsDragging(true);
+      setStartX(e.pageX - e.currentTarget.getBoundingClientRect().left);
+      setScrollLeft(e.currentTarget.scrollLeft);
+    },
+    [isScrollable]
+  );
 
   const handleMouseLeave = useCallback(() => {
     setIsDragging(false);
@@ -273,6 +295,7 @@ const ActiveFiltersChips: FC = () => {
         Added filters:
       </Typography>
       <Stack
+        ref={scrollRef}
         direction="row"
         spacing={1}
         onMouseDown={handleMouseDown}
@@ -287,7 +310,7 @@ const ActiveFiltersChips: FC = () => {
           "&::-webkit-scrollbar": { display: "none" },
           msOverflowStyle: "none",
           scrollbarWidth: "none",
-          cursor: isDragging ? "grabbing" : "grab",
+          cursor: isScrollable ? (isDragging ? "grabbing" : "grab") : "default",
           userSelect: "none", // Prevent text selection while dragging
           "& *": { cursor: isDragging ? "grabbing" : "inherit" },
         }}
@@ -330,6 +353,7 @@ const ActiveFiltersChips: FC = () => {
           color: theme.palette.primary1,
           "&:hover": { backgroundColor: "transparent", color: color.blue.dark },
         }}
+        data-testid="clear-all-filters"
       >
         Clear all
       </Button>
