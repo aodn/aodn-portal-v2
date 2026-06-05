@@ -105,6 +105,9 @@ const funcParameterVocabs: ParameterVocabsIn = (vocabs: Array<Vocab>) => {
     parameterVocabLabels.push(
       `parameter_vocabs='${vocab.label?.toLowerCase()}'`
     );
+    parameterVocabLabels.push(
+      `ai_parameter_vocabs='${vocab.label?.toLowerCase()}'`
+    );
   });
   // if no parameter vocabs, return undefined
   if (parameterVocabLabels.length === 0) {
@@ -117,7 +120,8 @@ const funcPlatformFilter: PlatformFilter = (platforms: Array<string>) => {
   if (!platforms || platforms.length === 0) return "";
 
   const platformQueries = platforms.map(
-    (platform) => `platform_vocabs='${platform}'`
+    (platform) =>
+      `platform_vocabs='${platform}' OR ai_platform_vocabs='${platform}'`
   );
   return `(${platformQueries.join(" or ")})`;
 };
