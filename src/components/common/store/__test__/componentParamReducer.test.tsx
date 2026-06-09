@@ -183,4 +183,19 @@ describe("Component Reducer Function Test", () => {
     const objAnswer6: ParameterState = unFlattenToParameterState(answer6);
     expect(objAnswer6).toEqual(sample6);
   });
+
+  // Pasted URLs may encode spaces as "+" (x-www-form-urlencoded), which
+  // decodeURIComponent does not convert. Free text must init without "+".
+  it("Verify unFlattenToParameterState decodes '+' in free text as space", () => {
+    const fromPlus = unFlattenToParameterState(
+      "datasetGroup=imos&searchText=temperature+data"
+    );
+    expect(fromPlus.searchText).toEqual("temperature data");
+
+    // "%20"-encoded spaces must keep working too.
+    const fromPercent = unFlattenToParameterState(
+      "datasetGroup=imos&searchText=temperature%20data"
+    );
+    expect(fromPercent.searchText).toEqual("temperature data");
+  });
 });
