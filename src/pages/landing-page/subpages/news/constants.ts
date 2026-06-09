@@ -33,6 +33,6 @@ export const NEWS_CARDS_DATA: NewsCardData[] = [
     subheading: "Ships of Opportunity",
     date: "01/01/2011 >>",
     title: "Fisheries vessels real-time data collection",
-    link: `${window.location.origin}/details/0015db7e-e684-7548-e053-08114f8cd4ad?tab=summary`,
+    link: `${window.location.origin}/details/d810b8cb-2af9-412c-8d21-aa1e9a78edc2?tab=summary`,
   },
 ];
