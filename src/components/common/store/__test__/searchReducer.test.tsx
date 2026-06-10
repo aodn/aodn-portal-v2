@@ -76,7 +76,9 @@ describe("Search Reducer Function Test", () => {
 
     const sp: SearchParameters = createSearchParamFrom(parameterState);
     expect(sp.text).equals("temperature");
-    expect(sp.filter).contains("(parameter_vocabs='temperature')");
+    expect(sp.filter).contains(
+      "(parameter_vocabs='temperature' or ai_parameter_vocabs='temperature')"
+    );
   });
   it("should include both assets_summary and links_airole_contains filter when hasCOData is true", () => {
     const param: ParameterState = {
