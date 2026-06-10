@@ -445,7 +445,12 @@ const parseQueryString = (queryString: string) => {
     const [key, value] = pair.split("="); // Split each pair into a key and a value
     // Ensure the key and value are present
     if (key && value) {
-      obj[decodeURIComponent(key)] = decodeURIComponent(value); // Decode and store them in the object
+      // In x-www-form-urlencoded query strings "+" represents a space, but
+      // decodeURIComponent does not convert it. So we need to
+      // replace "+" with a space first
+      obj[decodeURIComponent(key.replace(/\+/g, " "))] = decodeURIComponent(
+        value.replace(/\+/g, " ")
+      ); // Decode and store them in the object
     }
   });
 
