@@ -140,8 +140,9 @@ def test_search_api_request_urls_across_page(
         )
     ],
 )
-
-@pytest.mark.skip(reason='Ignoring for now due to search reducer updated')
+@pytest.mark.skip(
+    reason='Ignoring for now due to search reducer updated, which requires updating the test assertions accordingly.'
+)
 def test_search_api_request_urls_after_map_state_change(
     responsive_page: Page,
     date: str,
