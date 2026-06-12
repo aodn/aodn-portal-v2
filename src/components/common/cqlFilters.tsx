@@ -99,21 +99,16 @@ const funcBBoxPolygonOrEmptyExtents: PolygonOperation = (p) => {
 };
 
 const funcParameterVocabs: ParameterVocabsIn = (vocabs: Array<Vocab>) => {
-  const parameterVocabLabels: string[] = [];
-  // grab labels only
-  vocabs.forEach((vocab) => {
-    parameterVocabLabels.push(
-      `parameter_vocabs='${vocab.label?.toLowerCase()}'`
-    );
-    parameterVocabLabels.push(
-      `ai_parameter_vocabs='${vocab.label?.toLowerCase()}'`
-    );
+  const parameterVocabQueries = vocabs.map((vocab) => {
+    const label = vocab.label?.toLowerCase();
+    return `(parameter_vocabs='${label}' OR ai_parameter_vocabs='${label}')`;
   });
+
   // if no parameter vocabs, return undefined
-  if (parameterVocabLabels.length === 0) {
+  if (parameterVocabQueries.length === 0) {
     return undefined;
   }
-  return `(${parameterVocabLabels.join(" or ")})`;
+  return `(${parameterVocabQueries.join(" OR ")})`;
 };
 
 const funcPlatformFilter: PlatformFilter = (platforms: Array<string>) => {
@@ -121,9 +116,9 @@ const funcPlatformFilter: PlatformFilter = (platforms: Array<string>) => {
 
   const platformQueries = platforms.map(
     (platform) =>
-      `platform_vocabs='${platform}' OR ai_platform_vocabs='${platform}'`
+      `(platform_vocabs='${platform}' OR ai_platform_vocabs='${platform}')`
   );
-  return `(${platformQueries.join(" or ")})`;
+  return `(${platformQueries.join(" OR ")})`;
 };
 
 /**
