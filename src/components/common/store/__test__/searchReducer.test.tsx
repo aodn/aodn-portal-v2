@@ -89,7 +89,7 @@ describe("Search Reducer Function Test", () => {
     const sp: SearchParameters = createSearchParamFrom(parameterState);
 
     expect(sp.filter).equals(
-      "((parameter_vocabs='temperature' OR ai_parameter_vocabs='temperature') or (parameter_vocabs='salinity' OR ai_parameter_vocabs='salinity'))"
+      "((parameter_vocabs='temperature' OR ai_parameter_vocabs='temperature') OR (parameter_vocabs='salinity' OR ai_parameter_vocabs='salinity'))"
     );
   });
 
