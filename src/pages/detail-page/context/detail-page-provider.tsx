@@ -105,14 +105,15 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       });
   }, [dispatch, uuid]);
 
-  useEffect(() => {
-    if (!uuid) return;
-    dispatch(fetchFeaturesByUuid(uuid))
-      .unwrap()
-      .then((features) => {
-        setFeatures(features);
-      });
-  }, [dispatch, uuid]);
+  // comment out since it queries features from elasticsearch and useless for pmtiles
+  // useEffect(() => {
+  //   if (!uuid) return;
+  //   dispatch(fetchFeaturesByUuid(uuid))
+  //     .unwrap()
+  //     .then((features) => {
+  //       setFeatures(features);
+  //     });
+  // }, [dispatch, uuid]);
 
   return (
     <DetailPageContext.Provider
