@@ -178,6 +178,14 @@ class ApiRouter:
     ) -> None:
         self.unroute(Routes.ESTIMATE_WFS_DOWNLOAD, handler_function)
 
+    def route_estimate_co_download(self, handler_function: Callable) -> None:
+        self.route(Routes.ESTIMATE_CO_DOWNLOAD, handler_function)
+
+    def unroute_estimate_co_download(
+        self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.ESTIMATE_CO_DOWNLOAD, handler_function)
+
     def route_static_geojson(self, handler_function: Callable) -> None:
         self.route(Routes.STATIC_GEOJSON, handler_function)
 

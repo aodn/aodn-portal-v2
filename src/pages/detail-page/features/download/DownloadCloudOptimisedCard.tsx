@@ -23,6 +23,7 @@ import {
 import DownloadButton from "../../../../components/common/buttons/DownloadButton";
 import DownloadSubsetting from "./DownloadSubsetting";
 import DownloadSelect from "./DownloadSelect";
+import useCoEstimateSize from "../../../../hooks/useCoEstimateSize";
 
 const downloadFormats = [
   { label: "NetCDFs", value: "netcdf" },
@@ -45,6 +46,8 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
   setSelectedCoKey,
 }) => {
   const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
+  const { isEstimating, estimateSize, cancelEstimate, estimatedSizeBytes } =
+    useCoEstimateSize();
 
   const dateRangeBounds = useMemo(() => {
     let min = dayjs(dateDefault.min);
@@ -168,6 +171,20 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
     [getAndSetDownloadConditions]
   );
 
+  // Re-estimate whenever the selected data item (key) or download conditions
+  // (format / subsetting) change
+  useEffect(() => {
+    if (!collection?.id || !selectedDataItem) return;
+    estimateSize(collection.id, downloadConditions);
+    return () => cancelEstimate();
+  }, [
+    collection?.id,
+    selectedDataItem,
+    downloadConditions,
+    estimateSize,
+    cancelEstimate,
+  ]);
+
   return (
     <Stack>
       <Stack sx={{ p: "16px" }} spacing={2}>
@@ -182,7 +199,11 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
           value={selectedDataItem}
           onSelectCallback={handleSelectDataItem}
         />
-        <DownloadButton onDownload={onDownload} />
+        <DownloadButton
+          onDownload={onDownload}
+          isEstimating={isEstimating}
+          estimatedSizeBytes={estimatedSizeBytes}
+        />
       </Stack>
       <DownloadSubsetting
         downloadConditions={downloadConditions}
