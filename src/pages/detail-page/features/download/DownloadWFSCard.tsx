@@ -12,7 +12,7 @@ import { portalTheme } from "../../../../styles";
 import useWFSDownload, {
   DownloadStatus,
 } from "../../../../hooks/useWFSDownload";
-import useWFSEstimateSize from "../../../../hooks/useWFSEstimateSize";
+import useEstimateSize from "../../../../hooks/useEstimateSize";
 import {
   DownloadCondition,
   DownloadConditionType,
@@ -30,7 +30,10 @@ import {
 } from "../../../../components/common/store/GeoserverDefinitions";
 import { useAppDispatch } from "../../../../components/common/store/hooks";
 import { SelectItem } from "../../../../components/common/dropdown/CommonSelect";
-import { fetchGeoServerDownloadLayers } from "../../../../components/common/store/searchReducer";
+import {
+  fetchGeoServerDownloadLayers,
+  processWFSEstimateSize,
+} from "../../../../components/common/store/searchReducer";
 import AdminScreenContext from "../../../../components/admin/AdminScreenContext";
 import { formatBytes } from "../../../../utils/Helpers";
 
@@ -73,7 +76,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
     isDownloading,
   } = useWFSDownload(() => setSnackbarOpen(true));
   const { isEstimating, estimateSize, cancelEstimate, estimatedSizeBytes } =
-    useWFSEstimateSize();
+    useEstimateSize(processWFSEstimateSize);
   const dispatch = useAppDispatch();
   const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
   const [dataSelectOptions, setDataSelectOptions] = useState<SelectItem[]>([]);
@@ -131,7 +134,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
   // Re-estimate whenever the selected data item or download conditions (subsetting) change
   useEffect(() => {
     if (!selectedDataItem || !uuid) return;
-    estimateSize(uuid, selectedDataItem, downloadConditions);
+    estimateSize({ uuid, layerName: selectedDataItem, downloadConditions });
     return () => cancelEstimate();
   }, [
     selectedDataItem,

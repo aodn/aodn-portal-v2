@@ -23,13 +23,20 @@ import {
 import DownloadButton from "../../../../components/common/buttons/DownloadButton";
 import DownloadSubsetting from "./DownloadSubsetting";
 import DownloadSelect from "./DownloadSelect";
-import useCoEstimateSize from "../../../../hooks/useCoEstimateSize";
+import useEstimateSize from "../../../../hooks/useEstimateSize";
+import { processCoEstimateSize } from "../../../../components/common/store/searchReducer";
 
 const downloadFormats = [
   { label: "NetCDFs", value: "netcdf" },
   { label: "CSV", value: "csv" },
   { label: "GeoTIFF", value: "geotiff" },
 ];
+
+// The CO `estimate-complete` payload reports the size of the actual download
+// output in `estimated_output_bytes` (vs `estimated_uncompressed_bytes`)
+const getCoEstimatedBytes = (data: {
+  estimated_output_bytes?: number;
+}): number | undefined => data.estimated_output_bytes;
 
 interface DownloadCardProps extends DownloadCondition {
   collection: OGCCollection;
@@ -47,7 +54,7 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
 }) => {
   const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
   const { isEstimating, estimateSize, cancelEstimate, estimatedSizeBytes } =
-    useCoEstimateSize();
+    useEstimateSize(processCoEstimateSize, getCoEstimatedBytes);
 
   const dateRangeBounds = useMemo(() => {
     let min = dayjs(dateDefault.min);
@@ -175,7 +182,7 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
   // (format / subsetting) change
   useEffect(() => {
     if (!collection?.id || !selectedDataItem) return;
-    estimateSize(collection.id, downloadConditions);
+    estimateSize({ uuid: collection.id, downloadConditions });
     return () => cancelEstimate();
   }, [
     collection?.id,
