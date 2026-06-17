@@ -7,7 +7,7 @@ import { DetailPageProvider } from "./context/detail-page-provider";
 import ContentSection from "./layout/ContentSection";
 import SectionContainer from "../../components/layout/components/SectionContainer";
 import { PAGE_CONTENT_WIDTH_DETAIL } from "../../components/layout/constant";
-import { LngLatBounds, MapMouseEvent } from "mapbox-gl";
+import { LngLatBounds } from "mapbox-gl";
 import { useCallback, useState } from "react";
 
 const DetailsPage = () => {
