@@ -54,7 +54,7 @@
     "he": "^1.2.0",
     "http-proxy-middleware": "3.0.5",
     "lodash": "4.17.23",
-    "mapbox-gl": "3.24.0",
+    "mapbox-gl": "3.24.1",
     "mapbox-gl-draw-rectangle-mode": "^1.0.4",
     "media-typer": "^1.1.0",
     "pmtiles": "^4.4.1",
