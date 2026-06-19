@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useMemo } from "react";
 import { useDetailPageContext } from "../context/detail-page-context";
 import NavigatablePanel, {
   NavigatablePanelChild,
@@ -124,15 +124,7 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
     ];
   }, [collection]);
 
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    if (!collection) {
-      setIsLoading(true);
-    } else {
-      setIsLoading(false);
-    }
-  }, [collection]);
+  const isLoading = !collection;
 
   const blocks: NavigatablePanelChild[] = useMemo(
     () => [

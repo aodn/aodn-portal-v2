@@ -5,7 +5,7 @@ import React, {
   SyntheticEvent,
   useCallback,
   useEffect,
-  useRef,
+  useMemo,
   useState,
 } from "react";
 import { useSelector } from "react-redux";
@@ -168,7 +168,10 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     [dispatch, setPendingSearch]
   );
 
-  const debounceRefreshOptions = useRef(debounce(refreshOptions, 500)).current;
+  const debounceRefreshOptions = useMemo(
+    () => debounce(refreshOptions, 500),
+    [refreshOptions]
+  );
 
   // cancel all debounce things when component is unmounted
   useEffect(() => {
@@ -254,12 +257,15 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
     );
   }, [isSearchbarActive, searchInput, setShouldExpandSearchbar]);
 
-  useEffect(() => {
-    // Only update local state if Redux state is different from what's currently on screen
-    if (searchInput !== inputValue) {
-      setInputValue(searchInput);
-    }
-  }, [inputValue, searchInput]);
+  // Keep track of the last searchInput we saw to update local state during render
+  const [prevSearchInput, setPrevSearchInput] = useState<string | undefined>(
+    searchInput
+  );
+
+  if (searchInput !== prevSearchInput) {
+    setPrevSearchInput(searchInput);
+    setInputValue(searchInput);
+  }
 
   // Input suggester popper
   const CustomPopper = useCallback(

@@ -62,24 +62,21 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
 
   // Function to take photo of the map for given bounding boxes
   const takePhoto = useCallback(
-    (bboxes: Array<Position> | undefined, index: number) => {
-      if (!Array.isArray(bboxes) || !setPhotos) return;
+    (bboxes: Array<Position> | undefined, startIndex: number) => {
+      if (!Array.isArray(bboxes) || !setPhotos || !map) return;
 
-      // when it comes to the last index, map fitBound to the first bbox (the overall bbox)
-      if (bboxes.length === index) {
-        fitToBound(map, bboxes[0], { animate });
-        return;
-      }
+      // Define an internal named function to handle recursion safely
+      const capture = (index: number) => {
+        // Last index: map fitBound to the first bbox (overall bbox)
+        if (bboxes.length === index) {
+          fitToBound(map, bboxes[0], { animate });
+          return;
+        }
 
-      // before the last bbox snapshot has been taken, map will fit to current bounding box
-      const bound = bboxes[index];
-      if (map) {
-        fitToBound(map, bound, {
-          animate: animate,
-        });
+        const bound = bboxes[index];
+        fitToBound(map, bound, { animate });
 
         map.once("idle", () => {
-          // get canvas and store in state photos[] after fitBounds completed
           const canvas = map.getCanvas();
           canvas?.toBlob((blob) => {
             if (blob) {
@@ -95,10 +92,14 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
               console.error("Error creating blob from canvas");
             }
           }, "image/png");
-          // increase the index to loop
-          takePhoto(bboxes, index + 1);
+
+          // Recursively call the internal function safely
+          capture(index + 1);
         });
-      }
+      };
+
+      // Kick off the recursion loop
+      capture(startIndex);
     },
     [map, animate, setPhotos]
   );

@@ -167,7 +167,7 @@ export const isDrawModeRectangle = (
   if (!map) return false;
   // The control is the instance we added with `map.addControl(draw)`
   const ctrl = map._controls?.find((c: any) => c instanceof MapboxDraw);
-  return ctrl?.getMode() === DRAW_RECTANGLE_MODE;
+  return (ctrl as unknown as MapboxDraw)?.getMode() === DRAW_RECTANGLE_MODE;
 };
 // Mapbox do not create a bbox box align with EPSG:3857 if you use the bounds value, you need to adjust it
 // with functions, however, if you use the url directly with "{bbox-epsg-3857}", then mapbox will do the cal for you.
