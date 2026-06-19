@@ -1,5 +1,4 @@
-import * as React from "react";
-import { IpynbRenderer, IpynbType } from "react-ipynb-renderer";
+import { Ipynb, Notebook } from "@jupyter-kit/react";
 import Dialog from "@mui/material/Dialog";
 import { getNotebook } from "./api";
 import { startTransition, useEffect, useState } from "react";
@@ -16,7 +15,7 @@ export interface NotebookModelProps {
 
 const NotebookModel = (props: NotebookModelProps) => {
   const [open, setOpen] = useState<boolean>(false);
-  const [nb, setNb] = useState<IpynbType | null>(null);
+  const [nb, setNb] = useState<Ipynb | null>(null);
 
   useEffect(() => {
     startTransition(() => setOpen(props.showDialog));
@@ -24,7 +23,7 @@ const NotebookModel = (props: NotebookModelProps) => {
 
   useEffect(() => {
     if (props.url != null) {
-      getNotebook(props.url).then((value: IpynbType) => setNb(value));
+      getNotebook(props.url).then((value: Ipynb) => setNb(value));
       // .catch((reason) => {
       //   //TODO: Should print the error reason
       // });
@@ -46,15 +45,9 @@ const NotebookModel = (props: NotebookModelProps) => {
       aria-labelledby="scroll-dialog-title"
       aria-describedby="scroll-dialog-description"
     >
-      {nb && <IpynbRenderer ipynb={nb} />}
+      {nb && <Notebook ipynb={nb} language="python" />}
     </Dialog>
   );
 };
-
-// NotebookModel.defaultProps = {
-//   url: undefined,
-//   callback: (p: NotebookModelCallbackProps) => {},
-//   showDialog: false,
-// };
 
 export default NotebookModel;

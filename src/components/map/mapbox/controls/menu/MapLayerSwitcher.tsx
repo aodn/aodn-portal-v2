@@ -51,14 +51,16 @@ export interface LayerSwitcherLayer<T = string> {
   selected?: boolean;
 }
 
-interface LayerSwitcherProps
-  extends ControlProps<LayerSwitcherLayer<LayerName>> {
+interface LayerSwitcherProps extends ControlProps<
+  LayerSwitcherLayer<LayerName>
+> {
   layers: Array<LayerSwitcherLayer<LayerName>>;
 }
 
 const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
   layers,
   onEvent,
+  map,
 }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [currentLayer, setCurrentLayer] = useState<LayerName | undefined>(
@@ -95,12 +97,27 @@ const MapLayerSwitcher: React.FC<LayerSwitcherProps> = ({
     eventEmitter.on(EVENT_MAP.MOVE_START, handleMapEvent);
     eventEmitter.on(EVENT_MAP.CLICKED, handleMapEvent);
 
+    if (map) {
+      map.on("resize", handleMapEvent);
+    }
+
     return () => {
       eventEmitter.off(EVENT_MENU.CLICKED, handleEvent);
       eventEmitter.off(EVENT_MAP.MOVE_START, handleMapEvent);
       eventEmitter.off(EVENT_MAP.CLICKED, handleMapEvent);
+      if (map) {
+        map.off("resize", handleMapEvent);
+      }
     };
-  }, []);
+  }, [map]);
+
+  useEffect(() => {
+    if (anchorEl && anchorEl.offsetParent === null) {
+      setTimeout(() => {
+        setAnchorEl(null);
+      }, 0);
+    }
+  });
 
   const open = Boolean(anchorEl);
   return (

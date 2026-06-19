@@ -2,7 +2,6 @@ import * as React from "react";
 import { Box, Grid, Typography } from "@mui/material";
 import StoryBoard from "./StoryBoard";
 import NotebookModel, {
-  //NotebookModelCallbackProps,
   NotebookModelProps,
 } from "../../../../components/common/ipython/NotebookModel";
 import { padding } from "../../../../styles/constants";
@@ -12,10 +11,6 @@ const StoryBoardPanel = () => {
   const [notebook, setNotebook] = React.useState<NotebookModelProps>({
     showDialog: false,
   });
-
-  // const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-  //   setValue(newValue);
-  // };
 
   return (
     <Box sx={{ paddingY: padding.triple }}>
