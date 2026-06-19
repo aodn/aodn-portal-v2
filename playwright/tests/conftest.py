@@ -26,6 +26,7 @@ def setup_page(
     # Create a new browser context with the device configuration
     context = browser.new_context(**context_kwargs)
     page = context.new_page()
+    page.on("console", lambda msg: print(f"[BROWSER CONSOLE] {msg.text}"))
     apply_mock(page)
     return browser, context, page
 

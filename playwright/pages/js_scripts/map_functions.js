@@ -89,12 +89,50 @@ window.__map_functions = {
   },
   isMapLayerVisible: function (mapId, layerId) {
     const map = this.getMap(mapId);
-    if (map.getLayer(layerId) == undefined) {
+    console.log("[DEBUG] isMapLayerVisible checking layerId:", layerId);
+
+    const testProps = this.getTestProps(mapId);
+    if (
+      testProps &&
+      typeof testProps.isHexbinVisible === "function" &&
+      typeof testProps.getHexbinLayer === "function"
+    ) {
+      if (layerId === testProps.getHexbinLayer()) {
+        const isVisible = testProps.isHexbinVisible();
+        console.log(
+          "[DEBUG] Hexbin layer visibility from testProps:",
+          isVisible
+        );
+        return !!isVisible;
+      }
+    }
+
+    const style = map.getStyle();
+    if (style && style.layers) {
+      console.log(
+        "[DEBUG] Available layers in map style:",
+        style.layers.map((l) => l.id)
+      );
+    }
+    const layer = map.getLayer(layerId);
+    if (layer == undefined) {
+      console.log("[DEBUG] Layer", layerId, "not found (undefined)");
       return false;
-    } else if (map.getLayer(layerId).props == undefined) {
+    } else if (layer.props == undefined) {
+      console.log(
+        "[DEBUG] Layer",
+        layerId,
+        "found, but props is undefined. Returning true."
+      );
       return true;
     } else {
-      return map.getLayer(layerId).props.visible;
+      console.log(
+        "[DEBUG] Layer",
+        layerId,
+        "found, visible prop:",
+        layer.props.visible
+      );
+      return layer.props.visible;
     }
   },
   findAndClickCluster: function (mapId) {
