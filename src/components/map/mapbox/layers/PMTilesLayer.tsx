@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect } from "react";
+import { FC, useContext, useEffect, useRef } from "react";
 import MapContext from "../MapContext";
 import dayjs, { Dayjs } from "dayjs";
 import { ExpressionSpecification } from "mapbox-gl";
@@ -52,15 +52,17 @@ const getPaintProperties = (keys: string[]) => {
       0,
       "rgba(0, 0, 0, 0)",
       1,
-      "#E2ECF3",
+      "#1E293B",
       10,
-      "#C5D8E7",
+      "#334155",
       100,
-      "#54BCEB",
+      "#475569",
       1000,
-      "#3B6E8F",
+      "#0284C7",
+      5000,
+      "#0D9488",
       10000,
-      "#182C3A",
+      "#14B8A6",
     ] as ExpressionSpecification,
     "fill-opacity": [
       "interpolate",
@@ -82,9 +84,19 @@ const getPaintProperties = (keys: string[]) => {
 const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   filterStartDate,
   filterEndDate,
-  visible = false,
+  visible = true,
 }) => {
   const { map } = useContext(MapContext);
+
+  const filterStartDateRef = useRef(filterStartDate);
+  const filterEndDateRef = useRef(filterEndDate);
+  const visibleRef = useRef(visible);
+
+  useEffect(() => {
+    filterStartDateRef.current = filterStartDate;
+    filterEndDateRef.current = filterEndDate;
+    visibleRef.current = visible;
+  }, [filterStartDate, filterEndDate, visible]);
 
   useEffect(() => {
     if (!map) return;
@@ -100,11 +112,15 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         });
       }
 
-      const keys = getMonthKeysInRange(filterStartDate, filterEndDate);
+      const keys = getMonthKeysInRange(
+        filterStartDateRef.current,
+        filterEndDateRef.current
+      );
       const paintProps = getPaintProperties(keys);
 
       PMTILE_LAYERS.forEach((layer) => {
         if (!map.getLayer(layer.id)) {
+          console.log(`Adding layer ${layer.id}`);
           map.addLayer({
             id: layer.id,
             type: "fill",
@@ -113,7 +129,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
             minzoom: layer.minzoom,
             maxzoom: layer.maxzoom,
             layout: {
-              visibility: visible ? "visible" : "none",
+              visibility: visibleRef.current ? "visible" : "none",
             },
             paint: {
               "fill-color": paintProps["fill-color"],
@@ -149,7 +165,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         map.removeSource(SOURCE_ID);
       }
     };
-  }, [map, filterEndDate, filterStartDate, visible]);
+  }, [map]);
 
   // Update visibility on changes
   useEffect(() => {
