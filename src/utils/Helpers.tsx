@@ -41,20 +41,6 @@ export const sortByRelevance = (
   ]);
 };
 
-/** Acronym full names go on top; everything else follows by relevance. Duplicates are removed. */
-export const orderSuggestions = (
-  pinnedAcronyms: Set<string> | string[],
-  otherSuggestions: Set<string> | string[],
-  typedText: string
-): string[] => {
-  const onTop = Array.from(pinnedAcronyms);
-  const alreadyOnTop = new Set(onTop);
-  const rest = sortByRelevance(otherSuggestions, typedText).filter(
-    (suggestion) => !alreadyOnTop.has(suggestion)
-  );
-  return [...onTop, ...rest];
-};
-
 // Check if array is undefined, null, empty array, or contains only empty strings
 export const checkEmptyArray = (array?: any[]): boolean => {
   return array?.some((item) => item?.toString().trim() !== "") ?? false;
