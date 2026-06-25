@@ -4,10 +4,7 @@ import { useDetailPageContext } from "../context/detail-page-context";
 import ExpandableTextArea from "../../../components/list/listItem/subitem/ExpandableTextArea";
 import dayjs, { Dayjs } from "dayjs";
 import { FeatureCollection, Point } from "geojson";
-import {
-  DatasetType,
-  OGCCollection,
-} from "../../../components/common/store/OGCCollectionDefinitions";
+import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
 import {
   LayerName,
   LayerSwitcherLayer,
@@ -69,12 +66,19 @@ export const buildMapLayerConfig = (
         (!isWMSAvailable && !isSupportHexbin));
 
     if (isSupportHexbin) {
-      const l: LayerSwitcherLayer<LayerName> = {
-        id: LayerName.Hexbin,
-        name: "Hex Grid",
+      // const l: LayerSwitcherLayer<LayerName> = {
+      //   id: LayerName.Hexbin,
+      //   name: "Hex Grid",
+      //   selected: true,
+      // };
+      // layers.push(l);
+
+      const h3: LayerSwitcherLayer<LayerName> = {
+        id: LayerName.H3,
+        name: "H3",
         selected: true,
       };
-      layers.push(l);
+      layers.push(h3);
     }
 
     if (isWMSAvailable) {

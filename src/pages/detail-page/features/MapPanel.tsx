@@ -56,6 +56,7 @@ import {
   buildMapLayerConfig,
   getMinMaxDateStamps,
 } from "./SummaryAndDownloadPanel";
+import PMTilesHexLayer from "../../../components/map/mapbox/layers/PMTilesLayer";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -452,6 +453,14 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
             bbox={mapFocusArea}
           />
           {createStaticLayers(staticLayer)}
+          <PMTilesHexLayer
+            filterStartDate={filterStartDate}
+            filterEndDate={filterEndDate}
+            visible={
+              mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
+              LayerName.H3
+            }
+          />
           <HexbinLayer
             featureCollection={featureCollection}
             filterStartDate={filterStartDate}

@@ -226,8 +226,8 @@ describe("buildMapLayerConfig", () => {
 
     expect(result).toHaveLength(2);
     expect(result[0]).toEqual({
-      id: LayerName.Hexbin,
-      name: "Hex Grid",
+      id: LayerName.H3,
+      name: "H3",
       selected: true,
     } as LayerSwitcherLayer<LayerName>);
     expect(result[1]).toEqual({
@@ -296,8 +296,8 @@ describe("buildMapLayerConfig", () => {
 
     expect(result).toHaveLength(2);
     expect(result[0]).toEqual({
-      id: LayerName.Hexbin,
-      name: "Hex Grid",
+      id: LayerName.H3,
+      name: "H3",
       selected: true,
     } as LayerSwitcherLayer<LayerName>);
     expect(result[1]).toEqual({
