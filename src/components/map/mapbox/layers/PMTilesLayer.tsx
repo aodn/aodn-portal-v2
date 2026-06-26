@@ -126,8 +126,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   useEffect(() => {
     if (!map) return;
 
-    const sourceUrl =
-      "https://aodnportal-dev-data.s3.ap-southeast-2.amazonaws.com/portal/visualization/2a5739e7-0cb8-444a-b83b-b2bc841b0ce8/aggregated_amsa_nonqc.parquet.pmtiles";
+    const sourceUrl = `https://${bucket}/portal/visualization/${collection?.id}/${selectedCoKey}.pmtiles`;
 
     const addSourceAndLayers = () => {
       if (!map.getSource(SOURCE_ID)) {
