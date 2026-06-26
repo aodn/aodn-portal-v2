@@ -460,6 +460,8 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
               mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
               LayerName.H3
             }
+            selectedCoKey={selectedCoKey}
+            onSelectCoKey={setSelectedCoKey}
           />
           <HexbinLayer
             featureCollection={featureCollection}

@@ -1,9 +1,20 @@
-import { FC, useContext, useEffect, useRef } from "react";
+import {
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import MapContext from "../MapContext";
 import dayjs, { Dayjs } from "dayjs";
 import { ExpressionSpecification } from "mapbox-gl";
+import { LayerBasicType } from "./Layers";
+import MapLayerSelect from "../component/MapLayerSelect";
+import { SelectItem } from "../../../common/dropdown/CommonSelect";
 
 const SOURCE_ID = "pmtiles-source-id";
+const bucket = import.meta.env.VITE_PMTILES_BUCKET;
 
 const PMTILE_LAYERS = [
   { id: "pmtiles-hex-z0", sourceLayer: "hex_z0", minzoom: 0, maxzoom: 2 },
@@ -14,10 +25,11 @@ const PMTILE_LAYERS = [
   { id: "pmtiles-hex-z10", sourceLayer: "hex_z10", minzoom: 10, maxzoom: 13 },
 ];
 
-interface PMTilesHexLayerProps {
+interface PMTilesHexLayerProps extends LayerBasicType {
   filterStartDate?: Dayjs;
   filterEndDate?: Dayjs;
-  visible?: boolean;
+  selectedCoKey?: string;
+  onSelectCoKey?: (key: string) => void;
 }
 
 const getMonthKeysInRange = (start?: Dayjs, end?: Dayjs): string[] => {
@@ -82,15 +94,28 @@ const getPaintProperties = (keys: string[]) => {
 };
 
 const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
+  collection,
+  selectedCoKey,
+  onSelectCoKey,
   filterStartDate,
   filterEndDate,
   visible = true,
 }) => {
   const { map } = useContext(MapContext);
+  const [datasetOptions, setDatasetOptions] = useState<SelectItem<string>[]>(
+    []
+  );
 
   const filterStartDateRef = useRef(filterStartDate);
   const filterEndDateRef = useRef(filterEndDate);
   const visibleRef = useRef(visible);
+
+  const handleSelectDataset = useCallback(
+    (key: string) => {
+      onSelectCoKey?.(key);
+    },
+    [onSelectCoKey]
+  );
 
   useEffect(() => {
     filterStartDateRef.current = filterStartDate;
@@ -165,7 +190,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         map.removeSource(SOURCE_ID);
       }
     };
-  }, [map]);
+  }, [map, collection?.id, selectedCoKey]);
 
   // Update visibility on changes
   useEffect(() => {
@@ -204,7 +229,19 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     });
   }, [map, filterStartDate, filterEndDate]);
 
-  return null;
+  return (
+    <>
+      {visible && (
+        <MapLayerSelect
+          mapLayersOptions={datasetOptions}
+          selectedItem={selectedCoKey || ""}
+          handleSelectItem={handleSelectDataset}
+          isLoading={false}
+          loadingText="Loading H3 Layers..."
+        />
+      )}
+    </>
+  );
 };
 
 export default PMTilesHexLayer;
