@@ -454,6 +454,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
           />
           {createStaticLayers(staticLayer)}
           <PMTilesHexLayer
+            collection={collection}
             filterStartDate={filterStartDate}
             filterEndDate={filterEndDate}
             visible={

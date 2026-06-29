@@ -171,6 +171,12 @@ export default ({ mode }) => {
     build: {
       outDir: "dist",
     },
+    // mapbox-gl 3.x emits a worker that uses dynamic imports (code-splitting),
+    // which Vite's default "iife" worker format can't support. Build workers as
+    // ES modules so the split chunks are allowed.
+    worker: {
+      format: "es",
+    },
     test: {
       globals: true,
       // 👋 add the line below to add jsdom to vite
