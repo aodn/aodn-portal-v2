@@ -1,11 +1,4 @@
-import {
-  FC,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { FC, useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import MapContext from "../MapContext";
 import dayjs, { Dayjs } from "dayjs";
 import { ExpressionSpecification } from "mapbox-gl";
@@ -102,10 +95,6 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   visible = true,
 }) => {
   const { map } = useContext(MapContext);
-  const [datasetOptions, setDatasetOptions] = useState<SelectItem<string>[]>(
-    []
-  );
-
   const filterStartDateRef = useRef(filterStartDate);
   const filterEndDateRef = useRef(filterEndDate);
   const visibleRef = useRef(visible);
@@ -116,6 +105,20 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     },
     [onSelectCoKey]
   );
+
+  // Derive dataset options from the collection's summary links
+  const datasetOptions = useMemo<SelectItem<string>[]>(() => {
+    const summaryLinks = collection?.links?.filter(
+      (link) => link.rel === "summary"
+    );
+    if (!summaryLinks || summaryLinks.length === 0) {
+      return [];
+    }
+    return summaryLinks.map((link) => ({
+      value: link.title,
+      label: link.title.replace(/\.(zarr|parquet)$/i, ""),
+    }));
+  }, [collection]);
 
   useEffect(() => {
     filterStartDateRef.current = filterStartDate;
