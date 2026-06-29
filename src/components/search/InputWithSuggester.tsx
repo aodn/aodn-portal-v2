@@ -29,7 +29,7 @@ import {
 } from "../common/store/searchReducer";
 import { borderRadius, color, padding } from "../../styles/constants";
 import { debounce } from "lodash";
-import { orderSuggestions } from "../../utils/Helpers";
+import { sortByRelevance } from "../../utils/Helpers";
 import { useAppDispatch } from "../common/store/hooks";
 import { TEXT_FIELD_MIN_WIDTH } from "./constants";
 import { SearchbarButtonNames } from "./SearchbarButtonGroup";
@@ -119,8 +119,6 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
               data.suggested_organizations_vocabs
             );
             const platform = new Set<string>(data.suggested_platform_vocabs);
-            // Acronym full names, e.g. "Australian Antarctic Division" for "aad", shown on top.
-            const acronyms = new Set<string>(data.suggested_acronyms);
 
             // Create an array of all unique suggestions
             const allSuggestions = new Set([
@@ -130,18 +128,16 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
               ...platform,
             ]);
 
-            const orderedSuggestions = orderSuggestions(
-              acronyms,
+            // Sort suggestions by relevance
+            const sortedSuggestions = sortByRelevance(
               allSuggestions,
               inputValue
             );
 
             // Create a sorted options array
-            const options: OptionType[] = orderedSuggestions.map(
+            const options: OptionType[] = sortedSuggestions.map(
               (suggestion) => {
-                if (acronyms.has(suggestion)) {
-                  return { text: suggestion, group: OptionGroup.PHRASE };
-                } else if (organization.has(suggestion)) {
+                if (organization.has(suggestion)) {
                   return { text: suggestion, group: OptionGroup.ORGANIZATION };
                 } else if (parameter.has(suggestion)) {
                   return { text: suggestion, group: OptionGroup.PARAMETER };
@@ -343,9 +339,6 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
       value={inputValue}
       forcePopupIcon={false}
       options={options.flatMap((option) => option.text)}
-      // Suggestions are already filtered/ordered server-side; don't let MUI re-filter by the typed
-      // text (it would hide multi-word edits and acronym full names that don't contain the input).
-      filterOptions={(suggestions) => suggestions}
       autoComplete
       includeInputInList
       disablePortal
