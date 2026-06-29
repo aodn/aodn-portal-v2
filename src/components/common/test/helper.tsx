@@ -14,6 +14,7 @@ interface TestProps {
   getSpiderLayer?: () => string;
   getGeoServerTileLayer?: () => string;
   getHexbinLayer?: () => string;
+  isHexbinVisible?: () => boolean | undefined;
   getSpatialExtentLayer?: () => string;
   getMapClickLngLat?: () => LngLat;
   getSelectedLocationIntersects?: () => any;

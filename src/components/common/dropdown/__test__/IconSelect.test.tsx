@@ -129,7 +129,7 @@ describe("IconSelect", () => {
     const customSx = { borderColor: "purple" };
     renderWithTheme(<IconSelect {...defaultProps} selectSx={customSx} />);
     const select = screen.getByTestId("icon-select");
-    expect(select).toHaveStyle("border-color: purple");
+    expect(select).toHaveStyle("border-color: rgb(128, 0, 128)");
   });
 
   it("renders with custom data-testid", () => {
@@ -178,7 +178,7 @@ describe("IconSelect", () => {
 
     return waitFor(() => screen.getByTestId("icon")).then((icon) => {
       expect(icon).toHaveStyle(
-        "fill: yellow; background-color: rgb(128, 128, 128);"
+        "fill: rgb(255, 255, 0); background-color: rgb(128, 128, 128);"
       ); // display gray color for MenuItem
     });
   });

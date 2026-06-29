@@ -1,11 +1,4 @@
-import {
-  FC,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { FC, useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import MapContext from "../MapContext";
 import { GeoJSONSource } from "mapbox-gl";
 import MapPopup from "../component/MapPopup";
@@ -107,9 +100,9 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   clusterLayerConfig,
 }: ClusterLayerProps) => {
   const { map } = useContext(MapContext);
-  const [_, setLastVisiblePoint] = useState<
-    FeatureCollection<Point> | undefined
-  >(undefined);
+  const lastVisiblePointRef = useRef<FeatureCollection<Point> | undefined>(
+    undefined
+  );
 
   const [layerId, clusterSourceId, clusterLayer, unclusterPointLayer] =
     useMemo(() => {
@@ -264,17 +257,15 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
   const updateSource = useCallback(() => {
     if (map?.getSource(clusterSourceId)) {
-      setLastVisiblePoint((p) => {
-        const newData = findSuitableVisiblePoint(
-          featureCollection,
-          map,
-          p,
-          preferCurrentCentroid
-        );
+      const newData = findSuitableVisiblePoint(
+        featureCollection,
+        map,
+        lastVisiblePointRef.current,
+        preferCurrentCentroid
+      );
 
-        (map?.getSource(clusterSourceId) as GeoJSONSource).setData(newData);
-        return newData;
-      });
+      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(newData);
+      lastVisiblePointRef.current = newData;
     }
   }, [map, clusterSourceId, featureCollection, preferCurrentCentroid]);
 

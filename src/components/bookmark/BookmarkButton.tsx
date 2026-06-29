@@ -33,6 +33,17 @@ const BookmarkButton: FC<BookmarkButtonProps> = ({
     dataset ? checkIsBookmarked(store.getState(), dataset.id) : false
   );
 
+  const [prevDatasetId, setPrevDatasetId] = useState<string | undefined>(
+    dataset?.id
+  );
+
+  if (dataset?.id !== prevDatasetId) {
+    setPrevDatasetId(dataset?.id);
+    setIsBookmarked(
+      dataset ? checkIsBookmarked(store.getState(), dataset.id) : false
+    );
+  }
+
   const onClickBookmark = useCallback(
     (
       event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -59,12 +70,6 @@ const BookmarkButton: FC<BookmarkButtonProps> = ({
     },
     [isBookmarked]
   );
-
-  useEffect(() => {
-    if (!dataset) return;
-    const bookmarkStatus = checkIsBookmarked(store.getState(), dataset.id);
-    setIsBookmarked(bookmarkStatus);
-  }, [dataset]);
 
   useEffect(() => {
     if (!dataset) return;

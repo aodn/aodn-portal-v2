@@ -355,6 +355,7 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
       <TestHelper
         id={map?.getContainer().id || ""}
         getHexbinLayer={() => MAPBOX_OVERLAY_HEXAGON_LAYER}
+        isHexbinVisible={() => visible}
       />
     </>
   );

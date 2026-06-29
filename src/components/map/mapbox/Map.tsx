@@ -226,17 +226,19 @@ const ReactMap = memo(
 
         // Create a resize observer to the canvas so we know if its size have changed
         // we need to redraw the map
+        const container = map.getContainer();
         const resizeObserver = new ResizeObserver((_) =>
           // https://stackoverflow.com/questions/70533564/mapbox-gl-flickers-when-resizing-the-container-div
           setTimeout(() => {
             try {
-              map?.resize();
+              if (container.offsetWidth > 0 || container.offsetHeight > 0) {
+                map?.resize();
+              }
             } catch (error: any) {
               /* empty */
             }
-          }, 0.1)
+          }, 100)
         );
-        const container = map.getContainer();
         resizeObserver.observe(container);
 
         if (import.meta.env.MODE === "playwright-local") {

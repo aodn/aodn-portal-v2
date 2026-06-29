@@ -25,6 +25,7 @@ import MenuTooltip from "./MenuTooltip";
 import { PolygonSelectionTooltipIcon } from "../../../../../assets/icons/map/tooltip_polygon_selection";
 import { PolygonSelectionIcon } from "../../../../../assets/icons/map/polygon_selection";
 import usePolygonCursorHint from "../../../../../hooks/usePolygonCursorHint";
+import { IControl } from "mapbox-gl";
 
 interface DrawControlProps extends ControlProps {
   onChangeFeatures?: (
@@ -255,7 +256,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
         }
       };
 
-      map.addControl(mapDraw);
+      map.addControl(mapDraw as unknown as IControl);
       map.on("draw.create", onCreate);
       map.on("draw.delete", onUpdateOrDelete);
       map.on("draw.update", onUpdateOrDelete);
@@ -267,7 +268,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
           map.off("draw.delete", onUpdateOrDelete);
           map.off("draw.update", onUpdateOrDelete);
           map.off("draw.modechange", onModeChanged);
-          map.removeControl(mapDraw);
+          map.removeControl(mapDraw as unknown as IControl);
         } catch (ignored) {
           /* can be ignored */
         }

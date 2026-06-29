@@ -1,11 +1,4 @@
-import {
-  FC,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { FC, useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import MapContext from "../MapContext";
 
 import {
@@ -119,9 +112,9 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
   heatmapLayerConfig,
 }: HeatmapLayerProps) => {
   const { map } = useContext(MapContext);
-  const [_, setLastVisiblePoint] = useState<
-    FeatureCollection<Point> | undefined
-  >(undefined);
+  const lastVisiblePointRef = useRef<FeatureCollection<Point> | undefined>(
+    undefined
+  );
 
   const [
     heatmapSourceId,
@@ -319,21 +312,19 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
   }, [map]);
 
   const updateSource = useCallback(() => {
-    setLastVisiblePoint((p) => {
-      const newData = findSuitableVisiblePoint(
-        featureCollection,
-        map,
-        p,
-        preferCurrentCentroid
-      );
-      if (map?.getSource(heatmapSourceId)) {
-        (map?.getSource(heatmapSourceId) as GeoJSONSource).setData(newData);
-      }
-      if (map?.getSource(clusterSourceId)) {
-        (map?.getSource(clusterSourceId) as GeoJSONSource).setData(newData);
-      }
-      return newData;
-    });
+    const newData = findSuitableVisiblePoint(
+      featureCollection,
+      map,
+      lastVisiblePointRef.current,
+      preferCurrentCentroid
+    );
+    if (map?.getSource(heatmapSourceId)) {
+      (map?.getSource(heatmapSourceId) as GeoJSONSource).setData(newData);
+    }
+    if (map?.getSource(clusterSourceId)) {
+      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(newData);
+    }
+    lastVisiblePointRef.current = newData;
   }, [
     featureCollection,
     map,

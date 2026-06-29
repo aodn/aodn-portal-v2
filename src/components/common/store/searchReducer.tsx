@@ -332,7 +332,7 @@ const fetchFeaturesByUuid = createAsyncThunk<
     .get<FeatureCollection<Point>>(`/ogc/collections/${id}/items/summary`)
     .then((response) => ({
       ...response.data,
-      features: response.data.features.map((feature: any) => ({
+      features: (response.data?.features || []).map((feature: any) => ({
         ...feature,
         properties: {
           ...feature.properties,
