@@ -184,9 +184,10 @@ const BBoxRow: React.FC<BBoxRowProps> = ({
             columnGap: 3,
           }}
         >
+          {/* Group latitude bounds (N, S) then longitude bounds (W, E) */}
           <CoordReadOnly label="N" value={north} />
-          <CoordReadOnly label="W" value={west} />
           <CoordReadOnly label="S" value={south} />
+          <CoordReadOnly label="W" value={west} />
           <CoordReadOnly label="E" value={east} />
         </Box>
       </Box>
