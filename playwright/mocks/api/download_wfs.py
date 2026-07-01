@@ -9,6 +9,10 @@ def handle_estimate_wfs_download(route: Route) -> None:
     route.fulfill(json={})  # Response not needed in the UI tests
 
 
+def handle_estimate_co_download(route: Route) -> None:
+    route.fulfill(json={})  # Response not needed in the UI tests
+
+
 def handle_download_wfs(route: Route) -> None:
     # Parse the POST body to get the uuid
     request = route.request
@@ -67,11 +71,7 @@ def get_sse_response(uuid: str, data: bytes) -> str:
 
     # Connection established event
     sse_response += 'event:connection-established\n'
-    sse_response += f'data:{json.dumps({"message": f"Starting WFS download for UUID: {uuid}", "status": "connected", "timestamp": int(time.time() * 1000)})}\n\n'
-
-    # WFS request ready event
-    sse_response += 'event:wfs-request-ready\n'
-    sse_response += f'data:{json.dumps({"message": "Connecting to WFS server...", "timestamp": int(time.time() * 1000)})}\n\n'
+    sse_response += f'data:{json.dumps({"message": f"Starting WFS download for UUID: {uuid}", "timestamp": int(time.time() * 1000)})}\n\n'
 
     # Download started event
     sse_response += 'event:download-started\n'

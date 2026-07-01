@@ -14,6 +14,7 @@ from mocks.api.collections import (
 from mocks.api.download_dialog import handle_download_dialog_success
 from mocks.api.download_wfs import (
     handle_download_wfs,
+    handle_estimate_co_download,
     handle_estimate_wfs_download,
 )
 from mocks.api.search_collections import (
@@ -63,4 +64,5 @@ def apply_mock(page: Page) -> None:
     api_router.route_download_dialog(handle_download_dialog_success)
     api_router.route_download_wfs(handle_download_wfs)
     api_router.route_estimate_wfs_download(handle_estimate_wfs_download)
+    api_router.route_estimate_co_download(handle_estimate_co_download)
     api_router.route_static_geojson(handle_static_geojson_api)

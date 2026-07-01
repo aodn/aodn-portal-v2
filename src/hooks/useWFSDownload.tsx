@@ -4,27 +4,19 @@ import { processWFSDownload } from "../components/common/store/searchReducer";
 import { IDownloadCondition } from "../pages/detail-page/context/DownloadDefinitions";
 import { consumeSSEStream } from "../utils/SSEUtils";
 
-// Aligned with backend WFS SSE event names
+// Aligned with backend SSE event names (ogc-api SseEventName enum)
 enum EventName {
   CONNECTION_ESTABLISHED = "connection-established",
   KEEP_ALIVE = "keep-alive",
-  WFS_REQUEST_READY = "wfs-request-ready",
   DOWNLOAD_STARTED = "download-started",
   FILE_CHUNK = "file-chunk",
   DOWNLOAD_COMPLETE = "download-complete",
   ERROR = "error",
 }
 
-// Aligned with backend WFS SSE event status
-enum EventStatus {
-  STREAMING = "streaming",
-  WAITING_FOR_WFS_SERVER = "waiting-for-wfs-server",
-}
-
 // Aligned with backend WFS SSE event data
 interface SSEEventData {
   data?: string;
-  status?: EventStatus;
   message?: string;
   timestamp?: number;
   chunkSize?: number;
@@ -119,21 +111,15 @@ const useWFSDownload = (onCallback?: () => void) => {
           onCallback?.();
           break;
 
-        case EventName.WFS_REQUEST_READY:
-          setDownloadingStatus(DownloadStatus.WAITING_SERVER);
-          setProgressMessage(
-            data.message || DownloadProgressMessage.CONNECTING
-          );
-          onCallback?.();
-          break;
-
         case EventName.KEEP_ALIVE:
-          if (data.status === EventStatus.WAITING_FOR_WFS_SERVER) {
+          // The keep-alive payload carries only { message, timestamp }; the
+          // message reflects whether the WFS server has started streaming
+          if (data.message?.includes("streaming")) {
+            setDownloadingStatus(DownloadStatus.IN_PROGRESS);
+          } else {
             setDownloadingStatus(DownloadStatus.WAITING_SERVER);
             setProgressMessage(DownloadProgressMessage.WAITING_SERVER);
             onCallback?.();
-          } else if (data.status === EventStatus.STREAMING) {
-            setDownloadingStatus(DownloadStatus.IN_PROGRESS);
           }
           break;
 
