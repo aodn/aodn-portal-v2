@@ -299,8 +299,12 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
       if (options.length > 0) {
         setHexbinOptions(options);
 
-        // Set first option as default if none selected
-        if (!selectedCoKey) {
+        // Default to first option if none selected, or the selected key
+        // (set elsewhere, e.g. from link titles) isn't a valid map layer
+        if (
+          !selectedCoKey ||
+          !options.some((option) => option.value === selectedCoKey)
+        ) {
           handleSelectHexbin(options[0].value);
         }
       } else {
@@ -349,7 +353,6 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
           selectedItem={selectedCoKey || ""}
           handleSelectItem={handleSelectHexbin}
           isLoading={isFetchingHexbinOptions}
-          loadingText="Loading Hexbin Layers..."
         />
       )}
       <TestHelper

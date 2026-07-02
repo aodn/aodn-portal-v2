@@ -66,6 +66,15 @@ export const buildMapLayerConfig = (
       ((hasSummaryFeature && isZarrDataset) ||
         (!isWMSAvailable && !isSupportHexbin));
 
+    if (isSupportH3) {
+      const h3: LayerSwitcherLayer<LayerName> = {
+        id: LayerName.H3,
+        name: "H3",
+        selected: true,
+      };
+      layers.push(h3);
+    }
+
     if (isSupportHexbin) {
       const l: LayerSwitcherLayer<LayerName> = {
         id: LayerName.Hexbin,
@@ -74,17 +83,6 @@ export const buildMapLayerConfig = (
         selected: !isSupportH3,
       };
       layers.push(l);
-    }
-
-    // H3 is independent of hexbin support, gated only by whether the selected
-    // cloud-optimised dataset has H3 metadata available.
-    if (isSupportH3) {
-      const h3: LayerSwitcherLayer<LayerName> = {
-        id: LayerName.H3,
-        name: "H3",
-        selected: true,
-      };
-      layers.push(h3);
     }
 
     if (isWMSAvailable) {

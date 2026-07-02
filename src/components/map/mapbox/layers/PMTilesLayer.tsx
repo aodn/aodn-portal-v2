@@ -132,6 +132,14 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     const sourceUrl = `https://${bucket}/portal/visualization/${collection?.id}/${selectedCoKey}.pmtiles`;
 
     const addSourceAndLayers = () => {
+      try {
+        addSourceAndLayersUnsafe();
+      } catch (error) {
+        // OK to ignore error here
+      }
+    };
+
+    const addSourceAndLayersUnsafe = () => {
       if (!map.getSource(SOURCE_ID)) {
         map.addSource(SOURCE_ID, {
           type: "vector",
@@ -181,15 +189,21 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
 
     return () => {
       if (!map) return;
-      map.off("styledata", onStyleData);
 
-      PMTILE_LAYERS.forEach((layer) => {
-        if (map.getLayer(layer.id)) {
-          map.removeLayer(layer.id);
+      try {
+        PMTILE_LAYERS.forEach((layer) => {
+          if (map.getLayer(layer.id)) {
+            map.removeLayer(layer.id);
+          }
+        });
+        if (map.getSource(SOURCE_ID)) {
+          map.removeSource(SOURCE_ID);
         }
-      });
-      if (map.getSource(SOURCE_ID)) {
-        map.removeSource(SOURCE_ID);
+      } catch (error) {
+        // OK to ignore error here
+      } finally {
+        map.off("styledata", onStyleData);
+        map.off("load", addSourceAndLayers);
       }
     };
   }, [map, collection?.id, selectedCoKey]);
@@ -197,15 +211,19 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   // Update visibility on changes
   useEffect(() => {
     if (!map) return;
-    PMTILE_LAYERS.forEach((layer) => {
-      if (map.getLayer(layer.id)) {
-        map.setLayoutProperty(
-          layer.id,
-          "visibility",
-          visible ? "visible" : "none"
-        );
-      }
-    });
+    try {
+      PMTILE_LAYERS.forEach((layer) => {
+        if (map.getLayer(layer.id)) {
+          map.setLayoutProperty(
+            layer.id,
+            "visibility",
+            visible ? "visible" : "none"
+          );
+        }
+      });
+    } catch (error) {
+      // OK to ignore error here
+    }
   }, [map, visible]);
 
   // Update paint properties on date filter changes
@@ -214,21 +232,29 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     const keys = getMonthKeysInRange(filterStartDate, filterEndDate);
     const paintProps = getPaintProperties(keys);
 
-    PMTILE_LAYERS.forEach((layer) => {
-      if (map.getLayer(layer.id)) {
-        map.setPaintProperty(layer.id, "fill-color", paintProps["fill-color"]);
-        map.setPaintProperty(
-          layer.id,
-          "fill-opacity",
-          paintProps["fill-opacity"]
-        );
-        map.setPaintProperty(
-          layer.id,
-          "fill-outline-color",
-          paintProps["fill-outline-color"]
-        );
-      }
-    });
+    try {
+      PMTILE_LAYERS.forEach((layer) => {
+        if (map.getLayer(layer.id)) {
+          map.setPaintProperty(
+            layer.id,
+            "fill-color",
+            paintProps["fill-color"]
+          );
+          map.setPaintProperty(
+            layer.id,
+            "fill-opacity",
+            paintProps["fill-opacity"]
+          );
+          map.setPaintProperty(
+            layer.id,
+            "fill-outline-color",
+            paintProps["fill-outline-color"]
+          );
+        }
+      });
+    } catch (error) {
+      // OK to ignore error here
+    }
   }, [map, filterStartDate, filterEndDate]);
 
   return (
