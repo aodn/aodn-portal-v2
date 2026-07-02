@@ -78,6 +78,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     downloadService,
     selectedCoKey,
     setSelectedCoKey,
+    isSupportH3,
   } = useDetailPageContext();
 
   const [mapLayerConfig, setMapLayerConfig] = useState<
@@ -143,6 +144,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
             isZarrDataset,
             isWMSAvailable,
             hasSpatialExtent,
+            isSupportH3,
             lastSelectedMapLayer
           )
         );
@@ -154,6 +156,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       downloadService,
       featureCollection,
       isWMSAvailable,
+      isSupportH3,
       lastSelectedMapLayer,
     ]);
 

@@ -53,6 +53,7 @@ export const buildMapLayerConfig = (
   isZarrDataset: boolean,
   isWMSAvailable: boolean,
   hasSpatialExtent: boolean,
+  isSupportH3: boolean,
   lastSelectedLayer: LayerSwitcherLayer<LayerName> | null = null
 ): LayerSwitcherLayer<LayerName>[] => {
   const layers: LayerSwitcherLayer<LayerName>[] = [];
@@ -66,13 +67,18 @@ export const buildMapLayerConfig = (
         (!isWMSAvailable && !isSupportHexbin));
 
     if (isSupportHexbin) {
-      // const l: LayerSwitcherLayer<LayerName> = {
-      //   id: LayerName.Hexbin,
-      //   name: "Hex Grid",
-      //   selected: true,
-      // };
-      // layers.push(l);
+      const l: LayerSwitcherLayer<LayerName> = {
+        id: LayerName.Hexbin,
+        name: "Hex Grid",
+        // H3 takes priority when both are available
+        selected: !isSupportH3,
+      };
+      layers.push(l);
+    }
 
+    // H3 is independent of hexbin support, gated only by whether the selected
+    // cloud-optimised dataset has H3 metadata available.
+    if (isSupportH3) {
       const h3: LayerSwitcherLayer<LayerName> = {
         id: LayerName.H3,
         name: "H3",
@@ -85,7 +91,7 @@ export const buildMapLayerConfig = (
       const l: LayerSwitcherLayer<LayerName> = {
         id: LayerName.GeoServer,
         name: "Geoserver",
-        selected: !isSupportHexbin,
+        selected: !isSupportHexbin && !isSupportH3,
       };
       layers.push(l);
     }
