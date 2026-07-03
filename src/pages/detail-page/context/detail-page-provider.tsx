@@ -139,11 +139,14 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       });
   }, [dispatch, uuid]);
 
-  // H3 layer is supported when the selected cloud-optimised dataset name
-  // matches one of the dataset names returned by the dataset_metadata endpoint.
+  // H3 layer is supported when the selected co key
+  // matches one of the dataset names returned by the dataset_metadata endpoint
+  // and that dataset is a parquet dataset (key ends with ".parquet").
   const isSupportH3 = useMemo<boolean>(() => {
     if (!datasetMetadata || !selectedCoKey) return false;
-    return Object.keys(datasetMetadata).includes(selectedCoKey);
+    return Object.keys(datasetMetadata).some(
+      (key) => key === selectedCoKey && key.endsWith(".parquet")
+    );
   }, [datasetMetadata, selectedCoKey]);
 
   return (
