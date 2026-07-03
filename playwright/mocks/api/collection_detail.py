@@ -14,6 +14,21 @@ def handle_detail_api(route: Route) -> None:
         raise e
 
 
+def handle_detail_dataset_metadata_api(route: Route) -> None:
+    data_id = route.request.url.split('/')[-3]
+    print(
+        f'[MOCK API] handle_detail_dataset_metadata_api called for URL: {route.request.url}, data_id: {data_id}'
+    )
+    try:
+        json_data = load_json_data(f'dataset_metadata/{data_id}.json')
+        route.fulfill(json=json_data)
+    except FileNotFoundError:
+        print(
+            f'[MOCK API] File dataset_metadata/{data_id}.json NOT found. Returning 404.'
+        )
+        route.fulfill(status=404, body='Not Found')
+
+
 def handle_detail_summary_api(route: Route) -> None:
     data_id = route.request.url.split('/')[-3]
     print(

@@ -456,17 +456,19 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
             bbox={mapFocusArea}
           />
           {createStaticLayers(staticLayer)}
-          <PMTilesHexLayer
-            collection={collection}
-            filterStartDate={filterStartDate}
-            filterEndDate={filterEndDate}
-            visible={
-              mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
-              LayerName.H3
-            }
-            selectedCoKey={selectedCoKey}
-            onSelectCoKey={setSelectedCoKey}
-          />
+          {isSupportH3 && ( // Avoid fetching S3 when not support H3
+            <PMTilesHexLayer
+              collection={collection}
+              filterStartDate={filterStartDate}
+              filterEndDate={filterEndDate}
+              visible={
+                mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
+                LayerName.H3
+              }
+              selectedCoKey={selectedCoKey}
+              onSelectCoKey={setSelectedCoKey}
+            />
+          )}
           <HexbinLayer
             featureCollection={featureCollection}
             filterStartDate={filterStartDate}

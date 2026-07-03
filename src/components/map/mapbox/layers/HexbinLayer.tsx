@@ -72,6 +72,12 @@ export const filterFeaturesByKey = (
   // Show all if no key selected
   if (!selectedKey) return featureCollection;
 
+  // Show all if the features carry no key at all
+  const hasKeyedFeature = featureCollection.features.some(
+    (feature) => feature.properties?.key
+  );
+  if (!hasKeyedFeature) return featureCollection;
+
   const filteredFeatures = featureCollection.features.filter(
     (feature) => feature.properties?.key === selectedKey
   );
