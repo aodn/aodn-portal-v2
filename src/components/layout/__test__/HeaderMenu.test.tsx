@@ -95,14 +95,15 @@ describe("HeaderMenu", () => {
   it("renders accordion menu correctly", () => {
     render(<HeaderMenu menuStyle={HeaderMenuStyle.ACCORDION_MENU} />);
 
-    // Should have three accordion menus
+    // Should have four accordion menus
     const accordions = screen.getAllByTestId("accordion-menu");
-    expect(accordions).toHaveLength(3);
+    expect(accordions).toHaveLength(4);
 
     // Should render menu summaries (About Us, Resources)
     // Here we trust MUI Accordion so no need to test the expand of accordion
     expect(screen.getByText("IMOS Home")).toBeInTheDocument();
     expect(screen.getByText("About Us")).toBeInTheDocument();
+    expect(screen.getByText("Subscribe")).toBeInTheDocument();
     expect(screen.getByText("Resources")).toBeInTheDocument();
   });
 });
