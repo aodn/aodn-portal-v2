@@ -108,6 +108,16 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
       },
       {
         menu: {
+          name: "Subscribe",
+          handler: () =>
+            openInNewTab(
+              `${pageDefault.url.IMOS}/news/marine-matters-newsletter`
+            ),
+        },
+        items: [],
+      },
+      {
+        menu: {
           name: "Resources",
         },
         items: [
