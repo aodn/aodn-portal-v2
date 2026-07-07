@@ -8,6 +8,7 @@ import { SelectItem } from "../../../common/dropdown/CommonSelect";
 
 const SOURCE_ID = "pmtiles-source-id";
 const bucket = import.meta.env.VITE_PMTILES_BUCKET;
+const region = import.meta.env.VITE_AWS_REGION;
 
 const PMTILE_LAYERS = [
   { id: "pmtiles-hex-z0", sourceLayer: "hex_z0", minzoom: 0, maxzoom: 2 },
@@ -129,7 +130,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   useEffect(() => {
     if (!map) return;
 
-    const sourceUrl = `https://${bucket}/portal/visualization/${collection?.id}/${selectedCoKey}.pmtiles`;
+    const sourceUrl = `https://${bucket}.s3.${region}.amazonaws.com/portal/visualization/${collection?.id}/${selectedCoKey}.pmtiles`;
 
     const addSourceAndLayers = () => {
       try {
