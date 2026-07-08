@@ -1,6 +1,15 @@
 import { useParams } from "react-router-dom";
-import { FC, ReactNode, useCallback, useEffect, useState } from "react";
 import {
+  FC,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import {
+  DatasetMetadata,
+  fetchDatasetMetadataByUuid,
   fetchFeaturesByUuid,
   fetchResultByUuidNoStore,
 } from "../../../components/common/store/searchReducer";
@@ -37,6 +46,9 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   );
   const [features, setFeatures] = useState<
     FeatureCollection<Point, CloudOptimizedFeature> | undefined
+  >(undefined);
+  const [datasetMetadata, setDatasetMetadata] = useState<
+    DatasetMetadata | undefined
   >(undefined);
   const [isCollectionNotFound, setIsCollectionNotFound] =
     useState<boolean>(false);
@@ -114,12 +126,37 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       });
   }, [dispatch, uuid]);
 
+  useEffect(() => {
+    if (!uuid) return;
+    dispatch(fetchDatasetMetadataByUuid(uuid))
+      .unwrap()
+      .then((metadata) => {
+        setDatasetMetadata(metadata);
+      })
+      .catch((error) => {
+        console.log("Error fetching dataset metadata by UUID:", error);
+        setDatasetMetadata(undefined);
+      });
+  }, [dispatch, uuid]);
+
+  // H3 layer is supported when the selected co key
+  // matches one of the dataset names returned by the dataset_metadata endpoint
+  // and that dataset is a parquet dataset (key ends with ".parquet").
+  const isSupportH3 = useMemo<boolean>(() => {
+    if (!datasetMetadata || !selectedCoKey) return false;
+    return Object.keys(datasetMetadata).some(
+      (key) => key === selectedCoKey && key.endsWith(".parquet")
+    );
+  }, [datasetMetadata, selectedCoKey]);
+
   return (
     <DetailPageContext.Provider
       value={{
         collection,
         setCollection,
         featureCollection: features,
+        datasetMetadata,
+        isSupportH3,
         isCollectionNotFound,
         downloadConditions,
         getAndSetDownloadConditions,

@@ -11,6 +11,7 @@ import {
   LayerSwitcherLayer,
 } from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 import { CloudOptimizedFeature } from "../../../components/common/store/CloudOptimizedDefinitions";
+import { DatasetMetadata } from "../../../components/common/store/searchReducer";
 
 export interface DetailPageContextType {
   collection: OGCCollection | undefined;
@@ -18,6 +19,8 @@ export interface DetailPageContextType {
   featureCollection:
     | FeatureCollection<Point, CloudOptimizedFeature>
     | undefined;
+  datasetMetadata: DatasetMetadata | undefined;
+  isSupportH3: boolean;
   isCollectionNotFound: boolean;
   downloadConditions: IDownloadCondition[];
   getAndSetDownloadConditions: (
@@ -43,6 +46,8 @@ const DetailPageContextDefault = {
   featureCollection: {} as
     | FeatureCollection<Point, CloudOptimizedFeature>
     | undefined,
+  datasetMetadata: undefined,
+  isSupportH3: false,
   isCollectionNotFound: false,
   downloadConditions: [],
   getAndSetDownloadConditions: () => [],

@@ -4,10 +4,7 @@ import { useDetailPageContext } from "../context/detail-page-context";
 import ExpandableTextArea from "../../../components/list/listItem/subitem/ExpandableTextArea";
 import dayjs, { Dayjs } from "dayjs";
 import { FeatureCollection, Point } from "geojson";
-import {
-  DatasetType,
-  OGCCollection,
-} from "../../../components/common/store/OGCCollectionDefinitions";
+import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
 import {
   LayerName,
   LayerSwitcherLayer,
@@ -56,6 +53,7 @@ export const buildMapLayerConfig = (
   isZarrDataset: boolean,
   isWMSAvailable: boolean,
   hasSpatialExtent: boolean,
+  isSupportH3: boolean,
   lastSelectedLayer: LayerSwitcherLayer<LayerName> | null = null
 ): LayerSwitcherLayer<LayerName>[] => {
   const layers: LayerSwitcherLayer<LayerName>[] = [];
@@ -68,11 +66,21 @@ export const buildMapLayerConfig = (
       ((hasSummaryFeature && isZarrDataset) ||
         (!isWMSAvailable && !isSupportHexbin));
 
+    if (isSupportH3) {
+      const h3: LayerSwitcherLayer<LayerName> = {
+        id: LayerName.H3,
+        name: "H3",
+        selected: true,
+      };
+      layers.push(h3);
+    }
+
     if (isSupportHexbin) {
       const l: LayerSwitcherLayer<LayerName> = {
         id: LayerName.Hexbin,
         name: "Hex Grid",
-        selected: true,
+        // H3 takes priority when both are available
+        selected: !isSupportH3,
       };
       layers.push(l);
     }
@@ -81,7 +89,7 @@ export const buildMapLayerConfig = (
       const l: LayerSwitcherLayer<LayerName> = {
         id: LayerName.GeoServer,
         name: "Geoserver",
-        selected: !isSupportHexbin,
+        selected: !isSupportHexbin && !isSupportH3,
       };
       layers.push(l);
     }

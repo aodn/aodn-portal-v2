@@ -56,6 +56,7 @@ import {
   buildMapLayerConfig,
   getMinMaxDateStamps,
 } from "./SummaryAndDownloadPanel";
+import PMTilesHexLayer from "../../../components/map/mapbox/layers/PMTilesLayer";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -77,6 +78,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     downloadService,
     selectedCoKey,
     setSelectedCoKey,
+    isSupportH3,
   } = useDetailPageContext();
 
   const [mapLayerConfig, setMapLayerConfig] = useState<
@@ -142,6 +144,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
             isZarrDataset,
             isWMSAvailable,
             hasSpatialExtent,
+            isSupportH3,
             lastSelectedMapLayer
           )
         );
@@ -153,6 +156,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       downloadService,
       featureCollection,
       isWMSAvailable,
+      isSupportH3,
       lastSelectedMapLayer,
     ]);
 
@@ -452,6 +456,19 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
             bbox={mapFocusArea}
           />
           {createStaticLayers(staticLayer)}
+          {isSupportH3 && ( // Avoid fetching S3 when not support H3
+            <PMTilesHexLayer
+              collection={collection}
+              filterStartDate={filterStartDate}
+              filterEndDate={filterEndDate}
+              visible={
+                mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
+                LayerName.H3
+              }
+              selectedCoKey={selectedCoKey}
+              onSelectCoKey={setSelectedCoKey}
+            />
+          )}
           <HexbinLayer
             featureCollection={featureCollection}
             filterStartDate={filterStartDate}

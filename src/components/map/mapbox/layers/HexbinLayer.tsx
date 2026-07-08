@@ -72,6 +72,12 @@ export const filterFeaturesByKey = (
   // Show all if no key selected
   if (!selectedKey) return featureCollection;
 
+  // Show all if the features carry no key at all
+  const hasKeyedFeature = featureCollection.features.some(
+    (feature) => feature.properties?.key
+  );
+  if (!hasKeyedFeature) return featureCollection;
+
   const filteredFeatures = featureCollection.features.filter(
     (feature) => feature.properties?.key === selectedKey
   );
@@ -299,8 +305,12 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
       if (options.length > 0) {
         setHexbinOptions(options);
 
-        // Set first option as default if none selected
-        if (!selectedCoKey) {
+        // Default to first option if none selected, or the selected key
+        // (set elsewhere, e.g. from link titles) isn't a valid map layer
+        if (
+          !selectedCoKey ||
+          !options.some((option) => option.value === selectedCoKey)
+        ) {
           handleSelectHexbin(options[0].value);
         }
       } else {
@@ -349,7 +359,6 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
           selectedItem={selectedCoKey || ""}
           handleSelectItem={handleSelectHexbin}
           isLoading={isFetchingHexbinOptions}
-          loadingText="Loading Hexbin Layers..."
         />
       )}
       <TestHelper
