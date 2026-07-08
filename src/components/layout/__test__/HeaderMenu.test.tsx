@@ -106,4 +106,17 @@ describe("HeaderMenu", () => {
     expect(screen.getByText("Subscribe")).toBeInTheDocument();
     expect(screen.getByText("Resources")).toBeInTheDocument();
   });
+
+  it("calls openInNewTab with the newsletter URL when Subscribe is clicked", () => {
+    const user = userEvent.setup();
+    render(<HeaderMenu menuStyle={HeaderMenuStyle.ACCORDION_MENU} />);
+
+    user.click(screen.getByText("Subscribe"));
+
+    return waitFor(() =>
+      expect(openInNewTab).toHaveBeenCalledWith(
+        `${pageDefault.url.IMOS}/news/marine-matters-newsletter`
+      )
+    );
+  });
 });
