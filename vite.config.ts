@@ -10,6 +10,7 @@ export default ({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
 
   const apiPath = process.env.VITE_API_HOST?.replace(/\/$/, "");
+  const port = Number(process.env.VITE_PORT);
 
   const inlineNewRelicPlugin = () => {
     // We need to inline the relic_script in the index.html, you can dynamic include based on env here
@@ -125,6 +126,7 @@ export default ({ mode }) => {
 
   return defineConfig({
     server: {
+      port: port,
       watch: {
         usePolling: true,
       },
