@@ -93,6 +93,16 @@ describe("Search Reducer Function Test", () => {
     );
   });
 
+  it("should exclude document scope when excludeDocument is true", () => {
+    const param: ParameterState = {
+      excludeDocument: true,
+    };
+
+    const result = createSearchParamFrom(param);
+
+    expect(result.filter).toEqual("NOT (scope='document')");
+  });
+
   it("should include both assets_summary and links_airole_contains filter when hasCOData is true", () => {
     const param: ParameterState = {
       hasCOData: true,

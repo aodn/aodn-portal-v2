@@ -35,6 +35,7 @@ interface Filters {
   dataDeliveryMode?: Array<string>;
   dataStatus?: Array<DatasetStatus> | undefined;
   dataIndexedType?: Array<IndexDataType>;
+  excludeDocument?: Array<string>;
   dataService?: Array<string>;
 }
 
@@ -65,6 +66,7 @@ const checkBadge = (filters: Filters, tabName: FiltersTabs): boolean => {
         filters.dataDeliveryMode?.length ||
         filters.dataService?.length ||
         filters.dataIndexedType?.length ||
+        filters.excludeDocument?.length ||
         filters.dataStatus?.length
       );
 
@@ -80,6 +82,7 @@ const FiltersFC: FC<FiltersProps> = ({ sx }) => {
     updateFreq,
     datasetGroup,
     hasCOData,
+    excludeDocument,
     datasetStatus,
   } = useAppSelector((state) => state.paramReducer);
 
@@ -168,6 +171,10 @@ const FiltersFC: FC<FiltersProps> = ({ sx }) => {
           dataIndexedType: [IndexDataType.CLOUD],
         }));
       }
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        excludeDocument: excludeDocument ? ["Yes"] : undefined,
+      }));
       if (datasetStatus) {
         setFilters((prevFilters) => ({
           ...prevFilters,
@@ -181,6 +188,7 @@ const FiltersFC: FC<FiltersProps> = ({ sx }) => {
     parameterVocabs,
     platform,
     updateFreq,
+    excludeDocument,
     datasetStatus,
   ]);
 

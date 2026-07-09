@@ -67,6 +67,10 @@ const checkCount = ({
         count++;
       }
 
+      if (filterObj.excludeDocument) {
+        count++;
+      }
+
       if (filterObj.hasCOData) {
         count++;
       }
