@@ -57,6 +57,7 @@ import {
   getMinMaxDateStamps,
 } from "./SummaryAndDownloadPanel";
 import PMTilesHexLayer from "../../../components/map/mapbox/layers/PMTilesLayer";
+import WmsLegend from "./WmsLegend";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -371,139 +372,149 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   if (!collection) return null;
 
   return (
-    <Box
-      arial-label="map"
-      id={mapContainerId}
-      sx={{
-        width: "100%",
-        minHeight: "550px",
-        marginY: padding.large,
-      }}
-    >
-      <MapBox
-        animate={false}
-        panelId={mapContainerId}
-        projection={"mercator"}
-        announcement={
-          noMapPreview ? "Dataset preview is not available" : undefined
-        }
-        onMoveEvent={handleMapChange}
-        onZoomEvent={handleMapChange}
+    <>
+      <Box
+        arial-label="map"
+        id={mapContainerId}
+        sx={{
+          width: "100%",
+          minHeight: "550px",
+          marginY: padding.large,
+        }}
       >
-        <Controls>
-          <NavigationControl visible={!isUnderLaptop} />
-          <ScaleControl />
-          <DisplayCoordinate />
-          <MenuControlGroup>
-            <MenuControl menu={<BaseMapSwitcher />} />
-            <MenuControl
-              menu={
-                <ReferenceLayerSwitcher
-                  layers={staticBaseLayerConfig}
-                  onEvent={handleBaseMapSwitch}
-                />
-              }
-            />
-            <MenuControl
-              menu={
-                <MapLayerSwitcher
-                  layers={mapLayerConfig}
-                  onEvent={handleMapLayerChange}
-                />
-              }
-              visible={mapLayerConfig.length !== 0}
-            />
-            <MenuControl
-              visible={checkSubsettingSupport(SubsettingType.TimeSlider)}
-              menu={
-                <DateRange
-                  key="date-range"
-                  minDate={minDateStamp.format(dateDefault.DATE_FORMAT)}
-                  maxDate={maxDateStamp.format(dateDefault.DATE_FORMAT)}
-                  getAndSetDownloadConditions={getAndSetDownloadConditions}
-                  downloadConditions={downloadConditions}
-                  options={
-                    discreteTimeSliderValues
-                      ? {
-                          additionalSlider: (
-                            <DateSliderPoint
-                              valid_points={discreteTimeSliderValues?.get(
-                                selectedWmsLayer
-                              )}
-                              onDatePointChange={handleSliderPointChange}
-                            />
-                          ),
-                        }
-                      : undefined
-                  }
-                />
-              }
-            />
-            <MenuControl
-              visible={checkSubsettingSupport(SubsettingType.DrawRect)}
-              menu={
-                <DrawRect
-                  onChangeFeatures={handleFeaturesChange}
-                  features={drawFeatures}
-                />
-              }
-            />
-          </MenuControlGroup>
-        </Controls>
-        <Layers>
-          <FitToSpatialExtentsLayer
-            collection={collection}
-            bbox={mapFocusArea}
-          />
-          {createStaticLayers(staticLayer)}
-          {isSupportH3 && ( // Avoid fetching S3 when not support H3
-            <PMTilesHexLayer
+        <MapBox
+          animate={false}
+          panelId={mapContainerId}
+          projection={"mercator"}
+          announcement={
+            noMapPreview ? "Dataset preview is not available" : undefined
+          }
+          onMoveEvent={handleMapChange}
+          onZoomEvent={handleMapChange}
+        >
+          <Controls>
+            <NavigationControl visible={!isUnderLaptop} />
+            <ScaleControl />
+            <DisplayCoordinate />
+            <MenuControlGroup>
+              <MenuControl menu={<BaseMapSwitcher />} />
+              <MenuControl
+                menu={
+                  <ReferenceLayerSwitcher
+                    layers={staticBaseLayerConfig}
+                    onEvent={handleBaseMapSwitch}
+                  />
+                }
+              />
+              <MenuControl
+                menu={
+                  <MapLayerSwitcher
+                    layers={mapLayerConfig}
+                    onEvent={handleMapLayerChange}
+                  />
+                }
+                visible={mapLayerConfig.length !== 0}
+              />
+              <MenuControl
+                visible={checkSubsettingSupport(SubsettingType.TimeSlider)}
+                menu={
+                  <DateRange
+                    key="date-range"
+                    minDate={minDateStamp.format(dateDefault.DATE_FORMAT)}
+                    maxDate={maxDateStamp.format(dateDefault.DATE_FORMAT)}
+                    getAndSetDownloadConditions={getAndSetDownloadConditions}
+                    downloadConditions={downloadConditions}
+                    options={
+                      discreteTimeSliderValues
+                        ? {
+                            additionalSlider: (
+                              <DateSliderPoint
+                                valid_points={discreteTimeSliderValues?.get(
+                                  selectedWmsLayer
+                                )}
+                                onDatePointChange={handleSliderPointChange}
+                              />
+                            ),
+                          }
+                        : undefined
+                    }
+                  />
+                }
+              />
+              <MenuControl
+                visible={checkSubsettingSupport(SubsettingType.DrawRect)}
+                menu={
+                  <DrawRect
+                    onChangeFeatures={handleFeaturesChange}
+                    features={drawFeatures}
+                  />
+                }
+              />
+            </MenuControlGroup>
+          </Controls>
+          <Layers>
+            <FitToSpatialExtentsLayer
               collection={collection}
+              bbox={mapFocusArea}
+            />
+            {createStaticLayers(staticLayer)}
+            {isSupportH3 && ( // Avoid fetching S3 when not support H3
+              <PMTilesHexLayer
+                collection={collection}
+                filterStartDate={filterStartDate}
+                filterEndDate={filterEndDate}
+                visible={
+                  mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
+                  LayerName.H3
+                }
+                selectedCoKey={selectedCoKey}
+                onSelectCoKey={setSelectedCoKey}
+              />
+            )}
+            <HexbinLayer
+              featureCollection={featureCollection}
               filterStartDate={filterStartDate}
               filterEndDate={filterEndDate}
               visible={
                 mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
-                LayerName.H3
+                LayerName.Hexbin
               }
               selectedCoKey={selectedCoKey}
               onSelectCoKey={setSelectedCoKey}
             />
-          )}
-          <HexbinLayer
-            featureCollection={featureCollection}
-            filterStartDate={filterStartDate}
-            filterEndDate={filterEndDate}
-            visible={
-              mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
-              LayerName.Hexbin
-            }
-            selectedCoKey={selectedCoKey}
-            onSelectCoKey={setSelectedCoKey}
-          />
-          <GeoServerLayer
-            geoServerLayerConfig={geoServerLayerConfig}
-            onWMSAvailabilityChange={onWMSAvailabilityChange}
-            onWmsLayerChange={onWmsLayerChange}
-            setWmsFields={setWMSFields}
-            setTimeSliderSupport={setTimeSliderSupport}
-            setDiscreteTimeSliderValues={setDiscreteTimeSliderValues}
-            setDrawRectSupportSupport={setDrawRectSupportSupport}
-            collection={collection}
-            visible={
-              mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
-              LayerName.GeoServer
-            }
-          />
-          <GeojsonLayer
-            collection={collection}
-            visible={
-              mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
-              LayerName.SpatialExtent
-            }
-          />
-        </Layers>
-      </MapBox>
-    </Box>
+            <GeoServerLayer
+              geoServerLayerConfig={geoServerLayerConfig}
+              onWMSAvailabilityChange={onWMSAvailabilityChange}
+              onWmsLayerChange={onWmsLayerChange}
+              setWmsFields={setWMSFields}
+              setTimeSliderSupport={setTimeSliderSupport}
+              setDiscreteTimeSliderValues={setDiscreteTimeSliderValues}
+              setDrawRectSupportSupport={setDrawRectSupportSupport}
+              collection={collection}
+              visible={
+                mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
+                LayerName.GeoServer
+              }
+            />
+            <GeojsonLayer
+              collection={collection}
+              visible={
+                mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
+                LayerName.SpatialExtent
+              }
+            />
+          </Layers>
+        </MapBox>
+      </Box>
+      {/* Show the legend exactly when the GeoServer (WMS) layer is the selected
+          map layer - same gate as the GeoServerLayer's own `visible` prop */}
+      {mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
+        LayerName.GeoServer && (
+        <Box>
+          <WmsLegend uuid={collection.id} layerName={selectedWmsLayer} />
+        </Box>
+      )}
+    </>
   );
 };
 
