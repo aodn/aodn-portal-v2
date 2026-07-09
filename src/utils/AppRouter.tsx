@@ -8,6 +8,7 @@ import ErrorBoundary from "./ErrorBoundary";
 import { pageDefault } from "../components/common/constants";
 import HealthChecker from "./HealthChecker";
 import DegradedPage from "../pages/error-page/DegradedPage";
+import { syncCanonicalUrl } from "./seo/canonicalUrl";
 import React from "react";
 
 // Helper to conditionally wrap a page with HealthChecker based on the mode
@@ -70,6 +71,9 @@ const router = createBrowserRouter([
     children: [],
   },
 ]);
+
+// Keep the canonical URL in sync with the current route (SEO).
+syncCanonicalUrl(router);
 
 export default router;
 // TODO: move this to different place that is more related

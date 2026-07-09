@@ -67,15 +67,13 @@ export default ({ mode }) => {
   const inlineSEOPlugin = () => {
     return {
       name: "inline-seo",
-      transformIndexHtml(html) {
-        const canonicalUrl = "https://portal-beta.aodn.org.au/";
+      transformIndexHtml(html: string) {
         const isProduction = mode === "prod";
 
+        // Canonical is set at runtime per route in AppRouter.tsx (SPA has a single
+        // index.html, so a static canonical would wrongly point every page at "/").
         const seoTags = `
         <!-- SEO -->
-
-        <!-- Canonical URL: All environments point to production for SEO consolidation -->
-        <link rel="canonical" href="${canonicalUrl}" />
 
         ${
           !isProduction
