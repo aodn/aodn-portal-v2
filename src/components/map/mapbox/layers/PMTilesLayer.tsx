@@ -1,10 +1,13 @@
 import { FC, useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import MapContext from "../MapContext";
 import dayjs, { Dayjs } from "dayjs";
-import { ExpressionSpecification } from "mapbox-gl";
+import { ExpressionSpecification, MapLayerMouseEvent, Popup } from "mapbox-gl";
 import { LayerBasicType } from "./Layers";
 import MapLayerSelect from "../component/MapLayerSelect";
 import { SelectItem } from "../../../common/dropdown/CommonSelect";
+import { InnerHtmlBuilder } from "../../../../utils/HtmlUtils";
+import { MapDefaultConfig } from "../constants";
+import { playwrightTestIds } from "../../../common/constants";
 
 const SOURCE_ID = "pmtiles-source-id";
 const bucket = import.meta.env.VITE_PMTILES_BUCKET;
@@ -40,6 +43,42 @@ const getMonthKeysInRange = (start?: Dayjs, end?: Dayjs): string[] => {
     limit++;
   }
   return keys;
+};
+
+// Format a month key like "m202401" for display as "2024-01"
+const formatMonthKey = (key: string): string =>
+  `${key.slice(1, 5)}-${key.slice(5, 7)}`;
+
+// Build the hover popup content from a hexbin feature's monthly count
+// properties, matching the old HexbinLayer popup layout
+const buildPopupHtml = (
+  properties: Record<string, unknown>,
+  filterStartDate?: Dayjs,
+  filterEndDate?: Dayjs
+): string => {
+  const keys = getMonthKeysInRange(filterStartDate, filterEndDate);
+
+  let total = 0;
+  let firstKey: string | undefined;
+  let lastKey: string | undefined;
+  keys.forEach((key) => {
+    const value = properties[key];
+    if (typeof value === "number" && value > 0) {
+      total += value;
+      if (!firstKey) firstKey = key;
+      lastKey = key;
+    }
+  });
+
+  return new InnerHtmlBuilder()
+    .addTitle("Data Records In This Area:")
+    .addText("Data Record Count: " + total)
+    .addRange(
+      "Time Range",
+      firstKey ? formatMonthKey(firstKey) : "N/A",
+      lastKey ? formatMonthKey(lastKey) : "N/A"
+    )
+    .getHtml();
 };
 
 const buildSumExpression = (keys: string[]) => {
@@ -99,6 +138,12 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   const filterStartDateRef = useRef(filterStartDate);
   const filterEndDateRef = useRef(filterEndDate);
   const visibleRef = useRef(visible);
+  const popupRef = useRef<Popup | null>(null);
+
+  const removePopup = useCallback(() => {
+    popupRef.current?.remove();
+    popupRef.current = null;
+  }, []);
 
   const handleSelectDataset = useCallback(
     (key: string) => {
@@ -205,9 +250,79 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       } finally {
         map.off("styledata", onStyleData);
         map.off("load", addSourceAndLayers);
+        removePopup();
       }
     };
-  }, [map, collection?.id, selectedCoKey]);
+  }, [map, collection?.id, selectedCoKey, removePopup]);
+
+  // Show an aggregation-details popup while hovering a hexbin
+  useEffect(() => {
+    if (!map) return;
+
+    // Identity of the currently hovered hexbin, so the popup HTML is only
+    // rebuilt when the cursor moves onto a different feature
+    let hoveredId: string | number | undefined;
+
+    const onHexHover = (e: MapLayerMouseEvent) => {
+      if (!visibleRef.current) return;
+      const feature = e.features?.[0];
+      if (!feature) return;
+
+      map.getCanvas().style.cursor = "pointer";
+
+      if (!popupRef.current) {
+        // A hover popup must not show a close button
+        popupRef.current = new Popup({
+          ...MapDefaultConfig.DEFAULT_POPUP,
+          closeButton: false,
+        });
+        hoveredId = undefined;
+      }
+
+      // Vector tile features may not carry an id; rebuild every event then
+      if (feature.id === undefined || feature.id !== hoveredId) {
+        hoveredId = feature.id;
+        popupRef.current.setHTML(
+          buildPopupHtml(
+            feature.properties ?? {},
+            filterStartDateRef.current,
+            filterEndDateRef.current
+          )
+        );
+      }
+
+      popupRef.current.setLngLat(e.lngLat);
+      if (!popupRef.current.isOpen()) {
+        popupRef.current.addTo(map);
+      }
+
+      // add test id for playwright tests
+      const popupElement = popupRef.current.getElement();
+      if (popupElement) {
+        popupElement.dataset.testid = playwrightTestIds.DETAIL_MAP_POPUP;
+      }
+    };
+
+    const onHexLeave = () => {
+      map.getCanvas().style.cursor = "";
+      hoveredId = undefined;
+      removePopup();
+    };
+
+    PMTILE_LAYERS.forEach((layer) => {
+      map.on("mousemove", layer.id, onHexHover);
+      map.on("mouseleave", layer.id, onHexLeave);
+    });
+
+    return () => {
+      PMTILE_LAYERS.forEach((layer) => {
+        map.off("mousemove", layer.id, onHexHover);
+        map.off("mouseleave", layer.id, onHexLeave);
+      });
+      map.getCanvas().style.cursor = "";
+      removePopup();
+    };
+  }, [map, removePopup]);
 
   // Update visibility on changes
   useEffect(() => {
@@ -225,7 +340,10 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     } catch (error) {
       // OK to ignore error here
     }
-  }, [map, visible]);
+    if (!visible) {
+      removePopup();
+    }
+  }, [map, visible, removePopup]);
 
   // Update paint properties on date filter changes
   useEffect(() => {
@@ -256,7 +374,9 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     } catch (error) {
       // OK to ignore error here
     }
-  }, [map, filterStartDate, filterEndDate]);
+    // Popup content is derived from the date filter, so drop any open popup
+    removePopup();
+  }, [map, filterStartDate, filterEndDate, removePopup]);
 
   return (
     <>
