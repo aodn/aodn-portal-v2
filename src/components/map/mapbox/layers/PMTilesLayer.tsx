@@ -1,7 +1,13 @@
 import { FC, useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import MapContext from "../MapContext";
 import dayjs, { Dayjs } from "dayjs";
-import { ExpressionSpecification, MapLayerMouseEvent, Popup } from "mapbox-gl";
+import {
+  ExpressionSpecification,
+  GeoJSONSource,
+  MapMouseEvent,
+  Popup,
+} from "mapbox-gl";
+import { FeatureCollection, Geometry } from "geojson";
 import { LayerBasicType } from "./Layers";
 import MapLayerSelect from "../component/MapLayerSelect";
 import { SelectItem } from "../../../common/dropdown/CommonSelect";
@@ -10,6 +16,13 @@ import { MapDefaultConfig } from "../constants";
 import { playwrightTestIds } from "../../../common/constants";
 
 const SOURCE_ID = "pmtiles-source-id";
+const HOVER_SOURCE_ID = "pmtiles-hover-source-id";
+const HOVER_OUTLINE_LAYER_ID = "pmtiles-hex-hover-outline";
+const CURSOR_POINTER_CLASS = "map-cursor-pointer";
+const EMPTY_FEATURE_COLLECTION: FeatureCollection = {
+  type: "FeatureCollection",
+  features: [],
+};
 const bucket = import.meta.env.VITE_PMTILES_BUCKET;
 const region = import.meta.env.VITE_AWS_REGION;
 
@@ -220,6 +233,32 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
           });
         }
       });
+
+      // Highlight outline for the hovered hexbin, drawn above the fill layers
+      if (!map.getSource(HOVER_SOURCE_ID)) {
+        map.addSource(HOVER_SOURCE_ID, {
+          type: "geojson",
+          data: EMPTY_FEATURE_COLLECTION,
+        });
+      }
+      if (!map.getLayer(HOVER_OUTLINE_LAYER_ID)) {
+        map.addLayer({
+          id: HOVER_OUTLINE_LAYER_ID,
+          type: "line",
+          source: HOVER_SOURCE_ID,
+          layout: {
+            visibility: visibleRef.current ? "visible" : "none",
+            "line-join": "round",
+            "line-cap": "round",
+          },
+          paint: {
+            // Brighter and slightly thicker than the fill layers' default
+            // outline (rgba(255, 255, 255, 0.4), 1px)
+            "line-color": "rgba(255, 255, 255, 0.9)",
+            "line-width": 1.5,
+          },
+        });
+      }
     };
 
     if (map.isStyleLoaded()) {
@@ -242,8 +281,14 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
             map.removeLayer(layer.id);
           }
         });
+        if (map.getLayer(HOVER_OUTLINE_LAYER_ID)) {
+          map.removeLayer(HOVER_OUTLINE_LAYER_ID);
+        }
         if (map.getSource(SOURCE_ID)) {
           map.removeSource(SOURCE_ID);
+        }
+        if (map.getSource(HOVER_SOURCE_ID)) {
+          map.removeSource(HOVER_SOURCE_ID);
         }
       } catch (error) {
         // OK to ignore error here
@@ -255,20 +300,43 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     };
   }, [map, collection?.id, selectedCoKey, removePopup]);
 
-  // Show an aggregation-details popup while hovering a hexbin
+  // Show an aggregation-details popup and highlight outline while hovering
+  // a hexbin
   useEffect(() => {
     if (!map) return;
 
-    // Identity of the currently hovered hexbin, so the popup HTML is only
-    // rebuilt when the cursor moves onto a different feature
+    // Identity of the currently hovered hexbin, so the popup HTML and the
+    // highlight outline are only rebuilt when the cursor moves onto a
+    // different feature
     let hoveredId: string | number | undefined;
 
-    const onHexHover = (e: MapLayerMouseEvent) => {
+    const setHoverOutline = (geometry?: Geometry) => {
+      const source = map.getSource<GeoJSONSource>(HOVER_SOURCE_ID);
+      source?.setData(
+        geometry
+          ? {
+              type: "FeatureCollection",
+              features: [{ type: "Feature", geometry, properties: {} }],
+            }
+          : EMPTY_FEATURE_COLLECTION
+      );
+    };
+
+    const clearHover = () => {
+      // The deck.gl overlay (HexbinLayer) rewrites the canvas's inline
+      // cursor on every pointer move, so toggle a CSS class instead
+      map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
+      hoveredId = undefined;
+      setHoverOutline(undefined);
+      removePopup();
+    };
+
+    const onHexHover = (e: MapMouseEvent) => {
       if (!visibleRef.current) return;
       const feature = e.features?.[0];
       if (!feature) return;
 
-      map.getCanvas().style.cursor = "pointer";
+      map.getCanvas().classList.add(CURSOR_POINTER_CLASS);
 
       if (!popupRef.current) {
         // A hover popup must not show a close button
@@ -289,6 +357,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
             filterEndDateRef.current
           )
         );
+        setHoverOutline(feature.geometry);
       }
 
       popupRef.current.setLngLat(e.lngLat);
@@ -304,9 +373,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     };
 
     const onHexLeave = () => {
-      map.getCanvas().style.cursor = "";
-      hoveredId = undefined;
-      removePopup();
+      clearHover();
     };
 
     PMTILE_LAYERS.forEach((layer) => {
@@ -319,8 +386,11 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         map.off("mousemove", layer.id, onHexHover);
         map.off("mouseleave", layer.id, onHexLeave);
       });
-      map.getCanvas().style.cursor = "";
-      removePopup();
+      try {
+        clearHover();
+      } catch (error) {
+        // OK to ignore error here — the map may already be torn down
+      }
     };
   }, [map, removePopup]);
 
@@ -337,10 +407,21 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
           );
         }
       });
+      if (map.getLayer(HOVER_OUTLINE_LAYER_ID)) {
+        map.setLayoutProperty(
+          HOVER_OUTLINE_LAYER_ID,
+          "visibility",
+          visible ? "visible" : "none"
+        );
+      }
     } catch (error) {
       // OK to ignore error here
     }
     if (!visible) {
+      map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
+      map
+        .getSource<GeoJSONSource>(HOVER_SOURCE_ID)
+        ?.setData(EMPTY_FEATURE_COLLECTION);
       removePopup();
     }
   }, [map, visible, removePopup]);
