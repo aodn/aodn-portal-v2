@@ -42,7 +42,8 @@ interface PMTilesHexLayerProps extends LayerBasicType {
   onSelectCoKey?: (key: string) => void;
 }
 
-const getMonthKeysInRange = (start?: Dayjs, end?: Dayjs): string[] => {
+// Exported following functions for unit testing
+export const getMonthKeysInRange = (start?: Dayjs, end?: Dayjs): string[] => {
   const s = start || dayjs("2000-01-01");
   const e = end || dayjs();
   const keys: string[] = [];
@@ -59,12 +60,12 @@ const getMonthKeysInRange = (start?: Dayjs, end?: Dayjs): string[] => {
 };
 
 // Format a month key like "m202401" for display as "2024-01"
-const formatMonthKey = (key: string): string =>
+export const formatMonthKey = (key: string): string =>
   `${key.slice(1, 5)}-${key.slice(5, 7)}`;
 
 // Build the hover popup content from a hexbin feature's monthly count
 // properties, matching the old HexbinLayer popup layout
-const buildPopupHtml = (
+export const buildPopupHtml = (
   properties: Record<string, unknown>,
   filterStartDate?: Dayjs,
   filterEndDate?: Dayjs
@@ -94,7 +95,7 @@ const buildPopupHtml = (
     .getHtml();
 };
 
-const buildSumExpression = (keys: string[]) => {
+export const buildSumExpression = (keys: string[]) => {
   if (keys.length === 0) return 0;
   if (keys.length === 1) return ["coalesce", ["get", keys[0]], 0];
   return ["+", ...keys.map((k) => ["coalesce", ["get", k], 0])];
