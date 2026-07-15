@@ -326,7 +326,7 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
             <StyledToggleButton
               value={item.value}
               key={item.value}
-              aria-label={item.label}
+              aria-label={`Exclude Documents ${item.label}`} // use a different aria-label to avoid duplicate labels for accessibility
             >
               {item.label}
             </StyledToggleButton>
