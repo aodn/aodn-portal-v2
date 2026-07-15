@@ -298,7 +298,7 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
             padding: "8px 20px",
           }}
         >
-          Exclude Document
+          Exclude Documents
         </Typography>
         <StyledToggleButtonGroup
           value={filters.excludeDocument}
