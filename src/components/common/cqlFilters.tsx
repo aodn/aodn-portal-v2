@@ -29,6 +29,7 @@ export type UpdateFrequency = SingleArgumentFunction<DatasetFrequency, string>;
 export type DatasetGroup = SingleArgumentFunction<string, string>;
 export type PlatformFilter = SingleArgumentFunction<Array<string>, string>;
 export type Status = SingleArgumentFunction<DatasetStatus, string>;
+export type ExcludeDatasetScope = SingleArgumentFunction<string, string>;
 export type StaticAreasFilter = SingleArgumentFunction<
   Array<SelectedStaticArea>,
   string
@@ -43,6 +44,7 @@ export type FilterTypes =
   | UpdateFrequency
   | PlatformFilter
   | Status
+  | ExcludeDatasetScope
   | StaticAreasFilter
   | IsNotNull;
 
@@ -58,6 +60,9 @@ const funcUpdateFrequency: UpdateFrequency = (freq: DatasetFrequency) => {
 };
 
 const funcStatus: Status = (stat: DatasetStatus) => `status='${stat}'`;
+
+const funcExcludeDatasetScope: ExcludeDatasetScope = (scope: string) =>
+  `NOT (scope='${scope}')`;
 
 const funcUpdateDatasetGroup: DatasetGroup = (name: string) =>
   `dataset_group='${name}'`;
@@ -145,6 +150,7 @@ cqlDefaultFilters
   .set("BBOX_POLYGON_OR_EMPTY_EXTENTS", funcBBoxPolygonOrEmptyExtents)
   .set("UPDATE_FREQUENCY", funcUpdateFrequency)
   .set("STATUS", funcStatus)
+  .set("EXCLUDE_DATASET_SCOPE", funcExcludeDatasetScope)
   .set("UPDATE_PLATFORM_FILTER_VARIABLES", funcPlatformFilter)
   .set("STATIC_AREAS", funcStaticAreas)
   .set("IS_NOT_NULL", funcIsNotNull);

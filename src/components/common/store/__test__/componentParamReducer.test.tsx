@@ -108,6 +108,7 @@ describe("Component Reducer Function Test", () => {
     const sample1: ParameterState = {
       datasetGroup: SearchKeys.IMOS,
       hasCOData: false,
+      excludeDocument: false,
       dateTimeFilterRange: {},
       searchText: "",
       zoom: MapDefaultConfig.ZOOM,
@@ -121,6 +122,7 @@ describe("Component Reducer Function Test", () => {
     const sample4: ParameterState = {
       datasetGroup: SearchKeys.IMOS,
       hasCOData: false,
+      excludeDocument: false,
       dateTimeFilterRange: {
         start: 12345,
         end: 45697,
@@ -144,6 +146,7 @@ describe("Component Reducer Function Test", () => {
     const sample5: ParameterState = {
       datasetGroup: SearchKeys.IMOS,
       hasCOData: false,
+      excludeDocument: false,
       dateTimeFilterRange: {
         start: 12345,
         end: 45697,
@@ -170,6 +173,7 @@ describe("Component Reducer Function Test", () => {
     const sample6: ParameterState = {
       datasetGroup: SearchKeys.IMOS,
       hasCOData: false,
+      excludeDocument: false,
       dateTimeFilterRange: {},
       searchText: "",
       zoom: MapDefaultConfig.ZOOM,

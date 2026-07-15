@@ -14,6 +14,7 @@ import {
   UpdateFrequency,
   Status,
   StaticAreasFilter,
+  ExcludeDatasetScope,
 } from "../cqlFilters";
 import { OGCCollection, OGCCollections } from "./OGCCollectionDefinitions";
 import {
@@ -693,6 +694,13 @@ const createSearchParamFrom = (
       p.filter,
       `(${coDataFilter} OR ${downloadLinkFilter})`
     );
+  }
+
+  if (i.excludeDocument) {
+    const f = cqlDefaultFilters.get(
+      "EXCLUDE_DATASET_SCOPE"
+    ) as ExcludeDatasetScope;
+    p.filter = appendFilter(p.filter, f("document"));
   }
 
   if (i.updateFreq) {

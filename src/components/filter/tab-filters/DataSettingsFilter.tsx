@@ -2,6 +2,7 @@ import React, { FC, useCallback } from "react";
 import { Box, Stack, SxProps, Typography } from "@mui/material";
 import {
   updateHasData,
+  updateExcludeDocument,
   updateStatus,
   updateUpdateFreq,
 } from "../../common/store/componentParamReducer";
@@ -20,6 +21,7 @@ enum DataSettingsCategory {
   dataDeliverMode = "dataDeliveryMode",
   dataDeliveryFrequency = "dataDeliveryFrequency",
   dataIndexedType = "dataIndexedType",
+  excludeDocument = "excludeDocument",
   dataService = "dataService",
   dataStatus = "dataStatus",
 }
@@ -44,6 +46,12 @@ const DATA_SETTINGS: DataSettingsFilterType = {
   dataIndexedType: [
     {
       value: IndexDataType.CLOUD,
+      label: "Yes",
+    },
+  ],
+  excludeDocument: [
+    {
+      value: "Yes",
       label: "Yes",
     },
   ],
@@ -143,6 +151,14 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
             dataIndexedType: newAlignment as Array<IndexDataType>,
           }));
           dispatch(updateHasData(values?.includes(IndexDataType.CLOUD)));
+        }
+        if (category === DataSettingsCategory.excludeDocument) {
+          const values = newAlignment as Array<string>;
+          setFilters((prevFilters) => ({
+            ...prevFilters,
+            excludeDocument: values,
+          }));
+          dispatch(updateExcludeDocument(values?.includes("Yes")));
         }
         if (category === DataSettingsCategory.dataStatus) {
           const value = newAlignment as DatasetStatus | null;
@@ -267,6 +283,50 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
               value={item.value}
               key={item.value}
               aria-label={item.label}
+            >
+              {item.label}
+            </StyledToggleButton>
+          ))}
+        </StyledToggleButtonGroup>
+      </Box>
+      <Box>
+        <Typography
+          sx={{
+            ...portalTheme.typography.title1Medium,
+            color: portalTheme.palette.text1,
+            fontWeight: 500,
+            padding: "8px 20px",
+          }}
+        >
+          Exclude Documents
+        </Typography>
+        <StyledToggleButtonGroup
+          value={filters.excludeDocument}
+          onChange={handleChange(DataSettingsCategory.excludeDocument)}
+          sx={{
+            gap: "14px 12px",
+            "& .MuiToggleButton-root": {
+              borderRadius: "6px",
+              textTransform: "capitalize",
+              ...portalTheme.typography.title2Regular,
+              color: portalTheme.palette.text1,
+              bgcolor: "#fff",
+              border: `1px solid ${portalTheme.palette.grey500}`,
+              px: "38px",
+              py: "8px",
+              "&.Mui-selected": {
+                border: "none",
+                bgcolor: portalTheme.palette.primary1,
+                color: "#fff",
+              },
+            },
+          }}
+        >
+          {DATA_SETTINGS.excludeDocument.map((item) => (
+            <StyledToggleButton
+              value={item.value}
+              key={item.value}
+              aria-label={`Exclude Documents ${item.label}`} // use a different aria-label to avoid duplicate labels for accessibility
             >
               {item.label}
             </StyledToggleButton>
