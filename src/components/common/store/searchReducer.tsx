@@ -14,6 +14,7 @@ import {
   UpdateFrequency,
   Status,
   StaticAreasFilter,
+  ExcludeDatasetScope,
 } from "../cqlFilters";
 import { OGCCollection, OGCCollections } from "./OGCCollectionDefinitions";
 import {
@@ -320,6 +321,27 @@ const fetchResultByUuidNoStore = createAsyncThunk<
   ogcAxiosWithRetry
     .get<OGCCollection>(`/ogc/collections/${id}`)
     .then((response) => Object.assign(new OGCCollection(), response.data))
+    .catch(errorHandling(thunkApi))
+);
+
+export interface DatasetMetadataItem {
+  uuid: string;
+  dname: string;
+  lat?: Record<string, unknown>;
+  lng?: Record<string, unknown>;
+  depth?: Record<string, unknown>;
+}
+
+export type DatasetMetadata = Record<string, DatasetMetadataItem>;
+
+const fetchDatasetMetadataByUuid = createAsyncThunk<
+  DatasetMetadata,
+  string,
+  { rejectValue: ErrorResponse }
+>("search/fetchDatasetMetadataByUuid", async (id: string, thunkApi: any) =>
+  ogcAxiosWithRetry
+    .get<DatasetMetadata>(`/ogc/collections/${id}/items/dataset_metadata`)
+    .then((response) => response.data)
     .catch(errorHandling(thunkApi))
 );
 
@@ -724,6 +746,13 @@ const createSearchParamFrom = (
     );
   }
 
+  if (i.excludeDocument) {
+    const f = cqlDefaultFilters.get(
+      "EXCLUDE_DATASET_SCOPE"
+    ) as ExcludeDatasetScope;
+    p.filter = appendFilter(p.filter, f("document"));
+  }
+
   if (i.updateFreq) {
     const f = cqlDefaultFilters.get("UPDATE_FREQUENCY") as UpdateFrequency;
     p.filter = appendFilter(p.filter, f(i.updateFreq));
@@ -812,6 +841,7 @@ export {
   fetchResultAppendStore,
   fetchResultByUuidNoStore,
   fetchFeaturesByUuid,
+  fetchDatasetMetadataByUuid,
   fetchParameterVocabsWithStore,
   fetchGeoServerMapFeature,
   fetchGeoServerMapFields,

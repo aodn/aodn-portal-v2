@@ -17,3 +17,9 @@ body {
   padding: 0 !important;
   overflow-y: scroll !important;
 }
+
+/* Pointer cursor on the map canvas that survives the deck.gl overlay
+   (HexbinLayer) resetting the canvas's inline cursor on every pointer move */
+.map-cursor-pointer {
+  cursor: pointer !important;
+}

@@ -61,7 +61,8 @@ const Header: FC = () => {
     !!(params.platform && params.platform.length > 0) ||
     !!params.updateFreq ||
     !!params.datasetStatus ||
-    !!params.hasCOData;
+    !!params.hasCOData ||
+    !!params.excludeDocument;
 
   return (
     <Box

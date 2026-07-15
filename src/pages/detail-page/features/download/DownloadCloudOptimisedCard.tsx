@@ -130,16 +130,23 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
       (condition) => condition.type === DownloadConditionType.KEY
     );
 
-    if (dataSelectOptions.length > 0 && !hasKeyCondition) {
+    if (dataSelectOptions.length > 0 && !hasKeyCondition && !selectedCoKey) {
       startTransition(() => {
         const defaultValue = dataSelectOptions[0].value;
         setSelectedDataItem(defaultValue);
         getAndSetDownloadConditions(DownloadConditionType.KEY, [
           new KeyCondition("key", defaultValue),
         ]);
+        setSelectedCoKey?.(defaultValue);
       });
     }
-  }, [dataSelectOptions, downloadConditions, getAndSetDownloadConditions]);
+  }, [
+    dataSelectOptions,
+    downloadConditions,
+    getAndSetDownloadConditions,
+    selectedCoKey,
+    setSelectedCoKey,
+  ]);
 
   const filteredDownloadFormats = useMemo(() => {
     const datasetType = collection?.getDatasetType();

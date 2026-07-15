@@ -14,6 +14,8 @@ import TopicCard, { TopicCardType } from "./TopicCard";
 import {
   clearComponentParam,
   updateDatasetGroup,
+  updateExcludeDocument,
+  updateHasData,
   updateSearchText,
 } from "../../../../components/common/store/componentParamReducer";
 import { portalTheme } from "../../../../styles";
@@ -197,7 +199,20 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       {
         title: "Gridded Datasets",
         icon: IconGriddedDatasets,
-        handler: () => handleClickTopicCard("Gridded Datasets"),
+        handler: () => {
+          // Clear the component states
+          dispatch(clearComponentParam());
+          // Then update the search text with the selected topic value
+          dispatch(updateSearchText("Gridded Datasets"));
+          dispatch(updateExcludeDocument(true));
+          dispatch(updateHasData(true));
+          // Track topics panel button click
+          trackCustomEvent(AnalyticsEvent.SEARCH_TOPIC_CLICK, {
+            search_topic: "Gridded Datasets",
+          });
+
+          redirectSearch("TopicsPanel");
+        },
       },
       {
         title: "Ocean Physics",
@@ -227,7 +242,20 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       {
         title: "Time Series Datasets",
         icon: IconTimeSeriesDatasets,
-        handler: () => handleClickTopicCard("Time Series Datasets"),
+        handler: () => {
+          // Clear the component states
+          dispatch(clearComponentParam());
+          // Then update the search text with the selected topic value
+          dispatch(updateSearchText("Time Series Datasets"));
+          dispatch(updateExcludeDocument(true));
+          dispatch(updateHasData(true));
+          // Track topics panel button click
+          trackCustomEvent(AnalyticsEvent.SEARCH_TOPIC_CLICK, {
+            search_topic: "Time Series Datasets",
+          });
+
+          redirectSearch("TopicsPanel");
+        },
       },
     ],
     [dispatch, handleClickTopicCard, redirectSearch]

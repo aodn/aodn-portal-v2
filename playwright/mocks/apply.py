@@ -4,6 +4,7 @@ from mocks.api.autocomplete import handle_search_autocomplete_api
 from mocks.api.categories import handle_categories_api
 from mocks.api.collection_detail import (
     handle_detail_api,
+    handle_detail_dataset_metadata_api,
     handle_detail_summary_api,
 )
 from mocks.api.collections import (
@@ -50,7 +51,9 @@ def apply_mock(page: Page) -> None:
         handle_collections_popup_api,
     )
     api_router.route_collection_detail(
-        handle_detail_api, handle_detail_summary_api
+        handle_detail_api,
+        handle_detail_summary_api,
+        handle_detail_dataset_metadata_api,
     )
 
     api_router.route_wms_map_tile(handle_wms_map_tile_api)

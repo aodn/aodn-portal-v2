@@ -26,6 +26,7 @@ const UPDATE_SORT_BY_VARIABLE = "UPDATE_SORT_BY_VARIABLE";
 const UPDATE_ZOOM_VARIABLE = "UPDATE_ZOOM_VARIABLE";
 // Contains cloud optimized data where download possible
 const UPDATE_HAS_DATA = "UPDATE_HAS_DATA";
+const UPDATE_EXCLUDE_DOCUMENT = "UPDATE_EXCLUDE_DOCUMENT";
 const UPDATE_SORT = "UPDATE_SORT";
 const UPDATE_LAYOUT = "UPDATE_LAYOUT";
 const UPDATE_STATIC_AREAS_FILTER_VARIABLE =
@@ -73,6 +74,7 @@ export interface ParameterState {
   // User filter using static map areas
   staticAreas?: Array<SelectedStaticArea>;
   hasCOData?: boolean;
+  excludeDocument?: boolean;
   includeNoGeometry?: boolean;
   searchText?: string;
   parameterVocabs?: Array<Vocab>;
@@ -181,6 +183,17 @@ const updateHasData = (hasCOData: boolean | undefined): ActionType => {
   };
 };
 
+const updateExcludeDocument = (
+  excludeDocument: boolean | undefined
+): ActionType => {
+  return {
+    type: UPDATE_EXCLUDE_DOCUMENT,
+    payload: {
+      excludeDocument: excludeDocument,
+    } as ParameterState,
+  };
+};
+
 const updateParameterVocabs = (input: Array<Vocab>): ActionType => {
   // We only need to store label, the other is not needed and will create a massive
   // url.
@@ -272,6 +285,7 @@ const createInitialParameterState = (
   const state: ParameterState = {
     datasetGroup: undefined,
     hasCOData: false,
+    excludeDocument: false,
     dateTimeFilterRange: {},
     searchText: "",
     zoom: MapDefaultConfig.ZOOM,
@@ -312,6 +326,11 @@ const paramReducer = (
       return {
         ...state,
         hasCOData: action.payload.hasCOData,
+      };
+    case UPDATE_EXCLUDE_DOCUMENT:
+      return {
+        ...state,
+        excludeDocument: action.payload.excludeDocument,
       };
     case UPDATE_PLATFORM_FILTER_VARIABLE:
       return {
@@ -525,6 +544,7 @@ export {
   updateStatus,
   updateZoom,
   updateHasData,
+  updateExcludeDocument,
   updateSort,
   updateLayout,
   updateFilterStaticAreas,

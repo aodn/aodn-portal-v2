@@ -8,6 +8,7 @@ const paramLookup: Map<string, string> = new Map<string, string>([
   ["bbox.type", "B4"],
   ["datasetGroup", "I1"],
   ["hasCOData", "I2"],
+  ["excludeDocument", "I3"],
   ["polygon.geometry.coordinates", "P1"],
   ["polygon.geometry.type", "P2"],
   ["polygon.type", "P3"],

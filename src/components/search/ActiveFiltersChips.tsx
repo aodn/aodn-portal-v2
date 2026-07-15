@@ -8,6 +8,7 @@ import {
   SelectedStaticArea,
   updateDatasetGroup,
   updateDateTimeFilterRange,
+  updateExcludeDocument,
   updateFilterPolygon,
   updateFilterStaticAreas,
   updateHasData,
@@ -202,6 +203,17 @@ const ActiveFiltersChips: FC = () => {
         label: `Status: ${DATA_SETTINGS.dataStatus.find((f) => f.value === params.datasetStatus)?.label || params.datasetStatus}`,
         onDelete: () => {
           dispatch(updateStatus(undefined));
+          triggerRedirectIfOnSearchPage();
+        },
+      });
+    }
+
+    // Exclude document datasets
+    if (params.excludeDocument) {
+      chips.push({
+        label: "Exclude Document",
+        onDelete: () => {
+          dispatch(updateExcludeDocument(false));
           triggerRedirectIfOnSearchPage();
         },
       });

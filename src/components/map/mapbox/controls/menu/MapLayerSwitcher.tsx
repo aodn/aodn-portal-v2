@@ -39,6 +39,7 @@ import { ComponentId, DataTestId } from "../../constants";
 export enum LayerName {
   Hexbin = "hexbin",
   GeoServer = "geoServer",
+  H3 = "h3",
   SpatialExtent = "spatialExtent",
   Heatmap = "centre points (heatmap)",
   Cluster = "centre points (clustered)",
