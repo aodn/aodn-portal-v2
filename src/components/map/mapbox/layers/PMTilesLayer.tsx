@@ -332,8 +332,17 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       removePopup();
     };
 
-    const onHexHover = (e: MapMouseEvent) => {
+    const onHexHover = (
+      layer: (typeof PMTILE_LAYERS)[number],
+      e: MapMouseEvent
+    ) => {
       if (!visibleRef.current) return;
+      // queryRenderedFeatures ignores layer minzoom/maxzoom, so retained
+      // lower-zoom tiles can still report hexbins from bands that are no
+      // longer rendered — skip those.
+      const zoom = map.getZoom();
+      if (zoom < layer.minzoom || zoom >= layer.maxzoom) return;
+
       const feature = e.features?.[0];
       if (!feature) return;
 
@@ -377,16 +386,29 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       clearHover();
     };
 
-    PMTILE_LAYERS.forEach((layer) => {
-      map.on("mousemove", layer.id, onHexHover);
-      map.on("mouseleave", layer.id, onHexLeave);
+    // Drop any open hover popup/outline when the zoom changes, so a hexbin
+    // hovered just before crossing a zoom band can't linger once hidden
+    const onZoom = () => {
+      clearHover();
+    };
+
+    const hoverHandlers = PMTILE_LAYERS.map((layer) => ({
+      layerId: layer.id,
+      onMouseMove: (e: MapMouseEvent) => onHexHover(layer, e),
+    }));
+
+    hoverHandlers.forEach(({ layerId, onMouseMove }) => {
+      map.on("mousemove", layerId, onMouseMove);
+      map.on("mouseleave", layerId, onHexLeave);
     });
+    map.on("zoom", onZoom);
 
     return () => {
-      PMTILE_LAYERS.forEach((layer) => {
-        map.off("mousemove", layer.id, onHexHover);
-        map.off("mouseleave", layer.id, onHexLeave);
+      hoverHandlers.forEach(({ layerId, onMouseMove }) => {
+        map.off("mousemove", layerId, onMouseMove);
+        map.off("mouseleave", layerId, onHexLeave);
       });
+      map.off("zoom", onZoom);
       try {
         clearHover();
       } catch (error) {
