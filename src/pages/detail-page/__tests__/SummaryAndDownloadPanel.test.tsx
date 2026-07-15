@@ -201,12 +201,19 @@ describe("buildMapLayerConfig", () => {
   };
 
   it("returns empty array when collection is null", () => {
-    const result = buildMapLayerConfig(null, false, false, false, false);
+    const result = buildMapLayerConfig(null, false, false, false, false, false);
     expect(result).toEqual([]);
   });
 
   it("returns empty array when collection is undefined", () => {
-    const result = buildMapLayerConfig(undefined, false, false, false, false);
+    const result = buildMapLayerConfig(
+      undefined,
+      false,
+      false,
+      false,
+      false,
+      false
+    );
     expect(result).toEqual([]);
   });
 
@@ -221,16 +228,22 @@ describe("buildMapLayerConfig", () => {
       true, // hasSummaryFeature
       false, // isZarrDataset
       true, // isWMSAvailable
-      true // hasSpatialExtent
+      true, // hasSpatialExtent
+      true // isSupportH3
     );
 
-    expect(result).toHaveLength(2);
+    expect(result).toHaveLength(3);
     expect(result[0]).toEqual({
-      id: LayerName.Hexbin,
-      name: "Hex Grid",
+      id: LayerName.H3,
+      name: "H3",
       selected: true,
     } as LayerSwitcherLayer<LayerName>);
     expect(result[1]).toEqual({
+      id: LayerName.Hexbin,
+      name: "Hex Grid",
+      selected: false, // H3 takes priority when both are available
+    } as LayerSwitcherLayer<LayerName>);
+    expect(result[2]).toEqual({
       id: LayerName.GeoServer,
       name: "Geoserver",
       selected: false,
@@ -249,7 +262,8 @@ describe("buildMapLayerConfig", () => {
       true, // hasSummaryFeature
       true, // isZarrDataset
       false, // isWMSAvailable
-      true // hasSpatialExtent
+      true, // hasSpatialExtent
+      false // isSupportH3
     );
 
     expect(result).toHaveLength(1);
@@ -270,7 +284,8 @@ describe("buildMapLayerConfig", () => {
       false, // hasSummaryFeature
       false, // isZarrDataset
       false, // isWMSAvailable (no WMS, no hexbin -> spatial extent should be available)
-      true // hasSpatialExtent
+      true, // hasSpatialExtent
+      false // isSupportH3
     );
 
     expect(result).toHaveLength(1);
@@ -291,19 +306,25 @@ describe("buildMapLayerConfig", () => {
       true, // hasSummaryFeature
       false, // isZarrDataset
       true, // isWMSAvailable
-      true // hasSpatialExtent
+      true, // hasSpatialExtent
+      true // isSupportH3
     );
 
-    expect(result).toHaveLength(2);
+    expect(result).toHaveLength(3);
     expect(result[0]).toEqual({
-      id: LayerName.Hexbin,
-      name: "Hex Grid",
+      id: LayerName.H3,
+      name: "H3",
       selected: true,
     } as LayerSwitcherLayer<LayerName>);
     expect(result[1]).toEqual({
+      id: LayerName.Hexbin,
+      name: "Hex Grid",
+      selected: false, // Not default because H3 takes priority
+    } as LayerSwitcherLayer<LayerName>);
+    expect(result[2]).toEqual({
       id: LayerName.GeoServer,
       name: "Geoserver",
-      selected: false, // Not default because hexbin is available
+      selected: false, // Not default because H3 is available
     } as LayerSwitcherLayer<LayerName>);
   });
 
@@ -318,7 +339,8 @@ describe("buildMapLayerConfig", () => {
       false, // hasSummaryFeature = false → no hexbin
       false, // isZarrDataset = false
       false, // isWMSAvailable = false
-      false // hasSpatialExtent = false
+      false, // hasSpatialExtent = false
+      false // isSupportH3 = false
     );
     // Should return empty array (no layers available)
     expect(result).toEqual([]);

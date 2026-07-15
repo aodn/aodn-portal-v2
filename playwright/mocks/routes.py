@@ -17,6 +17,9 @@ class Routes:
     )
     COLLECTION_DETAIL = f'{PREFIX}/collections/*'
     COLLECTION_DETAIL_SUMMARY = f'{PREFIX}/collections/*/items/summary'
+    COLLECTION_DETAIL_DATASET_METADATA = (
+        f'{PREFIX}/collections/*/items/dataset_metadata'
+    )
 
     WMS_MAP_TILE = '*/**/items/wms_map_tile?*'
     WMS_LAYERS = '*/**/items/wms_layers?*'

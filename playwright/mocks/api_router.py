@@ -93,18 +93,31 @@ class ApiRouter:
         self.route(Routes.COLLECTION_ALL, handler_function)
 
     def route_collection_detail(
-        self, detail_handler: Callable, detail_summary_handler: Callable
+        self,
+        detail_handler: Callable,
+        detail_summary_handler: Callable,
+        detail_dataset_metadata_handler: Optional[Callable] = None,
     ) -> None:
         self.route(Routes.COLLECTION_DETAIL, detail_handler)
         self.route(Routes.COLLECTION_DETAIL_SUMMARY, detail_summary_handler)
+        if detail_dataset_metadata_handler is not None:
+            self.route(
+                Routes.COLLECTION_DETAIL_DATASET_METADATA,
+                detail_dataset_metadata_handler,
+            )
 
     def unroute_collection_detail(
         self,
         detail_handler: Optional[Callable] = None,
         detail_summary_handler: Optional[Callable] = None,
+        detail_dataset_metadata_handler: Optional[Callable] = None,
     ) -> None:
         self.unroute(Routes.COLLECTION_DETAIL, detail_handler)
         self.unroute(Routes.COLLECTION_DETAIL_SUMMARY, detail_summary_handler)
+        self.unroute(
+            Routes.COLLECTION_DETAIL_DATASET_METADATA,
+            detail_dataset_metadata_handler,
+        )
 
     def route_wms_map_tile(self, handler_function: Callable) -> None:
         self.route(Routes.WMS_MAP_TILE, handler_function)

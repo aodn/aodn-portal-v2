@@ -322,6 +322,27 @@ const fetchResultByUuidNoStore = createAsyncThunk<
     .catch(errorHandling(thunkApi))
 );
 
+export interface DatasetMetadataItem {
+  uuid: string;
+  dname: string;
+  lat?: Record<string, unknown>;
+  lng?: Record<string, unknown>;
+  depth?: Record<string, unknown>;
+}
+
+export type DatasetMetadata = Record<string, DatasetMetadataItem>;
+
+const fetchDatasetMetadataByUuid = createAsyncThunk<
+  DatasetMetadata,
+  string,
+  { rejectValue: ErrorResponse }
+>("search/fetchDatasetMetadataByUuid", async (id: string, thunkApi: any) =>
+  ogcAxiosWithRetry
+    .get<DatasetMetadata>(`/ogc/collections/${id}/items/dataset_metadata`)
+    .then((response) => response.data)
+    .catch(errorHandling(thunkApi))
+);
+
 const fetchFeaturesByUuid = createAsyncThunk<
   FeatureCollection<Point, CloudOptimizedFeature>,
   string,
@@ -770,6 +791,7 @@ export {
   fetchResultAppendStore,
   fetchResultByUuidNoStore,
   fetchFeaturesByUuid,
+  fetchDatasetMetadataByUuid,
   fetchParameterVocabsWithStore,
   fetchGeoServerMapFeature,
   fetchGeoServerMapFields,
