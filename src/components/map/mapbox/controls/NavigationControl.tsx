@@ -58,6 +58,8 @@ class StyledNavigationControl extends MapboxNavigationControl {
     this.zoomReset.style.minHeight = StyledNavigationControl.ICON_PX;
     this.zoomReset.style.minWidth = StyledNavigationControl.ICON_PX;
     this.zoomReset.style.borderTop = "0px";
+    // Hide zoom reset until it is fixed, see https://github.com/aodn/backlog/issues/8743
+    this.zoomReset.style.display = "none";
 
     this.pointerOverHandler = (event: PointerEvent) => {
       if (event?.target instanceof Element) {
