@@ -80,8 +80,14 @@ const ExpandedLegendPanel: FC<
 
       {imageFailed ? (
         <Typography
-          variant="body3Small"
-          sx={{ py: "10px", px: HORIZONTAL_PADDING }}
+          variant="body1Medium"
+          color={theme.palette.text1}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            height: COLLAPSED_BAR_HEIGHT,
+            px: HORIZONTAL_PADDING,
+          }}
         >
           No legend available for this layer
         </Typography>
