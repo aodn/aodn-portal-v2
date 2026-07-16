@@ -59,8 +59,8 @@ class StyledNavigationControl extends MapboxNavigationControl {
     this.zoomReset.ariaLabel = "Zoom reset";
     this.zoomReset.ariaHidden = "false";
     this.zoomReset.appendChild(zoomResetSpan);
-    this.zoomReset.style.minHeight = StyledNavigationControl.ICON_PX;
-    this.zoomReset.style.minWidth = StyledNavigationControl.ICON_PX;
+    this.zoomReset.style.height = StyledNavigationControl.ICON_PX;
+    this.zoomReset.style.width = StyledNavigationControl.ICON_PX;
     this.zoomReset.style.borderTop = "0px";
     this.zoomReset.style.backgroundColor = "transparent";
     // Hide zoom reset until it is fixed, see https://github.com/aodn/backlog/issues/8743
@@ -117,8 +117,8 @@ class StyledNavigationControl extends MapboxNavigationControl {
         icon.style.backgroundImage = icon.dataset.normalSvg;
         icon.style.backgroundSize = "contain";
       }
-      zoomIn.style.minHeight = StyledNavigationControl.ICON_PX;
-      zoomIn.style.minWidth = StyledNavigationControl.ICON_PX;
+      zoomIn.style.height = StyledNavigationControl.ICON_PX;
+      zoomIn.style.width = StyledNavigationControl.ICON_PX;
       zoomIn.style.borderTop = "0px";
       // Inline style suppresses mapbox's grey :hover background
       zoomIn.style.backgroundColor = "transparent";
@@ -140,8 +140,8 @@ class StyledNavigationControl extends MapboxNavigationControl {
         icon.style.backgroundImage = icon.dataset.normalSvg;
         icon.style.backgroundSize = "contain";
       }
-      zoomOut.style.minHeight = StyledNavigationControl.ICON_PX;
-      zoomOut.style.minWidth = StyledNavigationControl.ICON_PX;
+      zoomOut.style.height = StyledNavigationControl.ICON_PX;
+      zoomOut.style.width = StyledNavigationControl.ICON_PX;
       zoomOut.style.borderTop = "0px";
       zoomOut.style.backgroundColor = "transparent";
     }
@@ -268,9 +268,10 @@ const NavigationControl = ({
       open={hint !== null}
       anchorEl={hint?.anchor ?? null}
       placement="right"
-      // The button box has ~6px invisible shadow padding right of the
-      // circle, 4px here visually matches the menu hints' 10px distance
-      modifiers={[{ name: "offset", options: { offset: [0, 4] } }]}
+      // The visible circle sits top-left in the button box (the rest is
+      // shadow padding): -2 recenters the tip on the circle, 4 makes the
+      // visual distance match the menu hints' 10px
+      modifiers={[{ name: "offset", options: { offset: [-2, 4] } }]}
     >
       <MenuHintBubble hint={hint?.text ?? ""} />
     </Popper>
