@@ -177,6 +177,24 @@ const getIcon = (link: ILink) => {
   }
 };
 
+// Map a summary link to its DatasetType via media type, falling back to the
+// file extension in the link title when the media type is not recognised
+const toDatasetType = (link: ILink): DatasetType | undefined => {
+  if (link.type === MediaType.PARQUET) {
+    return DatasetType.PARQUET;
+  }
+  if (link.type === MediaType.ZARR) {
+    return DatasetType.ZARR;
+  }
+  if (/\.parquet$/i.test(link.title ?? "")) {
+    return DatasetType.PARQUET;
+  }
+  if (/\.zarr$/i.test(link.title ?? "")) {
+    return DatasetType.ZARR;
+  }
+  return undefined;
+};
+
 // Please put all OGCCollection interfaces, types, or classes here.
 export class OGCCollection {
   private propValue?: SummariesProperties;
@@ -322,25 +340,51 @@ export class OGCCollection {
     );
     return result?.length ? result : undefined;
   };
-  // A feature call summary is provided if you do cloud optimized data download
+  // Check if the collection has any CO dataset type, e.g., zarr or parquet, in its summary links
   hasSummaryFeature = () => this.links?.some((link) => link.rel === "summary");
-  getDatasetType = () => {
+  // Get all CO keys (summary link titles), e.g. ["a.zarr", "b.parquet"]
+  getAllCOKeys = (): string[] =>
+    this.links
+      ?.filter((link) => link.rel === "summary")
+      .map((link) => link.title) ?? [];
+  // Get all CO keys of zarr datasets
+  getAllZarrKeys = (): string[] =>
+    this.getAllCOKeys().filter(
+      (key) => this.getDatasetTypeByKey(key) === DatasetType.ZARR
+    );
+  // Get all CO keys of parquet datasets
+  getAllParquetKeys = (): string[] =>
+    this.getAllCOKeys().filter(
+      (key) => this.getDatasetTypeByKey(key) === DatasetType.PARQUET
+    );
+  // Get the distinct COdataset types across all summary links, e.g. [zarr, parquet]
+  getDatasetType = (): DatasetType[] | undefined => {
     const summaryLinks = this.links?.filter((link) => link.rel === "summary");
     if (!summaryLinks || summaryLinks.length === 0) {
       return undefined;
     }
-
-    const type = summaryLinks[0].type;
-    if (type === MediaType.PARQUET) {
-      return DatasetType.PARQUET;
-    } else if (type === MediaType.ZARR) {
-      return DatasetType.ZARR;
-    } else {
-      console.error(
-        `Unsupported dataset type: ${type}. Only PARQUET and ZARR are supported.`
-      );
+    const datasetTypes = new Set<DatasetType>();
+    summaryLinks.forEach((link) => {
+      const datasetType = toDatasetType(link);
+      if (datasetType) {
+        datasetTypes.add(datasetType);
+      } else {
+        console.error(
+          `Unrecognized dataset type for summary link: ${link.title} (${link.href})`
+        );
+      }
+    });
+    return datasetTypes.size > 0 ? Array.from(datasetTypes) : undefined;
+  };
+  // Get the CO dataset type of a specific summary link, matched by its title (key)
+  getDatasetTypeByKey = (key: string) => {
+    const summaryLink = this.links?.find(
+      (link) => link.rel === "summary" && link.title === key
+    );
+    if (!summaryLink) {
       return undefined;
     }
+    return toDatasetType(summaryLink);
   };
 }
 

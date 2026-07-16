@@ -28,7 +28,13 @@ import {
   SubsettingType,
 } from "../context/DownloadDefinitions";
 import { dateDefault } from "../../../components/common/constants";
-import { Feature, Polygon, MultiPolygon } from "geojson";
+import {
+  Feature,
+  FeatureCollection,
+  MultiPolygon,
+  Point,
+  Polygon,
+} from "geojson";
 import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
 import HexbinLayer from "../../../components/map/mapbox/layers/HexbinLayer";
 import GeoServerLayer, {
@@ -38,7 +44,6 @@ import MapLayerSwitcher, {
   LayerName,
   LayerSwitcherLayer,
 } from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
-import { DatasetType } from "../../../components/common/store/OGCCollectionDefinitions";
 import ReferenceLayerSwitcher, {
   staticBaseLayerConfig,
 } from "../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
@@ -52,14 +57,121 @@ import { dateToValue } from "../../../utils/DateUtils";
 import { GeoserverFieldsResponse } from "../../../components/common/store/GeoserverDefinitions";
 import * as turf from "@turf/turf";
 import { createStaticLayers } from "../../../components/map/mapbox/layers/StaticLayer";
-import {
-  buildMapLayerConfig,
-  getMinMaxDateStamps,
-} from "./SummaryAndDownloadPanel";
 import PMTilesHexLayer from "../../../components/map/mapbox/layers/PMTilesLayer";
 import WmsLegend from "./WmsLegend";
+import {
+  DatasetType,
+  OGCCollection,
+} from "../../../components/common/store/OGCCollectionDefinitions";
 
 const mapContainerId = "map-detail-container-id";
+
+// Exported for unit tests
+export const getMinMaxDateStamps = (
+  featureCollection?: FeatureCollection<Point>
+): [Dayjs, Dayjs] => {
+  if (!featureCollection?.features?.length) {
+    return [dayjs(dateDefault.min), dayjs(dateDefault.max)];
+  }
+
+  let minDate: Dayjs | null = null;
+  let maxDate: Dayjs | null = null;
+
+  for (const { properties } of featureCollection.features) {
+    const dateStr = properties?.date;
+    if (typeof dateStr !== "string") continue;
+
+    const date = dayjs(dateStr);
+    if (!date.isValid()) continue;
+
+    if (!minDate || date.isBefore(minDate) || date.isSame(minDate)) {
+      minDate = date;
+    }
+    if (!maxDate || date.isAfter(maxDate) || date.isSame(maxDate)) {
+      maxDate = date;
+    }
+  }
+
+  return [
+    minDate && minDate.isValid() ? minDate : dayjs(dateDefault.min),
+    maxDate && maxDate.isValid() ? maxDate : dayjs(dateDefault.max),
+  ];
+};
+
+// Exported for unit tests
+export const buildMapLayerConfig = (
+  collection: OGCCollection | null | undefined,
+  isWMSAvailable: boolean,
+  hasSpatialExtent: boolean,
+  isSupportH3: boolean,
+  lastSelectedLayer: LayerSwitcherLayer<LayerName> | null = null
+): LayerSwitcherLayer<LayerName>[] => {
+  const layers: LayerSwitcherLayer<LayerName>[] = [];
+
+  if (collection) {
+    const datasetTypes = collection.getDatasetType() ?? [];
+    const zarrOnlyDataset =
+      datasetTypes.length === 1 && datasetTypes[0] === DatasetType.ZARR;
+    const parquetOnlyDataset =
+      datasetTypes.length === 1 && datasetTypes[0] === DatasetType.PARQUET;
+    const zarrParquetDataset =
+      datasetTypes.includes(DatasetType.ZARR) &&
+      datasetTypes.includes(DatasetType.PARQUET);
+
+    const isSupportHexbin = zarrParquetDataset || parquetOnlyDataset;
+
+    const isSupportSpatialExtent =
+      hasSpatialExtent &&
+      (zarrOnlyDataset || (!isWMSAvailable && !isSupportHexbin));
+
+    if (isSupportH3) {
+      const h3: LayerSwitcherLayer<LayerName> = {
+        id: LayerName.H3,
+        name: "H3",
+        selected: true,
+      };
+      layers.push(h3);
+    }
+
+    if (isSupportHexbin) {
+      const l: LayerSwitcherLayer<LayerName> = {
+        id: LayerName.Hexbin,
+        name: "Hex Grid",
+        // H3 takes priority when both are available
+        selected: !isSupportH3,
+      };
+      layers.push(l);
+    }
+
+    if (isWMSAvailable) {
+      const l: LayerSwitcherLayer<LayerName> = {
+        id: LayerName.GeoServer,
+        name: "Geoserver",
+        selected: !isSupportHexbin && !isSupportH3,
+      };
+      layers.push(l);
+    }
+
+    if (isSupportSpatialExtent) {
+      const l: LayerSwitcherLayer<LayerName> = {
+        id: LayerName.SpatialExtent,
+        name: "Spatial Extent",
+        selected: false,
+      };
+      layers.push(l);
+    }
+
+    if (lastSelectedLayer) {
+      layers.forEach((l) => (l.selected = l.id === lastSelectedLayer.id));
+    } else if (
+      layers.length > 0 &&
+      layers.find((l) => l.selected) === undefined
+    ) {
+      layers[0].selected = true;
+    }
+  }
+  return layers;
+};
 
 interface MapPanelProps {
   mapFocusArea?: LngLatBounds;
@@ -106,8 +218,6 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       const hasSummaryFeature = collection?.hasSummaryFeature() || false;
       const bbox = collection?.getBBox();
       const hasSpatialExtent = Array.isArray(bbox) && bbox.length > 0;
-      const isZarrDataset = collection?.getDatasetType() === DatasetType.ZARR;
-
       const scope = collection?.getScope();
       const isDocumentScope = scope?.toLowerCase() === "document";
       const noMapPreview = isDocumentScope
@@ -141,8 +251,6 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
         setMapLayerConfig(
           buildMapLayerConfig(
             collection,
-            hasSummaryFeature,
-            isZarrDataset,
             isWMSAvailable,
             hasSpatialExtent,
             isSupportH3,

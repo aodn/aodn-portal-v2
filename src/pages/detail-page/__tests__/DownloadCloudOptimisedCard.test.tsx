@@ -57,7 +57,14 @@ const createMockCollection = (datasetType: DatasetType): OGCCollection => {
         type: "application/x-parquet",
       },
     ],
-    getDatasetType: () => datasetType,
+    getDatasetType: () => [datasetType],
+    getAllCOKeys: () => ["test-zarr.zarr", "test-parquet.parquet"],
+    getDatasetTypeByKey: (key: string) =>
+      key.endsWith(".parquet")
+        ? DatasetType.PARQUET
+        : key.endsWith(".zarr")
+          ? DatasetType.ZARR
+          : undefined,
     getExtent: () => ({
       getOverallTemporal: () => ["2020-01-01", "2024-12-31"],
     }),

@@ -1,10 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import dayjs from "dayjs";
 import { FeatureCollection, Point } from "geojson";
-import {
-  buildMapLayerConfig,
-  getMinMaxDateStamps,
-} from "../features/SummaryAndDownloadPanel";
+import { buildMapLayerConfig, getMinMaxDateStamps } from "../features/MapPanel";
 import { dateDefault } from "../../../components/common/constants";
 import {
   LayerName,
@@ -185,7 +182,7 @@ describe("buildMapLayerConfig", () => {
   const createMockCollection = (
     overrides: Partial<{
       hasSummaryFeature: boolean;
-      getDatasetType: () => DatasetType | undefined;
+      getDatasetType: () => DatasetType[] | undefined;
       getBBox: () => any;
     }> = {}
   ) => {
@@ -201,32 +198,24 @@ describe("buildMapLayerConfig", () => {
   };
 
   it("returns empty array when collection is null", () => {
-    const result = buildMapLayerConfig(null, false, false, false, false, false);
+    const result = buildMapLayerConfig(null, false, false, false);
     expect(result).toEqual([]);
   });
 
   it("returns empty array when collection is undefined", () => {
-    const result = buildMapLayerConfig(
-      undefined,
-      false,
-      false,
-      false,
-      false,
-      false
-    );
+    const result = buildMapLayerConfig(undefined, false, false, false);
     expect(result).toEqual([]);
   });
 
   it("builds correct layer config with hexbin support", () => {
     const mockCollection = createMockCollection({
       hasSummaryFeature: true,
+      getDatasetType: () => [DatasetType.PARQUET], // parquet-only -> hexbin support
       getBBox: () => [0, 0, 1, 1],
     });
 
     const result = buildMapLayerConfig(
       mockCollection,
-      true, // hasSummaryFeature
-      false, // isZarrDataset
       true, // isWMSAvailable
       true, // hasSpatialExtent
       true // isSupportH3
@@ -253,14 +242,12 @@ describe("buildMapLayerConfig", () => {
   it("builds correct layer config for zarr dataset with spatial extent", () => {
     const mockCollection = createMockCollection({
       hasSummaryFeature: true,
-      getDatasetType: () => DatasetType.ZARR,
+      getDatasetType: () => [DatasetType.ZARR], // zarr-only -> spatial extent support
       getBBox: () => [0, 0, 1, 1],
     });
 
     const result = buildMapLayerConfig(
       mockCollection,
-      true, // hasSummaryFeature
-      true, // isZarrDataset
       false, // isWMSAvailable
       true, // hasSpatialExtent
       false // isSupportH3
@@ -281,8 +268,6 @@ describe("buildMapLayerConfig", () => {
 
     const result = buildMapLayerConfig(
       mockCollection,
-      false, // hasSummaryFeature
-      false, // isZarrDataset
       false, // isWMSAvailable (no WMS, no hexbin -> spatial extent should be available)
       true, // hasSpatialExtent
       false // isSupportH3
@@ -298,13 +283,12 @@ describe("buildMapLayerConfig", () => {
 
   it("builds layer config with multiple layers and correct defaults", () => {
     const mockCollection = createMockCollection({
+      getDatasetType: () => [DatasetType.PARQUET], // parquet-only -> hexbin support
       getBBox: () => [0, 0, 1, 1],
     });
 
     const result = buildMapLayerConfig(
       mockCollection,
-      true, // hasSummaryFeature
-      false, // isZarrDataset
       true, // isWMSAvailable
       true, // hasSpatialExtent
       true // isSupportH3
@@ -336,8 +320,6 @@ describe("buildMapLayerConfig", () => {
     });
     const result = buildMapLayerConfig(
       mockCollection,
-      false, // hasSummaryFeature = false → no hexbin
-      false, // isZarrDataset = false
       false, // isWMSAvailable = false
       false, // hasSpatialExtent = false
       false // isSupportH3 = false

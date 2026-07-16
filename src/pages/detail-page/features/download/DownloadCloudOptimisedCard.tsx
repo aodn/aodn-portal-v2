@@ -62,22 +62,16 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
   const [selectedDataItem, setSelectedDataItem] = useState<
     string | undefined
   >();
+  const [selectedFormat, setSelectedFormat] = useState<string | undefined>();
 
   const onDownload = useCallback(() => {
     setDownloadDialogOpen(true);
   }, []);
   const dataSelectOptions = useMemo(() => {
-    const summaryLinks = collection?.links?.filter(
-      (link) => link.rel === "summary"
-    );
-
-    if (!summaryLinks || summaryLinks.length === 0) {
-      return [];
-    }
-
-    return summaryLinks.map((link) => ({
-      value: link.title,
-      label: link.title.replace(/\.(zarr|parquet)$/i, ""),
+    const coKeys = collection?.getAllCOKeys() ?? [];
+    return coKeys.map((key) => ({
+      value: key,
+      label: key.replace(/\.(zarr|parquet)$/i, ""),
     }));
   }, [collection]);
 
@@ -139,7 +133,14 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
   ]);
 
   const filteredDownloadFormats = useMemo(() => {
-    const datasetType = collection?.getDatasetType();
+    // Before a data item is selected, only narrow the formats down when the
+    // whole collection shares a single dataset type
+    const collectionDatasetTypes = collection?.getDatasetType();
+    const datasetType = selectedDataItem
+      ? collection?.getDatasetTypeByKey(selectedDataItem)
+      : collectionDatasetTypes?.length === 1
+        ? collectionDatasetTypes[0]
+        : undefined;
     if (!datasetType) {
       return downloadFormats;
     }
@@ -152,22 +153,47 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
       );
     }
     return downloadFormats;
-  }, [collection]);
+  }, [collection, selectedDataItem]);
 
+  // Keep the selected format valid for the current data selection: fall back
+  // to the first supported format whenever the current one is not available
   useEffect(() => {
-    if (
-      downloadConditions.filter(
-        (condition) => condition.type === DownloadConditionType.FORMAT
-      ).length === 0
-    ) {
-      getAndSetDownloadConditions(DownloadConditionType.FORMAT, [
-        new FormatCondition("format", "netcdf"),
-      ]);
+    const validFormat = filteredDownloadFormats.some(
+      (format) => format.value === selectedFormat
+    )
+      ? selectedFormat
+      : filteredDownloadFormats[0]?.value;
+
+    if (!validFormat) {
+      return;
     }
-  }, [downloadConditions, getAndSetDownloadConditions]);
+
+    const hasMatchingFormatCondition = downloadConditions.some(
+      (condition) =>
+        condition.type === DownloadConditionType.FORMAT &&
+        (condition as FormatCondition).format === validFormat
+    );
+
+    if (validFormat !== selectedFormat || !hasMatchingFormatCondition) {
+      startTransition(() => {
+        setSelectedFormat(validFormat);
+        if (!hasMatchingFormatCondition) {
+          getAndSetDownloadConditions(DownloadConditionType.FORMAT, [
+            new FormatCondition("format", validFormat),
+          ]);
+        }
+      });
+    }
+  }, [
+    filteredDownloadFormats,
+    selectedFormat,
+    downloadConditions,
+    getAndSetDownloadConditions,
+  ]);
 
   const onSelectChange = useCallback(
     (value: string) => {
+      setSelectedFormat(value);
       getAndSetDownloadConditions(DownloadConditionType.FORMAT, [
         new FormatCondition("format", value),
       ]);
@@ -179,15 +205,16 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
     <Stack>
       <Stack sx={{ p: "16px" }} spacing={2}>
         <DownloadSelect
-          label="Format Selection"
-          items={filteredDownloadFormats}
-          onSelectCallback={onSelectChange}
-        />
-        <DownloadSelect
           label="Data Selection"
           items={dataSelectOptions}
           value={selectedDataItem}
           onSelectCallback={handleSelectDataItem}
+        />
+        <DownloadSelect
+          label="Format Selection"
+          items={filteredDownloadFormats}
+          value={selectedFormat}
+          onSelectCallback={onSelectChange}
         />
         <DownloadButton onDownload={onDownload} />
       </Stack>
