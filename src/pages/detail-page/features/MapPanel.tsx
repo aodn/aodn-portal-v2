@@ -510,7 +510,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
           map layer - same gate as the GeoServerLayer's own `visible` prop */}
       {mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
         LayerName.GeoServer && (
-        <Box>
+        <Box sx={{ mb: 1 }}>
           <WmsLegend uuid={collection.id} layerName={selectedWmsLayer} />
         </Box>
       )}
