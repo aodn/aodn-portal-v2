@@ -45,8 +45,6 @@ class StyledNavigationControl extends MapboxNavigationControl {
     zoomResetSpan.dataset.normalSvg = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomResetIcon />))}")`;
     zoomResetSpan.dataset.hoverSvg = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomResetIcon hover={true} />))}")`;
     zoomResetSpan.style.backgroundImage = zoomResetSpan.dataset.normalSvg;
-    // Scale the fixed 39px SVG down to the button size
-    zoomResetSpan.style.backgroundSize = "contain";
     zoomResetSpan.ariaHidden = "true";
     zoomResetSpan.title = "Zoom Reset";
     zoomResetSpan.style.display = "inline-block";
@@ -59,10 +57,9 @@ class StyledNavigationControl extends MapboxNavigationControl {
     this.zoomReset.ariaLabel = "Zoom reset";
     this.zoomReset.ariaHidden = "false";
     this.zoomReset.appendChild(zoomResetSpan);
-    this.zoomReset.style.height = StyledNavigationControl.ICON_PX;
-    this.zoomReset.style.width = StyledNavigationControl.ICON_PX;
+    this.zoomReset.style.minHeight = StyledNavigationControl.ICON_PX;
+    this.zoomReset.style.minWidth = StyledNavigationControl.ICON_PX;
     this.zoomReset.style.borderTop = "0px";
-    this.zoomReset.style.backgroundColor = "transparent";
     // Hide zoom reset until it is fixed, see https://github.com/aodn/backlog/issues/8743
     this.zoomReset.style.display = "none";
 
