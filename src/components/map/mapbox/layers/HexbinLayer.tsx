@@ -298,35 +298,30 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
         return;
       }
       setIsFetchingHexbinOptions(true);
-
-      // Extract options from sorted feature collection
-      const options = extractHexbinOptions(sortedFeatureCollection);
-
-      if (options.length > 0) {
-        setHexbinOptions(options);
-
-        // Default to first option if none selected, or the selected key
-        // (set elsewhere, e.g. from link titles) isn't a valid map layer
-        if (
-          !selectedCoKey ||
-          !options.some((option) => option.value === selectedCoKey)
-        ) {
-          handleSelectHexbin(options[0].value);
-        }
-      } else {
-        setHexbinOptions([]);
-      }
-
+      setHexbinOptions(extractHexbinOptions(sortedFeatureCollection));
       setIsFetchingHexbinOptions(false);
     });
-  }, [sortedFeatureCollection, selectedCoKey, handleSelectHexbin]);
+  }, [sortedFeatureCollection]);
+
+  // The hexbin layer can only render keys present in the feature collection
+  // (parquet datasets), so an unknown selected key (e.g. a zarr key in a mixed
+  // collection) falls back to the first option for display only
+  const displayKey = useMemo(() => {
+    if (
+      selectedCoKey &&
+      hexbinOptions.some((option) => option.value === selectedCoKey)
+    ) {
+      return selectedCoKey;
+    }
+    return hexbinOptions[0]?.value ?? "";
+  }, [hexbinOptions, selectedCoKey]);
 
   useEffect(() => {
     // Update the data on change, first filter by key, then filter by date range
     if (overlayRef.current) {
       const keyFilteredFeatures = filterFeaturesByKey(
         sortedFeatureCollection,
-        selectedCoKey
+        displayKey
       );
 
       const features = createFilteredFeatures(
@@ -348,7 +343,7 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
     filterEndDate,
     filterStartDate,
     visible,
-    selectedCoKey,
+    displayKey,
   ]);
 
   return (
@@ -356,7 +351,7 @@ const HexbinLayer: FC<HexbinLayerProps> = ({
       {visible && (
         <MapLayerSelect
           mapLayersOptions={hexbinOptions}
-          selectedItem={selectedCoKey || ""}
+          selectedItem={displayKey}
           handleSelectItem={handleSelectHexbin}
           isLoading={isFetchingHexbinOptions}
         />

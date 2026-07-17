@@ -14,6 +14,7 @@ import { SelectItem } from "../../../common/dropdown/CommonSelect";
 import { InnerHtmlBuilder } from "../../../../utils/HtmlUtils";
 import { MapDefaultConfig } from "../constants";
 import { playwrightTestIds } from "../../../common/constants";
+import { DatasetType } from "../../../common/store/OGCCollectionDefinitions";
 
 const SOURCE_ID = "pmtiles-source-id";
 const HOVER_SOURCE_ID = "pmtiles-hover-source-id";
@@ -166,19 +167,24 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     [onSelectCoKey]
   );
 
-  // Derive dataset options from the collection's summary links
+  // Derive dataset options from the collection's CO keys
   const datasetOptions = useMemo<SelectItem<string>[]>(() => {
-    const summaryLinks = collection?.links?.filter(
-      (link) => link.rel === "summary"
-    );
-    if (!summaryLinks || summaryLinks.length === 0) {
-      return [];
-    }
-    return summaryLinks.map((link) => ({
-      value: link.title,
-      label: link.title.replace(/\.(zarr|parquet)$/i, ""),
+    const coKeys = collection?.getAllCOKeys() ?? [];
+    return coKeys.map((key) => ({
+      value: key,
+      label: key.replace(/\.(zarr|parquet)$/i, ""),
     }));
   }, [collection]);
+
+  // The PMTiles visualization only exists for parquet datasets, so in a mixed
+  // zarr/parquet collection, a non-parquet key falls back to the first parquet key
+  const formSourceUrl = useCallback(() => {
+    let key = selectedCoKey;
+    if (key && collection?.getDatasetTypeByKey(key) !== DatasetType.PARQUET) {
+      key = collection?.getAllParquetKeys()[0] ?? key;
+    }
+    return `https://${bucket}.s3.${region}.amazonaws.com/portal/visualization/${collection?.id}/${key}.pmtiles`;
+  }, [collection, selectedCoKey]);
 
   useEffect(() => {
     filterStartDateRef.current = filterStartDate;
@@ -189,7 +195,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   useEffect(() => {
     if (!map) return;
 
-    const sourceUrl = `https://${bucket}.s3.${region}.amazonaws.com/portal/visualization/${collection?.id}/${selectedCoKey}.pmtiles`;
+    const sourceUrl = formSourceUrl();
 
     const addSourceAndLayers = () => {
       try {
@@ -299,7 +305,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         removePopup();
       }
     };
-  }, [map, collection?.id, selectedCoKey, removePopup]);
+  }, [map, collection?.id, selectedCoKey, formSourceUrl, removePopup]);
 
   // Show an aggregation-details popup and highlight outline while hovering
   // a hexbin
@@ -490,7 +496,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
           selectedItem={selectedCoKey || ""}
           handleSelectItem={handleSelectDataset}
           isLoading={false}
-          loadingText="Loading H3 Layers..."
+          loadingText="Loading Data Density Layers..."
         />
       )}
     </>

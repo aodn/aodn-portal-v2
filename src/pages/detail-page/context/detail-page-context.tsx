@@ -20,7 +20,7 @@ export interface DetailPageContextType {
     | FeatureCollection<Point, CloudOptimizedFeature>
     | undefined;
   datasetMetadata: DatasetMetadata | undefined;
-  isSupportH3: boolean;
+  isSupportPMTiles: boolean;
   isCollectionNotFound: boolean;
   downloadConditions: IDownloadCondition[];
   getAndSetDownloadConditions: (
@@ -47,7 +47,7 @@ const DetailPageContextDefault = {
     | FeatureCollection<Point, CloudOptimizedFeature>
     | undefined,
   datasetMetadata: undefined,
-  isSupportH3: false,
+  isSupportPMTiles: false,
   isCollectionNotFound: false,
   downloadConditions: [],
   getAndSetDownloadConditions: () => [],
