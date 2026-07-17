@@ -1,5 +1,6 @@
 import { Root } from "react-dom/client";
 import {
+  LngLat,
   LngLatBoundsLike,
   Map as MapboxMap,
   MercatorCoordinate,
@@ -75,14 +76,21 @@ const half = worldSize / 2;
 const ensureEastGreaterThanWest = (west: number, east: number): number =>
   east < west ? east + 360 : east;
 
-const AUSTRALIA_CENTER: [number, number] = [
+const AUSTRALIA_CENTER_LNG =
   (MapDefaultConfig.BBOX_ENDPOINTS.WEST_LON +
     MapDefaultConfig.BBOX_ENDPOINTS.EAST_LON) /
-    2,
-  (MapDefaultConfig.BBOX_ENDPOINTS.SOUTH_LAT +
-    MapDefaultConfig.BBOX_ENDPOINTS.NORTH_LAT) /
-    2,
-];
+  2;
+
+// Only recentre when the bbox actually reaches Australia's longitudes,
+// otherwise data such as an Atlantic-hemisphere bbox would end up off-screen
+const overlapsAustraliaLng = (west: number, east: number): boolean => {
+  const { WEST_LON, EAST_LON } = MapDefaultConfig.BBOX_ENDPOINTS;
+  return (
+    Math.max(west, WEST_LON) <= Math.min(east, EAST_LON) ||
+    // for bboxes unwrapped past 180, Australia repeats at +360
+    Math.max(west, WEST_LON + 360) <= Math.min(east, EAST_LON + 360)
+  );
+};
 
 // A bbox this wide (or tall — catches degenerate metadata like
 // [180, -71, 180, 63]) fits at world-level zoom anyway, so the view is
@@ -147,9 +155,14 @@ export const fitToBound = (
 
       // Use flyTo for more control over the viewport
       map.flyTo({
-        center: isWorldScale(west, south, east, north)
-          ? AUSTRALIA_CENTER
-          : camera.center,
+        // Swap only the lng and keep the computed lat, so high-latitude
+        // data (e.g. around Antarctica) stays in view
+        center:
+          camera.center !== undefined &&
+          isWorldScale(west, south, east, north) &&
+          overlapsAustraliaLng(west, east)
+            ? [AUSTRALIA_CENTER_LNG, LngLat.convert(camera.center).lat]
+            : camera.center,
         zoom: camera.zoom,
         animate: animate,
       });

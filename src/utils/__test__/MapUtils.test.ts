@@ -150,8 +150,9 @@ describe("MapUtils", () => {
     );
   });
 
-  // centre of BBOX_ENDPOINTS, written out by hand on purpose
-  const AUSTRALIA_CENTER = [133.5, -25.5];
+  // lng of BBOX_ENDPOINTS centre written out by hand on purpose;
+  // lat is kept from cameraForBounds, which the mock returns as 0
+  const RECENTRED = [133.5, 0];
 
   it("centred on Australia (but zoomed out to show most of world) for near-global bbox", () => {
     const map = createMockMap();
@@ -166,7 +167,7 @@ describe("MapUtils", () => {
       expect.objectContaining({ padding: 20 })
     );
     expect(map.flyTo).toHaveBeenCalledWith(
-      expect.objectContaining({ center: AUSTRALIA_CENTER, zoom: 5 })
+      expect.objectContaining({ center: RECENTRED, zoom: 5 })
     );
   });
 
@@ -183,17 +184,41 @@ describe("MapUtils", () => {
       expect.objectContaining({ padding: 20 })
     );
     expect(map.flyTo).toHaveBeenCalledWith(
-      expect.objectContaining({ center: AUSTRALIA_CENTER })
+      expect.objectContaining({ center: RECENTRED })
     );
   });
 
-  it("centred on Australia (but zoomed out to show most of world) for degenerate bbox with hemisphere lat span", () => {
+  it("keeps own centre for degenerate bbox whose lng misses Australia (already looks practically right)", () => {
     const map = createMockMap();
 
     fitToBound(map, [180, -71, 180, 63]); // ec2c0ef9-3645-4ded-b617-c8297f6eb250
 
     expect(map.flyTo).toHaveBeenCalledWith(
-      expect.objectContaining({ center: AUSTRALIA_CENTER })
+      expect.objectContaining({ center: [0, 0] })
+    );
+  });
+
+  it("keeps own centre for world-scale bbox that never reaches Australia", () => {
+    const map = createMockMap();
+
+    fitToBound(map, [-180, -60, 0, 60]); // atlantic hemisphere
+
+    expect(map.flyTo).toHaveBeenCalledWith(
+      expect.objectContaining({ center: [0, 0] })
+    );
+  });
+
+  it("keeps computed lat when recentring, so high-latitude data stays in view", () => {
+    const map = createMockMap();
+    (map.cameraForBounds as ReturnType<typeof vi.fn>).mockReturnValue({
+      center: [0, -67],
+      zoom: 1,
+    });
+
+    fitToBound(map, [-180, -80, 180, -55]); // circumpolar southern ocean
+
+    expect(map.flyTo).toHaveBeenCalledWith(
+      expect.objectContaining({ center: [133.5, -67], zoom: 1 })
     );
   });
 
