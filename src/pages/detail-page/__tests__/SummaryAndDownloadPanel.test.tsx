@@ -218,19 +218,19 @@ describe("buildMapLayerConfig", () => {
       mockCollection,
       true, // isWMSAvailable
       true, // hasSpatialExtent
-      true // isSupportH3
+      true // isSupportPMTiles
     );
 
     expect(result).toHaveLength(3);
     expect(result[0]).toEqual({
-      id: LayerName.H3,
-      name: "H3",
+      id: LayerName.PMTiles,
+      name: "Data Density",
       selected: true,
     } as LayerSwitcherLayer<LayerName>);
     expect(result[1]).toEqual({
       id: LayerName.Hexbin,
       name: "Hex Grid",
-      selected: false, // H3 takes priority when both are available
+      selected: false, // PMTiles takes priority when both are available
     } as LayerSwitcherLayer<LayerName>);
     expect(result[2]).toEqual({
       id: LayerName.GeoServer,
@@ -250,7 +250,7 @@ describe("buildMapLayerConfig", () => {
       mockCollection,
       false, // isWMSAvailable
       true, // hasSpatialExtent
-      false // isSupportH3
+      false // isSupportPMTiles
     );
 
     expect(result).toHaveLength(1);
@@ -270,7 +270,7 @@ describe("buildMapLayerConfig", () => {
       mockCollection,
       false, // isWMSAvailable (no WMS, no hexbin -> spatial extent should be available)
       true, // hasSpatialExtent
-      false // isSupportH3
+      false // isSupportPMTiles
     );
 
     expect(result).toHaveLength(1);
@@ -291,24 +291,24 @@ describe("buildMapLayerConfig", () => {
       mockCollection,
       true, // isWMSAvailable
       true, // hasSpatialExtent
-      true // isSupportH3
+      true // isSupportPMTiles
     );
 
     expect(result).toHaveLength(3);
     expect(result[0]).toEqual({
-      id: LayerName.H3,
-      name: "H3",
+      id: LayerName.PMTiles,
+      name: "Data Density",
       selected: true,
     } as LayerSwitcherLayer<LayerName>);
     expect(result[1]).toEqual({
       id: LayerName.Hexbin,
       name: "Hex Grid",
-      selected: false, // Not default because H3 takes priority
+      selected: false, // Not default because PMTiles takes priority
     } as LayerSwitcherLayer<LayerName>);
     expect(result[2]).toEqual({
       id: LayerName.GeoServer,
       name: "Geoserver",
-      selected: false, // Not default because H3 is available
+      selected: false, // Not default because PMTiles is available
     } as LayerSwitcherLayer<LayerName>);
   });
 
@@ -322,7 +322,7 @@ describe("buildMapLayerConfig", () => {
       mockCollection,
       false, // isWMSAvailable = false
       false, // hasSpatialExtent = false
-      false // isSupportH3 = false
+      false // isSupportPMTiles = false
     );
     // Should return empty array (no layers available)
     expect(result).toEqual([]);

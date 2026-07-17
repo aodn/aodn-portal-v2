@@ -103,7 +103,7 @@ export const buildMapLayerConfig = (
   collection: OGCCollection | null | undefined,
   isWMSAvailable: boolean,
   hasSpatialExtent: boolean,
-  isSupportH3: boolean,
+  isSupportPMTiles: boolean,
   lastSelectedLayer: LayerSwitcherLayer<LayerName> | null = null
 ): LayerSwitcherLayer<LayerName>[] => {
   const layers: LayerSwitcherLayer<LayerName>[] = [];
@@ -124,21 +124,21 @@ export const buildMapLayerConfig = (
       hasSpatialExtent &&
       (zarrOnlyDataset || (!isWMSAvailable && !isSupportHexbin));
 
-    if (isSupportH3) {
-      const h3: LayerSwitcherLayer<LayerName> = {
-        id: LayerName.H3,
-        name: "H3",
+    if (isSupportPMTiles) {
+      const pmtiles: LayerSwitcherLayer<LayerName> = {
+        id: LayerName.PMTiles,
+        name: "Data Density",
         selected: true,
       };
-      layers.push(h3);
+      layers.push(pmtiles);
     }
 
     if (isSupportHexbin) {
       const l: LayerSwitcherLayer<LayerName> = {
         id: LayerName.Hexbin,
         name: "Hex Grid",
-        // H3 takes priority when both are available
-        selected: !isSupportH3,
+        // PMTiles takes priority when both are available
+        selected: !isSupportPMTiles,
       };
       layers.push(l);
     }
@@ -147,7 +147,7 @@ export const buildMapLayerConfig = (
       const l: LayerSwitcherLayer<LayerName> = {
         id: LayerName.GeoServer,
         name: "Geoserver",
-        selected: !isSupportHexbin && !isSupportH3,
+        selected: !isSupportHexbin && !isSupportPMTiles,
       };
       layers.push(l);
     }
@@ -191,7 +191,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     downloadService,
     selectedCoKey,
     setSelectedCoKey,
-    isSupportH3,
+    isSupportPMTiles,
   } = useDetailPageContext();
 
   const [mapLayerConfig, setMapLayerConfig] = useState<
@@ -253,7 +253,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
             collection,
             isWMSAvailable,
             hasSpatialExtent,
-            isSupportH3,
+            isSupportPMTiles,
             lastSelectedMapLayer
           )
         );
@@ -265,7 +265,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       downloadService,
       featureCollection,
       isWMSAvailable,
-      isSupportH3,
+      isSupportPMTiles,
       lastSelectedMapLayer,
     ]);
 
@@ -566,14 +566,14 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
               bbox={mapFocusArea}
             />
             {createStaticLayers(staticLayer)}
-            {isSupportH3 && ( // Avoid fetching S3 when not support H3
+            {isSupportPMTiles && ( // Avoid fetching S3 when not support PMTiles
               <PMTilesHexLayer
                 collection={collection}
                 filterStartDate={filterStartDate}
                 filterEndDate={filterEndDate}
                 visible={
                   mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
-                  LayerName.H3
+                  LayerName.PMTiles
                 }
                 selectedCoKey={selectedCoKey}
                 onSelectCoKey={setSelectedCoKey}

@@ -496,7 +496,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
           selectedItem={selectedCoKey || ""}
           handleSelectItem={handleSelectDataset}
           isLoading={false}
-          loadingText="Loading H3 Layers..."
+          loadingText="Loading Data Density Layers..."
         />
       )}
     </>

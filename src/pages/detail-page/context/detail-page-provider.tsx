@@ -139,11 +139,11 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       });
   }, [dispatch, uuid]);
 
-  // H3 layer is supported when the dataset_metadata endpoint returns at least
+  // PMTiles layer is supported when the dataset_metadata endpoint returns at least
   // one parquet dataset
   // TODO: This is a temporary solution until the backend provides a more reliable
-  // way to determine H3 support. Before that shall we use the CO keys in Collection?
-  const isSupportH3 = useMemo<boolean>(() => {
+  // way to determine PMTiles support. Before that shall we use the CO keys in Collection?
+  const isSupportPMTiles = useMemo<boolean>(() => {
     if (!datasetMetadata) return false;
     return Object.keys(datasetMetadata).some((key) => key.endsWith(".parquet"));
   }, [datasetMetadata]);
@@ -155,7 +155,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         setCollection,
         featureCollection: features,
         datasetMetadata,
-        isSupportH3,
+        isSupportPMTiles,
         isCollectionNotFound,
         downloadConditions,
         getAndSetDownloadConditions,
