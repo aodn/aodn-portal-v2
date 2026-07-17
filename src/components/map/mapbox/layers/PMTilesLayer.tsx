@@ -102,6 +102,12 @@ export const buildSumExpression = (keys: string[]) => {
   return ["+", ...keys.map((k) => ["coalesce", ["get", k], 0])];
 };
 
+// Hexbins with no records in the filtered range must be excluded from the layer
+export const buildNonZeroCountFilter = (
+  keys: string[]
+): ExpressionSpecification =>
+  [">", buildSumExpression(keys), 0] as ExpressionSpecification;
+
 const getPaintProperties = (keys: string[]) => {
   const sumExpr = buildSumExpression(keys);
   return {
@@ -229,6 +235,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
             "source-layer": layer.sourceLayer,
             minzoom: layer.minzoom,
             maxzoom: layer.maxzoom,
+            filter: buildNonZeroCountFilter(keys),
             layout: {
               visibility: visibleRef.current ? "visible" : "none",
             },
@@ -464,6 +471,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     try {
       PMTILE_LAYERS.forEach((layer) => {
         if (map.getLayer(layer.id)) {
+          map.setFilter(layer.id, buildNonZeroCountFilter(keys));
           map.setPaintProperty(
             layer.id,
             "fill-color",
