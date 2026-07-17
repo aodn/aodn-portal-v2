@@ -111,6 +111,11 @@ const isWorldScale = (
  * based on the map container's dimensions.
  * TODO: This temporary resolve fitting map to bound cut off problem, can refactor if have better solution
  *
+ * Zoom and lat always follow the record's own bbox. The only intervention
+ * (bug 8271): when the bbox is world-scale AND reaches Australia's longitudes,
+ * the view centre's lng is swapped to Australia so the world view is centred
+ * on Australia instead of the Atlantic. Everything else fits as-is.
+ *
  * @param map - The Mapbox map instance
  * @param bbox - Array of positions representing the bounding box
  * @param options - Additional options for fitting the bbox
