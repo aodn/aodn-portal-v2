@@ -1,5 +1,6 @@
 import { Root } from "react-dom/client";
 import {
+  LngLat,
   LngLatBoundsLike,
   Map as MapboxMap,
   MercatorCoordinate,
@@ -70,10 +71,50 @@ const BBOX_COORDINATES_COUNT = 4;
 const worldSize = 40075016.68; // Full projected width/height in meters
 const half = worldSize / 2;
 
+// Keep east greater than west for bbox crossing the antimeridian,
+// otherwise cameraForBounds fits the opposite side of the globe
+const ensureEastGreaterThanWest = (west: number, east: number): number =>
+  east < west ? east + 360 : east;
+
+const AUSTRALIA_CENTER_LNG =
+  (MapDefaultConfig.BBOX_ENDPOINTS.WEST_LON +
+    MapDefaultConfig.BBOX_ENDPOINTS.EAST_LON) /
+  2;
+
+// Only recentre when the bbox actually reaches Australia's longitudes,
+// otherwise data such as an Atlantic-hemisphere bbox would end up off-screen
+const overlapsAustraliaLng = (west: number, east: number): boolean => {
+  const { WEST_LON, EAST_LON } = MapDefaultConfig.BBOX_ENDPOINTS;
+  return (
+    Math.max(west, WEST_LON) <= Math.min(east, EAST_LON) ||
+    // for bboxes unwrapped past 180, Australia repeats at +360
+    Math.max(west, WEST_LON + 360) <= Math.min(east, EAST_LON + 360)
+  );
+};
+
+// A bbox this wide (or tall — catches degenerate metadata like
+// [180, -71, 180, 63]) fits at world-level zoom anyway, so the view is
+// centred on Australia instead of the bbox's own centre
+const WORLD_SCALE_LNG_SPAN = 180;
+const WORLD_SCALE_LAT_SPAN = 90;
+
+const isWorldScale = (
+  west: number,
+  south: number,
+  east: number,
+  north: number
+): boolean =>
+  east - west >= WORLD_SCALE_LNG_SPAN || north - south >= WORLD_SCALE_LAT_SPAN;
+
 /**
  * Fits the map view to the specified bounding box with intelligent zoom calculation
  * based on the map container's dimensions.
  * TODO: This temporary resolve fitting map to bound cut off problem, can refactor if have better solution
+ *
+ * Zoom and lat always follow the record's own bbox. The only intervention
+ * (bug 8271): when the bbox is world-scale AND reaches Australia's longitudes,
+ * the view centre's lng is swapped to Australia so the world view is centred
+ * on Australia instead of the Atlantic. Everything else fits as-is.
  *
  * @param map - The Mapbox map instance
  * @param bbox - Array of positions representing the bounding box
@@ -101,23 +142,33 @@ export const fitToBound = (
 
     const boundsArray = bbox as number[];
     if (boundsArray && boundsArray.length === BBOX_COORDINATES_COUNT) {
-      const [west, south, east, north] = boundsArray;
+      const [west, south, rawEast, north] = boundsArray;
+      const east = ensureEastGreaterThanWest(west, rawEast);
       const bounds: LngLatBoundsLike = [
         [west, south],
-        // cameraForBounds do not handle cross antimeridian
-        // and takes shortest path (Atlantic-centered).
-        [east > 180 ? east - 360 : east, north],
+        [east, north],
       ];
 
-      const { center, zoom } = map.cameraForBounds(bounds, {
+      const camera = map.cameraForBounds(bounds, {
         padding: 20, // or zoomOffset equivalent
         maxZoom: baseZoom,
-      })!;
+      });
+      if (!camera) {
+        console.error("cameraForBounds returned no camera for:", bounds);
+        return;
+      }
 
       // Use flyTo for more control over the viewport
       map.flyTo({
-        center: center,
-        zoom: zoom,
+        // Swap only the lng and keep the computed lat, so high-latitude
+        // data (e.g. around Antarctica) stays in view
+        center:
+          camera.center !== undefined &&
+          isWorldScale(west, south, east, north) &&
+          overlapsAustraliaLng(west, east)
+            ? [AUSTRALIA_CENTER_LNG, LngLat.convert(camera.center).lat]
+            : camera.center,
+        zoom: camera.zoom,
         animate: animate,
       });
     } else {
