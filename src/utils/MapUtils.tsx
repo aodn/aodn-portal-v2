@@ -70,6 +70,34 @@ const BBOX_COORDINATES_COUNT = 4;
 const worldSize = 40075016.68; // Full projected width/height in meters
 const half = worldSize / 2;
 
+// Keep east greater than west for bbox crossing the antimeridian,
+// otherwise cameraForBounds fits the opposite side of the globe
+const ensureEastGreaterThanWest = (west: number, east: number): number =>
+  east < west ? east + 360 : east;
+
+const AUSTRALIA_CENTER: [number, number] = [
+  (MapDefaultConfig.BBOX_ENDPOINTS.WEST_LON +
+    MapDefaultConfig.BBOX_ENDPOINTS.EAST_LON) /
+    2,
+  (MapDefaultConfig.BBOX_ENDPOINTS.SOUTH_LAT +
+    MapDefaultConfig.BBOX_ENDPOINTS.NORTH_LAT) /
+    2,
+];
+
+// A bbox this wide (or tall — catches degenerate metadata like
+// [180, -71, 180, 63]) fits at world-level zoom anyway, so the view is
+// centred on Australia instead of the bbox's own centre
+const WORLD_SCALE_LNG_SPAN = 180;
+const WORLD_SCALE_LAT_SPAN = 90;
+
+const isWorldScale = (
+  west: number,
+  south: number,
+  east: number,
+  north: number
+): boolean =>
+  east - west >= WORLD_SCALE_LNG_SPAN || north - south >= WORLD_SCALE_LAT_SPAN;
+
 /**
  * Fits the map view to the specified bounding box with intelligent zoom calculation
  * based on the map container's dimensions.
@@ -101,23 +129,28 @@ export const fitToBound = (
 
     const boundsArray = bbox as number[];
     if (boundsArray && boundsArray.length === BBOX_COORDINATES_COUNT) {
-      const [west, south, east, north] = boundsArray;
+      const [west, south, rawEast, north] = boundsArray;
+      const east = ensureEastGreaterThanWest(west, rawEast);
       const bounds: LngLatBoundsLike = [
         [west, south],
-        // cameraForBounds do not handle cross antimeridian
-        // and takes shortest path (Atlantic-centered).
-        [east > 180 ? east - 360 : east, north],
+        [east, north],
       ];
 
-      const { center, zoom } = map.cameraForBounds(bounds, {
+      const camera = map.cameraForBounds(bounds, {
         padding: 20, // or zoomOffset equivalent
         maxZoom: baseZoom,
-      })!;
+      });
+      if (!camera) {
+        console.error("cameraForBounds returned no camera for:", bounds);
+        return;
+      }
 
       // Use flyTo for more control over the viewport
       map.flyTo({
-        center: center,
-        zoom: zoom,
+        center: isWorldScale(west, south, east, north)
+          ? AUSTRALIA_CENTER
+          : camera.center,
+        zoom: camera.zoom,
         animate: animate,
       });
     } else {
