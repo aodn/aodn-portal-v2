@@ -15,6 +15,7 @@ interface NavigationControlProps {
   showCompass?: boolean;
   showZoom?: boolean;
   visualizePitch?: boolean;
+  onReset?: (map: Mapbox) => void;
 }
 
 const MAP_LEFT_CONTROL_CONTAINER = "map-left-control-container";
@@ -28,6 +29,7 @@ class StyledNavigationControl extends MapboxNavigationControl {
   private zoomButtonEnable: () => void = () => {};
   private pointerOverHandler: (event: PointerEvent) => void;
   private pointerOutHandler: (event: PointerEvent) => void;
+  private onReset: ((map: Mapbox) => void) | undefined = undefined;
 
   private static readonly ICON_PX = "39px";
 
@@ -76,6 +78,10 @@ class StyledNavigationControl extends MapboxNavigationControl {
         if (icon) icon.style.backgroundImage = icon.dataset.normalSvg || "";
       }
     };
+  }
+
+  setOnReset(onReset: ((map: Mapbox) => void) | undefined) {
+    this.onReset = onReset;
   }
 
   onAdd(map: Mapbox): HTMLElement {
@@ -135,7 +141,8 @@ class StyledNavigationControl extends MapboxNavigationControl {
 
     // Now add our own element
     this.container.appendChild(this.zoomReset!);
-    this.zoomResetHandler = () => map.zoomTo(MapDefaultConfig.ZOOM);
+    this.zoomResetHandler = () =>
+      this.onReset ? this.onReset(map) : map.zoomTo(MapDefaultConfig.ZOOM);
     this.zoomReset?.addEventListener("click", this.zoomResetHandler);
 
     this.zoomButtonDisable = () => {
@@ -182,11 +189,16 @@ const NavigationControl = ({
   showCompass = false,
   showZoom = true,
   visualizePitch = true,
+  onReset = undefined,
 }: NavigationControlProps) => {
   const { map } = useContext(MapContext);
-  const [_, setControl] = useState<StyledNavigationControl | undefined>(
+  const [control, setControl] = useState<StyledNavigationControl | undefined>(
     undefined
   );
+
+  useEffect(() => {
+    control?.setOnReset(onReset);
+  }, [control, onReset]);
 
   useEffect(() => {
     if (map !== null) {

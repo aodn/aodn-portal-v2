@@ -7,7 +7,10 @@ import {
 } from "mapbox-gl";
 import { Position } from "geojson";
 import { OGCCollection } from "../components/common/store/OGCCollectionDefinitions";
-import { MapDefaultConfig } from "../components/map/mapbox/constants";
+import {
+  AUSTRALIA_CENTER_LNG,
+  MapDefaultConfig,
+} from "../components/map/mapbox/constants";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { DRAW_RECTANGLE_MODE } from "../components/map/mapbox/controls/menu/DrawRect";
 
@@ -75,11 +78,6 @@ const half = worldSize / 2;
 // otherwise cameraForBounds fits the opposite side of the globe
 const ensureEastGreaterThanWest = (west: number, east: number): number =>
   east < west ? east + 360 : east;
-
-const AUSTRALIA_CENTER_LNG =
-  (MapDefaultConfig.BBOX_ENDPOINTS.WEST_LON +
-    MapDefaultConfig.BBOX_ENDPOINTS.EAST_LON) /
-  2;
 
 // Only recentre when the bbox actually reaches Australia's longitudes,
 // otherwise data such as an Atlantic-hemisphere bbox would end up off-screen
@@ -177,6 +175,21 @@ export const fitToBound = (
   } catch (error) {
     console.error("Error fitting to bounds:", error);
   }
+};
+
+/**
+ * Fit the map to the collection's overall extent (or the default extent
+ * when the collection has none), animated. Used by the map reset buttons:
+ * - detail page: passes its collection, so reset refits the dataset's extent
+ * - search page: passes undefined, so reset refits the default Australia-wide extent
+ * - location filter: not this function — calls fitToBound directly with baseZoom 0
+ *   for a world view centred on Australia
+ */
+export const fitToDefaultExtent = (
+  map: MapboxMap,
+  collection: OGCCollection | undefined
+): void => {
+  fitToBound(map, overallBoundingBox(collection), { animate: true });
 };
 
 export const safeRemoveControl = (

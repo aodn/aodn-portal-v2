@@ -12,6 +12,17 @@ export enum MapEventEnum {
   RENDER = "render",
 }
 
+// Australia-wide view, used as the portal's default map extent
+export const AUSTRALIA_BBOX_ENDPOINTS = {
+  WEST_LON: 104,
+  EAST_LON: 163,
+  NORTH_LAT: -8,
+  SOUTH_LAT: -43,
+};
+
+export const AUSTRALIA_CENTER_LNG =
+  (AUSTRALIA_BBOX_ENDPOINTS.WEST_LON + AUSTRALIA_BBOX_ENDPOINTS.EAST_LON) / 2;
+
 export const MapDefaultConfig = {
   // Magic number, try and error by experience
   DEBOUNCE_BEFORE_EVENT_FIRE: 300,
@@ -22,12 +33,7 @@ export const MapDefaultConfig = {
   MAX_ZOOM: 12,
   PROJECTION: "equirectangular",
   DEFAULT_STYLE: 3,
-  BBOX_ENDPOINTS: {
-    WEST_LON: 104,
-    EAST_LON: 163,
-    NORTH_LAT: -8,
-    SOUTH_LAT: -43,
-  },
+  BBOX_ENDPOINTS: AUSTRALIA_BBOX_ENDPOINTS,
   DEFAULT_POPUP: {
     closeButton: true,
     closeOnClick: false,
