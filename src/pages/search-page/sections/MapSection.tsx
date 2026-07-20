@@ -38,9 +38,11 @@ import ReferenceLayerSwitcher, {
 } from "../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
 import { ProgressType } from "../../../components/map/mapbox/MapContext";
 import { createStaticLayers } from "../../../components/map/mapbox/layers/StaticLayer";
+import { fitToDefaultExtent } from "../../../utils/MapUtils";
 
 interface MapSectionProps
-  extends Partial<MapBasicType>,
+  extends
+    Partial<MapBasicType>,
     Partial<LayerBasicType>,
     BookmarkListMenuBasicType,
     ToggleControlProps {
@@ -143,7 +145,11 @@ const MapSection: React.FC<MapSectionProps> = memo(
               onToggleClicked={onToggleClicked}
               showFullMap={showFullMap}
             />
-            <NavigationControl visible={!isUnderLaptop} />
+            <NavigationControl
+              visible={!isUnderLaptop}
+              // Reset flies back to the default Australia-wide extent
+              onReset={(map) => fitToDefaultExtent(map, undefined)}
+            />
             <ScaleControl />
             <DisplayCoordinate />
             <MenuControlGroup>

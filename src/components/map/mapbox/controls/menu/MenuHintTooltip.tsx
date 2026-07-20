@@ -1,17 +1,41 @@
 import React, { useState } from "react";
-import { Box, Popper, Typography } from "@mui/material";
+import { Box, Popper, PopperPlacementType, Typography } from "@mui/material";
 import { portalTheme } from "../../../../../styles";
+
+// The hint bubble alone, for tooltips anchored to non-React elements
+export const MenuHintBubble: React.FC<{ hint: string }> = ({ hint }) => (
+  <Box
+    sx={{
+      backgroundColor: portalTheme.palette.primary6,
+      color: portalTheme.palette.primary2,
+      padding: "2px 10px",
+      borderRadius: "6px",
+    }}
+  >
+    <Typography
+      sx={{
+        ...portalTheme.typography.body2Regular,
+        padding: 0,
+        textWrap: "nowrap",
+      }}
+    >
+      {hint}
+    </Typography>
+  </Box>
+);
 
 interface MenuHintTooltipProps {
   hint: string;
   // If the associated menu is currently open then the hint is disabled. The tooltip will only show when the menu is closed.
   disable: boolean;
+  placement?: PopperPlacementType;
   children: React.ReactElement;
 }
 
 const MenuHintTooltip: React.FC<MenuHintTooltipProps> = ({
   hint,
   disable,
+  placement = "left",
   children,
 }) => {
   const [hovered, setHovered] = useState(false);
@@ -29,28 +53,11 @@ const MenuHintTooltip: React.FC<MenuHintTooltipProps> = ({
       <Popper
         open={hovered && !disable}
         anchorEl={anchorEl}
-        placement="left"
+        placement={placement}
         disablePortal
         modifiers={[{ name: "offset", options: { offset: [0, 10] } }]}
       >
-        <Box
-          sx={{
-            backgroundColor: portalTheme.palette.primary6,
-            color: portalTheme.palette.primary2,
-            padding: "2px 10px",
-            borderRadius: "6px",
-          }}
-        >
-          <Typography
-            sx={{
-              ...portalTheme.typography.body2Regular,
-              padding: 0,
-              textWrap: "nowrap",
-            }}
-          >
-            {hint}
-          </Typography>
-        </Box>
+        <MenuHintBubble hint={hint} />
       </Popper>
     </>
   );
