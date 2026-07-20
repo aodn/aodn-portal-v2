@@ -48,10 +48,10 @@ class StyledNavigationControl extends MapboxNavigationControl {
     zoomResetSpan.dataset.hoverSvg = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomResetIcon hover={true} />))}")`;
     zoomResetSpan.style.backgroundImage = zoomResetSpan.dataset.normalSvg;
     zoomResetSpan.ariaHidden = "true";
-    zoomResetSpan.title = "Zoom Reset";
     zoomResetSpan.style.display = "inline-block";
     zoomResetSpan.style.height = "100%";
     zoomResetSpan.style.width = "100%";
+    zoomResetSpan.style.backgroundSize = "contain";
 
     this.zoomReset = document.createElement("button");
     this.zoomReset.id = "map-zoom-reset";
@@ -59,11 +59,11 @@ class StyledNavigationControl extends MapboxNavigationControl {
     this.zoomReset.ariaLabel = "Zoom reset";
     this.zoomReset.ariaHidden = "false";
     this.zoomReset.appendChild(zoomResetSpan);
-    this.zoomReset.style.minHeight = StyledNavigationControl.ICON_PX;
-    this.zoomReset.style.minWidth = StyledNavigationControl.ICON_PX;
+    this.zoomReset.style.height = StyledNavigationControl.ICON_PX;
+    this.zoomReset.style.width = StyledNavigationControl.ICON_PX;
     this.zoomReset.style.borderTop = "0px";
-    // Hide zoom reset until it is fixed, see https://github.com/aodn/backlog/issues/8743
-    this.zoomReset.style.display = "none";
+    // Inline style suppresses mapbox's grey :hover background
+    this.zoomReset.style.backgroundColor = "transparent";
 
     this.pointerOverHandler = (event: PointerEvent) => {
       if (event?.target instanceof Element) {
@@ -246,7 +246,7 @@ const NavigationControl = ({
     }
   }, [visible]);
 
-  // Hover hints for the mapbox-created zoom buttons, shown at their right
+  // Hover hints for the zoom and reset buttons, shown at their right
   useEffect(() => {
     if (!control) return;
     const container = document.getElementById(MAP_LEFT_CONTROL_CONTAINER);
@@ -255,6 +255,7 @@ const NavigationControl = ({
     const buttons: Array<[string, HTMLButtonElement | null]> = [
       ["Zoom in", container.querySelector(".mapboxgl-ctrl-zoom-in")],
       ["Zoom out", container.querySelector(".mapboxgl-ctrl-zoom-out")],
+      ["Zoom reset", container.querySelector("#map-zoom-reset")],
     ];
     const cleanups: Array<() => void> = [];
     buttons.forEach(([text, button]) => {
