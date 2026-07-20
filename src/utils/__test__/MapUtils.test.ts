@@ -4,6 +4,7 @@ import { OGCCollection } from "../../components/common/store/OGCCollectionDefini
 import {
   cssFontFamilyToMapboxTextFont,
   fitToBound,
+  fitToDefaultExtent,
   overallBoundingBox,
 } from "../MapUtils";
 import { FONT_FAMILIES } from "../../styles/fontsRC8";
@@ -150,7 +151,7 @@ describe("MapUtils", () => {
     );
   });
 
-  // lng of BBOX_ENDPOINTS centre written out by hand on purpose;
+  // lng of AUSTRALIA_BBOX_ENDPOINTS centre written out by hand on purpose;
   // lat is kept from cameraForBounds, which the mock returns as 0
   const RECENTRED = [133.5, 0];
 
@@ -281,6 +282,59 @@ describe("MapUtils", () => {
         [30, 40],
       ],
       expect.any(Object)
+    );
+  });
+
+  it("caps zoom via baseZoom, which the location filter uses for its world view", () => {
+    const map = createMockMap();
+
+    fitToBound(map, [104, -43, 163, -8], { baseZoom: 0 });
+
+    expect(map.cameraForBounds).toHaveBeenCalledWith(
+      [
+        [104, -43],
+        [163, -8],
+      ],
+      expect.objectContaining({ maxZoom: 0 })
+    );
+  });
+
+  it("fitToDefaultExtent fits the collection's own extent, animated", () => {
+    const map = createMockMap();
+    const collection: OGCCollection = Object.assign(new OGCCollection(), {
+      // 78d588ed-79dd-47e2-b806-d39025194e7e (tasmania)
+      extent: { spatial: { bbox: [[145, -44, 147.5, -40]] } },
+    });
+
+    fitToDefaultExtent(map, collection);
+
+    expect(map.cameraForBounds).toHaveBeenCalledWith(
+      [
+        [145, -44],
+        [147.5, -40],
+      ],
+      expect.objectContaining({ padding: 20 })
+    );
+    expect(map.flyTo).toHaveBeenCalledWith(
+      expect.objectContaining({ animate: true })
+    );
+  });
+
+  it("fitToDefaultExtent falls back to the default extent when collection is undefined", () => {
+    const map = createMockMap();
+
+    fitToDefaultExtent(map, undefined);
+
+    // default extent corners written out by hand on purpose
+    expect(map.cameraForBounds).toHaveBeenCalledWith(
+      [
+        [104, -43],
+        [163, -8],
+      ],
+      expect.objectContaining({ padding: 20 })
+    );
+    expect(map.flyTo).toHaveBeenCalledWith(
+      expect.objectContaining({ animate: true })
     );
   });
 });

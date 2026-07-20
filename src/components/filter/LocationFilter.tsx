@@ -49,7 +49,11 @@ import MenuControlGroup from "../map/mapbox/controls/menu/MenuControlGroup";
 import BaseMapSwitcher from "../map/mapbox/controls/menu/BaseMapSwitcher";
 import MenuControl from "../map/mapbox/controls/menu/MenuControl";
 import DrawRect from "../map/mapbox/controls/menu/DrawRect";
-import { cssFontFamilyToMapboxTextFont } from "../../utils/MapUtils";
+import {
+  cssFontFamilyToMapboxTextFont,
+  fitToBound,
+  overallBoundingBox,
+} from "../../utils/MapUtils";
 import { portalTheme as theme } from "../../styles";
 import StyledTabs from "../common/tab/StyledTabs";
 import StyledTab from "../common/tab/StyledTab";
@@ -721,7 +725,15 @@ const LocationFilter: FC<LocationFilterProps> = () => {
             <ReactMap panelId={MAP_ID} zoom={0}>
               <Controls>
                 <SelectedAreaLayer areas={highlightCollection} />
-                <NavigationControl />
+                <NavigationControl
+                  // Reset flies back to the world view centred on Australia
+                  onReset={(map) =>
+                    fitToBound(map, overallBoundingBox(undefined), {
+                      animate: true,
+                      baseZoom: 0,
+                    })
+                  }
+                />
                 <ScaleControl />
                 <DisplayCoordinate />
                 <MenuControlGroup>

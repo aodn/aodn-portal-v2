@@ -52,6 +52,7 @@ import GeojsonLayer from "../../../components/map/mapbox/layers/GeojsonLayer";
 import useBreakpoint from "../../../hooks/useBreakpoint";
 import FitToSpatialExtentsLayer from "../../../components/map/mapbox/layers/FitToSpatialExtentsLayer";
 import { MapEventEnum } from "../../../components/map/mapbox/constants";
+import { fitToDefaultExtent } from "../../../utils/MapUtils";
 import { DateSliderPoint } from "../../../components/common/slider/DateSlider";
 import { dateToValue } from "../../../utils/DateUtils";
 import { GeoserverFieldsResponse } from "../../../components/common/store/GeoserverDefinitions";
@@ -501,7 +502,11 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
           onZoomEvent={handleMapChange}
         >
           <Controls>
-            <NavigationControl visible={!isUnderLaptop} />
+            <NavigationControl
+              visible={!isUnderLaptop}
+              // Reset flies back to this collection's spatial extent
+              onReset={(map) => fitToDefaultExtent(map, collection)}
+            />
             <ScaleControl />
             <DisplayCoordinate />
             <MenuControlGroup>
