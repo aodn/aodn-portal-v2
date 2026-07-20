@@ -4,10 +4,11 @@ import MapContext from "../MapContext";
 import React, { startTransition, useContext, useEffect, useState } from "react";
 import { IconButton } from "@mui/material";
 import { borderRadius } from "../../../../styles/constants";
-import FullscreenIcon from "@mui/icons-material/Fullscreen";
-import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
+import { FullscreenIcon } from "../../../../assets/icons/map/fullscreen";
+import { CloseFullscreenIcon } from "../../../../assets/icons/map/close_fullscreen";
 import { MapEventEnum } from "../constants";
 import { portalTheme } from "../../../../styles";
+import MenuHintTooltip from "./menu/MenuHintTooltip";
 
 export interface ToggleControlProps {
   showFullMap: boolean;
@@ -19,44 +20,35 @@ const ToggleButton: React.FC<ToggleControlProps> = ({
   onToggleClicked,
 }) => {
   return (
-    <IconButton
-      id="map-toggle-control-button"
-      title={showFullMap ? "Exit fullscreen" : "Fullscreen"}
-      sx={{
-        width: "30px",
-        height: "30px",
-        borderRadius: borderRadius.small,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "none",
-      }}
-      onClick={() => onToggleClicked?.(!showFullMap)}
+    <MenuHintTooltip
+      hint={showFullMap ? "Exit fullscreen" : "Fullscreen"}
+      disable={false}
+      placement="right"
     >
-      {showFullMap ? (
-        <CloseFullscreenIcon
-          sx={{
-            height: "100%",
-            width: "100%",
+      <IconButton
+        id="map-toggle-control-button"
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "none",
+          // Repeated class beats mapbox's default button rules
+          "&.MuiIconButton-root.MuiIconButton-root": {
+            width: "30px",
+            height: "30px",
+            borderRadius: borderRadius.small,
+            color: portalTheme.palette.grey700,
             "&:hover": {
               color: "white",
               backgroundColor: portalTheme.palette.secondary1,
             },
-          }}
-        />
-      ) : (
-        <FullscreenIcon
-          sx={{
-            height: "100%",
-            width: "100%",
-            "&:hover": {
-              color: "white",
-              backgroundColor: portalTheme.palette.secondary1,
-            },
-          }}
-        />
-      )}
-    </IconButton>
+          },
+        }}
+        onClick={() => onToggleClicked?.(!showFullMap)}
+      >
+        {showFullMap ? <CloseFullscreenIcon /> : <FullscreenIcon />}
+      </IconButton>
+    </MenuHintTooltip>
   );
 };
 
@@ -83,7 +75,12 @@ class ToggleControlClass implements IControl {
   onAdd(map: Map): HTMLElement {
     this.container = document.createElement("div");
     this.container.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
-    this.container.style.marginLeft = "13px";
+    // Align with the zoom buttons below
+    this.container.style.marginLeft = "11px";
+    this.container.style.marginBottom = "5px";
+    // Match the button's hover radius so the white group background
+    // does not peek out at the corners
+    this.container.style.borderRadius = "6px";
     this.root = createRoot(this.container!);
     this.redraw(this.props.showFullMap);
 

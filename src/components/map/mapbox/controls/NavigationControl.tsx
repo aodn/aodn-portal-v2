@@ -1,5 +1,7 @@
 import React, { useContext, useEffect, useState, startTransition } from "react";
+import { Popper } from "@mui/material";
 import MapContext from "../MapContext";
+import { MenuHintBubble } from "./menu/MenuHintTooltip";
 import {
   NavigationControl as MapboxNavigationControl,
   Map as Mapbox,
@@ -31,7 +33,7 @@ class StyledNavigationControl extends MapboxNavigationControl {
   private pointerOutHandler: (event: PointerEvent) => void;
   private onReset: ((map: Mapbox) => void) | undefined = undefined;
 
-  private static readonly ICON_PX = "39px";
+  private static readonly ICON_PX = "36px";
 
   constructor(options: {
     showCompass?: boolean;
@@ -60,6 +62,8 @@ class StyledNavigationControl extends MapboxNavigationControl {
     this.zoomReset.style.minHeight = StyledNavigationControl.ICON_PX;
     this.zoomReset.style.minWidth = StyledNavigationControl.ICON_PX;
     this.zoomReset.style.borderTop = "0px";
+    // Hide zoom reset until it is fixed, see https://github.com/aodn/backlog/issues/8743
+    this.zoomReset.style.display = "none";
 
     this.pointerOverHandler = (event: PointerEvent) => {
       if (event?.target instanceof Element) {
@@ -88,13 +92,14 @@ class StyledNavigationControl extends MapboxNavigationControl {
     this.container = super.onAdd(map) as HTMLDivElement;
     this.container.id = MAP_LEFT_CONTROL_CONTAINER;
     this.container.style.cssText = `
-      align-content: left;
+      display: flex;
+      flex-direction: column;
       border: 0 !important;
       border-radius: 0 !important;
       border-style: none !important;
       box-shadow: none !important;
       background: transparent !important;
-      gap: 20px
+      gap: 6px
     `;
     this.container?.addEventListener("pointerover", this.pointerOverHandler);
     this.container?.addEventListener("pointerout", this.pointerOutHandler);
@@ -113,10 +118,13 @@ class StyledNavigationControl extends MapboxNavigationControl {
         icon.dataset.normalSvg = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomInIcon />))}")`;
         icon.dataset.hoverSvg = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomInIcon hover={true} />))}")`;
         icon.style.backgroundImage = icon.dataset.normalSvg;
+        icon.style.backgroundSize = "contain";
       }
-      zoomIn.style.minHeight = StyledNavigationControl.ICON_PX;
-      zoomIn.style.minWidth = StyledNavigationControl.ICON_PX;
+      zoomIn.style.height = StyledNavigationControl.ICON_PX;
+      zoomIn.style.width = StyledNavigationControl.ICON_PX;
       zoomIn.style.borderTop = "0px";
+      // Inline style suppresses mapbox's grey :hover background
+      zoomIn.style.backgroundColor = "transparent";
     }
 
     const zoomOut = this.container.querySelector(
@@ -133,10 +141,12 @@ class StyledNavigationControl extends MapboxNavigationControl {
         icon.dataset.normalSvg = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomOutIcon />))}")`;
         icon.dataset.hoverSvg = `url("data:image/svg+xml;charset=utf8,${encodeURIComponent(renderToStaticMarkup(<ZoomOutIcon hover={true} />))}")`;
         icon.style.backgroundImage = icon.dataset.normalSvg;
+        icon.style.backgroundSize = "contain";
       }
-      zoomOut.style.minHeight = StyledNavigationControl.ICON_PX;
-      zoomOut.style.minWidth = StyledNavigationControl.ICON_PX;
+      zoomOut.style.height = StyledNavigationControl.ICON_PX;
+      zoomOut.style.width = StyledNavigationControl.ICON_PX;
       zoomOut.style.borderTop = "0px";
+      zoomOut.style.backgroundColor = "transparent";
     }
 
     // Now add our own element
@@ -195,6 +205,10 @@ const NavigationControl = ({
   const [control, setControl] = useState<StyledNavigationControl | undefined>(
     undefined
   );
+  const [hint, setHint] = useState<{
+    text: string;
+    anchor: HTMLElement;
+  } | null>(null);
 
   useEffect(() => {
     control?.setOnReset(onReset);
@@ -227,10 +241,50 @@ const NavigationControl = ({
     ) as HTMLButtonElement;
 
     if (container) {
-      container.style.display = visible ? "block" : "none";
+      // flex keeps the button gap working
+      container.style.display = visible ? "flex" : "none";
     }
   }, [visible]);
-  return <React.Fragment />;
+
+  // Hover hints for the mapbox-created zoom buttons, shown at their right
+  useEffect(() => {
+    if (!control) return;
+    const container = document.getElementById(MAP_LEFT_CONTROL_CONTAINER);
+    if (!container) return;
+
+    const buttons: Array<[string, HTMLButtonElement | null]> = [
+      ["Zoom in", container.querySelector(".mapboxgl-ctrl-zoom-in")],
+      ["Zoom out", container.querySelector(".mapboxgl-ctrl-zoom-out")],
+    ];
+    const cleanups: Array<() => void> = [];
+    buttons.forEach(([text, button]) => {
+      if (!button) return;
+      button.removeAttribute("title"); // the hint replaces the native tooltip
+      const enter = () => setHint({ text: text, anchor: button });
+      const leave = () => setHint(null);
+      button.addEventListener("mouseenter", enter);
+      button.addEventListener("mouseleave", leave);
+      cleanups.push(() => {
+        button.removeEventListener("mouseenter", enter);
+        button.removeEventListener("mouseleave", leave);
+      });
+    });
+    return () => cleanups.forEach((cleanup) => cleanup());
+  }, [control]);
+
+  return (
+    <Popper
+      open={hint !== null}
+      anchorEl={hint?.anchor ?? null}
+      placement="right"
+      // The visible circle sits top-left in the button box (the rest is
+      // shadow padding): -2 recenters the tip on the circle, 4 makes the
+      // visual distance match the menu hints' 10px
+      modifiers={[{ name: "offset", options: { offset: [-2, 4] } }]}
+    >
+      <MenuHintBubble hint={hint?.text ?? ""} />
+    </Popper>
+  );
 };
 
 export default NavigationControl;
