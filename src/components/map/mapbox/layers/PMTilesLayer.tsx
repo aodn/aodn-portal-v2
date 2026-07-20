@@ -26,6 +26,13 @@ const EMPTY_FEATURE_COLLECTION: FeatureCollection = {
 };
 const bucket = import.meta.env.VITE_PMTILES_BUCKET;
 const region = import.meta.env.VITE_AWS_REGION;
+// Caps keep Mapbox paint/filter expressions bounded for very wide ranges.
+// Day cap is high enough for multi-decade daily PMTiles (~55 years).
+const MONTH_KEY_LIMIT = 1200;
+const DAY_KEY_LIMIT = 20000;
+const DEFAULT_RANGE_START = "2000-01-01";
+// mYYYYMM (month bucket) or mYYYYMMDD (day bucket)
+const COUNT_PROPERTY_KEY = /^m(\d{6}|\d{8})$/;
 
 const PMTILE_LAYERS = [
   { id: "pmtiles-hex-z0", sourceLayer: "hex_z0", minzoom: 0, maxzoom: 2 },
@@ -43,16 +50,26 @@ interface PMTilesHexLayerProps extends LayerBasicType {
   onSelectCoKey?: (key: string) => void;
 }
 
+// Older PMTiles use month buckets (mYYYYMM); upgraded tiles use day buckets
+// (mYYYYMMDD). A given file uses one format. Summing both is safe because
+// missing properties coalesce to 0.
+
+const resolveRange = (start?: Dayjs, end?: Dayjs) => ({
+  start: start || dayjs(DEFAULT_RANGE_START),
+  end: end || dayjs(),
+});
+
 // Exported following functions for unit testing
 export const getMonthKeysInRange = (start?: Dayjs, end?: Dayjs): string[] => {
-  const s = start || dayjs("2000-01-01");
-  const e = end || dayjs();
+  const { start: s, end: e } = resolveRange(start, end);
   const keys: string[] = [];
   let current = s.startOf("month");
   const last = e.startOf("month");
-
   let limit = 0;
-  while ((current.isBefore(last) || current.isSame(last)) && limit < 1200) {
+  while (
+    (current.isBefore(last) || current.isSame(last)) &&
+    limit < MONTH_KEY_LIMIT
+  ) {
     keys.push(`m${current.format("YYYYMM")}`);
     current = current.add(1, "month");
     limit++;
@@ -60,38 +77,104 @@ export const getMonthKeysInRange = (start?: Dayjs, end?: Dayjs): string[] => {
   return keys;
 };
 
-// Format a month key like "m202401" for display as "2024-01"
-export const formatMonthKey = (key: string): string =>
-  `${key.slice(1, 5)}-${key.slice(5, 7)}`;
+export const getDayKeysInRange = (start?: Dayjs, end?: Dayjs): string[] => {
+  const { start: s, end: e } = resolveRange(start, end);
+  const keys: string[] = [];
+  let current = s.startOf("day");
+  const last = e.startOf("day");
+  let limit = 0;
+  while (
+    (current.isBefore(last) || current.isSame(last)) &&
+    limit < DAY_KEY_LIMIT
+  ) {
+    keys.push(`m${current.format("YYYYMMDD")}`);
+    current = current.add(1, "day");
+    limit++;
+  }
+  return keys;
+};
 
-// Build the hover popup content from a hexbin feature's monthly count
-// properties, matching the old HexbinLayer popup layout
+/** Month + day keys for a range — supports both PMTiles property formats. */
+export const getDateKeysInRange = (start?: Dayjs, end?: Dayjs): string[] => [
+  ...getMonthKeysInRange(start, end),
+  ...getDayKeysInRange(start, end),
+];
+
+/** Format mYYYYMM → YYYY-MM or mYYYYMMDD → YYYY-MM-DD. */
+export const formatDateKey = (key: string): string => {
+  const digits = key.startsWith("m") ? key.slice(1) : key;
+  if (digits.length >= 8) {
+    return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`;
+  }
+  return `${digits.slice(0, 4)}-${digits.slice(4, 6)}`;
+};
+
+/**
+ * Whether a count property key falls in the filter range.
+ * - Day keys (mYYYYMMDD): the day must lie inside the filter.
+ * - Month keys (mYYYYMM): the month overlaps the filter (whole-month bucket).
+ */
+export const isCountPropertyInRange = (
+  key: string,
+  filterStart?: Dayjs,
+  filterEnd?: Dayjs
+): boolean => {
+  if (!COUNT_PROPERTY_KEY.test(key)) return false;
+  const { start, end } = resolveRange(filterStart, filterEnd);
+  const rangeStart = start.startOf("day");
+  const rangeEnd = end.startOf("day");
+  if (rangeStart.isAfter(rangeEnd)) return false;
+
+  const digits = key.slice(1);
+  if (digits.length === 8) {
+    const day = dayjs(
+      `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`
+    );
+    if (!day.isValid()) return false;
+    return (
+      (day.isAfter(rangeStart) || day.isSame(rangeStart, "day")) &&
+      (day.isBefore(rangeEnd) || day.isSame(rangeEnd, "day"))
+    );
+  }
+
+  // Month bucket: include when the month overlaps the filter window
+  const monthStart = dayjs(`${digits.slice(0, 4)}-${digits.slice(4, 6)}-01`);
+  if (!monthStart.isValid()) return false;
+  const monthEnd = monthStart.endOf("month").startOf("day");
+  return (
+    !monthStart.isAfter(rangeEnd, "day") &&
+    !monthEnd.isBefore(rangeStart, "day")
+  );
+};
+
+/**
+ * Popup totals come from properties present on the feature (not a pre-built
+ * key list), so long day-bucket series are not truncated by DAY_KEY_LIMIT.
+ */
 export const buildPopupHtml = (
   properties: Record<string, unknown>,
   filterStartDate?: Dayjs,
   filterEndDate?: Dayjs
 ): string => {
-  const keys = getMonthKeysInRange(filterStartDate, filterEndDate);
-
   let total = 0;
-  let firstKey: string | undefined;
-  let lastKey: string | undefined;
-  keys.forEach((key) => {
-    const value = properties[key];
-    if (typeof value === "number" && value > 0) {
-      total += value;
-      if (!firstKey) firstKey = key;
-      lastKey = key;
-    }
-  });
-
+  const matchedKeys: string[] = [];
+  for (const [key, value] of Object.entries(properties)) {
+    if (typeof value !== "number" || value <= 0) continue;
+    if (!isCountPropertyInRange(key, filterStartDate, filterEndDate)) continue;
+    total += value;
+    matchedKeys.push(key);
+  }
+  // Lexicographic order matches chronological order for mYYYYMM / mYYYYMMDD
+  matchedKeys.sort();
+  const firstKey = matchedKeys[0];
+  const lastKey = matchedKeys[matchedKeys.length - 1];
   return new InnerHtmlBuilder()
     .addTitle("Data Records In This Area:")
     .addText("Data Record Count: " + total)
     .addRange(
       "Time Range",
-      firstKey ? formatMonthKey(firstKey) : "N/A",
-      lastKey ? formatMonthKey(lastKey) : "N/A"
+      firstKey ? formatDateKey(firstKey) : "N/A",
+      lastKey ? formatDateKey(lastKey) : "N/A"
     )
     .getHtml();
 };
@@ -219,7 +302,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         });
       }
 
-      const keys = getMonthKeysInRange(
+      const keys = getDateKeysInRange(
         filterStartDateRef.current,
         filterEndDateRef.current
       );
@@ -465,7 +548,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   // Update paint properties on date filter changes
   useEffect(() => {
     if (!map) return;
-    const keys = getMonthKeysInRange(filterStartDate, filterEndDate);
+    const keys = getDateKeysInRange(filterStartDate, filterEndDate);
     const paintProps = getPaintProperties(keys);
 
     try {
