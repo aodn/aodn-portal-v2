@@ -1,3 +1,6 @@
 # https://www.robotstxt.org/robotstxt.html
+# Allow crawling so Googlebot can read the <meta name="robots" content="noindex">
+# tag and drop non-prod pages from its index. Do NOT use "Disallow: /" here — a
+# blocked page can never be de-indexed because Google can't fetch the noindex tag.
 User-agent: *
-Disallow: /
+Allow: /
