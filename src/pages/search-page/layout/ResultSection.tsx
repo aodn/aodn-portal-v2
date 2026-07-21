@@ -23,7 +23,8 @@ import {
 } from "../constants";
 
 interface ResultSectionProps
-  extends Partial<ResultPanelSimpleFilterType>,
+  extends
+    Partial<ResultPanelSimpleFilterType>,
     Partial<ResultCardsType>,
     BookmarkListButtonBasicType {
   showFullMap: boolean;
