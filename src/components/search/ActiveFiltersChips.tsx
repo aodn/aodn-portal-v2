@@ -211,7 +211,7 @@ const ActiveFiltersChips: FC = () => {
     // Exclude document datasets
     if (params.excludeDocument) {
       chips.push({
-        label: "Exclude Document",
+        label: "Exclude Documents",
         onDelete: () => {
           dispatch(updateExcludeDocument(false));
           triggerRedirectIfOnSearchPage();
