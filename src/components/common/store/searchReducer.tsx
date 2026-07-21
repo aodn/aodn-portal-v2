@@ -25,12 +25,14 @@ import {
 import { FeatureCollection, Point } from "geojson";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 import {
+  CoEstimateRequest,
   DatasetDownloadRequest,
   WFSDownloadRequest,
 } from "../../../pages/detail-page/context/DownloadDefinitions";
 import {
   getDateConditionFrom,
   getFormatFrom,
+  getKeyFrom,
   getMultiPolygonFrom,
 } from "../../../utils/DownloadConditionUtils";
 import { trackSearchResultParameters } from "../../../analytics/searchParamsEvent";
@@ -100,7 +102,7 @@ const DEFAULT_SEARCH_SCORE = import.meta.env.VITE_ELASTIC_RELEVANCE_SCORE;
 const TIMEOUT = 60000;
 const WFS_DOWNLOAD_TIMEOUT =
   Number(import.meta.env.VITE_WFS_DOWNLOADING_TIMEOUT) || 1200000; // Default 20 minutes timeout for WFS downloads
-const WFS_ESTIMATE_TIMEOUT =
+const SIZE_ESTIMATE_TIMEOUT =
   Number(import.meta.env.VITE_WFS_ESTIMATE_TIMEOUT) || 300000; // Default 5 minutes timeout for WFS size estimation
 
 const jsonToOGCCollections = (json: any): OGCCollections => {
@@ -471,7 +473,55 @@ const processWFSEstimateSize = createAsyncThunk<
             Accept: "text/event-stream",
             "Cache-Control": "no-cache",
           },
-          timeout: WFS_ESTIMATE_TIMEOUT,
+          timeout: SIZE_ESTIMATE_TIMEOUT,
+          signal: thunkAPI.signal,
+        }
+      );
+    } catch (error) {
+      errorHandling(thunkAPI);
+    }
+  }
+);
+
+// Estimate the size of a Cloud Optimised (zarr/parquet) download.
+// Mirrors the WFS estimate SSE flow, but hits the CO estimate endpoint and
+// identifies the dataset by `key` (from the KEY condition) instead of a layer.
+const processCoEstimateSize = createAsyncThunk<
+  any,
+  CoEstimateRequest,
+  { rejectValue: ErrorResponse }
+>(
+  "download/estimateCoSize",
+  async (request: CoEstimateRequest, thunkAPI: any) => {
+    try {
+      const dateRange = getDateConditionFrom(request.downloadConditions);
+      const multiPolygon = getMultiPolygonFrom(request.downloadConditions);
+      const format = getFormatFrom(request.downloadConditions);
+      const key = getKeyFrom(request.downloadConditions);
+
+      const requestBody = {
+        inputs: {
+          uuid: request.uuid,
+          key,
+          start_date: dateRange.start,
+          end_date: dateRange.end,
+          output_format: format,
+          multi_polygon: multiPolygon,
+        },
+      };
+
+      return ogcAxiosWithRetry.post(
+        "/ogc/processes/estimateCOdownload/execution",
+        requestBody,
+        {
+          adapter: "fetch",
+          responseType: "stream",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "text/event-stream",
+            "Cache-Control": "no-cache",
+          },
+          timeout: SIZE_ESTIMATE_TIMEOUT,
           signal: thunkAPI.signal,
         }
       );
@@ -802,6 +852,7 @@ export {
   processDatasetDownload,
   processWFSDownload,
   processWFSEstimateSize,
+  processCoEstimateSize,
   jsonToOGCCollections,
   ogcAxiosWithRetry,
 };
