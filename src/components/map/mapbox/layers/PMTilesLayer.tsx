@@ -13,7 +13,9 @@ import dayjs, { Dayjs } from "dayjs";
 import {
   ExpressionSpecification,
   GeoJSONSource,
+  Map,
   MapMouseEvent,
+  MapSourceDataEvent,
   Popup,
 } from "mapbox-gl";
 import { FeatureCollection, Geometry } from "geojson";
@@ -29,13 +31,17 @@ const SOURCE_ID = "pmtiles-source-id";
 const HOVER_SOURCE_ID = "pmtiles-hover-source-id";
 const HOVER_OUTLINE_LAYER_ID = "pmtiles-hex-hover-outline";
 const CURSOR_POINTER_CLASS = "map-cursor-pointer";
+/** Feature-state key written by sparse JS sums for density paint/filter. */
+export const FEATURE_STATE_TOTAL = "total";
+/** H3 cell id property; promoted to feature id so feature-state can target hexes. */
+const PROMOTE_ID_PROPERTY = "h";
 const EMPTY_FEATURE_COLLECTION: FeatureCollection = {
   type: "FeatureCollection",
   features: [],
 };
 const bucket = import.meta.env.VITE_PMTILES_BUCKET;
 const region = import.meta.env.VITE_AWS_REGION;
-// Caps keep Mapbox paint/filter expressions bounded for very wide ranges.
+// Caps keep legacy key-list helpers bounded (tests / optional tooling).
 // Day cap is high enough for multi-decade daily PMTiles (~55 years).
 const MONTH_KEY_LIMIT = 1200;
 const DAY_KEY_LIMIT = 20000;
@@ -244,6 +250,49 @@ export const isCountPropertyInRange = (
 };
 
 /**
+ * Coerce MVT property values to a finite number. Vector tiles often deliver
+ * counts as strings; treating only typeof === "number" would zero every total.
+ */
+export const coerceCountValue = (value: unknown): number => {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string" && value.trim() !== "") {
+    const n = Number(value);
+    if (Number.isFinite(n)) return n;
+  }
+  return NaN;
+};
+
+/**
+ * Sparse sum of pre-baked m* counts on a feature for the filter window.
+ * Only walks properties that exist (not a dense calendar of day keys).
+ */
+export const sumSparseCountFromProperties = (
+  properties: Record<string, unknown> | null | undefined,
+  filterStartDate?: Dayjs,
+  filterEndDate?: Dayjs,
+  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY
+): { total: number; matchedKeys: string[] } => {
+  let total = 0;
+  const matchedKeys: string[] = [];
+  if (!properties) return { total, matchedKeys };
+
+  for (const [key, value] of Object.entries(properties)) {
+    const count = coerceCountValue(value);
+    if (!Number.isFinite(count) || count <= 0) continue;
+    if (
+      !isCountPropertyInRange(key, filterStartDate, filterEndDate, timeGroupBy)
+    ) {
+      continue;
+    }
+    total += count;
+    matchedKeys.push(key);
+  }
+  // Lexicographic order matches chronological order for mYYYYMM / mYYYYMMDD
+  matchedKeys.sort();
+  return { total, matchedKeys };
+};
+
+/**
  * Popup totals come from properties present on the feature (not a pre-built
  * key list), so long day-bucket series are not truncated by DAY_KEY_LIMIT.
  * Only properties matching `time_group_by` are summed.
@@ -254,20 +303,12 @@ export const buildPopupHtml = (
   filterEndDate?: Dayjs,
   timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY
 ): string => {
-  let total = 0;
-  const matchedKeys: string[] = [];
-  for (const [key, value] of Object.entries(properties)) {
-    if (typeof value !== "number" || value <= 0) continue;
-    if (
-      !isCountPropertyInRange(key, filterStartDate, filterEndDate, timeGroupBy)
-    ) {
-      continue;
-    }
-    total += value;
-    matchedKeys.push(key);
-  }
-  // Lexicographic order matches chronological order for mYYYYMM / mYYYYMMDD
-  matchedKeys.sort();
+  const { total, matchedKeys } = sumSparseCountFromProperties(
+    properties,
+    filterStartDate,
+    filterEndDate,
+    timeGroupBy
+  );
   const firstKey = matchedKeys[0];
   const lastKey = matchedKeys[matchedKeys.length - 1];
   return new InnerHtmlBuilder()
@@ -281,20 +322,61 @@ export const buildPopupHtml = (
     .getHtml();
 };
 
+/** @deprecated Prefer feature-state totals; kept for unit tests / tooling. */
 export const buildSumExpression = (keys: string[]) => {
   if (keys.length === 0) return 0;
   if (keys.length === 1) return ["coalesce", ["get", keys[0]], 0];
   return ["+", ...keys.map((k) => ["coalesce", ["get", k], 0])];
 };
 
-// Hexbins with no records in the filtered range must be excluded from the layer
+/** @deprecated Prefer buildFeatureStateNonZeroFilter. */
 export const buildNonZeroCountFilter = (
   keys: string[]
 ): ExpressionSpecification =>
   [">", buildSumExpression(keys), 0] as ExpressionSpecification;
 
-const getPaintProperties = (keys: string[]) => {
-  const sumExpr = buildSumExpression(keys);
+/** Density input: sparse total written via setFeatureState. */
+export const buildFeatureStateTotalExpression = (): ExpressionSpecification =>
+  [
+    "coalesce",
+    ["feature-state", FEATURE_STATE_TOTAL],
+    0,
+  ] as ExpressionSpecification;
+
+/**
+ * Layer filter for density mode.
+ *
+ * IMPORTANT: Mapbox/MapLibre do **not** allow `feature-state` in filters — only
+ * in paint/layout. Zero-count hexes are hidden via transparent paint instead.
+ * Presence filter keeps only real hex features.
+ */
+export const buildDensityLayerFilter = (): ExpressionSpecification =>
+  ["has", PROMOTE_ID_PROPERTY] as ExpressionSpecification;
+
+/** @deprecated Use buildDensityLayerFilter — feature-state cannot be used in filters. */
+export const buildFeatureStateNonZeroFilter = (): ExpressionSpecification =>
+  buildDensityLayerFilter();
+
+/** Phase A: any hex feature is present (tiles only contain cells with data). */
+export const buildPresenceFilter = (): ExpressionSpecification =>
+  ["has", PROMOTE_ID_PROPERTY] as ExpressionSpecification;
+
+export type HexFillPaint = {
+  "fill-color": ExpressionSpecification | string;
+  "fill-opacity": ExpressionSpecification | number;
+  "fill-outline-color": string;
+};
+
+/** Neutral style while feature-state totals are computed in the background. */
+export const getPlaceholderPaintProperties = (): HexFillPaint => ({
+  "fill-color": "#475569",
+  "fill-opacity": 0.4,
+  "fill-outline-color": "rgba(255, 255, 255, 0.4)",
+});
+
+/** Density paint driven by feature-state totals (no dense day-key sum). */
+export const getFeatureStatePaintProperties = (): HexFillPaint => {
+  const sumExpr = buildFeatureStateTotalExpression();
   return {
     "fill-color": [
       "interpolate",
@@ -332,6 +414,123 @@ const getPaintProperties = (keys: string[]) => {
   };
 };
 
+/** Apply fill filter + paint to every PMTiles hex zoom band that exists. */
+export const applyHexLayerStyle = (
+  map: Map,
+  filter: ExpressionSpecification | null,
+  paint: HexFillPaint
+): void => {
+  PMTILE_LAYERS.forEach((layer) => {
+    if (!map.getLayer(layer.id)) return;
+    // Paint first so a filter failure cannot leave density colors unapplied
+    map.setPaintProperty(layer.id, "fill-color", paint["fill-color"]);
+    map.setPaintProperty(layer.id, "fill-opacity", paint["fill-opacity"]);
+    map.setPaintProperty(
+      layer.id,
+      "fill-outline-color",
+      paint["fill-outline-color"]
+    );
+    if (filter) {
+      map.setFilter(layer.id, filter);
+    }
+  });
+};
+
+/**
+ * For each loaded vector feature, sum sparse m* properties in the filter
+ * range and write the total to feature-state for paint/filter.
+ */
+export const updateFeatureStateTotals = (
+  map: Map,
+  filterStartDate?: Dayjs,
+  filterEndDate?: Dayjs,
+  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY
+): number => {
+  if (!map.getSource(SOURCE_ID)) return 0;
+
+  let updated = 0;
+  for (const layer of PMTILE_LAYERS) {
+    let features;
+    try {
+      features = map.querySourceFeatures(SOURCE_ID, {
+        sourceLayer: layer.sourceLayer,
+      });
+    } catch {
+      continue;
+    }
+
+    for (const feature of features) {
+      // promoteId: "h" should populate feature.id; fall back to property
+      const rawId = feature.id ?? feature.properties?.[PROMOTE_ID_PROPERTY];
+      if (rawId === undefined || rawId === null || rawId === "") continue;
+      // Mapbox feature ids are string | number; keep type from promoteId
+      const id = rawId as string | number;
+
+      const { total } = sumSparseCountFromProperties(
+        feature.properties as Record<string, unknown> | null,
+        filterStartDate,
+        filterEndDate,
+        timeGroupBy
+      );
+
+      try {
+        map.setFeatureState(
+          {
+            source: SOURCE_ID,
+            sourceLayer: layer.sourceLayer,
+            id,
+          },
+          { [FEATURE_STATE_TOTAL]: total }
+        );
+        updated++;
+      } catch {
+        // Feature may have left the tile cache
+      }
+    }
+  }
+  return updated;
+};
+
+/**
+ * Schedule work after the browser is idle (or on the next macrotask).
+ * Returns a cancel function so stale density updates can be dropped.
+ */
+export const scheduleDeferredWork = (work: () => void): (() => void) => {
+  let cancelled = false;
+  const run = () => {
+    if (!cancelled) work();
+  };
+
+  const ric = (
+    globalThis as typeof globalThis & {
+      requestIdleCallback?: (
+        cb: () => void,
+        opts?: { timeout: number }
+      ) => number;
+      cancelIdleCallback?: (id: number) => void;
+    }
+  ).requestIdleCallback;
+
+  if (typeof ric === "function") {
+    const id = ric(run, { timeout: 250 });
+    const cancelRic = (
+      globalThis as typeof globalThis & {
+        cancelIdleCallback?: (id: number) => void;
+      }
+    ).cancelIdleCallback;
+    return () => {
+      cancelled = true;
+      cancelRic?.(id);
+    };
+  }
+
+  const timeoutId = setTimeout(run, 0);
+  return () => {
+    cancelled = true;
+    clearTimeout(timeoutId);
+  };
+};
+
 const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   collection,
   selectedCoKey,
@@ -346,8 +545,10 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   const visibleRef = useRef(visible);
   const timeGroupByRef = useRef<TimeGroupBy>(DEFAULT_TIME_GROUP_BY);
   const periodBoundsRef = useRef<MetadataPeriodBounds>({});
+  // Bumps when a newer feature-state pass is scheduled so stale idle work is dropped
+  const featureStateGenRef = useRef(0);
   const popupRef = useRef<Popup | null>(null);
-  // Drives paint/filter updates once `.metadata` is known
+  // Drives feature-state refresh once `.metadata` is known
   const [timeGroupBy, setTimeGroupBy] = useState<TimeGroupBy>(
     DEFAULT_TIME_GROUP_BY
   );
@@ -357,6 +558,60 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     popupRef.current?.remove();
     popupRef.current = null;
   }, []);
+
+  /**
+   * Sparse-sum loaded features into feature-state, then paint/filter from
+   * those totals (no dense day-key Mapbox expression).
+   *
+   * @param showPlaceholder When true (date/metadata change), flash a cheap
+   *   presence style first so hexes stay visible while totals recompute.
+   *   When false (new tiles loaded), only refresh feature-state — avoids
+   *   flicker while panning.
+   */
+  const scheduleFeatureStateDensity = useCallback(
+    (options?: { showPlaceholder?: boolean }) => {
+      if (!map) return () => undefined;
+
+      const generation = ++featureStateGenRef.current;
+      const showPlaceholder = options?.showPlaceholder ?? false;
+
+      if (showPlaceholder) {
+        try {
+          applyHexLayerStyle(
+            map,
+            buildPresenceFilter(),
+            getPlaceholderPaintProperties()
+          );
+        } catch {
+          // Map may already be torn down
+        }
+      }
+
+      return scheduleDeferredWork(() => {
+        if (generation !== featureStateGenRef.current) return;
+        try {
+          updateFeatureStateTotals(
+            map,
+            filterStartDateRef.current,
+            filterEndDateRef.current,
+            timeGroupByRef.current
+          );
+          // Density colors from feature-state; filter must NOT use feature-state
+          // (unsupported). Zero totals paint as transparent via interpolate.
+          applyHexLayerStyle(
+            map,
+            buildDensityLayerFilter(),
+            getFeatureStatePaintProperties()
+          );
+          // Ensure the map redraws after bulk setFeatureState
+          map.triggerRepaint?.();
+        } catch {
+          // Map may already be torn down
+        }
+      });
+    },
+    [map]
+  );
 
   const handleSelectDataset = useCallback(
     (key: string) => {
@@ -453,6 +708,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     if (!map) return;
 
     const sourceUrl = formSourceUrl();
+    let cancelDensity: (() => void) | undefined;
 
     const addSourceAndLayers = () => {
       try {
@@ -467,20 +723,18 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         map.addSource(SOURCE_ID, {
           type: "vector",
           url: sourceUrl,
+          // Promote H3 cell id so setFeatureState can address each hex
+          promoteId: PROMOTE_ID_PROPERTY,
         });
       }
 
-      const keys = getDateKeysInRange(
-        filterStartDateRef.current,
-        filterEndDateRef.current,
-        timeGroupByRef.current,
-        periodBoundsRef.current
-      );
-      const paintProps = getPaintProperties(keys);
+      const placeholderPaint = getPlaceholderPaintProperties();
+      let addedFillLayer = false;
 
       PMTILE_LAYERS.forEach((layer) => {
         if (!map.getLayer(layer.id)) {
           console.log(`Adding layer ${layer.id}`);
+          addedFillLayer = true;
           map.addLayer({
             id: layer.id,
             type: "fill",
@@ -488,14 +742,15 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
             "source-layer": layer.sourceLayer,
             minzoom: layer.minzoom,
             maxzoom: layer.maxzoom,
-            filter: buildNonZeroCountFilter(keys),
+            // Phase A until feature-state totals are written
+            filter: buildPresenceFilter(),
             layout: {
               visibility: visibleRef.current ? "visible" : "none",
             },
             paint: {
-              "fill-color": paintProps["fill-color"],
-              "fill-opacity": paintProps["fill-opacity"],
-              "fill-outline-color": paintProps["fill-outline-color"],
+              "fill-color": placeholderPaint["fill-color"],
+              "fill-opacity": placeholderPaint["fill-opacity"],
+              "fill-outline-color": placeholderPaint["fill-outline-color"],
             },
           });
         }
@@ -526,6 +781,11 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
           },
         });
       }
+
+      if (addedFillLayer) {
+        cancelDensity?.();
+        cancelDensity = scheduleFeatureStateDensity({ showPlaceholder: true });
+      }
     };
 
     if (map.isStyleLoaded()) {
@@ -539,8 +799,19 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     };
     map.on("styledata", onStyleData);
 
+    // Newly loaded tiles need feature-state totals for the current filter
+    const onSourceData = (e: MapSourceDataEvent) => {
+      if (e.sourceId !== SOURCE_ID || !e.isSourceLoaded) return;
+      cancelDensity?.();
+      cancelDensity = scheduleFeatureStateDensity({ showPlaceholder: false });
+    };
+    map.on("sourcedata", onSourceData);
+
     return () => {
       if (!map) return;
+
+      cancelDensity?.();
+      featureStateGenRef.current += 1;
 
       try {
         PMTILE_LAYERS.forEach((layer) => {
@@ -561,11 +832,19 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         // OK to ignore error here
       } finally {
         map.off("styledata", onStyleData);
+        map.off("sourcedata", onSourceData);
         map.off("load", addSourceAndLayers);
         removePopup();
       }
     };
-  }, [map, collection?.id, selectedCoKey, formSourceUrl, removePopup]);
+  }, [
+    map,
+    collection?.id,
+    selectedCoKey,
+    formSourceUrl,
+    removePopup,
+    scheduleFeatureStateDensity,
+  ]);
 
   // Show an aggregation-details popup and highlight outline while hovering
   // a hexbin
@@ -716,44 +995,12 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     }
   }, [map, visible, removePopup]);
 
-  // Update paint/filter when the date range or metadata coverage changes.
-  // Keys are clamped to min_date/max_date so we only sum pre-baked m* counts.
+  // Recompute sparse feature-state totals when the date range or metadata changes.
   useEffect(() => {
     if (!map) return;
-    const keys = getDateKeysInRange(
-      filterStartDate,
-      filterEndDate,
-      timeGroupBy,
-      periodBounds
-    );
-    const paintProps = getPaintProperties(keys);
-
-    try {
-      PMTILE_LAYERS.forEach((layer) => {
-        if (map.getLayer(layer.id)) {
-          map.setFilter(layer.id, buildNonZeroCountFilter(keys));
-          map.setPaintProperty(
-            layer.id,
-            "fill-color",
-            paintProps["fill-color"]
-          );
-          map.setPaintProperty(
-            layer.id,
-            "fill-opacity",
-            paintProps["fill-opacity"]
-          );
-          map.setPaintProperty(
-            layer.id,
-            "fill-outline-color",
-            paintProps["fill-outline-color"]
-          );
-        }
-      });
-    } catch (error) {
-      // OK to ignore error here
-    }
-    // Popup content is derived from the date filter / grouping, so drop any open popup
+    const cancel = scheduleFeatureStateDensity({ showPlaceholder: true });
     removePopup();
+    return cancel;
   }, [
     map,
     filterStartDate,
@@ -761,6 +1008,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     timeGroupBy,
     periodBounds,
     removePopup,
+    scheduleFeatureStateDensity,
   ]);
 
   return (

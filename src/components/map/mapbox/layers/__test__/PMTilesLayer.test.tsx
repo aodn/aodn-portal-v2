@@ -1,4 +1,6 @@
 import dayjs from "dayjs";
+import { vi } from "vitest";
+import type { Map } from "mapbox-gl";
 import {
   getMonthKeysInRange,
   getDayKeysInRange,
@@ -10,6 +12,17 @@ import {
   parseTimeGroupBy,
   periodNumberToDayjs,
   clampRangeToMetadata,
+  sumSparseCountFromProperties,
+  coerceCountValue,
+  buildFeatureStateTotalExpression,
+  buildDensityLayerFilter,
+  buildPresenceFilter,
+  getPlaceholderPaintProperties,
+  getFeatureStatePaintProperties,
+  applyHexLayerStyle,
+  updateFeatureStateTotals,
+  scheduleDeferredWork,
+  FEATURE_STATE_TOTAL,
   DEFAULT_TIME_GROUP_BY,
 } from "../PMTilesLayer";
 
@@ -432,5 +445,148 @@ describe("PMTilesLayer - buildPopupHtml", () => {
       filterEnd
     );
     expect(html).toContain("Data Record Count: 99");
+  });
+});
+
+describe("PMTilesLayer - sparse sum and feature-state", () => {
+  const start = dayjs("2024-01-01");
+  const end = dayjs("2024-03-31");
+
+  it("sums only in-range m* properties that exist on the feature", () => {
+    const { total, matchedKeys } = sumSparseCountFromProperties(
+      { h: "abc", m20240101: 5, m20240201: 7, m20240501: 99, m202401: 3 },
+      start,
+      end,
+      "date"
+    );
+    expect(total).toBe(12);
+    expect(matchedKeys).toEqual(["m20240101", "m20240201"]);
+  });
+
+  it("coerces string counts from vector tiles", () => {
+    expect(coerceCountValue("9120")).toBe(9120);
+    expect(coerceCountValue(9120)).toBe(9120);
+    expect(coerceCountValue("x")).toBeNaN();
+    const { total } = sumSparseCountFromProperties(
+      { m20240115: "10", m20240201: "3" },
+      start,
+      end,
+      "date"
+    );
+    expect(total).toBe(13);
+  });
+
+  it("returns zero when no properties match", () => {
+    expect(
+      sumSparseCountFromProperties(
+        { h: "abc", m20250601: 1 },
+        start,
+        end,
+        "date"
+      ).total
+    ).toBe(0);
+    expect(sumSparseCountFromProperties(null, start, end, "date").total).toBe(
+      0
+    );
+  });
+
+  it("builds feature-state paint; layer filter does not use feature-state", () => {
+    expect(buildFeatureStateTotalExpression()).toEqual([
+      "coalesce",
+      ["feature-state", FEATURE_STATE_TOTAL],
+      0,
+    ]);
+    // feature-state is illegal in filters — density uses presence only
+    expect(buildDensityLayerFilter()).toEqual(["has", "h"]);
+    expect(JSON.stringify(buildDensityLayerFilter())).not.toContain(
+      "feature-state"
+    );
+    expect(buildPresenceFilter()).toEqual(["has", "h"]);
+    expect(typeof getPlaceholderPaintProperties()["fill-color"]).toBe("string");
+    // Density paint must reference feature-state, not a dense + of day keys
+    const density = getFeatureStatePaintProperties();
+    expect(JSON.stringify(density["fill-color"])).toContain("feature-state");
+    expect(JSON.stringify(density["fill-color"])).not.toContain("m2024");
+  });
+
+  it("writes sparse totals via setFeatureState for loaded features", () => {
+    const setFeatureState = vi.fn();
+    const map = {
+      getSource: (id: string) => (id === "pmtiles-source-id" ? {} : undefined),
+      querySourceFeatures: (_source: string, opts: { sourceLayer: string }) => {
+        if (opts.sourceLayer !== "hex_z0") return [];
+        return [
+          {
+            id: "cell-a",
+            properties: { h: "cell-a", m20240115: 10, m20240601: 50 },
+          },
+          {
+            id: "cell-b",
+            properties: { h: "cell-b", m20240201: 3 },
+          },
+        ];
+      },
+      setFeatureState,
+      getLayer: () => undefined,
+      setFilter: vi.fn(),
+      setPaintProperty: vi.fn(),
+    } as unknown as Map;
+
+    const updated = updateFeatureStateTotals(
+      map,
+      dayjs("2024-01-01"),
+      dayjs("2024-03-31"),
+      "date"
+    );
+    // 2 features × 6 source layers queried, but only hex_z0 returns features
+    // updateFeatureStateTotals loops all layers; only hex_z0 has features
+    expect(updated).toBe(2);
+    expect(setFeatureState).toHaveBeenCalledWith(
+      {
+        source: "pmtiles-source-id",
+        sourceLayer: "hex_z0",
+        id: "cell-a",
+      },
+      { [FEATURE_STATE_TOTAL]: 10 }
+    );
+    expect(setFeatureState).toHaveBeenCalledWith(
+      {
+        source: "pmtiles-source-id",
+        sourceLayer: "hex_z0",
+        id: "cell-b",
+      },
+      { [FEATURE_STATE_TOTAL]: 3 }
+    );
+  });
+
+  it("applies filter and paint to existing hex layers only", () => {
+    const setFilter = vi.fn();
+    const setPaintProperty = vi.fn();
+    const map = {
+      getLayer: (id: string) =>
+        id === "pmtiles-hex-z0" || id === "pmtiles-hex-z2" ? {} : undefined,
+      setFilter,
+      setPaintProperty,
+    } as unknown as Map;
+    applyHexLayerStyle(
+      map,
+      buildDensityLayerFilter(),
+      getFeatureStatePaintProperties()
+    );
+    expect(setFilter).toHaveBeenCalledTimes(2);
+    expect(setPaintProperty).toHaveBeenCalledTimes(6);
+  });
+
+  it("runs deferred work and supports cancellation", async () => {
+    const work = vi.fn();
+    const cancel = scheduleDeferredWork(work);
+    cancel();
+    await new Promise((r) => setTimeout(r, 30));
+    expect(work).not.toHaveBeenCalled();
+
+    const work2 = vi.fn();
+    scheduleDeferredWork(work2);
+    await new Promise((r) => setTimeout(r, 50));
+    expect(work2).toHaveBeenCalledTimes(1);
   });
 });
