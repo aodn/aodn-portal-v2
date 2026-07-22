@@ -44,6 +44,12 @@ class IntersectionObserver {
 
 (global as any).IntersectionObserver = IntersectionObserver;
 
+// A global mock to avoid analytics side effects (window.gtag in a setTimeout)
+// firing after test teardown, you can override in the test file
+vi.mock("./analytics/customEventTracker", () => ({
+  trackCustomEvent: vi.fn(),
+}));
+
 // A global mock to avoid real layer fetch calls, if you need different return value
 // you can override in the test file
 vi.mock("./components/map/mapbox/layers/StaticLayer", async () => {
