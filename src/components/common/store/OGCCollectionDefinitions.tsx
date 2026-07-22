@@ -411,7 +411,6 @@ export class SummariesProperties {
 }
 
 export class Spatial {
-  private parent: OGCCollection;
   private bounding_box: Array<Position> = [];
   private temporal_value: {
     interval: Array<Array<string | null>>;
@@ -421,9 +420,7 @@ export class Spatial {
   };
   crs: string = "";
 
-  constructor(ogcCollection: OGCCollection) {
-    this.parent = ogcCollection;
-  }
+  constructor(_ogcCollection: OGCCollection) {}
 
   set temporal(value: { interval: Array<Array<string | null>>; trs?: string }) {
     this.temporal_value = value;

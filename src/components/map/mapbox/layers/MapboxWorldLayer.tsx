@@ -1,11 +1,4 @@
-import {
-  FC,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-  useRef,
-} from "react";
+import { FC, useCallback, useContext, useEffect, useRef } from "react";
 import MapContext from "../MapContext";
 import { TestHelper } from "../../../common/test/helper";
 

@@ -2,9 +2,8 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import ExpandableTextArea from "../ExpandableTextArea";
 import AppTheme from "../../../../../utils/AppTheme";
 import { ThemeProvider } from "@mui/material/styles";
-import { expect, vi, beforeEach, afterEach } from "vitest";
+import { expect, vi, afterEach } from "vitest";
 import { ClipboardProvider } from "../../../../../context/clipboard/ClipboardProvider";
-import userEvent from "@testing-library/user-event";
 
 describe("ExpandableTextArea", () => {
   const theme = AppTheme;

@@ -13,12 +13,9 @@ import {
   Checkbox,
   FormControlLabel,
   FormGroup,
-  IconButton,
   alpha,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import ReplayIcon from "@mui/icons-material/Replay";
-import { color, fontSize, gap, padding } from "../../styles/constants";
+import { gap, padding } from "../../styles/constants";
 import {
   ParameterState,
   SelectedStaticArea,
@@ -428,23 +425,6 @@ const LocationFilter: FC<LocationFilterProps> = () => {
       getStaticAreasFromSets,
     ]
   );
-
-  const handleClear = useCallback(() => {
-    dispatch(updateFilterPolygon(undefined));
-    dispatch(updateFilterStaticAreas([]));
-
-    setSelectedMarineParkValues(new Set());
-    setSelectedMarineEcoregionValues(new Set());
-    setSelectedAllenCoralAtlasValues(new Set());
-
-    // Clear drawn features from map and state
-    if (removeFeatureRef.current) {
-      drawFeatures.forEach((f) => {
-        if (f.id) removeFeatureRef.current!(String(f.id));
-      });
-    }
-    startTransition(() => setDrawFeatures([]));
-  }, [dispatch, drawFeatures]);
 
   const handleFeaturesChange = useCallback(
     (

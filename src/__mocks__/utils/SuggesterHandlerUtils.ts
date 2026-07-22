@@ -1,6 +1,6 @@
 import { SUGGESTER_OPTIONS } from "../data/SUGGESTER_OPTIONS";
 
-const getSuggesterOptionsBy = (input: string, filter: string[]) => {
+const getSuggesterOptionsBy = (input: string, _filter: string[]) => {
   // Filter each category based on input
   const filteredOrganisations = filterItemsIn(
     SUGGESTER_OPTIONS.suggested_organisation_vocabs

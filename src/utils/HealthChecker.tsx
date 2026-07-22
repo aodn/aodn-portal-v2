@@ -3,7 +3,6 @@ import { useAppDispatch } from "../components/common/store/hooks";
 import { fetchSystemHealthNoStore } from "../components/common/store/searchReducer";
 import DegradedPage from "../pages/error-page/DegradedPage";
 import { Health } from "../components/common/store/systemDefinition";
-import { ErrorResponse } from "../utils/ErrorBoundary";
 
 interface HealthCheckerProps {
   children?: React.ReactNode;

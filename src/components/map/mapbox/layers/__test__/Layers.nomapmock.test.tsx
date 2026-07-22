@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson";
 import { findSuitableVisiblePoint, isFeatureVisible } from "../Layers";
-import * as turf from "@turf/turf";
 import { LngLatBounds } from "mapbox-gl";
 
 // Define the test where we do not need to mock the Map

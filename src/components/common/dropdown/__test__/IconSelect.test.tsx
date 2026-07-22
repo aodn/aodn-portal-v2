@@ -5,12 +5,11 @@ import {
   waitFor,
   within,
 } from "@testing-library/react";
-import { vi, describe, it, expect, beforeEach, Mock } from "vitest";
+import { vi, describe, it, expect, beforeEach } from "vitest";
 import IconSelect, { IconSelectProps } from "../IconSelect";
 import { FunctionComponent } from "react";
 import { ThemeProvider } from "@mui/material/styles";
 import { SelectItem } from "../CommonSelect";
-import { disableScroll, enableScroll } from "../../../../utils/ScrollUtils";
 import AppTheme from "../../../../utils/AppTheme"; // Adjust to your theme path
 
 // Mock dependencies

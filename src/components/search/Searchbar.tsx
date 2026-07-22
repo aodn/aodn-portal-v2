@@ -53,7 +53,6 @@ const Searchbar: FC<SearchbarProps> = ({
 }) => {
   const location = useLocation();
   const dispatch = useAppDispatch();
-  const searchInput = useAppSelector((state) => state.paramReducer.searchText);
   const { isMobile, isTablet } = useBreakpoint();
   const [open, setOpen] = useState(false);
   const [boxRef, setBoxRef] = useState<HTMLDivElement | null>(null);

@@ -1,6 +1,6 @@
 import { FC, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { Box, Link, Stack } from "@mui/material";
+import { Box, Link } from "@mui/material";
 import { portalTheme } from "../../../styles";
 import {
   border,
@@ -16,7 +16,6 @@ import HeaderMenu, { HeaderMenuStyle } from "./HeaderMenu";
 import { pageDefault } from "../../common/constants";
 import Searchbar from "../../search/Searchbar";
 import { useAppSelector } from "../../common/store/hooks";
-import { ParameterState } from "../../common/store/componentParamReducer";
 import {
   PAGE_CONTENT_MAX_WIDTH,
   PAGE_CONTENT_WIDTH_HEADER,

@@ -67,7 +67,7 @@ describe("ResultCardButton", () => {
       />
     );
     const icon = screen.getByTestId("mock-icon");
-    const text = screen.getByText("Test");
+    screen.getByText("Test");
     expect(icon).toHaveStyle("font-size: 18px");
   });
 

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, startTransition } from "react";
+import { useContext, useEffect, useState, startTransition } from "react";
 import { Popper } from "@mui/material";
 import MapContext from "../MapContext";
 import { MenuHintBubble } from "./menu/MenuHintTooltip";

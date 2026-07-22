@@ -67,12 +67,7 @@ vi.mock(
 vi.mock(
   "@/pages/detail-page/features/download/DownloadDialog/EmailInputStep",
   () => ({
-    default: ({
-      isMobile,
-      emailInputRef,
-      dataUsage,
-      onDataUsageChange,
-    }: any) => (
+    default: ({ emailInputRef }: any) => (
       <div data-testid="email-input-step">
         <input
           ref={emailInputRef}

@@ -49,7 +49,7 @@ import {
   useAppSelector,
 } from "../../components/common/store/hooks";
 import { pageDefault, pageReferer } from "../../components/common/constants";
-import { color, padding } from "../../styles/constants";
+import { color } from "../../styles/constants";
 import {
   BookmarkEvent,
   EVENT_BOOKMARK,

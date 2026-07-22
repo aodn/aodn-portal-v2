@@ -7,8 +7,7 @@ import {
 } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach, Mock } from "vitest";
 import CommonSelect, { CommonSelectProps, SelectItem } from "../CommonSelect";
-import { useDetailPageContext } from "../../../../pages/detail-page/context/detail-page-context";
-import { disableScroll, enableScroll } from "../../../../utils/ScrollUtils";
+import { disableScroll } from "../../../../utils/ScrollUtils";
 
 // Mock dependencies
 vi.mock("../../../../pages/detail-page/context/detail-page-context", () => ({
@@ -33,9 +32,7 @@ const defaultProps: CommonSelectProps = {
 };
 
 // Setup mocks
-const mockUseDetailPageContext = useDetailPageContext as Mock;
 const mockDisableScroll = disableScroll as Mock;
-const mockEnableScroll = enableScroll as Mock;
 
 describe("CommonSelect", () => {
   beforeEach(() => {
