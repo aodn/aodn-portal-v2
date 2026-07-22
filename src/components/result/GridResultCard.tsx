@@ -1,4 +1,4 @@
-import React, { FC, SyntheticEvent, useRef, useState } from "react";
+import { FC, SyntheticEvent, useRef, useState } from "react";
 import {
   Box,
   Card,

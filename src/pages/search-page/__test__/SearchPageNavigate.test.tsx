@@ -102,7 +102,7 @@ vi.mock("../layout/MapSection", () => ({
   default: () => <div>MapSection</div>,
 }));
 
-vi.mock("../../../components/layout/layout", () => ({
+vi.mock("../../../components/layout/Layout", () => ({
   default: ({ children }: any) => <div>{children}</div>,
 }));
 

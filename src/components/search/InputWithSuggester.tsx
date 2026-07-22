@@ -178,7 +178,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
 
   const handleInputChange = useCallback(
     (
-      event: SyntheticEvent,
+      _event: SyntheticEvent,
       newInputValue: string,
       reason: AutocompleteInputChangeReason
     ) => {

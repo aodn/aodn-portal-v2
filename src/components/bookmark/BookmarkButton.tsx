@@ -46,7 +46,7 @@ const BookmarkButton: FC<BookmarkButtonProps> = ({
 
   const onClickBookmark = useCallback(
     (
-      event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+      _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
       item: OGCCollection
     ) => {
       const { expandedItem, temporaryItem } = getBookmarkList(store.getState());

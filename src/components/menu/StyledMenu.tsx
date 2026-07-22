@@ -1,12 +1,6 @@
 import Menu, { MenuProps } from "@mui/material/Menu";
 import { styled } from "@mui/material/styles";
-import {
-  border,
-  borderRadius,
-  color,
-  fontSize,
-  gap,
-} from "../../styles/constants";
+import { border, borderRadius, color } from "../../styles/constants";
 
 const StyledMenu = styled((props: MenuProps) => (
   <Menu

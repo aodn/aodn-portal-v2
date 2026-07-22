@@ -255,8 +255,8 @@ const fieldChangeHandlers = {
   },
 
   "single-select": (
-    prev: DataUsageInformation,
-    fieldKey: string,
+    _prev: DataUsageInformation,
+    _fieldKey: string,
     value: string | boolean | string[]
   ) => {
     return value as string[];

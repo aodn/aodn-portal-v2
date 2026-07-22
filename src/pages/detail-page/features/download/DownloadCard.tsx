@@ -3,7 +3,6 @@ import { useDetailPageContext } from "../../context/detail-page-context";
 import DownloadWFSCard from "./DownloadWFSCard";
 import DownloadCloudOptimisedCard from "./DownloadCloudOptimisedCard";
 import SideCardContainer from "../../layout/SideCardContainer";
-import DownloadNotAvailableCard from "./DownloadNotAvailableCard";
 import { DownloadServiceType } from "../../context/DownloadDefinitions";
 
 const DownloadCard: FC = () => {

@@ -38,7 +38,7 @@ import {
   setExpandedItem,
   setTemporaryItem,
 } from "../../components/common/store/bookmarkListReducer";
-import Layout from "../../components/layout/layout";
+import Layout from "../../components/layout/Layout";
 import ResultSection from "./layout/ResultSection";
 import MapSection from "./layout/MapSection";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/ResultListLayoutButton";
@@ -49,7 +49,7 @@ import {
   useAppSelector,
 } from "../../components/common/store/hooks";
 import { pageDefault, pageReferer } from "../../components/common/constants";
-import { color, padding } from "../../styles/constants";
+import { color } from "../../styles/constants";
 import {
   BookmarkEvent,
   EVENT_BOOKMARK,

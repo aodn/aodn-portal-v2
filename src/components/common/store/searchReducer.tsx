@@ -229,7 +229,7 @@ const searchResult = async (
 };
 // TODO: Why no param needed?
 const searchParameterVocabs = async (
-  param: Map<string, string> | null,
+  _param: Map<string, string> | null,
   thunkApi: any
 ) =>
   ogcAxiosWithRetry

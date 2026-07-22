@@ -12,8 +12,6 @@ import {
   IDownloadCondition,
 } from "../../pages/detail-page/context/DownloadDefinitions";
 import { MultiPolygon } from "geojson";
-import { dateDefault } from "../../components/common/constants";
-import dayjs from "dayjs";
 
 describe("DownloadConditionUtils", () => {
   describe("getDateConditionFrom", () => {
