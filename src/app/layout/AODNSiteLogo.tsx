@@ -1,12 +1,12 @@
 import { Box } from "@mui/material";
-import useBreakpoint from "../../../hooks/useBreakpoint";
-import useRedirectHome from "../../../hooks/useRedirectHome";
+import useBreakpoint from "@/hooks/useBreakpoint";
+import useRedirectHome from "@/hooks/useRedirectHome";
 import {
   AODN_SITE_LOGO_HEIGHT,
   AODN_SITE_LOGO_HEIGHT_MOBILE,
-} from "../constant";
-import { pageDefault } from "../../common/constants";
-import { IconImosLogoWithTitle } from "../../icon/IconImosLogoWithTitle";
+} from "@/app/layout/constant";
+import { pageDefault } from "@/components/common/constants";
+import { IconImosLogoWithTitle } from "@/components/icon/IconImosLogoWithTitle";
 
 const AODNSiteLogo = () => {
   const { isMobile } = useBreakpoint();

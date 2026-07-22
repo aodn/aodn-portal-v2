@@ -102,10 +102,6 @@ vi.mock("../layout/MapSection", () => ({
   default: () => <div>MapSection</div>,
 }));
 
-vi.mock("../../../components/layout/Layout", () => ({
-  default: ({ children }: any) => <div>{children}</div>,
-}));
-
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import SearchPage from "../SearchPage";

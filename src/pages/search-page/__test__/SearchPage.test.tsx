@@ -41,7 +41,8 @@ const mockRedirectSearch = vi.fn();
 
 // Import the component and router after the mock is defined
 import SearchPage from "../SearchPage";
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Layout from "@/app/layout/Layout";
 import { pageReferer } from "../../../components/common/constants";
 
 // Mock the Map component to avoid map initialization
@@ -116,7 +117,11 @@ describe("SearchPage Basic", () => {
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
-            <SearchPage />
+            <Routes>
+              <Route element={<Layout />}>
+                <Route path="*" element={<SearchPage />} />
+              </Route>
+            </Routes>
           </Router>
         </ThemeProvider>
       </Provider>
@@ -160,7 +165,11 @@ describe("SearchPage Basic", () => {
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
-            <SearchPage />
+            <Routes>
+              <Route element={<Layout />}>
+                <Route path="*" element={<SearchPage />} />
+              </Route>
+            </Routes>
           </Router>
         </ThemeProvider>
       </Provider>
@@ -211,7 +220,11 @@ describe("SearchPage Basic", () => {
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
-            <SearchPage />
+            <Routes>
+              <Route element={<Layout />}>
+                <Route path="*" element={<SearchPage />} />
+              </Route>
+            </Routes>
           </Router>
         </ThemeProvider>
       </Provider>
@@ -248,7 +261,11 @@ describe("SearchPage Basic", () => {
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
-            <SearchPage />
+            <Routes>
+              <Route element={<Layout />}>
+                <Route path="*" element={<SearchPage />} />
+              </Route>
+            </Routes>
           </Router>
         </ThemeProvider>
       </Provider>
@@ -288,7 +305,11 @@ describe("SearchPage Basic", () => {
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
-            <SearchPage />
+            <Routes>
+              <Route element={<Layout />}>
+                <Route path="*" element={<SearchPage />} />
+              </Route>
+            </Routes>
           </Router>
         </ThemeProvider>
       </Provider>

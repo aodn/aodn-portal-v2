@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
-import { openInNewTab } from "../../../utils/LinkUtils";
-import HeaderMenu, { HeaderMenuStyle } from "../components/HeaderMenu";
+import { openInNewTab } from "@/utils/LinkUtils";
+import HeaderMenu, { HeaderMenuStyle } from "../HeaderMenu";
 import { userEvent } from "@testing-library/user-event";
-import { pageDefault } from "../../common/constants";
+import { pageDefault } from "@/components/common/constants";
 
-vi.mock("../../../utils/LinkUtils", () => ({
+vi.mock("@/utils/LinkUtils", () => ({
   openInNewTab: vi.fn(),
 }));
 

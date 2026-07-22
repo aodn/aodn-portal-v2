@@ -1,7 +1,7 @@
 import { FC, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Box, Link } from "@mui/material";
-import { portalTheme } from "../../../styles";
+import { portalTheme } from "@/styles";
 import {
   border,
   borderRadius,
@@ -9,24 +9,24 @@ import {
   padding,
   shadow,
   zIndex,
-} from "../../../styles/constants";
+} from "@/styles/constants";
 import AODNSiteLogo from "./AODNSiteLogo";
-import SectionContainer from "./SectionContainer";
+import SectionContainer from "@/components/common/container/SectionContainer";
 import HeaderMenu, { HeaderMenuStyle } from "./HeaderMenu";
-import { pageDefault } from "../../common/constants";
-import Searchbar from "../../search/Searchbar";
+import { pageDefault } from "@/components/common/constants";
+import Searchbar from "@/components/search/Searchbar";
 import { useAppSelector } from "@/app/store/hooks";
 import {
   PAGE_CONTENT_MAX_WIDTH,
   PAGE_CONTENT_WIDTH_HEADER,
   SEARCHBAR_CONTENT_WIDTH,
-} from "../constant";
+} from "@/app/layout/constant";
 import {
   SEARCHBAR_EXPANSION_WIDTH_LAPTOP,
   SEARCHBAR_EXPANSION_WIDTH_TABLET,
-} from "../../search/constants";
-import useBreakpoint from "../../../hooks/useBreakpoint";
-import ShareButtonMenu from "../../menu/ShareButtonMenu";
+} from "@/components/search/constants";
+import useBreakpoint from "@/hooks/useBreakpoint";
+import ShareButtonMenu from "@/components/menu/ShareButtonMenu";
 import HeaderIconMenu from "./HeaderIconMenu";
 
 const FEEDBACK_URL =

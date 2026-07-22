@@ -29,7 +29,7 @@ import LocationFilter from "../filter/LocationFilter";
 import Filters from "../filter/Filters";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import useScrollToElement from "../../hooks/useScrollToElement";
-import { HEADER_HEIGHT, HEADER_HEIGHT_MOBILE } from "../layout/constant";
+import { HEADER_HEIGHT, HEADER_HEIGHT_MOBILE } from "@/app/layout/constant";
 import {
   clearComponentParam,
   ParameterState,

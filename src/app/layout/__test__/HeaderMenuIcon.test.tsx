@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import HeaderIconMenu from "../components/HeaderIconMenu";
+import HeaderIconMenu from "../HeaderIconMenu";
 
 describe("HeaderIconMenu", () => {
   beforeEach(() => {

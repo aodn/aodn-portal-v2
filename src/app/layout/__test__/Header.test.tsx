@@ -18,15 +18,15 @@ import {
   clearComponentParam,
   updateHasData,
 } from "@/app/store/componentParamReducer";
-import Header from "../components/Header";
-import { SEARCHBAR_EXPANSION_WIDTH_LAPTOP } from "../../search/constants";
+import Header from "../Header";
+import { SEARCHBAR_EXPANSION_WIDTH_LAPTOP } from "@/components/search/constants";
 
 const theme = AppTheme;
 const expectedLaptopWidth = `${SEARCHBAR_EXPANSION_WIDTH_LAPTOP * 100}%`;
 
 // Mock useBreakpoint to control laptop vs mobile viewports in our test
 const mockBreakpoint = { isMobile: false, isUnderLaptop: false };
-vi.mock("../../../hooks/useBreakpoint", () => ({
+vi.mock("@/hooks/useBreakpoint", () => ({
   default: () => mockBreakpoint,
 }));
 

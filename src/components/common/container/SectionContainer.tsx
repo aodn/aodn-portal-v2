@@ -1,6 +1,6 @@
 import { Box, Divider, Stack, SxProps } from "@mui/material";
 import { ReactNode } from "react";
-import { PAGE_CONTENT_MAX_WIDTH } from "../constant";
+import { PAGE_CONTENT_MAX_WIDTH } from "@/app/layout/constant";
 
 interface SectionContainerProps {
   children: ReactNode;

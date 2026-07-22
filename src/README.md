@@ -1,17 +1,17 @@
 # Source structure
 
-| Folder        | What is inside                                              |
-| ------------- | ----------------------------------------------------------- |
-| `main.tsx`    | App entry point, renders `<App />`                          |
-| `app/`        | App setup: `App.tsx`, router, global providers, Redux store |
-| `pages/`      | One folder per page: landing, search, detail, error         |
-| `components/` | UI components used by more than one page                    |
-| `hooks/`      | Custom React hooks                                          |
-| `styles/`     | Theme: colors, fonts, spacing                               |
-| `utils/`      | Small helper functions (dates, strings, URLs, ...)          |
-| `analytics/`  | Google Analytics tracking                                   |
-| `assets/`     | Images, icons, logos                                        |
-| `__mocks__/`  | Fake data for tests                                         |
+| Folder        | What is inside                                                                      |
+| ------------- | ----------------------------------------------------------------------------------- |
+| `main.tsx`    | App entry point, renders `<App />`                                                  |
+| `app/`        | App setup: `App.tsx`, router, layout (header/footer), global providers, Redux store |
+| `pages/`      | One folder per page: landing, search, detail, error                                 |
+| `components/` | UI components used by more than one page                                            |
+| `hooks/`      | Custom React hooks                                                                  |
+| `styles/`     | Theme: colors, fonts, spacing                                                       |
+| `utils/`      | Small helper functions (dates, strings, URLs, ...)                                  |
+| `analytics/`  | Google Analytics tracking                                                           |
+| `assets/`     | Images, icons, logos                                                                |
+| `__mocks__/`  | Fake data for tests                                                                 |
 
 ## Rules
 

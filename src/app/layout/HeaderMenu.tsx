@@ -1,5 +1,5 @@
 import { FC, useCallback, useMemo, useState, MouseEvent } from "react";
-import PlainMenu, { type Menu } from "../../menu/PlainMenu";
+import PlainMenu, { type Menu } from "@/components/menu/PlainMenu";
 import {
   Accordion,
   AccordionDetails,
@@ -21,10 +21,10 @@ import {
   gap,
   margin,
   padding,
-} from "../../../styles/constants";
-import { openInNewTab } from "../../../utils/LinkUtils";
+} from "@/styles/constants";
+import { openInNewTab } from "@/utils/LinkUtils";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { pageDefault } from "../../common/constants";
+import { pageDefault } from "@/components/common/constants";
 
 export enum HeaderMenuStyle {
   DROPDOWN_MENU = "DROPDOWN",

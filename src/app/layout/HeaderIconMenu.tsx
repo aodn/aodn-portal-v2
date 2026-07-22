@@ -1,16 +1,16 @@
 import { FC, useCallback, useState } from "react";
 import { IconButton, Menu } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { MenuIcon } from "../../icon/MenuIcon";
+import { MenuIcon } from "@/components/icon/MenuIcon";
 import {
   borderRadius,
   color,
   fontColor,
   fontSize,
   padding,
-} from "../../../styles/constants";
+} from "@/styles/constants";
 import HeaderMenu, { HeaderMenuStyle } from "./HeaderMenu";
-import { disableScroll, enableScroll } from "../../../utils/ScrollUtils";
+import { disableScroll, enableScroll } from "@/utils/ScrollUtils";
 
 const HeaderIconMenu: FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);

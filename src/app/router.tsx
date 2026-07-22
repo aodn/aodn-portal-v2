@@ -9,6 +9,7 @@ import { pageDefault } from "../components/common/constants";
 import HealthChecker from "@/utils/HealthChecker";
 import DegradedPage from "../pages/error-page/DegradedPage";
 import { syncCanonicalUrl } from "@/utils/seo/canonicalUrl";
+import Layout from "./layout/Layout";
 import React from "react";
 
 // Helper to conditionally wrap a page with HealthChecker based on the mode
@@ -34,26 +35,33 @@ export const searchLoader = ({ request }: { request: Request }) => {
 
 const router = createBrowserRouter([
   {
-    path: pageDefault.landing,
-    element: (
-      <ErrorBoundary>{wrapWithHealthChecker(<LandingPage />)}</ErrorBoundary>
-    ),
-    children: [],
-  },
-  {
-    path: pageDefault.search,
-    loader: searchLoader,
-    element: (
-      <ErrorBoundary>{wrapWithHealthChecker(<SearchPage />)}</ErrorBoundary>
-    ),
-    children: [],
-  },
-  {
-    path: `${pageDefault.details}/:uuid`,
-    element: (
-      <ErrorBoundary>{wrapWithHealthChecker(<DetailsPage />)}</ErrorBoundary>
-    ),
-    children: [],
+    // Layout route: renders Header/Footer once, pages render into its <Outlet />
+    element: <Layout />,
+    children: [
+      {
+        path: pageDefault.landing,
+        element: (
+          <ErrorBoundary>
+            {wrapWithHealthChecker(<LandingPage />)}
+          </ErrorBoundary>
+        ),
+      },
+      {
+        path: pageDefault.search,
+        loader: searchLoader,
+        element: (
+          <ErrorBoundary>{wrapWithHealthChecker(<SearchPage />)}</ErrorBoundary>
+        ),
+      },
+      {
+        path: `${pageDefault.details}/:uuid`,
+        element: (
+          <ErrorBoundary>
+            {wrapWithHealthChecker(<DetailsPage />)}
+          </ErrorBoundary>
+        ),
+      },
+    ],
   },
   {
     path: pageDefault.error,

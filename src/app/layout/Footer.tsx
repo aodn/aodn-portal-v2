@@ -25,16 +25,16 @@ import {
   gap,
   margin,
   padding,
-} from "../../../styles/constants";
+} from "@/styles/constants";
 import AODNSiteLogo from "./AODNSiteLogo";
-import SectionContainer from "./SectionContainer";
-import { openInNewTab } from "../../../utils/LinkUtils";
-import { scrollToTop } from "../../../utils/ScrollUtils";
+import SectionContainer from "@/components/common/container/SectionContainer";
+import { openInNewTab } from "@/utils/LinkUtils";
+import { scrollToTop } from "@/utils/ScrollUtils";
 import { useLocation } from "react-router-dom";
-import { pageDefault } from "../../common/constants";
-import { NorthIcon } from "../../icon/NorthIcon";
-import { BlueskyLogoIcon } from "../../icon/BlueskyLogoIcon";
-import { PAGE_CONTENT_WIDTH_LANDING } from "../constant";
+import { pageDefault } from "@/components/common/constants";
+import { NorthIcon } from "@/components/icon/NorthIcon";
+import { BlueskyLogoIcon } from "@/components/icon/BlueskyLogoIcon";
+import { PAGE_CONTENT_WIDTH_LANDING } from "@/app/layout/constant";
 
 interface IconContainerProps {
   children: JSX.Element;

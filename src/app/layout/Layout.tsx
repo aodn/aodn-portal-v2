@@ -1,18 +1,16 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 // TODO: Temp works but need to check user locale on date time format
 import "dayjs/locale/en-gb";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import ScrollToTop from "../common/scroll/ScrollToTop";
-import { useLocation } from "react-router-dom";
-import { trackPageResponseTime } from "../../analytics/pageResTimeEvent";
-import { trackWebVitals } from "../../analytics/webVitalsEvents";
+import Header from "./Header";
+import Footer from "./Footer";
+import ScrollToTop from "@/components/common/scroll/ScrollToTop";
+import { Outlet, useLocation } from "react-router-dom";
+import { trackPageResponseTime } from "@/analytics/pageResTimeEvent";
+import { trackWebVitals } from "@/analytics/webVitalsEvents";
 
-interface LayoutProps {}
-
-const Layout = ({ children }: React.PropsWithChildren<LayoutProps>) => {
+const Layout = () => {
   const location = useLocation();
 
   // This Layout wraps all pages - any effects here run globally on every route change
@@ -27,7 +25,9 @@ const Layout = ({ children }: React.PropsWithChildren<LayoutProps>) => {
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"en-gb"}>
       <ScrollToTop />
       <Header />
-      <main>{children}</main>
+      <main>
+        <Outlet />
+      </main>
       <Footer />
     </LocalizationProvider>
   );
