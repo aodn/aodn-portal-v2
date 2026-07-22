@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { border, borderRadius, color, padding } from "../../styles/constants";
 import { FC, Fragment, SyntheticEvent, useRef, useState } from "react";
-import OrganizationLogo from "../logo/OrganizationLogo";
+import OrganizationLogo from "../icon/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import { ResultCardBasicType } from "./ResultCards";
 import BookmarkButton from "../bookmark/BookmarkButton";

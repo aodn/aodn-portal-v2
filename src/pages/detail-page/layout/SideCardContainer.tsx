@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import { portalTheme } from "../../../styles";
-import { ArrowOutwardIcon } from "../../../assets/icons/side-cards/arrowOutward";
+import { ArrowOutwardIcon } from "../../../components/icon/ArrowOutwardIcon";
 
 interface SideCardContainerProps {
   title: string;

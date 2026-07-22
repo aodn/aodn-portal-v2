@@ -12,9 +12,9 @@ import { bboxPolygon } from "@turf/turf";
 import * as turf from "@turf/turf";
 import dayjs from "dayjs";
 import { dateDefault } from "../constants";
-import { IconWMS } from "../../../assets/icons/wms-icon";
-import { IconWFS } from "../../../assets/icons/wfs-icon";
-import { IconLink } from "../../../assets/icons/link";
+import { IconWMS } from "../../icon/IconWMS";
+import { IconWFS } from "../../icon/IconWFS";
+import { IconLink } from "../../icon/IconLink";
 
 // interfaces:
 export interface IKeyword {
