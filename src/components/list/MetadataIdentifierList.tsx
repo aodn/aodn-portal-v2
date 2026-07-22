@@ -1,7 +1,7 @@
 import React from "react";
 import ExpandableList from "./ExpandableList";
-import TextArea from "./listItem/subitem/TextArea";
-import ItemBaseGrid from "./listItem/ItemBaseGrid";
+import TextArea from "./list-item/sub-item/TextArea";
+import ItemBaseGrid from "./list-item/ItemBaseGrid";
 
 interface MetadataIdentifierListProps {
   identifier: string;

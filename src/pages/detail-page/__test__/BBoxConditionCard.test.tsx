@@ -11,7 +11,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 
 // Stub CoordInput to a plain <input> so we can drive it with fireEvent and
 // read back values by aria-label, without dragging in MUI's InputBase.
-vi.mock("../features/download/SubsetConditions/CoordInput", () => ({
+vi.mock("../features/download/subset-conditions/CoordInput", () => ({
   default: ({ value, onChange, onSubmit, ariaLabel, id, disabled }: any) => (
     <input
       id={id}
@@ -27,7 +27,7 @@ vi.mock("../features/download/SubsetConditions/CoordInput", () => ({
 }));
 
 // BaseConditionCard owns layout/expand state — not under test here.
-vi.mock("../features/download/SubsetConditions/BaseConditionCard", () => ({
+vi.mock("../features/download/subset-conditions/BaseConditionCard", () => ({
   default: ({ children, actions }: any) => (
     <div>
       {children}
@@ -36,7 +36,7 @@ vi.mock("../features/download/SubsetConditions/BaseConditionCard", () => ({
   ),
 }));
 
-import BBoxConditionCard from "../features/download/SubsetConditions/BBoxConditionCard";
+import BBoxConditionCard from "../features/download/subset-conditions/BBoxConditionCard";
 import { BBoxCondition } from "../context/DownloadDefinitions";
 
 // --- DOM helpers -----------------------------------------------------------

@@ -1,6 +1,6 @@
 import React from "react";
 import ExpandableList from "./ExpandableList";
-import ItemBaseGrid from "./listItem/ItemBaseGrid";
+import ItemBaseGrid from "./list-item/ItemBaseGrid";
 import { Grid, Typography, useTheme } from "@mui/material";
 import { portalTheme } from "../../styles";
 

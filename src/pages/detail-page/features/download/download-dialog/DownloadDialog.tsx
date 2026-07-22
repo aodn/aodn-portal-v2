@@ -8,7 +8,7 @@ import {
   useTheme,
   Divider,
 } from "@mui/material";
-import SubsetConditions from "../SubsetConditions/SubsetConditions";
+import SubsetConditions from "../subset-conditions/SubsetConditions";
 import LicenseStep from "./LicenseStep";
 import { useDownloadDialog } from "../../../../../hooks/useDownloadDialog";
 import EmailInputStep from "./EmailInputStep";

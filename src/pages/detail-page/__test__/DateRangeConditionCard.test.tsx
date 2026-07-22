@@ -27,11 +27,11 @@ vi.mock("../../../components/common/datetime/PlainDatePicker", () => ({
 }));
 
 // BaseConditionCard owns layout/expand state — not under test here.
-vi.mock("../features/download/SubsetConditions/BaseConditionCard", () => ({
+vi.mock("../features/download/subset-conditions/BaseConditionCard", () => ({
   default: ({ children }: any) => <div>{children}</div>,
 }));
 
-import DateRangeConditionCard from "../features/download/SubsetConditions/DateRangeConditionCard";
+import DateRangeConditionCard from "../features/download/subset-conditions/DateRangeConditionCard";
 import {
   DateRangeCondition,
   DownloadConditionType,

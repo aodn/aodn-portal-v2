@@ -1,9 +1,9 @@
 import { IContact } from "@/app/store/OGCCollectionDefinitions";
 import React, { ReactNode, useMemo } from "react";
 import ExpandableList from "./ExpandableList";
-import ContactArea from "./listItem/subitem/ContactArea";
-import CollapseItem from "./listItem/CollapseItem";
-import CollapseContactItemTitle from "./listItem/subitem/CollapseContactItemTitle";
+import ContactArea from "./list-item/sub-item/ContactArea";
+import CollapseItem from "./list-item/CollapseItem";
+import CollapseContactItemTitle from "./list-item/sub-item/CollapseContactItemTitle";
 import { Grid } from "@mui/material";
 
 interface ContactListProps {

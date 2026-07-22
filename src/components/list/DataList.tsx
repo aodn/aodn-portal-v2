@@ -5,9 +5,9 @@ import {
   DataAccessSubGroup,
   getSubgroup,
 } from "@/app/store/OGCCollectionDefinitions";
-import LinkCard from "./listItem/subitem/LinkCard";
-import CollapseItem from "./listItem/CollapseItem";
-import ExpandableTextArea from "./listItem/subitem/ExpandableTextArea";
+import LinkCard from "./list-item/sub-item/LinkCard";
+import CollapseItem from "./list-item/CollapseItem";
+import ExpandableTextArea from "./list-item/sub-item/ExpandableTextArea";
 
 interface DataListProps {
   dataAccessLinks?: ILink[];

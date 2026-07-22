@@ -6,7 +6,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 // - Escape calls onCancel
 // - error wires aria-invalid + aria-errormessage for screen readers
 
-import CoordInput from "../features/download/SubsetConditions/CoordInput";
+import CoordInput from "../features/download/subset-conditions/CoordInput";
 
 const getInput = () => screen.getByRole("textbox") as HTMLInputElement;
 

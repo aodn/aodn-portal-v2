@@ -9,7 +9,7 @@ import {
 import { Stack } from "@mui/material";
 import dayjs from "dayjs";
 import { dateDefault } from "../../../../components/common/constants";
-import DownloadDialog from "./DownloadDialog/DownloadDialog";
+import DownloadDialog from "./download-dialog/DownloadDialog";
 import {
   DownloadCondition,
   DownloadConditionType,

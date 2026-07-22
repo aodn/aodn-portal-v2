@@ -1,8 +1,8 @@
 import React, { cloneElement, ReactNode, useState } from "react";
 import { Collapse, Grid, Box } from "@mui/material";
 import ItemBaseGrid from "./ItemBaseGrid";
-import CollapseItemTitle from "./subitem/CollapseItemTitle";
-import CollapseBtn from "./subitem/CollapseBtn";
+import CollapseItemTitle from "./sub-item/CollapseItemTitle";
+import CollapseBtn from "./sub-item/CollapseBtn";
 
 interface CollapseItemProps {
   title?: string;

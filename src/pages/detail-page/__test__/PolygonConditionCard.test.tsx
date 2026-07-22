@@ -12,7 +12,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 // Stub CoordInput to a plain <input>: lets us drive it with fireEvent and
 // keep keyboard semantics (Enter/Escape) without MUI internals.
 // forwardRef is needed because EditVertexRow attaches a ref for auto-focus.
-vi.mock("../features/download/SubsetConditions/CoordInput", async () => {
+vi.mock("../features/download/subset-conditions/CoordInput", async () => {
   const React = await import("react");
   return {
     default: React.forwardRef<HTMLInputElement, any>(function MockCoordInput(
@@ -37,7 +37,7 @@ vi.mock("../features/download/SubsetConditions/CoordInput", async () => {
 });
 
 // BaseConditionCard owns layout/expand state — not under test here.
-vi.mock("../features/download/SubsetConditions/BaseConditionCard", () => ({
+vi.mock("../features/download/subset-conditions/BaseConditionCard", () => ({
   default: ({ children, actions }: any) => (
     <div>
       {children}
@@ -46,7 +46,7 @@ vi.mock("../features/download/SubsetConditions/BaseConditionCard", () => ({
   ),
 }));
 
-import PolygonConditionCard from "../features/download/SubsetConditions/PolygonConditionCard";
+import PolygonConditionCard from "../features/download/subset-conditions/PolygonConditionCard";
 import { PolygonCondition } from "../context/DownloadDefinitions";
 
 // --- DOM helpers -----------------------------------------------------------

@@ -1,8 +1,8 @@
 import React from "react";
 import ExpandableList from "./ExpandableList";
-import ItemBaseGrid from "./listItem/ItemBaseGrid";
+import ItemBaseGrid from "./list-item/ItemBaseGrid";
 import { ILink } from "@/app/store/OGCCollectionDefinitions";
-import LinkCard from "./listItem/subitem/LinkCard";
+import LinkCard from "./list-item/sub-item/LinkCard";
 
 const INFO_TIP_CONTENT = {
   title: "Information",

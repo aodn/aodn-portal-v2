@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
-import DownloadDialog from "../features/download/DownloadDialog/DownloadDialog";
+import DownloadDialog from "../features/download/download-dialog/DownloadDialog";
 import { BBoxCondition } from "../context/DownloadDefinitions";
 
 // Mock the custom hook
@@ -34,7 +34,7 @@ vi.mock("@/hooks/useDownloadDialog", () => ({
 
 // Mock other components
 vi.mock(
-  "@/pages/detail-page/features/download/DownloadDialog/stepper/StepperButton",
+  "@/pages/detail-page/features/download/download-dialog/stepper/StepperButton",
   () => ({
     default: ({ title, onClick, disabled }: any) => (
       <button
@@ -49,7 +49,7 @@ vi.mock(
 );
 
 vi.mock(
-  "@/pages/detail-page/features/download/SubsetConditions/SubsetConditions",
+  "@/pages/detail-page/features/download/subset-conditions/SubsetConditions",
   () => ({
     default: () => (
       <div data-testid="data-selection">Data Selection Component</div>
@@ -58,14 +58,14 @@ vi.mock(
 );
 
 vi.mock(
-  "@/pages/detail-page/features/download/DownloadDialog/LicenseStep",
+  "@/pages/detail-page/features/download/download-dialog/LicenseStep",
   () => ({
     default: () => <div data-testid="license-content">License Content</div>,
   })
 );
 
 vi.mock(
-  "@/pages/detail-page/features/download/DownloadDialog/EmailInputStep",
+  "@/pages/detail-page/features/download/download-dialog/EmailInputStep",
   () => ({
     default: ({ emailInputRef }: any) => (
       <div data-testid="email-input-step">
