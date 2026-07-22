@@ -247,7 +247,15 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       let start: Dayjs;
       let end: Dayjs;
 
+      // PMTiles layer: time slider tracks `.metadata` min_date / max_date
       if (
+        selectedMapLayerId === LayerName.PMTiles &&
+        pmtilesPeriodRange?.minDate &&
+        pmtilesPeriodRange?.maxDate
+      ) {
+        start = pmtilesPeriodRange.minDate;
+        end = pmtilesPeriodRange.maxDate;
+      } else if (
         downloadService === DownloadServiceType.CloudOptimised &&
         featureCollection?.features?.length
       ) {
@@ -285,26 +293,9 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       isWMSAvailable,
       isSupportPMTiles,
       lastSelectedMapLayer,
+      selectedMapLayerId,
+      pmtilesPeriodRange,
     ]);
-
-  // When the PMTiles layer is active, the time slider tracks `.metadata`
-  // min_date / max_date (Dayjs from PMTilesLayer period parsing).
-  const [sliderMinDate, sliderMaxDate] = useMemo((): [string, string] => {
-    if (
-      selectedMapLayerId === LayerName.PMTiles &&
-      pmtilesPeriodRange?.minDate &&
-      pmtilesPeriodRange?.maxDate
-    ) {
-      return [
-        pmtilesPeriodRange.minDate.format(dateDefault.DATE_FORMAT),
-        pmtilesPeriodRange.maxDate.format(dateDefault.DATE_FORMAT),
-      ];
-    }
-    return [
-      minDateStamp.format(dateDefault.DATE_FORMAT),
-      maxDateStamp.format(dateDefault.DATE_FORMAT),
-    ];
-  }, [selectedMapLayerId, pmtilesPeriodRange, minDateStamp, maxDateStamp]);
 
   const [filterStartDate, filterEndDate] = useMemo(() => {
     const dateRangeConditionGeneric = downloadConditions.find(
@@ -569,9 +560,9 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
                 menu={
                   <DateRange
                     // Remount when slider bounds change so thumbs reset to full coverage
-                    key={`date-range-${sliderMinDate}-${sliderMaxDate}`}
-                    minDate={sliderMinDate}
-                    maxDate={sliderMaxDate}
+                    key={`date-range-${minDateStamp.format(dateDefault.DATE_FORMAT)}-${maxDateStamp.format(dateDefault.DATE_FORMAT)}`}
+                    minDate={minDateStamp.format(dateDefault.DATE_FORMAT)}
+                    maxDate={maxDateStamp.format(dateDefault.DATE_FORMAT)}
                     getAndSetDownloadConditions={getAndSetDownloadConditions}
                     downloadConditions={downloadConditions}
                     options={
