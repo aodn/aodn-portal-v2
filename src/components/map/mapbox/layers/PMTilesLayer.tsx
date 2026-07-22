@@ -71,6 +71,12 @@ interface PMTilesSidecarMetadata {
   time_group_by?: string;
 }
 
+/** Optional period bounds from `{dname}.metadata` (YYYYMM or YYYYMMDD ints). */
+export interface MetadataPeriodBounds {
+  minDate?: number;
+  maxDate?: number;
+}
+
 const resolveRange = (start?: Dayjs, end?: Dayjs) => ({
   start: start || dayjs(DEFAULT_RANGE_START),
   end: end || dayjs(),
@@ -83,6 +89,53 @@ export const parseTimeGroupBy = (value: unknown): TimeGroupBy =>
     : value === "date"
       ? "date"
       : DEFAULT_TIME_GROUP_BY;
+
+/**
+ * Convert a sidecar `min_date` / `max_date` integer to a Dayjs bound.
+ * Month periods use the first/last day of that month; day periods use the day.
+ */
+export const periodNumberToDayjs = (
+  period: number | undefined,
+  timeGroupBy: TimeGroupBy,
+  bound: "start" | "end" = "start"
+): Dayjs | undefined => {
+  if (period == null || !Number.isFinite(period)) return undefined;
+  const digits = String(Math.trunc(period));
+  const isDayPeriod =
+    timeGroupBy === "date" || digits.length === 8 || digits.length > 6;
+
+  if (isDayPeriod && digits.length >= 8) {
+    const day = dayjs(
+      `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`
+    );
+    return day.isValid() ? day.startOf("day") : undefined;
+  }
+
+  if (digits.length < 6) return undefined;
+  const month = dayjs(`${digits.slice(0, 4)}-${digits.slice(4, 6)}-01`);
+  if (!month.isValid()) return undefined;
+  return bound === "end"
+    ? month.endOf("month").startOf("day")
+    : month.startOf("month");
+};
+
+/**
+ * Intersect the UI filter window with metadata period coverage so paint
+ * expressions only reference keys that can exist in the PMTiles.
+ */
+export const clampRangeToMetadata = (
+  start?: Dayjs,
+  end?: Dayjs,
+  bounds?: MetadataPeriodBounds,
+  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY
+): { start: Dayjs; end: Dayjs } => {
+  let { start: s, end: e } = resolveRange(start, end);
+  const metaStart = periodNumberToDayjs(bounds?.minDate, timeGroupBy, "start");
+  const metaEnd = periodNumberToDayjs(bounds?.maxDate, timeGroupBy, "end");
+  if (metaStart && s.isBefore(metaStart, "day")) s = metaStart;
+  if (metaEnd && e.isAfter(metaEnd, "day")) e = metaEnd;
+  return { start: s, end: e };
+};
 
 // Exported following functions for unit testing
 export const getMonthKeysInRange = (start?: Dayjs, end?: Dayjs): string[] => {
@@ -122,16 +175,22 @@ export const getDayKeysInRange = (start?: Dayjs, end?: Dayjs): string[] => {
 /**
  * Count property keys for the filter range, using only the bucket format
  * declared by PMTiles `.metadata` `time_group_by` (`date` → mYYYYMMDD,
- * `month` → mYYYYMM).
+ * `month` → mYYYYMM). When metadata min/max are provided, the range is
+ * clamped so paint/filter expressions do not expand empty calendar days
+ * outside the tile's actual coverage (counts are already pre-aggregated
+ * as m* properties — we only sum those keys).
  */
 export const getDateKeysInRange = (
   start?: Dayjs,
   end?: Dayjs,
-  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY
-): string[] =>
-  timeGroupBy === "date"
-    ? getDayKeysInRange(start, end)
-    : getMonthKeysInRange(start, end);
+  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY,
+  bounds?: MetadataPeriodBounds
+): string[] => {
+  const clamped = clampRangeToMetadata(start, end, bounds, timeGroupBy);
+  return timeGroupBy === "date"
+    ? getDayKeysInRange(clamped.start, clamped.end)
+    : getMonthKeysInRange(clamped.start, clamped.end);
+};
 
 /** Format mYYYYMM → YYYY-MM or mYYYYMMDD → YYYY-MM-DD. */
 export const formatDateKey = (key: string): string => {
@@ -286,11 +345,13 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   const filterEndDateRef = useRef(filterEndDate);
   const visibleRef = useRef(visible);
   const timeGroupByRef = useRef<TimeGroupBy>(DEFAULT_TIME_GROUP_BY);
+  const periodBoundsRef = useRef<MetadataPeriodBounds>({});
   const popupRef = useRef<Popup | null>(null);
-  // Drives paint/filter updates once `.metadata` `time_group_by` is known
+  // Drives paint/filter updates once `.metadata` is known
   const [timeGroupBy, setTimeGroupBy] = useState<TimeGroupBy>(
     DEFAULT_TIME_GROUP_BY
   );
+  const [periodBounds, setPeriodBounds] = useState<MetadataPeriodBounds>({});
 
   const removePopup = useCallback(() => {
     popupRef.current?.remove();
@@ -340,14 +401,18 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     visibleRef.current = visible;
   }, [filterStartDate, filterEndDate, visible]);
 
-  // Load `time_group_by` from the `.metadata` sidecar for the selected dataset
+  // Load `time_group_by` and period coverage from the `.metadata` sidecar
   useEffect(() => {
     const metadataUrl = formMetadataUrl();
     let cancelled = false;
 
-    // Reset to the default while the new sidecar loads
+    // Reset while the new sidecar loads
     timeGroupByRef.current = DEFAULT_TIME_GROUP_BY;
-    startTransition(() => setTimeGroupBy(DEFAULT_TIME_GROUP_BY));
+    periodBoundsRef.current = {};
+    startTransition(() => {
+      setTimeGroupBy(DEFAULT_TIME_GROUP_BY);
+      setPeriodBounds({});
+    });
 
     fetch(metadataUrl)
       .then((response) => {
@@ -359,14 +424,24 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       .then((data) => {
         if (cancelled) return;
         const groupBy = parseTimeGroupBy(data?.time_group_by);
+        const bounds: MetadataPeriodBounds = {
+          minDate:
+            typeof data?.min_date === "number" ? data.min_date : undefined,
+          maxDate:
+            typeof data?.max_date === "number" ? data.max_date : undefined,
+        };
         timeGroupByRef.current = groupBy;
+        periodBoundsRef.current = bounds;
         setTimeGroupBy(groupBy);
+        setPeriodBounds(bounds);
       })
       .catch(() => {
-        // Missing or unreadable sidecar → date aggregation default
+        // Missing or unreadable sidecar → date aggregation, no period clamp
         if (cancelled) return;
         timeGroupByRef.current = DEFAULT_TIME_GROUP_BY;
+        periodBoundsRef.current = {};
         setTimeGroupBy(DEFAULT_TIME_GROUP_BY);
+        setPeriodBounds({});
       });
 
     return () => {
@@ -398,7 +473,8 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       const keys = getDateKeysInRange(
         filterStartDateRef.current,
         filterEndDateRef.current,
-        timeGroupByRef.current
+        timeGroupByRef.current,
+        periodBoundsRef.current
       );
       const paintProps = getPaintProperties(keys);
 
@@ -640,13 +716,15 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     }
   }, [map, visible, removePopup]);
 
-  // Update paint/filter when the date range or metadata time_group_by changes
+  // Update paint/filter when the date range or metadata coverage changes.
+  // Keys are clamped to min_date/max_date so we only sum pre-baked m* counts.
   useEffect(() => {
     if (!map) return;
     const keys = getDateKeysInRange(
       filterStartDate,
       filterEndDate,
-      timeGroupBy
+      timeGroupBy,
+      periodBounds
     );
     const paintProps = getPaintProperties(keys);
 
@@ -676,7 +754,14 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     }
     // Popup content is derived from the date filter / grouping, so drop any open popup
     removePopup();
-  }, [map, filterStartDate, filterEndDate, timeGroupBy, removePopup]);
+  }, [
+    map,
+    filterStartDate,
+    filterEndDate,
+    timeGroupBy,
+    periodBounds,
+    removePopup,
+  ]);
 
   return (
     <>

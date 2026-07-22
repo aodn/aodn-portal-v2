@@ -8,6 +8,8 @@ import {
   buildPopupHtml,
   buildSumExpression,
   parseTimeGroupBy,
+  periodNumberToDayjs,
+  clampRangeToMetadata,
   DEFAULT_TIME_GROUP_BY,
 } from "../PMTilesLayer";
 
@@ -81,6 +83,67 @@ describe("PMTilesLayer - getDayKeysInRange", () => {
   });
 });
 
+describe("PMTilesLayer - periodNumberToDayjs", () => {
+  it("parses day periods as calendar days", () => {
+    expect(periodNumberToDayjs(20100815, "date")?.format("YYYY-MM-DD")).toBe(
+      "2010-08-15"
+    );
+    expect(
+      periodNumberToDayjs(20100815, "date", "end")?.format("YYYY-MM-DD")
+    ).toBe("2010-08-15");
+  });
+
+  it("parses month periods as month start/end", () => {
+    expect(
+      periodNumberToDayjs(201008, "month", "start")?.format("YYYY-MM-DD")
+    ).toBe("2010-08-01");
+    expect(
+      periodNumberToDayjs(201008, "month", "end")?.format("YYYY-MM-DD")
+    ).toBe("2010-08-31");
+  });
+
+  it("returns undefined for missing or invalid values", () => {
+    expect(periodNumberToDayjs(undefined, "date")).toBeUndefined();
+    expect(periodNumberToDayjs(NaN, "date")).toBeUndefined();
+    expect(periodNumberToDayjs(12, "month")).toBeUndefined();
+  });
+});
+
+describe("PMTilesLayer - clampRangeToMetadata", () => {
+  it("clamps the UI filter to metadata day coverage", () => {
+    const { start, end } = clampRangeToMetadata(
+      dayjs("2000-01-01"),
+      dayjs("2030-12-31"),
+      { minDate: 20100815, maxDate: 20100901 },
+      "date"
+    );
+    expect(start.format("YYYY-MM-DD")).toBe("2010-08-15");
+    expect(end.format("YYYY-MM-DD")).toBe("2010-09-01");
+  });
+
+  it("clamps month metadata to month boundaries", () => {
+    const { start, end } = clampRangeToMetadata(
+      dayjs("2000-01-01"),
+      dayjs("2030-12-31"),
+      { minDate: 201008, maxDate: 201010 },
+      "month"
+    );
+    expect(start.format("YYYY-MM-DD")).toBe("2010-08-01");
+    expect(end.format("YYYY-MM-DD")).toBe("2010-10-31");
+  });
+
+  it("leaves the filter unchanged when metadata bounds are absent", () => {
+    const { start, end } = clampRangeToMetadata(
+      dayjs("2020-01-01"),
+      dayjs("2020-01-31"),
+      {},
+      "date"
+    );
+    expect(start.format("YYYY-MM-DD")).toBe("2020-01-01");
+    expect(end.format("YYYY-MM-DD")).toBe("2020-01-31");
+  });
+});
+
 describe("PMTilesLayer - getDateKeysInRange", () => {
   const start = dayjs("2024-01-30");
   const end = dayjs("2024-02-01");
@@ -112,6 +175,39 @@ describe("PMTilesLayer - getDateKeysInRange", () => {
     expect(
       getDateKeysInRange(dayjs("2024-06-01"), dayjs("2024-01-01"), "date")
     ).toEqual([]);
+  });
+
+  it("clamps day keys to metadata min_date/max_date (pre-baked coverage)", () => {
+    // Wide UI filter, narrow tile coverage — only expand keys that can exist
+    const keys = getDateKeysInRange(
+      dayjs("2000-01-01"),
+      dayjs("2030-12-31"),
+      "date",
+      { minDate: 20100814, maxDate: 20100816 }
+    );
+    expect(keys).toEqual(["m20100814", "m20100815", "m20100816"]);
+  });
+
+  it("clamps month keys to metadata min_date/max_date", () => {
+    const keys = getDateKeysInRange(
+      dayjs("2000-01-01"),
+      dayjs("2030-12-31"),
+      "month",
+      { minDate: 201008, maxDate: 201010 }
+    );
+    expect(keys).toEqual(["m201008", "m201009", "m201010"]);
+  });
+
+  it("intersects metadata clamp with a partial UI filter", () => {
+    const keys = getDateKeysInRange(
+      dayjs("2010-08-15"),
+      dayjs("2010-08-20"),
+      "date",
+      { minDate: 20100801, maxDate: 20100831 }
+    );
+    expect(keys[0]).toBe("m20100815");
+    expect(keys[keys.length - 1]).toBe("m20100820");
+    expect(keys.length).toBe(6);
   });
 });
 
