@@ -11,6 +11,7 @@ import {
   buildSumExpression,
   parseTimeGroupBy,
   periodNumberToDayjs,
+  parsePMTilesMetadata,
   clampRangeToMetadata,
   sumSparseCountFromProperties,
   coerceCountValue,
@@ -27,12 +28,13 @@ import {
   FEATURE_STATE_TOTAL,
   PLACEHOLDER_FILL_COLOR,
   DEFAULT_TIME_GROUP_BY,
+  TimeGroupBy,
 } from "../PMTilesLayer";
 
 describe("PMTilesLayer - parseTimeGroupBy", () => {
   it("accepts date and month, falls back to default for anything else", () => {
-    expect(parseTimeGroupBy("date")).toBe("date");
-    expect(parseTimeGroupBy("month")).toBe("month");
+    expect(parseTimeGroupBy("date")).toBe(TimeGroupBy.Date);
+    expect(parseTimeGroupBy("month")).toBe(TimeGroupBy.Month);
     expect(parseTimeGroupBy(undefined)).toBe(DEFAULT_TIME_GROUP_BY);
     expect(parseTimeGroupBy("week")).toBe(DEFAULT_TIME_GROUP_BY);
     expect(parseTimeGroupBy(null)).toBe(DEFAULT_TIME_GROUP_BY);
@@ -101,27 +103,81 @@ describe("PMTilesLayer - getDayKeysInRange", () => {
 
 describe("PMTilesLayer - periodNumberToDayjs", () => {
   it("parses day periods as calendar days", () => {
-    expect(periodNumberToDayjs(20100815, "date")?.format("YYYY-MM-DD")).toBe(
-      "2010-08-15"
-    );
     expect(
-      periodNumberToDayjs(20100815, "date", "end")?.format("YYYY-MM-DD")
+      periodNumberToDayjs(20100815, TimeGroupBy.Date)?.format("YYYY-MM-DD")
+    ).toBe("2010-08-15");
+    expect(
+      periodNumberToDayjs(20100815, TimeGroupBy.Date, "end")?.format(
+        "YYYY-MM-DD"
+      )
     ).toBe("2010-08-15");
   });
 
   it("parses month periods as month start/end", () => {
     expect(
-      periodNumberToDayjs(201008, "month", "start")?.format("YYYY-MM-DD")
+      periodNumberToDayjs(201008, TimeGroupBy.Month, "start")?.format(
+        "YYYY-MM-DD"
+      )
     ).toBe("2010-08-01");
     expect(
-      periodNumberToDayjs(201008, "month", "end")?.format("YYYY-MM-DD")
+      periodNumberToDayjs(201008, TimeGroupBy.Month, "end")?.format(
+        "YYYY-MM-DD"
+      )
     ).toBe("2010-08-31");
   });
 
   it("returns undefined for missing or invalid values", () => {
-    expect(periodNumberToDayjs(undefined, "date")).toBeUndefined();
-    expect(periodNumberToDayjs(NaN, "date")).toBeUndefined();
-    expect(periodNumberToDayjs(12, "month")).toBeUndefined();
+    expect(periodNumberToDayjs(undefined, TimeGroupBy.Date)).toBeUndefined();
+    expect(periodNumberToDayjs(NaN, TimeGroupBy.Date)).toBeUndefined();
+    expect(periodNumberToDayjs(12, TimeGroupBy.Month)).toBeUndefined();
+  });
+});
+
+describe("PMTilesLayer - parsePMTilesMetadata", () => {
+  it("converts sidecar JSON day periods to Dayjs (not unix ms / 1970)", () => {
+    // Regression: dayjs(20080109) is ~1970; period keys must be string-sliced
+    expect(dayjs(20080109).format("YYYY-MM-DD")).toBe("1970-01-01");
+    expect(
+      periodNumberToDayjs(20080109, TimeGroupBy.Date)?.format("YYYY-MM-DD")
+    ).toBe("2008-01-09");
+    expect(
+      periodNumberToDayjs("20260304", TimeGroupBy.Date)?.format("YYYY-MM-DD")
+    ).toBe("2026-03-04");
+
+    const range = parsePMTilesMetadata({
+      min_date: 20080109,
+      max_date: 20260304,
+      time_group_by: "date",
+    });
+    expect(range?.minDate.format("YYYY-MM-DD")).toBe("2008-01-09");
+    expect(range?.maxDate.format("YYYY-MM-DD")).toBe("2026-03-04");
+    expect(range?.timeGroupBy).toBe(TimeGroupBy.Date);
+  });
+
+  it("uses month start/end for month metadata", () => {
+    const range = parsePMTilesMetadata({
+      min_date: 201008,
+      max_date: 201010,
+      time_group_by: "month",
+    });
+    expect(range?.minDate.format("YYYY-MM-DD")).toBe("2010-08-01");
+    expect(range?.maxDate.format("YYYY-MM-DD")).toBe("2010-10-31");
+    expect(range?.timeGroupBy).toBe(TimeGroupBy.Month);
+  });
+
+  it("accepts numeric strings and rejects incomplete bounds", () => {
+    expect(
+      parsePMTilesMetadata({
+        min_date: "20080109",
+        max_date: "20260304",
+        time_group_by: "date",
+      })?.minDate.format("YYYY-MM-DD")
+    ).toBe("2008-01-09");
+    expect(
+      parsePMTilesMetadata({ min_date: 20100815, time_group_by: "date" })
+    ).toBeNull();
+    expect(parsePMTilesMetadata({})).toBeNull();
+    expect(parsePMTilesMetadata(null)).toBeNull();
   });
 });
 
@@ -130,8 +186,11 @@ describe("PMTilesLayer - clampRangeToMetadata", () => {
     const { start, end } = clampRangeToMetadata(
       dayjs("2000-01-01"),
       dayjs("2030-12-31"),
-      { minDate: 20100815, maxDate: 20100901 },
-      "date"
+      {
+        minDate: periodNumberToDayjs(20100815, TimeGroupBy.Date),
+        maxDate: periodNumberToDayjs(20100901, TimeGroupBy.Date),
+      },
+      TimeGroupBy.Date
     );
     expect(start.format("YYYY-MM-DD")).toBe("2010-08-15");
     expect(end.format("YYYY-MM-DD")).toBe("2010-09-01");
@@ -141,8 +200,11 @@ describe("PMTilesLayer - clampRangeToMetadata", () => {
     const { start, end } = clampRangeToMetadata(
       dayjs("2000-01-01"),
       dayjs("2030-12-31"),
-      { minDate: 201008, maxDate: 201010 },
-      "month"
+      {
+        minDate: periodNumberToDayjs(201008, TimeGroupBy.Month, "start"),
+        maxDate: periodNumberToDayjs(201010, TimeGroupBy.Month, "end"),
+      },
+      TimeGroupBy.Month
     );
     expect(start.format("YYYY-MM-DD")).toBe("2010-08-01");
     expect(end.format("YYYY-MM-DD")).toBe("2010-10-31");
@@ -153,7 +215,7 @@ describe("PMTilesLayer - clampRangeToMetadata", () => {
       dayjs("2020-01-01"),
       dayjs("2020-01-31"),
       {},
-      "date"
+      TimeGroupBy.Date
     );
     expect(start.format("YYYY-MM-DD")).toBe("2020-01-01");
     expect(end.format("YYYY-MM-DD")).toBe("2020-01-31");
@@ -170,7 +232,7 @@ describe("PMTilesLayer - getDateKeysInRange", () => {
       "m20240131",
       "m20240201",
     ]);
-    expect(getDateKeysInRange(start, end, "date")).toEqual([
+    expect(getDateKeysInRange(start, end, TimeGroupBy.Date)).toEqual([
       "m20240130",
       "m20240131",
       "m20240201",
@@ -178,7 +240,7 @@ describe("PMTilesLayer - getDateKeysInRange", () => {
   });
 
   it("returns only month keys when time_group_by is month", () => {
-    expect(getDateKeysInRange(start, end, "month")).toEqual([
+    expect(getDateKeysInRange(start, end, TimeGroupBy.Month)).toEqual([
       "m202401",
       "m202402",
     ]);
@@ -186,10 +248,18 @@ describe("PMTilesLayer - getDateKeysInRange", () => {
 
   it("returns empty when start is after end", () => {
     expect(
-      getDateKeysInRange(dayjs("2024-06-01"), dayjs("2024-01-01"), "month")
+      getDateKeysInRange(
+        dayjs("2024-06-01"),
+        dayjs("2024-01-01"),
+        TimeGroupBy.Month
+      )
     ).toEqual([]);
     expect(
-      getDateKeysInRange(dayjs("2024-06-01"), dayjs("2024-01-01"), "date")
+      getDateKeysInRange(
+        dayjs("2024-06-01"),
+        dayjs("2024-01-01"),
+        TimeGroupBy.Date
+      )
     ).toEqual([]);
   });
 
@@ -198,8 +268,11 @@ describe("PMTilesLayer - getDateKeysInRange", () => {
     const keys = getDateKeysInRange(
       dayjs("2000-01-01"),
       dayjs("2030-12-31"),
-      "date",
-      { minDate: 20100814, maxDate: 20100816 }
+      TimeGroupBy.Date,
+      {
+        minDate: periodNumberToDayjs(20100814, TimeGroupBy.Date),
+        maxDate: periodNumberToDayjs(20100816, TimeGroupBy.Date),
+      }
     );
     expect(keys).toEqual(["m20100814", "m20100815", "m20100816"]);
   });
@@ -208,8 +281,11 @@ describe("PMTilesLayer - getDateKeysInRange", () => {
     const keys = getDateKeysInRange(
       dayjs("2000-01-01"),
       dayjs("2030-12-31"),
-      "month",
-      { minDate: 201008, maxDate: 201010 }
+      TimeGroupBy.Month,
+      {
+        minDate: periodNumberToDayjs(201008, TimeGroupBy.Month, "start"),
+        maxDate: periodNumberToDayjs(201010, TimeGroupBy.Month, "end"),
+      }
     );
     expect(keys).toEqual(["m201008", "m201009", "m201010"]);
   });
@@ -218,8 +294,11 @@ describe("PMTilesLayer - getDateKeysInRange", () => {
     const keys = getDateKeysInRange(
       dayjs("2010-08-15"),
       dayjs("2010-08-20"),
-      "date",
-      { minDate: 20100801, maxDate: 20100831 }
+      TimeGroupBy.Date,
+      {
+        minDate: periodNumberToDayjs(20100801, TimeGroupBy.Date),
+        maxDate: periodNumberToDayjs(20100831, TimeGroupBy.Date),
+      }
     );
     expect(keys[0]).toBe("m20100815");
     expect(keys[keys.length - 1]).toBe("m20100820");
@@ -244,29 +323,47 @@ describe("PMTilesLayer - isCountPropertyInRange", () => {
   const end = dayjs("2024-01-20");
 
   it("includes day keys on days inside the filter when time_group_by is date", () => {
-    expect(isCountPropertyInRange("m20240115", start, end, "date")).toBe(true);
-    expect(isCountPropertyInRange("m20240110", start, end, "date")).toBe(true);
-    expect(isCountPropertyInRange("m20240120", start, end, "date")).toBe(true);
+    expect(
+      isCountPropertyInRange("m20240115", start, end, TimeGroupBy.Date)
+    ).toBe(true);
+    expect(
+      isCountPropertyInRange("m20240110", start, end, TimeGroupBy.Date)
+    ).toBe(true);
+    expect(
+      isCountPropertyInRange("m20240120", start, end, TimeGroupBy.Date)
+    ).toBe(true);
   });
 
   it("excludes day keys outside the filter when time_group_by is date", () => {
-    expect(isCountPropertyInRange("m20240109", start, end, "date")).toBe(false);
-    expect(isCountPropertyInRange("m20240121", start, end, "date")).toBe(false);
+    expect(
+      isCountPropertyInRange("m20240109", start, end, TimeGroupBy.Date)
+    ).toBe(false);
+    expect(
+      isCountPropertyInRange("m20240121", start, end, TimeGroupBy.Date)
+    ).toBe(false);
   });
 
   it("includes month keys that overlap the filter when time_group_by is month", () => {
-    expect(isCountPropertyInRange("m202401", start, end, "month")).toBe(true);
-    expect(isCountPropertyInRange("m202312", start, end, "month")).toBe(false);
-    expect(isCountPropertyInRange("m202402", start, end, "month")).toBe(false);
+    expect(
+      isCountPropertyInRange("m202401", start, end, TimeGroupBy.Month)
+    ).toBe(true);
+    expect(
+      isCountPropertyInRange("m202312", start, end, TimeGroupBy.Month)
+    ).toBe(false);
+    expect(
+      isCountPropertyInRange("m202402", start, end, TimeGroupBy.Month)
+    ).toBe(false);
   });
 
   it("rejects keys that do not match the active time_group_by format", () => {
     // Month tile must not sum day properties
-    expect(isCountPropertyInRange("m20240115", start, end, "month")).toBe(
-      false
-    );
+    expect(
+      isCountPropertyInRange("m20240115", start, end, TimeGroupBy.Month)
+    ).toBe(false);
     // Date tile must not sum month properties
-    expect(isCountPropertyInRange("m202401", start, end, "date")).toBe(false);
+    expect(
+      isCountPropertyInRange("m202401", start, end, TimeGroupBy.Date)
+    ).toBe(false);
   });
 
   it("defaults to date grouping when time_group_by is omitted", () => {
@@ -275,8 +372,12 @@ describe("PMTilesLayer - isCountPropertyInRange", () => {
   });
 
   it("rejects non-count property names", () => {
-    expect(isCountPropertyInRange("h", start, end, "month")).toBe(false);
-    expect(isCountPropertyInRange("m2024", start, end, "month")).toBe(false);
+    expect(isCountPropertyInRange("h", start, end, TimeGroupBy.Month)).toBe(
+      false
+    );
+    expect(isCountPropertyInRange("m2024", start, end, TimeGroupBy.Month)).toBe(
+      false
+    );
   });
 });
 
@@ -311,7 +412,7 @@ describe("PMTilesLayer - buildPopupHtml", () => {
       { m202401: 5, m202403: 7, m202405: 0 },
       filterStart,
       filterEnd,
-      "month"
+      TimeGroupBy.Month
     );
     expect(html).toContain("Data Records In This Area:");
     expect(html).toContain("Data Record Count: 12");
@@ -323,7 +424,7 @@ describe("PMTilesLayer - buildPopupHtml", () => {
       { m20240101: 5, m20240302: 7, m20240501: 0 },
       filterStart,
       filterEnd,
-      "date"
+      TimeGroupBy.Date
     );
     expect(html).toContain("Data Records In This Area:");
     expect(html).toContain("Data Record Count: 12");
@@ -335,7 +436,7 @@ describe("PMTilesLayer - buildPopupHtml", () => {
       { m202401: 5, m20240101: 99 },
       filterStart,
       filterEnd,
-      "month"
+      TimeGroupBy.Month
     );
     expect(html).toContain("Data Record Count: 5");
     expect(html).toContain("Time Range: 2024-01 to 2024-01");
@@ -346,7 +447,7 @@ describe("PMTilesLayer - buildPopupHtml", () => {
       { m202401: 99, m20240101: 5 },
       filterStart,
       filterEnd,
-      "date"
+      TimeGroupBy.Date
     );
     expect(html).toContain("Data Record Count: 5");
     expect(html).toContain("Time Range: 2024-01-01 to 2024-01-01");
@@ -357,7 +458,7 @@ describe("PMTilesLayer - buildPopupHtml", () => {
       { m20240101: 5, m20250601: 99, m20240201: "not-a-number" },
       filterStart,
       filterEnd,
-      "date"
+      TimeGroupBy.Date
     );
     expect(html).toContain("Data Record Count: 5");
     expect(html).toContain("Time Range: 2024-01-01 to 2024-01-01");
@@ -368,7 +469,7 @@ describe("PMTilesLayer - buildPopupHtml", () => {
       { m202401: 5, m202506: 99, m202402: "not-a-number" },
       filterStart,
       filterEnd,
-      "month"
+      TimeGroupBy.Month
     );
     expect(html).toContain("Data Record Count: 5");
     expect(html).toContain("Time Range: 2024-01 to 2024-01");
@@ -379,7 +480,7 @@ describe("PMTilesLayer - buildPopupHtml", () => {
       { m20250601: 99 },
       filterStart,
       filterEnd,
-      "date"
+      TimeGroupBy.Date
     );
     expect(html).toContain("Data Record Count: 0");
     expect(html).toContain("Time Range: N/A to N/A");
@@ -396,8 +497,8 @@ describe("PMTilesLayer - buildPopupHtml", () => {
       m20100815: 75196,
       m20100831: 50000,
     };
-    const monthHtml = buildPopupHtml(monthProps, start, end, "month");
-    const dayHtml = buildPopupHtml(dayProps, start, end, "date");
+    const monthHtml = buildPopupHtml(monthProps, start, end, TimeGroupBy.Month);
+    const dayHtml = buildPopupHtml(dayProps, start, end, TimeGroupBy.Date);
     expect(monthHtml).toContain("Data Record Count: 175196");
     expect(dayHtml).toContain("Data Record Count: 175196");
   });
@@ -405,12 +506,17 @@ describe("PMTilesLayer - buildPopupHtml", () => {
   it("partial-month filters count whole months on month tiles but only in-range days on day tiles", () => {
     const start = dayjs("2010-08-01");
     const end = dayjs("2010-08-15");
-    const monthHtml = buildPopupHtml({ m201008: 175196 }, start, end, "month");
+    const monthHtml = buildPopupHtml(
+      { m201008: 175196 },
+      start,
+      end,
+      TimeGroupBy.Month
+    );
     const dayHtml = buildPopupHtml(
       { m20100801: 10000, m20100815: 9120, m20100816: 50000 },
       start,
       end,
-      "date"
+      TimeGroupBy.Date
     );
     // Month encoding cannot subdivide the month
     expect(monthHtml).toContain("Data Record Count: 175196");
@@ -436,7 +542,7 @@ describe("PMTilesLayer - buildPopupHtml", () => {
       props,
       dayjs("2008-11-01"),
       dayjs("2023-06-30"),
-      "date"
+      TimeGroupBy.Date
     );
     expect(html).toContain(`Data Record Count: ${expected}`);
   });
@@ -460,7 +566,7 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
       { h: "abc", m20240101: 5, m20240201: 7, m20240501: 99, m202401: 3 },
       start,
       end,
-      "date"
+      TimeGroupBy.Date
     );
     expect(total).toBe(12);
     expect(matchedKeys).toEqual(["m20240101", "m20240201"]);
@@ -474,7 +580,7 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
       { m20240115: "10", m20240201: "3" },
       start,
       end,
-      "date"
+      TimeGroupBy.Date
     );
     expect(total).toBe(13);
   });
@@ -485,12 +591,12 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
         { h: "abc", m20250601: 1 },
         start,
         end,
-        "date"
+        TimeGroupBy.Date
       ).total
     ).toBe(0);
-    expect(sumSparseCountFromProperties(null, start, end, "date").total).toBe(
-      0
-    );
+    expect(
+      sumSparseCountFromProperties(null, start, end, TimeGroupBy.Date).total
+    ).toBe(0);
   });
 
   it("builds feature-state paint; layer filter does not use feature-state", () => {
@@ -548,7 +654,7 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
       map,
       dayjs("2024-01-01"),
       dayjs("2024-03-31"),
-      "date"
+      TimeGroupBy.Date
     );
     // 2 features × 6 source layers queried, but only hex_z0 returns features
     // updateFeatureStateTotals loops all layers; only hex_z0 has features
