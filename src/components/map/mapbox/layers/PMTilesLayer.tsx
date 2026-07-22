@@ -335,13 +335,25 @@ export const buildNonZeroCountFilter = (
 ): ExpressionSpecification =>
   [">", buildSumExpression(keys), 0] as ExpressionSpecification;
 
-/** Density input: sparse total written via setFeatureState. */
+/** Density input: sparse total written via setFeatureState (0 when unset). */
 export const buildFeatureStateTotalExpression = (): ExpressionSpecification =>
   [
     "coalesce",
     ["feature-state", FEATURE_STATE_TOTAL],
     0,
   ] as ExpressionSpecification;
+
+/**
+ * True when feature-state total has been written. Unset state is `null` and must
+ * not be treated like a real zero count (new tiles would vanish mid-load).
+ */
+export const buildFeatureStateTotalIsSetExpression =
+  (): ExpressionSpecification =>
+    [
+      "!=",
+      ["feature-state", FEATURE_STATE_TOTAL],
+      null,
+    ] as ExpressionSpecification;
 
 /**
  * Layer filter for density mode.
@@ -367,48 +379,56 @@ export type HexFillPaint = {
   "fill-outline-color": string;
 };
 
+export const PLACEHOLDER_FILL_COLOR = "#475569";
+export const PLACEHOLDER_FILL_OPACITY = 0.4;
+
 /** Neutral style while feature-state totals are computed in the background. */
 export const getPlaceholderPaintProperties = (): HexFillPaint => ({
-  "fill-color": "#475569",
-  "fill-opacity": 0.4,
+  "fill-color": PLACEHOLDER_FILL_COLOR,
+  "fill-opacity": PLACEHOLDER_FILL_OPACITY,
   "fill-outline-color": "rgba(255, 255, 255, 0.4)",
 });
 
-/** Density paint driven by feature-state totals (no dense day-key sum). */
+/**
+ * Density paint driven by feature-state totals (no dense day-key sum).
+ *
+ * Unset feature-state (tile not yet processed) keeps the placeholder look so
+ * newly loaded hexes do not disappear until their sparse total is written.
+ * A real total of 0 paints transparent (out of filter range).
+ */
 export const getFeatureStatePaintProperties = (): HexFillPaint => {
+  const totalIsSet = buildFeatureStateTotalIsSetExpression();
   const sumExpr = buildFeatureStateTotalExpression();
   return {
     "fill-color": [
-      "interpolate",
-      ["linear"],
-      sumExpr,
-      0,
-      "rgba(0, 0, 0, 0)",
-      1,
-      "#1E293B",
-      10,
-      "#334155",
-      100,
-      "#475569",
-      1000,
-      "#0284C7",
-      5000,
-      "#0D9488",
-      10000,
-      "#14B8A6",
+      "case",
+      ["!", totalIsSet],
+      PLACEHOLDER_FILL_COLOR,
+      [
+        "interpolate",
+        ["linear"],
+        sumExpr,
+        0,
+        "rgba(0, 0, 0, 0)",
+        1,
+        "#1E293B",
+        10,
+        "#334155",
+        100,
+        "#475569",
+        1000,
+        "#0284C7",
+        5000,
+        "#0D9488",
+        10000,
+        "#14B8A6",
+      ],
     ] as ExpressionSpecification,
     "fill-opacity": [
-      "interpolate",
-      ["linear"],
-      sumExpr,
-      0,
-      0,
-      1,
-      0.15,
-      100,
-      0.6,
-      1000,
-      0.8,
+      "case",
+      ["!", totalIsSet],
+      PLACEHOLDER_FILL_OPACITY,
+      ["interpolate", ["linear"], sumExpr, 0, 0, 1, 0.15, 100, 0.6, 1000, 0.8],
     ] as ExpressionSpecification,
     "fill-outline-color": "rgba(255, 255, 255, 0.4)",
   };
@@ -531,6 +551,26 @@ export const scheduleDeferredWork = (work: () => void): (() => void) => {
   };
 };
 
+/**
+ * Trailing debounce so rapid tile `sourcedata` / `idle` events collapse into
+ * one feature-state pass after the viewport settles (avoids partial updates).
+ */
+export const FEATURE_STATE_DEBOUNCE_MS = 120;
+
+export const scheduleDebouncedWork = (
+  work: () => void,
+  delayMs: number = FEATURE_STATE_DEBOUNCE_MS
+): (() => void) => {
+  let cancelled = false;
+  const timeoutId = setTimeout(() => {
+    if (!cancelled) work();
+  }, delayMs);
+  return () => {
+    cancelled = true;
+    clearTimeout(timeoutId);
+  };
+};
+
 const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   collection,
   selectedCoKey,
@@ -560,20 +600,24 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   }, []);
 
   /**
-   * Sparse-sum loaded features into feature-state, then paint/filter from
-   * those totals (no dense day-key Mapbox expression).
+   * Sparse-sum loaded features into feature-state, then paint from those
+   * totals (no dense day-key Mapbox expression).
+   *
+   * Tile loads arrive in waves; we debounce trailing updates so a pass runs
+   * after the viewport settles and covers as many loaded features as possible.
+   * Paint treats unset feature-state as placeholder (not transparent) so hexes
+   * never vanish between tile fetch and the next state pass.
    *
    * @param showPlaceholder When true (date/metadata change), flash a cheap
-   *   presence style first so hexes stay visible while totals recompute.
-   *   When false (new tiles loaded), only refresh feature-state — avoids
-   *   flicker while panning.
+   *   presence style first while totals recompute for a new filter window.
    */
   const scheduleFeatureStateDensity = useCallback(
-    (options?: { showPlaceholder?: boolean }) => {
+    (options?: { showPlaceholder?: boolean; delayMs?: number }) => {
       if (!map) return () => undefined;
 
       const generation = ++featureStateGenRef.current;
       const showPlaceholder = options?.showPlaceholder ?? false;
+      const delayMs = options?.delayMs ?? FEATURE_STATE_DEBOUNCE_MS;
 
       if (showPlaceholder) {
         try {
@@ -587,7 +631,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         }
       }
 
-      return scheduleDeferredWork(() => {
+      return scheduleDebouncedWork(() => {
         if (generation !== featureStateGenRef.current) return;
         try {
           updateFeatureStateTotals(
@@ -597,18 +641,18 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
             timeGroupByRef.current
           );
           // Density colors from feature-state; filter must NOT use feature-state
-          // (unsupported). Zero totals paint as transparent via interpolate.
+          // (unsupported). Unset totals stay placeholder; real 0 is transparent.
           applyHexLayerStyle(
             map,
             buildDensityLayerFilter(),
             getFeatureStatePaintProperties()
           );
-          // Ensure the map redraws after bulk setFeatureState
-          map.triggerRepaint?.();
+          // setFeatureState already invalidates paint; avoid extra repaint
+          // loops with map "idle" handlers.
         } catch {
           // Map may already be torn down
         }
-      });
+      }, delayMs);
     },
     [map]
   );
@@ -799,13 +843,28 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     };
     map.on("styledata", onStyleData);
 
-    // Newly loaded tiles need feature-state totals for the current filter
-    const onSourceData = (e: MapSourceDataEvent) => {
-      if (e.sourceId !== SOURCE_ID || !e.isSourceLoaded) return;
+    const rescheduleDensityFromTiles = () => {
       cancelDensity?.();
+      // No placeholder flash — paint already keeps unset totals as placeholder
       cancelDensity = scheduleFeatureStateDensity({ showPlaceholder: false });
     };
+
+    // Tile content arrives in waves; re-sum all currently loaded features.
+    // Skip metadata-only events. Do not require isSourceLoaded — intermediate
+    // tile batches must still get feature-state or hexes look "half missing".
+    const onSourceData = (e: MapSourceDataEvent) => {
+      if (e.sourceId !== SOURCE_ID) return;
+      if (e.sourceDataType === "metadata") return;
+      rescheduleDensityFromTiles();
+    };
     map.on("sourcedata", onSourceData);
+
+    // After pan/zoom settles, run another pass for any tiles that finished
+    // loading after the last sourcedata debounce window.
+    const onMoveEnd = () => {
+      rescheduleDensityFromTiles();
+    };
+    map.on("moveend", onMoveEnd);
 
     return () => {
       if (!map) return;
@@ -833,6 +892,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       } finally {
         map.off("styledata", onStyleData);
         map.off("sourcedata", onSourceData);
+        map.off("moveend", onMoveEnd);
         map.off("load", addSourceAndLayers);
         removePopup();
       }

@@ -15,6 +15,7 @@ import {
   sumSparseCountFromProperties,
   coerceCountValue,
   buildFeatureStateTotalExpression,
+  buildFeatureStateTotalIsSetExpression,
   buildDensityLayerFilter,
   buildPresenceFilter,
   getPlaceholderPaintProperties,
@@ -22,7 +23,9 @@ import {
   applyHexLayerStyle,
   updateFeatureStateTotals,
   scheduleDeferredWork,
+  scheduleDebouncedWork,
   FEATURE_STATE_TOTAL,
+  PLACEHOLDER_FILL_COLOR,
   DEFAULT_TIME_GROUP_BY,
 } from "../PMTilesLayer";
 
@@ -496,6 +499,11 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
       ["feature-state", FEATURE_STATE_TOTAL],
       0,
     ]);
+    expect(buildFeatureStateTotalIsSetExpression()).toEqual([
+      "!=",
+      ["feature-state", FEATURE_STATE_TOTAL],
+      null,
+    ]);
     // feature-state is illegal in filters — density uses presence only
     expect(buildDensityLayerFilter()).toEqual(["has", "h"]);
     expect(JSON.stringify(buildDensityLayerFilter())).not.toContain(
@@ -505,8 +513,12 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     expect(typeof getPlaceholderPaintProperties()["fill-color"]).toBe("string");
     // Density paint must reference feature-state, not a dense + of day keys
     const density = getFeatureStatePaintProperties();
-    expect(JSON.stringify(density["fill-color"])).toContain("feature-state");
-    expect(JSON.stringify(density["fill-color"])).not.toContain("m2024");
+    const colorJson = JSON.stringify(density["fill-color"]);
+    expect(colorJson).toContain("feature-state");
+    expect(colorJson).not.toContain("m2024");
+    // Unset feature-state keeps placeholder so mid-load tiles do not vanish
+    expect(colorJson).toContain(PLACEHOLDER_FILL_COLOR);
+    expect(colorJson).toContain("case");
   });
 
   it("writes sparse totals via setFeatureState for loaded features", () => {
@@ -588,5 +600,16 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     scheduleDeferredWork(work2);
     await new Promise((r) => setTimeout(r, 50));
     expect(work2).toHaveBeenCalledTimes(1);
+  });
+
+  it("debounces work so tile storms collapse to one pass", async () => {
+    const work = vi.fn();
+    const cancel1 = scheduleDebouncedWork(work, 40);
+    cancel1();
+    scheduleDebouncedWork(work, 40);
+    await new Promise((r) => setTimeout(r, 20));
+    expect(work).not.toHaveBeenCalled();
+    await new Promise((r) => setTimeout(r, 40));
+    expect(work).toHaveBeenCalledTimes(1);
   });
 });
