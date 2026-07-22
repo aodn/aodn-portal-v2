@@ -32,8 +32,8 @@ import { openInNewTab } from "../../../utils/LinkUtils";
 import { scrollToTop } from "../../../utils/ScrollUtils";
 import { useLocation } from "react-router-dom";
 import { pageDefault } from "../../common/constants";
-import { NorthIcon } from "../../../assets/icons/footer/arrowUp";
-import { BlueskyLogoIcon } from "../../../assets/icons/footer/bluesky";
+import { NorthIcon } from "../../icon/NorthIcon";
+import { BlueskyLogoIcon } from "../../icon/BlueskyLogoIcon";
 import { PAGE_CONTENT_WIDTH_LANDING } from "../constant";
 
 interface IconContainerProps {

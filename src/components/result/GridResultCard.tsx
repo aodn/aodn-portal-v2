@@ -14,7 +14,7 @@ import {
   gap,
   padding,
 } from "../../styles/constants";
-import OrganizationLogo from "../logo/OrganizationLogo";
+import OrganizationLogo from "../icon/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import { ResultCardBasicType } from "./ResultCards";
 import BookmarkButton from "../bookmark/BookmarkButton";

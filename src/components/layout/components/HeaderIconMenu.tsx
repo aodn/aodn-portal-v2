@@ -1,7 +1,7 @@
 import { FC, useCallback, useState } from "react";
 import { IconButton, Menu } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { MenuIcon } from "../../../assets/icons/header/MenuIcon";
+import { MenuIcon } from "../../icon/MenuIcon";
 import {
   borderRadius,
   color,

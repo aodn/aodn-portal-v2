@@ -6,7 +6,7 @@ import {
   AODN_SITE_LOGO_HEIGHT_MOBILE,
 } from "../constant";
 import { pageDefault } from "../../common/constants";
-import { IconImosLogoWithTitle } from "../../../assets/images/banner_logo_with_title";
+import { IconImosLogoWithTitle } from "../../icon/IconImosLogoWithTitle";
 
 const AODNSiteLogo = () => {
   const { isMobile } = useBreakpoint();
