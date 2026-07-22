@@ -375,12 +375,6 @@ export const buildSumExpression = (keys: string[]) => {
   return ["+", ...keys.map((k) => ["coalesce", ["get", k], 0])];
 };
 
-/** @deprecated Prefer buildFeatureStateNonZeroFilter. */
-export const buildNonZeroCountFilter = (
-  keys: string[]
-): ExpressionSpecification =>
-  [">", buildSumExpression(keys), 0] as ExpressionSpecification;
-
 /** Density input: sparse total written via setFeatureState (0 when unset). */
 export const buildFeatureStateTotalExpression = (): ExpressionSpecification =>
   [
