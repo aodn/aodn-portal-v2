@@ -1,7 +1,4 @@
-import {
-  getSubgroup,
-  ILink,
-} from "../components/common/store/OGCCollectionDefinitions";
+import { getSubgroup, ILink } from "@/app/store/OGCCollectionDefinitions";
 
 // ================== UTILITY FUNCTIONS ==================
 export function dataAccessParams(link: ILink): Gtag.CustomParams {

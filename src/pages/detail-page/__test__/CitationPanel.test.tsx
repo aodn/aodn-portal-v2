@@ -1,8 +1,8 @@
 import { afterAll, afterEach, beforeAll, expect, vi } from "vitest";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
-import AppTheme from "../../../utils/AppTheme";
+import AppTheme from "@/styles/theme";
 import { Provider } from "react-redux";
-import store from "../../../components/common/store/store";
+import store from "@/app/store/store";
 import { ThemeProvider } from "@mui/material/styles";
 import { DetailPageProvider } from "../context/detail-page-provider";
 import { server } from "../../../__mocks__/server";

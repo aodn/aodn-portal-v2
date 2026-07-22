@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import { IconButton, Stack } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { useAppDispatch } from "../../../../components/common/store/hooks";
+import { useAppDispatch } from "@/app/store/hooks";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 import useRedirectSearch from "../../../../hooks/useRedirectSearch";
 import useTopicsPanelSize from "../../../../hooks/useTopicsPanelSize";
@@ -17,7 +17,7 @@ import {
   updateExcludeDocument,
   updateHasData,
   updateSearchText,
-} from "../../../../components/common/store/componentParamReducer";
+} from "@/app/store/componentParamReducer";
 import { portalTheme } from "../../../../styles";
 import { AnalyticsEvent } from "../../../../analytics/analyticsEvents";
 import { trackCustomEvent } from "../../../../analytics/customEventTracker";

@@ -4,11 +4,11 @@ import DetailsPage from "../pages/detail-page/DetailsPage";
 import { createBrowserRouter, redirect } from "react-router-dom";
 import NotFoundPage from "../pages/error-page/NotFoundPage";
 import ErrorPage from "../pages/error-page/ErrorPage";
-import ErrorBoundary from "./ErrorBoundary";
+import ErrorBoundary from "@/utils/ErrorBoundary";
 import { pageDefault } from "../components/common/constants";
-import HealthChecker from "./HealthChecker";
+import HealthChecker from "@/utils/HealthChecker";
 import DegradedPage from "../pages/error-page/DegradedPage";
-import { syncCanonicalUrl } from "./seo/canonicalUrl";
+import { syncCanonicalUrl } from "@/utils/seo/canonicalUrl";
 import React from "react";
 
 // Helper to conditionally wrap a page with HealthChecker based on the mode

@@ -15,9 +15,9 @@ import {
   zIndex,
 } from "../../../../styles/constants";
 import MapContext from "../MapContext";
-import { useAppDispatch } from "../../../common/store/hooks";
-import { fetchResultByUuidNoStore } from "../../../common/store/searchReducer";
-import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
+import { useAppDispatch } from "@/app/store/hooks";
+import { fetchResultByUuidNoStore } from "@/app/store/searchReducer";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { MapEvent, MapMouseEvent } from "mapbox-gl";
 import { Feature, Point } from "geojson";
 import useBreakpoint from "../../../../hooks/useBreakpoint";

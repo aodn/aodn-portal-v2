@@ -12,12 +12,12 @@ import userEvent from "@testing-library/user-event";
 import { Provider } from "react-redux";
 import { ThemeProvider } from "@mui/material/styles";
 import { MemoryRouter } from "react-router-dom";
-import AppTheme from "../../../utils/AppTheme";
-import store from "../../common/store/store";
+import AppTheme from "@/styles/theme";
+import store from "@/app/store/store";
 import {
   clearComponentParam,
   updateHasData,
-} from "../../common/store/componentParamReducer";
+} from "@/app/store/componentParamReducer";
 import Header from "../components/Header";
 import { SEARCHBAR_EXPANSION_WIDTH_LAPTOP } from "../../search/constants";
 

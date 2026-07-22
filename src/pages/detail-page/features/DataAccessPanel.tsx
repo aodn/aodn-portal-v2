@@ -8,7 +8,7 @@ import {
   DataAccessSubGroup,
   getSubgroup,
   ILink,
-} from "../../../components/common/store/OGCCollectionDefinitions";
+} from "@/app/store/OGCCollectionDefinitions";
 import SideCardContainer from "../layout/SideCardContainer";
 import NavigatablePanel, {
   NavigatablePanelChild,

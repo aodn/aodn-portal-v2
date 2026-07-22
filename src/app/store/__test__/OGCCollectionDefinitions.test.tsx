@@ -9,9 +9,9 @@ import {
 vi.mock("@/assets/images/default-thumbnail.png", () => ({
   default: "mocked-default-thumbnail.png",
 }));
-vi.mock("../../../assets/icons/wms.png", () => "mocked-wms-icon.png");
-vi.mock("../../../assets/icons/wfs.png", () => "mocked-wfs-icon.png");
-vi.mock("../../../assets/icons/link.png", () => "mocked-link-icon.png");
+vi.mock("@/components/assets/icons/wms.png", () => "mocked-wms-icon.png");
+vi.mock("@/components/assets/icons/wfs.png", () => "mocked-wfs-icon.png");
+vi.mock("@/components/assets/icons/link.png", () => "mocked-link-icon.png");
 
 describe("OGCCollection", () => {
   describe("findThumbnail", () => {

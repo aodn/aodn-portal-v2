@@ -2,7 +2,7 @@
 import React from "react";
 import ExpandableList from "./ExpandableList";
 import ItemBaseGrid from "./listItem/ItemBaseGrid";
-import { ILink } from "../common/store/OGCCollectionDefinitions";
+import { ILink } from "@/app/store/OGCCollectionDefinitions";
 import LinkCard from "./listItem/subitem/LinkCard";
 
 interface CodeTutorialsListProps {

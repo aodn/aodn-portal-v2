@@ -6,13 +6,13 @@ import { OGCCollection } from "./OGCCollectionDefinitions";
 import {
   BookmarkEvent,
   EVENT_BOOKMARK,
-} from "../../map/mapbox/controls/menu/Definition";
-import { errorHandling, ErrorResponse } from "../../../utils/ErrorBoundary";
+} from "@/components/map/mapbox/controls/menu/Definition";
+import { errorHandling, ErrorResponse } from "@/utils/ErrorBoundary";
 import {
   loadBookmarkIdsFromStorage,
   saveBookmarkIdsToStorage,
-} from "../../../utils/StorageUtils";
-import { createFilterString } from "../../../utils/StringUtils";
+} from "@/utils/StorageUtils";
+import { createFilterString } from "@/utils/StringUtils";
 
 interface BookmarkListState {
   items: Array<OGCCollection>;

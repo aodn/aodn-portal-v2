@@ -1,7 +1,4 @@
-import {
-  IAssociatedRecord,
-  ILink,
-} from "../common/store/OGCCollectionDefinitions";
+import { IAssociatedRecord, ILink } from "@/app/store/OGCCollectionDefinitions";
 import React, { memo, ReactNode, useMemo } from "react";
 import ExpandableList from "./ExpandableList";
 import CollapseItem from "./listItem/CollapseItem";

@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from "vitest";
 import { redirect } from "react-router-dom";
-import { searchLoader } from "../AppRouter";
+import { searchLoader } from "../router";
 
 // Mock the redirect function
 vi.mock("react-router-dom", async () => {

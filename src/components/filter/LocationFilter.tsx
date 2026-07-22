@@ -21,8 +21,8 @@ import {
   SelectedStaticArea,
   updateFilterPolygon,
   updateFilterStaticAreas,
-} from "../common/store/componentParamReducer";
-import { useAppDispatch, useAppSelector } from "../common/store/hooks";
+} from "@/app/store/componentParamReducer";
+import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { featureCollection, union } from "@turf/turf";
 import {
   fetchAllenCoralAtlasOptions,
@@ -469,8 +469,7 @@ const LocationFilter: FC<LocationFilterProps> = () => {
   );
 
   const highlightCollection = useMemo(():
-    | FeatureCollection<Polygon | MultiPolygon>
-    | undefined => {
+    FeatureCollection<Polygon | MultiPolygon> | undefined => {
     const allFeats: Feature<Polygon | MultiPolygon>[] = [];
 
     if (selectedMarineParkValues.size > 0) {

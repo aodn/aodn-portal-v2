@@ -36,8 +36,8 @@ import {
   unFlattenToParameterState,
   updateParameterStates,
   updateSearchText,
-} from "../common/store/componentParamReducer";
-import { useAppDispatch, useAppSelector } from "../common/store/hooks";
+} from "@/app/store/componentParamReducer";
+import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import ActiveFiltersChips from "./ActiveFiltersChips";
 
 import { createPortal } from "react-dom";

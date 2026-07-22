@@ -8,7 +8,7 @@ import {
   WFSDownloadRequest,
   DateRangeCondition,
   FormatCondition,
-} from "../../../../pages/detail-page/context/DownloadDefinitions";
+} from "@/pages/detail-page/context/DownloadDefinitions";
 import { configureStore } from "@reduxjs/toolkit";
 
 describe("searchReducer async thunks", () => {

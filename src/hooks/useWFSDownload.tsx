@@ -1,6 +1,6 @@
 import { useCallback, useState, useRef } from "react";
-import { useAppDispatch } from "../components/common/store/hooks";
-import { processWFSDownload } from "../components/common/store/searchReducer";
+import { useAppDispatch } from "@/app/store/hooks";
+import { processWFSDownload } from "@/app/store/searchReducer";
 import { IDownloadCondition } from "../pages/detail-page/context/DownloadDefinitions";
 import { consumeSSEStream } from "../utils/SSEUtils";
 

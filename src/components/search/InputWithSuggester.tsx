@@ -21,16 +21,16 @@ import SearchIcon from "@mui/icons-material/Search";
 import {
   ParameterState,
   updateSearchText,
-} from "../common/store/componentParamReducer";
-import store, { getComponentState, RootState } from "../common/store/store";
+} from "@/app/store/componentParamReducer";
+import store, { getComponentState, RootState } from "@/app/store/store";
 import {
   createSuggesterParamFrom,
   fetchSuggesterOptions,
-} from "../common/store/searchReducer";
+} from "@/app/store/searchReducer";
 import { borderRadius, color, padding } from "../../styles/constants";
 import { debounce } from "lodash";
 import { sortByRelevance } from "../../utils/Helpers";
-import { useAppDispatch } from "../common/store/hooks";
+import { useAppDispatch } from "@/app/store/hooks";
 import { TEXT_FIELD_MIN_WIDTH } from "./constants";
 import { SearchbarButtonNames } from "./SearchbarButtonGroup";
 import { useLocation } from "react-router-dom";

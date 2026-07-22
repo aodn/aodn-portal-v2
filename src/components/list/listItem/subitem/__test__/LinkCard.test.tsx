@@ -2,11 +2,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import LinkCard from "../LinkCard";
-import { ILink } from "../../../../common/store/OGCCollectionDefinitions";
-import * as ClipboardContext from "../../../../../context/clipboard/ClipboardContext";
+import { ILink } from "@/app/store/OGCCollectionDefinitions";
+import * as ClipboardContext from "@/app/providers/ClipboardContext";
 import * as LinkUtils from "../../../../../utils/LinkUtils";
 
-vi.mock("../../../../../context/clipboard/ClipboardContext", () => ({
+vi.mock("@/app/providers/ClipboardContext", () => ({
   useClipboardContext: vi.fn(),
 }));
 

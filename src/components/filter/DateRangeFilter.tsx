@@ -23,16 +23,16 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { color, padding } from "../../styles/constants";
 import { dateDefault } from "../common/constants";
-import { updateDateTimeFilterRange } from "../common/store/componentParamReducer";
-import { useAppDispatch, useAppSelector } from "../common/store/hooks";
+import { updateDateTimeFilterRange } from "@/app/store/componentParamReducer";
+import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import {
   OGCCollection,
   OGCCollections,
-} from "../common/store/OGCCollectionDefinitions";
+} from "@/app/store/OGCCollectionDefinitions";
 import {
   fetchResultNoStore,
   jsonToOGCCollections,
-} from "../common/store/searchReducer";
+} from "@/app/store/searchReducer";
 import {
   cqlDefaultFilters,
   DatasetGroup,

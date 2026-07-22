@@ -14,14 +14,14 @@ import { bboxPolygon, booleanEqual } from "@turf/turf";
 import store, {
   getComponentState,
   getSearchQueryResult,
-} from "../../components/common/store/store";
+} from "@/app/store/store";
 import {
   createSearchParamFrom,
   fetchResultByUuidNoStore,
   fetchResultNoStore,
   jsonToOGCCollections,
   SearchParameters,
-} from "../../components/common/store/searchReducer";
+} from "@/app/store/searchReducer";
 import {
   formatToUrlParam,
   ParameterState,
@@ -31,23 +31,20 @@ import {
   updateSort,
   updateSortBy,
   updateZoom,
-} from "../../components/common/store/componentParamReducer";
+} from "@/app/store/componentParamReducer";
 import {
   off,
   on,
   setExpandedItem,
   setTemporaryItem,
-} from "../../components/common/store/bookmarkListReducer";
+} from "@/app/store/bookmarkListReducer";
 import Layout from "../../components/layout/Layout";
 import ResultSection from "./layout/ResultSection";
 import MapSection from "./layout/MapSection";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/ResultListLayoutButton";
 import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
-import { OGCCollection } from "../../components/common/store/OGCCollectionDefinitions";
-import {
-  useAppDispatch,
-  useAppSelector,
-} from "../../components/common/store/hooks";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { pageDefault, pageReferer } from "../../components/common/constants";
 import { color } from "../../styles/constants";
 import {

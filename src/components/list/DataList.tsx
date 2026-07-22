@@ -4,7 +4,7 @@ import {
   ILink,
   DataAccessSubGroup,
   getSubgroup,
-} from "../common/store/OGCCollectionDefinitions";
+} from "@/app/store/OGCCollectionDefinitions";
 import LinkCard from "./listItem/subitem/LinkCard";
 import CollapseItem from "./listItem/CollapseItem";
 import ExpandableTextArea from "./listItem/subitem/ExpandableTextArea";

@@ -3,9 +3,9 @@ import { Box, SxProps } from "@mui/material";
 import {
   updateParameterVocabs,
   Vocab,
-} from "../../common/store/componentParamReducer";
-import { useAppDispatch } from "../../common/store/hooks";
-import { fetchParameterVocabsWithStore } from "../../common/store/searchReducer";
+} from "@/app/store/componentParamReducer";
+import { useAppDispatch } from "@/app/store/hooks";
+import { fetchParameterVocabsWithStore } from "@/app/store/searchReducer";
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
 import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
 import { TabFilterType } from "../Filters";

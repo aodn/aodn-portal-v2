@@ -5,10 +5,10 @@
 import { bboxPolygon } from "@turf/turf";
 import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from "geojson";
 import { DatasetFrequency, DatasetStatus } from "./searchReducer";
-import { MapDefaultConfig } from "../../map/mapbox/constants";
-import { SearchResultLayoutEnum } from "../buttons/ResultListLayoutButton";
-import { SortResultEnum } from "../buttons/ResultListSortButton";
-import { decodeParam, encodeParam } from "../../../utils/UrlUtils";
+import { MapDefaultConfig } from "@/components/map/mapbox/constants";
+import { SearchResultLayoutEnum } from "@/components/common/buttons/ResultListLayoutButton";
+import { SortResultEnum } from "@/components/common/buttons/ResultListSortButton";
+import { decodeParam, encodeParam } from "@/utils/UrlUtils";
 
 const UPDATE_PARAMETER_STATES = "UPDATE_PARAMETER_STATES";
 const UPDATE_DATETIME_FILTER_VARIABLE = "UPDATE_DATETIME_FILTER_VARIABLE";

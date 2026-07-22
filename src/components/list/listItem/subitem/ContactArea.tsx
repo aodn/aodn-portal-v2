@@ -1,8 +1,5 @@
 import React from "react";
-import {
-  IAddress,
-  IContact,
-} from "../../../common/store/OGCCollectionDefinitions";
+import { IAddress, IContact } from "@/app/store/OGCCollectionDefinitions";
 import { portalTheme } from "../../../../styles";
 import { Grid, Link, Typography, Box } from "@mui/material";
 import { LocationOnOutlinedIcon } from "../../../../assets/icons/details/location";

@@ -4,11 +4,11 @@ import {
   CollectionsQueryType,
   DEFAULT_SEARCH_PAGE_SIZE,
   FULL_LIST_PAGE_SIZE,
-} from "../common/store/searchReducer";
+} from "@/app/store/searchReducer";
 import useTabNavigation, { OpenType } from "../../hooks/useTabNavigation";
 import GridResultCard from "./GridResultCard";
 import ListResultCard from "./ListResultCard";
-import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { SearchResultLayoutEnum } from "../common/buttons/ResultListLayoutButton";
 import useFetchData from "../../hooks/useFetchData";
 import useBreakpoint from "../../hooks/useBreakpoint";

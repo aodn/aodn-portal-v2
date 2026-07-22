@@ -15,28 +15,28 @@ import {
   Status,
   StaticAreasFilter,
   ExcludeDatasetScope,
-} from "../cqlFilters";
+} from "@/components/common/cqlFilters";
 import { OGCCollection, OGCCollections } from "./OGCCollectionDefinitions";
 import {
   createErrorResponse,
   errorHandling,
   ErrorResponse,
-} from "../../../utils/ErrorBoundary";
+} from "@/utils/ErrorBoundary";
 import { FeatureCollection, Point } from "geojson";
-import { mergeWithDefaults } from "../../../utils/ObjectUtils";
+import { mergeWithDefaults } from "@/utils/ObjectUtils";
 import {
   CoEstimateRequest,
   DatasetDownloadRequest,
   WFSDownloadRequest,
-} from "../../../pages/detail-page/context/DownloadDefinitions";
+} from "@/pages/detail-page/context/DownloadDefinitions";
 import {
   getDateConditionFrom,
   getFormatFrom,
   getKeyFrom,
   getMultiPolygonFrom,
-} from "../../../utils/DownloadConditionUtils";
-import { trackSearchResultParameters } from "../../../analytics/searchParamsEvent";
-import { trackHttpRequestError } from "../../../analytics/httpRequestErrEvent";
+} from "@/utils/DownloadConditionUtils";
+import { trackSearchResultParameters } from "@/analytics/searchParamsEvent";
+import { trackHttpRequestError } from "@/analytics/httpRequestErrEvent";
 import {
   MapFeatureRequest,
   MapFeatureResponse,
@@ -45,7 +45,7 @@ import {
   DownloadLayersResponse,
 } from "./GeoserverDefinitions";
 import dayjs from "dayjs";
-import { dateDefault } from "../constants";
+import { dateDefault } from "@/components/common/constants";
 import { CloudOptimizedFeature } from "./CloudOptimizedDefinitions";
 import { Health } from "./systemDefinition";
 

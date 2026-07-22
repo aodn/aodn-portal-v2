@@ -19,12 +19,12 @@ import {
 } from "vitest";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
-import { AnalyticsEvent } from "../../../../analytics/analyticsEvents";
+import { AnalyticsEvent } from "@/analytics/analyticsEvents";
 
-vi.mock("../../../../analytics/customEventTracker", () => ({
+vi.mock("@/analytics/customEventTracker", () => ({
   trackCustomEvent: vi.fn(),
 }));
-import { trackCustomEvent } from "../../../../analytics/customEventTracker";
+import { trackCustomEvent } from "@/analytics/customEventTracker";
 import { ogcAxiosWithRetry } from "../searchReducer";
 
 const mockedTrackCustomEvent = vi.mocked(trackCustomEvent);

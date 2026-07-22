@@ -15,7 +15,7 @@ import SectionContainer from "./SectionContainer";
 import HeaderMenu, { HeaderMenuStyle } from "./HeaderMenu";
 import { pageDefault } from "../../common/constants";
 import Searchbar from "../../search/Searchbar";
-import { useAppSelector } from "../../common/store/hooks";
+import { useAppSelector } from "@/app/store/hooks";
 import {
   PAGE_CONTENT_MAX_WIDTH,
   PAGE_CONTENT_WIDTH_HEADER,

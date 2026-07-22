@@ -1,7 +1,7 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { Box, Chip, Typography, Button, Stack, useTheme } from "@mui/material";
 import { useLocation } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../common/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   clearComponentParam,
@@ -16,7 +16,7 @@ import {
   updatePlatform,
   updateStatus,
   updateUpdateFreq,
-} from "../common/store/componentParamReducer";
+} from "@/app/store/componentParamReducer";
 import dayjs from "dayjs";
 import { dateDefault, pageDefault, pageReferer } from "../common/constants";
 import useRedirectSearch from "../../hooks/useRedirectSearch";

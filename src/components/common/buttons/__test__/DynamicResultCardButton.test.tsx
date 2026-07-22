@@ -3,10 +3,10 @@ import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 
 import { server } from "../../../../__mocks__/server";
 import { Provider } from "react-redux";
-import store from "../../store/store";
+import store from "@/app/store/store";
 import DynamicResultCardButton from "../DynamicResultCardButton";
 import { rgbToHex } from "@mui/material";
-import AppTheme from "../../../../utils/AppTheme";
+import AppTheme from "@/styles/theme";
 import { ThemeProvider } from "@mui/material/styles";
 
 describe("DynamicResultCardButton", async () => {

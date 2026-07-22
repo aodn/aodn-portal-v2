@@ -11,10 +11,10 @@ import { server } from "../../../__mocks__/server";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import AssociatedRecordsPanel from "../features/AssociatedRecordsPanel";
 import { ThemeProvider } from "@mui/material/styles";
-import AppTheme from "../../../utils/AppTheme";
+import AppTheme from "@/styles/theme";
 import { DetailPageProvider } from "../context/detail-page-provider";
 import { useLocation, useParams } from "react-router-dom";
-import store from "../../../components/common/store/store";
+import store from "@/app/store/store";
 import { Provider } from "react-redux";
 import { userEvent } from "@testing-library/user-event";
 

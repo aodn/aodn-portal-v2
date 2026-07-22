@@ -1,5 +1,5 @@
 // Put common item here to avoid circular reference
-import { DatasetFrequency } from "../common/store/searchReducer";
+import { DatasetFrequency } from "@/app/store/searchReducer";
 import { ElementType } from "react";
 
 export enum IndexDataType {

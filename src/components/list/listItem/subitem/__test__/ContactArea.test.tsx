@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import ContactArea from "../ContactArea";
 import { CONTACT } from "../../../../../__mocks__/data/SPECIFIC_DETAILS";
-import AppTheme from "../../../../../utils/AppTheme";
+import AppTheme from "@/styles/theme";
 import { ThemeProvider } from "@mui/material/styles";
 import { expect } from "vitest";
 

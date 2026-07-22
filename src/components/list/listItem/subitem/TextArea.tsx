@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { SxProps, Theme, Typography } from "@mui/material";
-import { useClipboardContext } from "../../../../context/clipboard/ClipboardContext";
+import { useClipboardContext } from "@/app/providers/ClipboardContext";
 import { decodeHtmlEntities } from "../../../../utils/StringUtils";
 import TextAreaBaseGrid from "./TextAreaBaseGrid";
 import { portalTheme } from "../../../../styles";

@@ -1,8 +1,8 @@
 import { createElement, FC, useMemo, useState } from "react";
 import { Box, Link, Typography } from "@mui/material";
-import { useClipboardContext } from "../../../../context/clipboard/ClipboardContext";
+import { useClipboardContext } from "@/app/providers/ClipboardContext";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
-import { ILink } from "../../../common/store/OGCCollectionDefinitions";
+import { ILink } from "@/app/store/OGCCollectionDefinitions";
 import { openInNewTab } from "../../../../utils/LinkUtils";
 import { portalTheme } from "../../../../styles";
 import { AnalyticsEvent } from "../../../../analytics/analyticsEvents";

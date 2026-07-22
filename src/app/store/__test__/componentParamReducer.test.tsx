@@ -5,9 +5,9 @@ import {
   ParameterState,
 } from "../componentParamReducer";
 import { bboxPolygon } from "@turf/turf";
-import { MapDefaultConfig } from "../../../map/mapbox/constants";
-import { decodeParam } from "../../../../utils/UrlUtils";
-import { SearchKeys } from "../../../search/constants";
+import { MapDefaultConfig } from "@/components/map/mapbox/constants";
+import { decodeParam } from "@/utils/UrlUtils";
+import { SearchKeys } from "@/components/search/constants";
 
 describe("Component Reducer Function Test", () => {
   it("Verify formatToUrlParam", () => {

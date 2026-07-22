@@ -27,13 +27,13 @@ import { AnalyticsEvent } from "../../../../analytics/analyticsEvents";
 import {
   DownloadLayersResponse,
   MapFeatureRequest,
-} from "../../../../components/common/store/GeoserverDefinitions";
-import { useAppDispatch } from "../../../../components/common/store/hooks";
+} from "@/app/store/GeoserverDefinitions";
+import { useAppDispatch } from "@/app/store/hooks";
 import { SelectItem } from "../../../../components/common/dropdown/CommonSelect";
 import {
   fetchGeoServerDownloadLayers,
   processWFSEstimateSize,
-} from "../../../../components/common/store/searchReducer";
+} from "@/app/store/searchReducer";
 import AdminScreenContext from "../../../../components/admin/AdminScreenContext";
 import { formatBytes } from "../../../../utils/Helpers";
 

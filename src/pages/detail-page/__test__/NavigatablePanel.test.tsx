@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import NavigatablePanel, {
   NavigatablePanelChild,
 } from "../layout/NavigatablePanel";
-import AppTheme from "../../../utils/AppTheme";
+import AppTheme from "@/styles/theme";
 import { ThemeProvider } from "@mui/material/styles";
 import { MemoryRouter } from "react-router-dom";
 import { InfoContentType } from "../../../components/info/InfoDefinition";

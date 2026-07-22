@@ -8,7 +8,7 @@ import {
   startTransition,
 } from "react";
 import { useParams } from "react-router-dom";
-import { useAppDispatch } from "../components/common/store/hooks";
+import { useAppDispatch } from "@/app/store/hooks";
 import { DataUsageInformation } from "../pages/detail-page/features/download/DownloadDialog/DataUsageForm";
 import { useDetailPageContext } from "../pages/detail-page/context/detail-page-context";
 import {
@@ -21,7 +21,7 @@ import {
   DatasetDownloadRequest,
   DownloadConditionType,
 } from "../pages/detail-page/context/DownloadDefinitions";
-import { processDatasetDownload } from "../components/common/store/searchReducer";
+import { processDatasetDownload } from "@/app/store/searchReducer";
 import { trackCustomEvent } from "../analytics/customEventTracker";
 import { AnalyticsEvent } from "../analytics/analyticsEvents";
 import { calculateBboxes } from "../analytics/downloadCODataEvent";

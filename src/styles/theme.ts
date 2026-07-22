@@ -1,23 +1,24 @@
 /**
- * AppTheme.ts - Legacy Theme with RC8 Integration
+ * theme.ts - Legacy Theme with RC8 Integration
+ * (formerly utils/AppTheme.ts — moved here so the theme lives with the other
+ * style files; content unchanged)
  *
  * MIGRATION PLAN:
  *
  * CURRENT FILES:
  * ├── src/
- * │   ├── styles/
- * │   │   ├── designTokensRC8.ts     (✅ New - RC8 design tokens from Figma)
- * │   │   └── theme.ts               (✅ New - Clean RC8 theme implementation)
- * │   └── utils/
- * │       └── AppTheme.ts            (📝 Current file - Legacy + RC8 integration)
+ * │   └── styles/
+ * │       ├── designTokensRC8.ts     (✅ New - RC8 design tokens from Figma)
+ * │       ├── themeRC8.ts            (✅ New - Clean RC8 theme implementation)
+ * │       └── theme.ts               (📝 Current file - Legacy + RC8 integration)
  *
  * MIGRATION PHASES:
  *
  * Phase 1: Legacy + RC8 Integration
- * - AppTheme.ts: Spreads portalTheme as base, legacy configs override
+ * - theme.ts: Spreads portalTheme as base, legacy configs override
  * - All existing components continue to work unchanged
  * - RC8 features available for new development
- * - Usage: import AppTheme from "./utils/AppTheme"
+ * - Usage: import AppTheme from "@/styles/theme"
  *
  * Phase 2 (CURRENT): Component Migration
  * - Gradually replace legacy styles with RC8 equivalents:
@@ -29,10 +30,8 @@
  *   ✅ sx={{ padding: theme.rc8Spacing.md }}
  *
  * Phase 3: Complete Migration
- * - Delete utils/AppTheme.ts file
- * - Update App.tsx: import theme from "./styles/theme"
- * - Remove legacy type declarations from styles/theme.ts
- * - Clean RC8-only theme system
+ * - Remove legacy type declarations and overrides from this file
+ * - Clean RC8-only theme system (fold into themeRC8.ts)
  *
  * LEGACY FEATURES (to be removed after migration):
  * - theme.border.* (detailBtnLight, detailSubtabBtn, detailNa)
@@ -49,8 +48,8 @@
  */
 
 import { createTheme, Shadows, ThemeOptions } from "@mui/material/styles";
-import { portalTheme } from "../styles";
-import { FONT_FAMILIES } from "../styles/fontsRC8";
+import { portalTheme } from "./index";
+import { FONT_FAMILIES } from "./fontsRC8";
 
 declare module "@mui/material/styles" {
   interface Theme {

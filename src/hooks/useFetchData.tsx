@@ -1,16 +1,16 @@
 import { useCallback } from "react";
-import { ParameterState } from "../components/common/store/componentParamReducer";
+import { ParameterState } from "@/app/store/componentParamReducer";
 import store, {
   getComponentState,
   getSearchQueryResult,
-} from "../components/common/store/store";
+} from "@/app/store/store";
 import {
   createSearchParamFrom,
   DEFAULT_SEARCH_PAGE_SIZE,
   fetchResultAppendStore,
   fetchResultWithStore,
-} from "../components/common/store/searchReducer";
-import { useAppDispatch } from "../components/common/store/hooks";
+} from "@/app/store/searchReducer";
+import { useAppDispatch } from "@/app/store/hooks";
 
 const useFetchData = () => {
   const dispatch = useAppDispatch();

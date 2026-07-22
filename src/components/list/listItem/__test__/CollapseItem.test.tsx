@@ -1,4 +1,4 @@
-import AppTheme from "../../../../utils/AppTheme";
+import AppTheme from "@/styles/theme";
 import { ThemeProvider } from "@mui/material/styles";
 import { render, screen } from "@testing-library/react";
 import CollapseItem from "../CollapseItem";

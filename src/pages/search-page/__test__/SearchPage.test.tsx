@@ -9,13 +9,10 @@ import {
 } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { ThemeProvider } from "@mui/material/styles";
-import AppTheme from "../../../utils/AppTheme";
+import AppTheme from "@/styles/theme";
 import { server } from "../../../__mocks__/server";
-import store from "../../../components/common/store/store";
-import {
-  updateLayout,
-  updateSort,
-} from "../../../components/common/store/componentParamReducer";
+import store from "@/app/store/store";
+import { updateLayout, updateSort } from "@/app/store/componentParamReducer";
 import { SearchResultLayoutEnum } from "../../../components/common/buttons/ResultListLayoutButton";
 import { SortResultEnum } from "../../../components/common/buttons/ResultListSortButton";
 import * as useRedirectSearchModule from "../../../hooks/useRedirectSearch";

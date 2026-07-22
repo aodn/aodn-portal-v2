@@ -6,7 +6,7 @@ import React, {
   useMemo,
 } from "react";
 import { Box, Button, Grid, SxProps } from "@mui/material";
-import { useClipboardContext } from "../../../../context/clipboard/ClipboardContext";
+import { useClipboardContext } from "@/app/providers/ClipboardContext";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 import TextAreaBaseGrid from "./TextAreaBaseGrid";
 import MarkdownRenderer from "../../../common/text/MarkdownRenderer";

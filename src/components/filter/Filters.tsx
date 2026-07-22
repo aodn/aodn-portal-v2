@@ -7,14 +7,14 @@ import {
   useState,
 } from "react";
 import { Box, SxProps } from "@mui/material";
-import { Vocab } from "../common/store/componentParamReducer";
-import { useAppSelector } from "../common/store/hooks";
+import { Vocab } from "@/app/store/componentParamReducer";
+import { useAppSelector } from "@/app/store/hooks";
 import TabsPanelContainer, { Tab } from "../common/tab/TabsPanelContainer";
 import ThemeFilter from "./tab-filters/ThemeFilter";
 import PlatformFilter from "./tab-filters/PlatformFilter";
 import OrganisationFilter from "./tab-filters/OrganisationFilter";
 import DataSettingsFilter from "./tab-filters/DataSettingsFilter";
-import { DatasetFrequency, DatasetStatus } from "../common/store/searchReducer";
+import { DatasetFrequency, DatasetStatus } from "@/app/store/searchReducer";
 import { IndexDataType } from "./FilterDefinition";
 import { portalTheme } from "../../styles";
 
