@@ -1,5 +1,5 @@
 import { FC } from "react";
-import Layout from "../../components/layout/layout";
+import Layout from "../../components/layout/Layout";
 import Banner from "./features/banner/Banner";
 import Searchbar from "../../components/search/Searchbar";
 import { color, padding } from "../../styles/constants";

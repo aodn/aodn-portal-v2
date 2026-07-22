@@ -1,4 +1,4 @@
-import Layout from "../../components/layout/layout";
+import Layout from "../../components/layout/Layout";
 import { Grid } from "@mui/material";
 import { color, padding } from "../../styles/constants";
 import HeaderSection from "./layout/HeaderSection";

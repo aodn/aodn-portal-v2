@@ -38,7 +38,7 @@ import {
   setExpandedItem,
   setTemporaryItem,
 } from "../../components/common/store/bookmarkListReducer";
-import Layout from "../../components/layout/layout";
+import Layout from "../../components/layout/Layout";
 import ResultSection from "./layout/ResultSection";
 import MapSection from "./layout/MapSection";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/ResultListLayoutButton";
