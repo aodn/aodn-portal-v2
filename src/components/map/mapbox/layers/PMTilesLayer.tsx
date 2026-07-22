@@ -1,4 +1,13 @@
-import { FC, useCallback, useContext, useEffect, useMemo, useRef } from "react";
+import {
+  FC,
+  startTransition,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import MapContext from "../MapContext";
 import dayjs, { Dayjs } from "dayjs";
 import {
@@ -34,6 +43,12 @@ const DEFAULT_RANGE_START = "2000-01-01";
 // mYYYYMM (month bucket) or mYYYYMMDD (day bucket)
 const COUNT_PROPERTY_KEY = /^m(\d{6}|\d{8})$/;
 
+/** Matches sidecar `{dname}.metadata` `time_group_by` from batch PMTiles gen. */
+export type TimeGroupBy = "date" | "month";
+
+/** Default when `.metadata` is missing or invalid. */
+export const DEFAULT_TIME_GROUP_BY: TimeGroupBy = "date";
+
 const PMTILE_LAYERS = [
   { id: "pmtiles-hex-z0", sourceLayer: "hex_z0", minzoom: 0, maxzoom: 2 },
   { id: "pmtiles-hex-z2", sourceLayer: "hex_z2", minzoom: 2, maxzoom: 4 },
@@ -50,14 +65,24 @@ interface PMTilesHexLayerProps extends LayerBasicType {
   onSelectCoKey?: (key: string) => void;
 }
 
-// Older PMTiles use month buckets (mYYYYMM); upgraded tiles use day buckets
-// (mYYYYMMDD). A given file uses one format. Summing both is safe because
-// missing properties coalesce to 0.
+interface PMTilesSidecarMetadata {
+  min_date?: number;
+  max_date?: number;
+  time_group_by?: string;
+}
 
 const resolveRange = (start?: Dayjs, end?: Dayjs) => ({
   start: start || dayjs(DEFAULT_RANGE_START),
   end: end || dayjs(),
 });
+
+/** Parse sidecar metadata; only `"date"` and `"month"` are accepted. */
+export const parseTimeGroupBy = (value: unknown): TimeGroupBy =>
+  value === "month"
+    ? "month"
+    : value === "date"
+      ? "date"
+      : DEFAULT_TIME_GROUP_BY;
 
 // Exported following functions for unit testing
 export const getMonthKeysInRange = (start?: Dayjs, end?: Dayjs): string[] => {
@@ -94,11 +119,19 @@ export const getDayKeysInRange = (start?: Dayjs, end?: Dayjs): string[] => {
   return keys;
 };
 
-/** Month + day keys for a range — supports both PMTiles property formats. */
-export const getDateKeysInRange = (start?: Dayjs, end?: Dayjs): string[] => [
-  ...getMonthKeysInRange(start, end),
-  ...getDayKeysInRange(start, end),
-];
+/**
+ * Count property keys for the filter range, using only the bucket format
+ * declared by PMTiles `.metadata` `time_group_by` (`date` → mYYYYMMDD,
+ * `month` → mYYYYMM).
+ */
+export const getDateKeysInRange = (
+  start?: Dayjs,
+  end?: Dayjs,
+  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY
+): string[] =>
+  timeGroupBy === "date"
+    ? getDayKeysInRange(start, end)
+    : getMonthKeysInRange(start, end);
 
 /** Format mYYYYMM → YYYY-MM or mYYYYMMDD → YYYY-MM-DD. */
 export const formatDateKey = (key: string): string => {
@@ -110,23 +143,27 @@ export const formatDateKey = (key: string): string => {
 };
 
 /**
- * Whether a count property key falls in the filter range.
- * - Day keys (mYYYYMMDD): the day must lie inside the filter.
- * - Month keys (mYYYYMM): the month overlaps the filter (whole-month bucket).
+ * Whether a count property key falls in the filter range for the active
+ * `time_group_by`. Keys that do not match the expected bucket length are
+ * rejected (month tiles → mYYYYMM only; date tiles → mYYYYMMDD only).
  */
 export const isCountPropertyInRange = (
   key: string,
   filterStart?: Dayjs,
-  filterEnd?: Dayjs
+  filterEnd?: Dayjs,
+  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY
 ): boolean => {
   if (!COUNT_PROPERTY_KEY.test(key)) return false;
+  const digits = key.slice(1);
+  const isDayKey = digits.length === 8;
+  if (timeGroupBy === "date" ? !isDayKey : isDayKey) return false;
+
   const { start, end } = resolveRange(filterStart, filterEnd);
   const rangeStart = start.startOf("day");
   const rangeEnd = end.startOf("day");
   if (rangeStart.isAfter(rangeEnd)) return false;
 
-  const digits = key.slice(1);
-  if (digits.length === 8) {
+  if (isDayKey) {
     const day = dayjs(
       `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`
     );
@@ -150,17 +187,23 @@ export const isCountPropertyInRange = (
 /**
  * Popup totals come from properties present on the feature (not a pre-built
  * key list), so long day-bucket series are not truncated by DAY_KEY_LIMIT.
+ * Only properties matching `time_group_by` are summed.
  */
 export const buildPopupHtml = (
   properties: Record<string, unknown>,
   filterStartDate?: Dayjs,
-  filterEndDate?: Dayjs
+  filterEndDate?: Dayjs,
+  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY
 ): string => {
   let total = 0;
   const matchedKeys: string[] = [];
   for (const [key, value] of Object.entries(properties)) {
     if (typeof value !== "number" || value <= 0) continue;
-    if (!isCountPropertyInRange(key, filterStartDate, filterEndDate)) continue;
+    if (
+      !isCountPropertyInRange(key, filterStartDate, filterEndDate, timeGroupBy)
+    ) {
+      continue;
+    }
     total += value;
     matchedKeys.push(key);
   }
@@ -242,7 +285,12 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   const filterStartDateRef = useRef(filterStartDate);
   const filterEndDateRef = useRef(filterEndDate);
   const visibleRef = useRef(visible);
+  const timeGroupByRef = useRef<TimeGroupBy>(DEFAULT_TIME_GROUP_BY);
   const popupRef = useRef<Popup | null>(null);
+  // Drives paint/filter updates once `.metadata` `time_group_by` is known
+  const [timeGroupBy, setTimeGroupBy] = useState<TimeGroupBy>(
+    DEFAULT_TIME_GROUP_BY
+  );
 
   const removePopup = useCallback(() => {
     popupRef.current?.remove();
@@ -267,19 +315,64 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
 
   // The PMTiles visualization only exists for parquet datasets, so in a mixed
   // zarr/parquet collection, a non-parquet key falls back to the first parquet key
-  const formSourceUrl = useCallback(() => {
+  const resolveParquetKey = useCallback((): string | undefined => {
     let key = selectedCoKey;
     if (key && collection?.getDatasetTypeByKey(key) !== DatasetType.PARQUET) {
       key = collection?.getAllParquetKeys()[0] ?? key;
     }
-    return `https://${bucket}.s3.${region}.amazonaws.com/portal/visualization/${collection?.id}/${key}.pmtiles`;
+    return key;
   }, [collection, selectedCoKey]);
+
+  const formSourceUrl = useCallback(() => {
+    const key = resolveParquetKey();
+    return `https://${bucket}.s3.${region}.amazonaws.com/portal/visualization/${collection?.id}/${key}.pmtiles`;
+  }, [collection?.id, resolveParquetKey]);
+
+  // Sidecar written next to the archive by batch PMTiles generation
+  const formMetadataUrl = useCallback(() => {
+    const key = resolveParquetKey();
+    return `https://${bucket}.s3.${region}.amazonaws.com/portal/visualization/${collection?.id}/${key}.metadata`;
+  }, [collection?.id, resolveParquetKey]);
 
   useEffect(() => {
     filterStartDateRef.current = filterStartDate;
     filterEndDateRef.current = filterEndDate;
     visibleRef.current = visible;
   }, [filterStartDate, filterEndDate, visible]);
+
+  // Load `time_group_by` from the `.metadata` sidecar for the selected dataset
+  useEffect(() => {
+    const metadataUrl = formMetadataUrl();
+    let cancelled = false;
+
+    // Reset to the default while the new sidecar loads
+    timeGroupByRef.current = DEFAULT_TIME_GROUP_BY;
+    startTransition(() => setTimeGroupBy(DEFAULT_TIME_GROUP_BY));
+
+    fetch(metadataUrl)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Metadata fetch failed: ${response.status}`);
+        }
+        return response.json() as Promise<PMTilesSidecarMetadata>;
+      })
+      .then((data) => {
+        if (cancelled) return;
+        const groupBy = parseTimeGroupBy(data?.time_group_by);
+        timeGroupByRef.current = groupBy;
+        setTimeGroupBy(groupBy);
+      })
+      .catch(() => {
+        // Missing or unreadable sidecar → date aggregation default
+        if (cancelled) return;
+        timeGroupByRef.current = DEFAULT_TIME_GROUP_BY;
+        setTimeGroupBy(DEFAULT_TIME_GROUP_BY);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [formMetadataUrl]);
 
   useEffect(() => {
     if (!map) return;
@@ -304,7 +397,8 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
 
       const keys = getDateKeysInRange(
         filterStartDateRef.current,
-        filterEndDateRef.current
+        filterEndDateRef.current,
+        timeGroupByRef.current
       );
       const paintProps = getPaintProperties(keys);
 
@@ -460,7 +554,8 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
           buildPopupHtml(
             feature.properties ?? {},
             filterStartDateRef.current,
-            filterEndDateRef.current
+            filterEndDateRef.current,
+            timeGroupByRef.current
           )
         );
         setHoverOutline(feature.geometry);
@@ -545,10 +640,14 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     }
   }, [map, visible, removePopup]);
 
-  // Update paint properties on date filter changes
+  // Update paint/filter when the date range or metadata time_group_by changes
   useEffect(() => {
     if (!map) return;
-    const keys = getDateKeysInRange(filterStartDate, filterEndDate);
+    const keys = getDateKeysInRange(
+      filterStartDate,
+      filterEndDate,
+      timeGroupBy
+    );
     const paintProps = getPaintProperties(keys);
 
     try {
@@ -575,9 +674,9 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     } catch (error) {
       // OK to ignore error here
     }
-    // Popup content is derived from the date filter, so drop any open popup
+    // Popup content is derived from the date filter / grouping, so drop any open popup
     removePopup();
-  }, [map, filterStartDate, filterEndDate, removePopup]);
+  }, [map, filterStartDate, filterEndDate, timeGroupBy, removePopup]);
 
   return (
     <>

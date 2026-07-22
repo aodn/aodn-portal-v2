@@ -7,7 +7,19 @@ import {
   isCountPropertyInRange,
   buildPopupHtml,
   buildSumExpression,
+  parseTimeGroupBy,
+  DEFAULT_TIME_GROUP_BY,
 } from "../PMTilesLayer";
+
+describe("PMTilesLayer - parseTimeGroupBy", () => {
+  it("accepts date and month, falls back to default for anything else", () => {
+    expect(parseTimeGroupBy("date")).toBe("date");
+    expect(parseTimeGroupBy("month")).toBe("month");
+    expect(parseTimeGroupBy(undefined)).toBe(DEFAULT_TIME_GROUP_BY);
+    expect(parseTimeGroupBy("week")).toBe(DEFAULT_TIME_GROUP_BY);
+    expect(parseTimeGroupBy(null)).toBe(DEFAULT_TIME_GROUP_BY);
+  });
+});
 
 describe("PMTilesLayer - getMonthKeysInRange", () => {
   it("returns one key per month between start and end inclusive", () => {
@@ -70,20 +82,35 @@ describe("PMTilesLayer - getDayKeysInRange", () => {
 });
 
 describe("PMTilesLayer - getDateKeysInRange", () => {
-  it("includes both month and day keys for the same range", () => {
-    const keys = getDateKeysInRange(dayjs("2024-01-30"), dayjs("2024-02-01"));
-    expect(keys).toEqual([
-      "m202401",
-      "m202402",
+  const start = dayjs("2024-01-30");
+  const end = dayjs("2024-02-01");
+
+  it("defaults to day keys when time_group_by is omitted", () => {
+    expect(getDateKeysInRange(start, end)).toEqual([
+      "m20240130",
+      "m20240131",
+      "m20240201",
+    ]);
+    expect(getDateKeysInRange(start, end, "date")).toEqual([
       "m20240130",
       "m20240131",
       "m20240201",
     ]);
   });
 
+  it("returns only month keys when time_group_by is month", () => {
+    expect(getDateKeysInRange(start, end, "month")).toEqual([
+      "m202401",
+      "m202402",
+    ]);
+  });
+
   it("returns empty when start is after end", () => {
     expect(
-      getDateKeysInRange(dayjs("2024-06-01"), dayjs("2024-01-01"))
+      getDateKeysInRange(dayjs("2024-06-01"), dayjs("2024-01-01"), "month")
+    ).toEqual([]);
+    expect(
+      getDateKeysInRange(dayjs("2024-06-01"), dayjs("2024-01-01"), "date")
     ).toEqual([]);
   });
 });
@@ -104,26 +131,40 @@ describe("PMTilesLayer - isCountPropertyInRange", () => {
   const start = dayjs("2024-01-10");
   const end = dayjs("2024-01-20");
 
-  it("includes day keys on days inside the filter", () => {
+  it("includes day keys on days inside the filter when time_group_by is date", () => {
+    expect(isCountPropertyInRange("m20240115", start, end, "date")).toBe(true);
+    expect(isCountPropertyInRange("m20240110", start, end, "date")).toBe(true);
+    expect(isCountPropertyInRange("m20240120", start, end, "date")).toBe(true);
+  });
+
+  it("excludes day keys outside the filter when time_group_by is date", () => {
+    expect(isCountPropertyInRange("m20240109", start, end, "date")).toBe(false);
+    expect(isCountPropertyInRange("m20240121", start, end, "date")).toBe(false);
+  });
+
+  it("includes month keys that overlap the filter when time_group_by is month", () => {
+    expect(isCountPropertyInRange("m202401", start, end, "month")).toBe(true);
+    expect(isCountPropertyInRange("m202312", start, end, "month")).toBe(false);
+    expect(isCountPropertyInRange("m202402", start, end, "month")).toBe(false);
+  });
+
+  it("rejects keys that do not match the active time_group_by format", () => {
+    // Month tile must not sum day properties
+    expect(isCountPropertyInRange("m20240115", start, end, "month")).toBe(
+      false
+    );
+    // Date tile must not sum month properties
+    expect(isCountPropertyInRange("m202401", start, end, "date")).toBe(false);
+  });
+
+  it("defaults to date grouping when time_group_by is omitted", () => {
     expect(isCountPropertyInRange("m20240115", start, end)).toBe(true);
-    expect(isCountPropertyInRange("m20240110", start, end)).toBe(true);
-    expect(isCountPropertyInRange("m20240120", start, end)).toBe(true);
-  });
-
-  it("excludes day keys outside the filter", () => {
-    expect(isCountPropertyInRange("m20240109", start, end)).toBe(false);
-    expect(isCountPropertyInRange("m20240121", start, end)).toBe(false);
-  });
-
-  it("includes month keys that overlap the filter (whole-month bucket)", () => {
-    expect(isCountPropertyInRange("m202401", start, end)).toBe(true);
-    expect(isCountPropertyInRange("m202312", start, end)).toBe(false);
-    expect(isCountPropertyInRange("m202402", start, end)).toBe(false);
+    expect(isCountPropertyInRange("m202401", start, end)).toBe(false);
   });
 
   it("rejects non-count property names", () => {
-    expect(isCountPropertyInRange("h", start, end)).toBe(false);
-    expect(isCountPropertyInRange("m2024", start, end)).toBe(false);
+    expect(isCountPropertyInRange("h", start, end, "month")).toBe(false);
+    expect(isCountPropertyInRange("m2024", start, end, "month")).toBe(false);
   });
 });
 
@@ -153,33 +194,58 @@ describe("PMTilesLayer - buildPopupHtml", () => {
   const filterStart = dayjs("2024-01-01");
   const filterEnd = dayjs("2024-12-31");
 
-  it("sums monthly counts and shows the month range of non-zero counts", () => {
+  it("sums monthly counts when time_group_by is month", () => {
     const html = buildPopupHtml(
       { m202401: 5, m202403: 7, m202405: 0 },
       filterStart,
-      filterEnd
+      filterEnd,
+      "month"
     );
     expect(html).toContain("Data Records In This Area:");
     expect(html).toContain("Data Record Count: 12");
     expect(html).toContain("Time Range: 2024-01 to 2024-03");
   });
 
-  it("sums daily counts and shows the day range of non-zero counts", () => {
+  it("sums daily counts when time_group_by is date", () => {
     const html = buildPopupHtml(
       { m20240101: 5, m20240302: 7, m20240501: 0 },
       filterStart,
-      filterEnd
+      filterEnd,
+      "date"
     );
     expect(html).toContain("Data Records In This Area:");
     expect(html).toContain("Data Record Count: 12");
     expect(html).toContain("Time Range: 2024-01-01 to 2024-03-02");
   });
 
+  it("ignores day keys when time_group_by is month", () => {
+    const html = buildPopupHtml(
+      { m202401: 5, m20240101: 99 },
+      filterStart,
+      filterEnd,
+      "month"
+    );
+    expect(html).toContain("Data Record Count: 5");
+    expect(html).toContain("Time Range: 2024-01 to 2024-01");
+  });
+
+  it("ignores month keys when time_group_by is date", () => {
+    const html = buildPopupHtml(
+      { m202401: 99, m20240101: 5 },
+      filterStart,
+      filterEnd,
+      "date"
+    );
+    expect(html).toContain("Data Record Count: 5");
+    expect(html).toContain("Time Range: 2024-01-01 to 2024-01-01");
+  });
+
   it("ignores day keys outside the filter range and non-numeric values", () => {
     const html = buildPopupHtml(
       { m20240101: 5, m20250601: 99, m20240201: "not-a-number" },
       filterStart,
-      filterEnd
+      filterEnd,
+      "date"
     );
     expect(html).toContain("Data Record Count: 5");
     expect(html).toContain("Time Range: 2024-01-01 to 2024-01-01");
@@ -189,14 +255,20 @@ describe("PMTilesLayer - buildPopupHtml", () => {
     const html = buildPopupHtml(
       { m202401: 5, m202506: 99, m202402: "not-a-number" },
       filterStart,
-      filterEnd
+      filterEnd,
+      "month"
     );
     expect(html).toContain("Data Record Count: 5");
     expect(html).toContain("Time Range: 2024-01 to 2024-01");
   });
 
   it("shows zero count and N/A range when the hexbin has no records in range", () => {
-    const html = buildPopupHtml({ m20250601: 99 }, filterStart, filterEnd);
+    const html = buildPopupHtml(
+      { m20250601: 99 },
+      filterStart,
+      filterEnd,
+      "date"
+    );
     expect(html).toContain("Data Record Count: 0");
     expect(html).toContain("Time Range: N/A to N/A");
   });
@@ -212,8 +284,8 @@ describe("PMTilesLayer - buildPopupHtml", () => {
       m20100815: 75196,
       m20100831: 50000,
     };
-    const monthHtml = buildPopupHtml(monthProps, start, end);
-    const dayHtml = buildPopupHtml(dayProps, start, end);
+    const monthHtml = buildPopupHtml(monthProps, start, end, "month");
+    const dayHtml = buildPopupHtml(dayProps, start, end, "date");
     expect(monthHtml).toContain("Data Record Count: 175196");
     expect(dayHtml).toContain("Data Record Count: 175196");
   });
@@ -221,11 +293,12 @@ describe("PMTilesLayer - buildPopupHtml", () => {
   it("partial-month filters count whole months on month tiles but only in-range days on day tiles", () => {
     const start = dayjs("2010-08-01");
     const end = dayjs("2010-08-15");
-    const monthHtml = buildPopupHtml({ m201008: 175196 }, start, end);
+    const monthHtml = buildPopupHtml({ m201008: 175196 }, start, end, "month");
     const dayHtml = buildPopupHtml(
       { m20100801: 10000, m20100815: 9120, m20100816: 50000 },
       start,
-      end
+      end,
+      "date"
     );
     // Month encoding cannot subdivide the month
     expect(monthHtml).toContain("Data Record Count: 175196");
@@ -250,8 +323,18 @@ describe("PMTilesLayer - buildPopupHtml", () => {
     const html = buildPopupHtml(
       props,
       dayjs("2008-11-01"),
-      dayjs("2023-06-30")
+      dayjs("2023-06-30"),
+      "date"
     );
     expect(html).toContain(`Data Record Count: ${expected}`);
+  });
+
+  it("defaults to date grouping when time_group_by is omitted", () => {
+    const html = buildPopupHtml(
+      { m202401: 5, m20240101: 99 },
+      filterStart,
+      filterEnd
+    );
+    expect(html).toContain("Data Record Count: 99");
   });
 });
