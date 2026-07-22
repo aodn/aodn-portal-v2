@@ -15,6 +15,8 @@
 
 ## Rules
 
+- Folder names: kebab-case (`detail-page`, `list-item`).
+  Component files: PascalCase matching the component (`DocumentList.tsx`).
 - Import with `@/`, for example `@/app/store/store` — avoid long `../../..` paths.
 - Put tests in a `__test__/` folder next to the code being tested.
 - Get colors and fonts from the theme (`styles/`), do not hardcode values.

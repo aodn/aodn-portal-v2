@@ -41,3 +41,6 @@ system yarn 1 — yarn 1 rewrites the whole lockfile.
 - `canned.tsx` test fixture is 15,700 lines
 - `ErrorBoundary` / `HealthChecker` live in `utils/` (decided to keep)
 - `public/` vs `src/assets/` may hold duplicate images
+- Naming convention (kebab-case folders, PascalCase components — see
+  `src/README.md`) is not machine-enforced; `eslint-plugin-check-file`
+  could do it (new dev dependency, install with yarn 4)
