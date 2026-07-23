@@ -29,7 +29,28 @@ import {
   PLACEHOLDER_FILL_COLOR,
   DEFAULT_TIME_GROUP_BY,
   TimeGroupBy,
+  type PMTilesMetadataRange,
 } from "../PMTilesLayer";
+
+/** Test helper: periodNumberToDayjs with required Dayjs (throws if parse fails). */
+const requirePeriod = (
+  value: unknown,
+  timeGroupBy: TimeGroupBy = TimeGroupBy.Date,
+  bound: "start" | "end" = "start"
+) => {
+  const d = periodNumberToDayjs(value, timeGroupBy, bound);
+  if (!d) throw new Error(`Expected period ${String(value)} to parse`);
+  return d;
+};
+
+const metaRange = (
+  min: unknown,
+  max: unknown,
+  timeGroupBy: TimeGroupBy = TimeGroupBy.Date
+): PMTilesMetadataRange => ({
+  minDate: requirePeriod(min, timeGroupBy, "start"),
+  maxDate: requirePeriod(max, timeGroupBy, "end"),
+});
 
 describe("PMTilesLayer - parseTimeGroupBy", () => {
   it("accepts date and month, falls back to default for anything else", () => {
@@ -186,10 +207,7 @@ describe("PMTilesLayer - clampRangeToMetadata", () => {
     const { start, end } = clampRangeToMetadata(
       dayjs("2000-01-01"),
       dayjs("2030-12-31"),
-      {
-        minDate: periodNumberToDayjs(20100815, TimeGroupBy.Date),
-        maxDate: periodNumberToDayjs(20100901, TimeGroupBy.Date),
-      },
+      metaRange(20100815, 20100901, TimeGroupBy.Date),
       TimeGroupBy.Date
     );
     expect(start.format("YYYY-MM-DD")).toBe("2010-08-15");
@@ -200,10 +218,7 @@ describe("PMTilesLayer - clampRangeToMetadata", () => {
     const { start, end } = clampRangeToMetadata(
       dayjs("2000-01-01"),
       dayjs("2030-12-31"),
-      {
-        minDate: periodNumberToDayjs(201008, TimeGroupBy.Month, "start"),
-        maxDate: periodNumberToDayjs(201010, TimeGroupBy.Month, "end"),
-      },
+      metaRange(201008, 201010, TimeGroupBy.Month),
       TimeGroupBy.Month
     );
     expect(start.format("YYYY-MM-DD")).toBe("2010-08-01");
@@ -269,10 +284,7 @@ describe("PMTilesLayer - getDateKeysInRange", () => {
       dayjs("2000-01-01"),
       dayjs("2030-12-31"),
       TimeGroupBy.Date,
-      {
-        minDate: periodNumberToDayjs(20100814, TimeGroupBy.Date),
-        maxDate: periodNumberToDayjs(20100816, TimeGroupBy.Date),
-      }
+      metaRange(20100814, 20100816, TimeGroupBy.Date)
     );
     expect(keys).toEqual(["m20100814", "m20100815", "m20100816"]);
   });
@@ -282,10 +294,7 @@ describe("PMTilesLayer - getDateKeysInRange", () => {
       dayjs("2000-01-01"),
       dayjs("2030-12-31"),
       TimeGroupBy.Month,
-      {
-        minDate: periodNumberToDayjs(201008, TimeGroupBy.Month, "start"),
-        maxDate: periodNumberToDayjs(201010, TimeGroupBy.Month, "end"),
-      }
+      metaRange(201008, 201010, TimeGroupBy.Month)
     );
     expect(keys).toEqual(["m201008", "m201009", "m201010"]);
   });
@@ -295,10 +304,7 @@ describe("PMTilesLayer - getDateKeysInRange", () => {
       dayjs("2010-08-15"),
       dayjs("2010-08-20"),
       TimeGroupBy.Date,
-      {
-        minDate: periodNumberToDayjs(20100801, TimeGroupBy.Date),
-        maxDate: periodNumberToDayjs(20100831, TimeGroupBy.Date),
-      }
+      metaRange(20100801, 20100831, TimeGroupBy.Date)
     );
     expect(keys[0]).toBe("m20100815");
     expect(keys[keys.length - 1]).toBe("m20100820");
