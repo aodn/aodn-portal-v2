@@ -20,7 +20,7 @@ import { TestHelper } from "../../../common/test/helper";
 import { MapDefaultConfig } from "../constants";
 import { isDrawModeRectangle } from "../../../../utils/MapUtils";
 import dayjs from "dayjs";
-import { CloudOptimizedFeature } from "../../../common/store/CloudOptimizedDefinitions";
+import { CloudOptimizedFeature } from "@/app/store/CloudOptimizedDefinitions";
 import _ from "lodash";
 import { SelectItem } from "../../../common/dropdown/CommonSelect";
 import MapLayerSelect from "../component/MapLayerSelect";

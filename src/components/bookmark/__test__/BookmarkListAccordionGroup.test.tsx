@@ -1,17 +1,17 @@
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { vi, beforeEach, describe, expect, afterAll, afterEach } from "vitest";
-import store from "../../common/store/store";
+import store from "@/app/store/store";
 import {
   removeAllItems,
   addItem,
   setTemporaryItem,
   setItems,
-} from "../../common/store/bookmarkListReducer";
-import { OGCCollection } from "../../common/store/OGCCollectionDefinitions";
+} from "@/app/store/bookmarkListReducer";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import BookmarkListAccordionGroup from "../BookmarkListAccordionGroup";
 import { userEvent } from "@testing-library/user-event";
 import { server } from "../../../__mocks__/server";
-import * as bookmarkListReducer from "../../common/store/bookmarkListReducer";
+import * as bookmarkListReducer from "@/app/store/bookmarkListReducer";
 import { COLLECTIONS_WAVE } from "../../../__mocks__/data/COLLECTIONS_WAVE";
 import fs from "fs/promises";
 import path from "path";

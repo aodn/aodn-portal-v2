@@ -6,7 +6,7 @@ import {
   MercatorCoordinate,
 } from "mapbox-gl";
 import { Position } from "geojson";
-import { OGCCollection } from "../components/common/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import {
   AUSTRALIA_CENTER_LNG,
   MapDefaultConfig,

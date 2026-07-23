@@ -4,7 +4,7 @@ import DoneAllIcon from "@mui/icons-material/DoneAll";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 import { ContentCopyIcon } from "../../../assets/icons/download/contentCopy";
 import { portalTheme } from "../../../styles";
-import { useClipboardContext } from "../../../context/clipboard/ClipboardContext";
+import { useClipboardContext } from "@/app/providers/ClipboardContext";
 
 interface CopyIconConfig {
   iconBeforeCopy?: ReactNode;

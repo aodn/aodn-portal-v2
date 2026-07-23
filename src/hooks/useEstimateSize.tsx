@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { AsyncThunk } from "@reduxjs/toolkit";
-import { useAppDispatch } from "../components/common/store/hooks";
+import { useAppDispatch } from "@/app/store/hooks";
 import { consumeSSEStream } from "../utils/SSEUtils";
 import { ErrorResponse } from "../utils/ErrorBoundary";
 

@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 import { axisClasses, BarSeriesType, BarChart } from "@mui/x-charts";
-import { OGCCollections } from "../store/OGCCollectionDefinitions";
+import { OGCCollections } from "@/app/store/OGCCollectionDefinitions";
 import { color } from "../../../styles/constants";
 import { legendClasses } from "@mui/x-charts/ChartsLegend";
 

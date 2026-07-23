@@ -8,7 +8,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import DateRangeFilter from "../DateRangeFilter";
 import { dateDefault } from "../../common/constants";
-import { updateDateTimeFilterRange } from "../../common/store/componentParamReducer";
+import { updateDateTimeFilterRange } from "@/app/store/componentParamReducer";
 import { dateToValue } from "../../../utils/DateUtils";
 import axios from "axios";
 import { responseIdTemporal, responseIdProvider } from "./canned";

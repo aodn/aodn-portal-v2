@@ -1,6 +1,6 @@
 import { FC, useCallback } from "react";
 import { Box, Stack, SxProps, Tooltip, Typography } from "@mui/material";
-import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import Map from "../map/mapbox/Map";
 import Layers from "../map/mapbox/layers/Layers";
 import GeojsonLayer from "../map/mapbox/layers/GeojsonLayer";

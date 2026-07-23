@@ -1,13 +1,13 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { vi, beforeEach, describe, expect, afterAll, it } from "vitest";
-import store from "../../common/store/store";
+import store from "@/app/store/store";
 import {
   removeAllItems,
   addItem,
   setItems,
-} from "../../common/store/bookmarkListReducer";
-import { OGCCollection } from "../../common/store/OGCCollectionDefinitions";
+} from "@/app/store/bookmarkListReducer";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import BookmarkButton from "../BookmarkButton";
 
 // Mock the local store, so that bookmarkListReducer save value to Record instead of the window store

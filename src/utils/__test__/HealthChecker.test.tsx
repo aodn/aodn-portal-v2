@@ -11,7 +11,7 @@ vi.mock("../../pages/error-page/DegradedPage", () => ({
 
 // Mock the app dispatch hook by directly exporting a function that returns our mock dispatch
 const mockDispatch = vi.fn();
-vi.mock("../../components/common/store/hooks", () => ({
+vi.mock("@/app/store/hooks", () => ({
   useAppDispatch: () => mockDispatch,
 }));
 

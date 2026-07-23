@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { MapDefaultConfig } from "../../components/map/mapbox/constants";
-import { OGCCollection } from "../../components/common/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import {
   cssFontFamilyToMapboxTextFont,
   fitToBound,

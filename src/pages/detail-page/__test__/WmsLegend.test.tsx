@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { ThemeProvider } from "@mui/material/styles";
-import AppTheme from "../../../utils/AppTheme";
+import AppTheme from "@/styles/theme";
 import WmsLegend from "../features/WmsLegend";
 
 const renderLegend = (layerName = "test-layer") =>

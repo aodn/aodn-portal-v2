@@ -14,7 +14,7 @@ import { SelectItem } from "../../../common/dropdown/CommonSelect";
 import { InnerHtmlBuilder } from "../../../../utils/HtmlUtils";
 import { MapDefaultConfig } from "../constants";
 import { playwrightTestIds } from "../../../common/constants";
-import { DatasetType } from "../../../common/store/OGCCollectionDefinitions";
+import { DatasetType } from "@/app/store/OGCCollectionDefinitions";
 
 const SOURCE_ID = "pmtiles-source-id";
 const HOVER_SOURCE_ID = "pmtiles-hover-source-id";

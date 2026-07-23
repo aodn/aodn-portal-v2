@@ -17,7 +17,7 @@ import Layers, {
 import ClusterLayer from "../../../components/map/mapbox/layers/ClusterLayer";
 import HeatmapLayer from "../../../components/map/mapbox/layers/HeatmapLayer";
 import UnclusterLayer from "../../../components/map/mapbox/layers/UnclusterLayer";
-import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
 import { generateFeatureCollectionFrom } from "../../../utils/GeoJsonUtils";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";

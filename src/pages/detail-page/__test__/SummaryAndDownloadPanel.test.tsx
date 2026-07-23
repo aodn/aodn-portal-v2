@@ -10,7 +10,7 @@ import {
 import {
   OGCCollection,
   DatasetType,
-} from "../../../components/common/store/OGCCollectionDefinitions";
+} from "@/app/store/OGCCollectionDefinitions";
 
 // Helper to create a FeatureCollection for testing
 const createFeatureCollection = (

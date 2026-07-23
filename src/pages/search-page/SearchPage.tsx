@@ -14,14 +14,14 @@ import { bboxPolygon, booleanEqual } from "@turf/turf";
 import store, {
   getComponentState,
   getSearchQueryResult,
-} from "../../components/common/store/store";
+} from "@/app/store/store";
 import {
   createSearchParamFrom,
   fetchResultByUuidNoStore,
   fetchResultNoStore,
   jsonToOGCCollections,
   SearchParameters,
-} from "../../components/common/store/searchReducer";
+} from "@/app/store/searchReducer";
 import {
   formatToUrlParam,
   ParameterState,
@@ -31,23 +31,19 @@ import {
   updateSort,
   updateSortBy,
   updateZoom,
-} from "../../components/common/store/componentParamReducer";
+} from "@/app/store/componentParamReducer";
 import {
   off,
   on,
   setExpandedItem,
   setTemporaryItem,
-} from "../../components/common/store/bookmarkListReducer";
-import Layout from "../../components/layout/Layout";
+} from "@/app/store/bookmarkListReducer";
 import ResultSection from "./layout/ResultSection";
 import MapSection from "./layout/MapSection";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/ResultListLayoutButton";
 import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
-import { OGCCollection } from "../../components/common/store/OGCCollectionDefinitions";
-import {
-  useAppDispatch,
-  useAppSelector,
-} from "../../components/common/store/hooks";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { pageDefault, pageReferer } from "../../components/common/constants";
 import { color } from "../../styles/constants";
 import {
@@ -565,80 +561,75 @@ const SearchPage = () => {
   }, [urlParamState]);
 
   return (
-    <Layout>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: { xs: "column-reverse", md: "row" },
+        justifyContent: "space-between",
+        alignItems: "stretch",
+        width: "100%",
+        height: {
+          xs:
+            layout === SearchResultLayoutEnum.FULL_MAP
+              ? "auto"
+              : SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_UNDER_LAPTOP,
+          md: SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_ABOVE_LAPTOP,
+        },
+        overflowX: "hidden",
+        padding: isUnderLaptop ? "10px" : "24px",
+        bgcolor: color.blue.light,
+      }}
+      gap={layout === SearchResultLayoutEnum.FULL_MAP || isUnderLaptop ? 0 : 1}
+    >
       <Box
         sx={{
-          display: "flex",
-          flexDirection: { xs: "column-reverse", md: "row" },
-          justifyContent: "space-between",
-          alignItems: "stretch",
-          width: "100%",
-          height: {
-            xs:
-              layout === SearchResultLayoutEnum.FULL_MAP
-                ? "auto"
-                : SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_UNDER_LAPTOP,
-            md: SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_ABOVE_LAPTOP,
-          },
-          overflowX: "hidden",
-          padding: isUnderLaptop ? "10px" : "24px",
-          bgcolor: color.blue.light,
+          flex: isUnderLaptop ? 1 : "none",
+          width: layout === SearchResultLayoutEnum.FULL_LIST ? "100%" : "auto",
+          height: layout === SearchResultLayoutEnum.FULL_MAP ? 0 : "auto",
         }}
-        gap={
-          layout === SearchResultLayoutEnum.FULL_MAP || isUnderLaptop ? 0 : 1
-        }
       >
-        <Box
-          sx={{
-            flex: isUnderLaptop ? 1 : "none",
-            width:
-              layout === SearchResultLayoutEnum.FULL_LIST ? "100%" : "auto",
-            height: layout === SearchResultLayoutEnum.FULL_MAP ? 0 : "auto",
-          }}
-        >
-          <ResultSection
-            showFullMap={layout === SearchResultLayoutEnum.FULL_MAP}
-            showFullList={layout === SearchResultLayoutEnum.FULL_LIST}
-            onClickCard={onClickResultCard}
-            selectedUuids={selectedUuids}
-            currentSort={currentSort}
-            onChangeSorting={onChangeSorting}
-            currentLayout={currentLayout}
-            onChangeLayout={onChangeLayout}
-            onDeselectDataset={onDeselectDataset}
-            cancelLoading={cancelAllSearch}
-          />
-        </Box>
-        <Box
-          sx={{
-            flex: isUnderLaptop ? "none" : 1,
-            height: isUnderLaptop
-              ? layout === SearchResultLayoutEnum.FULL_LIST
-                ? SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_LIST
-                : layout === SearchResultLayoutEnum.FULL_MAP
-                  ? isMobile
-                    ? SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_MOBILE
-                    : SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_TABLET
-                  : SEARCH_PAGE_MAP_CONTAINER_HEIGHT_UNDER_LAPTOP
-              : SEARCH_PAGE_MAP_CONTAINER_HEIGHT_ABOVE_LAPTOP,
-          }}
-        >
-          <MapSection
-            showFullMap={layout === SearchResultLayoutEnum.FULL_MAP}
-            showFullList={layout === SearchResultLayoutEnum.FULL_LIST}
-            collections={layers}
-            bbox={bbox}
-            zoom={zoom}
-            selectedUuids={selectedUuids}
-            onMapZoomOrMove={onMapZoomOrMove}
-            onToggleClicked={onToggleDisplay}
-            onClickMapPoint={onClickMapPoint}
-            progress={progress}
-            onDeselectDataset={onDeselectDataset}
-          />
-        </Box>
+        <ResultSection
+          showFullMap={layout === SearchResultLayoutEnum.FULL_MAP}
+          showFullList={layout === SearchResultLayoutEnum.FULL_LIST}
+          onClickCard={onClickResultCard}
+          selectedUuids={selectedUuids}
+          currentSort={currentSort}
+          onChangeSorting={onChangeSorting}
+          currentLayout={currentLayout}
+          onChangeLayout={onChangeLayout}
+          onDeselectDataset={onDeselectDataset}
+          cancelLoading={cancelAllSearch}
+        />
       </Box>
-    </Layout>
+      <Box
+        sx={{
+          flex: isUnderLaptop ? "none" : 1,
+          height: isUnderLaptop
+            ? layout === SearchResultLayoutEnum.FULL_LIST
+              ? SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_LIST
+              : layout === SearchResultLayoutEnum.FULL_MAP
+                ? isMobile
+                  ? SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_MOBILE
+                  : SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_TABLET
+                : SEARCH_PAGE_MAP_CONTAINER_HEIGHT_UNDER_LAPTOP
+            : SEARCH_PAGE_MAP_CONTAINER_HEIGHT_ABOVE_LAPTOP,
+        }}
+      >
+        <MapSection
+          showFullMap={layout === SearchResultLayoutEnum.FULL_MAP}
+          showFullList={layout === SearchResultLayoutEnum.FULL_LIST}
+          collections={layers}
+          bbox={bbox}
+          zoom={zoom}
+          selectedUuids={selectedUuids}
+          onMapZoomOrMove={onMapZoomOrMove}
+          onToggleClicked={onToggleDisplay}
+          onClickMapPoint={onClickMapPoint}
+          progress={progress}
+          onDeselectDataset={onDeselectDataset}
+        />
+      </Box>
+    </Box>
   );
 };
 

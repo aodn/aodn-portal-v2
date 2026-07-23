@@ -10,7 +10,7 @@ import IconSelect, { IconSelectProps } from "../IconSelect";
 import { FunctionComponent } from "react";
 import { ThemeProvider } from "@mui/material/styles";
 import { SelectItem } from "../CommonSelect";
-import AppTheme from "../../../../utils/AppTheme"; // Adjust to your theme path
+import AppTheme from "@/styles/theme"; // Adjust to your theme path
 
 // Mock dependencies
 vi.mock("../../../utils/ScrollUtils", () => ({

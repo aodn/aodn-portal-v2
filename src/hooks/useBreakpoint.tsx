@@ -1,5 +1,5 @@
 import { useMediaQuery, useTheme } from "@mui/material";
-import { BREAKPOINT } from "../components/layout/constant";
+import { BREAKPOINT } from "@/app/layout/constant";
 
 const useBreakpoint = () => {
   const theme = useTheme();

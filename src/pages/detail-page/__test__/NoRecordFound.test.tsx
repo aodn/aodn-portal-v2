@@ -9,11 +9,11 @@ import {
   expect,
 } from "vitest";
 import { server } from "../../../__mocks__/server";
-import AppTheme from "../../../utils/AppTheme";
+import AppTheme from "@/styles/theme";
 import { useLocation, useParams } from "react-router-dom";
 import { cleanup, render, waitFor, screen } from "@testing-library/react";
 import { Provider } from "react-redux";
-import store from "../../../components/common/store/store";
+import store from "@/app/store/store";
 import { ThemeProvider } from "@mui/material/styles";
 import { DetailPageProvider } from "../context/detail-page-provider";
 import DetailsPage from "../DetailsPage";

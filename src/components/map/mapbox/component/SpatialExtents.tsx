@@ -4,9 +4,9 @@ import {
   fetchResultNoStore,
   jsonToOGCCollections,
   SearchParameters,
-} from "../../../common/store/searchReducer";
+} from "@/app/store/searchReducer";
 import { MapMouseEvent } from "mapbox-gl";
-import { useAppDispatch } from "../../../common/store/hooks";
+import { useAppDispatch } from "@/app/store/hooks";
 
 interface SpatialExtentsProps {
   layerId: string;

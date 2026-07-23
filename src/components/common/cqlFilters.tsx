@@ -6,8 +6,8 @@ import dayjs from "dayjs";
 import { dateDefault } from "./constants";
 import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from "geojson";
 import * as wellknown from "wellknown";
-import { SelectedStaticArea, Vocab } from "./store/componentParamReducer";
-import { DatasetFrequency, DatasetStatus } from "./store/searchReducer";
+import { SelectedStaticArea, Vocab } from "@/app/store/componentParamReducer";
+import { DatasetFrequency, DatasetStatus } from "@/app/store/searchReducer";
 import { bbox } from "@turf/turf";
 
 // TODO: refactor this, naming like this is not ideal for readability,

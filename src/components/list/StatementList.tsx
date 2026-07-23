@@ -1,7 +1,7 @@
 import React from "react";
 import ExpandableList from "./ExpandableList";
-import ItemBaseGrid from "./listItem/ItemBaseGrid";
-import ExpandableTextArea from "./listItem/subitem/ExpandableTextArea";
+import ItemBaseGrid from "./list-item/ItemBaseGrid";
+import ExpandableTextArea from "./list-item/sub-item/ExpandableTextArea";
 
 interface StatementListProps {
   title?: string;

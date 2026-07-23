@@ -2,8 +2,8 @@ import { afterAll, afterEach, beforeAll, beforeEach, expect, vi } from "vitest";
 import { server } from "../../../__mocks__/server";
 import { useLocation, useParams } from "react-router-dom";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
-import AppTheme from "../../../utils/AppTheme";
-import store from "../../../components/common/store/store";
+import AppTheme from "@/styles/theme";
+import store from "@/app/store/store";
 import { ThemeProvider } from "@mui/material/styles";
 import { DetailPageProvider } from "../context/detail-page-provider";
 import { Provider } from "react-redux";
@@ -12,10 +12,7 @@ import {
   DetailPageContext,
   DetailPageContextDefault,
 } from "../context/detail-page-context";
-import {
-  OGCCollection,
-  ITheme,
-} from "../../../components/common/store/OGCCollectionDefinitions";
+import { OGCCollection, ITheme } from "@/app/store/OGCCollectionDefinitions";
 
 describe("Additional Info", async () => {
   const theme = AppTheme;

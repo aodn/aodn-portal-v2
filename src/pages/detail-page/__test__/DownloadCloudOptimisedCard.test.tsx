@@ -33,8 +33,8 @@ import DownloadCloudOptimisedCard from "../features/download/DownloadCloudOptimi
 import {
   DatasetType,
   OGCCollection,
-} from "../../../components/common/store/OGCCollectionDefinitions";
-import store from "../../../components/common/store/store";
+} from "@/app/store/OGCCollectionDefinitions";
+import store from "@/app/store/store";
 
 const theme = createTheme();
 

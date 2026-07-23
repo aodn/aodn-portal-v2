@@ -1,17 +1,14 @@
 import { FC } from "react";
 import { useSelector } from "react-redux";
 import { Box, SxProps } from "@mui/material";
-import { CollectionsQueryType } from "../../../components/common/store/searchReducer";
+import { CollectionsQueryType } from "@/app/store/searchReducer";
 import ResultPanelSimpleFilter, {
   ResultPanelSimpleFilterType,
 } from "../../../components/filter/ResultPanelSimpleFilter";
 import ResultCards, {
   ResultCardsType,
 } from "../../../components/result/ResultCards";
-import {
-  RootState,
-  getSearchQueryResult,
-} from "../../../components/common/store/store";
+import { RootState, getSearchQueryResult } from "@/app/store/store";
 import BookmarkListButton, {
   BookmarkListButtonBasicType,
 } from "../../../components/result/BookmarkListButton";

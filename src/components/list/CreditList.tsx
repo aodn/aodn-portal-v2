@@ -1,7 +1,7 @@
 import React from "react";
 import ExpandableList from "./ExpandableList";
-import ExpandableTextArea from "./listItem/subitem/ExpandableTextArea";
-import ItemBaseGrid from "./listItem/ItemBaseGrid";
+import ExpandableTextArea from "./list-item/sub-item/ExpandableTextArea";
+import ItemBaseGrid from "./list-item/ItemBaseGrid";
 
 interface CreditListProps {
   credits: string[];

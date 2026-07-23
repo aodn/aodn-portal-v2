@@ -1,7 +1,7 @@
 import { FC, useMemo } from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import { useDetailPageContext } from "../context/detail-page-context";
-import ExpandableTextArea from "../../../components/list/listItem/subitem/ExpandableTextArea";
+import ExpandableTextArea from "../../../components/list/list-item/sub-item/ExpandableTextArea";
 import useBreakpoint from "../../../hooks/useBreakpoint";
 import AIGenTag from "../../../components/info/AIGenTag";
 import { portalTheme } from "../../../styles";

@@ -9,7 +9,7 @@ import {
 import { Stack } from "@mui/material";
 import dayjs from "dayjs";
 import { dateDefault } from "../../../../components/common/constants";
-import DownloadDialog from "./DownloadDialog/DownloadDialog";
+import DownloadDialog from "./download-dialog/DownloadDialog";
 import {
   DownloadCondition,
   DownloadConditionType,
@@ -19,12 +19,12 @@ import {
 import {
   DatasetType,
   OGCCollection,
-} from "../../../../components/common/store/OGCCollectionDefinitions";
+} from "@/app/store/OGCCollectionDefinitions";
 import DownloadButton from "../../../../components/common/buttons/DownloadButton";
 import DownloadSubsetting from "./DownloadSubsetting";
 import DownloadSelect from "./DownloadSelect";
 import useEstimateSize from "../../../../hooks/useEstimateSize";
-import { processCoEstimateSize } from "../../../../components/common/store/searchReducer";
+import { processCoEstimateSize } from "@/app/store/searchReducer";
 
 const downloadFormats = [
   { label: "NetCDFs", value: "netcdf" },

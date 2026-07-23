@@ -55,7 +55,7 @@ import { MapEventEnum } from "../../../components/map/mapbox/constants";
 import { fitToDefaultExtent } from "../../../utils/MapUtils";
 import { DateSliderPoint } from "../../../components/common/slider/DateSlider";
 import { dateToValue } from "../../../utils/DateUtils";
-import { GeoserverFieldsResponse } from "../../../components/common/store/GeoserverDefinitions";
+import { GeoserverFieldsResponse } from "@/app/store/GeoserverDefinitions";
 import * as turf from "@turf/turf";
 import { createStaticLayers } from "../../../components/map/mapbox/layers/StaticLayer";
 import PMTilesHexLayer from "../../../components/map/mapbox/layers/PMTilesLayer";
@@ -63,7 +63,7 @@ import WmsLegend from "./WmsLegend";
 import {
   DatasetType,
   OGCCollection,
-} from "../../../components/common/store/OGCCollectionDefinitions";
+} from "@/app/store/OGCCollectionDefinitions";
 
 const mapContainerId = "map-detail-container-id";
 

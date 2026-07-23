@@ -1,9 +1,9 @@
 // CodeTutorialsList is a List component that displays a list of python notebook links
 import React from "react";
 import ExpandableList from "./ExpandableList";
-import ItemBaseGrid from "./listItem/ItemBaseGrid";
-import { ILink } from "../common/store/OGCCollectionDefinitions";
-import LinkCard from "./listItem/subitem/LinkCard";
+import ItemBaseGrid from "./list-item/ItemBaseGrid";
+import { ILink } from "@/app/store/OGCCollectionDefinitions";
+import LinkCard from "./list-item/sub-item/LinkCard";
 
 interface CodeTutorialsListProps {
   pythonNotebookLinks?: ILink[];

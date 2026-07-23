@@ -1,12 +1,9 @@
-import {
-  IAssociatedRecord,
-  ILink,
-} from "../common/store/OGCCollectionDefinitions";
+import { IAssociatedRecord, ILink } from "@/app/store/OGCCollectionDefinitions";
 import React, { memo, ReactNode, useMemo } from "react";
 import ExpandableList from "./ExpandableList";
-import CollapseItem from "./listItem/CollapseItem";
-import ExpandableTextArea from "./listItem/subitem/ExpandableTextArea";
-import LinkCard from "./listItem/subitem/LinkCard";
+import CollapseItem from "./list-item/CollapseItem";
+import ExpandableTextArea from "./list-item/sub-item/ExpandableTextArea";
+import LinkCard from "./list-item/sub-item/LinkCard";
 import { pageDefault } from "../common/constants";
 import { IconLink } from "../icon/IconLink";
 
