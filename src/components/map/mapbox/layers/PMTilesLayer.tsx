@@ -33,6 +33,72 @@ const HOVER_OUTLINE_LAYER_ID = "pmtiles-hex-hover-outline";
 const CURSOR_POINTER_CLASS = "map-cursor-pointer";
 /** Feature-state key written by sparse JS sums for density paint/filter. */
 export const FEATURE_STATE_TOTAL = "total";
+/**
+ * Top density total used by paint interpolate and by the feature-state early-stop.
+ * Totals at or above this value all paint the same; full accuracy is only needed
+ * for the hover popup (which does not use this cap).
+ *
+ * Color/opacity breakpoints are ratios of this value — change only the cap and
+ * the whole scale rescales (see `DENSITY_COLOR_STOPS` / `DENSITY_OPACITY_STOPS`).
+ */
+export const DENSITY_TOTAL_CAP = 10000;
+
+/**
+ * Density fill-color stops as a fraction of {@link DENSITY_TOTAL_CAP}.
+ * Ratios must be strictly increasing from 0 to 1.
+ */
+export const DENSITY_COLOR_STOPS: ReadonlyArray<{
+  ratio: number;
+  color: string;
+}> = [
+  { ratio: 0, color: "rgba(0, 0, 0, 0)" },
+  { ratio: 0.0001, color: "#1E293B" }, // 1 @ cap 10000
+  { ratio: 0.001, color: "#334155" }, // 10
+  { ratio: 0.01, color: "#475569" }, // 100
+  { ratio: 0.1, color: "#0284C7" }, // 1000
+  { ratio: 0.5, color: "#0D9488" }, // 5000
+  { ratio: 1, color: "#14B8A6" }, // cap
+];
+
+/**
+ * Density fill-opacity stops as a fraction of {@link DENSITY_TOTAL_CAP}.
+ * Ratios must be strictly increasing from 0 toward 1 (need not reach 1).
+ */
+export const DENSITY_OPACITY_STOPS: ReadonlyArray<{
+  ratio: number;
+  opacity: number;
+}> = [
+  { ratio: 0, opacity: 0 },
+  { ratio: 0.0001, opacity: 0.15 }, // 1 @ cap 10000
+  { ratio: 0.01, opacity: 0.6 }, // 100
+  { ratio: 0.1, opacity: 0.8 }, // 1000
+];
+
+/** Absolute count at a density ratio (rounded; keeps 0 exact). */
+export const densityStopValue = (
+  ratio: number,
+  cap: number = DENSITY_TOTAL_CAP
+): number => (ratio === 0 ? 0 : Math.max(1, Math.round(ratio * cap)));
+
+/**
+ * Flatten ratio-based stops into Mapbox `interpolate` input/output pairs,
+ * dropping any non-increasing values after rounding so the expression stays valid.
+ */
+export const buildDensityInterpolateStops = <T extends string | number>(
+  stops: ReadonlyArray<{ ratio: number; value: T }>,
+  cap: number = DENSITY_TOTAL_CAP
+): Array<number | T> => {
+  const pairs: Array<number | T> = [];
+  let lastInput = -Infinity;
+  for (const stop of stops) {
+    const input = densityStopValue(stop.ratio, cap);
+    // Skip duplicates / regressions from rounding at small caps
+    if (input <= lastInput) continue;
+    pairs.push(input, stop.value);
+    lastInput = input;
+  }
+  return pairs;
+};
 /** H3 cell id property; promoted to feature id so feature-state can target hexes. */
 const PROMOTE_ID_PROPERTY = "h";
 const EMPTY_FEATURE_COLLECTION: FeatureCollection = {
@@ -307,19 +373,43 @@ export const coerceCountValue = (value: unknown): number => {
   return NaN;
 };
 
+/** Options for sparse m* summing (density vs exact popup). */
+export type SumSparseCountOptions = {
+  /**
+   * When set, stop adding once `total` reaches this value and clamp the result.
+   * Used for density paint (see `DENSITY_TOTAL_CAP`) so large hexes do not walk
+   * every day/month property when the color scale has already saturated.
+   */
+  maxTotal?: number;
+  /**
+   * Collect and sort matching property keys (needed for popup time range).
+   * Density feature-state only needs the total — default false when maxTotal
+   * is set, true otherwise.
+   */
+  collectMatchedKeys?: boolean;
+};
+
 /**
  * Sparse sum of pre-baked m* counts on a feature for the filter window.
  * Only walks properties that exist (not a dense calendar of day keys).
+ *
+ * Pass `maxTotal` (e.g. `DENSITY_TOTAL_CAP`) for density feature-state so
+ * high-count hexes exit early; omit it for popup HTML so counts stay exact.
  */
 export const sumSparseCountFromProperties = (
   properties: Record<string, unknown> | null | undefined,
   filterStartDate?: Dayjs,
   filterEndDate?: Dayjs,
-  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY
+  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY,
+  options?: SumSparseCountOptions
 ): { total: number; matchedKeys: string[] } => {
   let total = 0;
   const matchedKeys: string[] = [];
   if (!properties) return { total, matchedKeys };
+
+  const maxTotal = options?.maxTotal;
+  const collectMatchedKeys =
+    options?.collectMatchedKeys ?? maxTotal === undefined;
 
   for (const [key, value] of Object.entries(properties)) {
     const count = coerceCountValue(value);
@@ -330,10 +420,18 @@ export const sumSparseCountFromProperties = (
       continue;
     }
     total += count;
-    matchedKeys.push(key);
+    if (collectMatchedKeys) {
+      matchedKeys.push(key);
+    }
+    if (maxTotal !== undefined && total >= maxTotal) {
+      total = maxTotal;
+      break;
+    }
   }
   // Lexicographic order matches chronological order for mYYYYMM / mYYYYMMDD
-  matchedKeys.sort();
+  if (collectMatchedKeys) {
+    matchedKeys.sort();
+  }
   return { total, matchedKeys };
 };
 
@@ -434,40 +532,38 @@ export const getPlaceholderPaintProperties = (): HexFillPaint => ({
  * Unset feature-state (tile not yet processed) keeps the placeholder look so
  * newly loaded hexes do not disappear until their sparse total is written.
  * A real total of 0 paints transparent (out of filter range).
+ *
+ * Color and opacity breakpoints scale with {@link DENSITY_TOTAL_CAP} via
+ * {@link DENSITY_COLOR_STOPS} / {@link DENSITY_OPACITY_STOPS}.
  */
-export const getFeatureStatePaintProperties = (): HexFillPaint => {
+export const getFeatureStatePaintProperties = (
+  cap: number = DENSITY_TOTAL_CAP
+): HexFillPaint => {
   const totalIsSet = buildFeatureStateTotalIsSetExpression();
   const sumExpr = buildFeatureStateTotalExpression();
+  const colorStops = buildDensityInterpolateStops(
+    DENSITY_COLOR_STOPS.map(({ ratio, color }) => ({ ratio, value: color })),
+    cap
+  );
+  const opacityStops = buildDensityInterpolateStops(
+    DENSITY_OPACITY_STOPS.map(({ ratio, opacity }) => ({
+      ratio,
+      value: opacity,
+    })),
+    cap
+  );
   return {
     "fill-color": [
       "case",
       ["!", totalIsSet],
       PLACEHOLDER_FILL_COLOR,
-      [
-        "interpolate",
-        ["linear"],
-        sumExpr,
-        0,
-        "rgba(0, 0, 0, 0)",
-        1,
-        "#1E293B",
-        10,
-        "#334155",
-        100,
-        "#475569",
-        1000,
-        "#0284C7",
-        5000,
-        "#0D9488",
-        10000,
-        "#14B8A6",
-      ],
+      ["interpolate", ["linear"], sumExpr, ...colorStops],
     ] as ExpressionSpecification,
     "fill-opacity": [
       "case",
       ["!", totalIsSet],
       PLACEHOLDER_FILL_OPACITY,
-      ["interpolate", ["linear"], sumExpr, 0, 0, 1, 0.15, 100, 0.6, 1000, 0.8],
+      ["interpolate", ["linear"], sumExpr, ...opacityStops],
     ] as ExpressionSpecification,
     "fill-outline-color": "rgba(255, 255, 255, 0.4)",
   };
@@ -536,11 +632,14 @@ export const updateFeatureStateTotals = (
       // Mapbox feature ids are string | number; keep type from promoteId
       const id = rawId as string | number;
 
+      // Cap at paint max — further day/month keys do not change color/opacity.
+      // Popup uses an uncapped sum via buildPopupHtml for the exact count.
       const { total } = sumSparseCountFromProperties(
         feature.properties as Record<string, unknown> | null,
         filterStartDate,
         filterEndDate,
-        timeGroupBy
+        timeGroupBy,
+        { maxTotal: DENSITY_TOTAL_CAP, collectMatchedKeys: false }
       );
 
       try {

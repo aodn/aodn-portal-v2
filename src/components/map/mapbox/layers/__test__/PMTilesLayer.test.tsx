@@ -26,6 +26,11 @@ import {
   scheduleDeferredWork,
   scheduleDebouncedWork,
   FEATURE_STATE_TOTAL,
+  DENSITY_TOTAL_CAP,
+  DENSITY_COLOR_STOPS,
+  DENSITY_OPACITY_STOPS,
+  densityStopValue,
+  buildDensityInterpolateStops,
   PLACEHOLDER_FILL_COLOR,
   DEFAULT_TIME_GROUP_BY,
   TimeGroupBy,
@@ -605,6 +610,35 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     ).toBe(0);
   });
 
+  it("stops summing at maxTotal so density paint can early-exit", () => {
+    const { total, matchedKeys } = sumSparseCountFromProperties(
+      {
+        m20240101: 6000,
+        m20240102: 6000,
+        m20240201: 50000,
+        m20240301: 1,
+      },
+      start,
+      end,
+      TimeGroupBy.Date,
+      { maxTotal: DENSITY_TOTAL_CAP, collectMatchedKeys: false }
+    );
+    expect(total).toBe(DENSITY_TOTAL_CAP);
+    // Density path does not collect keys
+    expect(matchedKeys).toEqual([]);
+  });
+
+  it("does not clamp totals below the density cap", () => {
+    const { total } = sumSparseCountFromProperties(
+      { m20240101: 5, m20240201: 7 },
+      start,
+      end,
+      TimeGroupBy.Date,
+      { maxTotal: DENSITY_TOTAL_CAP, collectMatchedKeys: false }
+    );
+    expect(total).toBe(12);
+  });
+
   it("builds feature-state paint; layer filter does not use feature-state", () => {
     expect(buildFeatureStateTotalExpression()).toEqual([
       "coalesce",
@@ -628,9 +662,55 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     const colorJson = JSON.stringify(density["fill-color"]);
     expect(colorJson).toContain("feature-state");
     expect(colorJson).not.toContain("m2024");
+    // Top color stop must match the early-stop cap
+    expect(colorJson).toContain(String(DENSITY_TOTAL_CAP));
     // Unset feature-state keeps placeholder so mid-load tiles do not vanish
     expect(colorJson).toContain(PLACEHOLDER_FILL_COLOR);
     expect(colorJson).toContain("case");
+    // Default cap preserves the historical absolute breakpoints
+    expect(colorJson).toContain("#1E293B");
+    expect(colorJson).toContain("#14B8A6");
+    for (const input of [0, 1, 10, 100, 1000, 5000, DENSITY_TOTAL_CAP]) {
+      expect(colorJson).toContain(String(input));
+    }
+  });
+
+  it("scales density color breakpoints with the cap", () => {
+    const doubled = getFeatureStatePaintProperties(DENSITY_TOTAL_CAP * 2);
+    const colorJson = JSON.stringify(doubled["fill-color"]);
+    // Intermediate stops scale with the new cap (1000 → 2000 at 0.1 ratio)
+    expect(colorJson).toContain(String(DENSITY_TOTAL_CAP * 2));
+    expect(colorJson).toContain(
+      String(Math.round(0.1 * DENSITY_TOTAL_CAP * 2))
+    );
+    expect(colorJson).toContain(
+      String(Math.round(0.5 * DENSITY_TOTAL_CAP * 2))
+    );
+  });
+
+  it("builds monotonic interpolate stops from ratios", () => {
+    const pairs = buildDensityInterpolateStops(
+      DENSITY_COLOR_STOPS.map(({ ratio, color }) => ({ ratio, value: color })),
+      DENSITY_TOTAL_CAP
+    );
+    // [input, color, input, color, ...]
+    expect(pairs[0]).toBe(0);
+    expect(pairs[pairs.length - 2]).toBe(DENSITY_TOTAL_CAP);
+    expect(pairs[pairs.length - 1]).toBe("#14B8A6");
+    for (let i = 2; i < pairs.length; i += 2) {
+      expect(pairs[i] as number).toBeGreaterThan(pairs[i - 2] as number);
+    }
+    // Opacity ratios stay monotonic too
+    const opacityPairs = buildDensityInterpolateStops(
+      DENSITY_OPACITY_STOPS.map(({ ratio, opacity }) => ({
+        ratio,
+        value: opacity,
+      })),
+      DENSITY_TOTAL_CAP
+    );
+    expect(opacityPairs).toEqual([0, 0, 1, 0.15, 100, 0.6, 1000, 0.8]);
+    expect(densityStopValue(1)).toBe(DENSITY_TOTAL_CAP);
+    expect(densityStopValue(0)).toBe(0);
   });
 
   it("writes sparse totals via setFeatureState for loaded features", () => {
@@ -648,6 +728,16 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
             id: "cell-b",
             properties: { h: "cell-b", m20240201: 3 },
           },
+          {
+            // Hot cell: true sum far above paint max — density stores the cap
+            id: "cell-hot",
+            properties: {
+              h: "cell-hot",
+              m20240101: 8000,
+              m20240102: 8000,
+              m20240201: 50000,
+            },
+          },
         ];
       },
       setFeatureState,
@@ -662,9 +752,9 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
       dayjs("2024-03-31"),
       TimeGroupBy.Date
     );
-    // 2 features × 6 source layers queried, but only hex_z0 returns features
+    // 3 features × 6 source layers queried, but only hex_z0 returns features
     // updateFeatureStateTotals loops all layers; only hex_z0 has features
-    expect(updated).toBe(2);
+    expect(updated).toBe(3);
     expect(setFeatureState).toHaveBeenCalledWith(
       {
         source: "pmtiles-source-id",
@@ -680,6 +770,14 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
         id: "cell-b",
       },
       { [FEATURE_STATE_TOTAL]: 3 }
+    );
+    expect(setFeatureState).toHaveBeenCalledWith(
+      {
+        source: "pmtiles-source-id",
+        sourceLayer: "hex_z0",
+        id: "cell-hot",
+      },
+      { [FEATURE_STATE_TOTAL]: DENSITY_TOTAL_CAP }
     );
   });
 
