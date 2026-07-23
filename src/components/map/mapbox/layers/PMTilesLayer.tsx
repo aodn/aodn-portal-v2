@@ -627,6 +627,8 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   const periodBoundsRef = useRef<PMTilesMetadataRange | null>(null);
   // Bumps when a newer feature-state pass is scheduled so stale idle work is dropped
   const featureStateGenRef = useRef(0);
+  // Hover popup is disabled until feature-state density has been applied
+  const densityReadyRef = useRef(false);
   const popupRef = useRef<Popup | null>(null);
   // Drives feature-state refresh once `.metadata` is known
   const [timeGroupBy, setTimeGroupBy] = useState<TimeGroupBy>(
@@ -650,6 +652,9 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
    * Paint treats unset feature-state as placeholder (not transparent) so hexes
    * never vanish between tile fetch and the next state pass.
    *
+   * Hover popups stay disabled from the moment a pass is scheduled until
+   * feature-state totals are written and density paint is applied.
+   *
    * @param showPlaceholder When true (date/metadata change), flash a cheap
    *   presence style first while totals recompute for a new filter window.
    */
@@ -660,6 +665,10 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       const generation = ++featureStateGenRef.current;
       const showPlaceholder = options?.showPlaceholder ?? false;
       const delayMs = options?.delayMs ?? FEATURE_STATE_DEBOUNCE_MS;
+
+      // Block popups while this (and any superseded) density pass is in flight
+      densityReadyRef.current = false;
+      removePopup();
 
       if (showPlaceholder) {
         try {
@@ -689,14 +698,16 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
             buildDensityLayerFilter(),
             getFeatureStatePaintProperties()
           );
-          // setFeatureState already invalidates paint; avoid extra repaint
-          // loops with map "idle" handlers.
+          // Only the latest generation may re-enable hover popups
+          if (generation === featureStateGenRef.current) {
+            densityReadyRef.current = true;
+          }
         } catch {
-          // Map may already be torn down
+          // Map may already be torn down — leave densityReady false
         }
       }, delayMs);
     },
-    [map]
+    [map, removePopup]
   );
 
   const handleSelectDataset = useCallback(
@@ -922,6 +933,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
 
       cancelDensity?.();
       featureStateGenRef.current += 1;
+      densityReadyRef.current = false;
 
       try {
         PMTILE_LAYERS.forEach((layer) => {
@@ -993,6 +1005,12 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       e: MapMouseEvent
     ) => {
       if (!visibleRef.current) return;
+      // Wait until feature-state density totals are applied — popup counts
+      // would be incomplete or wrong during the placeholder phase.
+      if (!densityReadyRef.current) {
+        clearHover();
+        return;
+      }
       // queryRenderedFeatures ignores layer minzoom/maxzoom, so retained
       // lower-zoom tiles can still report hexbins from bands that are no
       // longer rendered — skip those.
