@@ -473,16 +473,22 @@ describe("PMTilesLayer - CountFilterRange (integer + key set)", () => {
     expect(dayjsToMonthPeriod(dayjs("2024-01-15"))).toBe(202401);
   });
 
-  it("builds a day range with integer bounds and a key set when narrow", () => {
+  it("builds a day range with integer bounds; key set is opt-in", () => {
     const range = buildCountFilterRange(start, end, TimeGroupBy.Date);
     expect(range.empty).toBe(false);
     expect(range.startPeriod).toBe(20240110);
     expect(range.endPeriod).toBe(20240120);
-    expect(range.keySet?.has("m20240115")).toBe(true);
-    expect(range.keySet?.has("m20240109")).toBe(false);
+    // Default path uses integer compares only (safer for small tiles)
+    expect(range.keySet).toBeUndefined();
     expect(isCountKeyInFilterRange("m20240115", range)).toBe(true);
     expect(isCountKeyInFilterRange("m20240109", range)).toBe(false);
     expect(isCountKeyInFilterRange("m202401", range)).toBe(false);
+
+    const withSet = buildCountFilterRange(start, end, TimeGroupBy.Date, {
+      includeKeySet: true,
+    });
+    expect(withSet.keySet?.has("m20240115")).toBe(true);
+    expect(withSet.keySet?.has("m20240109")).toBe(false);
   });
 
   it("builds a month range with integer bounds", () => {
@@ -797,6 +803,43 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
       { range, collectMatchedKeys: false }
     );
     expect(total).toBe(4);
+  });
+
+  it("infers month buckets when date mode finds no day keys (small monthly tiles)", () => {
+    // Default time_group_by is date; small archives often only have mYYYYMM keys
+    // until `.metadata` arrives — without inference density paints total 0.
+    const withoutInfer = sumSparseCountFromProperties(
+      { h: "cell", m202401: 5, m202402: 7, m202406: 99 },
+      dayjs("2024-01-01"),
+      dayjs("2024-03-31"),
+      TimeGroupBy.Date,
+      { inferTimeGroupBy: false }
+    );
+    expect(withoutInfer.total).toBe(0);
+    expect(withoutInfer.sawOtherFormat).toBe(true);
+    expect(withoutInfer.sawExpectedFormat).toBe(false);
+
+    const { total, timeGroupBy } = sumSparseCountFromProperties(
+      { h: "cell", m202401: 5, m202402: 7, m202406: 99 },
+      dayjs("2024-01-01"),
+      dayjs("2024-03-31"),
+      TimeGroupBy.Date
+    );
+    expect(timeGroupBy).toBe(TimeGroupBy.Month);
+    expect(total).toBe(12);
+  });
+
+  it("does not infer when expected-format keys exist but fall outside the filter", () => {
+    const { total, timeGroupBy } = sumSparseCountFromProperties(
+      { m20240115: 5, m20240601: 99 },
+      dayjs("2024-06-01"),
+      dayjs("2024-06-30"),
+      TimeGroupBy.Date,
+      { inferTimeGroupBy: true }
+    );
+    // Day keys present (expected format) but only June is in range
+    expect(timeGroupBy).toBe(TimeGroupBy.Date);
+    expect(total).toBe(99);
   });
 
   it("builds feature-state paint; layer filter does not use feature-state", () => {
