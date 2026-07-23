@@ -118,7 +118,7 @@ const DEFAULT_RANGE_START = "2000-01-01";
  */
 export const COUNT_KEY_SET_MAX = 2000;
 /** Features to sum + setFeatureState per idle slice (keeps the main thread responsive). */
-export const FEATURE_STATE_CHUNK_SIZE = 200;
+export const FEATURE_STATE_CHUNK_SIZE = 400;
 
 /** Matches sidecar `{dname}.metadata` `time_group_by` from batch PMTiles gen. */
 export enum TimeGroupBy {
@@ -139,13 +139,20 @@ const PMTILE_LAYERS = [
 ];
 
 /**
- * Period bounds from `{dname}.metadata`, as Dayjs values.
- * Built via period string-slicing (never `dayjs(YYYYMMDD)` which treats the
- * int as unix ms → ~1970).
+ * Inclusive calendar period as an integer: `YYYYMMDD` (date buckets) or
+ * `YYYYMM` (month buckets). Prefer this over Dayjs for all PMTiles internals.
+ *
+ * Never treat these as unix timestamps — `dayjs(20100815)` is ~1970.
+ */
+export type PeriodInt = number;
+
+/**
+ * Period coverage from `{dname}.metadata` as integers (same shape as sidecar
+ * `min_date` / `max_date` after validation).
  */
 export interface PMTilesMetadataRange {
-  minDate: Dayjs;
-  maxDate: Dayjs;
+  minPeriod: PeriodInt;
+  maxPeriod: PeriodInt;
 }
 
 /**
@@ -180,30 +187,65 @@ export const parseTimeGroupBy = (value: unknown): TimeGroupBy =>
       ? TimeGroupBy.Date
       : DEFAULT_TIME_GROUP_BY;
 
+/** Digits from a sidecar period number or numeric string (no dayjs). */
+export const coercePeriodDigits = (value: unknown): string | undefined => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return String(Math.trunc(value));
+  }
+  if (typeof value === "string" && value.trim() !== "") {
+    const n = Number(value.trim());
+    if (Number.isFinite(n)) return String(Math.trunc(n));
+  }
+  return undefined;
+};
+
 /**
- * Convert a sidecar `min_date` / `max_date` value (YYYYMM or YYYYMMDD number
- * or numeric string) to a Dayjs bound.
+ * Parse a sidecar `min_date` / `max_date` into a validated {@link PeriodInt}.
+ * Rejects unix-ms-sized numbers and invalid calendars without using the value
+ * as a dayjs timestamp.
+ */
+export const parsePeriodInt = (
+  value: unknown,
+  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY
+): PeriodInt | undefined => {
+  const digits = coercePeriodDigits(value);
+  if (!digits) return undefined;
+  // Guard: real unix-ms timestamps are 12–13 digits; period keys are 6 or 8
+  if (digits.length > 8 || digits.length < 6) return undefined;
+
+  const isDate = timeGroupBy === TimeGroupBy.Date;
+  // Date mode requires day periods; month mode requires month periods
+  if (isDate) {
+    if (digits.length !== 8) return undefined;
+    const iso = `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`;
+    const day = dayjs(iso);
+    if (!day.isValid() || day.format("YYYY-MM-DD") !== iso) return undefined;
+    return Number(digits);
+  }
+
+  // Month mode: accept YYYYMM only (sidecar month keys)
+  if (digits.length !== 6) return undefined;
+  const monthStart = dayjs(`${digits.slice(0, 4)}-${digits.slice(4, 6)}-01`);
+  if (!monthStart.isValid()) return undefined;
+  if (monthStart.format("YYYYMM") !== digits) return undefined;
+  return Number(digits);
+};
+
+/**
+ * Convert a period int (or raw sidecar value) to Dayjs for UI edges only.
  *
  * Never call `dayjs(periodNumber)` — dayjs treats numbers as unix ms (→ 1970).
  * Digits are string-sliced into a calendar date, then parsed as ISO.
  *
- * bound is use when groupby month only, for date it is ignored
+ * `bound` matters for month periods only (start → 1st, end → last day).
  */
 export const periodNumberToDayjs = (
   value: unknown,
   timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY,
   bound: "start" | "end" = "start"
 ): Dayjs | undefined => {
-  let digits: string | undefined;
-  if (typeof value === "number" && Number.isFinite(value)) {
-    digits = String(Math.trunc(value));
-  } else if (typeof value === "string" && value.trim() !== "") {
-    const n = Number(value.trim());
-    if (Number.isFinite(n)) digits = String(Math.trunc(n));
-  }
-  if (!digits) return undefined;
-  // Guard: real unix-ms timestamps are 12–13 digits; period keys are 6 or 8
-  if (digits.length > 8) return undefined;
+  const digits = coercePeriodDigits(value);
+  if (!digits || digits.length > 8) return undefined;
 
   const isDayPeriod =
     timeGroupBy === TimeGroupBy.Date ||
@@ -227,36 +269,92 @@ export const periodNumberToDayjs = (
 };
 
 /**
- * Intersect the UI filter window with metadata period coverage so paint
- * expressions only reference keys that can exist in the PMTiles.
+ * UI helper: Dayjs bounds for a metadata period range (slider / display).
+ * Returns null if either bound fails to convert.
+ */
+export const metadataRangeToDayjs = (
+  range: PMTilesMetadataRange,
+  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY
+): { minDate: Dayjs; maxDate: Dayjs } | null => {
+  const minDate = periodNumberToDayjs(range.minPeriod, timeGroupBy, "start");
+  const maxDate = periodNumberToDayjs(range.maxPeriod, timeGroupBy, "end");
+  if (!minDate || !maxDate) return null;
+  return { minDate, maxDate };
+};
+
+/**
+ * Clamp inclusive period ints to metadata coverage (integer-only, no dayjs).
+ */
+export const clampPeriodsToMetadata = (
+  startPeriod: PeriodInt,
+  endPeriod: PeriodInt,
+  bounds?: PMTilesMetadataRange | null
+): { startPeriod: PeriodInt; endPeriod: PeriodInt; empty: boolean } => {
+  let s = startPeriod;
+  let e = endPeriod;
+  if (bounds) {
+    if (s < bounds.minPeriod) s = bounds.minPeriod;
+    if (e > bounds.maxPeriod) e = bounds.maxPeriod;
+  }
+  if (s > e) {
+    return { startPeriod: 0, endPeriod: -1, empty: true };
+  }
+  return { startPeriod: s, endPeriod: e, empty: false };
+};
+
+/**
+ * Intersect the UI filter window with metadata period coverage.
+ * Converts Dayjs → period ints, clamps with integers, converts back for callers
+ * that still expand key lists via dayjs walkers.
  */
 export const clampRangeToMetadata = (
   start?: Dayjs,
   end?: Dayjs,
   bounds?: PMTilesMetadataRange | null,
-  _timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY
+  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY
 ): { start: Dayjs; end: Dayjs } => {
-  let { start: s, end: e } = resolveRange(start, end);
-  if (!bounds) return { start: s, end: e };
-  if (s.isBefore(bounds.minDate, "day")) s = bounds.minDate;
-  if (e.isAfter(bounds.maxDate, "day")) e = bounds.maxDate;
-  return { start: s, end: e };
+  const { start: s0, end: e0 } = resolveRange(start, end);
+  const isDate = timeGroupBy === TimeGroupBy.Date;
+  const startPeriod = isDate
+    ? dayjsToDayPeriod(s0.startOf("day"))
+    : dayjsToMonthPeriod(s0);
+  const endPeriod = isDate
+    ? dayjsToDayPeriod(e0.startOf("day"))
+    : dayjsToMonthPeriod(e0);
+
+  // Already inverted UI window — keep order so key walkers yield []
+  if (startPeriod > endPeriod) {
+    return { start: s0, end: e0 };
+  }
+
+  const clamped = clampPeriodsToMetadata(startPeriod, endPeriod, bounds);
+  if (clamped.empty) {
+    // No intersection with metadata — force start after end for key walkers
+    const emptyEnd = s0.startOf("day").subtract(1, "day");
+    return { start: s0.startOf("day"), end: emptyEnd };
+  }
+
+  const minD = periodNumberToDayjs(clamped.startPeriod, timeGroupBy, "start");
+  const maxD = periodNumberToDayjs(clamped.endPeriod, timeGroupBy, "end");
+  if (!minD || !maxD) return { start: s0, end: e0 };
+  return { start: minD, end: maxD };
 };
 
 /**
  * Parse the `{dname}.metadata` JSON body into app `PMTilesMetadata`.
  * Accepts the sidecar field names (`min_date`, `max_date`, `time_group_by`).
  * Returns null when either bound is missing or invalid.
+ * Bounds are stored as {@link PeriodInt} (not Dayjs).
  */
 export const parsePMTilesMetadata = (data: unknown): PMTilesMetadata | null => {
   if (data == null || typeof data !== "object") return null;
   const raw = data as Record<string, unknown>;
   const timeGroupBy = parseTimeGroupBy(raw.time_group_by);
-  const minDate = periodNumberToDayjs(raw.min_date, timeGroupBy, "start");
-  const maxDate = periodNumberToDayjs(raw.max_date, timeGroupBy, "end");
-  if (!minDate || !maxDate) return null;
-  if (minDate.isAfter(maxDate, "day")) return null;
-  return { minDate, maxDate, timeGroupBy };
+  const minPeriod = parsePeriodInt(raw.min_date, timeGroupBy);
+  const maxPeriod = parsePeriodInt(raw.max_date, timeGroupBy);
+  if (minPeriod === undefined || maxPeriod === undefined) return null;
+  if (minPeriod > maxPeriod) return null;
+  return { minPeriod, maxPeriod, timeGroupBy };
 };
 
 // Exported following functions for unit testing
@@ -376,14 +474,75 @@ export const parseCountPropertyKey = (
 };
 
 /**
+ * Build a reusable filter range for density/popup sums from period ints.
+ * Dayjs is not used on this path — convert at the edge with
+ * {@link buildCountFilterRange} when the UI still speaks Dayjs.
+ */
+export const buildCountFilterRangeFromPeriods = (
+  startPeriod: PeriodInt,
+  endPeriod: PeriodInt,
+  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY,
+  options?: {
+    includeKeySet?: boolean;
+    bounds?: PMTilesMetadataRange | null;
+  }
+): CountFilterRange => {
+  const clamped = clampPeriodsToMetadata(
+    startPeriod,
+    endPeriod,
+    options?.bounds
+  );
+  if (clamped.empty) {
+    return {
+      timeGroupBy,
+      startPeriod: 0,
+      endPeriod: -1,
+      empty: true,
+    };
+  }
+
+  const range: CountFilterRange = {
+    timeGroupBy,
+    startPeriod: clamped.startPeriod,
+    endPeriod: clamped.endPeriod,
+    empty: false,
+  };
+
+  const includeKeySet = options?.includeKeySet !== false;
+  if (includeKeySet) {
+    // Key expansion still walks with dayjs once per filter change (not per feature)
+    const startD = periodNumberToDayjs(
+      clamped.startPeriod,
+      timeGroupBy,
+      "start"
+    );
+    const endD = periodNumberToDayjs(clamped.endPeriod, timeGroupBy, "end");
+    if (startD && endD) {
+      const keys =
+        timeGroupBy === TimeGroupBy.Date
+          ? getDayKeysInRange(startD, endD)
+          : getMonthKeysInRange(startD, endD);
+      if (keys.length > 0 && keys.length <= COUNT_KEY_SET_MAX) {
+        range.keySet = new Set(keys);
+      }
+    }
+  }
+  return range;
+};
+
+/**
  * Build a reusable filter range for density/popup sums.
- * Optionally attaches a key allow-set when the window is narrow.
+ * Converts the UI Dayjs window to {@link PeriodInt} once, then clamps/sums
+ * with integers. Optionally attaches a key allow-set when the window is narrow.
  */
 export const buildCountFilterRange = (
   filterStart?: Dayjs,
   filterEnd?: Dayjs,
   timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY,
-  options?: { includeKeySet?: boolean }
+  options?: {
+    includeKeySet?: boolean;
+    bounds?: PMTilesMetadataRange | null;
+  }
 ): CountFilterRange => {
   const { start, end } = resolveRange(filterStart, filterEnd);
   const rangeStart = start.startOf("day");
@@ -405,24 +564,12 @@ export const buildCountFilterRange = (
     ? dayjsToDayPeriod(rangeEnd)
     : dayjsToMonthPeriod(rangeEnd);
 
-  const range: CountFilterRange = {
-    timeGroupBy,
+  return buildCountFilterRangeFromPeriods(
     startPeriod,
     endPeriod,
-    empty: false,
-  };
-
-  const includeKeySet = options?.includeKeySet !== false;
-  if (includeKeySet) {
-    const keys = isDate
-      ? getDayKeysInRange(rangeStart, rangeEnd)
-      : getMonthKeysInRange(rangeStart, rangeEnd);
-    // Only attach when cheap; multi-decade day lists are worse than int compares
-    if (keys.length > 0 && keys.length <= COUNT_KEY_SET_MAX) {
-      range.keySet = new Set(keys);
-    }
-  }
-  return range;
+    timeGroupBy,
+    options
+  );
 };
 
 /**
@@ -1237,12 +1384,14 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     visibleRef.current = visible;
   }, [filterStartDate, filterEndDate, visible]);
 
-  // Rebuild integer/key-set range whenever the filter window or grouping changes
+  // Rebuild integer/key-set range whenever the filter window, grouping, or
+  // metadata period coverage changes. Bounds clamp is pure PeriodInt math.
   useEffect(() => {
     countFilterRangeRef.current = buildCountFilterRange(
       filterStartDate,
       filterEndDate,
-      timeGroupBy
+      timeGroupBy,
+      { bounds: periodBoundsRef.current }
     );
   }, [filterStartDate, filterEndDate, timeGroupBy]);
 
@@ -1273,15 +1422,29 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
           timeGroupByRef.current = DEFAULT_TIME_GROUP_BY;
           periodBoundsRef.current = null;
           setTimeGroupBy(DEFAULT_TIME_GROUP_BY);
+          // Rebuild range without bounds (timeGroupBy may stay default)
+          countFilterRangeRef.current = buildCountFilterRange(
+            filterStartDateRef.current,
+            filterEndDateRef.current,
+            DEFAULT_TIME_GROUP_BY,
+            { bounds: null }
+          );
           onMetadataPeriodChange?.(null);
           return;
         }
         const bounds: PMTilesMetadataRange = {
-          minDate: metadata.minDate,
-          maxDate: metadata.maxDate,
+          minPeriod: metadata.minPeriod,
+          maxPeriod: metadata.maxPeriod,
         };
         timeGroupByRef.current = metadata.timeGroupBy;
         periodBoundsRef.current = bounds;
+        // Clamp filter to sidecar coverage immediately (integer periods)
+        countFilterRangeRef.current = buildCountFilterRange(
+          filterStartDateRef.current,
+          filterEndDateRef.current,
+          metadata.timeGroupBy,
+          { bounds }
+        );
         setTimeGroupBy(metadata.timeGroupBy);
         onMetadataPeriodChange?.(metadata);
       })
@@ -1292,6 +1455,12 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         if (abortController.signal.aborted) return;
         timeGroupByRef.current = DEFAULT_TIME_GROUP_BY;
         periodBoundsRef.current = null;
+        countFilterRangeRef.current = buildCountFilterRange(
+          filterStartDateRef.current,
+          filterEndDateRef.current,
+          DEFAULT_TIME_GROUP_BY,
+          { bounds: null }
+        );
         setTimeGroupBy(DEFAULT_TIME_GROUP_BY);
         onMetadataPeriodChange?.(null);
       });

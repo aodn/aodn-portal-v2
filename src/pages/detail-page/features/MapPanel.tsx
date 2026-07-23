@@ -60,6 +60,7 @@ import * as turf from "@turf/turf";
 import { createStaticLayers } from "../../../components/map/mapbox/layers/StaticLayer";
 import PMTilesHexLayer, {
   PMTilesMetadata,
+  metadataRangeToDayjs,
 } from "../../../components/map/mapbox/layers/PMTilesLayer";
 import WmsLegend from "./WmsLegend";
 import {
@@ -247,14 +248,18 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       let start: Dayjs;
       let end: Dayjs;
 
-      // PMTiles layer: time slider tracks `.metadata` min_date / max_date
-      if (
-        selectedMapLayerId === LayerName.PMTiles &&
-        pmtilesPeriodRange?.minDate &&
-        pmtilesPeriodRange?.maxDate
-      ) {
-        start = pmtilesPeriodRange.minDate;
-        end = pmtilesPeriodRange.maxDate;
+      // PMTiles layer: sidecar periods are ints; convert to Dayjs only for the slider
+      const pmtilesDayjs =
+        selectedMapLayerId === LayerName.PMTiles && pmtilesPeriodRange
+          ? metadataRangeToDayjs(
+              pmtilesPeriodRange,
+              pmtilesPeriodRange.timeGroupBy
+            )
+          : null;
+
+      if (pmtilesDayjs) {
+        start = pmtilesDayjs.minDate;
+        end = pmtilesDayjs.maxDate;
       } else if (
         downloadService === DownloadServiceType.CloudOptimised &&
         featureCollection?.features?.length
