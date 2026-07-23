@@ -25,12 +25,22 @@ import {
   updateFeatureStateTotals,
   scheduleDeferredWork,
   scheduleDebouncedWork,
+  scheduleChunkedWork,
+  buildCountFilterRange,
+  isCountKeyInFilterRange,
+  parseCountPropertyKey,
+  dayjsToDayPeriod,
+  dayjsToMonthPeriod,
+  createFeatureStateTotalsSession,
+  featureStateSessionKey,
   FEATURE_STATE_TOTAL,
   DENSITY_TOTAL_CAP,
   DENSITY_COLOR_STOPS,
   DENSITY_OPACITY_STOPS,
   densityStopValue,
   buildDensityInterpolateStops,
+  COUNT_KEY_SET_MAX,
+  FEATURE_STATE_CHUNK_SIZE,
   PLACEHOLDER_FILL_COLOR,
   DEFAULT_TIME_GROUP_BY,
   TimeGroupBy,
@@ -392,6 +402,82 @@ describe("PMTilesLayer - isCountPropertyInRange", () => {
   });
 });
 
+describe("PMTilesLayer - CountFilterRange (integer + key set)", () => {
+  const start = dayjs("2024-01-10");
+  const end = dayjs("2024-01-20");
+
+  it("parses count keys without dayjs", () => {
+    expect(parseCountPropertyKey("m20240115")).toEqual({
+      isDay: true,
+      period: 20240115,
+    });
+    expect(parseCountPropertyKey("m202401")).toEqual({
+      isDay: false,
+      period: 202401,
+    });
+    expect(parseCountPropertyKey("h")).toBeNull();
+    expect(parseCountPropertyKey("m2024")).toBeNull();
+    expect(parseCountPropertyKey("m202401ab")).toBeNull();
+  });
+
+  it("converts dayjs to period integers", () => {
+    expect(dayjsToDayPeriod(dayjs("2024-01-15"))).toBe(20240115);
+    expect(dayjsToMonthPeriod(dayjs("2024-01-15"))).toBe(202401);
+  });
+
+  it("builds a day range with integer bounds and a key set when narrow", () => {
+    const range = buildCountFilterRange(start, end, TimeGroupBy.Date);
+    expect(range.empty).toBe(false);
+    expect(range.startPeriod).toBe(20240110);
+    expect(range.endPeriod).toBe(20240120);
+    expect(range.keySet?.has("m20240115")).toBe(true);
+    expect(range.keySet?.has("m20240109")).toBe(false);
+    expect(isCountKeyInFilterRange("m20240115", range)).toBe(true);
+    expect(isCountKeyInFilterRange("m20240109", range)).toBe(false);
+    expect(isCountKeyInFilterRange("m202401", range)).toBe(false);
+  });
+
+  it("builds a month range with integer bounds", () => {
+    const range = buildCountFilterRange(
+      dayjs("2024-01-15"),
+      dayjs("2024-03-10"),
+      TimeGroupBy.Month
+    );
+    expect(range.startPeriod).toBe(202401);
+    expect(range.endPeriod).toBe(202403);
+    expect(isCountKeyInFilterRange("m202402", range)).toBe(true);
+    expect(isCountKeyInFilterRange("m202312", range)).toBe(false);
+    expect(isCountKeyInFilterRange("m20240115", range)).toBe(false);
+  });
+
+  it("omits keySet for wide day windows above COUNT_KEY_SET_MAX", () => {
+    // More than COUNT_KEY_SET_MAX days
+    const wideStart = dayjs("2000-01-01");
+    const wideEnd = wideStart.add(COUNT_KEY_SET_MAX + 50, "day");
+    const range = buildCountFilterRange(wideStart, wideEnd, TimeGroupBy.Date);
+    expect(range.keySet).toBeUndefined();
+    // Integer path still works
+    expect(
+      isCountKeyInFilterRange(
+        `m${dayjsToDayPeriod(wideStart.add(10, "day"))}`,
+        range
+      )
+    ).toBe(true);
+    expect(
+      isCountKeyInFilterRange(
+        `m${dayjsToDayPeriod(wideStart.subtract(1, "day"))}`,
+        range
+      )
+    ).toBe(false);
+  });
+
+  it("marks empty ranges when start is after end", () => {
+    const range = buildCountFilterRange(end, start, TimeGroupBy.Date);
+    expect(range.empty).toBe(true);
+    expect(isCountKeyInFilterRange("m20240115", range)).toBe(false);
+  });
+});
+
 describe("PMTilesLayer - buildSumExpression", () => {
   it("returns 0 for no keys", () => {
     expect(buildSumExpression([])).toBe(0);
@@ -639,6 +725,18 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     expect(total).toBe(12);
   });
 
+  it("uses a precomputed CountFilterRange for sparse sums", () => {
+    const range = buildCountFilterRange(start, end, TimeGroupBy.Date);
+    const { total } = sumSparseCountFromProperties(
+      { m20240115: 4, m20240601: 99 },
+      undefined,
+      undefined,
+      TimeGroupBy.Date,
+      { range, collectMatchedKeys: false }
+    );
+    expect(total).toBe(4);
+  });
+
   it("builds feature-state paint; layer filter does not use feature-state", () => {
     expect(buildFeatureStateTotalExpression()).toEqual([
       "coalesce",
@@ -746,7 +844,7 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
       setPaintProperty: vi.fn(),
     } as unknown as Map;
 
-    const updated = updateFeatureStateTotals(
+    const { updated, complete } = updateFeatureStateTotals(
       map,
       dayjs("2024-01-01"),
       dayjs("2024-03-31"),
@@ -755,6 +853,7 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     // 3 features × 6 source layers queried, but only hex_z0 returns features
     // updateFeatureStateTotals loops all layers; only hex_z0 has features
     expect(updated).toBe(3);
+    expect(complete).toBe(true);
     expect(setFeatureState).toHaveBeenCalledWith(
       {
         source: "pmtiles-source-id",
@@ -779,6 +878,134 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
       },
       { [FEATURE_STATE_TOTAL]: DENSITY_TOTAL_CAP }
     );
+  });
+
+  it("skips features already written in the session (incremental)", () => {
+    const setFeatureState = vi.fn();
+    const features: Array<{
+      id: string;
+      properties: Record<string, string | number>;
+    }> = [
+      {
+        id: "cell-a",
+        properties: { h: "cell-a", m20240115: 10 },
+      },
+      {
+        id: "cell-b",
+        properties: { h: "cell-b", m20240201: 3 },
+      },
+    ];
+    const map = {
+      getSource: () => ({}),
+      querySourceFeatures: (_s: string, opts: { sourceLayer: string }) =>
+        opts.sourceLayer === "hex_z0" ? features : [],
+      setFeatureState,
+    } as unknown as Map;
+
+    const session = createFeatureStateTotalsSession();
+    const range = buildCountFilterRange(
+      dayjs("2024-01-01"),
+      dayjs("2024-03-31"),
+      TimeGroupBy.Date
+    );
+
+    const first = updateFeatureStateTotals(
+      map,
+      dayjs("2024-01-01"),
+      dayjs("2024-03-31"),
+      TimeGroupBy.Date,
+      { range, session }
+    );
+    expect(first.updated).toBe(2);
+    expect(
+      session.written.has(featureStateSessionKey("hex_z0", "cell-a"))
+    ).toBe(true);
+
+    setFeatureState.mockClear();
+    const second = updateFeatureStateTotals(
+      map,
+      dayjs("2024-01-01"),
+      dayjs("2024-03-31"),
+      TimeGroupBy.Date,
+      { range, session }
+    );
+    expect(second.updated).toBe(0);
+    expect(setFeatureState).not.toHaveBeenCalled();
+
+    // New tile feature appears
+    features.push({
+      id: "cell-c",
+      properties: { h: "cell-c", m20240301: 7 },
+    });
+    const third = updateFeatureStateTotals(
+      map,
+      dayjs("2024-01-01"),
+      dayjs("2024-03-31"),
+      TimeGroupBy.Date,
+      { range, session }
+    );
+    expect(third.updated).toBe(1);
+    expect(setFeatureState).toHaveBeenCalledWith(
+      {
+        source: "pmtiles-source-id",
+        sourceLayer: "hex_z0",
+        id: "cell-c",
+      },
+      { [FEATURE_STATE_TOTAL]: 7 }
+    );
+  });
+
+  it("chunks feature-state writes when maxFeatures is set", () => {
+    const setFeatureState = vi.fn();
+    const features = Array.from({ length: 5 }, (_, i) => ({
+      id: `cell-${i}`,
+      properties: { h: `cell-${i}`, m20240115: i + 1 },
+    }));
+    const map = {
+      getSource: () => ({}),
+      querySourceFeatures: (_s: string, opts: { sourceLayer: string }) =>
+        opts.sourceLayer === "hex_z0" ? features : [],
+      setFeatureState,
+    } as unknown as Map;
+
+    const session = createFeatureStateTotalsSession();
+    const range = buildCountFilterRange(
+      dayjs("2024-01-01"),
+      dayjs("2024-03-31"),
+      TimeGroupBy.Date
+    );
+
+    const chunk1 = updateFeatureStateTotals(
+      map,
+      undefined,
+      undefined,
+      TimeGroupBy.Date,
+      { range, session, maxFeatures: 2 }
+    );
+    expect(chunk1.updated).toBe(2);
+    expect(chunk1.complete).toBe(false);
+
+    const chunk2 = updateFeatureStateTotals(
+      map,
+      undefined,
+      undefined,
+      TimeGroupBy.Date,
+      { range, session, maxFeatures: 2 }
+    );
+    expect(chunk2.updated).toBe(2);
+    expect(chunk2.complete).toBe(false);
+
+    const chunk3 = updateFeatureStateTotals(
+      map,
+      undefined,
+      undefined,
+      TimeGroupBy.Date,
+      { range, session, maxFeatures: 2 }
+    );
+    expect(chunk3.updated).toBe(1);
+    expect(chunk3.complete).toBe(true);
+    expect(setFeatureState).toHaveBeenCalledTimes(5);
+    expect(FEATURE_STATE_CHUNK_SIZE).toBeGreaterThan(0);
   });
 
   it("applies filter and paint to existing hex layers only", () => {
@@ -821,5 +1048,29 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     expect(work).not.toHaveBeenCalled();
     await new Promise((r) => setTimeout(r, 40));
     expect(work).toHaveBeenCalledTimes(1);
+  });
+
+  it("runs chunked work until the worker reports done", async () => {
+    let n = 0;
+    const cancel = scheduleChunkedWork(() => {
+      n += 1;
+      return n >= 3;
+    });
+    await new Promise((r) => setTimeout(r, 150));
+    expect(n).toBe(3);
+    cancel();
+  });
+
+  it("stops chunked work when cancelled mid-flight", async () => {
+    let n = 0;
+    const cancel = scheduleChunkedWork(() => {
+      n += 1;
+      return false;
+    });
+    await new Promise((r) => setTimeout(r, 30));
+    cancel();
+    const afterCancel = n;
+    await new Promise((r) => setTimeout(r, 80));
+    expect(n).toBe(afterCancel);
   });
 });
