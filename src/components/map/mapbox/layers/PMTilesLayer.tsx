@@ -1,10 +1,21 @@
-import { FC, useCallback, useContext, useEffect, useMemo, useRef } from "react";
+import {
+  FC,
+  startTransition,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import MapContext from "../MapContext";
 import dayjs, { Dayjs } from "dayjs";
 import {
   ExpressionSpecification,
   GeoJSONSource,
+  Map,
   MapMouseEvent,
+  MapSourceDataEvent,
   Popup,
 } from "mapbox-gl";
 import { FeatureCollection, Geometry } from "geojson";
@@ -20,19 +31,103 @@ const SOURCE_ID = "pmtiles-source-id";
 const HOVER_SOURCE_ID = "pmtiles-hover-source-id";
 const HOVER_OUTLINE_LAYER_ID = "pmtiles-hex-hover-outline";
 const CURSOR_POINTER_CLASS = "map-cursor-pointer";
+/** Feature-state key written by sparse JS sums for density paint/filter. */
+export const FEATURE_STATE_TOTAL = "total";
+/**
+ * Top density total used by paint interpolate and by the feature-state early-stop.
+ * Totals at or above this value all paint the same; full accuracy is only needed
+ * for the hover popup (which does not use this cap).
+ *
+ * Color/opacity breakpoints are ratios of this value — change only the cap and
+ * the whole scale rescales (see `DENSITY_COLOR_STOPS` / `DENSITY_OPACITY_STOPS`).
+ */
+export const DENSITY_TOTAL_CAP = 10000;
+
+/**
+ * Density fill-color stops as a fraction of {@link DENSITY_TOTAL_CAP}.
+ * Ratios must be strictly increasing from 0 to 1.
+ */
+export const DENSITY_COLOR_STOPS: ReadonlyArray<{
+  ratio: number;
+  color: string;
+}> = [
+  { ratio: 0, color: "rgba(0, 0, 0, 0)" },
+  { ratio: 0.0001, color: "#1E293B" }, // 1 @ cap 10000
+  { ratio: 0.001, color: "#334155" }, // 10
+  { ratio: 0.01, color: "#475569" }, // 100
+  { ratio: 0.1, color: "#0284C7" }, // 1000
+  { ratio: 0.5, color: "#0D9488" }, // 5000
+  { ratio: 1, color: "#14B8A6" }, // cap
+];
+
+/**
+ * Density fill-opacity stops as a fraction of {@link DENSITY_TOTAL_CAP}.
+ * Ratios must be strictly increasing from 0 toward 1 (need not reach 1).
+ */
+export const DENSITY_OPACITY_STOPS: ReadonlyArray<{
+  ratio: number;
+  opacity: number;
+}> = [
+  { ratio: 0, opacity: 0 },
+  { ratio: 0.0001, opacity: 0.15 }, // 1 @ cap 10000
+  { ratio: 0.01, opacity: 0.6 }, // 100
+  { ratio: 0.1, opacity: 0.8 }, // 1000
+];
+
+/** Absolute count at a density ratio (rounded; keeps 0 exact). */
+export const densityStopValue = (
+  ratio: number,
+  cap: number = DENSITY_TOTAL_CAP
+): number => (ratio === 0 ? 0 : Math.max(1, Math.round(ratio * cap)));
+
+/**
+ * Flatten ratio-based stops into Mapbox `interpolate` input/output pairs,
+ * dropping any non-increasing values after rounding so the expression stays valid.
+ */
+export const buildDensityInterpolateStops = <T extends string | number>(
+  stops: ReadonlyArray<{ ratio: number; value: T }>,
+  cap: number = DENSITY_TOTAL_CAP
+): Array<number | T> => {
+  const pairs: Array<number | T> = [];
+  let lastInput = -Infinity;
+  for (const stop of stops) {
+    const input = densityStopValue(stop.ratio, cap);
+    // Skip duplicates / regressions from rounding at small caps
+    if (input <= lastInput) continue;
+    pairs.push(input, stop.value);
+    lastInput = input;
+  }
+  return pairs;
+};
+/** H3 cell id property; promoted to feature id so feature-state can target hexes. */
+const PROMOTE_ID_PROPERTY = "h";
 const EMPTY_FEATURE_COLLECTION: FeatureCollection = {
   type: "FeatureCollection",
   features: [],
 };
 const bucket = import.meta.env.VITE_PMTILES_BUCKET;
 const region = import.meta.env.VITE_AWS_REGION;
-// Caps keep Mapbox paint/filter expressions bounded for very wide ranges.
+// Caps keep legacy key-list helpers bounded (tests / optional tooling).
 // Day cap is high enough for multi-decade daily PMTiles (~55 years).
 const MONTH_KEY_LIMIT = 1200;
 const DAY_KEY_LIMIT = 20000;
 const DEFAULT_RANGE_START = "2000-01-01";
-// mYYYYMM (month bucket) or mYYYYMMDD (day bucket)
-const COUNT_PROPERTY_KEY = /^m(\d{6}|\d{8})$/;
+/**
+ * Build a key allow-set when the filter window has at most this many buckets.
+ * Wider day ranges use integer period compares only (building 10k+ keys is wasteful).
+ */
+export const COUNT_KEY_SET_MAX = 2000;
+/** Features to sum + setFeatureState per idle slice (keeps the main thread responsive). */
+export const FEATURE_STATE_CHUNK_SIZE = 400;
+
+/** Matches sidecar `{dname}.metadata` `time_group_by` from batch PMTiles gen. */
+export enum TimeGroupBy {
+  Date = "date",
+  Month = "month",
+}
+
+/** Default when `.metadata` is missing or invalid. */
+export const DEFAULT_TIME_GROUP_BY = TimeGroupBy.Date;
 
 const PMTILE_LAYERS = [
   { id: "pmtiles-hex-z0", sourceLayer: "hex_z0", minzoom: 0, maxzoom: 2 },
@@ -43,21 +138,224 @@ const PMTILE_LAYERS = [
   { id: "pmtiles-hex-z10", sourceLayer: "hex_z10", minzoom: 10, maxzoom: 13 },
 ];
 
+/**
+ * Inclusive calendar period as an integer: `YYYYMMDD` (date buckets) or
+ * `YYYYMM` (month buckets). Prefer this over Dayjs for all PMTiles internals.
+ *
+ * Never treat these as unix timestamps — `dayjs(20100815)` is ~1970.
+ */
+export type PeriodInt = number;
+
+/**
+ * Period coverage from `{dname}.metadata` as integers (same shape as sidecar
+ * `min_date` / `max_date` after validation).
+ */
+export interface PMTilesMetadataRange {
+  minPeriod: PeriodInt;
+  maxPeriod: PeriodInt;
+}
+
+/**
+ * Full coverage range from `{dname}.metadata` including grouping mode.
+ */
+export interface PMTilesMetadata extends PMTilesMetadataRange {
+  timeGroupBy: TimeGroupBy;
+}
+
 interface PMTilesHexLayerProps extends LayerBasicType {
   filterStartDate?: Dayjs;
   filterEndDate?: Dayjs;
   selectedCoKey?: string;
   onSelectCoKey?: (key: string) => void;
+  /**
+   * Fired when the `.metadata` sidecar is loaded (or cleared on dataset change /
+   * error) so the map time slider can align with tile coverage.
+   */
+  onMetadataPeriodChange?: (range: PMTilesMetadata | null) => void;
 }
-
-// Older PMTiles use month buckets (mYYYYMM); upgraded tiles use day buckets
-// (mYYYYMMDD). A given file uses one format. Summing both is safe because
-// missing properties coalesce to 0.
 
 const resolveRange = (start?: Dayjs, end?: Dayjs) => ({
   start: start || dayjs(DEFAULT_RANGE_START),
   end: end || dayjs(),
 });
+
+/** Parse sidecar metadata; only `"date"` and `"month"` are accepted. */
+export const parseTimeGroupBy = (value: unknown): TimeGroupBy =>
+  value === TimeGroupBy.Month
+    ? TimeGroupBy.Month
+    : value === TimeGroupBy.Date
+      ? TimeGroupBy.Date
+      : DEFAULT_TIME_GROUP_BY;
+
+/** Digits from a sidecar period number or numeric string (no dayjs). */
+export const coercePeriodDigits = (value: unknown): string | undefined => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return String(Math.trunc(value));
+  }
+  if (typeof value === "string" && value.trim() !== "") {
+    const n = Number(value.trim());
+    if (Number.isFinite(n)) return String(Math.trunc(n));
+  }
+  return undefined;
+};
+
+/**
+ * Parse a sidecar `min_date` / `max_date` into a validated {@link PeriodInt}.
+ * Rejects unix-ms-sized numbers and invalid calendars without using the value
+ * as a dayjs timestamp.
+ */
+export const parsePeriodInt = (
+  value: unknown,
+  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY
+): PeriodInt | undefined => {
+  const digits = coercePeriodDigits(value);
+  if (!digits) return undefined;
+  // Guard: real unix-ms timestamps are 12–13 digits; period keys are 6 or 8
+  if (digits.length > 8 || digits.length < 6) return undefined;
+
+  const isDate = timeGroupBy === TimeGroupBy.Date;
+  // Date mode requires day periods; month mode requires month periods
+  if (isDate) {
+    if (digits.length !== 8) return undefined;
+    const iso = `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`;
+    const day = dayjs(iso);
+    if (!day.isValid() || day.format("YYYY-MM-DD") !== iso) return undefined;
+    return Number(digits);
+  }
+
+  // Month mode: accept YYYYMM only (sidecar month keys)
+  if (digits.length !== 6) return undefined;
+  const monthStart = dayjs(`${digits.slice(0, 4)}-${digits.slice(4, 6)}-01`);
+  if (!monthStart.isValid()) return undefined;
+  if (monthStart.format("YYYYMM") !== digits) return undefined;
+  return Number(digits);
+};
+
+/**
+ * Convert a period int (or raw sidecar value) to Dayjs for UI edges only.
+ *
+ * Never call `dayjs(periodNumber)` — dayjs treats numbers as unix ms (→ 1970).
+ * Digits are string-sliced into a calendar date, then parsed as ISO.
+ *
+ * `bound` matters for month periods only (start → 1st, end → last day).
+ */
+export const periodNumberToDayjs = (
+  value: unknown,
+  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY,
+  bound: "start" | "end" = "start"
+): Dayjs | undefined => {
+  const digits = coercePeriodDigits(value);
+  if (!digits || digits.length > 8) return undefined;
+
+  const isDayPeriod =
+    timeGroupBy === TimeGroupBy.Date ||
+    digits.length === 8 ||
+    digits.length > 6;
+
+  if (isDayPeriod && digits.length >= 8) {
+    const iso = `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`;
+    const day = dayjs(iso);
+    return day.isValid() && day.format("YYYY-MM-DD") === iso
+      ? day.startOf("day")
+      : undefined;
+  }
+
+  if (digits.length < 6) return undefined;
+  const monthStart = dayjs(`${digits.slice(0, 4)}-${digits.slice(4, 6)}-01`);
+  if (!monthStart.isValid()) return undefined;
+  return bound === "end"
+    ? monthStart.endOf("month").startOf("day")
+    : monthStart.startOf("month");
+};
+
+/**
+ * UI helper: Dayjs bounds for a metadata period range (slider / display).
+ * Returns null if either bound fails to convert.
+ */
+export const metadataRangeToDayjs = (
+  range: PMTilesMetadataRange,
+  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY
+): { minDate: Dayjs; maxDate: Dayjs } | null => {
+  const minDate = periodNumberToDayjs(range.minPeriod, timeGroupBy, "start");
+  const maxDate = periodNumberToDayjs(range.maxPeriod, timeGroupBy, "end");
+  if (!minDate || !maxDate) return null;
+  return { minDate, maxDate };
+};
+
+/**
+ * Clamp inclusive period ints to metadata coverage (integer-only, no dayjs).
+ */
+export const clampPeriodsToMetadata = (
+  startPeriod: PeriodInt,
+  endPeriod: PeriodInt,
+  bounds?: PMTilesMetadataRange | null
+): { startPeriod: PeriodInt; endPeriod: PeriodInt; empty: boolean } => {
+  let s = startPeriod;
+  let e = endPeriod;
+  if (bounds) {
+    if (s < bounds.minPeriod) s = bounds.minPeriod;
+    if (e > bounds.maxPeriod) e = bounds.maxPeriod;
+  }
+  if (s > e) {
+    return { startPeriod: 0, endPeriod: -1, empty: true };
+  }
+  return { startPeriod: s, endPeriod: e, empty: false };
+};
+
+/**
+ * Intersect the UI filter window with metadata period coverage.
+ * Converts Dayjs → period ints, clamps with integers, converts back for callers
+ * that still expand key lists via dayjs walkers.
+ */
+export const clampRangeToMetadata = (
+  start?: Dayjs,
+  end?: Dayjs,
+  bounds?: PMTilesMetadataRange | null,
+  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY
+): { start: Dayjs; end: Dayjs } => {
+  const { start: s0, end: e0 } = resolveRange(start, end);
+  const isDate = timeGroupBy === TimeGroupBy.Date;
+  const startPeriod = isDate
+    ? dayjsToDayPeriod(s0.startOf("day"))
+    : dayjsToMonthPeriod(s0);
+  const endPeriod = isDate
+    ? dayjsToDayPeriod(e0.startOf("day"))
+    : dayjsToMonthPeriod(e0);
+
+  // Already inverted UI window — keep order so key walkers yield []
+  if (startPeriod > endPeriod) {
+    return { start: s0, end: e0 };
+  }
+
+  const clamped = clampPeriodsToMetadata(startPeriod, endPeriod, bounds);
+  if (clamped.empty) {
+    // No intersection with metadata — force start after end for key walkers
+    const emptyEnd = s0.startOf("day").subtract(1, "day");
+    return { start: s0.startOf("day"), end: emptyEnd };
+  }
+
+  const minD = periodNumberToDayjs(clamped.startPeriod, timeGroupBy, "start");
+  const maxD = periodNumberToDayjs(clamped.endPeriod, timeGroupBy, "end");
+  if (!minD || !maxD) return { start: s0, end: e0 };
+  return { start: minD, end: maxD };
+};
+
+/**
+ * Parse the `{dname}.metadata` JSON body into app `PMTilesMetadata`.
+ * Accepts the sidecar field names (`min_date`, `max_date`, `time_group_by`).
+ * Returns null when either bound is missing or invalid.
+ * Bounds are stored as {@link PeriodInt} (not Dayjs).
+ */
+export const parsePMTilesMetadata = (data: unknown): PMTilesMetadata | null => {
+  if (data == null || typeof data !== "object") return null;
+  const raw = data as Record<string, unknown>;
+  const timeGroupBy = parseTimeGroupBy(raw.time_group_by);
+  const minPeriod = parsePeriodInt(raw.min_date, timeGroupBy);
+  const maxPeriod = parsePeriodInt(raw.max_date, timeGroupBy);
+  if (minPeriod === undefined || maxPeriod === undefined) return null;
+  if (minPeriod > maxPeriod) return null;
+  return { minPeriod, maxPeriod, timeGroupBy };
+};
 
 // Exported following functions for unit testing
 export const getMonthKeysInRange = (start?: Dayjs, end?: Dayjs): string[] => {
@@ -94,11 +392,25 @@ export const getDayKeysInRange = (start?: Dayjs, end?: Dayjs): string[] => {
   return keys;
 };
 
-/** Month + day keys for a range — supports both PMTiles property formats. */
-export const getDateKeysInRange = (start?: Dayjs, end?: Dayjs): string[] => [
-  ...getMonthKeysInRange(start, end),
-  ...getDayKeysInRange(start, end),
-];
+/**
+ * Count property keys for the filter range, using only the bucket format
+ * declared by PMTiles `.metadata` `time_group_by` (`date` → mYYYYMMDD,
+ * `month` → mYYYYMM). When metadata min/max are provided, the range is
+ * clamped so paint/filter expressions do not expand empty calendar days
+ * outside the tile's actual coverage (counts are already pre-aggregated
+ * as m* properties — we only sum those keys).
+ */
+export const getDateKeysInRange = (
+  start?: Dayjs,
+  end?: Dayjs,
+  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY,
+  bounds?: PMTilesMetadataRange | null
+): string[] => {
+  const clamped = clampRangeToMetadata(start, end, bounds, timeGroupBy);
+  return timeGroupBy === TimeGroupBy.Date
+    ? getDayKeysInRange(clamped.start, clamped.end)
+    : getMonthKeysInRange(clamped.start, clamped.end);
+};
 
 /** Format mYYYYMM → YYYY-MM or mYYYYMMDD → YYYY-MM-DD. */
 export const formatDateKey = (key: string): string => {
@@ -110,62 +422,398 @@ export const formatDateKey = (key: string): string => {
 };
 
 /**
- * Whether a count property key falls in the filter range.
- * - Day keys (mYYYYMMDD): the day must lie inside the filter.
- * - Month keys (mYYYYMM): the month overlaps the filter (whole-month bucket).
+ * Precomputed filter window for sparse m* sums.
+ * Prefer this over dayjs-per-key checks in the density hot path.
+ */
+export type CountFilterRange = {
+  timeGroupBy: TimeGroupBy;
+  /** Inclusive YYYYMM or YYYYMMDD integer bound. */
+  startPeriod: number;
+  /** Inclusive YYYYMM or YYYYMMDD integer bound. */
+  endPeriod: number;
+  /** True when start is after end (sum always 0). */
+  empty: boolean;
+  /**
+   * Optional allow-set of `m*` keys when the window is small enough
+   * ({@link COUNT_KEY_SET_MAX}). Membership is O(1); wide day ranges omit this
+   * and use integer period compares only.
+   */
+  keySet?: ReadonlySet<string>;
+};
+
+/** Calendar day → YYYYMMDD integer (local calendar fields from dayjs). */
+export const dayjsToDayPeriod = (d: Dayjs): number =>
+  d.year() * 10000 + (d.month() + 1) * 100 + d.date();
+
+/** Calendar month → YYYYMM integer. */
+export const dayjsToMonthPeriod = (d: Dayjs): number =>
+  d.year() * 100 + (d.month() + 1);
+
+/**
+ * Parse an mYYYYMM / mYYYYMMDD property name without dayjs.
+ * Returns null when the key is not a count bucket.
+ */
+export const parseCountPropertyKey = (
+  key: string
+): { isDay: boolean; period: number } | null => {
+  // Fast reject non-count props (e.g. promoteId "h") before regex
+  if (key.length < 7 || key.length > 9 || key.charCodeAt(0) !== 109 /* m */) {
+    return null;
+  }
+  const digits = key.slice(1);
+  const len = digits.length;
+  if (len !== 6 && len !== 8) return null;
+  // Require pure digits (same as COUNT_PROPERTY_KEY)
+  for (let i = 0; i < len; i++) {
+    const c = digits.charCodeAt(i);
+    if (c < 48 || c > 57) return null;
+  }
+  const period = Number(digits);
+  if (!Number.isFinite(period)) return null;
+  return { isDay: len === 8, period };
+};
+
+/**
+ * Build a reusable filter range for density/popup sums from period ints.
+ * Dayjs is not used on this path — convert at the edge with
+ * {@link buildCountFilterRange} when the UI still speaks Dayjs.
+ */
+export const buildCountFilterRangeFromPeriods = (
+  startPeriod: PeriodInt,
+  endPeriod: PeriodInt,
+  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY,
+  options?: {
+    includeKeySet?: boolean;
+    bounds?: PMTilesMetadataRange | null;
+  }
+): CountFilterRange => {
+  const clamped = clampPeriodsToMetadata(
+    startPeriod,
+    endPeriod,
+    options?.bounds
+  );
+  if (clamped.empty) {
+    return {
+      timeGroupBy,
+      startPeriod: 0,
+      endPeriod: -1,
+      empty: true,
+    };
+  }
+
+  const range: CountFilterRange = {
+    timeGroupBy,
+    startPeriod: clamped.startPeriod,
+    endPeriod: clamped.endPeriod,
+    empty: false,
+  };
+
+  // keySet is opt-in only — integer period compares are the default and are
+  // safer for small tiles (a mismatched allow-set zeros every total).
+  if (options?.includeKeySet === true) {
+    // Key expansion still walks with dayjs once per filter change (not per feature)
+    const startD = periodNumberToDayjs(
+      clamped.startPeriod,
+      timeGroupBy,
+      "start"
+    );
+    const endD = periodNumberToDayjs(clamped.endPeriod, timeGroupBy, "end");
+    if (startD && endD) {
+      const keys =
+        timeGroupBy === TimeGroupBy.Date
+          ? getDayKeysInRange(startD, endD)
+          : getMonthKeysInRange(startD, endD);
+      if (keys.length > 0 && keys.length <= COUNT_KEY_SET_MAX) {
+        range.keySet = new Set(keys);
+      }
+    }
+  }
+  return range;
+};
+
+/**
+ * Build a reusable filter range for density/popup sums.
+ * Converts the UI Dayjs window to {@link PeriodInt} once, then clamps/sums
+ * with integers. Optionally attaches a key allow-set when the window is narrow.
+ */
+export const buildCountFilterRange = (
+  filterStart?: Dayjs,
+  filterEnd?: Dayjs,
+  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY,
+  options?: {
+    includeKeySet?: boolean;
+    bounds?: PMTilesMetadataRange | null;
+  }
+): CountFilterRange => {
+  const { start, end } = resolveRange(filterStart, filterEnd);
+  const rangeStart = start.startOf("day");
+  const rangeEnd = end.startOf("day");
+  if (rangeStart.isAfter(rangeEnd)) {
+    return {
+      timeGroupBy,
+      startPeriod: 0,
+      endPeriod: -1,
+      empty: true,
+    };
+  }
+
+  const isDate = timeGroupBy === TimeGroupBy.Date;
+  const startPeriod = isDate
+    ? dayjsToDayPeriod(rangeStart)
+    : dayjsToMonthPeriod(rangeStart);
+  const endPeriod = isDate
+    ? dayjsToDayPeriod(rangeEnd)
+    : dayjsToMonthPeriod(rangeEnd);
+
+  return buildCountFilterRangeFromPeriods(
+    startPeriod,
+    endPeriod,
+    timeGroupBy,
+    options
+  );
+};
+
+/**
+ * Whether a count property key falls in a precomputed {@link CountFilterRange}.
+ * Hot path: integer period compare (or Set when present) — no dayjs.
+ */
+export const isCountKeyInFilterRange = (
+  key: string,
+  range: CountFilterRange
+): boolean => {
+  if (range.empty) return false;
+  if (range.keySet) {
+    return range.keySet.has(key);
+  }
+  const parsed = parseCountPropertyKey(key);
+  if (!parsed) return false;
+  const wantDay = range.timeGroupBy === TimeGroupBy.Date;
+  if (parsed.isDay !== wantDay) return false;
+  return parsed.period >= range.startPeriod && parsed.period <= range.endPeriod;
+};
+
+/**
+ * Whether a count property key falls in the filter range for the active
+ * `time_group_by`. Keys that do not match the expected bucket length are
+ * rejected (month tiles → mYYYYMM only; date tiles → mYYYYMMDD only).
+ *
+ * Convenience wrapper that builds a {@link CountFilterRange} each call —
+ * prefer {@link isCountKeyInFilterRange} / {@link buildCountFilterRange} in loops.
  */
 export const isCountPropertyInRange = (
   key: string,
   filterStart?: Dayjs,
-  filterEnd?: Dayjs
+  filterEnd?: Dayjs,
+  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY
 ): boolean => {
-  if (!COUNT_PROPERTY_KEY.test(key)) return false;
-  const { start, end } = resolveRange(filterStart, filterEnd);
-  const rangeStart = start.startOf("day");
-  const rangeEnd = end.startOf("day");
-  if (rangeStart.isAfter(rangeEnd)) return false;
+  // No keySet: building keys just for a single membership check is wasteful
+  const range = buildCountFilterRange(filterStart, filterEnd, timeGroupBy, {
+    includeKeySet: false,
+  });
+  return isCountKeyInFilterRange(key, range);
+};
 
-  const digits = key.slice(1);
-  if (digits.length === 8) {
-    const day = dayjs(
-      `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`
+/**
+ * Coerce MVT property values to a finite number. Vector tiles often deliver
+ * counts as strings; treating only typeof === "number" would zero every total.
+ */
+export const coerceCountValue = (value: unknown): number => {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string" && value.trim() !== "") {
+    const n = Number(value);
+    if (Number.isFinite(n)) return n;
+  }
+  return NaN;
+};
+
+/** Options for sparse m* summing (density vs exact popup). */
+export type SumSparseCountOptions = {
+  /**
+   * When set, stop adding once `total` reaches this value and clamp the result.
+   * Used for density paint (see `DENSITY_TOTAL_CAP`) so large hexes do not walk
+   * every day/month property when the color scale has already saturated.
+   */
+  maxTotal?: number;
+  /**
+   * Collect and sort matching property keys (needed for popup time range).
+   * Density feature-state only needs the total — default false when maxTotal
+   * is set, true otherwise.
+   */
+  collectMatchedKeys?: boolean;
+  /**
+   * Precomputed filter range. When omitted, built from dayjs args (slower).
+   * Density passes should always supply this.
+   */
+  range?: CountFilterRange;
+  /**
+   * When true (default), if no keys match the expected day/month format but the
+   * other format is present (common before `.metadata` loads on small monthly
+   * tiles), re-sum with the inferred grouping so hexes are not painted as 0.
+   */
+  inferTimeGroupBy?: boolean;
+};
+
+export type SumSparseCountResult = {
+  total: number;
+  matchedKeys: string[];
+  /** True when at least one m* key matched the active day/month format. */
+  sawExpectedFormat: boolean;
+  /** True when at least one m* key used the opposite day/month format. */
+  sawOtherFormat: boolean;
+  /** Grouping actually used for the total (may differ if inference ran). */
+  timeGroupBy: TimeGroupBy;
+};
+
+/**
+ * Detect whether feature properties look like day buckets, month buckets, or both.
+ */
+export const inspectCountPropertyFormats = (
+  properties: Record<string, unknown> | null | undefined
+): { hasDay: boolean; hasMonth: boolean } => {
+  let hasDay = false;
+  let hasMonth = false;
+  if (!properties) return { hasDay, hasMonth };
+  for (const key of Object.keys(properties)) {
+    const parsed = parseCountPropertyKey(key);
+    if (!parsed) continue;
+    if (parsed.isDay) hasDay = true;
+    else hasMonth = true;
+    if (hasDay && hasMonth) break;
+  }
+  return { hasDay, hasMonth };
+};
+
+/**
+ * Sparse sum of pre-baked m* counts on a feature for the filter window.
+ * Only walks properties that exist (not a dense calendar of day keys).
+ *
+ * Pass `maxTotal` (e.g. `DENSITY_TOTAL_CAP`) for density feature-state so
+ * high-count hexes exit early; omit it for popup HTML so counts stay exact.
+ * Pass `options.range` from {@link buildCountFilterRange} to avoid dayjs per key.
+ *
+ * Uses integer period compares by default (not a key allow-set) so small
+ * datasets cannot vanish due to a mismatched keySet. If the tile uses the
+ * opposite bucket format from `timeGroupBy` and nothing matches, optionally
+ * infers the format from the property bag (see `inferTimeGroupBy`).
+ */
+export const sumSparseCountFromProperties = (
+  properties: Record<string, unknown> | null | undefined,
+  filterStartDate?: Dayjs,
+  filterEndDate?: Dayjs,
+  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY,
+  options?: SumSparseCountOptions
+): SumSparseCountResult => {
+  const empty = (): SumSparseCountResult => ({
+    total: 0,
+    matchedKeys: [],
+    sawExpectedFormat: false,
+    sawOtherFormat: false,
+    timeGroupBy,
+  });
+
+  if (!properties) return empty();
+
+  const range =
+    options?.range ??
+    buildCountFilterRange(filterStartDate, filterEndDate, timeGroupBy, {
+      includeKeySet: false,
+    });
+  if (range.empty) {
+    return { ...empty(), timeGroupBy: range.timeGroupBy };
+  }
+
+  const maxTotal = options?.maxTotal;
+  const collectMatchedKeys =
+    options?.collectMatchedKeys ?? maxTotal === undefined;
+  const wantDay = range.timeGroupBy === TimeGroupBy.Date;
+  const startPeriod = range.startPeriod;
+  const endPeriod = range.endPeriod;
+
+  let total = 0;
+  const matchedKeys: string[] = [];
+  let sawExpectedFormat = false;
+  let sawOtherFormat = false;
+
+  for (const key of Object.keys(properties)) {
+    const parsed = parseCountPropertyKey(key);
+    if (!parsed) continue;
+
+    if (parsed.isDay !== wantDay) {
+      sawOtherFormat = true;
+      continue;
+    }
+    sawExpectedFormat = true;
+    if (parsed.period < startPeriod || parsed.period > endPeriod) continue;
+
+    const count = coerceCountValue(properties[key]);
+    if (!Number.isFinite(count) || count <= 0) continue;
+
+    total += count;
+    if (collectMatchedKeys) {
+      matchedKeys.push(key);
+    }
+    if (maxTotal !== undefined && total >= maxTotal) {
+      total = maxTotal;
+      break;
+    }
+  }
+
+  // Small monthly tiles often load before `.metadata` sets time_group_by=month
+  // while the UI still defaults to date — day-format sum is 0 and density paint
+  // treats that as transparent (hexes disappear). Infer once from the bag.
+  const allowInfer = options?.inferTimeGroupBy !== false;
+  if (allowInfer && total === 0 && !sawExpectedFormat && sawOtherFormat) {
+    const inferred = wantDay ? TimeGroupBy.Month : TimeGroupBy.Date;
+    const inferredRange = buildCountFilterRange(
+      filterStartDate,
+      filterEndDate,
+      inferred,
+      { includeKeySet: false }
     );
-    if (!day.isValid()) return false;
-    return (
-      (day.isAfter(rangeStart) || day.isSame(rangeStart, "day")) &&
-      (day.isBefore(rangeEnd) || day.isSame(rangeEnd, "day"))
+    return sumSparseCountFromProperties(
+      properties,
+      filterStartDate,
+      filterEndDate,
+      inferred,
+      {
+        ...options,
+        range: inferredRange,
+        inferTimeGroupBy: false,
+      }
     );
   }
 
-  // Month bucket: include when the month overlaps the filter window
-  const monthStart = dayjs(`${digits.slice(0, 4)}-${digits.slice(4, 6)}-01`);
-  if (!monthStart.isValid()) return false;
-  const monthEnd = monthStart.endOf("month").startOf("day");
-  return (
-    !monthStart.isAfter(rangeEnd, "day") &&
-    !monthEnd.isBefore(rangeStart, "day")
-  );
+  if (collectMatchedKeys) {
+    matchedKeys.sort();
+  }
+  return {
+    total,
+    matchedKeys,
+    sawExpectedFormat,
+    sawOtherFormat,
+    timeGroupBy: range.timeGroupBy,
+  };
 };
 
 /**
  * Popup totals come from properties present on the feature (not a pre-built
  * key list), so long day-bucket series are not truncated by DAY_KEY_LIMIT.
+ * Only properties matching `time_group_by` are summed.
  */
 export const buildPopupHtml = (
   properties: Record<string, unknown>,
   filterStartDate?: Dayjs,
-  filterEndDate?: Dayjs
+  filterEndDate?: Dayjs,
+  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY,
+  range?: CountFilterRange
 ): string => {
-  let total = 0;
-  const matchedKeys: string[] = [];
-  for (const [key, value] of Object.entries(properties)) {
-    if (typeof value !== "number" || value <= 0) continue;
-    if (!isCountPropertyInRange(key, filterStartDate, filterEndDate)) continue;
-    total += value;
-    matchedKeys.push(key);
-  }
-  // Lexicographic order matches chronological order for mYYYYMM / mYYYYMMDD
-  matchedKeys.sort();
+  const { total, matchedKeys } = sumSparseCountFromProperties(
+    properties,
+    filterStartDate,
+    filterEndDate,
+    timeGroupBy,
+    range ? { range } : undefined
+  );
   const firstKey = matchedKeys[0];
   const lastKey = matchedKeys[matchedKeys.length - 1];
   return new InnerHtmlBuilder()
@@ -179,54 +827,369 @@ export const buildPopupHtml = (
     .getHtml();
 };
 
+/** @deprecated Prefer feature-state totals; kept for unit tests / tooling. */
 export const buildSumExpression = (keys: string[]) => {
   if (keys.length === 0) return 0;
   if (keys.length === 1) return ["coalesce", ["get", keys[0]], 0];
   return ["+", ...keys.map((k) => ["coalesce", ["get", k], 0])];
 };
 
-// Hexbins with no records in the filtered range must be excluded from the layer
-export const buildNonZeroCountFilter = (
-  keys: string[]
-): ExpressionSpecification =>
-  [">", buildSumExpression(keys), 0] as ExpressionSpecification;
+/** Density input: sparse total written via setFeatureState (0 when unset). */
+export const buildFeatureStateTotalExpression = (): ExpressionSpecification =>
+  [
+    "coalesce",
+    ["feature-state", FEATURE_STATE_TOTAL],
+    0,
+  ] as ExpressionSpecification;
 
-const getPaintProperties = (keys: string[]) => {
-  const sumExpr = buildSumExpression(keys);
+/**
+ * True when feature-state total has been written. Unset state is `null` and must
+ * not be treated like a real zero count (new tiles would vanish mid-load).
+ */
+export const buildFeatureStateTotalIsSetExpression =
+  (): ExpressionSpecification =>
+    [
+      "!=",
+      ["feature-state", FEATURE_STATE_TOTAL],
+      null,
+    ] as ExpressionSpecification;
+
+/**
+ * Layer filter for density mode.
+ *
+ * IMPORTANT: Mapbox/MapLibre do **not** allow `feature-state` in filters — only
+ * in paint/layout. Zero-count hexes are hidden via transparent paint instead.
+ * Presence filter keeps only real hex features.
+ */
+export const buildDensityLayerFilter = (): ExpressionSpecification =>
+  ["has", PROMOTE_ID_PROPERTY] as ExpressionSpecification;
+
+/** @deprecated Use buildDensityLayerFilter — feature-state cannot be used in filters. */
+export const buildFeatureStateNonZeroFilter = (): ExpressionSpecification =>
+  buildDensityLayerFilter();
+
+/** Phase A: any hex feature is present (tiles only contain cells with data). */
+export const buildPresenceFilter = (): ExpressionSpecification =>
+  ["has", PROMOTE_ID_PROPERTY] as ExpressionSpecification;
+
+export type HexFillPaint = {
+  "fill-color": ExpressionSpecification | string;
+  "fill-opacity": ExpressionSpecification | number;
+  "fill-outline-color": string;
+};
+
+export const PLACEHOLDER_FILL_COLOR = "#475569";
+export const PLACEHOLDER_FILL_OPACITY = 0.4;
+
+/** Neutral style while feature-state totals are computed in the background. */
+export const getPlaceholderPaintProperties = (): HexFillPaint => ({
+  "fill-color": PLACEHOLDER_FILL_COLOR,
+  "fill-opacity": PLACEHOLDER_FILL_OPACITY,
+  "fill-outline-color": "rgba(255, 255, 255, 0.4)",
+});
+
+/**
+ * Density paint driven by feature-state totals (no dense day-key sum).
+ *
+ * Unset feature-state (tile not yet processed) keeps the placeholder look so
+ * newly loaded hexes do not disappear until their sparse total is written.
+ * A real total of 0 paints transparent (out of filter range).
+ *
+ * Color and opacity breakpoints scale with {@link DENSITY_TOTAL_CAP} via
+ * {@link DENSITY_COLOR_STOPS} / {@link DENSITY_OPACITY_STOPS}.
+ */
+export const getFeatureStatePaintProperties = (
+  cap: number = DENSITY_TOTAL_CAP
+): HexFillPaint => {
+  const totalIsSet = buildFeatureStateTotalIsSetExpression();
+  const sumExpr = buildFeatureStateTotalExpression();
+  const colorStops = buildDensityInterpolateStops(
+    DENSITY_COLOR_STOPS.map(({ ratio, color }) => ({ ratio, value: color })),
+    cap
+  );
+  const opacityStops = buildDensityInterpolateStops(
+    DENSITY_OPACITY_STOPS.map(({ ratio, opacity }) => ({
+      ratio,
+      value: opacity,
+    })),
+    cap
+  );
   return {
     "fill-color": [
-      "interpolate",
-      ["linear"],
-      sumExpr,
-      0,
-      "rgba(0, 0, 0, 0)",
-      1,
-      "#1E293B",
-      10,
-      "#334155",
-      100,
-      "#475569",
-      1000,
-      "#0284C7",
-      5000,
-      "#0D9488",
-      10000,
-      "#14B8A6",
+      "case",
+      ["!", totalIsSet],
+      PLACEHOLDER_FILL_COLOR,
+      ["interpolate", ["linear"], sumExpr, ...colorStops],
     ] as ExpressionSpecification,
     "fill-opacity": [
-      "interpolate",
-      ["linear"],
-      sumExpr,
-      0,
-      0,
-      1,
-      0.15,
-      100,
-      0.6,
-      1000,
-      0.8,
+      "case",
+      ["!", totalIsSet],
+      PLACEHOLDER_FILL_OPACITY,
+      ["interpolate", ["linear"], sumExpr, ...opacityStops],
     ] as ExpressionSpecification,
     "fill-outline-color": "rgba(255, 255, 255, 0.4)",
+  };
+};
+
+/** Apply fill filter + paint to every PMTiles hex zoom band that exists. */
+export const applyHexLayerStyle = (
+  map: Map,
+  filter: ExpressionSpecification | null,
+  paint: HexFillPaint
+): void => {
+  PMTILE_LAYERS.forEach((layer) => {
+    if (!map.getLayer(layer.id)) return;
+    // Paint first so a filter failure cannot leave density colors unapplied
+    map.setPaintProperty(layer.id, "fill-color", paint["fill-color"]);
+    map.setPaintProperty(layer.id, "fill-opacity", paint["fill-opacity"]);
+    map.setPaintProperty(
+      layer.id,
+      "fill-outline-color",
+      paint["fill-outline-color"]
+    );
+    if (filter) {
+      map.setFilter(layer.id, filter);
+    }
+  });
+};
+
+/** Drop all feature-state for the PMTiles vector source (if present). */
+export const clearPmtilesFeatureState = (map: Map): void => {
+  if (!map.getSource(SOURCE_ID)) return;
+  try {
+    // Clears every feature-state entry for this source (all source-layers)
+    map.removeFeatureState({ source: SOURCE_ID });
+  } catch {
+    // Source may already be gone or style unloaded
+  }
+};
+
+/**
+ * Tracks which features already received feature-state for the current filter
+ * generation so tile loads only process new hexes.
+ */
+export type FeatureStateTotalsSession = {
+  /** Features already written: `${sourceLayer}\\0${id}` */
+  written: Set<string>;
+};
+
+export const createFeatureStateTotalsSession =
+  (): FeatureStateTotalsSession => ({
+    written: new Set(),
+  });
+
+export const featureStateSessionKey = (
+  sourceLayer: string,
+  id: string | number
+): string => `${sourceLayer}\0${String(id)}`;
+
+export type UpdateFeatureStateTotalsOptions = {
+  /** Precomputed range (required for hot path; built if omitted). */
+  range?: CountFilterRange;
+  /**
+   * When set, skip features already present in `session.written` and add new
+   * ones as they are written. Callers clear the set on filter/metadata change.
+   */
+  session?: FeatureStateTotalsSession;
+  /**
+   * Max features to write this call. When hit before all loaded features are
+   * processed, `complete` is false so the caller can schedule another chunk.
+   */
+  maxFeatures?: number;
+};
+
+export type UpdateFeatureStateTotalsResult = {
+  /** Features written in this call (not cumulative). */
+  updated: number;
+  /** Features seen in querySourceFeatures (including already-written). */
+  seen: number;
+  /** False when `maxFeatures` stopped the pass early. */
+  complete: boolean;
+};
+
+/**
+ * For each loaded vector feature, sum sparse m* properties in the filter
+ * range and write the total to feature-state for paint/filter.
+ *
+ * Supports incremental updates (skip `session.written`) and chunked work
+ * (`maxFeatures`) so wide ranges stay responsive on the main thread.
+ */
+export const updateFeatureStateTotals = (
+  map: Map,
+  filterStartDate?: Dayjs,
+  filterEndDate?: Dayjs,
+  timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY,
+  options?: UpdateFeatureStateTotalsOptions
+): UpdateFeatureStateTotalsResult => {
+  if (!map.getSource(SOURCE_ID)) {
+    return { updated: 0, seen: 0, complete: true };
+  }
+
+  const range =
+    options?.range ??
+    buildCountFilterRange(filterStartDate, filterEndDate, timeGroupBy, {
+      includeKeySet: false,
+    });
+  const session = options?.session;
+  const maxFeatures = options?.maxFeatures;
+  // Infer opposite day/month format so small monthly tiles still light up
+  // before (or without) a correct `.metadata` time_group_by.
+  const sumOptions: SumSparseCountOptions = {
+    maxTotal: DENSITY_TOTAL_CAP,
+    collectMatchedKeys: false,
+    range,
+    inferTimeGroupBy: true,
+  };
+
+  let updated = 0;
+  let seen = 0;
+  let stoppedEarly = false;
+
+  outer: for (const layer of PMTILE_LAYERS) {
+    let features;
+    try {
+      features = map.querySourceFeatures(SOURCE_ID, {
+        sourceLayer: layer.sourceLayer,
+      });
+    } catch {
+      continue;
+    }
+
+    for (const feature of features) {
+      // promoteId: "h" should populate feature.id; fall back to property
+      const rawId = feature.id ?? feature.properties?.[PROMOTE_ID_PROPERTY];
+      if (rawId === undefined || rawId === null || rawId === "") continue;
+      // Mapbox feature ids are string | number; keep type from promoteId
+      const id = rawId as string | number;
+      seen++;
+      const sessionKey = featureStateSessionKey(layer.sourceLayer, id);
+      if (session?.written.has(sessionKey)) continue;
+
+      // Cap at paint max — further day/month keys do not change color/opacity.
+      // Popup uses an uncapped sum via buildPopupHtml for the exact count.
+      const { total } = sumSparseCountFromProperties(
+        feature.properties as Record<string, unknown> | null,
+        filterStartDate,
+        filterEndDate,
+        timeGroupBy,
+        sumOptions
+      );
+
+      try {
+        map.setFeatureState(
+          {
+            source: SOURCE_ID,
+            sourceLayer: layer.sourceLayer,
+            id,
+          },
+          { [FEATURE_STATE_TOTAL]: total }
+        );
+        session?.written.add(sessionKey);
+        updated++;
+      } catch {
+        // Feature may have left the tile cache
+      }
+
+      if (maxFeatures !== undefined && updated >= maxFeatures) {
+        stoppedEarly = true;
+        break outer;
+      }
+    }
+  }
+  return { updated, seen, complete: !stoppedEarly };
+};
+
+/**
+ * Schedule work after the browser is idle (or on the next macrotask).
+ * Returns a cancel function so stale density updates can be dropped.
+ */
+export const scheduleDeferredWork = (work: () => void): (() => void) => {
+  let cancelled = false;
+  const run = () => {
+    if (!cancelled) work();
+  };
+
+  const ric = (
+    globalThis as typeof globalThis & {
+      requestIdleCallback?: (
+        cb: (deadline: {
+          timeRemaining: () => number;
+          didTimeout: boolean;
+        }) => void,
+        opts?: { timeout: number }
+      ) => number;
+      cancelIdleCallback?: (id: number) => void;
+    }
+  ).requestIdleCallback;
+
+  if (typeof ric === "function") {
+    const id = ric(() => run(), { timeout: 250 });
+    const cancelRic = (
+      globalThis as typeof globalThis & {
+        cancelIdleCallback?: (id: number) => void;
+      }
+    ).cancelIdleCallback;
+    return () => {
+      cancelled = true;
+      cancelRic?.(id);
+    };
+  }
+
+  const timeoutId = setTimeout(run, 0);
+  return () => {
+    cancelled = true;
+    clearTimeout(timeoutId);
+  };
+};
+
+/**
+ * Run `work` in idle slices until it returns true (done) or cancel is called.
+ * Each slice is scheduled via {@link scheduleDeferredWork}.
+ */
+export const scheduleChunkedWork = (
+  work: () => boolean,
+  isStale?: () => boolean
+): (() => void) => {
+  let cancelled = false;
+  let cancelSlice: (() => void) | undefined;
+
+  const tick = () => {
+    if (cancelled || isStale?.()) return;
+    let done = false;
+    try {
+      done = work();
+    } catch {
+      // Treat errors as terminal for this chain
+      return;
+    }
+    if (cancelled || isStale?.() || done) return;
+    cancelSlice = scheduleDeferredWork(tick);
+  };
+
+  cancelSlice = scheduleDeferredWork(tick);
+  return () => {
+    cancelled = true;
+    cancelSlice?.();
+  };
+};
+
+/**
+ * Trailing debounce so rapid tile `sourcedata` / `idle` events collapse into
+ * one feature-state pass after the viewport settles (avoids partial updates).
+ */
+export const FEATURE_STATE_DEBOUNCE_MS = 120;
+
+export const scheduleDebouncedWork = (
+  work: () => void,
+  delayMs: number = FEATURE_STATE_DEBOUNCE_MS
+): (() => void) => {
+  let cancelled = false;
+  const timeoutId = setTimeout(() => {
+    if (!cancelled) work();
+  }, delayMs);
+  return () => {
+    cancelled = true;
+    clearTimeout(timeoutId);
   };
 };
 
@@ -237,16 +1200,275 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   filterStartDate,
   filterEndDate,
   visible = true,
+  onMetadataPeriodChange,
 }) => {
   const { map } = useContext(MapContext);
   const filterStartDateRef = useRef(filterStartDate);
   const filterEndDateRef = useRef(filterEndDate);
   const visibleRef = useRef(visible);
+  const timeGroupByRef = useRef<TimeGroupBy>(DEFAULT_TIME_GROUP_BY);
+  const periodBoundsRef = useRef<PMTilesMetadataRange | null>(null);
+  /** Precomputed integer/key-set range for sparse sums (rebuilt on filter change). */
+  const countFilterRangeRef = useRef<CountFilterRange>(
+    buildCountFilterRange(undefined, undefined, DEFAULT_TIME_GROUP_BY)
+  );
+  /** Incremental feature-state session — cleared when the filter window changes. */
+  const featureStateSessionRef = useRef<FeatureStateTotalsSession>(
+    createFeatureStateTotalsSession()
+  );
+  // Bumps when a newer feature-state pass is scheduled so stale idle work is dropped
+  const featureStateGenRef = useRef(0);
+  // Hover popup is disabled until feature-state density has been applied
+  const densityReadyRef = useRef(false);
+  /**
+   * Single density-pass controller. Tile storms set `dirty` instead of cancelling
+   * mid-chunk (which used to leave feature-state cleared and never re-applied).
+   * Do not wipe Mapbox feature-state on reset — overwrite totals in place so
+   * density colors do not flash off.
+   */
+  const densityPassRef = useRef<{
+    cancelDebounce: (() => void) | null;
+    cancelChunks: (() => void) | null;
+    runningChunks: boolean;
+    dirty: boolean;
+    pendingReset: boolean;
+    /** Only used before density paint has been applied once (initial load). */
+    pendingPlaceholder: boolean;
+  }>({
+    cancelDebounce: null,
+    cancelChunks: null,
+    runningChunks: false,
+    dirty: false,
+    pendingReset: false,
+    pendingPlaceholder: false,
+  });
   const popupRef = useRef<Popup | null>(null);
+  // Drives feature-state refresh once `.metadata` is known (`time_group_by`)
+  const [timeGroupBy, setTimeGroupBy] = useState<TimeGroupBy>(
+    DEFAULT_TIME_GROUP_BY
+  );
 
   const removePopup = useCallback(() => {
     popupRef.current?.remove();
     popupRef.current = null;
+  }, []);
+
+  type ScheduleFeatureStateDensity = (options?: {
+    showPlaceholder?: boolean;
+    delayMs?: number;
+    resetSession?: boolean;
+  }) => () => void;
+
+  /**
+   * Always call the latest scheduler from idle/chunk completions via this ref.
+   * Avoids a self-reference inside `useCallback` (accessed-before-declaration /
+   * stale closure when the callback identity changes).
+   */
+  const scheduleFeatureStateDensityRef = useRef<ScheduleFeatureStateDensity>(
+    () => () => undefined
+  );
+
+  /**
+   * Sparse-sum loaded features into feature-state, then paint from those
+   * totals (no dense day-key Mapbox expression).
+   *
+   * Tile loads set a dirty flag rather than aborting an in-flight chunked pass.
+   * When a pass finishes, a pending dirty re-run processes only new hexes.
+   * Filter changes reset the session (recompute all) but do **not** call
+   * `removeFeatureState` first — that flash was wiping colors before the next
+   * pass could finish, and a cancelled pass left the map empty.
+   *
+   * @param showPlaceholder When true and density has never been ready, show
+   *   neutral presence paint until the first totals land.
+   * @param resetSession When true, drop incremental session so every loaded
+   *   feature is re-summed (date / time_group_by change).
+   */
+  const scheduleFeatureStateDensity = useCallback<ScheduleFeatureStateDensity>(
+    (options) => {
+      if (!map) return () => undefined;
+
+      const pass = densityPassRef.current;
+      const delayMs = options?.delayMs ?? FEATURE_STATE_DEBOUNCE_MS;
+
+      if (options?.resetSession) {
+        pass.pendingReset = true;
+      }
+      if (options?.showPlaceholder) {
+        pass.pendingPlaceholder = true;
+      }
+      pass.dirty = true;
+
+      // Filter change while chunks are running: abort and restart so we do not
+      // keep writing totals for the old window into the new session.
+      if (pass.runningChunks && options?.resetSession) {
+        pass.cancelChunks?.();
+        pass.cancelChunks = null;
+        pass.runningChunks = false;
+        // Invalidate in-flight work so its completion handler does not mark ready
+        featureStateGenRef.current += 1;
+      }
+
+      // Tile-only update while a pass is in flight: finish current pass, then
+      // re-run once for any features that arrived mid-flight.
+      if (pass.runningChunks) {
+        return () => undefined;
+      }
+
+      // Coalesce rapid schedule calls into one debounced start
+      pass.cancelDebounce?.();
+      pass.cancelDebounce = scheduleDebouncedWork(() => {
+        pass.cancelDebounce = null;
+        if (!pass.dirty && !pass.pendingReset) return;
+        if (!map.getSource(SOURCE_ID)) return;
+
+        const doReset = pass.pendingReset;
+        const doPlaceholder = pass.pendingPlaceholder;
+        pass.pendingReset = false;
+        pass.pendingPlaceholder = false;
+        pass.dirty = false;
+
+        if (doReset) {
+          // Overwrite totals in place — do not clearFeatureState (avoids empty flash)
+          featureStateSessionRef.current = createFeatureStateTotalsSession();
+          densityReadyRef.current = false;
+          removePopup();
+        }
+
+        // Placeholder only on first load (never after density paint has been applied)
+        if (doPlaceholder && !densityReadyRef.current) {
+          try {
+            applyHexLayerStyle(
+              map,
+              buildPresenceFilter(),
+              getPlaceholderPaintProperties()
+            );
+          } catch {
+            // Map may already be torn down
+          }
+        }
+
+        // Density paint early so each setFeatureState lights up immediately
+        try {
+          applyHexLayerStyle(
+            map,
+            buildDensityLayerFilter(),
+            getFeatureStatePaintProperties()
+          );
+        } catch {
+          // Layers may not exist yet
+        }
+
+        const generation = ++featureStateGenRef.current;
+        pass.runningChunks = true;
+
+        pass.cancelChunks = scheduleChunkedWork(
+          () => {
+            if (generation !== featureStateGenRef.current) {
+              pass.runningChunks = false;
+              return true;
+            }
+            try {
+              // Rebuild range each chunk so late-arriving metadata bounds apply
+              const range = buildCountFilterRange(
+                filterStartDateRef.current,
+                filterEndDateRef.current,
+                timeGroupByRef.current,
+                {
+                  includeKeySet: false,
+                  bounds: periodBoundsRef.current,
+                }
+              );
+              countFilterRangeRef.current = range;
+
+              const { complete, seen } = updateFeatureStateTotals(
+                map,
+                filterStartDateRef.current,
+                filterEndDateRef.current,
+                timeGroupByRef.current,
+                {
+                  range,
+                  session: featureStateSessionRef.current,
+                  maxFeatures: FEATURE_STATE_CHUNK_SIZE,
+                }
+              );
+              if (!complete) return false;
+
+              if (generation !== featureStateGenRef.current) {
+                pass.runningChunks = false;
+                return true;
+              }
+
+              // Small/fast tiles: first pass often runs before any vector content
+              // is queryable. Mark dirty and retry instead of locking densityReady
+              // with every hex still at transparent total 0 / unset.
+              let sourceLoaded;
+              try {
+                sourceLoaded = map.isSourceLoaded(SOURCE_ID);
+              } catch {
+                sourceLoaded = false;
+              }
+              if (seen === 0 && !sourceLoaded) {
+                pass.runningChunks = false;
+                pass.cancelChunks = null;
+                pass.dirty = true;
+                scheduleFeatureStateDensityRef.current({
+                  showPlaceholder: false,
+                  resetSession: false,
+                  delayMs: 150,
+                });
+                return true;
+              }
+
+              densityReadyRef.current = true;
+              pass.runningChunks = false;
+              pass.cancelChunks = null;
+              // Process hexes that arrived (or a filter reset) during this pass.
+              // Call through the ref so we always hit the latest callback.
+              if (pass.dirty || pass.pendingReset) {
+                scheduleFeatureStateDensityRef.current({
+                  resetSession: pass.pendingReset,
+                  showPlaceholder: false,
+                  delayMs: 0,
+                });
+              }
+              return true;
+            } catch {
+              pass.runningChunks = false;
+              pass.cancelChunks = null;
+              return true;
+            }
+          },
+          () => generation !== featureStateGenRef.current
+        );
+      }, delayMs);
+
+      return () => {
+        // Effect cleanups only cancel the debounce they own when superseded;
+        // in-flight chunks keep running unless a reset aborts them above.
+        // Full teardown is handled by the source effect unmount path.
+      };
+    },
+    [map, removePopup]
+  );
+
+  // Keep ref current so chunk completions never call a stale scheduler
+  useEffect(() => {
+    scheduleFeatureStateDensityRef.current = scheduleFeatureStateDensity;
+  }, [scheduleFeatureStateDensity]);
+
+  /** Abort all density work (source unmount / dataset change). */
+  const cancelAllDensityWork = useCallback(() => {
+    const pass = densityPassRef.current;
+    pass.cancelDebounce?.();
+    pass.cancelChunks?.();
+    pass.cancelDebounce = null;
+    pass.cancelChunks = null;
+    pass.runningChunks = false;
+    pass.dirty = false;
+    pass.pendingReset = false;
+    pass.pendingPlaceholder = false;
+    featureStateGenRef.current += 1;
+    densityReadyRef.current = false;
   }, []);
 
   const handleSelectDataset = useCallback(
@@ -267,19 +1489,123 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
 
   // The PMTiles visualization only exists for parquet datasets, so in a mixed
   // zarr/parquet collection, a non-parquet key falls back to the first parquet key
-  const formSourceUrl = useCallback(() => {
+  const resolveParquetKey = useCallback((): string | undefined => {
     let key = selectedCoKey;
     if (key && collection?.getDatasetTypeByKey(key) !== DatasetType.PARQUET) {
       key = collection?.getAllParquetKeys()[0] ?? key;
     }
-    return `https://${bucket}.s3.${region}.amazonaws.com/portal/visualization/${collection?.id}/${key}.pmtiles`;
+    return key;
   }, [collection, selectedCoKey]);
+
+  const formSourceUrl = useCallback(() => {
+    const key = resolveParquetKey();
+    return `https://${bucket}.s3.${region}.amazonaws.com/portal/visualization/${collection?.id}/${key}.pmtiles`;
+  }, [collection?.id, resolveParquetKey]);
+
+  // Sidecar written next to the archive by batch PMTiles generation
+  const formMetadataUrl = useCallback(() => {
+    const key = resolveParquetKey();
+    return `https://${bucket}.s3.${region}.amazonaws.com/portal/visualization/${collection?.id}/${key}.metadata`;
+  }, [collection?.id, resolveParquetKey]);
 
   useEffect(() => {
     filterStartDateRef.current = filterStartDate;
     filterEndDateRef.current = filterEndDate;
     visibleRef.current = visible;
   }, [filterStartDate, filterEndDate, visible]);
+
+  /**
+   * Bumps when metadata period bounds change so density recomputes even when
+   * `time_group_by` stays the same (previously small tiles kept stale totals).
+   */
+  const [periodBoundsVersion, setPeriodBoundsVersion] = useState(0);
+
+  // Rebuild integer range whenever the filter window, grouping, or bounds change.
+  useEffect(() => {
+    countFilterRangeRef.current = buildCountFilterRange(
+      filterStartDate,
+      filterEndDate,
+      timeGroupBy,
+      { includeKeySet: false, bounds: periodBoundsRef.current }
+    );
+  }, [filterStartDate, filterEndDate, timeGroupBy, periodBoundsVersion]);
+
+  // Load `time_group_by` and period coverage from the `.metadata` sidecar
+  useEffect(() => {
+    const metadataUrl = formMetadataUrl();
+    const abortController = new AbortController();
+
+    // Reset while the new sidecar loads
+    timeGroupByRef.current = DEFAULT_TIME_GROUP_BY;
+    periodBoundsRef.current = null;
+    startTransition(() => {
+      setTimeGroupBy(DEFAULT_TIME_GROUP_BY);
+      setPeriodBoundsVersion((v) => v + 1);
+    });
+    onMetadataPeriodChange?.(null);
+
+    fetch(metadataUrl, { signal: abortController.signal })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Metadata fetch failed: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data: unknown) => {
+        if (abortController.signal.aborted) return;
+        const metadata = parsePMTilesMetadata(data);
+        if (!metadata) {
+          timeGroupByRef.current = DEFAULT_TIME_GROUP_BY;
+          periodBoundsRef.current = null;
+          setTimeGroupBy(DEFAULT_TIME_GROUP_BY);
+          setPeriodBoundsVersion((v) => v + 1);
+          countFilterRangeRef.current = buildCountFilterRange(
+            filterStartDateRef.current,
+            filterEndDateRef.current,
+            DEFAULT_TIME_GROUP_BY,
+            { includeKeySet: false, bounds: null }
+          );
+          onMetadataPeriodChange?.(null);
+          return;
+        }
+        const bounds: PMTilesMetadataRange = {
+          minPeriod: metadata.minPeriod,
+          maxPeriod: metadata.maxPeriod,
+        };
+        timeGroupByRef.current = metadata.timeGroupBy;
+        periodBoundsRef.current = bounds;
+        countFilterRangeRef.current = buildCountFilterRange(
+          filterStartDateRef.current,
+          filterEndDateRef.current,
+          metadata.timeGroupBy,
+          { includeKeySet: false, bounds }
+        );
+        setTimeGroupBy(metadata.timeGroupBy);
+        setPeriodBoundsVersion((v) => v + 1);
+        onMetadataPeriodChange?.(metadata);
+      })
+      .catch((err: unknown) => {
+        // Abort on unmount / URL change is expected — do not reset state twice
+        if (err instanceof DOMException && err.name === "AbortError") return;
+        // Missing or unreadable sidecar → date aggregation, no period clamp
+        if (abortController.signal.aborted) return;
+        timeGroupByRef.current = DEFAULT_TIME_GROUP_BY;
+        periodBoundsRef.current = null;
+        countFilterRangeRef.current = buildCountFilterRange(
+          filterStartDateRef.current,
+          filterEndDateRef.current,
+          DEFAULT_TIME_GROUP_BY,
+          { includeKeySet: false, bounds: null }
+        );
+        setTimeGroupBy(DEFAULT_TIME_GROUP_BY);
+        setPeriodBoundsVersion((v) => v + 1);
+        onMetadataPeriodChange?.(null);
+      });
+
+    return () => {
+      abortController.abort();
+    };
+  }, [formMetadataUrl, onMetadataPeriodChange]);
 
   useEffect(() => {
     if (!map) return;
@@ -299,18 +1625,18 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         map.addSource(SOURCE_ID, {
           type: "vector",
           url: sourceUrl,
+          // Promote H3 cell id so setFeatureState can address each hex
+          promoteId: PROMOTE_ID_PROPERTY,
         });
       }
 
-      const keys = getDateKeysInRange(
-        filterStartDateRef.current,
-        filterEndDateRef.current
-      );
-      const paintProps = getPaintProperties(keys);
+      const placeholderPaint = getPlaceholderPaintProperties();
+      let addedFillLayer = false;
 
       PMTILE_LAYERS.forEach((layer) => {
         if (!map.getLayer(layer.id)) {
           console.log(`Adding layer ${layer.id}`);
+          addedFillLayer = true;
           map.addLayer({
             id: layer.id,
             type: "fill",
@@ -318,14 +1644,15 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
             "source-layer": layer.sourceLayer,
             minzoom: layer.minzoom,
             maxzoom: layer.maxzoom,
-            filter: buildNonZeroCountFilter(keys),
+            // Phase A until feature-state totals are written
+            filter: buildPresenceFilter(),
             layout: {
               visibility: visibleRef.current ? "visible" : "none",
             },
             paint: {
-              "fill-color": paintProps["fill-color"],
-              "fill-opacity": paintProps["fill-opacity"],
-              "fill-outline-color": paintProps["fill-outline-color"],
+              "fill-color": placeholderPaint["fill-color"],
+              "fill-opacity": placeholderPaint["fill-opacity"],
+              "fill-outline-color": placeholderPaint["fill-outline-color"],
             },
           });
         }
@@ -356,6 +1683,13 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
           },
         });
       }
+
+      if (addedFillLayer) {
+        scheduleFeatureStateDensity({
+          showPlaceholder: true,
+          resetSession: true,
+        });
+      }
     };
 
     if (map.isStyleLoaded()) {
@@ -369,10 +1703,47 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     };
     map.on("styledata", onStyleData);
 
+    const rescheduleDensityFromTiles = () => {
+      // Incremental: only new hexes; in-flight passes are not aborted
+      scheduleFeatureStateDensity({
+        showPlaceholder: false,
+        resetSession: false,
+      });
+    };
+
+    // Tile content arrives in waves; re-sum newly loaded features.
+    // Skip metadata-only events. Do not require isSourceLoaded — intermediate
+    // tile batches must still get feature-state or hexes look "half missing".
+    const onSourceData = (e: MapSourceDataEvent) => {
+      if (e.sourceId !== SOURCE_ID) return;
+      if (e.sourceDataType === "metadata") return;
+      rescheduleDensityFromTiles();
+    };
+    map.on("sourcedata", onSourceData);
+
+    // After pan/zoom settles, run another pass for any tiles that finished
+    // loading after the last sourcedata debounce window.
+    const onMoveEnd = () => {
+      rescheduleDensityFromTiles();
+    };
+    map.on("moveend", onMoveEnd);
+
+    // Small archives often finish loading without further sourcedata after the
+    // first empty density pass — idle is the reliable "tiles are queryable" signal.
+    const onIdle = () => {
+      if (densityReadyRef.current && !densityPassRef.current.dirty) return;
+      rescheduleDensityFromTiles();
+    };
+    map.on("idle", onIdle);
+
     return () => {
       if (!map) return;
 
+      cancelAllDensityWork();
+
       try {
+        map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
+        clearPmtilesFeatureState(map);
         PMTILE_LAYERS.forEach((layer) => {
           if (map.getLayer(layer.id)) {
             map.removeLayer(layer.id);
@@ -381,6 +1752,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         if (map.getLayer(HOVER_OUTLINE_LAYER_ID)) {
           map.removeLayer(HOVER_OUTLINE_LAYER_ID);
         }
+        // Removing sources drops tile cache + remaining feature-state
         if (map.getSource(SOURCE_ID)) {
           map.removeSource(SOURCE_ID);
         }
@@ -391,11 +1763,22 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         // OK to ignore error here
       } finally {
         map.off("styledata", onStyleData);
+        map.off("sourcedata", onSourceData);
+        map.off("moveend", onMoveEnd);
+        map.off("idle", onIdle);
         map.off("load", addSourceAndLayers);
         removePopup();
       }
     };
-  }, [map, collection?.id, selectedCoKey, formSourceUrl, removePopup]);
+  }, [
+    map,
+    collection?.id,
+    selectedCoKey,
+    formSourceUrl,
+    removePopup,
+    scheduleFeatureStateDensity,
+    cancelAllDensityWork,
+  ]);
 
   // Show an aggregation-details popup and highlight outline while hovering
   // a hexbin
@@ -433,6 +1816,12 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       e: MapMouseEvent
     ) => {
       if (!visibleRef.current) return;
+      // Wait until feature-state density totals are applied — popup counts
+      // would be incomplete or wrong during the placeholder phase.
+      if (!densityReadyRef.current) {
+        clearHover();
+        return;
+      }
       // queryRenderedFeatures ignores layer minzoom/maxzoom, so retained
       // lower-zoom tiles can still report hexbins from bands that are no
       // longer rendered — skip those.
@@ -460,7 +1849,9 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
           buildPopupHtml(
             feature.properties ?? {},
             filterStartDateRef.current,
-            filterEndDateRef.current
+            filterEndDateRef.current,
+            timeGroupByRef.current,
+            countFilterRangeRef.current
           )
         );
         setHoverOutline(feature.geometry);
@@ -545,39 +1936,23 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     }
   }, [map, visible, removePopup]);
 
-  // Update paint properties on date filter changes
+  // Full recompute when the date range, time grouping, or metadata bounds change.
   useEffect(() => {
     if (!map) return;
-    const keys = getDateKeysInRange(filterStartDate, filterEndDate);
-    const paintProps = getPaintProperties(keys);
-
-    try {
-      PMTILE_LAYERS.forEach((layer) => {
-        if (map.getLayer(layer.id)) {
-          map.setFilter(layer.id, buildNonZeroCountFilter(keys));
-          map.setPaintProperty(
-            layer.id,
-            "fill-color",
-            paintProps["fill-color"]
-          );
-          map.setPaintProperty(
-            layer.id,
-            "fill-opacity",
-            paintProps["fill-opacity"]
-          );
-          map.setPaintProperty(
-            layer.id,
-            "fill-outline-color",
-            paintProps["fill-outline-color"]
-          );
-        }
-      });
-    } catch (error) {
-      // OK to ignore error here
-    }
-    // Popup content is derived from the date filter, so drop any open popup
+    scheduleFeatureStateDensity({
+      showPlaceholder: true,
+      resetSession: true,
+    });
     removePopup();
-  }, [map, filterStartDate, filterEndDate, removePopup]);
+  }, [
+    map,
+    filterStartDate,
+    filterEndDate,
+    timeGroupBy,
+    periodBoundsVersion,
+    removePopup,
+    scheduleFeatureStateDensity,
+  ]);
 
   return (
     <>

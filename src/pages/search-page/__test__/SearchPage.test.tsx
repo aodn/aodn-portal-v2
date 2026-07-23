@@ -110,7 +110,8 @@ describe("SearchPage Basic", () => {
     server.close();
   });
 
-  it("The map should be able to expand properly", () => {
+  // Default vitest testTimeout is 5s; nested waitFors can exceed that under load.
+  it("The map should be able to expand properly", async () => {
     const user = userEvent.setup();
 
     render(
@@ -127,36 +128,33 @@ describe("SearchPage Basic", () => {
       </Provider>
     );
 
-    // Mock user input to trigger search
-    const input = screen.getByTestId("input-with-suggester");
-    user.type(input, "wave");
-    user.type(input, "{enter}");
+    // Await typing so the search is submitted before waiting on results UI
+    const input = await screen.findByTestId("input-with-suggester");
+    await user.type(input, "wave{enter}");
 
-    return waitFor(() => screen.findByTestId("result-layout-button")).then(
-      (select) => {
-        expect(select).toBeInTheDocument();
-        // Need to find combobox which is the element bound with mouse down event in MUI Select
-        return waitFor(() => within(select).findByRole("combobox")).then(
-          (combobox) => {
-            // Open the dropdown
-            // Use fireEvent.mouseDown instead of userEvent.click since MUI Select only responds to mouseDown
-            fireEvent.mouseDown(combobox);
-
-            // Wait for the dropdown to open and click the "Full Map View" option
-            return waitFor(() => screen.findByText("Full Map View")).then(
-              (option) => {
-                fireEvent.click(option);
-
-                // Verify search-page-result-list should not be there if full map view clicked
-                const list = screen.queryByTestId("search-page-result-list");
-                expect(list).not.toBeInTheDocument();
-              }
-            );
-          }
-        );
+    const select = await screen.findByTestId(
+      "result-layout-button",
+      {},
+      {
+        timeout: 8000,
       }
     );
-  });
+    expect(select).toBeInTheDocument();
+
+    // MUI Select opens on mouseDown of the combobox, not click
+    const combobox = await within(select).findByRole("combobox");
+    fireEvent.mouseDown(combobox);
+
+    const option = await screen.findByText("Full Map View");
+    fireEvent.click(option);
+
+    // Full map view removes the result list panel
+    await waitFor(() => {
+      expect(
+        screen.queryByTestId("search-page-result-list")
+      ).not.toBeInTheDocument();
+    });
+  }, 15000);
 
   it("Can load correct record after click load more button", () => {
     const user = userEvent.setup();

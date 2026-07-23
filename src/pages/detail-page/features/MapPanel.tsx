@@ -58,7 +58,10 @@ import { dateToValue } from "../../../utils/DateUtils";
 import { GeoserverFieldsResponse } from "@/app/store/GeoserverDefinitions";
 import * as turf from "@turf/turf";
 import { createStaticLayers } from "../../../components/map/mapbox/layers/StaticLayer";
-import PMTilesHexLayer from "../../../components/map/mapbox/layers/PMTilesLayer";
+import PMTilesHexLayer, {
+  PMTilesMetadata,
+  metadataRangeToDayjs,
+} from "../../../components/map/mapbox/layers/PMTilesLayer";
 import WmsLegend from "./WmsLegend";
 import {
   DatasetType,
@@ -212,7 +215,22 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   const [datePointValue, setDatePointValue] = useState<number>(
     dateToValue(dayjs(dateDefault.min))
   );
+  // Period coverage from the selected parquet's PMTiles `.metadata` sidecar
+  const [pmtilesPeriodRange, setPmtilesPeriodRange] =
+    useState<PMTilesMetadata | null>(null);
   const { isUnderLaptop } = useBreakpoint();
+
+  const handlePmtilesMetadataPeriodChange = useCallback(
+    (range: PMTilesMetadata | null) => {
+      setPmtilesPeriodRange(range);
+    },
+    []
+  );
+
+  const selectedMapLayerId = useMemo(
+    () => mapLayerConfig.find((m) => m.selected)?.id,
+    [mapLayerConfig]
+  );
 
   const [hasSummaryFeature, noMapPreview, minDateStamp, maxDateStamp] =
     useMemo(() => {
@@ -230,7 +248,19 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       let start: Dayjs;
       let end: Dayjs;
 
-      if (
+      // PMTiles layer: sidecar periods are ints; convert to Dayjs only for the slider
+      const pmtilesDayjs =
+        selectedMapLayerId === LayerName.PMTiles && pmtilesPeriodRange
+          ? metadataRangeToDayjs(
+              pmtilesPeriodRange,
+              pmtilesPeriodRange.timeGroupBy
+            )
+          : null;
+
+      if (pmtilesDayjs) {
+        start = pmtilesDayjs.minDate;
+        end = pmtilesDayjs.maxDate;
+      } else if (
         downloadService === DownloadServiceType.CloudOptimised &&
         featureCollection?.features?.length
       ) {
@@ -268,6 +298,8 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       isWMSAvailable,
       isSupportPMTiles,
       lastSelectedMapLayer,
+      selectedMapLayerId,
+      pmtilesPeriodRange,
     ]);
 
   const [filterStartDate, filterEndDate] = useMemo(() => {
@@ -366,15 +398,14 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
         case SubsettingType.TimeSlider:
           return (
             hasSummaryFeature ||
-            (mapLayerConfig.filter((m) => m.selected)?.[0]?.id ===
-              LayerName.GeoServer &&
-              timeSliderSupport)
+            // PMTiles density is filtered by date range from `.metadata` coverage
+            (isSupportPMTiles && selectedMapLayerId === LayerName.PMTiles) ||
+            (selectedMapLayerId === LayerName.GeoServer && timeSliderSupport)
           );
         case SubsettingType.DrawRect:
           return (
             (hasSummaryFeature ||
-              (mapLayerConfig.filter((m) => m.selected)?.[0]?.id ===
-                LayerName.GeoServer &&
+              (selectedMapLayerId === LayerName.GeoServer &&
                 drawRectSupport)) &&
             downloadService !== DownloadServiceType.Unavailable
           );
@@ -384,7 +415,8 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     },
     [
       hasSummaryFeature,
-      mapLayerConfig,
+      isSupportPMTiles,
+      selectedMapLayerId,
       timeSliderSupport,
       drawRectSupport,
       downloadService,
@@ -532,7 +564,8 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
                 visible={checkSubsettingSupport(SubsettingType.TimeSlider)}
                 menu={
                   <DateRange
-                    key="date-range"
+                    // Remount when slider bounds change so thumbs reset to full coverage
+                    key={`date-range-${minDateStamp.format(dateDefault.DATE_FORMAT)}-${maxDateStamp.format(dateDefault.DATE_FORMAT)}`}
                     minDate={minDateStamp.format(dateDefault.DATE_FORMAT)}
                     maxDate={maxDateStamp.format(dateDefault.DATE_FORMAT)}
                     getAndSetDownloadConditions={getAndSetDownloadConditions}
@@ -576,22 +609,17 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
                 collection={collection}
                 filterStartDate={filterStartDate}
                 filterEndDate={filterEndDate}
-                visible={
-                  mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
-                  LayerName.PMTiles
-                }
+                visible={selectedMapLayerId === LayerName.PMTiles}
                 selectedCoKey={selectedCoKey}
                 onSelectCoKey={setSelectedCoKey}
+                onMetadataPeriodChange={handlePmtilesMetadataPeriodChange}
               />
             )}
             <HexbinLayer
               featureCollection={featureCollection}
               filterStartDate={filterStartDate}
               filterEndDate={filterEndDate}
-              visible={
-                mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
-                LayerName.Hexbin
-              }
+              visible={selectedMapLayerId === LayerName.Hexbin}
               selectedCoKey={selectedCoKey}
               onSelectCoKey={setSelectedCoKey}
             />
@@ -604,17 +632,11 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
               setDiscreteTimeSliderValues={setDiscreteTimeSliderValues}
               setDrawRectSupportSupport={setDrawRectSupportSupport}
               collection={collection}
-              visible={
-                mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
-                LayerName.GeoServer
-              }
+              visible={selectedMapLayerId === LayerName.GeoServer}
             />
             <GeojsonLayer
               collection={collection}
-              visible={
-                mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
-                LayerName.SpatialExtent
-              }
+              visible={selectedMapLayerId === LayerName.SpatialExtent}
             />
           </Layers>
         </MapBox>
