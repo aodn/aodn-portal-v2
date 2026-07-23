@@ -92,7 +92,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
         >
           <img
             src={findThumbnail()}
-            alt="org_logo"
+            alt={`Thumbnail of ${title}`}
             loading="lazy"
             style={{
               objectFit: "fill",

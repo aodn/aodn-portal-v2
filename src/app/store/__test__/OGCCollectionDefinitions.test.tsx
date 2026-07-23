@@ -83,7 +83,7 @@ describe("OGCCollection", () => {
 
       const result = collection.findThumbnail();
       expect(result).toBe(
-        "https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/static/[110,-45,155,-10]/312x130@2x?padding=20&access_token=test-token"
+        "https://api.mapbox.com/styles/v1/mapbox/light-v11/static/[110,-45,155,-10]/312x130@2x?padding=20&access_token=test-token"
       );
       vi.unstubAllEnvs();
     });
@@ -98,7 +98,7 @@ describe("OGCCollection", () => {
 
       const result = collection.findThumbnail();
       expect(result).toBe(
-        "https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/static/147.3,-43.1,3/312x130@2x?access_token=test-token"
+        "https://api.mapbox.com/styles/v1/mapbox/light-v11/static/147.3,-43.1,3/312x130@2x?access_token=test-token"
       );
       vi.unstubAllEnvs();
     });
@@ -113,7 +113,7 @@ describe("OGCCollection", () => {
 
       const result = collection.findThumbnail();
       expect(result).toBe(
-        "https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/static/[-180,-85,180,85]/312x130@2x?padding=20&access_token=test-token"
+        "https://api.mapbox.com/styles/v1/mapbox/light-v11/static/[-180,-85,180,85]/312x130@2x?padding=20&access_token=test-token"
       );
       vi.unstubAllEnvs();
     });
@@ -128,6 +128,73 @@ describe("OGCCollection", () => {
 
       const result = collection.findThumbnail();
       expect(result).toBe("mocked-default-thumbnail.png");
+      vi.unstubAllEnvs();
+    });
+
+    it("should overlay the individual extents as geojson when present", () => {
+      vi.stubEnv("VITE_MAPBOX_ACCESS_TOKEN", "test-token");
+      const collection = new OGCCollection();
+      collection.links = [];
+      const spatial = new Spatial(collection);
+      // Overall bbox, one box extent and one point extent
+      spatial.bbox = [
+        [110, -45, 155, -10],
+        [147, -20, 148, -19],
+        [151.5, -24.5, 151.5, -24.5],
+      ];
+      collection.extentInt = spatial;
+
+      const result = collection.findThumbnail();
+      const match = result.match(
+        /^https:\/\/api\.mapbox\.com\/styles\/v1\/mapbox\/light-v11\/static\/geojson\((.+)\)\/auto\/312x130@2x\?padding=20&access_token=test-token$/
+      );
+      expect(match).not.toBeNull();
+      expect(decodeURIComponent(match![1])).toBe(
+        '{"type":"FeatureCollection","features":[' +
+          '{"type":"Feature","properties":{"stroke":"#3B6E8F","stroke-width":2,"fill":"#52BDEC","fill-opacity":0.45},' +
+          '"geometry":{"type":"Polygon","coordinates":[[[147,-20],[148,-20],[148,-19],[147,-19],[147,-20]]]}},' +
+          '{"type":"Feature","properties":{"marker-size":"small","marker-color":"#3B6E8F"},' +
+          '"geometry":{"type":"Point","coordinates":[151.5,-24.5]}}]}'
+      );
+      vi.unstubAllEnvs();
+    });
+
+    it("should fall back to the overall bbox when the extent spans most of the world", () => {
+      vi.stubEnv("VITE_MAPBOX_ACCESS_TOKEN", "test-token");
+      const collection = new OGCCollection();
+      collection.links = [];
+      const spatial = new Spatial(collection);
+      spatial.bbox = [
+        [-180, -90, 180, 90],
+        [10, -20, 20, -10],
+      ];
+      collection.extentInt = spatial;
+
+      const result = collection.findThumbnail();
+      expect(result).toBe(
+        "https://api.mapbox.com/styles/v1/mapbox/light-v11/static/[-180,-85,180,85]/312x130@2x?padding=20&access_token=test-token"
+      );
+      vi.unstubAllEnvs();
+    });
+
+    it("should fall back to the overall bbox when the overlay url gets too long", () => {
+      vi.stubEnv("VITE_MAPBOX_ACCESS_TOKEN", "test-token");
+      const collection = new OGCCollection();
+      collection.links = [];
+      const spatial = new Spatial(collection);
+      const manyExtents = Array.from({ length: 300 }, (_, i) => [
+        (i % 40) + 110,
+        -45,
+        (i % 40) + 111,
+        -44,
+      ]);
+      spatial.bbox = [[110, -45, 155, -10], ...manyExtents];
+      collection.extentInt = spatial;
+
+      const result = collection.findThumbnail();
+      expect(result).toBe(
+        "https://api.mapbox.com/styles/v1/mapbox/light-v11/static/[110,-45,155,-10]/312x130@2x?padding=20&access_token=test-token"
+      );
       vi.unstubAllEnvs();
     });
   });

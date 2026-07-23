@@ -198,11 +198,73 @@ const toDatasetType = (link: ILink): DatasetType | undefined => {
 // Please put all OGCCollection interfaces, types, or classes here.
 // Mapbox Static Images API settings for the bbox fallback thumbnail
 const staticMapDefault = {
-  styleUrl: "https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/static",
+  styleUrl: "https://api.mapbox.com/styles/v1/mapbox/light-v11/static",
   imageSize: "312x130@2x", // matches the result card image area
   bboxPadding: 20,
   pointZoomLevel: 3,
   maxLatitude: 85, // web mercator limit
+  coordPrecision: 3, // keep urls short and cache keys stable
+  maxUrlLength: 7500, // the api rejects urls over ~8kb
+  worldSpanLimit: 300, // skip overlay when extent covers most of the world
+  // Portal theme colors (theme.ts): #3B6E8F primary.main, #52BDEC primary.light
+  extentStyle: {
+    stroke: "#3B6E8F",
+    "stroke-width": 2,
+    fill: "#52BDEC",
+    "fill-opacity": 0.45,
+  },
+  pointStyle: { "marker-size": "small", "marker-color": "#3B6E8F" },
+};
+
+// Map one spatial extent (bbox or point, same data as getGeojsonFromBBox) to
+// a styled geojson feature for the static map overlay, undefined if not
+// drawable (e.g. cross antimeridian)
+const toExtentFeature = (extent: Position): Feature | undefined => {
+  const { maxLatitude, coordPrecision, extentStyle, pointStyle } =
+    staticMapDefault;
+  const round = (value: number) => Number(value.toFixed(coordPrecision));
+  if (extent.length === 2) {
+    return {
+      type: "Feature",
+      properties: pointStyle,
+      geometry: {
+        type: "Point",
+        coordinates: [round(extent[0]), round(extent[1])],
+      },
+    };
+  }
+  if (extent.length !== 4) {
+    return undefined;
+  }
+  const [west, south, east, north] = extent.map(round);
+  if (west === east && south === north) {
+    return {
+      type: "Feature",
+      properties: pointStyle,
+      geometry: { type: "Point", coordinates: [west, south] },
+    };
+  }
+  const clampedSouth = Math.max(south, -maxLatitude);
+  const clampedNorth = Math.min(north, maxLatitude);
+  if (west >= east || clampedSouth >= clampedNorth) {
+    return undefined;
+  }
+  return {
+    type: "Feature",
+    properties: extentStyle,
+    geometry: {
+      type: "Polygon",
+      coordinates: [
+        [
+          [west, clampedSouth],
+          [east, clampedSouth],
+          [east, clampedNorth],
+          [west, clampedNorth],
+          [west, clampedSouth],
+        ],
+      ],
+    },
+  };
 };
 
 export class OGCCollection {
@@ -280,7 +342,7 @@ export class OGCCollection {
   }
 
   // Locate the thumbnail from the links array, fallback to a static map
-  // of the overall bbox, then the default placeholder
+  // of the spatial extents, then the default placeholder
   findThumbnail = (): string => {
     const target = this.links?.find(
       (l) => l.type === "image" && l.rel === RelationType.PREVIEW
@@ -291,14 +353,58 @@ export class OGCCollection {
     return this.createStaticMapUrl() ?? default_thumbnail;
   };
 
-  // Build a Mapbox Static Images API url from the overall bbox (first entry),
-  // undefined if bbox is missing or not renderable (e.g. cross antimeridian)
+  // Build a Mapbox Static Images API url showing the spatial extents like
+  // the map view, falling back to the overall bbox (first entry) when the
+  // extents cannot be drawn; undefined if nothing is renderable
   createStaticMapUrl = (): string | undefined => {
-    const overallBBox = this.propExtent?.bbox?.[0];
+    const bboxes = this.propExtent?.bbox;
     const accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
-    if (!accessToken || overallBBox === undefined || overallBBox.length !== 4) {
+    const overallBBox = bboxes?.[0];
+    if (
+      !accessToken ||
+      bboxes === undefined ||
+      overallBBox === undefined ||
+      overallBBox.length !== 4
+    ) {
       return undefined;
     }
+    return (
+      this.createExtentsOverlayUrl(overallBBox, bboxes.slice(1), accessToken) ??
+      this.createOverallBBoxUrl(overallBBox, accessToken)
+    );
+  };
+
+  // Overlay the individual extents (bbox entries after the first), undefined
+  // when there is nothing worth drawing or the url would exceed the api limit
+  private createExtentsOverlayUrl = (
+    overallBBox: Position,
+    extents: Position[],
+    accessToken: string
+  ): string | undefined => {
+    const { styleUrl, imageSize, bboxPadding, maxUrlLength, worldSpanLimit } =
+      staticMapDefault;
+    const [west, , east] = overallBBox;
+    // A near-global overlay just tints the whole map, not worth drawing
+    if (east - west >= worldSpanLimit) {
+      return undefined;
+    }
+    const features = extents
+      .map(toExtentFeature)
+      .filter((feature): feature is Feature => feature !== undefined);
+    if (features.length === 0) {
+      return undefined;
+    }
+    const overlay = encodeURIComponent(
+      JSON.stringify({ type: "FeatureCollection", features })
+    );
+    const url = `${styleUrl}/geojson(${overlay})/auto/${imageSize}?padding=${bboxPadding}&access_token=${accessToken}`;
+    return url.length <= maxUrlLength ? url : undefined;
+  };
+
+  private createOverallBBoxUrl = (
+    overallBBox: Position,
+    accessToken: string
+  ): string | undefined => {
     const [west, south, east, north] = overallBBox;
     const { styleUrl, imageSize, bboxPadding, pointZoomLevel, maxLatitude } =
       staticMapDefault;
