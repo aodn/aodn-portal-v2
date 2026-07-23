@@ -119,6 +119,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
               data.suggested_organizations_vocabs
             );
             const platform = new Set<string>(data.suggested_platform_vocabs);
+            const semantic = new Set<string>(data.suggested_semantic);
 
             // Create an array of all unique suggestions
             const allSuggestions = new Set([
@@ -126,6 +127,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
               ...parameter,
               ...phrases,
               ...platform,
+              ...semantic,
             ]);
 
             // Sort suggestions by relevance
