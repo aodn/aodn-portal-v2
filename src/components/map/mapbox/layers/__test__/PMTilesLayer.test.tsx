@@ -214,7 +214,7 @@ describe("PMTilesLayer - clampRangeToMetadata", () => {
     const { start, end } = clampRangeToMetadata(
       dayjs("2020-01-01"),
       dayjs("2020-01-31"),
-      {},
+      null,
       TimeGroupBy.Date
     );
     expect(start.format("YYYY-MM-DD")).toBe("2020-01-01");

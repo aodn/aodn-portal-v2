@@ -68,13 +68,13 @@ const PMTILE_LAYERS = [
 ];
 
 /**
- * Optional period bounds from `{dname}.metadata`, as Dayjs values.
+ * Period bounds from `{dname}.metadata`, as Dayjs values.
  * Built via period string-slicing (never `dayjs(YYYYMMDD)` which treats the
  * int as unix ms → ~1970).
  */
 export interface PMTilesMetadataRange {
-  minDate?: Dayjs;
-  maxDate?: Dayjs;
+  minDate: Dayjs;
+  maxDate: Dayjs;
 }
 
 /**
@@ -162,14 +162,13 @@ export const periodNumberToDayjs = (
 export const clampRangeToMetadata = (
   start?: Dayjs,
   end?: Dayjs,
-  bounds?: PMTilesMetadataRange,
+  bounds?: PMTilesMetadataRange | null,
   _timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY
 ): { start: Dayjs; end: Dayjs } => {
   let { start: s, end: e } = resolveRange(start, end);
-  const metaStart = bounds?.minDate;
-  const metaEnd = bounds?.maxDate;
-  if (metaStart && s.isBefore(metaStart, "day")) s = metaStart;
-  if (metaEnd && e.isAfter(metaEnd, "day")) e = metaEnd;
+  if (!bounds) return { start: s, end: e };
+  if (s.isBefore(bounds.minDate, "day")) s = bounds.minDate;
+  if (e.isAfter(bounds.maxDate, "day")) e = bounds.maxDate;
   return { start: s, end: e };
 };
 
@@ -236,7 +235,7 @@ export const getDateKeysInRange = (
   start?: Dayjs,
   end?: Dayjs,
   timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY,
-  bounds?: PMTilesMetadataRange
+  bounds?: PMTilesMetadataRange | null
 ): string[] => {
   const clamped = clampRangeToMetadata(start, end, bounds, timeGroupBy);
   return timeGroupBy === TimeGroupBy.Date
@@ -625,7 +624,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   const filterEndDateRef = useRef(filterEndDate);
   const visibleRef = useRef(visible);
   const timeGroupByRef = useRef<TimeGroupBy>(DEFAULT_TIME_GROUP_BY);
-  const periodBoundsRef = useRef<PMTilesMetadataRange>({});
+  const periodBoundsRef = useRef<PMTilesMetadataRange | null>(null);
   // Bumps when a newer feature-state pass is scheduled so stale idle work is dropped
   const featureStateGenRef = useRef(0);
   const popupRef = useRef<Popup | null>(null);
@@ -633,7 +632,9 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   const [timeGroupBy, setTimeGroupBy] = useState<TimeGroupBy>(
     DEFAULT_TIME_GROUP_BY
   );
-  const [periodBounds, setPeriodBounds] = useState<PMTilesMetadataRange>({});
+  const [periodBounds, setPeriodBounds] = useState<PMTilesMetadataRange | null>(
+    null
+  );
 
   const removePopup = useCallback(() => {
     popupRef.current?.remove();
@@ -748,10 +749,10 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
 
     // Reset while the new sidecar loads
     timeGroupByRef.current = DEFAULT_TIME_GROUP_BY;
-    periodBoundsRef.current = {};
+    periodBoundsRef.current = null;
     startTransition(() => {
       setTimeGroupBy(DEFAULT_TIME_GROUP_BY);
-      setPeriodBounds({});
+      setPeriodBounds(null);
     });
     onMetadataPeriodChange?.(null);
 
@@ -767,9 +768,9 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         const metadata = parsePMTilesMetadata(data);
         if (!metadata) {
           timeGroupByRef.current = DEFAULT_TIME_GROUP_BY;
-          periodBoundsRef.current = {};
+          periodBoundsRef.current = null;
           setTimeGroupBy(DEFAULT_TIME_GROUP_BY);
-          setPeriodBounds({});
+          setPeriodBounds(null);
           onMetadataPeriodChange?.(null);
           return;
         }
@@ -787,9 +788,9 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         // Missing or unreadable sidecar → date aggregation, no period clamp
         if (cancelled) return;
         timeGroupByRef.current = DEFAULT_TIME_GROUP_BY;
-        periodBoundsRef.current = {};
+        periodBoundsRef.current = null;
         setTimeGroupBy(DEFAULT_TIME_GROUP_BY);
-        setPeriodBounds({});
+        setPeriodBounds(null);
         onMetadataPeriodChange?.(null);
       });
 
