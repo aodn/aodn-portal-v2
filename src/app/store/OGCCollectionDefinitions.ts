@@ -196,6 +196,15 @@ const toDatasetType = (link: ILink): DatasetType | undefined => {
 };
 
 // Please put all OGCCollection interfaces, types, or classes here.
+// Mapbox Static Images API settings for the bbox fallback thumbnail
+const staticMapDefault = {
+  styleUrl: "https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/static",
+  imageSize: "312x130@2x", // matches the result card image area
+  bboxPadding: 20,
+  pointZoomLevel: 3,
+  maxLatitude: 85, // web mercator limit
+};
+
 export class OGCCollection {
   private propValue?: SummariesProperties;
   private propExtent?: Spatial;
@@ -270,14 +279,43 @@ export class OGCCollection {
     this.propValue = Object.assign(new SummariesProperties(), props);
   }
 
-  // Locate the thumbnail from the links array
+  // Locate the thumbnail from the links array, fallback to a static map
+  // of the overall bbox, then the default placeholder
   findThumbnail = (): string => {
     const target = this.links?.find(
       (l) => l.type === "image" && l.rel === RelationType.PREVIEW
     );
-    return target !== undefined && target.href.length > 0
-      ? target.href
-      : default_thumbnail;
+    if (target !== undefined && target.href.length > 0) {
+      return target.href;
+    }
+    return this.createStaticMapUrl() ?? default_thumbnail;
+  };
+
+  // Build a Mapbox Static Images API url from the overall bbox (first entry),
+  // undefined if bbox is missing or not renderable (e.g. cross antimeridian)
+  createStaticMapUrl = (): string | undefined => {
+    const overallBBox = this.propExtent?.bbox?.[0];
+    const accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+    if (!accessToken || overallBBox === undefined || overallBBox.length !== 4) {
+      return undefined;
+    }
+    const [west, south, east, north] = overallBBox;
+    const { styleUrl, imageSize, bboxPadding, pointZoomLevel, maxLatitude } =
+      staticMapDefault;
+
+    const isSinglePoint = west === east && south === north;
+    if (isSinglePoint) {
+      return `${styleUrl}/${west},${south},${pointZoomLevel}/${imageSize}?access_token=${accessToken}`;
+    }
+
+    // Web mercator cannot render poles, clamp latitude
+    const clampedSouth = Math.max(south, -maxLatitude);
+    const clampedNorth = Math.min(north, maxLatitude);
+    const crossesAntimeridian = west >= east;
+    if (crossesAntimeridian || clampedSouth >= clampedNorth) {
+      return undefined;
+    }
+    return `${styleUrl}/[${west},${clampedSouth},${east},${clampedNorth}]/${imageSize}?padding=${bboxPadding}&access_token=${accessToken}`;
   };
   // Locate the logo from the links array
   findIcon = (): string | undefined => {

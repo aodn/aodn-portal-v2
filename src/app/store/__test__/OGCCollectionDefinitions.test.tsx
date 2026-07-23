@@ -3,6 +3,7 @@ import {
   getSubgroup,
   OGCCollection,
   RelationType,
+  Spatial,
 } from "../OGCCollectionDefinitions"; // Adjust the import path as needed
 
 // Mock the imported icons and default thumbnail
@@ -70,6 +71,64 @@ describe("OGCCollection", () => {
 
       const result = collection.findThumbnail();
       expect(result).toBe("mocked-default-thumbnail.png");
+    });
+
+    it("should return a static map url when no preview link exists but bbox does", () => {
+      vi.stubEnv("VITE_MAPBOX_ACCESS_TOKEN", "test-token");
+      const collection = new OGCCollection();
+      collection.links = [];
+      const spatial = new Spatial(collection);
+      spatial.bbox = [[110, -45, 155, -10]];
+      collection.extentInt = spatial;
+
+      const result = collection.findThumbnail();
+      expect(result).toBe(
+        "https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/static/[110,-45,155,-10]/312x130@2x?padding=20&access_token=test-token"
+      );
+      vi.unstubAllEnvs();
+    });
+
+    it("should return a center-zoom static map url for a point bbox", () => {
+      vi.stubEnv("VITE_MAPBOX_ACCESS_TOKEN", "test-token");
+      const collection = new OGCCollection();
+      collection.links = [];
+      const spatial = new Spatial(collection);
+      spatial.bbox = [[147.3, -43.1, 147.3, -43.1]];
+      collection.extentInt = spatial;
+
+      const result = collection.findThumbnail();
+      expect(result).toBe(
+        "https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/static/147.3,-43.1,3/312x130@2x?access_token=test-token"
+      );
+      vi.unstubAllEnvs();
+    });
+
+    it("should clamp latitudes beyond web mercator limits", () => {
+      vi.stubEnv("VITE_MAPBOX_ACCESS_TOKEN", "test-token");
+      const collection = new OGCCollection();
+      collection.links = [];
+      const spatial = new Spatial(collection);
+      spatial.bbox = [[-180, -90, 180, 90]];
+      collection.extentInt = spatial;
+
+      const result = collection.findThumbnail();
+      expect(result).toBe(
+        "https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/static/[-180,-85,180,85]/312x130@2x?padding=20&access_token=test-token"
+      );
+      vi.unstubAllEnvs();
+    });
+
+    it("should return the default thumbnail for a bbox crossing the antimeridian", () => {
+      vi.stubEnv("VITE_MAPBOX_ACCESS_TOKEN", "test-token");
+      const collection = new OGCCollection();
+      collection.links = [];
+      const spatial = new Spatial(collection);
+      spatial.bbox = [[170, -45, -170, -10]];
+      collection.extentInt = spatial;
+
+      const result = collection.findThumbnail();
+      expect(result).toBe("mocked-default-thumbnail.png");
+      vi.unstubAllEnvs();
     });
   });
 
