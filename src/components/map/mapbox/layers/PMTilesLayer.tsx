@@ -495,6 +495,17 @@ export const applyHexLayerStyle = (
   });
 };
 
+/** Drop all feature-state for the PMTiles vector source (if present). */
+export const clearPmtilesFeatureState = (map: Map): void => {
+  if (!map.getSource(SOURCE_ID)) return;
+  try {
+    // Clears every feature-state entry for this source (all source-layers)
+    map.removeFeatureState({ source: SOURCE_ID });
+  } catch {
+    // Source may already be gone or style unloaded
+  }
+};
+
 /**
  * For each loaded vector feature, sum sparse m* properties in the filter
  * range and write the total to feature-state for paint/filter.
@@ -756,7 +767,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   // Load `time_group_by` and period coverage from the `.metadata` sidecar
   useEffect(() => {
     const metadataUrl = formMetadataUrl();
-    let cancelled = false;
+    const abortController = new AbortController();
 
     // Reset while the new sidecar loads
     timeGroupByRef.current = DEFAULT_TIME_GROUP_BY;
@@ -767,7 +778,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     });
     onMetadataPeriodChange?.(null);
 
-    fetch(metadataUrl)
+    fetch(metadataUrl, { signal: abortController.signal })
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Metadata fetch failed: ${response.status}`);
@@ -775,7 +786,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         return response.json();
       })
       .then((data: unknown) => {
-        if (cancelled) return;
+        if (abortController.signal.aborted) return;
         const metadata = parsePMTilesMetadata(data);
         if (!metadata) {
           timeGroupByRef.current = DEFAULT_TIME_GROUP_BY;
@@ -795,9 +806,11 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         setPeriodBounds(bounds);
         onMetadataPeriodChange?.(metadata);
       })
-      .catch(() => {
+      .catch((err: unknown) => {
+        // Abort on unmount / URL change is expected — do not reset state twice
+        if (err instanceof DOMException && err.name === "AbortError") return;
         // Missing or unreadable sidecar → date aggregation, no period clamp
-        if (cancelled) return;
+        if (abortController.signal.aborted) return;
         timeGroupByRef.current = DEFAULT_TIME_GROUP_BY;
         periodBoundsRef.current = null;
         setTimeGroupBy(DEFAULT_TIME_GROUP_BY);
@@ -806,7 +819,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       });
 
     return () => {
-      cancelled = true;
+      abortController.abort();
     };
   }, [formMetadataUrl, onMetadataPeriodChange]);
 
@@ -936,6 +949,8 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       densityReadyRef.current = false;
 
       try {
+        map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
+        clearPmtilesFeatureState(map);
         PMTILE_LAYERS.forEach((layer) => {
           if (map.getLayer(layer.id)) {
             map.removeLayer(layer.id);
@@ -944,6 +959,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         if (map.getLayer(HOVER_OUTLINE_LAYER_ID)) {
           map.removeLayer(HOVER_OUTLINE_LAYER_ID);
         }
+        // Removing sources drops tile cache + remaining feature-state
         if (map.getSource(SOURCE_ID)) {
           map.removeSource(SOURCE_ID);
         }
