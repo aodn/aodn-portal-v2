@@ -38,7 +38,11 @@ import { pageDefault } from "../common/constants";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import { portalTheme } from "../../styles";
 import LabelChip from "../common/label/LabelChip";
-import { isQuotedPhrase, quotePhrase } from "../../utils/StringUtils";
+import {
+  isQuotedPhrase,
+  quotePhrase,
+  stripQuotes,
+} from "../../utils/StringUtils";
 
 interface InputWithSuggesterProps {
   containerRef?: HTMLDivElement | null;
@@ -153,9 +157,9 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
             );
 
             // add an exact-keyword-only option of what the user typed at the first position
-            const typed = inputValue.trim();
-            if (options.length > 0 && typed && !isQuotedPhrase(typed)) {
-              options.splice(1, 0, {
+            const typed = stripQuotes(inputValue);
+            if (typed && !isQuotedPhrase(inputValue.trim())) {
+              options.splice(0, 0, {
                 text: quotePhrase(typed),
                 group: OptionGroup.QUOTED,
               });

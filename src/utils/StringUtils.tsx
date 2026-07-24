@@ -101,8 +101,12 @@ export const getLinkType = (text: string): "email" | "url" | "text" => {
   return "text";
 };
 
-// Helper to wrap text in double quotes for an exact-keyword-only search, e.g. mooring -> "mooring"
-export const quotePhrase = (text: string): string => `"${text}"`;
+// Helper to remove double quotes and collapse whitespace, e.g. sea  "surface" -> sea surface
+export const stripQuotes = (text: string): string =>
+  text.replace(/"/g, "").replace(/\s+/g, " ").trim();
 
-export const isQuotedPhrase = (text: string): boolean =>
-  text.length > 1 && text.startsWith('"') && text.endsWith('"');
+// Helper to wrap text in double quotes for an exact-keyword-only search, e.g. mooring -> "mooring"
+// e.g. "wave -> "wave" and sea "surface" -> "sea surface"
+export const quotePhrase = (text: string): string => `"${stripQuotes(text)}"`;
+
+export const isQuotedPhrase = (text: string): boolean => /^"[^"]+"$/.test(text);
