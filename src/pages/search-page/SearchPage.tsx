@@ -17,11 +17,13 @@ import store, {
 } from "@/app/store/store";
 import {
   createSearchParamFrom,
-  fetchResultByUuidNoStore,
-  fetchResultNoStore,
   jsonToOGCCollections,
   SearchParameters,
 } from "@/app/store/searchReducer";
+import {
+  fetchResultByUuidNoStore,
+  fetchResultNoStore,
+} from "@/app/store/ogcApi";
 import {
   formatToUrlParam,
   ParameterState,
@@ -119,7 +121,9 @@ const SearchPage = () => {
   const listSearchAbortRef = useRef<{
     abort: (reason?: string) => void;
   } | null>(null);
-  const mapSearchAbortRef = useRef<AbortController | null>(null);
+  const mapSearchAbortRef = useRef<{ abort: (reason?: string) => void } | null>(
+    null
+  );
   // This is use to avoid update called too many times in short period that
   // hurt the performace
   const debounceHistoryUpdateRef = useRef<_.DebouncedFunc<
@@ -162,11 +166,7 @@ const SearchPage = () => {
       // will not exclude record without spatial extents however for map search
       // it is ok to exclude it because it isn't show on map anyway
       // Abort any ongoing search if exists
-      if (mapSearchAbortRef.current) {
-        mapSearchAbortRef.current.abort();
-      }
-      const controller = new AbortController();
-      mapSearchAbortRef.current = controller;
+      mapSearchAbortRef.current?.abort();
 
       const paramNonPaged: SearchParameters = createSearchParamFrom(
         componentParam,
@@ -174,53 +174,51 @@ const SearchPage = () => {
           pagesize: getMaxMapCentroids?.(),
         }
       );
-      // Make sure no other code abort the search
-      if (mapSearchAbortRef.current) {
-        setProgress(ProgressType.LINEAR);
-        await dispatch(
-          // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
-          // and ordered by uuid to avoid affecting cluster calculation
-          fetchResultNoStore({
-            ...paramNonPaged,
-            properties: "id,centroid",
-            sortby: "id",
-            signal: controller.signal,
-          } as SearchParameters & { signal: AbortSignal })
-        )
-          .unwrap()
-          .then((collections: string) => {
-            // This check is need due to user can move the map around when the search
-            // is still in progress, the store have the latest map bbox so we can check
-            // if the constant we store matches the bbox, if not then we know map
-            // moved and results isn't valid
-            const current = getSearchParams(store.getState())?.bbox;
-            if (
-              componentParam.bbox !== undefined &&
-              current !== undefined &&
-              booleanEqual(componentParam.bbox, current)
-            ) {
-              setLayers(jsonToOGCCollections(collections).collections);
-            }
-          })
-          .catch(() => {
-            // empty result / error → clear previous layers
-            setLayers([]);
-          })
-          .finally(() => {
-            // Must update status after search done, this change the location.state and will
-            // cause all search cancel. However, we also need to make sure that the controller is not canceled
-            // and replace by a new one due to new search
-            if (needNavigate && controller === mapSearchAbortRef.current) {
-              debounceHistoryUpdateRef?.current?.cancel();
-              debounceHistoryUpdateRef?.current?.(
-                pageDefault.search + "?" + formatToUrlParam(componentParam)
-              );
-            }
+      setProgress(ProgressType.LINEAR);
+      const request = dispatch(
+        // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
+        // and ordered by uuid to avoid affecting cluster calculation
+        fetchResultNoStore({
+          ...paramNonPaged,
+          properties: "id,centroid",
+          sortby: "id",
+        })
+      );
+      mapSearchAbortRef.current = request;
+      await request
+        .unwrap()
+        .then((collections: string) => {
+          // This check is need due to user can move the map around when the search
+          // is still in progress, the store have the latest map bbox so we can check
+          // if the constant we store matches the bbox, if not then we know map
+          // moved and results isn't valid
+          const current = getSearchParams(store.getState())?.bbox;
+          if (
+            componentParam.bbox !== undefined &&
+            current !== undefined &&
+            booleanEqual(componentParam.bbox, current)
+          ) {
+            setLayers(jsonToOGCCollections(collections).collections);
+          }
+        })
+        .catch(() => {
+          // empty result / error → clear previous layers
+          setLayers([]);
+        })
+        .finally(() => {
+          // Must update status after search done, this change the location.state and will
+          // cause all search cancel. However, we also need to make sure that the request is not canceled
+          // and replaced by a new one due to new search
+          if (needNavigate && request === mapSearchAbortRef.current) {
+            debounceHistoryUpdateRef?.current?.cancel();
+            debounceHistoryUpdateRef?.current?.(
+              pageDefault.search + "?" + formatToUrlParam(componentParam)
+            );
+          }
 
-            setProgress(undefined);
-            mapSearchAbortRef.current = null;
-          });
-      }
+          setProgress(undefined);
+          mapSearchAbortRef.current = null;
+        });
     },
     [dispatch, getMaxMapCentroids]
   );

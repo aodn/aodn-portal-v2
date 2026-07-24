@@ -1,7 +1,8 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import EventEmitter from "events";
 import type { AppDispatch, RootState } from "./store";
-import { fetchResultNoStore, jsonToOGCCollections } from "./searchReducer";
+import { jsonToOGCCollections } from "./searchReducer";
+import { fetchResultNoStore } from "./ogcApi";
 import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 import {
   BookmarkEvent,

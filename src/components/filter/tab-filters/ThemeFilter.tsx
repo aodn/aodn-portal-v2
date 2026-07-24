@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, FC } from "react";
 import { Box, SxProps } from "@mui/material";
 import { updateParameterVocabs, Vocab } from "@/app/store/searchParamsReducer";
 import { useAppDispatch } from "@/app/store/hooks";
-import { fetchParameterVocabsWithStore } from "@/app/store/searchReducer";
+import { fetchParameterVocabs } from "@/app/store/ogcApi";
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
 import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
 import { TabFilterType } from "../Filters";
@@ -32,7 +32,7 @@ const ThemeFilter: FC<ThemeFilterProps> = ({ filters, setFilters, sx }) => {
   );
 
   useEffect(() => {
-    dispatch(fetchParameterVocabsWithStore(null))
+    dispatch(fetchParameterVocabs())
       .unwrap()
       .then((vocabs: Array<Vocab>) => {
         // Extract second level vocabs and remove duplicates

@@ -17,6 +17,16 @@ import { ogcAxiosWithRetry, toErrorResponse } from "./httpClient";
 import { CloudOptimizedFeature } from "@/app/api/cloudOptimizedTypes";
 import { dateDefault } from "@/components/common/constants";
 
+export interface DatasetMetadataItem {
+  uuid: string;
+  dname: string;
+  lat?: Record<string, unknown>;
+  lng?: Record<string, unknown>;
+  depth?: Record<string, unknown>;
+}
+
+export type DatasetMetadata = Record<string, DatasetMetadataItem>;
+
 export const getDatasetMetadata = (id: string) =>
   ogcAxiosWithRetry
     .get(`/ogc/collections/${id}/items/dataset_metadata`)

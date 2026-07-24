@@ -57,10 +57,10 @@ ogcAxiosWithRetry.interceptors.response.use(
 );
 
 // The ONE place a failed HTTP response becomes an ErrorResponse.
-// Non-HTTP errors (aborts, network failures) are re-thrown untouched.
-export const toErrorResponse = (error: unknown): never => {
+// Non-HTTP errors (aborts, network failures) pass through untouched.
+export const normalizeHttpError = (error: unknown): unknown => {
   if (axios.isAxiosError(error) && error.response) {
-    throw createErrorResponse(
+    return createErrorResponse(
       error.response.status,
       error.response.data?.details
         ? error.response.data.details
@@ -70,7 +70,12 @@ export const toErrorResponse = (error: unknown): never => {
       error.response.data?.parameters
     );
   }
-  throw error;
+  return error;
+};
+
+// Throwing variant for promise .catch chains.
+export const toErrorResponse = (error: unknown): never => {
+  throw normalizeHttpError(error);
 };
 
 export { ogcAxiosWithRetry };

@@ -23,10 +23,8 @@ import {
   updateSearchText,
 } from "@/app/store/searchParamsReducer";
 import store, { getSearchParams, RootState } from "@/app/store/store";
-import {
-  createSuggesterParamFrom,
-  fetchSuggesterOptions,
-} from "@/app/store/searchReducer";
+import { createSuggesterParamFrom } from "@/app/store/searchReducer";
+import { fetchSuggesterOptions } from "@/app/store/ogcApi";
 import { borderRadius, color, padding } from "../../styles/constants";
 import { debounce } from "lodash";
 import { sortByRelevance } from "../../utils/Helpers";

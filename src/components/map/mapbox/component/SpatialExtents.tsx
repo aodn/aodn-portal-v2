@@ -1,10 +1,10 @@
 import React, { FC, useCallback, useContext, useEffect } from "react";
 import MapContext from "../MapContext";
 import {
-  fetchResultNoStore,
   jsonToOGCCollections,
   SearchParameters,
 } from "@/app/store/searchReducer";
+import { fetchResultNoStore } from "@/app/store/ogcApi";
 import { MapMouseEvent } from "mapbox-gl";
 import { useAppDispatch } from "@/app/store/hooks";
 

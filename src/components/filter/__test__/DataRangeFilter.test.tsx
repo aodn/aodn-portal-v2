@@ -3,6 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
+import { ogcApi } from "@/app/store/ogcApi";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
@@ -30,7 +31,10 @@ const createMockStore = (initialState = mockInitialState) =>
   configureStore({
     reducer: {
       searchParams: (state = initialState.searchParams) => state,
+      [ogcApi.reducerPath]: ogcApi.reducer,
     },
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().concat(ogcApi.middleware),
   });
 
 // Mock useBreakpoint hook

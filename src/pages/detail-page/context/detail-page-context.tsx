@@ -11,7 +11,7 @@ import {
   LayerSwitcherLayer,
 } from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 import { CloudOptimizedFeature } from "@/app/api/cloudOptimizedTypes";
-import { DatasetMetadata } from "@/app/store/searchReducer";
+import { DatasetMetadata } from "@/app/api/dataset";
 
 export interface DetailPageContextType {
   collection: OGCCollection | undefined;

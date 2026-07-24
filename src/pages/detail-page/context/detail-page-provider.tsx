@@ -7,12 +7,12 @@ import {
   useMemo,
   useState,
 } from "react";
+import { DatasetMetadata } from "@/app/api/dataset";
 import {
-  DatasetMetadata,
   fetchDatasetMetadataByUuid,
   fetchFeaturesByUuid,
   fetchResultByUuidNoStore,
-} from "@/app/store/searchReducer";
+} from "@/app/store/ogcApi";
 import { DetailPageContext } from "./detail-page-context";
 import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 import { useAppDispatch } from "@/app/store/hooks";

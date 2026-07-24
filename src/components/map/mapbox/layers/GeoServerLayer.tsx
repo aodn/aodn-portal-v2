@@ -37,7 +37,7 @@ import {
   fetchGeoServerMapFeature,
   fetchGeoServerMapFields,
   fetchGeoServerMapLayers,
-} from "@/app/store/geoserverThunks";
+} from "@/app/store/ogcApi";
 import { CardContent, Typography } from "@mui/material";
 import { createRoot, Root } from "react-dom/client";
 import dayjs, { Dayjs } from "dayjs";

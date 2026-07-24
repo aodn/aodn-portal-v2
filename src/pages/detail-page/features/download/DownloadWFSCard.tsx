@@ -30,7 +30,7 @@ import {
 } from "@/app/api/geoserverTypes";
 import { useAppDispatch } from "@/app/store/hooks";
 import { SelectItem } from "../../../../components/common/dropdown/CommonSelect";
-import { fetchGeoServerDownloadLayers } from "@/app/store/geoserverThunks";
+import { fetchGeoServerDownloadLayers } from "@/app/store/ogcApi";
 import { processWFSEstimateSize } from "@/app/store/downloadThunks";
 import AdminScreenContext from "../../../../components/admin/AdminScreenContext";
 import { formatBytes } from "../../../../utils/Helpers";

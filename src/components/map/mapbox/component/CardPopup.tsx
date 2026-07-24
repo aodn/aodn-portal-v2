@@ -16,7 +16,7 @@ import {
 } from "../../../../styles/constants";
 import MapContext from "../MapContext";
 import { useAppDispatch } from "@/app/store/hooks";
-import { fetchResultByUuidNoStore } from "@/app/store/searchReducer";
+import { fetchResultByUuidNoStore } from "@/app/store/ogcApi";
 import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 import { MapEvent, MapMouseEvent } from "mapbox-gl";
 import { Feature, Point } from "geojson";

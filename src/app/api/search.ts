@@ -12,6 +12,7 @@ import {
   SuggesterParameters,
 } from "./searchQueryBuilder";
 import { Vocab } from "@/app/store/searchParamsReducer";
+import { trackSearchResultParameters } from "@/analytics/searchParamsEvent";
 import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 
 // Map the UI-facing SearchParameters onto what the endpoint accepts.
@@ -37,8 +38,13 @@ const toOGCSearchParams = (param: SearchParameters): OGCSearchParameters => {
   return p;
 };
 
-export const getCollections = (param: SearchParameters, signal?: AbortSignal) =>
-  ogcAxiosWithRetry
+export const getCollections = (
+  param: SearchParameters,
+  signal?: AbortSignal
+) => {
+  // Track search page url parameters, do not block the search
+  setTimeout(() => trackSearchResultParameters(param), 500);
+  return ogcAxiosWithRetry
     .get<string>("/ogc/collections", {
       params: toOGCSearchParams(param),
       timeout: TIMEOUT,
@@ -46,6 +52,7 @@ export const getCollections = (param: SearchParameters, signal?: AbortSignal) =>
     })
     .then((response) => response.data)
     .catch(toErrorResponse);
+};
 
 export const getCollectionById = (id: string) =>
   ogcAxiosWithRetry

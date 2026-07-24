@@ -1,26 +1,19 @@
 /**
- * Thunks for dataset download and size estimates. HTTP work lives in
- * @/app/api/download; these wrappers only forward errors to redux.
+ * Thunks for the WFS / Cloud-Optimized download and size estimates.
+ * These endpoints stream server-sent events, so they stay as thunks —
+ * RTK Query caching makes no sense for a one-off byte stream.
+ * (Plain request/response downloads live in ogcApi.ts.)
  */
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { ErrorResponse } from "@/utils/ErrorBoundary";
 import * as downloadApi from "@/app/api/download";
 import {
   CoEstimateRequest,
-  DatasetDownloadRequest,
   WFSDownloadRequest,
 } from "@/pages/detail-page/context/DownloadDefinitions";
 
 const rejectWith = (thunkApi: any) => (error: unknown) =>
   thunkApi.rejectWithValue(error);
-
-export const processDatasetDownload = createAsyncThunk<
-  any,
-  DatasetDownloadRequest,
-  { rejectValue: ErrorResponse }
->("download/downloadDataset", (request, thunkApi) =>
-  downloadApi.postDatasetDownload(request).catch(rejectWith(thunkApi))
-);
 
 export const processWFSDownload = createAsyncThunk<
   any,

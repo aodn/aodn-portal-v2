@@ -26,10 +26,8 @@ import { dateDefault } from "../common/constants";
 import { updateDateTimeFilterRange } from "@/app/store/searchParamsReducer";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { OGCCollection, OGCCollections } from "@/app/api/ogcCollectionTypes";
-import {
-  fetchResultNoStore,
-  jsonToOGCCollections,
-} from "@/app/store/searchReducer";
+import { jsonToOGCCollections } from "@/app/store/searchReducer";
+import { fetchResultNoStore } from "@/app/store/ogcApi";
 import { cqlFilters } from "../common/cqlFilters";
 import TimeRangeBarChart from "../common/charts/TimeRangeBarChart";
 import PlainDatePicker from "../common/datetime/PlainDatePicker";

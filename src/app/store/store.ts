@@ -3,6 +3,7 @@ import { logger } from "redux-logger";
 import searchReducer from "./searchReducer";
 import searchParamsReducer from "./searchParamsReducer";
 import bookmarkListReducer from "./bookmarkListReducer";
+import { ogcApi } from "./ogcApi";
 
 const store = configureStore({
   middleware: (getDefaultMiddleware) =>
@@ -12,11 +13,14 @@ const store = configureStore({
       serializableCheck: false,
       thunk: true,
       // Console logging in development only; use Redux DevTools in any env.
-    }).concat(import.meta.env.DEV ? [logger] : []),
+    })
+      .concat(ogcApi.middleware)
+      .concat(import.meta.env.DEV ? [logger] : []),
   reducer: combineReducers({
     search: searchReducer,
     searchParams: searchParamsReducer,
     bookmarkList: bookmarkListReducer,
+    [ogcApi.reducerPath]: ogcApi.reducer,
   }),
 });
 
