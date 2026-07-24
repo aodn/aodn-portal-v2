@@ -3,7 +3,6 @@ import {
   createFilterString,
   decodeHtmlEntities,
   formatNumber,
-  isQuotedPhrase,
   quotePhrase,
   stripQuotes,
   truncateText,
