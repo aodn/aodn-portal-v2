@@ -13,6 +13,7 @@ import {
   Autocomplete,
   AutocompleteInputChangeReason,
   Box,
+  createFilterOptions,
   Paper,
   Popper,
   TextField,
@@ -27,16 +28,22 @@ import {
   createSuggesterParamFrom,
   fetchSuggesterOptions,
 } from "@/app/store/searchReducer";
-import { borderRadius, color, padding } from "../../styles/constants";
+import { borderRadius, color, gap, padding } from "../../styles/constants";
 import { debounce } from "lodash";
 import { sortByRelevance } from "../../utils/Helpers";
 import { useAppDispatch } from "@/app/store/hooks";
-import { TEXT_FIELD_MIN_WIDTH } from "./constants";
+import { DOUBLE_QUOTE_LABEL, TEXT_FIELD_MIN_WIDTH } from "./constants";
 import { SearchbarButtonNames } from "./SearchbarButtonGroup";
 import { useLocation } from "react-router-dom";
 import { pageDefault } from "../common/constants";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import { portalTheme } from "../../styles";
+import LabelChip from "../common/label/LabelChip";
+import {
+  isQuotedPhrase,
+  quotePhrase,
+  stripQuotes,
+} from "../../utils/StringUtils";
 
 interface InputWithSuggesterProps {
   containerRef?: HTMLDivElement | null;
@@ -64,7 +71,10 @@ enum OptionGroup {
   PHRASE = "phrase",
   ORGANIZATION = "organization",
   PLATFORM = "platform",
+  QUOTED = "quoted",
 }
+
+const defaultFilter = createFilterOptions<string>();
 
 /**
  * Customized input box with suggester. If more customization is needed, please
@@ -148,6 +158,14 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
                 }
               }
             );
+
+            // add an exact-keyword-only option of what the user typed at the second position
+            if (stripQuotes(inputValue) && !isQuotedPhrase(inputValue.trim())) {
+              options.splice(1, 0, {
+                text: quotePhrase(inputValue),
+                group: OptionGroup.QUOTED,
+              });
+            }
 
             setOptions(options);
           });
@@ -339,6 +357,17 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
       value={inputValue}
       forcePopupIcon={false}
       options={options.flatMap((option) => option.text)}
+      // The exact-keyword option is built from cleaned up text (quotes removed, extra spaces collapsed),
+      // typing "sea " builds the option "sea", which has no trailing space to match. So run MUI's own
+      // filter first, then add the exact-keyword option back if it was dropped.
+      filterOptions={(opts, state) => {
+        const kept = defaultFilter(opts, state);
+        const quoted = quotePhrase(state.inputValue);
+        if (opts.includes(quoted) && !kept.includes(quoted)) {
+          kept.splice(1, 0, quoted);
+        }
+        return kept;
+      }}
       autoComplete
       includeInputInList
       disablePortal
@@ -390,6 +419,16 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
       renderOption={(props, option) => (
         <li {...props}>
           {option}
+          {isQuotedPhrase(option) && (
+            <LabelChip
+              text={[DOUBLE_QUOTE_LABEL]}
+              color={portalTheme.palette.tag1}
+              sx={{
+                ml: gap.lg,
+                ...portalTheme.typography.body2Regular,
+              }}
+            />
+          )}
           {/* hidden by default, shown on focus, check sx in CustomPaper */}
           <SearchIcon sx={{ display: "none", ml: "auto" }} />
         </li>
