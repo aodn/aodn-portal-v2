@@ -191,4 +191,29 @@ describe("InputWithSuggester", () => {
     // 4. Verify suggestions are cleared (as per your handleSearchbarClose logic)
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
   });
+
+  it("offers a double-quoted 'Only keyword' option for the typed text", async () => {
+    const user = userEvent.setup();
+    const input = screen.getByTestId("input-with-suggester");
+
+    await user.click(input);
+    await user.clear(input);
+    await user.type(input, "wave");
+
+    await waitFor(() => {
+      expect(screen.queryByRole("listbox")).toBeInTheDocument();
+    });
+
+    // The quoted row and its chip are rendered
+    const quotedOption = await screen.findByText('"wave"');
+    expect(screen.getByTestId("label-chip-Only keyword")).toBeInTheDocument();
+
+    // Selecting it puts the quoted text into the input and Redux
+    await user.click(quotedOption);
+
+    await waitFor(() => {
+      expect(input).toHaveValue('"wave"');
+      expect(store.getState().searchParams.searchText).toBe('"wave"');
+    });
+  });
 });
