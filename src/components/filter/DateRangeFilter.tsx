@@ -23,21 +23,11 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { color, padding } from "../../styles/constants";
 import { dateDefault } from "../common/constants";
-import { updateDateTimeFilterRange } from "@/app/store/componentParamReducer";
+import { updateDateTimeFilterRange } from "@/app/store/searchParamsReducer";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
-import {
-  OGCCollection,
-  OGCCollections,
-} from "@/app/store/OGCCollectionDefinitions";
-import {
-  fetchResultNoStore,
-  jsonToOGCCollections,
-} from "@/app/store/searchReducer";
-import {
-  cqlDefaultFilters,
-  DatasetGroup,
-  TemporalDuring,
-} from "../common/cqlFilters";
+import { OGCCollection, OGCCollections } from "@/app/api/ogcCollectionTypes";
+import { jsonToOGCCollections } from "@/app/store/searchReducer";
+import { cqlFilters } from "../common/cqlFilters";
 import TimeRangeBarChart from "../common/charts/TimeRangeBarChart";
 import PlainDatePicker from "../common/datetime/PlainDatePicker";
 import PlainSlider from "../common/slider/PlainSlider";
@@ -47,6 +37,7 @@ import theme from "../../styles/themeRC8";
 import { CalendarIcon } from "../../assets/icons/search/calendar";
 import { DEFAULT_DATE_PICKER_SLOT } from "../common/datetime/datePickerSlots";
 import { TestHelper } from "../common/test/helper";
+import * as searchApi from "@/app/api/search";
 
 enum DateRangeOptionValues {
   Custom = "custom",
@@ -81,7 +72,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
 
   // State from redux
   const dateTimeFilterRange = useAppSelector(
-    (state) => state.paramReducer.dateTimeFilterRange
+    (state) => state.searchParams.dateTimeFilterRange
   );
 
   // Local state for date-range-slider
@@ -345,22 +336,20 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
 
   useEffect(() => {
     // Find all collection
-    dispatch(
-      fetchResultNoStore({
+    searchApi
+      .getCollections({
         properties: "id,temporal",
-        filter: `${cqlDefaultFilters.get("ALL_TIME_RANGE")}`,
+        filter: cqlFilters.allTimeRange,
       })
-    )
-      .unwrap()
+
       .then((value: string) => {
         // Find all id of collection from imosOnly
-        dispatch(
-          fetchResultNoStore({
+        searchApi
+          .getCollections({
             properties: "id,providers",
-            filter: `${cqlDefaultFilters.get("ALL_TIME_RANGE")} AND ${(cqlDefaultFilters.get("DATASET_GROUP") as DatasetGroup)("imos")}`,
+            filter: `${cqlFilters.allTimeRange} AND ${cqlFilters.datasetGroup("imos")}`,
           })
-        )
-          .unwrap()
+
           .then((imosOnlyCollection: string) => {
             const ids = jsonToOGCCollections(
               imosOnlyCollection
@@ -534,12 +523,9 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
 
       <TestHelper
         id="temporal-during"
-        getTemporalDuring={() => {
-          const funcIntersectPolygon = cqlDefaultFilters.get(
-            "BETWEEN_TIME_RANGE"
-          ) as TemporalDuring;
-          return funcIntersectPolygon(value[0], value[1]);
-        }}
+        getTemporalDuring={() =>
+          cqlFilters.betweenTimeRange(value[0], value[1])
+        }
       />
     </LocalizationProvider>
   );

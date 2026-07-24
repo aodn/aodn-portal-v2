@@ -1,5 +1,5 @@
 import React from "react";
-import { IKeyword } from "@/app/store/OGCCollectionDefinitions";
+import { IKeyword } from "@/app/api/ogcCollectionTypes";
 import CollapseItem from "./list-item/CollapseItem";
 import TextArea from "./list-item/sub-item/TextArea";
 import ExpandableList from "./ExpandableList";

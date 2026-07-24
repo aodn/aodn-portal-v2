@@ -4,7 +4,7 @@ import { Box, Grid, SxProps, Theme } from "@mui/material";
 import DepthSlider from "../../common/slider/DepthSlider";
 import PlainDropdownMenu from "../../common/dropdown/PlainDropdownMenu";
 import { margin } from "../../../styles/constants";
-import { ParameterState } from "@/app/store/componentParamReducer";
+import { ParameterState } from "@/app/store/searchParamsReducer";
 
 interface DepthFiltersProps {
   filter: ParameterState;

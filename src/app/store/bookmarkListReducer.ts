@@ -1,18 +1,19 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import EventEmitter from "events";
-import { AppDispatch, RootState } from "./store";
-import { fetchResultNoStore, jsonToOGCCollections } from "./searchReducer";
-import { OGCCollection } from "./OGCCollectionDefinitions";
+import type { AppDispatch, RootState } from "./store";
+import { jsonToOGCCollections } from "./searchReducer";
+import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 import {
   BookmarkEvent,
   EVENT_BOOKMARK,
 } from "@/components/map/mapbox/controls/menu/Definition";
-import { errorHandling, ErrorResponse } from "@/utils/ErrorBoundary";
+import { ErrorResponse } from "@/utils/ErrorBoundary";
 import {
   loadBookmarkIdsFromStorage,
   saveBookmarkIdsToStorage,
 } from "@/utils/StorageUtils";
 import { createFilterString } from "@/utils/StringUtils";
+import * as searchApi from "@/app/api/search";
 
 interface BookmarkListState {
   items: Array<OGCCollection>;
@@ -32,12 +33,20 @@ const on = (type: EVENT_BOOKMARK, handle: (event: BookmarkEvent) => void) =>
 const off = (type: EVENT_BOOKMARK, handle: (event: BookmarkEvent) => void) =>
   emitter.off(type, handle);
 
+// Fire events after the current call stack, so redux has finished the
+// update and listeners can read the new state via getState().
+// Payload stays untyped: the legacy events don't all match BookmarkEvent.
+const emitLater = (type: EVENT_BOOKMARK, event: unknown) =>
+  setTimeout(() => emitter.emit(type, event), 0.1);
+
 const initialState: BookmarkListState = {
   items: [],
   temporaryItem: undefined,
   expandedItem: undefined,
 };
 
+// Reducers are pure: they only compute the next state. Side effects
+// (event emits, localStorage writes) happen in the exported thunks below.
 const bookmarkListSlice = createSlice({
   name: "bookmarkList",
   initialState,
@@ -45,97 +54,105 @@ const bookmarkListSlice = createSlice({
     setItems: (state, action: PayloadAction<Array<OGCCollection>>) => {
       state.items = action.payload;
     },
-    setTemporaryItem: (
+    temporaryItemSet: (
       state,
       action: PayloadAction<OGCCollection | undefined>
     ) => {
-      if (state.temporaryItem?.id !== action.payload?.id) {
-        state.temporaryItem = action.payload;
-        // Fire event later, so we completed the redux update
-        // and other can use getState() to read it without issue
-        setTimeout(() => {
-          emitter.emit(EVENT_BOOKMARK.TEMP, {
-            id: action.payload?.id,
-            action: EVENT_BOOKMARK.TEMP,
-            value: action.payload,
-          });
-        }, 0.1);
-      }
+      state.temporaryItem = action.payload;
     },
-    setExpandedItem: (
+    expandedItemSet: (
       state,
       action: PayloadAction<OGCCollection | undefined>
     ) => {
-      if (state.expandedItem?.id !== action.payload?.id) {
-        state.expandedItem = action.payload;
-        // Fire event later, so we completed the redux update
-        // and other can use getState() to read it without issue
-        setTimeout(() => {
-          emitter.emit(EVENT_BOOKMARK.EXPAND, {
-            id: action.payload,
-            action: EVENT_BOOKMARK.EXPAND,
-            value: action.payload,
-          });
-        }, 0.1);
-      }
+      state.expandedItem = action.payload;
     },
-    addItem: (state, action: PayloadAction<OGCCollection>) => {
-      const exists = state.items.some((item) => item.id === action.payload.id);
-      if (!exists) {
-        state.items.unshift(action.payload);
-        saveBookmarkIdsToStorage(state.items);
-        // Fire event later, so we completed the redux update
-        // and other can use getState() to read it without issue
-        setTimeout(() => {
-          emitter.emit(EVENT_BOOKMARK.ADD, {
-            id: action.payload.id,
-            action: EVENT_BOOKMARK.ADD,
-            value: action.payload,
-          });
-        }, 0.1);
-      }
+    itemAdded: (state, action: PayloadAction<OGCCollection>) => {
+      state.items.unshift(action.payload);
     },
-    removeItem: (state, action: PayloadAction<string>) => {
-      const exists = state.items.some((item) => item.id === action.payload);
-      if (exists) {
-        state.items = state.items.filter((item) => item.id !== action.payload);
-        saveBookmarkIdsToStorage(state.items);
-        // Fire event later, so we completed the redux update
-        // and other can use getState() to read it without issue
-        setTimeout(() => {
-          emitter.emit(EVENT_BOOKMARK.REMOVE, {
-            id: action.payload,
-            action: EVENT_BOOKMARK.REMOVE,
-          });
-        }, 0.1);
-      }
+    itemRemoved: (state, action: PayloadAction<string>) => {
+      state.items = state.items.filter((item) => item.id !== action.payload);
     },
-    removeAllItems: (state) => {
+    allItemsRemoved: (state) => {
       state.items = [];
       state.temporaryItem = undefined;
       state.expandedItem = undefined;
-      saveBookmarkIdsToStorage([]);
-      // Fire event later, so we completed the redux update
-      // and other can use getState() to read it without issue
-      setTimeout(() => {
-        emitter.emit(EVENT_BOOKMARK.REMOVE_ALL, {
-          id: "",
-          action: EVENT_BOOKMARK.REMOVE_ALL,
-        });
-      }, 0.1);
     },
   },
 });
 
-// Export actions
-export const {
-  setItems,
-  setTemporaryItem,
-  setExpandedItem,
-  addItem,
-  removeItem,
-  removeAllItems,
+export const { setItems } = bookmarkListSlice.actions;
+const {
+  temporaryItemSet,
+  expandedItemSet,
+  itemAdded,
+  itemRemoved,
+  allItemsRemoved,
 } = bookmarkListSlice.actions;
+
+// Public API — same names and behavior as before, but as thunks so the
+// reducers above stay pure.
+export const setTemporaryItem =
+  (item: OGCCollection | undefined) =>
+  (dispatch: AppDispatch, getState: () => RootState) => {
+    if (getState().bookmarkList.temporaryItem?.id !== item?.id) {
+      dispatch(temporaryItemSet(item));
+      emitLater(EVENT_BOOKMARK.TEMP, {
+        id: item?.id,
+        action: EVENT_BOOKMARK.TEMP,
+        value: item,
+      });
+    }
+  };
+
+export const setExpandedItem =
+  (item: OGCCollection | undefined) =>
+  (dispatch: AppDispatch, getState: () => RootState) => {
+    if (getState().bookmarkList.expandedItem?.id !== item?.id) {
+      dispatch(expandedItemSet(item));
+      emitLater(EVENT_BOOKMARK.EXPAND, {
+        id: item,
+        action: EVENT_BOOKMARK.EXPAND,
+        value: item,
+      });
+    }
+  };
+
+export const addItem =
+  (item: OGCCollection) =>
+  (dispatch: AppDispatch, getState: () => RootState) => {
+    const exists = getState().bookmarkList.items.some((i) => i.id === item.id);
+    if (!exists) {
+      dispatch(itemAdded(item));
+      saveBookmarkIdsToStorage(getState().bookmarkList.items);
+      emitLater(EVENT_BOOKMARK.ADD, {
+        id: item.id,
+        action: EVENT_BOOKMARK.ADD,
+        value: item,
+      });
+    }
+  };
+
+export const removeItem =
+  (id: string) => (dispatch: AppDispatch, getState: () => RootState) => {
+    const exists = getState().bookmarkList.items.some((i) => i.id === id);
+    if (exists) {
+      dispatch(itemRemoved(id));
+      saveBookmarkIdsToStorage(getState().bookmarkList.items);
+      emitLater(EVENT_BOOKMARK.REMOVE, {
+        id,
+        action: EVENT_BOOKMARK.REMOVE,
+      });
+    }
+  };
+
+export const removeAllItems = () => (dispatch: AppDispatch) => {
+  dispatch(allItemsRemoved());
+  saveBookmarkIdsToStorage([]);
+  emitLater(EVENT_BOOKMARK.REMOVE_ALL, {
+    id: "",
+    action: EVENT_BOOKMARK.REMOVE_ALL,
+  });
+};
 
 export { on, off };
 
@@ -155,40 +172,35 @@ export const initializeBookmarkList = createAsyncThunk<
         filter: createFilterString(storedIds),
       };
 
-      await dispatch(fetchResultNoStore(searchParams))
-        .unwrap()
+      await searchApi
+        .getCollections(searchParams)
+
         .then((value: string) => {
           const collections = jsonToOGCCollections(value).collections;
           dispatch(setItems(collections));
           // Emit INIT event after data is loaded
-          setTimeout(() => {
-            emitter.emit(EVENT_BOOKMARK.INIT, {
-              id: "",
-              action: EVENT_BOOKMARK.INIT,
-              value: collections,
-            });
-          }, 0.1);
+          emitLater(EVENT_BOOKMARK.INIT, {
+            id: "",
+            action: EVENT_BOOKMARK.INIT,
+            value: collections,
+          });
         });
     } else {
       // Even with no bookmarks, still emit INIT with empty array
-      setTimeout(() => {
-        emitter.emit(EVENT_BOOKMARK.INIT, {
-          id: "",
-          action: EVENT_BOOKMARK.INIT,
-          value: [],
-        });
-      }, 0.1);
-    }
-  } catch (error) {
-    errorHandling(thunkAPI);
-    // Emit INIT with empty array in case of error
-    setTimeout(() => {
-      emitter.emit(EVENT_BOOKMARK.INIT, {
+      emitLater(EVENT_BOOKMARK.INIT, {
         id: "",
         action: EVENT_BOOKMARK.INIT,
         value: [],
       });
-    }, 0.1);
+    }
+  } catch (error) {
+    // Bookmarks are non-critical: on failure fall back to an empty list
+    // instead of rejecting, so the page keeps working.
+    emitLater(EVENT_BOOKMARK.INIT, {
+      id: "",
+      action: EVENT_BOOKMARK.INIT,
+      value: [],
+    });
   }
 });
 

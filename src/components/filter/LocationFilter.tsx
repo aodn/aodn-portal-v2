@@ -21,7 +21,7 @@ import {
   SelectedStaticArea,
   updateFilterPolygon,
   updateFilterStaticAreas,
-} from "@/app/store/componentParamReducer";
+} from "@/app/store/searchParamsReducer";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { featureCollection, union } from "@turf/turf";
 import {
@@ -34,7 +34,7 @@ import {
   STATIC_LAYER_LABEL_PAINT,
 } from "../map/mapbox/layers/StaticLayer";
 import { TestHelper } from "../common/test/helper";
-import { cqlDefaultFilters, StaticAreasFilter } from "../common/cqlFilters";
+import { cqlFilters } from "../common/cqlFilters";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import ReactMap from "../map/mapbox/Map";
 import MapContext from "../map/mapbox/MapContext";
@@ -226,7 +226,7 @@ const modeRadios: { value: LocationFilterMode; label: string }[] = [
 const LocationFilter: FC<LocationFilterProps> = () => {
   const dispatch = useAppDispatch();
   // Must use useAppSelector instead of useMemo to subscribe to state changes
-  const componentParam: ParameterState = useAppSelector((s) => s.paramReducer);
+  const componentParam: ParameterState = useAppSelector((s) => s.searchParams);
   const [filterMode, setFilterMode] =
     useState<LocationFilterMode>("marinePark");
 
@@ -469,7 +469,8 @@ const LocationFilter: FC<LocationFilterProps> = () => {
   );
 
   const highlightCollection = useMemo(():
-    FeatureCollection<Polygon | MultiPolygon> | undefined => {
+    | FeatureCollection<Polygon | MultiPolygon>
+    | undefined => {
     const allFeats: Feature<Polygon | MultiPolygon>[] = [];
 
     if (selectedMarineParkValues.size > 0) {
@@ -735,16 +736,13 @@ const LocationFilter: FC<LocationFilterProps> = () => {
       <TestHelper
         id="selected-location"
         getSelectedLocationIntersects={() => {
-          const funcStaticAreas = cqlDefaultFilters.get(
-            "STATIC_AREAS"
-          ) as StaticAreasFilter;
           const staticAreas = getStaticAreasFromSets(
             selectedMarineParkValues,
             selectedMarineEcoregionValues,
             selectedAllenCoralAtlasValues
           );
           return mergedPolygonForTests
-            ? funcStaticAreas(staticAreas)
+            ? cqlFilters.staticAreas(staticAreas)
             : undefined;
         }}
       />

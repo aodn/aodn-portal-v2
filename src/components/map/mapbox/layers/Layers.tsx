@@ -3,7 +3,7 @@ import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson";
 import { LngLatBounds, MapMouseEvent, LngLat, Map as Mapbox } from "mapbox-gl";
 import * as turf from "@turf/turf";
 import { TabNavigation } from "../../../../hooks/useTabNavigation";
-import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 
 export interface LayerBasicType<P = GeoJsonProperties> {
   // Tile layer should add to map

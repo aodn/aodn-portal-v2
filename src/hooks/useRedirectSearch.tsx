@@ -3,8 +3,8 @@ import { pageDefault } from "../components/common/constants";
 import {
   formatToUrlParam,
   ParameterState,
-} from "@/app/store/componentParamReducer";
-import store, { getComponentState } from "@/app/store/store";
+} from "@/app/store/searchParamsReducer";
+import store, { getSearchParams } from "@/app/store/store";
 
 const useRedirectSearch = () => {
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ const useRedirectSearch = () => {
     fromNavigate: boolean = true,
     requireSearch: boolean = true
   ) => {
-    const componentParam: ParameterState = getComponentState(store.getState());
+    const componentParam: ParameterState = getSearchParams(store.getState());
     navigate(pageDefault.search + "?" + formatToUrlParam(componentParam), {
       state: {
         fromNavigate: fromNavigate,

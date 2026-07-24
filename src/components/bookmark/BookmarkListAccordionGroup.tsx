@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 import { Box, IconButton, Typography } from "@mui/material";
-import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 import StyledAccordion from "../common/accordion/StyledAccordion";
 import StyledAccordionSummary from "../common/accordion/StyledAccordionSummary";
 import StyledAccordionDetails from "../common/accordion/StyledAccordionDetails";

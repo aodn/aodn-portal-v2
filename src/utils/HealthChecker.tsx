@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { useAppDispatch } from "@/app/store/hooks";
-import { fetchSystemHealthNoStore } from "@/app/store/searchReducer";
+import React from "react";
+import { useGetHealthQuery } from "@/app/store/ogcApi";
 import DegradedPage from "../pages/error-page/DegradedPage";
-import { Health } from "@/app/store/systemDefinition";
 
 interface HealthCheckerProps {
   children?: React.ReactNode;
@@ -11,61 +9,27 @@ interface HealthCheckerProps {
 const HEALTH_CHECK_INTERVAL_MS = 30000;
 
 const HealthChecker: React.FC<HealthCheckerProps> = ({ children }) => {
-  const dispatch = useAppDispatch();
-  // Track health status: null = checking, true = healthy, false = unhealthy
-  const [isHealthy, setIsHealthy] = useState<boolean>(true);
+  // No need for health checks in playwright-local mode
+  const skip = import.meta.env.MODE === "playwright-local";
 
-  useEffect(() => {
-    // No need for health checks in playwright-local mode
-    if (import.meta.env.MODE === "playwright-local") {
-      return;
-    }
+  // RTK Query handles the polling, abort-on-unmount and request dedupe
+  // that this component used to hand-roll.
+  const { data, isError } = useGetHealthQuery(undefined, {
+    pollingInterval: HEALTH_CHECK_INTERVAL_MS,
+    skip,
+  });
 
-    let isMounted = true;
-    let timerId: NodeJS.Timeout | null = null;
-    let current: {
-      abort: (reason?: string) => void;
-      unwrap: () => Promise<Health>;
-    } | null = null;
+  // While the first check is in flight, data is undefined — render the
+  // children (optimistic) to prevent flickering on initial load.
+  const isHealthy = (() => {
+    if (skip || (!data && !isError)) return true;
+    if (isError) return false;
+    const status = data?.status?.toUpperCase() || "UNKNOWN";
+    const ogcStatus =
+      data?.components?.ogcApiHealth?.status?.toUpperCase() || "UNKNOWN";
+    return status === "UP" && ogcStatus === "UP";
+  })();
 
-    const performCheck = async () => {
-      current = dispatch(fetchSystemHealthNoStore());
-      try {
-        const health = await current.unwrap();
-        if (isMounted) {
-          const status = health.status?.toUpperCase() || "UNKNOWN";
-          const ogcStatus =
-            health.components?.ogcApiHealth?.status?.toUpperCase() || "UNKNOWN";
-          setIsHealthy(status === "UP" && ogcStatus === "UP");
-        }
-      } catch (err: any) {
-        if (isMounted) {
-          // If the request was aborted, don't update health status to unhealthy
-          const isCancelled =
-            err?.name === "AbortError" || err?.code === "ERR_CANCELED";
-          if (!isCancelled) {
-            console.error("Error checking system health:", err);
-            setIsHealthy(false);
-          }
-        }
-      } finally {
-        if (isMounted) {
-          timerId = setTimeout(performCheck, HEALTH_CHECK_INTERVAL_MS);
-        }
-      }
-    };
-
-    performCheck();
-
-    return () => {
-      isMounted = false;
-      if (timerId) clearTimeout(timerId);
-      if (current) current.abort();
-    };
-  }, [dispatch]);
-
-  // While checking health status, render children (optimistic)
-  // This prevents flickering on initial load
   return isHealthy ? <>{children}</> : <DegradedPage />;
 };
 

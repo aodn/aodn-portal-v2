@@ -16,7 +16,7 @@ import {
   updatePlatform,
   updateStatus,
   updateUpdateFreq,
-} from "@/app/store/componentParamReducer";
+} from "@/app/store/searchParamsReducer";
 import dayjs from "dayjs";
 import { dateDefault, pageDefault, pageReferer } from "../common/constants";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
@@ -36,7 +36,7 @@ const ActiveFiltersChips: FC = () => {
   const dispatch = useAppDispatch();
   const redirectSearch = useRedirectSearch();
   const theme = useTheme();
-  const params = useAppSelector((state) => state.paramReducer);
+  const params = useAppSelector((state) => state.searchParams);
   const { pathname } = useLocation();
   const isSearchPage = pathname === pageDefault.search;
 

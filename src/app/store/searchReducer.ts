@@ -1,109 +1,33 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios, { AxiosError } from "axios";
-import axiosRetry, { isNetworkError, isRetryableError } from "axios-retry";
-import { ParameterState, Vocab } from "./componentParamReducer";
+import { OGCCollection, OGCCollections } from "@/app/api/ogcCollectionTypes";
+import { ErrorResponse } from "@/utils/ErrorBoundary";
+import { ogcAxiosWithRetry } from "@/app/api/httpClient";
+import * as searchApi from "@/app/api/search";
+import type { RootState } from "./store";
 import {
-  cqlDefaultFilters,
-  DatasetGroup,
-  IsNotNull,
-  ParameterVocabsIn,
-  PlatformFilter,
-  PolygonOperation,
-  TemporalAfterOrBefore,
-  TemporalDuring,
-  UpdateFrequency,
-  Status,
-  StaticAreasFilter,
-  ExcludeDatasetScope,
-} from "@/components/common/cqlFilters";
-import { OGCCollection, OGCCollections } from "./OGCCollectionDefinitions";
-import {
-  createErrorResponse,
-  errorHandling,
-  ErrorResponse,
-} from "@/utils/ErrorBoundary";
-import { FeatureCollection, Point } from "geojson";
-import { mergeWithDefaults } from "@/utils/ObjectUtils";
-import {
-  CoEstimateRequest,
-  DatasetDownloadRequest,
-  WFSDownloadRequest,
-} from "@/pages/detail-page/context/DownloadDefinitions";
-import {
-  getDateConditionFrom,
-  getFormatFrom,
-  getKeyFrom,
-  getMultiPolygonFrom,
-} from "@/utils/DownloadConditionUtils";
-import { trackSearchResultParameters } from "@/analytics/searchParamsEvent";
-import { trackHttpRequestError } from "@/analytics/httpRequestErrEvent";
-import {
-  MapFeatureRequest,
-  MapFeatureResponse,
-  GeoserverFieldsResponse,
-  MapLayerResponse,
-  DownloadLayersResponse,
-} from "./GeoserverDefinitions";
-import dayjs from "dayjs";
-import { dateDefault } from "@/components/common/constants";
-import { CloudOptimizedFeature } from "./CloudOptimizedDefinitions";
-import { Health } from "./systemDefinition";
+  createSearchParamFrom,
+  createSuggesterParamFrom,
+  SearchControl,
+  SearchParameters,
+  SuggesterParameters,
+} from "@/app/api/searchQueryBuilder";
 
-export enum DatasetFrequency {
-  REALTIME = "real-time",
-  DELAYED = "delayed",
-  OTHER = "other",
-  BOTH = "both",
-}
-
-export enum DatasetStatus {
-  ONGOING = "onGoing",
-  COMPLETED = "completed",
-}
-
-export type SuggesterParameters = {
-  input?: string;
-  filter?: string;
-};
-
-export type SearchParameters = {
-  text?: string;
-  filter?: string;
-  properties?: string;
-  sortby?: string;
-};
-// Control the behavior of search behavior not part of the query
-export type SearchControl = {
-  pagesize?: number;
-  searchafter?: Array<string>;
-  score?: number;
-};
-
-type OGCSearchParameters = {
-  q?: string;
-  filter?: string;
-  properties?: string;
-  sortby?: string;
-};
+// Re-export the API-layer building blocks so existing importers keep
+// working; new code should import them from @/app/api and @/app/store.
+export { DatasetFrequency, DatasetStatus } from "./searchParamsReducer";
+export { createSearchParamFrom, createSuggesterParamFrom, ogcAxiosWithRetry };
+export type { SearchControl, SearchParameters, SuggesterParameters };
 
 export interface CollectionsQueryType {
   result: OGCCollections;
   query: SearchParameters;
 }
 
-interface ObjectValue {
+interface SearchState {
   collectionsQueryResult: CollectionsQueryType;
-  parameterVocabsResult: Array<Vocab>;
 }
 export const DEFAULT_SEARCH_PAGE_SIZE = 11;
 export const FULL_LIST_PAGE_SIZE = 21;
-
-const DEFAULT_SEARCH_SCORE = import.meta.env.VITE_ELASTIC_RELEVANCE_SCORE;
-const TIMEOUT = 60000;
-const WFS_DOWNLOAD_TIMEOUT =
-  Number(import.meta.env.VITE_WFS_DOWNLOADING_TIMEOUT) || 1200000; // Default 20 minutes timeout for WFS downloads
-const SIZE_ESTIMATE_TIMEOUT =
-  Number(import.meta.env.VITE_WFS_ESTIMATE_TIMEOUT) || 300000; // Default 5 minutes timeout for WFS size estimation
 
 const jsonToOGCCollections = (json: any): OGCCollections => {
   return new OGCCollections(
@@ -116,426 +40,44 @@ const jsonToOGCCollections = (json: any): OGCCollections => {
   );
 };
 
-const initialState: ObjectValue = {
+const initialState: SearchState = {
   collectionsQueryResult: {
     result: new OGCCollections(),
     query: {},
   },
-  parameterVocabsResult: new Array<Vocab>(),
 };
 
-// ---------------------------------------------------------------------
-// 1. Create a **dedicated** axios instance for the OGC endpoint
-//     (you can reuse the default `axios` if you want global retries)
-const ogcAxiosWithRetry = axios.create({
-  baseURL: "/api/v1",
-  timeout: 15_000,
-});
+// These two thunks are the last hand-written fetches: unlike the RTK
+// Query endpoints in ogcApi.ts, their results are written into this
+// slice (replace vs append) which many components read via
+// getSearchQueryResult. They migrate to RTK Query when those consumers
+// move to hooks — see TECH_DEBT.md.
+const rejectWith = (thunkApi: any) => (error: unknown) =>
+  thunkApi.rejectWithValue(error);
 
-// 2. Attach retry logic
-axiosRetry(ogcAxiosWithRetry, {
-  retries: 10,
-  retryDelay: (retryCount) => {
-    // exponential back-off: start with 1000ms
-    return 1000 * Math.pow(2, retryCount - 1);
-  },
-
-  // -----------------------------------------------------------------
-  // 3. **Which errors should trigger a retry?**
-  // -----------------------------------------------------------------
-  retryCondition: (error) => {
-    // 1. Network / DNS / timeout errors
-    if (isNetworkError(error)) return true;
-
-    // 2. 5xx server errors + a few 4xx that are usually transient
-    if (error.response) {
-      const code = error.response.status;
-      return code >= 500 || [408, 429].includes(code);
-    }
-
-    // 3. Timeout (axios sets `code: 'ECONNABORTED'`)
-    if (error.code === "ECONNABORTED") return true;
-
-    // 4. Any other retryable error flagged by axios-retry
-    return isRetryableError(error);
-  },
-});
-
-// Centralized HTTP error tracking — fires once per final failure
-// (after retries), so every request through this instance is covered.
-ogcAxiosWithRetry.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    trackHttpRequestError(error);
-    return Promise.reject(error);
-  }
-);
-
-/**
- Define search functions
- */
-const searchResult = async (
+const searchCollections = (
   param: SearchParameters & { signal?: AbortSignal },
   thunkApi: any
-) => {
-  const p: OGCSearchParameters = {
-    properties:
-      param.properties !== undefined
-        ? param.properties
-        : // Including the keyword "bbox" to ensure spatial extents is returned
-          "id,title,description,status,scope,ai_update_frequency,links,assets_summary,bbox",
-  };
-
-  if (param.text !== undefined && param.text.length !== 0) {
-    p.q = param.text;
-  }
-  // DO NOT EXPOSE score externally, you should not allow share
-  // url with score, alter UI behavior which is hard to control
-  if (param.filter !== undefined && param.filter.length !== 0) {
-    p.filter = param.filter;
-  }
-
-  if (param.sortby !== undefined && param.sortby.length !== 0) {
-    p.sortby = param.sortby;
-  }
-
-  // Track search page url parameters, do not block the search
-  setTimeout(() => trackSearchResultParameters(param), 500);
-
-  return ogcAxiosWithRetry
-    .get<string>("/ogc/collections", {
-      params: p,
-      timeout: TIMEOUT,
-      signal: param.signal || thunkApi.signal,
-    })
-    .then((response) => response.data)
-    .catch((error: Error | AxiosError | ErrorResponse) => {
-      if (axios.isAxiosError(error) && error.response) {
-        return thunkApi.rejectWithValue(
-          createErrorResponse(
-            error?.response?.status,
-            error?.response?.data.details
-              ? error?.response?.data.details
-              : error?.response?.statusText,
-            error?.response?.data.message,
-            error?.response?.data.timestamp,
-            error?.response?.data.parameters
-          )
-        );
-      } else {
-        return thunkApi.rejectWithValue(error);
-      }
-    });
-};
-// TODO: Why no param needed?
-const searchParameterVocabs = async (
-  _param: Map<string, string> | null,
-  thunkApi: any
 ) =>
-  ogcAxiosWithRetry
-    .get<Array<Vocab>>("/ogc/ext/parameter/vocabs", {
-      timeout: TIMEOUT,
-    })
-    .then((response) => response.data)
-    .catch((error: Error | AxiosError | ErrorResponse) => {
-      if (axios.isAxiosError(error) && error.response) {
-        return thunkApi.rejectWithValue(
-          createErrorResponse(
-            error?.response?.status,
-            error?.response?.data.details
-              ? error?.response?.data.details
-              : error?.response?.statusText,
-            error?.response?.data.message,
-            error?.response?.data.timestamp,
-            error?.response?.data.parameters
-          )
-        );
-      } else {
-        return thunkApi.rejectWithValue(error);
-      }
-    });
-
-const fetchSuggesterOptions = createAsyncThunk<
-  any,
-  SuggesterParameters,
-  { rejectValue: ErrorResponse }
->(
-  "search/fetchSuggesterOptions",
-  async (params: SuggesterParameters, thunkApi: any) =>
-    ogcAxiosWithRetry
-      .get<any>("/ogc/ext/autocomplete", {
-        params: params,
-        timeout: TIMEOUT,
-      })
-      .then((response) => response.data)
-      .catch((error: Error | AxiosError | ErrorResponse) => {
-        if (axios.isAxiosError(error) && error.response) {
-          return thunkApi.rejectWithValue(
-            createErrorResponse(
-              error?.response?.status,
-              error?.response?.data.details
-                ? error?.response?.data.details
-                : error?.response?.statusText,
-              error?.response?.data.message,
-              error?.response?.data.timestamp,
-              error?.response?.data.parameters
-            )
-          );
-        } else {
-          return thunkApi.rejectWithValue(error);
-        }
-      })
-);
+  searchApi
+    .getCollections(param, param.signal || thunkApi.signal)
+    .catch(rejectWith(thunkApi));
 
 /**
- * Trunk for async action and update searcher, limited return properties to reduce load time,
+ * Thunk for async action and update searcher, limited return properties to reduce load time,
  * default it, title,description
  */
 const fetchResultWithStore = createAsyncThunk<
   OGCCollections,
   SearchParameters,
   { rejectValue: ErrorResponse }
->("search/fetchResultWithStore", searchResult);
-/**
- * Trunk for async action and update searcher, limited return properties to reduce load time,
- * default it, title,description. This one do not attach extraReducer and must return string due to redux expect
- * payload to be string. The caller need to call the jsonToCollections to convert it to OGCCollections class instance
- */
-const fetchResultNoStore = createAsyncThunk<
-  string,
-  SearchParameters,
-  { rejectValue: ErrorResponse }
->("search/fetchResultNoStore", searchResult);
+>("search/fetchResultWithStore", searchCollections);
 
 const fetchResultAppendStore = createAsyncThunk<
   OGCCollections,
   SearchParameters,
   { rejectValue: ErrorResponse }
->("search/fetchResultAppendStore", searchResult);
-
-const fetchResultByUuidNoStore = createAsyncThunk<
-  OGCCollection,
-  string,
-  { rejectValue: ErrorResponse }
->("search/fetchResultByUuidNoStore", async (id: string, thunkApi: any) =>
-  ogcAxiosWithRetry
-    .get<OGCCollection>(`/ogc/collections/${id}`)
-    .then((response) => Object.assign(new OGCCollection(), response.data))
-    .catch(errorHandling(thunkApi))
-);
-
-export interface DatasetMetadataItem {
-  uuid: string;
-  dname: string;
-  lat?: Record<string, unknown>;
-  lng?: Record<string, unknown>;
-  depth?: Record<string, unknown>;
-}
-
-export type DatasetMetadata = Record<string, DatasetMetadataItem>;
-
-const fetchDatasetMetadataByUuid = createAsyncThunk<
-  DatasetMetadata,
-  string,
-  { rejectValue: ErrorResponse }
->("search/fetchDatasetMetadataByUuid", async (id: string, thunkApi: any) =>
-  ogcAxiosWithRetry
-    .get<DatasetMetadata>(`/ogc/collections/${id}/items/dataset_metadata`)
-    .then((response) => response.data)
-    .catch(errorHandling(thunkApi))
-);
-
-const fetchFeaturesByUuid = createAsyncThunk<
-  FeatureCollection<Point, CloudOptimizedFeature>,
-  string,
-  { rejectValue: ErrorResponse }
->("search/fetchDatasetByUuid", async (id: string, thunkApi: any) =>
-  ogcAxiosWithRetry
-    .get<FeatureCollection<Point>>(`/ogc/collections/${id}/items/summary`)
-    .then((response) => ({
-      ...response.data,
-      features: (response.data?.features || []).map((feature: any) => ({
-        ...feature,
-        properties: {
-          ...feature.properties,
-          timestamp: dayjs(
-            feature.properties?.date,
-            [dateDefault.DATE_YEAR_MONTH_FORMAT, dateDefault.DATE_FORMAT],
-            true
-          ).valueOf(),
-        },
-      })),
-    }))
-    .catch(errorHandling(thunkApi))
-);
-
-const processDatasetDownload = createAsyncThunk<
-  any,
-  DatasetDownloadRequest,
-  { rejectValue: ErrorResponse }
->(
-  "download/downloadDataset",
-  async (request: DatasetDownloadRequest, thunkAPI: any) => {
-    try {
-      const response = await ogcAxiosWithRetry.post(
-        "/ogc/processes/download/execution",
-        request
-      );
-      return response.data;
-    } catch (error) {
-      errorHandling(thunkAPI);
-    }
-  }
-);
-
-const processWFSDownload = createAsyncThunk<
-  any,
-  WFSDownloadRequest,
-  { rejectValue: ErrorResponse }
->(
-  "download/downloadWFS",
-  async (request: WFSDownloadRequest, thunkAPI: any) => {
-    try {
-      // Extract download conditions
-      const dateRange = getDateConditionFrom(request.downloadConditions);
-      const multiPolygon = getMultiPolygonFrom(request.downloadConditions);
-      const format = getFormatFrom(request.downloadConditions);
-
-      const requestBody = {
-        inputs: {
-          uuid: request.uuid,
-          start_date: dateRange.start,
-          end_date: dateRange.end,
-          multi_polygon: multiPolygon,
-          layer_name: request.layerName,
-          output_format: format,
-        },
-        outputs: {},
-        subscriber: {
-          successUri: "",
-          inProgressUri: "",
-          failedUri: "",
-        },
-      };
-
-      return ogcAxiosWithRetry.post(
-        "/ogc/processes/downloadWfs/execution",
-        requestBody,
-        {
-          adapter: "fetch", // Use fetch adapter for streaming
-          responseType: "stream",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "text/event-stream",
-            "Cache-Control": "no-cache",
-          },
-          timeout: WFS_DOWNLOAD_TIMEOUT,
-          signal: thunkAPI.signal,
-        }
-      );
-    } catch (error) {
-      errorHandling(thunkAPI);
-    }
-  }
-);
-
-const processWFSEstimateSize = createAsyncThunk<
-  any,
-  WFSDownloadRequest,
-  { rejectValue: ErrorResponse }
->(
-  "download/estimateWFSSize",
-  async (request: WFSDownloadRequest, thunkAPI: any) => {
-    try {
-      const dateRange = getDateConditionFrom(request.downloadConditions);
-      const multiPolygon = getMultiPolygonFrom(request.downloadConditions);
-      const format = getFormatFrom(request.downloadConditions);
-
-      const requestBody = {
-        inputs: {
-          uuid: request.uuid,
-          layer_name: request.layerName,
-          start_date: dateRange.start,
-          end_date: dateRange.end,
-          output_format: format,
-          multi_polygon: multiPolygon,
-        },
-      };
-
-      return ogcAxiosWithRetry.post(
-        "/ogc/processes/estimateWfsDownload/execution",
-        requestBody,
-        {
-          adapter: "fetch",
-          responseType: "stream",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "text/event-stream",
-            "Cache-Control": "no-cache",
-          },
-          timeout: SIZE_ESTIMATE_TIMEOUT,
-          signal: thunkAPI.signal,
-        }
-      );
-    } catch (error) {
-      errorHandling(thunkAPI);
-    }
-  }
-);
-
-// Estimate the size of a Cloud Optimised (zarr/parquet) download.
-// Mirrors the WFS estimate SSE flow, but hits the CO estimate endpoint and
-// identifies the dataset by `key` (from the KEY condition) instead of a layer.
-const processCoEstimateSize = createAsyncThunk<
-  any,
-  CoEstimateRequest,
-  { rejectValue: ErrorResponse }
->(
-  "download/estimateCoSize",
-  async (request: CoEstimateRequest, thunkAPI: any) => {
-    try {
-      const dateRange = getDateConditionFrom(request.downloadConditions);
-      const multiPolygon = getMultiPolygonFrom(request.downloadConditions);
-      const format = getFormatFrom(request.downloadConditions);
-      const key = getKeyFrom(request.downloadConditions);
-
-      const requestBody = {
-        inputs: {
-          uuid: request.uuid,
-          key,
-          start_date: dateRange.start,
-          end_date: dateRange.end,
-          output_format: format,
-          multi_polygon: multiPolygon,
-        },
-      };
-
-      return ogcAxiosWithRetry.post(
-        "/ogc/processes/estimateCOdownload/execution",
-        requestBody,
-        {
-          adapter: "fetch",
-          responseType: "stream",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "text/event-stream",
-            "Cache-Control": "no-cache",
-          },
-          timeout: SIZE_ESTIMATE_TIMEOUT,
-          signal: thunkAPI.signal,
-        }
-      );
-    } catch (error) {
-      errorHandling(thunkAPI);
-    }
-  }
-);
-
-const fetchParameterVocabsWithStore = createAsyncThunk<
-  Array<Vocab>,
-  Map<string, string> | null,
-  { rejectValue: ErrorResponse }
->("search/fetchParameterVocabsWithStore", searchParameterVocabs);
+>("search/fetchResultAppendStore", searchCollections);
 
 const searcher = createSlice({
   name: "search",
@@ -559,302 +101,19 @@ const searcher = createSlice({
 
         state.collectionsQueryResult.result = collections;
         state.collectionsQueryResult.query = action.meta.arg;
-      })
-      .addCase(fetchParameterVocabsWithStore.fulfilled, (state, action) => {
-        state.parameterVocabsResult = action.payload;
       });
   },
 });
 
-const fetchGeoServerMapFeature = createAsyncThunk<
-  MapFeatureResponse,
-  MapFeatureRequest,
-  { rejectValue: ErrorResponse }
->(
-  "geoserver/fetchGeoServerMapFeature",
-  (request: MapFeatureRequest, thunkApi: any) => {
-    return ogcAxiosWithRetry
-      .get<MapFeatureResponse>(
-        `/ogc/collections/${request.uuid}/items/wms_map_feature`,
-        { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
-      )
-      .then((response) => response.data)
-      .catch(errorHandling(thunkApi));
-  }
-);
-
-const fetchGeoServerMapFields = createAsyncThunk<
-  Array<GeoserverFieldsResponse>,
-  MapFeatureRequest,
-  { rejectValue: ErrorResponse }
->(
-  "geoserver/fetchGeoServerMapFields",
-  (request: MapFeatureRequest, thunkApi: any) => {
-    return ogcAxiosWithRetry
-      .get<MapFeatureResponse>(
-        `/ogc/collections/${request.uuid}/items/wms_fields`,
-        { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
-      )
-      .then((response) => response.data)
-      .catch(errorHandling(thunkApi));
-  }
-);
-
-const fetchGeoServerFieldValues = createAsyncThunk<
-  Record<string, Array<object>>,
-  MapFeatureRequest,
-  { rejectValue: ErrorResponse }
->(
-  "geoserver/fetchGeoServerFieldValues",
-  (request: MapFeatureRequest, thunkApi: any) => {
-    return ogcAxiosWithRetry
-      .get<MapFeatureResponse>(
-        `/ogc/collections/${request.uuid}/items/wfs_field_value`,
-        { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
-      )
-      .then((response) => response.data)
-      .catch(errorHandling(thunkApi));
-  }
-);
-
-// TODO: refactor types and names that also used in fetchGeoServerMapFields
-const fetchGeoServerMapLayers = createAsyncThunk<
-  Array<MapLayerResponse>,
-  MapFeatureRequest,
-  { rejectValue: ErrorResponse }
->(
-  "geoserver/fetchGeoServerMapLayers",
-  (request: MapFeatureRequest, thunkApi: any) => {
-    return ogcAxiosWithRetry
-      .get<MapLayerResponse>(
-        `/ogc/collections/${request.uuid}/items/wms_layers`,
-        { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
-      )
-      .then((response) => response.data)
-      .catch(errorHandling(thunkApi));
-  }
-);
-
-const fetchGeoServerDownloadLayers = createAsyncThunk<
-  Array<DownloadLayersResponse>,
-  MapFeatureRequest,
-  { rejectValue: ErrorResponse }
->(
-  "geoserver/fetchGeoServerDownloadLayers",
-  (request: MapFeatureRequest, thunkApi: any) => {
-    return ogcAxiosWithRetry
-      .get<DownloadLayersResponse>(
-        `/ogc/collections/${request.uuid}/items/wfs_layers`,
-        { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
-      )
-      .then((response) => response.data)
-      .catch(errorHandling(thunkApi));
-  }
-);
-
-const fetchSystemHealthNoStore = createAsyncThunk<
-  Health,
-  void,
-  { rejectValue: ErrorResponse }
->("system/fetchSystemHealthNoStore", async (_, thunkApi) =>
-  ogcAxiosWithRetry
-    .get<Health>("/ogc/manage/health", { signal: thunkApi.signal })
-    .then((response) => response.data)
-    .catch(errorHandling(thunkApi))
-);
-/**
- * Appends a filter condition using AND operation.
- */
-const appendFilter = (
-  f: string | undefined,
-  a: string | undefined
-): string | undefined => (f === undefined ? a : f + " AND " + a);
-
-const createSuggesterParamFrom = (
-  paramState: ParameterState
-): SuggesterParameters => {
-  const suggesterParam: SuggesterParameters = {};
-  suggesterParam.input = paramState.searchText ? paramState.searchText : "";
-  if (paramState.parameterVocabs) {
-    const filterGenerator = cqlDefaultFilters.get(
-      "PARAMETER_VOCABS_IN"
-    ) as ParameterVocabsIn;
-    suggesterParam.filter = filterGenerator(paramState.parameterVocabs);
-  }
-  return suggesterParam;
-};
-// The longer the text user query, there higher the score it require, this makes sense
-// because user make specific query and result should be specific too.
-// const calculateScore = (
-//   base: number | undefined,
-//   text: string | undefined
-// ): number => {
-//   const pump = text ? (text.length / 2 > 50 ? 50 : text.length / 2) : 0;
-//   return base ? Number(base) + Number(pump) : Number(pump);
-// };
-
-// Given a ParameterState object, we convert it to the correct Restful parameters
-// always call this function and do not handcraft it elsewhere, some control isn't
-// part the ParameterState and therefore express as optional argument here
-const createSearchParamFrom = (
-  i: ParameterState,
-  control?: SearchControl
-): SearchParameters => {
-  const p: SearchParameters = {};
-  p.sortby = i.sortby;
-  p.text = i.searchText;
-
-  const c = mergeWithDefaults<SearchControl>(
-    {
-      score: DEFAULT_SEARCH_SCORE,
-    },
-    control
-  );
-
-  // The score control how relevant the records
-  // ! DO NO USE SCORE !, it will cause no result in some case because
-  // some text search only hit the filter which cause score become null
-  // if you set score you got nothing.
-  // p.filter = `score>=${calculateScore(c.score, p.text)}`;
-
-  // Control how many record return in 1 page.
-  if (c.pagesize) {
-    p.filter = appendFilter(p.filter, `page_size=${c.pagesize}`);
-  }
-
-  if (c.searchafter) {
-    p.filter = appendFilter(
-      p.filter,
-      `search_after='${c.searchafter.join("||")}'`
-    );
-  }
-
-  if (i.datasetGroup) {
-    const f = cqlDefaultFilters.get("DATASET_GROUP") as DatasetGroup;
-    p.filter = appendFilter(p.filter, f(i.datasetGroup));
-  }
-
-  if (i.hasCOData) {
-    // Filter records that have cloud optimized data OR have a downloadable link
-    const coDataFilter = (cqlDefaultFilters.get("IS_NOT_NULL") as IsNotNull)(
-      "assets_summary"
-    );
-    const downloadLinkFilter = "links_airole_contains='download'";
-    p.filter = appendFilter(
-      p.filter,
-      `(${coDataFilter} OR ${downloadLinkFilter})`
-    );
-  }
-
-  if (i.excludeDocument) {
-    const f = cqlDefaultFilters.get(
-      "EXCLUDE_DATASET_SCOPE"
-    ) as ExcludeDatasetScope;
-    p.filter = appendFilter(p.filter, f("document"));
-  }
-
-  if (i.updateFreq) {
-    const f = cqlDefaultFilters.get("UPDATE_FREQUENCY") as UpdateFrequency;
-    p.filter = appendFilter(p.filter, f(i.updateFreq));
-  }
-
-  if (i.datasetStatus) {
-    const f = cqlDefaultFilters.get("STATUS") as Status;
-    p.filter = appendFilter(p.filter, f(i.datasetStatus));
-  }
-
-  if (
-    i.dateTimeFilterRange &&
-    (i.dateTimeFilterRange.start || i.dateTimeFilterRange.end)
-  ) {
-    if (i.dateTimeFilterRange.start && i.dateTimeFilterRange.end) {
-      const f = cqlDefaultFilters.get("BETWEEN_TIME_RANGE") as TemporalDuring;
-      p.filter = appendFilter(
-        p.filter,
-        f(i.dateTimeFilterRange.start, i.dateTimeFilterRange.end)
-      );
-    } else if (
-      i.dateTimeFilterRange.start === undefined &&
-      i.dateTimeFilterRange.end
-    ) {
-      const f = cqlDefaultFilters.get("BEFORE_TIME") as TemporalAfterOrBefore;
-      p.filter = appendFilter(p.filter, f(i.dateTimeFilterRange.end));
-    } else if (
-      i.dateTimeFilterRange.end === undefined &&
-      i.dateTimeFilterRange.start
-    ) {
-      const f = cqlDefaultFilters.get("AFTER_TIME") as TemporalAfterOrBefore;
-      p.filter = appendFilter(p.filter, f(i.dateTimeFilterRange.start));
-    }
-  }
-
-  if (i.bbox) {
-    const f = cqlDefaultFilters.get(
-      i.includeNoGeometry ? "BBOX_POLYGON_OR_EMPTY_EXTENTS" : "BBOX_POLYGON"
-    ) as PolygonOperation;
-    p.filter = appendFilter(p.filter, f(i.bbox));
-  }
-
-  let spatialFilter: string | undefined;
-
-  if (i.staticAreas && i.staticAreas.length > 0) {
-    const f = cqlDefaultFilters.get("STATIC_AREAS") as StaticAreasFilter;
-    spatialFilter = f(i.staticAreas);
-  }
-
-  if (i.polygon) {
-    const f = cqlDefaultFilters.get("INTERSECT_POLYGON") as PolygonOperation;
-    const polygonFilter = f(i.polygon);
-    spatialFilter = spatialFilter
-      ? `(${spatialFilter} OR ${polygonFilter})`
-      : polygonFilter;
-  }
-
-  if (spatialFilter) {
-    p.filter = appendFilter(p.filter, spatialFilter);
-  }
-
-  if (i.parameterVocabs && i.parameterVocabs.length > 0) {
-    const f = cqlDefaultFilters.get("PARAMETER_VOCABS_IN") as ParameterVocabsIn;
-    const parameterVocabFilter = f(i.parameterVocabs);
-    if (parameterVocabFilter) {
-      p.filter = appendFilter(p.filter, parameterVocabFilter);
-    }
-  }
-
-  if (i.platform && i.platform.length > 0) {
-    const f = cqlDefaultFilters.get(
-      "UPDATE_PLATFORM_FILTER_VARIABLES"
-    ) as PlatformFilter;
-    p.filter = appendFilter(p.filter, f(i.platform));
-  }
-
-  return p;
-};
+// Selector for this reducer's slice of the state.
+const getSearchQueryResult = (state: RootState) =>
+  state.search.collectionsQueryResult;
 
 export {
-  createSuggesterParamFrom,
-  createSearchParamFrom,
-  fetchSuggesterOptions,
   fetchResultWithStore,
-  fetchResultNoStore,
   fetchResultAppendStore,
-  fetchResultByUuidNoStore,
-  fetchFeaturesByUuid,
-  fetchDatasetMetadataByUuid,
-  fetchParameterVocabsWithStore,
-  fetchGeoServerMapFeature,
-  fetchGeoServerMapFields,
-  fetchGeoServerMapLayers,
-  fetchGeoServerDownloadLayers,
-  fetchGeoServerFieldValues,
-  fetchSystemHealthNoStore,
-  processDatasetDownload,
-  processWFSDownload,
-  processWFSEstimateSize,
-  processCoEstimateSize,
   jsonToOGCCollections,
-  ogcAxiosWithRetry,
+  getSearchQueryResult,
 };
 
 export default searcher.reducer;

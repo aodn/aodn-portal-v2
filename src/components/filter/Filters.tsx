@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 import { Box, SxProps } from "@mui/material";
-import { Vocab } from "@/app/store/componentParamReducer";
+import { Vocab } from "@/app/store/searchParamsReducer";
 import { useAppSelector } from "@/app/store/hooks";
 import TabsPanelContainer, { Tab } from "../common/tab/TabsPanelContainer";
 import ThemeFilter from "./tab-filters/ThemeFilter";
@@ -84,7 +84,7 @@ const FiltersFC: FC<FiltersProps> = ({ sx }) => {
     hasCOData,
     excludeDocument,
     datasetStatus,
-  } = useAppSelector((state) => state.paramReducer);
+  } = useAppSelector((state) => state.searchParams);
 
   const [filters, setFilters] = useState<Filters>({});
   // Do not use useMemo here due to change in filters items not filters

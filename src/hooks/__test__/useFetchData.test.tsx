@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import useFetchData from "../useFetchData";
 import { useAppDispatch } from "@/app/store/hooks";
-import { updateSearchText } from "@/app/store/componentParamReducer";
+import { updateSearchText } from "@/app/store/searchParamsReducer";
 import { renderHook } from "@testing-library/react";
 import { Provider } from "react-redux";
 import store from "@/app/store/store";

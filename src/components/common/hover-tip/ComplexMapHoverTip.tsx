@@ -1,5 +1,5 @@
 import { FC, useCallback, useRef } from "react";
-import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 import { Box, Stack, SxProps, Tooltip, Typography } from "@mui/material";
 import {
   fontColor,

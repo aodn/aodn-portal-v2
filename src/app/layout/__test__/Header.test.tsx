@@ -17,7 +17,7 @@ import store from "@/app/store/store";
 import {
   clearComponentParam,
   updateHasData,
-} from "@/app/store/componentParamReducer";
+} from "@/app/store/searchParamsReducer";
 import Header from "../Header";
 import { SEARCHBAR_EXPANSION_WIDTH_LAPTOP } from "@/components/search/constants";
 

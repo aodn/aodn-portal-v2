@@ -1,7 +1,7 @@
 import { useCallback } from "react";
-import { ParameterState } from "@/app/store/componentParamReducer";
+import { ParameterState } from "@/app/store/searchParamsReducer";
 import store, {
-  getComponentState,
+  getSearchParams,
   getSearchQueryResult,
 } from "@/app/store/store";
 import {
@@ -18,9 +18,7 @@ const useFetchData = () => {
   const fetchRecord = useCallback(
     (restart: boolean, pageSize?: number) => {
       // This is very specific to how elastic works and then how to construct the query
-      const componentParam: ParameterState = getComponentState(
-        store.getState()
-      );
+      const componentParam: ParameterState = getSearchParams(store.getState());
       if (restart) {
         const paramPaged = createSearchParamFrom(
           { ...componentParam, includeNoGeometry: true },

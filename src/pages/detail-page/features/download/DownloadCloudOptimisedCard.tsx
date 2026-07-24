@@ -16,15 +16,12 @@ import {
   FormatCondition,
   KeyCondition,
 } from "../../context/DownloadDefinitions";
-import {
-  DatasetType,
-  OGCCollection,
-} from "@/app/store/OGCCollectionDefinitions";
+import { DatasetType, OGCCollection } from "@/app/api/ogcCollectionTypes";
 import DownloadButton from "../../../../components/common/buttons/DownloadButton";
 import DownloadSubsetting from "./DownloadSubsetting";
 import DownloadSelect from "./DownloadSelect";
 import useEstimateSize from "../../../../hooks/useEstimateSize";
-import { processCoEstimateSize } from "@/app/store/searchReducer";
+import * as downloadApi from "@/app/api/download";
 
 const downloadFormats = [
   { label: "NetCDFs", value: "netcdf" },
@@ -54,7 +51,7 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
 }) => {
   const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
   const { isEstimating, estimateSize, cancelEstimate, estimatedSizeBytes } =
-    useEstimateSize(processCoEstimateSize, getCoEstimatedBytes);
+    useEstimateSize(downloadApi.postCoEstimate, getCoEstimatedBytes);
 
   const dateRangeBounds = useMemo(() => {
     let min = dayjs(dateDefault.min);

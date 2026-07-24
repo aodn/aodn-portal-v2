@@ -6,7 +6,7 @@ import { useAppDispatch } from "@/app/store/hooks";
 import {
   clearComponentParam,
   updateParameterVocabs,
-} from "@/app/store/componentParamReducer";
+} from "@/app/store/searchParamsReducer";
 import useRedirectSearch from "../../../hooks/useRedirectSearch";
 import { pageReferer } from "../../../components/common/constants";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";

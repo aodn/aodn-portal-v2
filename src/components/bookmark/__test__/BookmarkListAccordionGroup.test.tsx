@@ -7,7 +7,7 @@ import {
   setTemporaryItem,
   setItems,
 } from "@/app/store/bookmarkListReducer";
-import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 import BookmarkListAccordionGroup from "../BookmarkListAccordionGroup";
 import { userEvent } from "@testing-library/user-event";
 import { server } from "../../../__mocks__/server";

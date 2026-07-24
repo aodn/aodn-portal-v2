@@ -8,7 +8,7 @@ import {
   IContact,
   MediaType,
   RelationType,
-} from "@/app/store/OGCCollectionDefinitions";
+} from "@/app/api/ogcCollectionTypes";
 import SuggestedCitationList from "../../../components/list/SuggestedCitationList";
 import CitedResponsiblePartyList from "../../../components/list/CitedResponsiblePartyList";
 import ConstraintList from "../../../components/list/ConstraintList";

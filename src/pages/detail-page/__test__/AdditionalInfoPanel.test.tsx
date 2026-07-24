@@ -12,7 +12,7 @@ import {
   DetailPageContext,
   DetailPageContextDefault,
 } from "../context/detail-page-context";
-import { OGCCollection, ITheme } from "@/app/store/OGCCollectionDefinitions";
+import { OGCCollection, ITheme } from "@/app/api/ogcCollectionTypes";
 
 describe("Additional Info", async () => {
   const theme = AppTheme;

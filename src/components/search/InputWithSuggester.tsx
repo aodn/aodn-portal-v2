@@ -22,12 +22,9 @@ import SearchIcon from "@mui/icons-material/Search";
 import {
   ParameterState,
   updateSearchText,
-} from "@/app/store/componentParamReducer";
-import store, { getComponentState, RootState } from "@/app/store/store";
-import {
-  createSuggesterParamFrom,
-  fetchSuggesterOptions,
-} from "@/app/store/searchReducer";
+} from "@/app/store/searchParamsReducer";
+import store, { getSearchParams, RootState } from "@/app/store/store";
+import { createSuggesterParamFrom } from "@/app/store/searchReducer";
 import { borderRadius, color, gap, padding } from "../../styles/constants";
 import { debounce } from "lodash";
 import { sortByRelevance } from "../../utils/Helpers";
@@ -38,6 +35,7 @@ import { useLocation } from "react-router-dom";
 import { pageDefault } from "../common/constants";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import { portalTheme } from "../../styles";
+import * as searchApi from "@/app/api/search";
 import LabelChip from "../common/label/LabelChip";
 import {
   isQuotedPhrase,
@@ -107,7 +105,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
 
   // Redux is the "Single Source of Truth" for the final value
   const searchInput = useSelector(
-    (state: RootState) => state.paramReducer.searchText
+    (state: RootState) => state.searchParams.searchText
   );
   // local state tracks what the user is currently typing
   const [inputValue, setInputValue] = useState<string | undefined>(searchInput);
@@ -117,11 +115,10 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
       // setPendingSearch to true to prevent doing search before refreshing options is finished
       setPendingSearch?.(true);
       try {
-        const currentState: ParameterState = getComponentState(
-          store.getState()
-        );
-        dispatch(fetchSuggesterOptions(createSuggesterParamFrom(currentState)))
-          .unwrap()
+        const currentState: ParameterState = getSearchParams(store.getState());
+        searchApi
+          .getAutocomplete(createSuggesterParamFrom(currentState))
+
           .then((data) => {
             const parameter = new Set<string>(data.suggested_parameter_vocabs);
             const phrases = new Set<string>(data.suggested_phrases);
@@ -179,7 +176,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
         setPendingSearch?.(false);
       }
     },
-    [dispatch, setPendingSearch]
+    [setPendingSearch]
   );
 
   const debounceRefreshOptions = useMemo(

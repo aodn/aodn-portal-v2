@@ -5,7 +5,7 @@ import { IControl, Map as Mapbox } from "mapbox-gl";
 import MapContext from "../../MapContext";
 import NavigationControl from "../NavigationControl";
 import { fitToDefaultExtent } from "../../../../../utils/MapUtils";
-import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 
 // Enough of a mapbox Map for the real NavigationControl to mount in jsdom
 const createMockMap = () =>

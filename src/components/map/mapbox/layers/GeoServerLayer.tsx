@@ -30,20 +30,13 @@ import {
   MapFeatureResponse,
   MapLayerResponse,
   MapTileRequest,
-} from "@/app/store/GeoserverDefinitions";
-import { useAppDispatch } from "@/app/store/hooks";
-import {
-  fetchGeoServerFieldValues,
-  fetchGeoServerMapFeature,
-  fetchGeoServerMapFields,
-  fetchGeoServerMapLayers,
-} from "@/app/store/searchReducer";
+} from "@/app/api/geoserverTypes";
 import { CardContent, Typography } from "@mui/material";
 import { createRoot, Root } from "react-dom/client";
 import dayjs, { Dayjs } from "dayjs";
 import { dateDefault, playwrightTestIds } from "../../../common/constants";
 import MapLayerSelect from "../component/MapLayerSelect";
-import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 import { ErrorResponse } from "../../../../utils/ErrorBoundary";
 import { SelectItem } from "../../../common/dropdown/CommonSelect";
 import {
@@ -55,7 +48,7 @@ import AdminScreenContext from "../../../admin/AdminScreenContext";
 import { HttpStatusCode } from "axios";
 import { dateToValue } from "../../../../utils/DateUtils";
 import { layernameRoughlyMatch } from "../../../../utils/GeoJsonUtils";
-import { AppDispatch } from "@/app/store/store";
+import * as geoserverApi from "@/app/api/geoserver";
 
 enum LAYER_VISIBILITY {
   VISIBLE = "visible",
@@ -179,7 +172,6 @@ const checkSupportTimeSliderOrDrawRect = (
 };
 
 const checkSupportDiscreteTimeSlider = (
-  dispatch: AppDispatch,
   id: string,
   layerName: string,
   setDiscreteTimeSliderValues?: Dispatch<
@@ -192,8 +184,9 @@ const checkSupportDiscreteTimeSlider = (
       layerName: layerName,
       properties: ["time"],
     };
-    dispatch(fetchGeoServerFieldValues(request))
-      .unwrap()
+    geoserverApi
+      .getWfsFieldValues(request)
+
       .then((val) => {
         if (val["time"] !== undefined && val["time"].length > 0) {
           const result: Map<string, Array<number>> = new Map();
@@ -227,10 +220,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
 }: GeoServerLayerProps) => {
   const { map, setLoading: setMapLoading } = useContext(MapContext);
   const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
-  const dispatch = useAppDispatch();
-  const layerSearchRef = useRef<{
-    abort: (reason?: string) => void;
-  } | null>(null);
+  const layerSearchRef = useRef<AbortController | null>(null);
   const popupRef = useRef<Popup | null>();
   const popupRootRef = useRef<Root | null>();
   const [wmsLayers, setWmsLayers] = useState<SelectItem[]>([]);
@@ -332,7 +322,6 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
           );
           shouldCheckDiscreteTimeSlider &&
             checkSupportDiscreteTimeSlider(
-              dispatch,
               config.uuid,
               value,
               setDiscreteTimeSliderValues
@@ -346,7 +335,6 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       setWmsFields,
       setTimeSliderSupport,
       setDrawRectSupportSupport,
-      dispatch,
       config.uuid,
       setDiscreteTimeSliderValues,
     ]
@@ -508,8 +496,9 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
         bbox: boundingBoxInEpsg3857(map),
       };
 
-      dispatch(fetchGeoServerMapFeature(request))
-        .unwrap()
+      geoserverApi
+        .getWmsMapFeature(request)
+
         .then((response) => {
           cleanPopup();
           if (
@@ -579,7 +568,6 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   }, [
     config.urlParams.LAYERS,
     config.uuid,
-    dispatch,
     map,
     setDrawRectSupportSupport,
     setMapLoading,
@@ -610,14 +598,14 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
 
         // Cancel in progress search if exist
         layerSearchRef.current?.abort();
-        const search = dispatch(fetchGeoServerMapLayers(wmsLayersRequest));
-        layerSearchRef.current = search;
+        const controller = new AbortController();
+        layerSearchRef.current = controller;
 
-        search
-          .unwrap()
+        geoserverApi
+          .getWmsLayers(wmsLayersRequest, controller.signal)
           .then((layers: MapLayerResponse[]) => {
             // Set fetched layers to wmsLayers because we successfully get the layers from geoserver capabilities
-            if (layers && layers.length > 0 && !(search as any).aborted) {
+            if (layers && layers.length > 0 && !controller.signal.aborted) {
               const wmsLayerOptions = formWmsLayerOptions(layers);
               if (wmsLayerOptions && wmsLayerOptions.length > 0) {
                 setWmsLayers(wmsLayerOptions);
@@ -627,8 +615,9 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             return layers;
           })
           .then((layersFromGeoserver: MapLayerResponse[]) => {
-            dispatch(fetchGeoServerMapFields(wmsFieldsRequest))
-              .unwrap()
+            geoserverApi
+              .getWmsFields(wmsFieldsRequest)
+
               .then((mapFields: GeoserverFieldsResponse[]) => {
                 // Successfully fetched fields, loading is completed
                 setWmsFields(mapFields);
@@ -693,7 +682,6 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     });
   }, [
     collection,
-    dispatch,
     enableGeoServerWhiteList,
     handleWmsLayerChange,
     onWMSAvailabilityChange,

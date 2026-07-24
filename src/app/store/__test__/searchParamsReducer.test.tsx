@@ -3,7 +3,7 @@ import {
   formatToUrlParam,
   unFlattenToParameterState,
   ParameterState,
-} from "../componentParamReducer";
+} from "../searchParamsReducer";
 import { bboxPolygon } from "@turf/turf";
 import { MapDefaultConfig } from "@/components/map/mapbox/constants";
 import { decodeParam } from "@/utils/UrlUtils";

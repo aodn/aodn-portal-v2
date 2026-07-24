@@ -1,7 +1,7 @@
 import dayjs, { Dayjs } from "dayjs";
 import { createFilteredFeatures, filterFeaturesByKey } from "../HexbinLayer";
 import { Feature, Point } from "geojson";
-import { CloudOptimizedFeature } from "@/app/store/CloudOptimizedDefinitions";
+import { CloudOptimizedFeature } from "@/app/api/cloudOptimizedTypes";
 import { dateDefault } from "../../../../common/constants";
 
 const mockFeature = (

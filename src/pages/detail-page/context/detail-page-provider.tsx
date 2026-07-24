@@ -7,14 +7,9 @@ import {
   useMemo,
   useState,
 } from "react";
-import {
-  DatasetMetadata,
-  fetchDatasetMetadataByUuid,
-  fetchFeaturesByUuid,
-  fetchResultByUuidNoStore,
-} from "@/app/store/searchReducer";
+import { DatasetMetadata } from "@/app/api/dataset";
 import { DetailPageContext } from "./detail-page-context";
-import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 import { useAppDispatch } from "@/app/store/hooks";
 import { FeatureCollection, Point } from "geojson";
 import {
@@ -30,7 +25,9 @@ import {
   LayerName,
   LayerSwitcherLayer,
 } from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
-import { CloudOptimizedFeature } from "@/app/store/CloudOptimizedDefinitions";
+import { CloudOptimizedFeature } from "@/app/api/cloudOptimizedTypes";
+import * as datasetApi from "@/app/api/dataset";
+import * as searchApi from "@/app/api/search";
 
 interface DetailPageProviderProps {
   children: ReactNode;
@@ -93,8 +90,9 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
 
   useEffect(() => {
     if (!uuid) return;
-    dispatch(fetchResultByUuidNoStore(uuid))
-      .unwrap()
+    searchApi
+      .getCollectionById(uuid)
+
       .then((collection) => {
         if (!collection) {
           setIsCollectionNotFound(true);
@@ -119,8 +117,9 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
 
   useEffect(() => {
     if (!uuid) return;
-    dispatch(fetchFeaturesByUuid(uuid))
-      .unwrap()
+    datasetApi
+      .getFeatureSummary(uuid)
+
       .then((features) => {
         setFeatures(features);
       });
@@ -128,8 +127,9 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
 
   useEffect(() => {
     if (!uuid) return;
-    dispatch(fetchDatasetMetadataByUuid(uuid))
-      .unwrap()
+    datasetApi
+      .getDatasetMetadata(uuid)
+
       .then((metadata) => {
         setDatasetMetadata(metadata);
       })

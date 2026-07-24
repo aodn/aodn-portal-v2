@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import default_thumbnail from "@/assets/images/default-thumbnail.png";
-import { OGCCollection } from "../OGCCollectionDefinitions";
-import { DateTimeFilterRange, ParameterState } from "../componentParamReducer";
+import { OGCCollection } from "@/app/api/ogcCollectionTypes";
+import { DateTimeFilterRange, ParameterState } from "../searchParamsReducer";
 import { createSearchParamFrom, SearchParameters } from "../searchReducer";
 import dayjs from "dayjs";
 

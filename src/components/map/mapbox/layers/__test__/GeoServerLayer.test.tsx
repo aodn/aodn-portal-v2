@@ -3,14 +3,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import searchReducer from "@/app/store/searchReducer";
+import { ogcApi } from "@/app/store/ogcApi";
 import GeoServerLayer from "../GeoServerLayer";
 import MapContext from "../../MapContext";
-import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 import AdminScreenContext from "../../../../admin/AdminScreenContext";
 import {
   GeoserverFieldsResponse,
   MapLayerResponse,
-} from "@/app/store/GeoserverDefinitions";
+} from "@/app/api/geoserverTypes";
 import { MapEventEnum } from "../../constants";
 import utc from "dayjs/plugin/utc";
 import { extend } from "dayjs";
@@ -79,9 +80,11 @@ describe("GeoServerLayer", () => {
     };
 
     store = configureStore({
-      reducer: { search: searchReducer },
+      reducer: { search: searchReducer, [ogcApi.reducerPath]: ogcApi.reducer },
       middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware({ serializableCheck: false }),
+        getDefaultMiddleware({ serializableCheck: false }).concat(
+          ogcApi.middleware
+        ),
     });
   });
 

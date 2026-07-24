@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import LinkCard from "../LinkCard";
-import { ILink } from "@/app/store/OGCCollectionDefinitions";
+import { ILink } from "@/app/api/ogcCollectionTypes";
 import * as ClipboardContext from "@/app/providers/ClipboardContext";
 import * as LinkUtils from "../../../../../utils/LinkUtils";
 

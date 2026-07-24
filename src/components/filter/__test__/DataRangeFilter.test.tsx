@@ -3,12 +3,13 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
+import { ogcApi } from "@/app/store/ogcApi";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import DateRangeFilter from "../DateRangeFilter";
 import { dateDefault } from "../../common/constants";
-import { updateDateTimeFilterRange } from "@/app/store/componentParamReducer";
+import { updateDateTimeFilterRange } from "@/app/store/searchParamsReducer";
 import { dateToValue } from "../../../utils/DateUtils";
 import axios from "axios";
 import { responseIdTemporal, responseIdProvider } from "./canned";
@@ -18,7 +19,7 @@ const initialMaxDate: Dayjs = dayjs(dateDefault.max);
 
 // Mock Redux store
 const mockInitialState = {
-  paramReducer: {
+  searchParams: {
     dateTimeFilterRange: {
       start: dateToValue(dayjs(dateDefault.min)),
       end: dateToValue(dayjs(dateDefault.max)),
@@ -29,8 +30,11 @@ const mockInitialState = {
 const createMockStore = (initialState = mockInitialState) =>
   configureStore({
     reducer: {
-      paramReducer: (state = initialState.paramReducer) => state,
+      searchParams: (state = initialState.searchParams) => state,
+      [ogcApi.reducerPath]: ogcApi.reducer,
     },
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().concat(ogcApi.middleware),
   });
 
 // Mock useBreakpoint hook
@@ -143,7 +147,7 @@ describe("DateRangeFilter", () => {
         expect(store.dispatch).toHaveBeenCalledWith(
           updateDateTimeFilterRange({
             start: dateToValue(newDate),
-            end: mockInitialState.paramReducer.dateTimeFilterRange.end,
+            end: mockInitialState.searchParams.dateTimeFilterRange.end,
           })
         )
       );
@@ -168,7 +172,7 @@ describe("DateRangeFilter", () => {
       }).then(() =>
         expect(store.dispatch).toHaveBeenCalledWith(
           updateDateTimeFilterRange({
-            start: mockInitialState.paramReducer.dateTimeFilterRange.start,
+            start: mockInitialState.searchParams.dateTimeFilterRange.start,
             end: dateToValue(
               newDate
                 .set("hour", 23)
@@ -214,7 +218,7 @@ describe("DateRangeFilter", () => {
     // Create a store with a different date range (e.g., Last 5 years)
     const fiveYearsAgo = dayjs().subtract(5, "year");
     const newState = {
-      paramReducer: {
+      searchParams: {
         dateTimeFilterRange: {
           start: dateToValue(fiveYearsAgo),
           end: dateToValue(dayjs()),

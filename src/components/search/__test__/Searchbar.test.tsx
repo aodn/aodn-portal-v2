@@ -17,7 +17,7 @@ import {
   updatePlatform,
   updateUpdateFreq,
   updateFilterStaticAreas,
-} from "@/app/store/componentParamReducer";
+} from "@/app/store/searchParamsReducer";
 import {
   fetchMarineParkOptions,
   BoundaryName,
@@ -267,7 +267,7 @@ describe("Searchbar", () => {
 
     return waitFor(() => {
       const state = store.getState();
-      const paramReducer = state.paramReducer;
+      const paramReducer = state.searchParams;
 
       // Verify boolean conversion works in complex URL
       expect(paramReducer.hasCOData).toBe(false);

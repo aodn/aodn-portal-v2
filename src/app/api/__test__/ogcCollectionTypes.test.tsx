@@ -3,7 +3,7 @@ import {
   getSubgroup,
   OGCCollection,
   RelationType,
-} from "../OGCCollectionDefinitions"; // Adjust the import path as needed
+} from "@/app/api/ogcCollectionTypes"; // Adjust the import path as needed
 
 // Mock the imported icons and default thumbnail
 vi.mock("@/assets/images/default-thumbnail.png", () => ({

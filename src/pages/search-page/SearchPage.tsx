@@ -12,13 +12,11 @@ import { LngLatBounds, MapEvent } from "mapbox-gl";
 import { Box } from "@mui/material";
 import { bboxPolygon, booleanEqual } from "@turf/turf";
 import store, {
-  getComponentState,
+  getSearchParams,
   getSearchQueryResult,
 } from "@/app/store/store";
 import {
   createSearchParamFrom,
-  fetchResultByUuidNoStore,
-  fetchResultNoStore,
   jsonToOGCCollections,
   SearchParameters,
 } from "@/app/store/searchReducer";
@@ -31,7 +29,7 @@ import {
   updateSort,
   updateSortBy,
   updateZoom,
-} from "@/app/store/componentParamReducer";
+} from "@/app/store/searchParamsReducer";
 import {
   off,
   on,
@@ -42,7 +40,7 @@ import ResultSection from "./layout/ResultSection";
 import MapSection from "./layout/MapSection";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/ResultListLayoutButton";
 import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
-import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { pageDefault, pageReferer } from "../../components/common/constants";
 import { color } from "../../styles/constants";
@@ -69,6 +67,7 @@ import _ from "lodash";
 import useFetchData from "../../hooks/useFetchData";
 import { ProgressType } from "../../components/map/mapbox/MapContext";
 import AdminScreenContext from "../../components/admin/AdminScreenContext";
+import * as searchApi from "@/app/api/search";
 
 const SearchPage = () => {
   const location = useLocation();
@@ -78,8 +77,8 @@ const SearchPage = () => {
   const { isUnderLaptop, isMobile } = useBreakpoint();
   const redirectSearch = useRedirectSearch();
   const { fetchRecord } = useFetchData();
-  const layout = useAppSelector((state) => state.paramReducer.layout);
-  const currentSort = useAppSelector((state) => state.paramReducer.sort);
+  const layout = useAppSelector((state) => state.searchParams.layout);
+  const currentSort = useAppSelector((state) => state.searchParams.sort);
   // Layers contain record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
   // CurrentLayout is used to remember last layout after change to full map view , which is SearchResultLayoutEnum exclude the value FULL_MAP
@@ -155,20 +154,14 @@ const SearchPage = () => {
 
   const doMapSearch = useCallback(
     async (needNavigate: boolean = false) => {
-      const componentParam: ParameterState = getComponentState(
-        store.getState()
-      );
+      const componentParam: ParameterState = getSearchParams(store.getState());
       // Use a different parameter so that it returns id and bbox only and do not store the values,
       // we cannot add page because we want to show all record on map
       // and by default we will include record without spatial extents so that BBOX
       // will not exclude record without spatial extents however for map search
       // it is ok to exclude it because it isn't show on map anyway
       // Abort any ongoing search if exists
-      if (mapSearchAbortRef.current) {
-        mapSearchAbortRef.current.abort();
-      }
-      const controller = new AbortController();
-      mapSearchAbortRef.current = controller;
+      mapSearchAbortRef.current?.abort();
 
       const paramNonPaged: SearchParameters = createSearchParamFrom(
         componentParam,
@@ -176,55 +169,54 @@ const SearchPage = () => {
           pagesize: getMaxMapCentroids?.(),
         }
       );
-      // Make sure no other code abort the search
-      if (mapSearchAbortRef.current) {
-        setProgress(ProgressType.LINEAR);
-        await dispatch(
-          // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
-          // and ordered by uuid to avoid affecting cluster calculation
-          fetchResultNoStore({
+      setProgress(ProgressType.LINEAR);
+      // add param "sortby: id" for searchApi.getCollections to ensure data source for map is always sorted
+      // and ordered by uuid to avoid affecting cluster calculation
+      const controller = new AbortController();
+      mapSearchAbortRef.current = controller;
+      await searchApi
+        .getCollections(
+          {
             ...paramNonPaged,
             properties: "id,centroid",
             sortby: "id",
-            signal: controller.signal,
-          } as SearchParameters & { signal: AbortSignal })
+          },
+          controller.signal
         )
-          .unwrap()
-          .then((collections: string) => {
-            // This check is need due to user can move the map around when the search
-            // is still in progress, the store have the latest map bbox so we can check
-            // if the constant we store matches the bbox, if not then we know map
-            // moved and results isn't valid
-            const current = getComponentState(store.getState())?.bbox;
-            if (
-              componentParam.bbox !== undefined &&
-              current !== undefined &&
-              booleanEqual(componentParam.bbox, current)
-            ) {
-              setLayers(jsonToOGCCollections(collections).collections);
-            }
-          })
-          .catch(() => {
-            // empty result / error → clear previous layers
-            setLayers([]);
-          })
-          .finally(() => {
-            // Must update status after search done, this change the location.state and will
-            // cause all search cancel. However, we also need to make sure that the controller is not canceled
-            // and replace by a new one due to new search
-            if (needNavigate && controller === mapSearchAbortRef.current) {
-              debounceHistoryUpdateRef?.current?.cancel();
-              debounceHistoryUpdateRef?.current?.(
-                pageDefault.search + "?" + formatToUrlParam(componentParam)
-              );
-            }
+        .then((collections: string) => {
+          // This check is need due to user can move the map around when the search
+          // is still in progress, the store have the latest map bbox so we can check
+          // if the constant we store matches the bbox, if not then we know map
+          // moved and results isn't valid
+          const current = getSearchParams(store.getState())?.bbox;
+          if (
+            componentParam.bbox !== undefined &&
+            current !== undefined &&
+            booleanEqual(componentParam.bbox, current)
+          ) {
+            setLayers(jsonToOGCCollections(collections).collections);
+          }
+        })
+        .catch(() => {
+          // empty result / error → clear previous layers
+          setLayers([]);
+        })
+        .finally(() => {
+          // Must update status after search done, this change the location.state and will
+          // cause all search cancel. However, we also need to make sure that the request is not canceled
+          // and replaced by a new one due to new search
+          if (needNavigate && controller === mapSearchAbortRef.current) {
+            debounceHistoryUpdateRef?.current?.cancel();
+            debounceHistoryUpdateRef?.current?.(
+              pageDefault.search + "?" + formatToUrlParam(componentParam)
+            );
+          }
 
-            setProgress(undefined);
-            mapSearchAbortRef.current = null;
-          });
-      }
+          setProgress(undefined);
+          mapSearchAbortRef.current = null;
+        });
     },
-    [dispatch, getMaxMapCentroids]
+    [getMaxMapCentroids]
   );
 
   const doListSearch = useCallback(
@@ -264,7 +256,7 @@ const SearchPage = () => {
           event?.type === MapEventEnum.ZOOM_END ||
           event?.type === MapEventEnum.MOVE_END
         ) {
-          const componentParam: ParameterState = getComponentState(
+          const componentParam: ParameterState = getSearchParams(
             store.getState()
           );
 
@@ -412,8 +404,9 @@ const SearchPage = () => {
           // If the item exists in items array or is already a temporary item, just expand the item
           dispatch(setExpandedItem(temporaryItemExisting));
         } else {
-          dispatch(fetchResultByUuidNoStore(uuids[0]))
-            .unwrap()
+          searchApi
+            .getCollectionById(uuids[0])
+
             .then((res: OGCCollection) => {
               dispatch(setTemporaryItem(res));
               dispatch(setExpandedItem(res));

@@ -1,15 +1,12 @@
 import React, { useEffect, useState, useCallback, FC } from "react";
 import { Box, SxProps } from "@mui/material";
-import {
-  updateParameterVocabs,
-  Vocab,
-} from "@/app/store/componentParamReducer";
+import { updateParameterVocabs, Vocab } from "@/app/store/searchParamsReducer";
 import { useAppDispatch } from "@/app/store/hooks";
-import { fetchParameterVocabsWithStore } from "@/app/store/searchReducer";
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
 import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
 import { TabFilterType } from "../Filters";
 import { portalTheme } from "../../../styles";
+import * as searchApi from "@/app/api/search";
 
 interface ThemeFilterProps extends TabFilterType {
   sx?: SxProps;
@@ -35,8 +32,9 @@ const ThemeFilter: FC<ThemeFilterProps> = ({ filters, setFilters, sx }) => {
   );
 
   useEffect(() => {
-    dispatch(fetchParameterVocabsWithStore(null))
-      .unwrap()
+    searchApi
+      .getParameterVocabs()
+
       .then((vocabs: Array<Vocab>) => {
         // Extract second level vocabs and remove duplicates
         const secondLevelVocabs = Array.from(

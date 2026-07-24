@@ -7,10 +7,7 @@ import {
   LayerName,
   LayerSwitcherLayer,
 } from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
-import {
-  OGCCollection,
-  DatasetType,
-} from "@/app/store/OGCCollectionDefinitions";
+import { OGCCollection, DatasetType } from "@/app/api/ogcCollectionTypes";
 
 // Helper to create a FeatureCollection for testing
 const createFeatureCollection = (
