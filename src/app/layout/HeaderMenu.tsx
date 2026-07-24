@@ -138,7 +138,9 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
           {
             name: "Contributing Data",
             handler: () =>
-              openInNewTab("https://help.aodn.org.au/contributing-data/"),
+              openInNewTab(
+                `${pageDefault.url.IMOS}/data/about-the-australian-ocean-data-network/contributing-data-to-the-aodn`
+              ),
           },
         ],
       },
