@@ -34,7 +34,7 @@ import {
   STATIC_LAYER_LABEL_PAINT,
 } from "../map/mapbox/layers/StaticLayer";
 import { TestHelper } from "../common/test/helper";
-import { cqlDefaultFilters, StaticAreasFilter } from "../common/cqlFilters";
+import { cqlFilters } from "../common/cqlFilters";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import ReactMap from "../map/mapbox/Map";
 import MapContext from "../map/mapbox/MapContext";
@@ -736,16 +736,13 @@ const LocationFilter: FC<LocationFilterProps> = () => {
       <TestHelper
         id="selected-location"
         getSelectedLocationIntersects={() => {
-          const funcStaticAreas = cqlDefaultFilters.get(
-            "STATIC_AREAS"
-          ) as StaticAreasFilter;
           const staticAreas = getStaticAreasFromSets(
             selectedMarineParkValues,
             selectedMarineEcoregionValues,
             selectedAllenCoralAtlasValues
           );
           return mergedPolygonForTests
-            ? funcStaticAreas(staticAreas)
+            ? cqlFilters.staticAreas(staticAreas)
             : undefined;
         }}
       />

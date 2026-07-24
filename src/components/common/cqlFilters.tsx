@@ -39,18 +39,6 @@ export type StaticAreasFilter = SingleArgumentFunction<
   string
 >;
 export type IsNotNull = SingleArgumentFunction<string, string>;
-export type FilterTypes =
-  | string
-  | ParameterVocabsIn
-  | TemporalDuring
-  | TemporalAfterOrBefore
-  | PolygonOperation
-  | UpdateFrequency
-  | PlatformFilter
-  | Status
-  | ExcludeDatasetScope
-  | StaticAreasFilter
-  | IsNotNull;
 
 const funcIsNotNull: IsNotNull = (field: string) => `(${field} IS NOT NULL)`;
 
@@ -139,24 +127,26 @@ const funcTemporalBetween: TemporalDuring = (s: number, e: number) =>
   `temporal DURING ${dayjs(s).format(dateDefault["DATE_TIME_FORMAT"])}/${dayjs(e).format(dateDefault["DATE_TIME_FORMAT"])}`;
 
 /**
- * Keep all cql query here, otherwise it will be very hard to manage
+ * All cql filters in one typed object — call them directly, e.g.
+ * cqlFilters.updateFrequency(freq). Typos fail at compile time and no
+ * casts are needed at the call sites.
  */
-const cqlDefaultFilters = new Map<string, FilterTypes>();
-cqlDefaultFilters
-  .set("PARAMETER_VOCABS_IN", funcParameterVocabs)
-  .set("DATASET_GROUP", funcUpdateDatasetGroup)
-  .set("ALL_TIME_RANGE", "temporal after 1970-01-01T00:00:00Z")
-  .set("BETWEEN_TIME_RANGE", funcTemporalBetween)
-  .set("AFTER_TIME", funcTemporalAfter)
-  .set("BEFORE_TIME", funcTemporalBefore)
-  .set("INTERSECT_POLYGON", funcIntersectPolygon)
-  .set("BBOX_POLYGON", funcBBoxPolygon)
-  .set("BBOX_POLYGON_OR_EMPTY_EXTENTS", funcBBoxPolygonOrEmptyExtents)
-  .set("UPDATE_FREQUENCY", funcUpdateFrequency)
-  .set("STATUS", funcStatus)
-  .set("EXCLUDE_DATASET_SCOPE", funcExcludeDatasetScope)
-  .set("UPDATE_PLATFORM_FILTER_VARIABLES", funcPlatformFilter)
-  .set("STATIC_AREAS", funcStaticAreas)
-  .set("IS_NOT_NULL", funcIsNotNull);
+const cqlFilters = {
+  parameterVocabsIn: funcParameterVocabs,
+  datasetGroup: funcUpdateDatasetGroup,
+  allTimeRange: "temporal after 1970-01-01T00:00:00Z",
+  betweenTimeRange: funcTemporalBetween,
+  afterTime: funcTemporalAfter,
+  beforeTime: funcTemporalBefore,
+  intersectPolygon: funcIntersectPolygon,
+  bboxPolygon: funcBBoxPolygon,
+  bboxPolygonOrEmptyExtents: funcBBoxPolygonOrEmptyExtents,
+  updateFrequency: funcUpdateFrequency,
+  status: funcStatus,
+  excludeDatasetScope: funcExcludeDatasetScope,
+  platformFilter: funcPlatformFilter,
+  staticAreas: funcStaticAreas,
+  isNotNull: funcIsNotNull,
+} as const;
 
-export { cqlDefaultFilters };
+export { cqlFilters };
