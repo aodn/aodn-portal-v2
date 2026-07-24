@@ -21,7 +21,7 @@ import {
   DatasetDownloadRequest,
   DownloadConditionType,
 } from "../pages/detail-page/context/DownloadDefinitions";
-import { processDatasetDownload } from "@/app/store/searchReducer";
+import { processDatasetDownload } from "@/app/store/downloadThunks";
 import { trackCustomEvent } from "../analytics/customEventTracker";
 import { AnalyticsEvent } from "../analytics/analyticsEvents";
 import { calculateBboxes } from "../analytics/downloadCODataEvent";

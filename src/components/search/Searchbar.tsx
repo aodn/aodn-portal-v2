@@ -36,7 +36,7 @@ import {
   unFlattenToParameterState,
   updateParameterStates,
   updateSearchText,
-} from "@/app/store/componentParamReducer";
+} from "@/app/store/searchParamsReducer";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import ActiveFiltersChips from "./ActiveFiltersChips";
 
@@ -66,7 +66,7 @@ const Searchbar: FC<SearchbarProps> = ({
   const { ref, width: searchbarWidth } = useElementSize();
   const redirectSearch = useRedirectSearch();
   const popperRef = useRef<any>(null);
-  const params = useAppSelector((state) => state.paramReducer);
+  const params = useAppSelector((state) => state.searchParams);
   const { scrollToElement } = useScrollToElement({
     ref: { current: boxRef },
     offset: (isMobile ? HEADER_HEIGHT_MOBILE : HEADER_HEIGHT) + 5,

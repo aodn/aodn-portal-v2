@@ -1,4 +1,4 @@
-import { getSubgroup, ILink } from "@/app/store/OGCCollectionDefinitions";
+import { getSubgroup, ILink } from "@/app/api/ogcCollectionTypes";
 
 // ================== UTILITY FUNCTIONS ==================
 export function dataAccessParams(link: ILink): Gtag.CustomParams {

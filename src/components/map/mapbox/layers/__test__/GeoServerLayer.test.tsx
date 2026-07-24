@@ -5,12 +5,12 @@ import { configureStore } from "@reduxjs/toolkit";
 import searchReducer from "@/app/store/searchReducer";
 import GeoServerLayer from "../GeoServerLayer";
 import MapContext from "../../MapContext";
-import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 import AdminScreenContext from "../../../../admin/AdminScreenContext";
 import {
   GeoserverFieldsResponse,
   MapLayerResponse,
-} from "@/app/store/GeoserverDefinitions";
+} from "@/app/api/geoserverTypes";
 import { MapEventEnum } from "../../constants";
 import utc from "dayjs/plugin/utc";
 import { extend } from "dayjs";

@@ -1,5 +1,5 @@
 import { createContext, Dispatch, SetStateAction, useContext } from "react";
-import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 import { FeatureCollection, Point } from "geojson";
 import {
   DownloadConditionType,
@@ -10,14 +10,15 @@ import {
   LayerName,
   LayerSwitcherLayer,
 } from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
-import { CloudOptimizedFeature } from "@/app/store/CloudOptimizedDefinitions";
+import { CloudOptimizedFeature } from "@/app/api/cloudOptimizedTypes";
 import { DatasetMetadata } from "@/app/store/searchReducer";
 
 export interface DetailPageContextType {
   collection: OGCCollection | undefined;
   setCollection: Dispatch<SetStateAction<OGCCollection | undefined>>;
   featureCollection:
-    FeatureCollection<Point, CloudOptimizedFeature> | undefined;
+    | FeatureCollection<Point, CloudOptimizedFeature>
+    | undefined;
   datasetMetadata: DatasetMetadata | undefined;
   isSupportPMTiles: boolean;
   isCollectionNotFound: boolean;
@@ -43,7 +44,8 @@ const DetailPageContextDefault = {
   collection: {} as OGCCollection | undefined,
   setCollection: () => {},
   featureCollection: {} as
-    FeatureCollection<Point, CloudOptimizedFeature> | undefined,
+    | FeatureCollection<Point, CloudOptimizedFeature>
+    | undefined,
   datasetMetadata: undefined,
   isSupportPMTiles: false,
   isCollectionNotFound: false,

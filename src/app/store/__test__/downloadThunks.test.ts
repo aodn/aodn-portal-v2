@@ -1,9 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import {
-  processWFSDownload,
-  processWFSEstimateSize,
-  ogcAxiosWithRetry,
-} from "../searchReducer";
+import { processWFSDownload, processWFSEstimateSize } from "../downloadThunks";
+import { ogcAxiosWithRetry } from "@/app/api/httpClient";
 import {
   WFSDownloadRequest,
   DateRangeCondition,

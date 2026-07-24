@@ -6,7 +6,7 @@ import LinkIcon from "@mui/icons-material/Link";
 import TaskAltSharpIcon from "@mui/icons-material/TaskAltSharp";
 import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
-import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 import ResultCardButton, {
   ResultCardButtonConfig,
 } from "../common/buttons/ResultCardButton";

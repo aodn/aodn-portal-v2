@@ -1,9 +1,6 @@
 import React, { useEffect, useState, useCallback, FC } from "react";
 import { Box, SxProps } from "@mui/material";
-import {
-  updateParameterVocabs,
-  Vocab,
-} from "@/app/store/componentParamReducer";
+import { updateParameterVocabs, Vocab } from "@/app/store/searchParamsReducer";
 import { useAppDispatch } from "@/app/store/hooks";
 import { fetchParameterVocabsWithStore } from "@/app/store/searchReducer";
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";

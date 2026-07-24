@@ -21,7 +21,7 @@ import {
   SelectedStaticArea,
   updateFilterPolygon,
   updateFilterStaticAreas,
-} from "@/app/store/componentParamReducer";
+} from "@/app/store/searchParamsReducer";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { featureCollection, union } from "@turf/turf";
 import {
@@ -226,7 +226,7 @@ const modeRadios: { value: LocationFilterMode; label: string }[] = [
 const LocationFilter: FC<LocationFilterProps> = () => {
   const dispatch = useAppDispatch();
   // Must use useAppSelector instead of useMemo to subscribe to state changes
-  const componentParam: ParameterState = useAppSelector((s) => s.paramReducer);
+  const componentParam: ParameterState = useAppSelector((s) => s.searchParams);
   const [filterMode, setFilterMode] =
     useState<LocationFilterMode>("marinePark");
 
@@ -469,7 +469,8 @@ const LocationFilter: FC<LocationFilterProps> = () => {
   );
 
   const highlightCollection = useMemo(():
-    FeatureCollection<Polygon | MultiPolygon> | undefined => {
+    | FeatureCollection<Polygon | MultiPolygon>
+    | undefined => {
     const allFeats: Feature<Polygon | MultiPolygon>[] = [];
 
     if (selectedMarineParkValues.size > 0) {

@@ -6,7 +6,7 @@ import { useAppSelector } from "@/app/store/hooks";
 import {
   DEFAULT_SEARCH_LOCATION,
   ParameterState,
-} from "@/app/store/componentParamReducer";
+} from "@/app/store/searchParamsReducer";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
 import { booleanEqual } from "@turf/boolean-equal";
@@ -116,7 +116,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
   };
 
   const componentParams: ParameterState = useAppSelector(
-    (state) => state.paramReducer
+    (state) => state.searchParams
   );
 
   const redirectSearch = useRedirectSearch();

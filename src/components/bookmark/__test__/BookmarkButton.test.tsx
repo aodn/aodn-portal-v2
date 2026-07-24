@@ -7,7 +7,7 @@ import {
   addItem,
   setItems,
 } from "@/app/store/bookmarkListReducer";
-import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 import BookmarkButton from "../BookmarkButton";
 
 // Mock the local store, so that bookmarkListReducer save value to Record instead of the window store

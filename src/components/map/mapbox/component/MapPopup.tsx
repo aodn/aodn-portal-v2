@@ -13,7 +13,7 @@ import MapContext from "../MapContext";
 import { Feature, Point } from "geojson";
 import { fetchResultByUuidNoStore } from "@/app/store/searchReducer";
 import AppTheme from "@/styles/theme";
-import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 import { useAppDispatch } from "@/app/store/hooks";
 import ComplexMapHoverTip from "../../../common/hover-tip/ComplexMapHoverTip";
 import { TabNavigation } from "../../../../hooks/useTabNavigation";

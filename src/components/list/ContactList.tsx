@@ -1,4 +1,4 @@
-import { IContact } from "@/app/store/OGCCollectionDefinitions";
+import { IContact } from "@/app/api/ogcCollectionTypes";
 import React, { ReactNode, useMemo } from "react";
 import ExpandableList from "./ExpandableList";
 import ContactArea from "./list-item/sub-item/ContactArea";

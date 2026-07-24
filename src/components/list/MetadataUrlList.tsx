@@ -2,7 +2,7 @@ import React from "react";
 import ExpandableList from "./ExpandableList";
 import ItemBaseGrid from "./list-item/ItemBaseGrid";
 import LinkCard from "./list-item/sub-item/LinkCard";
-import { ILink } from "@/app/store/OGCCollectionDefinitions";
+import { ILink } from "@/app/api/ogcCollectionTypes";
 import { IconLink } from "../icon/IconLink";
 
 interface MetadataUrlListProps {

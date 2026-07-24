@@ -5,7 +5,7 @@ import {
   updateExcludeDocument,
   updateStatus,
   updateUpdateFreq,
-} from "@/app/store/componentParamReducer";
+} from "@/app/store/searchParamsReducer";
 import { useAppDispatch } from "@/app/store/hooks";
 import { TabFilterType } from "../Filters";
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";

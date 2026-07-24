@@ -17,7 +17,7 @@ import {
   updateExcludeDocument,
   updateHasData,
   updateSearchText,
-} from "@/app/store/componentParamReducer";
+} from "@/app/store/searchParamsReducer";
 import { portalTheme } from "../../../../styles";
 import { AnalyticsEvent } from "../../../../analytics/analyticsEvents";
 import { trackCustomEvent } from "../../../../analytics/customEventTracker";

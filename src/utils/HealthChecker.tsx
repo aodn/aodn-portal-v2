@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch } from "@/app/store/hooks";
-import { fetchSystemHealthNoStore } from "@/app/store/searchReducer";
+import { fetchSystemHealthNoStore } from "@/app/store/healthThunks";
 import DegradedPage from "../pages/error-page/DegradedPage";
-import { Health } from "@/app/store/systemDefinition";
+import { Health } from "@/app/api/healthTypes";
 
 interface HealthCheckerProps {
   children?: React.ReactNode;

@@ -49,7 +49,7 @@ const Header: FC = () => {
     null
   );
 
-  const params = useAppSelector((state) => state.paramReducer);
+  const params = useAppSelector((state) => state.searchParams);
 
   const hasActiveFilters =
     !!(params.dateTimeFilterRange?.start || params.dateTimeFilterRange?.end) ||

@@ -118,7 +118,7 @@ describe("InputWithSuggester", () => {
           expect(input).toHaveValue("imos sst"); // or whatever exact value your mock returns
 
           // Make sure redux also updated the searchText
-          expect(store.getState().paramReducer.searchText).toBe("imos sst");
+          expect(store.getState().searchParams.searchText).toBe("imos sst");
         });
       });
     });
@@ -145,7 +145,7 @@ describe("InputWithSuggester", () => {
     expect(input).toHaveValue("");
 
     // 4. Verify Redux was updated
-    expect(store.getState().paramReducer.searchText).toBe("");
+    expect(store.getState().searchParams.searchText).toBe("");
 
     // 5. Verify the searchbar remains active (expanded)
     // In your implementation, setShouldExpandSearchbar is called based on isSearchbarActive

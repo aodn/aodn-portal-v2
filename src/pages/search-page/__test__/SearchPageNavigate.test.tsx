@@ -7,7 +7,7 @@ vi.mock("@/app/store/hooks", () => ({
   useAppDispatch: () => mockDispatch,
   useAppSelector: vi.fn((selector) =>
     selector({
-      paramReducer: {
+      searchParams: {
         layout: "LIST",
         sort: "RELEVANT",
         bbox: undefined,
@@ -22,7 +22,7 @@ vi.mock("@/app/store/hooks", () => ({
 vi.mock("@/app/store/store", () => ({
   default: {
     getState: vi.fn().mockReturnValue({
-      paramReducer: {
+      searchParams: {
         layout: "LIST",
         sort: "RELEVANT",
         bbox: undefined,
@@ -33,11 +33,11 @@ vi.mock("@/app/store/store", () => ({
     }),
     subscribe: vi.fn(),
   },
-  getComponentState: vi.fn((state) => state.paramReducer),
+  getSearchParams: vi.fn((state) => state.searchParams),
   getSearchQueryResult: vi.fn((state) => state.searchReducer),
 }));
 
-vi.mock("@/app/store/componentParamReducer", () => ({
+vi.mock("@/app/store/searchParamsReducer", () => ({
   formatToUrlParam: vi.fn(() => "param=1"),
   unFlattenToParameterState: vi.fn(() => ({
     layout: "LIST",

@@ -23,12 +23,9 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { color, padding } from "../../styles/constants";
 import { dateDefault } from "../common/constants";
-import { updateDateTimeFilterRange } from "@/app/store/componentParamReducer";
+import { updateDateTimeFilterRange } from "@/app/store/searchParamsReducer";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
-import {
-  OGCCollection,
-  OGCCollections,
-} from "@/app/store/OGCCollectionDefinitions";
+import { OGCCollection, OGCCollections } from "@/app/api/ogcCollectionTypes";
 import {
   fetchResultNoStore,
   jsonToOGCCollections,
@@ -81,7 +78,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
 
   // State from redux
   const dateTimeFilterRange = useAppSelector(
-    (state) => state.paramReducer.dateTimeFilterRange
+    (state) => state.searchParams.dateTimeFilterRange
   );
 
   // Local state for date-range-slider

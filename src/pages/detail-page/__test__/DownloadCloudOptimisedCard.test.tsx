@@ -30,10 +30,7 @@ vi.mock("../features/download/DownloadSelect", () => ({
 }));
 
 import DownloadCloudOptimisedCard from "../features/download/DownloadCloudOptimisedCard";
-import {
-  DatasetType,
-  OGCCollection,
-} from "@/app/store/OGCCollectionDefinitions";
+import { DatasetType, OGCCollection } from "@/app/api/ogcCollectionTypes";
 import store from "@/app/store/store";
 
 const theme = createTheme();

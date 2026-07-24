@@ -27,13 +27,11 @@ import { AnalyticsEvent } from "../../../../analytics/analyticsEvents";
 import {
   DownloadLayersResponse,
   MapFeatureRequest,
-} from "@/app/store/GeoserverDefinitions";
+} from "@/app/api/geoserverTypes";
 import { useAppDispatch } from "@/app/store/hooks";
 import { SelectItem } from "../../../../components/common/dropdown/CommonSelect";
-import {
-  fetchGeoServerDownloadLayers,
-  processWFSEstimateSize,
-} from "@/app/store/searchReducer";
+import { fetchGeoServerDownloadLayers } from "@/app/store/geoserverThunks";
+import { processWFSEstimateSize } from "@/app/store/downloadThunks";
 import AdminScreenContext from "../../../../components/admin/AdminScreenContext";
 import { formatBytes } from "../../../../utils/Helpers";
 

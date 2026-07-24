@@ -25,7 +25,7 @@ vi.mock("@/analytics/customEventTracker", () => ({
   trackCustomEvent: vi.fn(),
 }));
 import { trackCustomEvent } from "@/analytics/customEventTracker";
-import { ogcAxiosWithRetry } from "../searchReducer";
+import { ogcAxiosWithRetry } from "../httpClient";
 
 const mockedTrackCustomEvent = vi.mocked(trackCustomEvent);
 const server = setupServer();

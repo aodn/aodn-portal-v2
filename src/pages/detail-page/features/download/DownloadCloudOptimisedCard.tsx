@@ -16,15 +16,12 @@ import {
   FormatCondition,
   KeyCondition,
 } from "../../context/DownloadDefinitions";
-import {
-  DatasetType,
-  OGCCollection,
-} from "@/app/store/OGCCollectionDefinitions";
+import { DatasetType, OGCCollection } from "@/app/api/ogcCollectionTypes";
 import DownloadButton from "../../../../components/common/buttons/DownloadButton";
 import DownloadSubsetting from "./DownloadSubsetting";
 import DownloadSelect from "./DownloadSelect";
 import useEstimateSize from "../../../../hooks/useEstimateSize";
-import { processCoEstimateSize } from "@/app/store/searchReducer";
+import { processCoEstimateSize } from "@/app/store/downloadThunks";
 
 const downloadFormats = [
   { label: "NetCDFs", value: "netcdf" },

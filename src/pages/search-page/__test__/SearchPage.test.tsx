@@ -12,7 +12,11 @@ import { ThemeProvider } from "@mui/material/styles";
 import AppTheme from "@/styles/theme";
 import { server } from "../../../__mocks__/server";
 import store from "@/app/store/store";
-import { updateLayout, updateSort } from "@/app/store/componentParamReducer";
+import {
+  updateLayout,
+  updateSort,
+  updateParameterStates,
+} from "@/app/store/searchParamsReducer";
 import { SearchResultLayoutEnum } from "../../../components/common/buttons/ResultListLayoutButton";
 import { SortResultEnum } from "../../../components/common/buttons/ResultListSortButton";
 import * as useRedirectSearchModule from "../../../hooks/useRedirectSearch";
@@ -231,7 +235,7 @@ describe("SearchPage Basic", () => {
     // Verify that updateParameterStates was called with the correct parameters
     expect(dispatchSpy).toHaveBeenCalledWith(
       expect.objectContaining({
-        type: "UPDATE_PARAMETER_STATES",
+        type: updateParameterStates.type,
         payload: expect.objectContaining({
           layout: SearchResultLayoutEnum.GRID,
           sort: SortResultEnum.POPULARITY,
@@ -241,8 +245,8 @@ describe("SearchPage Basic", () => {
 
     // Verify that the state was updated correctly by checking the actual state
     const state = store.getState();
-    expect(state.paramReducer.layout).toBe(SearchResultLayoutEnum.GRID);
-    expect(state.paramReducer.sort).toBe(SortResultEnum.POPULARITY);
+    expect(state.searchParams.layout).toBe(SearchResultLayoutEnum.GRID);
+    expect(state.searchParams.sort).toBe(SortResultEnum.POPULARITY);
 
     // Clean up
     dispatchSpy.mockRestore();
@@ -333,7 +337,7 @@ describe("SearchPage Basic", () => {
             (option) => {
               fireEvent.click(option);
 
-              const updatedLayout = store.getState().paramReducer.layout;
+              const updatedLayout = store.getState().searchParams.layout;
               // Verify that the layout was updated in Redux state
               expect(updatedLayout).toBe(SearchResultLayoutEnum.LIST);
 

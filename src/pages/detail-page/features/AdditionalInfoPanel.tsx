@@ -13,7 +13,7 @@ import MetadataUrlList from "../../../components/list/MetadataUrlList";
 import MetadataDateList from "../../../components/list/MetadataDateList";
 import { convertDateFormat } from "../../../utils/DateUtils";
 import { contactRoles } from "../../../components/common/constants";
-import { IKeyword } from "@/app/store/OGCCollectionDefinitions";
+import { IKeyword } from "@/app/api/ogcCollectionTypes";
 
 const AdditionalInfoPanel = () => {
   const context = useDetailPageContext();

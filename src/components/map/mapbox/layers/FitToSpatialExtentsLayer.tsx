@@ -1,5 +1,5 @@
 import { FC, useContext, useEffect } from "react";
-import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 import MapContext from "../MapContext";
 import { fitToBound } from "../../../../utils/MapUtils";
 import { MapEventEnum } from "../constants";

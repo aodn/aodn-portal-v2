@@ -12,7 +12,7 @@ import { LngLatBounds, MapEvent } from "mapbox-gl";
 import { Box } from "@mui/material";
 import { bboxPolygon, booleanEqual } from "@turf/turf";
 import store, {
-  getComponentState,
+  getSearchParams,
   getSearchQueryResult,
 } from "@/app/store/store";
 import {
@@ -31,7 +31,7 @@ import {
   updateSort,
   updateSortBy,
   updateZoom,
-} from "@/app/store/componentParamReducer";
+} from "@/app/store/searchParamsReducer";
 import {
   off,
   on,
@@ -42,7 +42,7 @@ import ResultSection from "./layout/ResultSection";
 import MapSection from "./layout/MapSection";
 import { SearchResultLayoutEnum } from "../../components/common/buttons/ResultListLayoutButton";
 import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
-import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { pageDefault, pageReferer } from "../../components/common/constants";
 import { color } from "../../styles/constants";
@@ -78,8 +78,8 @@ const SearchPage = () => {
   const { isUnderLaptop, isMobile } = useBreakpoint();
   const redirectSearch = useRedirectSearch();
   const { fetchRecord } = useFetchData();
-  const layout = useAppSelector((state) => state.paramReducer.layout);
-  const currentSort = useAppSelector((state) => state.paramReducer.sort);
+  const layout = useAppSelector((state) => state.searchParams.layout);
+  const currentSort = useAppSelector((state) => state.searchParams.sort);
   // Layers contain record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
   // CurrentLayout is used to remember last layout after change to full map view , which is SearchResultLayoutEnum exclude the value FULL_MAP
@@ -155,9 +155,7 @@ const SearchPage = () => {
 
   const doMapSearch = useCallback(
     async (needNavigate: boolean = false) => {
-      const componentParam: ParameterState = getComponentState(
-        store.getState()
-      );
+      const componentParam: ParameterState = getSearchParams(store.getState());
       // Use a different parameter so that it returns id and bbox only and do not store the values,
       // we cannot add page because we want to show all record on map
       // and by default we will include record without spatial extents so that BBOX
@@ -195,7 +193,7 @@ const SearchPage = () => {
             // is still in progress, the store have the latest map bbox so we can check
             // if the constant we store matches the bbox, if not then we know map
             // moved and results isn't valid
-            const current = getComponentState(store.getState())?.bbox;
+            const current = getSearchParams(store.getState())?.bbox;
             if (
               componentParam.bbox !== undefined &&
               current !== undefined &&
@@ -264,7 +262,7 @@ const SearchPage = () => {
           event?.type === MapEventEnum.ZOOM_END ||
           event?.type === MapEventEnum.MOVE_END
         ) {
-          const componentParam: ParameterState = getComponentState(
+          const componentParam: ParameterState = getSearchParams(
             store.getState()
           );
 

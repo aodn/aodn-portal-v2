@@ -17,7 +17,7 @@ import {
 import MapContext from "../MapContext";
 import { useAppDispatch } from "@/app/store/hooks";
 import { fetchResultByUuidNoStore } from "@/app/store/searchReducer";
-import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 import { MapEvent, MapMouseEvent } from "mapbox-gl";
 import { Feature, Point } from "geojson";
 import useBreakpoint from "../../../../hooks/useBreakpoint";

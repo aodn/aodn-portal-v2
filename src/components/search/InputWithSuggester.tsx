@@ -21,8 +21,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import {
   ParameterState,
   updateSearchText,
-} from "@/app/store/componentParamReducer";
-import store, { getComponentState, RootState } from "@/app/store/store";
+} from "@/app/store/searchParamsReducer";
+import store, { getSearchParams, RootState } from "@/app/store/store";
 import {
   createSuggesterParamFrom,
   fetchSuggesterOptions,
@@ -97,7 +97,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
 
   // Redux is the "Single Source of Truth" for the final value
   const searchInput = useSelector(
-    (state: RootState) => state.paramReducer.searchText
+    (state: RootState) => state.searchParams.searchText
   );
   // local state tracks what the user is currently typing
   const [inputValue, setInputValue] = useState<string | undefined>(searchInput);
@@ -107,9 +107,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
       // setPendingSearch to true to prevent doing search before refreshing options is finished
       setPendingSearch?.(true);
       try {
-        const currentState: ParameterState = getComponentState(
-          store.getState()
-        );
+        const currentState: ParameterState = getSearchParams(store.getState());
         dispatch(fetchSuggesterOptions(createSuggesterParamFrom(currentState)))
           .unwrap()
           .then((data) => {

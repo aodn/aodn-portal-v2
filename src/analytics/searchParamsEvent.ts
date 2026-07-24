@@ -1,6 +1,6 @@
 import { AnalyticsEvent } from "./analyticsEvents";
 import { trackCustomEvent } from "./customEventTracker";
-import { SearchParameters } from "@/app/store/searchReducer";
+import { SearchParameters } from "@/app/api/searchQueryBuilder";
 
 /**
  * Track search result parameters at the API call level with session-based deduplication
