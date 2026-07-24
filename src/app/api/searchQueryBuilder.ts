@@ -82,14 +82,14 @@ const createSuggesterParamFrom = (
 // always call this function and do not handcraft it elsewhere, some control isn't
 // part the ParameterState and therefore express as optional argument here
 const createSearchParamFrom = (
-  i: ParameterState,
+  paramState: ParameterState,
   control?: SearchControl
 ): SearchParameters => {
-  const p: SearchParameters = {};
-  p.sortby = i.sortby;
-  p.text = i.searchText;
+  const result: SearchParameters = {};
+  result.sortby = paramState.sortby;
+  result.text = paramState.searchText;
 
-  const c = mergeWithDefaults<SearchControl>(
+  const mergedControl = mergeWithDefaults<SearchControl>(
     {
       score: DEFAULT_SEARCH_SCORE,
     },
@@ -100,121 +100,138 @@ const createSearchParamFrom = (
   // ! DO NO USE SCORE !, it will cause no result in some case because
   // some text search only hit the filter which cause score become null
   // if you set score you got nothing.
-  // p.filter = `score>=${calculateScore(c.score, p.text)}`;
+  // result.filter = `score>=${calculateScore(mergedControl.score, result.text)}`;
 
   // Control how many record return in 1 page.
-  if (c.pagesize) {
-    p.filter = appendFilter(p.filter, `page_size=${c.pagesize}`);
-  }
-
-  if (c.searchafter) {
-    p.filter = appendFilter(
-      p.filter,
-      `search_after='${c.searchafter.join("||")}'`
+  if (mergedControl.pagesize) {
+    result.filter = appendFilter(
+      result.filter,
+      `page_size=${mergedControl.pagesize}`
     );
   }
 
-  if (i.datasetGroup) {
-    const f = cqlDefaultFilters.get("DATASET_GROUP") as DatasetGroup;
-    p.filter = appendFilter(p.filter, f(i.datasetGroup));
+  if (mergedControl.searchafter) {
+    result.filter = appendFilter(
+      result.filter,
+      `search_after='${mergedControl.searchafter.join("||")}'`
+    );
   }
 
-  if (i.hasCOData) {
+  if (paramState.datasetGroup) {
+    const f = cqlDefaultFilters.get("DATASET_GROUP") as DatasetGroup;
+    result.filter = appendFilter(result.filter, f(paramState.datasetGroup));
+  }
+
+  if (paramState.hasCOData) {
     // Filter records that have cloud optimized data OR have a downloadable link
     const coDataFilter = (cqlDefaultFilters.get("IS_NOT_NULL") as IsNotNull)(
       "assets_summary"
     );
     const downloadLinkFilter = "links_airole_contains='download'";
-    p.filter = appendFilter(
-      p.filter,
+    result.filter = appendFilter(
+      result.filter,
       `(${coDataFilter} OR ${downloadLinkFilter})`
     );
   }
 
-  if (i.excludeDocument) {
+  if (paramState.excludeDocument) {
     const f = cqlDefaultFilters.get(
       "EXCLUDE_DATASET_SCOPE"
     ) as ExcludeDatasetScope;
-    p.filter = appendFilter(p.filter, f("document"));
+    result.filter = appendFilter(result.filter, f("document"));
   }
 
-  if (i.updateFreq) {
+  if (paramState.updateFreq) {
     const f = cqlDefaultFilters.get("UPDATE_FREQUENCY") as UpdateFrequency;
-    p.filter = appendFilter(p.filter, f(i.updateFreq));
+    result.filter = appendFilter(result.filter, f(paramState.updateFreq));
   }
 
-  if (i.datasetStatus) {
+  if (paramState.datasetStatus) {
     const f = cqlDefaultFilters.get("STATUS") as Status;
-    p.filter = appendFilter(p.filter, f(i.datasetStatus));
+    result.filter = appendFilter(result.filter, f(paramState.datasetStatus));
   }
 
   if (
-    i.dateTimeFilterRange &&
-    (i.dateTimeFilterRange.start || i.dateTimeFilterRange.end)
+    paramState.dateTimeFilterRange &&
+    (paramState.dateTimeFilterRange.start || paramState.dateTimeFilterRange.end)
   ) {
-    if (i.dateTimeFilterRange.start && i.dateTimeFilterRange.end) {
+    if (
+      paramState.dateTimeFilterRange.start &&
+      paramState.dateTimeFilterRange.end
+    ) {
       const f = cqlDefaultFilters.get("BETWEEN_TIME_RANGE") as TemporalDuring;
-      p.filter = appendFilter(
-        p.filter,
-        f(i.dateTimeFilterRange.start, i.dateTimeFilterRange.end)
+      result.filter = appendFilter(
+        result.filter,
+        f(
+          paramState.dateTimeFilterRange.start,
+          paramState.dateTimeFilterRange.end
+        )
       );
     } else if (
-      i.dateTimeFilterRange.start === undefined &&
-      i.dateTimeFilterRange.end
+      paramState.dateTimeFilterRange.start === undefined &&
+      paramState.dateTimeFilterRange.end
     ) {
       const f = cqlDefaultFilters.get("BEFORE_TIME") as TemporalAfterOrBefore;
-      p.filter = appendFilter(p.filter, f(i.dateTimeFilterRange.end));
+      result.filter = appendFilter(
+        result.filter,
+        f(paramState.dateTimeFilterRange.end)
+      );
     } else if (
-      i.dateTimeFilterRange.end === undefined &&
-      i.dateTimeFilterRange.start
+      paramState.dateTimeFilterRange.end === undefined &&
+      paramState.dateTimeFilterRange.start
     ) {
       const f = cqlDefaultFilters.get("AFTER_TIME") as TemporalAfterOrBefore;
-      p.filter = appendFilter(p.filter, f(i.dateTimeFilterRange.start));
+      result.filter = appendFilter(
+        result.filter,
+        f(paramState.dateTimeFilterRange.start)
+      );
     }
   }
 
-  if (i.bbox) {
+  if (paramState.bbox) {
     const f = cqlDefaultFilters.get(
-      i.includeNoGeometry ? "BBOX_POLYGON_OR_EMPTY_EXTENTS" : "BBOX_POLYGON"
+      paramState.includeNoGeometry
+        ? "BBOX_POLYGON_OR_EMPTY_EXTENTS"
+        : "BBOX_POLYGON"
     ) as PolygonOperation;
-    p.filter = appendFilter(p.filter, f(i.bbox));
+    result.filter = appendFilter(result.filter, f(paramState.bbox));
   }
 
   let spatialFilter: string | undefined;
 
-  if (i.staticAreas && i.staticAreas.length > 0) {
+  if (paramState.staticAreas && paramState.staticAreas.length > 0) {
     const f = cqlDefaultFilters.get("STATIC_AREAS") as StaticAreasFilter;
-    spatialFilter = f(i.staticAreas);
+    spatialFilter = f(paramState.staticAreas);
   }
 
-  if (i.polygon) {
+  if (paramState.polygon) {
     const f = cqlDefaultFilters.get("INTERSECT_POLYGON") as PolygonOperation;
-    const polygonFilter = f(i.polygon);
+    const polygonFilter = f(paramState.polygon);
     spatialFilter = spatialFilter
       ? `(${spatialFilter} OR ${polygonFilter})`
       : polygonFilter;
   }
 
   if (spatialFilter) {
-    p.filter = appendFilter(p.filter, spatialFilter);
+    result.filter = appendFilter(result.filter, spatialFilter);
   }
 
-  if (i.parameterVocabs && i.parameterVocabs.length > 0) {
+  if (paramState.parameterVocabs && paramState.parameterVocabs.length > 0) {
     const f = cqlDefaultFilters.get("PARAMETER_VOCABS_IN") as ParameterVocabsIn;
-    const parameterVocabFilter = f(i.parameterVocabs);
+    const parameterVocabFilter = f(paramState.parameterVocabs);
     if (parameterVocabFilter) {
-      p.filter = appendFilter(p.filter, parameterVocabFilter);
+      result.filter = appendFilter(result.filter, parameterVocabFilter);
     }
   }
 
-  if (i.platform && i.platform.length > 0) {
+  if (paramState.platform && paramState.platform.length > 0) {
     const f = cqlDefaultFilters.get(
       "UPDATE_PLATFORM_FILTER_VARIABLES"
     ) as PlatformFilter;
-    p.filter = appendFilter(p.filter, f(i.platform));
+    result.filter = appendFilter(result.filter, f(paramState.platform));
   }
 
-  return p;
+  return result;
 };
 
 export { createSuggesterParamFrom, createSearchParamFrom };

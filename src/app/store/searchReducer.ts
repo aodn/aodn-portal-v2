@@ -80,7 +80,7 @@ const fetchSuggesterOptions = createAsyncThunk<
 );
 
 /**
- * Trunk for async action and update searcher, limited return properties to reduce load time,
+ * Thunk for async action and update searcher, limited return properties to reduce load time,
  * default it, title,description
  */
 const fetchResultWithStore = createAsyncThunk<
@@ -89,9 +89,9 @@ const fetchResultWithStore = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >("search/fetchResultWithStore", searchCollections);
 /**
- * Trunk for async action and update searcher, limited return properties to reduce load time,
+ * Thunk for async action and update searcher, limited return properties to reduce load time,
  * default it, title,description. This one do not attach extraReducer and must return string due to redux expect
- * payload to be string. The caller need to call the jsonToCollections to convert it to OGCCollections class instance
+ * payload to be string. The caller need to call jsonToOGCCollections to convert it to OGCCollections class instance
  */
 const fetchResultNoStore = createAsyncThunk<
   string,
