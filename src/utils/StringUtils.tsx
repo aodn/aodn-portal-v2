@@ -100,3 +100,9 @@ export const getLinkType = (text: string): "email" | "url" | "text" => {
   if (isUrl(text)) return "url";
   return "text";
 };
+
+// Helper to wrap text in double quotes for an exact-keyword-only search, e.g. mooring -> "mooring"
+export const quotePhrase = (text: string): string => `"${text}"`;
+
+export const isQuotedPhrase = (text: string): boolean =>
+  text.length > 1 && text.startsWith('"') && text.endsWith('"');

@@ -27,16 +27,18 @@ import {
   createSuggesterParamFrom,
   fetchSuggesterOptions,
 } from "@/app/store/searchReducer";
-import { borderRadius, color, padding } from "../../styles/constants";
+import { borderRadius, color, gap, padding } from "../../styles/constants";
 import { debounce } from "lodash";
 import { sortByRelevance } from "../../utils/Helpers";
 import { useAppDispatch } from "@/app/store/hooks";
-import { TEXT_FIELD_MIN_WIDTH } from "./constants";
+import { DOUBLE_QUOTE_LABEL, TEXT_FIELD_MIN_WIDTH } from "./constants";
 import { SearchbarButtonNames } from "./SearchbarButtonGroup";
 import { useLocation } from "react-router-dom";
 import { pageDefault } from "../common/constants";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import { portalTheme } from "../../styles";
+import LabelChip from "../common/label/LabelChip";
+import { isQuotedPhrase, quotePhrase } from "../../utils/StringUtils";
 
 interface InputWithSuggesterProps {
   containerRef?: HTMLDivElement | null;
@@ -64,6 +66,7 @@ enum OptionGroup {
   PHRASE = "phrase",
   ORGANIZATION = "organization",
   PLATFORM = "platform",
+  QUOTED = "quoted",
 }
 
 /**
@@ -148,6 +151,15 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
                 }
               }
             );
+
+            // add an exact-keyword-only option of what the user typed at the first position
+            const typed = inputValue.trim();
+            if (options.length > 0 && typed && !isQuotedPhrase(typed)) {
+              options.splice(1, 0, {
+                text: quotePhrase(typed),
+                group: OptionGroup.QUOTED,
+              });
+            }
 
             setOptions(options);
           });
@@ -390,6 +402,16 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
       renderOption={(props, option) => (
         <li {...props}>
           {option}
+          {isQuotedPhrase(option) && (
+            <LabelChip
+              text={[DOUBLE_QUOTE_LABEL]}
+              color={portalTheme.palette.tag1}
+              sx={{
+                ml: gap.lg,
+                ...portalTheme.typography.body2Regular,
+              }}
+            />
+          )}
           {/* hidden by default, shown on focus, check sx in CustomPaper */}
           <SearchIcon sx={{ display: "none", ml: "auto" }} />
         </li>
