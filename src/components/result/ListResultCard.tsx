@@ -267,7 +267,8 @@ const ListResultCard: FC<ListResultCardProps> = ({
               >
                 <img
                   src={thumbnail}
-                  alt="org_logo"
+                  alt={`Thumbnail of ${title}`}
+                  loading="lazy"
                   style={{
                     width: "100%",
                     height: "100%",
