@@ -3,6 +3,9 @@ import {
   createFilterString,
   decodeHtmlEntities,
   formatNumber,
+  isQuotedPhrase,
+  quotePhrase,
+  stripQuotes,
   truncateText,
 } from "../StringUtils";
 
@@ -122,5 +125,50 @@ describe("createFilterString", () => {
     expect(createFilterString(["uuid1", "uuid2"])).toBe(
       "id IN ('uuid1','uuid2')"
     );
+  });
+});
+
+describe("stripQuotes", () => {
+  it("should leave plain text untouched", () => {
+    expect(stripQuotes("wave")).toBe("wave");
+  });
+
+  it("should remove a leading or trailing quote", () => {
+    expect(stripQuotes('"wave')).toBe("wave");
+    expect(stripQuotes('wave"')).toBe("wave");
+  });
+
+  it("should remove quotes from inside the text", () => {
+    expect(stripQuotes('sea "surface"')).toBe("sea surface");
+    expect(stripQuotes('"wave" or "swell"')).toBe("wave or swell");
+  });
+
+  it("should collapse and trim whitespace", () => {
+    expect(stripQuotes("sea  surface ")).toBe("sea surface");
+  });
+
+  it("should return an empty string when only quotes and spaces are given", () => {
+    expect(stripQuotes('"')).toBe("");
+    expect(stripQuotes('""')).toBe("");
+    expect(stripQuotes('"""')).toBe("");
+    expect(stripQuotes('"  "')).toBe("");
+  });
+});
+
+describe("quotePhrase", () => {
+  it("should wrap plain text in double quotes", () => {
+    expect(quotePhrase("mooring")).toBe('"mooring"');
+  });
+
+  it("should produce balanced quotes from half-quoted text", () => {
+    expect(quotePhrase('"wave')).toBe('"wave"');
+  });
+
+  it("should not nest quotes when the text is already quoted", () => {
+    expect(quotePhrase('"wave"')).toBe('"wave"');
+  });
+
+  it("should return an empty phrase when nothing is left after stripping", () => {
+    expect(quotePhrase('"')).toBe('""');
   });
 });

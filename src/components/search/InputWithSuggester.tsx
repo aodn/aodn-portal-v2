@@ -13,6 +13,7 @@ import {
   Autocomplete,
   AutocompleteInputChangeReason,
   Box,
+  createFilterOptions,
   Paper,
   Popper,
   TextField,
@@ -72,6 +73,8 @@ enum OptionGroup {
   PLATFORM = "platform",
   QUOTED = "quoted",
 }
+
+const defaultFilter = createFilterOptions<string>();
 
 /**
  * Customized input box with suggester. If more customization is needed, please
@@ -156,11 +159,10 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
               }
             );
 
-            // add an exact-keyword-only option of what the user typed at the first position
-            const typed = stripQuotes(inputValue);
-            if (typed && !isQuotedPhrase(inputValue.trim())) {
-              options.splice(0, 0, {
-                text: quotePhrase(typed),
+            // add an exact-keyword-only option of what the user typed at the second position
+            if (stripQuotes(inputValue) && !isQuotedPhrase(inputValue.trim())) {
+              options.splice(1, 0, {
+                text: quotePhrase(inputValue),
                 group: OptionGroup.QUOTED,
               });
             }
@@ -355,6 +357,17 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
       value={inputValue}
       forcePopupIcon={false}
       options={options.flatMap((option) => option.text)}
+      // The exact-keyword option is built from cleaned up text (quotes removed, extra spaces collapsed),
+      // typing "sea " builds the option "sea", which has no trailing space to match. So run MUI's own
+      // filter first, then add the exact-keyword option back if it was dropped.
+      filterOptions={(opts, state) => {
+        const kept = defaultFilter(opts, state);
+        const quoted = quotePhrase(state.inputValue);
+        if (opts.includes(quoted) && !kept.includes(quoted)) {
+          kept.splice(1, 0, quoted);
+        }
+        return kept;
+      }}
       autoComplete
       includeInputInList
       disablePortal
