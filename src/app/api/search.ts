@@ -1,6 +1,11 @@
 /**
- * Search and discovery requests: collection search, autocomplete
- * suggestions and the parameter vocab list.
+ * Search and discovery requests.
+ *
+ * Read (GET):
+ *   getCollections(param)      GET /ogc/collections
+ *   getCollectionById(id)      GET /ogc/collections/{id}
+ *   getAutocomplete(params)    GET /ogc/ext/autocomplete
+ *   getParameterVocabs()       GET /ogc/ext/parameter/vocabs
  *
  * Every function returns response data and throws a normalized
  * ErrorResponse on HTTP failure. Optional AbortSignal to cancel.

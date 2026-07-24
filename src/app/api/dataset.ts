@@ -1,12 +1,13 @@
 /**
- * Per-dataset data requests: dataset metadata and the cloud-optimized
- * feature summary used by charts and the time slider.
+ * Per-dataset data requests (used by charts and the time slider).
+ *
+ * Read (GET):
+ *   getDatasetMetadata(id)   GET /ogc/collections/{id}/items/dataset_metadata
+ *   getFeatureSummary(id)    GET /ogc/collections/{id}/items/summary
  *
  * Naming: a "collection" (see ogcCollectionTypes.ts) is the catalogue
- * record — title, description, bbox — i.e. what search results show.
- * A "dataset" is the real data behind that record. These endpoints take
- * a collection id and return information about its underlying dataset;
- * the file is named after the backend endpoint (`dataset_metadata`).
+ * record; a "dataset" is the real data behind it. These endpoints take a
+ * collection id and return information about its underlying dataset.
  *
  * Every function returns response data and throws a normalized
  * ErrorResponse on HTTP failure.

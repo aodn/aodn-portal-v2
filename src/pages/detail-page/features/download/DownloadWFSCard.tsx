@@ -30,10 +30,10 @@ import {
 } from "@/app/api/geoserverTypes";
 import { useAppDispatch } from "@/app/store/hooks";
 import { SelectItem } from "../../../../components/common/dropdown/CommonSelect";
-import { fetchGeoServerDownloadLayers } from "@/app/store/ogcApi";
-import { processWFSEstimateSize } from "@/app/store/downloadThunks";
 import AdminScreenContext from "../../../../components/admin/AdminScreenContext";
 import { formatBytes } from "../../../../utils/Helpers";
+import * as downloadApi from "@/app/api/download";
+import * as geoserverApi from "@/app/api/geoserver";
 
 // Currently only CSV is supported for WFS downloading
 // TODO:the format options will be fetched from the backend in the future
@@ -74,7 +74,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
     isDownloading,
   } = useWFSDownload(() => setSnackbarOpen(true));
   const { isEstimating, estimateSize, cancelEstimate, estimatedSizeBytes } =
-    useEstimateSize(processWFSEstimateSize);
+    useEstimateSize(downloadApi.postWfsEstimate);
   const dispatch = useAppDispatch();
   const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
   const [dataSelectOptions, setDataSelectOptions] = useState<SelectItem[]>([]);
@@ -150,8 +150,9 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
       enableGeoServerWhiteList: enableGeoServerWhiteList,
     };
 
-    dispatch(fetchGeoServerDownloadLayers(wfsLayersRequest))
-      .unwrap()
+    geoserverApi
+      .getWfsLayers(wfsLayersRequest)
+
       .then((layers: DownloadLayersResponse[]) => {
         // If there are layers available for download, we consider WFS download is available
         // We display all fetched wfs layers in the dropdown for user to select

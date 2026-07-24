@@ -57,12 +57,14 @@ vi.mock("@/app/store/searchReducer", () => ({
   })),
   DEFAULT_SEARCH_MAP_SIZE: 100,
   DEFAULT_SEARCH_PAGE_SIZE: 10,
-  fetchResultByUuidNoStore: vi.fn(() => ({
-    unwrap: vi.fn().mockResolvedValue({ id: "test" }),
-  })),
-  fetchResultNoStore: vi.fn(),
   fetchResultWithStore: vi.fn(() => ({ abort: vi.fn() })),
   jsonToOGCCollections: vi.fn(() => ({ collections: [] })),
+}));
+
+// The map search calls the api layer directly (no redux involved)
+vi.mock("@/app/api/search", () => ({
+  getCollections: vi.fn().mockResolvedValue("{}"),
+  getCollectionById: vi.fn().mockResolvedValue({ id: "test" }),
 }));
 
 vi.mock("@/app/store/bookmarkListReducer", () => ({
@@ -194,22 +196,23 @@ describe("SearchPage with useRedirectSearch", () => {
 
     render(<TestApp />);
 
-    // Initial mount triggers handleNavigation -> doListSearch -> 2 dispatches (withStore + noStore)
-    expect(mockDispatch).toHaveBeenCalledTimes(2);
+    // Initial mount triggers handleNavigation -> doListSearch -> 1 dispatch
+    // (fetchResultWithStore; the map search goes straight to the api layer)
+    expect(mockDispatch).toHaveBeenCalledTimes(1);
 
     // First click
     const button = screen.getByTestId("local-test-button");
     fireEvent.click(button);
 
-    // Another handleNavigation -> another 2 dispatches
-    return waitFor(() => expect(mockDispatch).toHaveBeenCalledTimes(4), {
+    // Another handleNavigation -> another dispatch
+    return waitFor(() => expect(mockDispatch).toHaveBeenCalledTimes(2), {
       timeout: 2000,
     }).then(() => {
       // Second click (repeat)
       fireEvent.click(button);
 
-      // Yet another 2 dispatches
-      return waitFor(() => expect(mockDispatch).toHaveBeenCalledTimes(6));
+      // Yet another dispatch
+      return waitFor(() => expect(mockDispatch).toHaveBeenCalledTimes(3));
     });
   });
 });

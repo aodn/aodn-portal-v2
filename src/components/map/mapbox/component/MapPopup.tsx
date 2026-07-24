@@ -11,15 +11,14 @@ import { Box, Card, CardContent, CircularProgress } from "@mui/material";
 import { MapEvent, MapMouseEvent, Popup } from "mapbox-gl";
 import MapContext from "../MapContext";
 import { Feature, Point } from "geojson";
-import { fetchResultByUuidNoStore } from "@/app/store/ogcApi";
 import AppTheme from "@/styles/theme";
 import { OGCCollection } from "@/app/api/ogcCollectionTypes";
-import { useAppDispatch } from "@/app/store/hooks";
 import ComplexMapHoverTip from "../../../common/hover-tip/ComplexMapHoverTip";
 import { TabNavigation } from "../../../../hooks/useTabNavigation";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 import { isDrawModeRectangle } from "../../../../utils/MapUtils";
 import { zIndex } from "../../../../styles/constants";
+import * as searchApi from "@/app/api/search";
 
 interface MapPopupProps {
   layerId: string;
@@ -58,22 +57,19 @@ const renderLoadingBox = ({ popupHeight, popupWidth }: PopupConfig) => (
 const MapPopup: React.FC<MapPopupProps> = memo(
   ({ layerId, tabNavigation }: MapPopupProps) => {
     const { map } = useContext(MapContext);
-    const dispatch = useAppDispatch();
     const { isUnderLaptop } = useBreakpoint();
 
     // TODO: there is bug that map popup is not re-render for the interaction with bookmark button
-    const getCollectionData = useCallback(
-      async (uuid: string) => {
-        return dispatch(fetchResultByUuidNoStore(uuid))
-          .unwrap()
-          .then((collection: OGCCollection) => collection)
-          .catch((error: any) => {
-            console.error("Error fetching collection data:", error);
-            // TODO: handle error in ErrorBoundary
-          });
-      },
-      [dispatch]
-    );
+    const getCollectionData = useCallback(async (uuid: string) => {
+      return searchApi
+        .getCollectionById(uuid)
+
+        .then((collection: OGCCollection) => collection)
+        .catch((error: any) => {
+          console.error("Error fetching collection data:", error);
+          // TODO: handle error in ErrorBoundary
+        });
+    }, []);
 
     const renderContentBox = useCallback(
       (

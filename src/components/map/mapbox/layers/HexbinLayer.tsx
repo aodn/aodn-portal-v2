@@ -158,9 +158,13 @@ export const createFilteredFeatures = (
 export const createSortedFeatures = (
   featureCollection?: FeatureCollection<Point, CloudOptimizedFeature>
 ) => {
-  const sortedFeatures = featureCollection?.features.sort(
-    (a, b) => a.properties.timestamp - b.properties.timestamp
-  );
+  // Sort a copy: the collection comes from the RTK Query cache, which is
+  // frozen — sorting it in place throws.
+  const sortedFeatures = featureCollection
+    ? [...featureCollection.features].sort(
+        (a, b) => a.properties.timestamp - b.properties.timestamp
+      )
+    : undefined;
 
   return {
     ...featureCollection,

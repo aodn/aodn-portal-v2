@@ -15,8 +15,6 @@ import {
   zIndex,
 } from "../../../../styles/constants";
 import MapContext from "../MapContext";
-import { useAppDispatch } from "@/app/store/hooks";
-import { fetchResultByUuidNoStore } from "@/app/store/ogcApi";
 import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 import { MapEvent, MapMouseEvent } from "mapbox-gl";
 import { Feature, Point } from "geojson";
@@ -30,6 +28,7 @@ import { detailPageDefault, pageReferer } from "../../../common/constants";
 import { MapEventEnum } from "../constants";
 import FitToSpatialExtentsLayer from "../layers/FitToSpatialExtentsLayer";
 import ContextMenu, { ContextMenuRef } from "../../../menu/ContextMenu";
+import * as searchApi from "@/app/api/search";
 
 interface CardPopupProps {
   layerId: string;
@@ -43,7 +42,6 @@ const CardPopup: React.FC<CardPopupProps> = ({
   tabNavigation = undefined,
 }) => {
   const { map } = useContext(MapContext);
-  const dispatch = useAppDispatch();
   const { isUnderLaptop, isTablet, isMobile } = useBreakpoint();
   const panel = useRef<HTMLDivElement>(null);
   const [content, setContent] = useState<OGCCollection>(new OGCCollection());
@@ -83,18 +81,16 @@ const CardPopup: React.FC<CardPopupProps> = ({
     [tabNavigation]
   );
 
-  const getCollectionData = useCallback(
-    async (uuid: string) => {
-      return dispatch(fetchResultByUuidNoStore(uuid))
-        .unwrap()
-        .then((collection: OGCCollection) => collection)
-        .catch((error: any) => {
-          console.error("Error fetching collection data:", error);
-          // TODO: handle error in ErrorBoundary
-        });
-    },
-    [dispatch]
-  );
+  const getCollectionData = useCallback(async (uuid: string) => {
+    return searchApi
+      .getCollectionById(uuid)
+
+      .then((collection: OGCCollection) => collection)
+      .catch((error: any) => {
+        console.error("Error fetching collection data:", error);
+        // TODO: handle error in ErrorBoundary
+      });
+  }, []);
 
   useEffect(() => {
     const onMouseClick = (

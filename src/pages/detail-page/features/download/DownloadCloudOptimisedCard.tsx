@@ -21,7 +21,7 @@ import DownloadButton from "../../../../components/common/buttons/DownloadButton
 import DownloadSubsetting from "./DownloadSubsetting";
 import DownloadSelect from "./DownloadSelect";
 import useEstimateSize from "../../../../hooks/useEstimateSize";
-import { processCoEstimateSize } from "@/app/store/downloadThunks";
+import * as downloadApi from "@/app/api/download";
 
 const downloadFormats = [
   { label: "NetCDFs", value: "netcdf" },
@@ -51,7 +51,7 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
 }) => {
   const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
   const { isEstimating, estimateSize, cancelEstimate, estimatedSizeBytes } =
-    useEstimateSize(processCoEstimateSize, getCoEstimatedBytes);
+    useEstimateSize(downloadApi.postCoEstimate, getCoEstimatedBytes);
 
   const dateRangeBounds = useMemo(() => {
     let min = dayjs(dateDefault.min);

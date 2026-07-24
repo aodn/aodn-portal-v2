@@ -1,10 +1,15 @@
 /**
- * Dataset download and size-estimate requests. The WFS/CO endpoints are
- * long-running processes streamed back as server-sent events, so those
- * functions return the raw response for the caller to consume.
+ * Dataset download and size-estimate requests.
  *
- * Every function throws a normalized ErrorResponse on HTTP failure.
- * Optional AbortSignal to cancel.
+ * Write (POST), all under /ogc/processes/:
+ *   postDatasetDownload(req)   .../download/execution        (plain JSON)
+ *   postWfsDownload(req)       .../downloadWfs/execution     (SSE stream)
+ *   postWfsEstimate(req)       .../estimateWfsDownload/execution  (SSE)
+ *   postCoEstimate(req)        .../estimateCOdownload/execution   (SSE)
+ *
+ * The SSE endpoints return the raw axios response — callers consume the
+ * event stream from response.data. Every function throws a normalized
+ * ErrorResponse on HTTP failure. Optional AbortSignal to cancel.
  */
 import {
   ogcAxiosWithRetry,

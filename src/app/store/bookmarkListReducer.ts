@@ -2,7 +2,6 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import EventEmitter from "events";
 import type { AppDispatch, RootState } from "./store";
 import { jsonToOGCCollections } from "./searchReducer";
-import { fetchResultNoStore } from "./ogcApi";
 import { OGCCollection } from "@/app/api/ogcCollectionTypes";
 import {
   BookmarkEvent,
@@ -14,6 +13,7 @@ import {
   saveBookmarkIdsToStorage,
 } from "@/utils/StorageUtils";
 import { createFilterString } from "@/utils/StringUtils";
+import * as searchApi from "@/app/api/search";
 
 interface BookmarkListState {
   items: Array<OGCCollection>;
@@ -172,8 +172,9 @@ export const initializeBookmarkList = createAsyncThunk<
         filter: createFilterString(storedIds),
       };
 
-      await dispatch(fetchResultNoStore(searchParams))
-        .unwrap()
+      await searchApi
+        .getCollections(searchParams)
+
         .then((value: string) => {
           const collections = jsonToOGCCollections(value).collections;
           dispatch(setItems(collections));

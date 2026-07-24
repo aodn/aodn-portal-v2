@@ -1,8 +1,6 @@
 import { useCallback, useRef, useState } from "react";
-import { AsyncThunk } from "@reduxjs/toolkit";
-import { useAppDispatch } from "@/app/store/hooks";
 import { consumeSSEStream } from "../utils/SSEUtils";
-import { ErrorResponse } from "../utils/ErrorBoundary";
+import { isAbortError } from "@/app/api/httpClient";
 
 // Aligned with backend SSE event names (ogc-api SseEventName enum)
 enum EstimateEventName {
@@ -46,56 +44,37 @@ enum EstimateStatus {
  * payload shape, handled by the `getEstimatedBytes` extractor.
  */
 const useEstimateSize = <TArg,>(
-  estimateThunk: AsyncThunk<any, TArg, { rejectValue: ErrorResponse }>,
+  estimateRequest: (arg: TArg, signal?: AbortSignal) => Promise<any>,
   getEstimatedBytes: (
     data: EstimateSSEEventData
   ) => number | undefined = defaultGetEstimatedBytes
 ) => {
-  const dispatch = useAppDispatch();
   const [estimatedSizeBytes, setEstimatedSizeBytes] = useState<number | null>(
     null
   );
   const [status, setStatus] = useState<EstimateStatus>(EstimateStatus.IDLE);
-  const estimatePromiseRef = useRef<any>(null);
+  const estimateAbortRef = useRef<AbortController | null>(null);
 
   const cancelEstimate = useCallback(() => {
-    if (estimatePromiseRef.current) {
-      estimatePromiseRef.current.abort();
-      estimatePromiseRef.current = null;
-    }
+    estimateAbortRef.current?.abort();
+    estimateAbortRef.current = null;
     setStatus(EstimateStatus.IDLE);
   }, []);
 
   const estimateSize = useCallback(
     async (arg: TArg) => {
       // Cancel any in-progress estimation before starting a new one
-      if (estimatePromiseRef.current) {
-        estimatePromiseRef.current.abort();
-        estimatePromiseRef.current = null;
-      }
+      estimateAbortRef.current?.abort();
 
       setEstimatedSizeBytes(null);
       setStatus(EstimateStatus.ESTIMATING);
 
       try {
-        // Cast around the AsyncThunk action-creator's generic call signature,
-        // which otherwise widens an unconstrained TArg to `TArg & undefined`
-        const estimatePromise = dispatch(
-          (estimateThunk as (a: TArg) => any)(arg)
-        );
-        estimatePromiseRef.current = estimatePromise;
+        const controller = new AbortController();
+        estimateAbortRef.current = controller;
 
-        const resultAction = await estimatePromise;
-
-        if (estimateThunk.rejected.match(resultAction)) {
-          // An aborted request (cancel or superseding estimate) is not an error
-          if (!resultAction.meta.aborted) {
-            setStatus(EstimateStatus.ERROR);
-          }
-          return;
-        }
-
-        const responseStream = resultAction.payload?.data as ReadableStream;
+        const response = await estimateRequest(arg, controller.signal);
+        const responseStream = response?.data as ReadableStream;
 
         if (!responseStream) {
           setStatus(EstimateStatus.ERROR);
@@ -126,14 +105,14 @@ const useEstimateSize = <TArg,>(
           }
         });
       } catch (error) {
-        // Aborting the stream (cancel or superseding estimate) is not an error
-        if (error instanceof DOMException && error.name === "AbortError") {
+        // Aborting (cancel or superseding estimate) is not an error
+        if (isAbortError(error)) {
           return;
         }
         setStatus(EstimateStatus.ERROR);
       }
     },
-    [dispatch, estimateThunk, getEstimatedBytes]
+    [estimateRequest, getEstimatedBytes]
   );
 
   return {

@@ -1,10 +1,16 @@
 /**
- * Geoserver-backed map item requests (WMS/WFS layers, fields, features).
- * All five endpoints share the same request shape, so they are generated
- * from one template.
+ * Geoserver-backed map item requests.
  *
- * Every function returns response data and throws a normalized
- * ErrorResponse on HTTP failure. Optional AbortSignal to cancel.
+ * Read (GET), all under /ogc/collections/{uuid}/items/:
+ *   getWmsMapFeature(req)    .../wms_map_feature
+ *   getWmsFields(req)        .../wms_fields
+ *   getWfsFieldValues(req)   .../wfs_field_value
+ *   getWmsLayers(req)        .../wms_layers
+ *   getWfsLayers(req)        .../wfs_layers
+ *
+ * All five share the same request shape, so they are generated from one
+ * template. Every function returns response data and throws a
+ * normalized ErrorResponse on HTTP failure. Optional AbortSignal.
  */
 import { ogcAxiosWithRetry, TIMEOUT, toErrorResponse } from "./httpClient";
 import {

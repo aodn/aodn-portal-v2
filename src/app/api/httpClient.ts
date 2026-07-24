@@ -73,6 +73,17 @@ export const normalizeHttpError = (error: unknown): unknown => {
   return error;
 };
 
+// True when the error is a cancelled request or aborted stream — callers
+// treat these as "stop quietly", not as failures.
+export const isAbortError = (error: unknown): boolean => {
+  const e = error as { name?: string; code?: string } | undefined;
+  return (
+    e?.name === "AbortError" ||
+    e?.name === "CanceledError" ||
+    e?.code === "ERR_CANCELED"
+  );
+};
+
 // Throwing variant for promise .catch chains.
 export const toErrorResponse = (error: unknown): never => {
   throw normalizeHttpError(error);

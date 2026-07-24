@@ -15,11 +15,19 @@ used everywhere.
 
 ## How a request flows
 
+Two paths, pick by need:
+
 ```
-component → dispatch(thunk)        store/xxxThunks.ts
-          → calls the API          api/search.ts etc.
-          → response lands in      store/xxxReducer.ts
-          → components re-render via useAppSelector (store/hooks.ts)
+One-off data (most cases):
+  component → api/search.ts etc. → .then(...) in the component
+  (cancel by passing an AbortSignal)
+
+Cached / polled data (health, more to come):
+  component → useXxxQuery hook → store/ogcApi.ts → api layer
+  (caching, dedupe and polling come for free)
+
+Search results (legacy, still redux):
+  component → dispatch(fetchResultWithStore) → store/searchReducer.ts
 ```
 
 ## Rules

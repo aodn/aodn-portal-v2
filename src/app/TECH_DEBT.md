@@ -18,15 +18,12 @@
       `"import/parsers": { "@typescript-eslint/parser": [".ts", ".tsx"] }`
 - [ ] After the cycles are fixed, turn on `"import/no-cycle": "error"`
 
-## Finish the RTK Query migration
+## Finish the server-state cleanup
 
 - [ ] Migrate `fetchResultWithStore` / `fetchResultAppendStore` (the
       last hand-written fetch thunks in `searchReducer.ts`): move their
       consumers (`getSearchQueryResult` readers) to RTK Query hooks,
       then delete the search slice
-- [ ] Decide the WFS/CO SSE downloads (`downloadThunks.ts`): they
-      stream server-sent events so RTK Query caching does not apply —
-      either keep them as thunks or call `@/app/api/download` directly
 - [ ] Store plain objects instead of `OGCCollections` class instances,
       then re-enable `serializableCheck`
 - [ ] Replace the bookmark EventEmitter bridge with store subscriptions

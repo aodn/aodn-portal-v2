@@ -24,7 +24,6 @@ import {
 } from "@/app/store/searchParamsReducer";
 import store, { getSearchParams, RootState } from "@/app/store/store";
 import { createSuggesterParamFrom } from "@/app/store/searchReducer";
-import { fetchSuggesterOptions } from "@/app/store/ogcApi";
 import { borderRadius, color, padding } from "../../styles/constants";
 import { debounce } from "lodash";
 import { sortByRelevance } from "../../utils/Helpers";
@@ -35,6 +34,7 @@ import { useLocation } from "react-router-dom";
 import { pageDefault } from "../common/constants";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import { portalTheme } from "../../styles";
+import * as searchApi from "@/app/api/search";
 
 interface InputWithSuggesterProps {
   containerRef?: HTMLDivElement | null;
@@ -106,8 +106,9 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
       setPendingSearch?.(true);
       try {
         const currentState: ParameterState = getSearchParams(store.getState());
-        dispatch(fetchSuggesterOptions(createSuggesterParamFrom(currentState)))
-          .unwrap()
+        searchApi
+          .getAutocomplete(createSuggesterParamFrom(currentState))
+
           .then((data) => {
             const parameter = new Set<string>(data.suggested_parameter_vocabs);
             const phrases = new Set<string>(data.suggested_phrases);
@@ -157,7 +158,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
         setPendingSearch?.(false);
       }
     },
-    [dispatch, setPendingSearch]
+    [setPendingSearch]
   );
 
   const debounceRefreshOptions = useMemo(

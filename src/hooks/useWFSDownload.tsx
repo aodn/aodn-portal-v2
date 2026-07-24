@@ -1,8 +1,8 @@
 import { useCallback, useState, useRef } from "react";
-import { useAppDispatch } from "@/app/store/hooks";
-import { processWFSDownload } from "@/app/store/downloadThunks";
 import { IDownloadCondition } from "../pages/detail-page/context/DownloadDefinitions";
 import { consumeSSEStream } from "../utils/SSEUtils";
+import { ErrorResponse } from "../utils/ErrorBoundary";
+import * as downloadApi from "@/app/api/download";
 
 // Aligned with backend SSE event names (ogc-api SseEventName enum)
 enum EventName {
@@ -52,13 +52,12 @@ enum DownloadStatus {
 }
 
 const useWFSDownload = (onCallback?: () => void) => {
-  const dispatch = useAppDispatch();
   const [downloadingStatus, setDownloadingStatus] = useState<DownloadStatus>(
     DownloadStatus.NOT_STARTED
   );
   const [progressMessage, setProgressMessage] = useState<string>("");
   const [downloadedBytes, setDownloadedBytes] = useState<number>(0);
-  const downloadPromiseRef = useRef<any>(null);
+  const downloadAbortRef = useRef<AbortController | null>(null);
   const fileChunksRef = useRef<string[]>([]);
   const receivedChunksRef = useRef<Set<number>>(new Set());
   const expectedTotalChunksRef = useRef<number>(0);
@@ -90,10 +89,8 @@ const useWFSDownload = (onCallback?: () => void) => {
 
   // Cancel download function
   const cancelDownload = useCallback(() => {
-    if (downloadPromiseRef.current) {
-      downloadPromiseRef.current.abort();
-      downloadPromiseRef.current = null;
-    }
+    downloadAbortRef.current?.abort();
+    downloadAbortRef.current = null;
     cleanupDownload();
     setDownloadedBytes(0);
     setDownloadingStatus(DownloadStatus.NOT_STARTED);
@@ -292,29 +289,34 @@ const useWFSDownload = (onCallback?: () => void) => {
       onCallback && onCallback();
 
       try {
-        const downloadPromise = dispatch(
-          processWFSDownload({
-            uuid,
-            layerName,
-            downloadConditions,
-          })
-        );
+        const controller = new AbortController();
+        // Store the controller so we can abort the request later
+        downloadAbortRef.current = controller;
 
-        // Store the promise so we can abort it later
-        downloadPromiseRef.current = downloadPromise;
-
-        const resultAction = await downloadPromise;
-
-        if (processWFSDownload.rejected.match(resultAction)) {
+        let response;
+        try {
+          response = await downloadApi.postWfsDownload(
+            {
+              uuid,
+              layerName,
+              downloadConditions,
+            },
+            controller.signal
+          );
+        } catch (error) {
           setDownloadingStatus(DownloadStatus.ERROR);
+          // Only HTTP failures carry a server message worth showing; aborts
+          // and network errors have messages like "canceled" / "Network Error"
           setProgressMessage(
-            resultAction.payload?.message || "Failed to start WFS download"
+            error instanceof ErrorResponse
+              ? error.message
+              : "Failed to start WFS download"
           );
           onCallback && onCallback();
           return;
         }
 
-        const responseStream = resultAction.payload.data as ReadableStream;
+        const responseStream = response.data as ReadableStream;
 
         if (!responseStream) {
           console.error("Response stream is null");
@@ -350,7 +352,7 @@ const useWFSDownload = (onCallback?: () => void) => {
         cleanupDownload();
       }
     },
-    [cleanupDownload, onCallback, processSSEData, dispatch]
+    [cleanupDownload, onCallback, processSSEData]
   );
 
   return {

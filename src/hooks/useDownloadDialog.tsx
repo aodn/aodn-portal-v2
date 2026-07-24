@@ -8,7 +8,6 @@ import {
   startTransition,
 } from "react";
 import { useParams } from "react-router-dom";
-import { useAppDispatch } from "@/app/store/hooks";
 import { DataUsageInformation } from "../pages/detail-page/features/download/download-dialog/DataUsageForm";
 import { useDetailPageContext } from "../pages/detail-page/context/detail-page-context";
 import {
@@ -21,11 +20,11 @@ import {
   DatasetDownloadRequest,
   DownloadConditionType,
 } from "../pages/detail-page/context/DownloadDefinitions";
-import { processDatasetDownload } from "@/app/store/ogcApi";
 import { trackCustomEvent } from "../analytics/customEventTracker";
 import { AnalyticsEvent } from "../analytics/analyticsEvents";
 import { calculateBboxes } from "../analytics/downloadCODataEvent";
 import { MultiPolygon } from "geojson";
+import * as downloadApi from "@/app/api/download";
 
 // ================== CONSTANTS ==================
 const STATUS_CODES = {
@@ -49,7 +48,6 @@ export const useDownloadDialog = (
 ) => {
   // ================== DEPENDENCIES & CONTEXT ==================
   const { uuid } = useParams<{ uuid: string }>();
-  const dispatch = useAppDispatch();
   const { downloadConditions, collection } = useDetailPageContext();
 
   // ================== STATE MANAGEMENT ==================
@@ -340,8 +338,9 @@ export const useDownloadDialog = (
         },
       };
 
-      dispatch(processDatasetDownload(request))
-        .unwrap()
+      downloadApi
+        .postDatasetDownload(request)
+
         .then((response: { status: { message: string } }) => {
           if (response?.status?.message) {
             const statusCode = response.status.message;
@@ -376,7 +375,7 @@ export const useDownloadDialog = (
           }
         );
     },
-    [uuid, dispatch, collection]
+    [uuid, collection]
   );
 
   // ================== FORM SUBMISSION HANDLERS ==================

@@ -4,9 +4,8 @@ import {
   jsonToOGCCollections,
   SearchParameters,
 } from "@/app/store/searchReducer";
-import { fetchResultNoStore } from "@/app/store/ogcApi";
 import { MapMouseEvent } from "mapbox-gl";
-import { useAppDispatch } from "@/app/store/hooks";
+import * as searchApi from "@/app/api/search";
 
 interface SpatialExtentsProps {
   layerId: string;
@@ -36,26 +35,23 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
   addedLayerIds = [],
 }) => {
   const { map } = useContext(MapContext);
-  const dispatch = useAppDispatch();
 
   // util function to get collection data given uuid
-  const getCollectionData = useCallback(
-    async (uuid: string) => {
-      const param: SearchParameters = {
-        filter: `id IN('${uuid}')`,
-        properties: "id,geometry",
-      };
+  const getCollectionData = useCallback(async (uuid: string) => {
+    const param: SearchParameters = {
+      filter: `id IN('${uuid}')`,
+      properties: "id,geometry",
+    };
 
-      return dispatch(fetchResultNoStore(param))
-        .unwrap()
-        .then((value: string) => jsonToOGCCollections(value).collections[0])
-        .catch((error: any) => {
-          console.error("Error fetching collection data:", error);
-          // TODO: handle error in ErrorBoundary
-        });
-    },
-    [dispatch]
-  );
+    return searchApi
+      .getCollections(param)
+
+      .then((value: string) => jsonToOGCCollections(value).collections[0])
+      .catch((error: any) => {
+        console.error("Error fetching collection data:", error);
+        // TODO: handle error in ErrorBoundary
+      });
+  }, []);
 
   const addSpatialExtentsLayer = useCallback(() => {
     const sourceIds = new Array<string>();

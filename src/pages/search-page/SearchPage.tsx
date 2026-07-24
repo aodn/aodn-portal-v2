@@ -21,10 +21,6 @@ import {
   SearchParameters,
 } from "@/app/store/searchReducer";
 import {
-  fetchResultByUuidNoStore,
-  fetchResultNoStore,
-} from "@/app/store/ogcApi";
-import {
   formatToUrlParam,
   ParameterState,
   unFlattenToParameterState,
@@ -71,6 +67,7 @@ import _ from "lodash";
 import useFetchData from "../../hooks/useFetchData";
 import { ProgressType } from "../../components/map/mapbox/MapContext";
 import AdminScreenContext from "../../components/admin/AdminScreenContext";
+import * as searchApi from "@/app/api/search";
 
 const SearchPage = () => {
   const location = useLocation();
@@ -121,9 +118,7 @@ const SearchPage = () => {
   const listSearchAbortRef = useRef<{
     abort: (reason?: string) => void;
   } | null>(null);
-  const mapSearchAbortRef = useRef<{ abort: (reason?: string) => void } | null>(
-    null
-  );
+  const mapSearchAbortRef = useRef<AbortController | null>(null);
   // This is use to avoid update called too many times in short period that
   // hurt the performace
   const debounceHistoryUpdateRef = useRef<_.DebouncedFunc<
@@ -175,18 +170,19 @@ const SearchPage = () => {
         }
       );
       setProgress(ProgressType.LINEAR);
-      const request = dispatch(
-        // add param "sortby: id" for fetchResultNoStore to ensure data source for map is always sorted
-        // and ordered by uuid to avoid affecting cluster calculation
-        fetchResultNoStore({
-          ...paramNonPaged,
-          properties: "id,centroid",
-          sortby: "id",
-        })
-      );
-      mapSearchAbortRef.current = request;
-      await request
-        .unwrap()
+      // add param "sortby: id" for searchApi.getCollections to ensure data source for map is always sorted
+      // and ordered by uuid to avoid affecting cluster calculation
+      const controller = new AbortController();
+      mapSearchAbortRef.current = controller;
+      await searchApi
+        .getCollections(
+          {
+            ...paramNonPaged,
+            properties: "id,centroid",
+            sortby: "id",
+          },
+          controller.signal
+        )
         .then((collections: string) => {
           // This check is need due to user can move the map around when the search
           // is still in progress, the store have the latest map bbox so we can check
@@ -209,7 +205,7 @@ const SearchPage = () => {
           // Must update status after search done, this change the location.state and will
           // cause all search cancel. However, we also need to make sure that the request is not canceled
           // and replaced by a new one due to new search
-          if (needNavigate && request === mapSearchAbortRef.current) {
+          if (needNavigate && controller === mapSearchAbortRef.current) {
             debounceHistoryUpdateRef?.current?.cancel();
             debounceHistoryUpdateRef?.current?.(
               pageDefault.search + "?" + formatToUrlParam(componentParam)
@@ -220,7 +216,7 @@ const SearchPage = () => {
           mapSearchAbortRef.current = null;
         });
     },
-    [dispatch, getMaxMapCentroids]
+    [getMaxMapCentroids]
   );
 
   const doListSearch = useCallback(
@@ -408,8 +404,9 @@ const SearchPage = () => {
           // If the item exists in items array or is already a temporary item, just expand the item
           dispatch(setExpandedItem(temporaryItemExisting));
         } else {
-          dispatch(fetchResultByUuidNoStore(uuids[0]))
-            .unwrap()
+          searchApi
+            .getCollectionById(uuids[0])
+
             .then((res: OGCCollection) => {
               dispatch(setTemporaryItem(res));
               dispatch(setExpandedItem(res));
