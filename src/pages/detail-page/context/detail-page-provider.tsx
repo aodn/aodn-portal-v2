@@ -32,6 +32,7 @@ import {
 } from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 import { CloudOptimizedFeature } from "@/app/store/CloudOptimizedDefinitions";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { useDatasetJsonLd } from "@/hooks/useDatasetJsonLd";
 
 interface DetailPageProviderProps {
   children: ReactNode;
@@ -119,6 +120,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   }, [dispatch, uuid]);
 
   useDocumentTitle(collection?.title);
+  useDatasetJsonLd(collection);
 
   useEffect(() => {
     if (!uuid) return;
