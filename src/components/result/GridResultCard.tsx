@@ -95,9 +95,9 @@ const GridResultCard: FC<GridResultCardProps> = ({
             alt={`Thumbnail of ${title}`}
             loading="lazy"
             style={{
-              objectFit: "fill",
+              objectFit: "cover",
               width: "100%",
-              height: "auto",
+              height: "100%",
             }}
             onError={(e: SyntheticEvent<HTMLImageElement, Event>) => {
               e.preventDefault();
