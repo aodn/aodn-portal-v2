@@ -17,6 +17,7 @@ import {
 import OrganizationLogo from "../icon/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import { ResultCardBasicType } from "./ResultCards";
+import { SHOW_RESULT_CARD_THUMBNAIL } from "./constants";
 import BookmarkButton from "../bookmark/BookmarkButton";
 import default_thumbnail from "@/assets/images/default-thumbnail.png";
 import { portalTheme } from "../../styles";
@@ -91,7 +92,11 @@ const GridResultCard: FC<GridResultCardProps> = ({
           borderRadius={borderRadius.small}
         >
           <img
-            src={findThumbnail()}
+            src={
+              SHOW_RESULT_CARD_THUMBNAIL
+                ? findThumbnail()
+                : (content.createStaticMapUrl() ?? default_thumbnail)
+            }
             alt={`Thumbnail of ${title}`}
             loading="lazy"
             style={{
