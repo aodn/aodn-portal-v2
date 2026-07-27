@@ -346,18 +346,15 @@ export class OGCCollection {
   }
 
   // Locate the thumbnail from the links array, fallback to a static map
-  // of the spatial extents (unless disabled), then the default placeholder
-  findThumbnail = (useStaticMapFallback: boolean = true): string => {
+  // of the spatial extents, then the default placeholder
+  findThumbnail = (): string => {
     const target = this.links?.find(
       (l) => l.type === "image" && l.rel === RelationType.PREVIEW
     );
     if (target !== undefined && target.href.length > 0) {
       return target.href;
     }
-    return (
-      (useStaticMapFallback ? this.createStaticMapUrl() : undefined) ??
-      default_thumbnail
-    );
+    return this.createStaticMapUrl() ?? default_thumbnail;
   };
 
   // Build a Mapbox Static Images API url showing the spatial extents like

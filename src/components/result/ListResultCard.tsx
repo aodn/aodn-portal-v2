@@ -15,7 +15,10 @@ import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import { ResultCardBasicType } from "./ResultCards";
 import BookmarkButton from "../bookmark/BookmarkButton";
 import default_thumbnail from "@/assets/images/default-thumbnail.png";
-import { LIST_CARD_TITLE_HEIGHT } from "./constants";
+import {
+  LIST_CARD_TITLE_HEIGHT,
+  SHOW_RESULT_CARD_THUMBNAIL,
+} from "./constants";
 import { portalTheme } from "../../styles";
 import { OpenType } from "../../hooks/useTabNavigation";
 import ContextMenu, { ContextMenuRef } from "../menu/ContextMenu";
@@ -93,8 +96,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
 
   const { id: uuid, title, description, findIcon, findThumbnail } = content;
   const isSelectedDataset = uuid === selectedUuid;
-  // Hide the static-map fallback in list view, only show real thumbnails
-  const thumbnail: string = findThumbnail(false);
+  const thumbnail: string = findThumbnail();
   const scope = content.getScope();
 
   // parse update frequency which is 'both' mode, and convert to ['real-time', 'delayed'] list
@@ -258,7 +260,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
                 </Box>
               )}
             </Box>
-            {thumbnail !== default_thumbnail && (
+            {SHOW_RESULT_CARD_THUMBNAIL && thumbnail !== default_thumbnail && (
               <Box
                 sx={{
                   maxWidth: 150,
