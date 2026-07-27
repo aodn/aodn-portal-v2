@@ -31,6 +31,7 @@ import {
   LayerSwitcherLayer,
 } from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 import { CloudOptimizedFeature } from "@/app/store/CloudOptimizedDefinitions";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 interface DetailPageProviderProps {
   children: ReactNode;
@@ -116,6 +117,8 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         setIsCollectionNotFound(true);
       });
   }, [dispatch, uuid]);
+
+  useDocumentTitle(collection?.title);
 
   useEffect(() => {
     if (!uuid) return;

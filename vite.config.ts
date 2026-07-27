@@ -93,6 +93,26 @@ export default ({ mode }) => {
     };
   };
 
+  const generateSitemapPlugin = () => {
+    return {
+      name: "generate-sitemap",
+      // Generate for prod (the indexable build) and edge (a rehearsal, so a
+      // broken sitemap build is caught on merge day instead of release day)
+      async closeBundle() {
+        if (mode !== "prod" && mode !== "edge") return;
+        try {
+          const { generateSitemap } =
+            await import("./src/utils/seo/SitemapUtils");
+          await generateSitemap(path.resolve(__dirname, "dist"));
+        } catch (error) {
+          // Edge builds run on every merge; a beta API hiccup must not block deploys
+          if (mode === "prod") throw error;
+          console.warn("Sitemap generation failed (non-prod, ignored):", error);
+        }
+      },
+    };
+  };
+
   const copyRobotsPlugin = () => {
     return {
       name: "copy-robots-txt",
@@ -166,6 +186,7 @@ export default ({ mode }) => {
       inlineNewRelicPlugin(),
       inlineGoogleAnalyticsPlugin(),
       inlineSEOPlugin(),
+      generateSitemapPlugin(),
       copyRobotsPlugin(),
     ].filter(Boolean),
     build: {

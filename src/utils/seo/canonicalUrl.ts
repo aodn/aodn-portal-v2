@@ -2,7 +2,9 @@ import type { createBrowserRouter } from "react-router-dom";
 
 type Router = ReturnType<typeof createBrowserRouter>;
 
-const CANONICAL_BASE_URL = "https://portal.aodn.org.au";
+// v2 is currently served from portal-beta. When it takes over the production
+// domain, update this, SitemapUtils.js and robots.prod.txt together.
+export const CANONICAL_BASE_URL = "https://portal-beta.aodn.org.au";
 
 const setCanonicalUrl = (pathname: string) => {
   let link = document.head.querySelector<HTMLLinkElement>(
