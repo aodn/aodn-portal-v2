@@ -719,26 +719,6 @@ export type SumSparseCountResult = {
   /** Grouping actually used for the total (may differ if inference ran). */
   timeGroupBy: TimeGroupBy;
 };
-
-/**
- * Detect whether feature properties look like day buckets, month buckets, or both.
- */
-export const inspectCountPropertyFormats = (
-  properties: Record<string, unknown> | null | undefined
-): { hasDay: boolean; hasMonth: boolean } => {
-  let hasDay = false;
-  let hasMonth = false;
-  if (!properties) return { hasDay, hasMonth };
-  for (const key of Object.keys(properties)) {
-    const parsed = parseCountPropertyKey(key);
-    if (!parsed) continue;
-    if (parsed.isDay) hasDay = true;
-    else hasMonth = true;
-    if (hasDay && hasMonth) break;
-  }
-  return { hasDay, hasMonth };
-};
-
 /**
  * Sparse sum of pre-baked m* counts on a feature for the filter window.
  * Only walks properties that exist (not a dense calendar of day keys).
