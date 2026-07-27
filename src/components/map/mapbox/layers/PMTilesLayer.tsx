@@ -22,7 +22,7 @@ import { FeatureCollection, Geometry } from "geojson";
 import { LayerBasicType } from "./Layers";
 import MapLayerSelect from "../component/MapLayerSelect";
 import { SelectItem } from "../../../common/dropdown/CommonSelect";
-import { InnerHtmlBuilder } from "../../../../utils/HtmlUtils";
+import { InnerHtmlBuilder } from "@/utils/HtmlUtils";
 import { MapDefaultConfig } from "../constants";
 import { playwrightTestIds } from "../../../common/constants";
 import { DatasetType } from "@/app/store/OGCCollectionDefinitions";
@@ -129,7 +129,19 @@ export enum TimeGroupBy {
 /** Default when `.metadata` is missing or invalid. */
 export const DEFAULT_TIME_GROUP_BY = TimeGroupBy.Date;
 
-const PMTILE_LAYERS = [
+/** One Mapbox fill band over a PMTiles `hex_z*` source-layer. */
+export type PmtilesHexLayerDef = {
+  id: string;
+  sourceLayer: string;
+  minzoom: number;
+  maxzoom: number;
+};
+
+/**
+ * Zoom bands for hex density fills. Mapbox ranges are half-open:
+ * layer is active when `minzoom ≤ zoom < maxzoom` (same as hover gating).
+ */
+export const PMTILE_LAYERS: readonly PmtilesHexLayerDef[] = [
   { id: "pmtiles-hex-z0", sourceLayer: "hex_z0", minzoom: 0, maxzoom: 2 },
   { id: "pmtiles-hex-z2", sourceLayer: "hex_z2", minzoom: 2, maxzoom: 4 },
   { id: "pmtiles-hex-z4", sourceLayer: "hex_z4", minzoom: 4, maxzoom: 6 },
@@ -137,6 +149,50 @@ const PMTILE_LAYERS = [
   { id: "pmtiles-hex-z8", sourceLayer: "hex_z8", minzoom: 8, maxzoom: 10 },
   { id: "pmtiles-hex-z10", sourceLayer: "hex_z10", minzoom: 10, maxzoom: 13 },
 ];
+
+/**
+ * Hex bands visible at `zoom` for density feature-state work.
+ * Usually 0–1 layer. Overzoom past the last `maxzoom` clamps to the top band;
+ * underzoom below the first `minzoom` clamps to the bottom band.
+ */
+export const getActivePmtilesLayers = (zoom: number): PmtilesHexLayerDef[] => {
+  const matched = PMTILE_LAYERS.filter(
+    (layer) => zoom >= layer.minzoom && zoom < layer.maxzoom
+  );
+  if (matched.length > 0) return matched;
+
+  const first = PMTILE_LAYERS[0];
+  const last = PMTILE_LAYERS[PMTILE_LAYERS.length - 1];
+  if (!first || !last) return [];
+  if (zoom >= last.minzoom) return [last];
+  return [first];
+};
+
+/**
+ * Drop feature-state on hex bands that are not active at `zoom`.
+ * Used on filter-window reset so inactive bands do not keep stale totals
+ * (active band is overwritten in place to avoid a density flash).
+ */
+export const clearInactivePmtilesFeatureState = (
+  map: Map,
+  zoom: number
+): void => {
+  if (!map.getSource(SOURCE_ID)) return;
+  const activeSourceLayers = new Set(
+    getActivePmtilesLayers(zoom).map((layer) => layer.sourceLayer)
+  );
+  for (const layer of PMTILE_LAYERS) {
+    if (activeSourceLayers.has(layer.sourceLayer)) continue;
+    try {
+      map.removeFeatureState({
+        source: SOURCE_ID,
+        sourceLayer: layer.sourceLayer,
+      });
+    } catch {
+      // Source or style may already be gone
+    }
+  }
+};
 
 /**
  * Inclusive calendar period as an integer: `YYYYMMDD` (date buckets) or
@@ -663,26 +719,6 @@ export type SumSparseCountResult = {
   /** Grouping actually used for the total (may differ if inference ran). */
   timeGroupBy: TimeGroupBy;
 };
-
-/**
- * Detect whether feature properties look like day buckets, month buckets, or both.
- */
-export const inspectCountPropertyFormats = (
-  properties: Record<string, unknown> | null | undefined
-): { hasDay: boolean; hasMonth: boolean } => {
-  let hasDay = false;
-  let hasMonth = false;
-  if (!properties) return { hasDay, hasMonth };
-  for (const key of Object.keys(properties)) {
-    const parsed = parseCountPropertyKey(key);
-    if (!parsed) continue;
-    if (parsed.isDay) hasDay = true;
-    else hasMonth = true;
-    if (hasDay && hasMonth) break;
-  }
-  return { hasDay, hasMonth };
-};
-
 /**
  * Sparse sum of pre-baked m* counts on a feature for the filter window.
  * Only walks properties that exist (not a dense calendar of day keys).
@@ -996,6 +1032,11 @@ export type UpdateFeatureStateTotalsOptions = {
    * processed, `complete` is false so the caller can schedule another chunk.
    */
   maxFeatures?: number;
+  /**
+   * When set, only query/sum these bands. Default: all {@link PMTILE_LAYERS}
+   * (tests and tooling). Density hot path passes the active zoom band only.
+   */
+  layers?: readonly PmtilesHexLayerDef[];
 };
 
 export type UpdateFeatureStateTotalsResult = {
@@ -1013,6 +1054,8 @@ export type UpdateFeatureStateTotalsResult = {
  *
  * Supports incremental updates (skip `session.written`) and chunked work
  * (`maxFeatures`) so wide ranges stay responsive on the main thread.
+ * Pass `layers` (e.g. from {@link getActivePmtilesLayers}) to skip bands
+ * that are not visible at the current zoom.
  */
 export const updateFeatureStateTotals = (
   map: Map,
@@ -1032,6 +1075,7 @@ export const updateFeatureStateTotals = (
     });
   const session = options?.session;
   const maxFeatures = options?.maxFeatures;
+  const layers = options?.layers ?? PMTILE_LAYERS;
   // Infer opposite day/month format so small monthly tiles still light up
   // before (or without) a correct `.metadata` time_group_by.
   const sumOptions: SumSparseCountOptions = {
@@ -1045,7 +1089,7 @@ export const updateFeatureStateTotals = (
   let seen = 0;
   let stoppedEarly = false;
 
-  outer: for (const layer of PMTILE_LAYERS) {
+  outer: for (const layer of layers) {
     let features;
     try {
       features = map.querySourceFeatures(SOURCE_ID, {
@@ -1328,10 +1372,17 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         pass.dirty = false;
 
         if (doReset) {
-          // Overwrite totals in place — do not clearFeatureState (avoids empty flash)
+          // Active band: overwrite totals in place (avoids empty flash).
+          // Inactive bands: drop feature-state so a later zoom does not paint
+          // stale totals from the previous filter window.
           featureStateSessionRef.current = createFeatureStateTotalsSession();
           densityReadyRef.current = false;
           removePopup();
+          try {
+            clearInactivePmtilesFeatureState(map, map.getZoom());
+          } catch {
+            // Map may already be torn down
+          }
         }
 
         // Placeholder only on first load (never after density paint has been applied)
@@ -1380,6 +1431,9 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
               );
               countFilterRangeRef.current = range;
 
+              // Only sum the band visible at the current zoom (each chunk
+              // re-reads zoom so a mid-pass zoom switch targets the new band).
+              const layers = getActivePmtilesLayers(map.getZoom());
               const { complete, seen } = updateFeatureStateTotals(
                 map,
                 filterStartDateRef.current,
@@ -1389,6 +1443,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
                   range,
                   session: featureStateSessionRef.current,
                   maxFeatures: FEATURE_STATE_CHUNK_SIZE,
+                  layers,
                 }
               );
               if (!complete) return false;

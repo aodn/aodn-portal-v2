@@ -37,6 +37,9 @@ import {
   dayjsToMonthPeriod,
   createFeatureStateTotalsSession,
   featureStateSessionKey,
+  getActivePmtilesLayers,
+  clearInactivePmtilesFeatureState,
+  PMTILE_LAYERS,
   FEATURE_STATE_TOTAL,
   DENSITY_TOTAL_CAP,
   DENSITY_COLOR_STOPS,
@@ -722,6 +725,92 @@ describe("PMTilesLayer - buildPopupHtml", () => {
   });
 });
 
+describe("PMTilesLayer - getActivePmtilesLayers", () => {
+  it("returns the half-open band for interior zooms", () => {
+    expect(getActivePmtilesLayers(0).map((l) => l.sourceLayer)).toEqual([
+      "hex_z0",
+    ]);
+    expect(getActivePmtilesLayers(1.9).map((l) => l.sourceLayer)).toEqual([
+      "hex_z0",
+    ]);
+    expect(getActivePmtilesLayers(2).map((l) => l.sourceLayer)).toEqual([
+      "hex_z2",
+    ]);
+    expect(getActivePmtilesLayers(5).map((l) => l.sourceLayer)).toEqual([
+      "hex_z4",
+    ]);
+    expect(getActivePmtilesLayers(8).map((l) => l.sourceLayer)).toEqual([
+      "hex_z8",
+    ]);
+    expect(getActivePmtilesLayers(12.9).map((l) => l.sourceLayer)).toEqual([
+      "hex_z10",
+    ]);
+  });
+
+  it("clamps underzoom to the first band and overzoom to the last", () => {
+    expect(getActivePmtilesLayers(-1).map((l) => l.sourceLayer)).toEqual([
+      "hex_z0",
+    ]);
+    expect(getActivePmtilesLayers(13).map((l) => l.sourceLayer)).toEqual([
+      "hex_z10",
+    ]);
+    expect(getActivePmtilesLayers(20).map((l) => l.sourceLayer)).toEqual([
+      "hex_z10",
+    ]);
+  });
+
+  it("covers every PMTILE_LAYERS boundary without gaps or overlap", () => {
+    for (const layer of PMTILE_LAYERS) {
+      expect(getActivePmtilesLayers(layer.minzoom)[0]?.sourceLayer).toBe(
+        layer.sourceLayer
+      );
+      // Just below maxzoom still this band; at maxzoom the next band (or clamp)
+      if (layer.maxzoom < 13) {
+        expect(
+          getActivePmtilesLayers(layer.maxzoom - 0.001)[0]?.sourceLayer
+        ).toBe(layer.sourceLayer);
+      }
+    }
+  });
+});
+
+describe("PMTilesLayer - clearInactivePmtilesFeatureState", () => {
+  it("removes feature-state only for inactive source-layers", () => {
+    const removeFeatureState = vi.fn();
+    const map = {
+      getSource: (id: string) => (id === "pmtiles-source-id" ? {} : undefined),
+      removeFeatureState,
+    } as unknown as Map;
+
+    clearInactivePmtilesFeatureState(map, 5); // hex_z4 active
+
+    const cleared = removeFeatureState.mock.calls.map(
+      (call) => (call[0] as { sourceLayer: string }).sourceLayer
+    );
+    expect(cleared).toEqual(
+      expect.arrayContaining([
+        "hex_z0",
+        "hex_z2",
+        "hex_z6",
+        "hex_z8",
+        "hex_z10",
+      ])
+    );
+    expect(cleared).not.toContain("hex_z4");
+    expect(cleared).toHaveLength(PMTILE_LAYERS.length - 1);
+  });
+
+  it("no-ops when the PMTiles source is missing", () => {
+    const removeFeatureState = vi.fn();
+    const map = {
+      getSource: () => undefined,
+      removeFeatureState,
+    } as unknown as Map;
+    clearInactivePmtilesFeatureState(map, 5);
+    expect(removeFeatureState).not.toHaveBeenCalled();
+  });
+});
+
 describe("PMTilesLayer - sparse sum and feature-state", () => {
   const start = dayjs("2024-01-01");
   const end = dayjs("2024-03-31");
@@ -1111,6 +1200,63 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     expect(chunk3.complete).toBe(true);
     expect(setFeatureState).toHaveBeenCalledTimes(5);
     expect(FEATURE_STATE_CHUNK_SIZE).toBeGreaterThan(0);
+  });
+
+  it("only queries and writes the layers option (active zoom band)", () => {
+    const setFeatureState = vi.fn();
+    const querySourceFeatures = vi.fn(
+      (_s: string, opts: { sourceLayer: string }) => {
+        if (opts.sourceLayer === "hex_z0") {
+          return [
+            {
+              id: "z0-cell",
+              properties: { h: "z0-cell", m20240115: 10 },
+            },
+          ];
+        }
+        if (opts.sourceLayer === "hex_z4") {
+          return [
+            {
+              id: "z4-cell",
+              properties: { h: "z4-cell", m20240115: 20 },
+            },
+          ];
+        }
+        return [];
+      }
+    );
+    const map = {
+      getSource: () => ({}),
+      querySourceFeatures,
+      setFeatureState,
+    } as unknown as Map;
+
+    const active = getActivePmtilesLayers(5); // hex_z4
+    expect(active.map((l) => l.sourceLayer)).toEqual(["hex_z4"]);
+
+    const { updated, complete } = updateFeatureStateTotals(
+      map,
+      dayjs("2024-01-01"),
+      dayjs("2024-03-31"),
+      TimeGroupBy.Date,
+      { layers: active }
+    );
+
+    expect(complete).toBe(true);
+    expect(updated).toBe(1);
+    expect(querySourceFeatures).toHaveBeenCalledTimes(1);
+    expect(querySourceFeatures).toHaveBeenCalledWith("pmtiles-source-id", {
+      sourceLayer: "hex_z4",
+    });
+    expect(setFeatureState).toHaveBeenCalledTimes(1);
+    expect(setFeatureState).toHaveBeenCalledWith(
+      {
+        source: "pmtiles-source-id",
+        sourceLayer: "hex_z4",
+        id: "z4-cell",
+      },
+      { [FEATURE_STATE_TOTAL]: 20 }
+    );
   });
 
   it("applies filter and paint to existing hex layers only", () => {
