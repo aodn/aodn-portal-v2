@@ -213,6 +213,16 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
   );
 };
 
+/** Epoch ms for {@link dateDefault.min} (1 Jan 1970 local). Slider floor. */
+const SLIDER_MIN_FLOOR = dateToValue(dayjs(dateDefault.min));
+
+/**
+ * Parse a date string to slider epoch ms, never below {@link SLIDER_MIN_FLOOR}.
+ * Dataset coverage can predate 1970; the control still starts at the floor.
+ */
+const dateStringToSliderValue = (date: string): number =>
+  Math.max(SLIDER_MIN_FLOOR, dateToValue(dayjs(date, dateDefault.DATE_FORMAT)));
+
 const DateSliderRange: React.FC<DateSliderRangeProps> = ({
   currentMinDate,
   currentMaxDate,
@@ -220,19 +230,15 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
   maxDate,
   onDateRangeChange,
 }) => {
-  const minValue = useMemo(
-    () => dateToValue(dayjs(minDate, dateDefault.DATE_FORMAT)),
-    [minDate]
-  );
+  // Floor dataset min at 1 Jan 1970 so the rail/thumbs never open earlier.
+  const minValue = useMemo(() => dateStringToSliderValue(minDate), [minDate]);
   const maxValue = useMemo(
     () => dateToValue(dayjs(maxDate, dateDefault.DATE_FORMAT)),
     [maxDate]
   );
 
   const [dateRangeStamp, setDateRangeStamp] = useState<number[]>([
-    dateToValue(
-      dayjs(currentMinDate ? currentMinDate : minDate, dateDefault.DATE_FORMAT)
-    ),
+    dateStringToSliderValue(currentMinDate ? currentMinDate : minDate),
     dateToValue(
       dayjs(currentMaxDate ? currentMaxDate : maxDate, dateDefault.DATE_FORMAT)
     ),
@@ -321,12 +327,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
   useEffect(() => {
     startTransition(() => {
       const newDateRangeStamp = [
-        dateToValue(
-          dayjs(
-            currentMinDate ? currentMinDate : minDate,
-            dateDefault.DATE_FORMAT
-          )
-        ),
+        dateStringToSliderValue(currentMinDate ? currentMinDate : minDate),
         dateToValue(
           dayjs(
             currentMaxDate ? currentMaxDate : maxDate,
@@ -427,7 +428,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
             color: portalTheme.palette.text1,
           }}
         >
-          {dayjs(minDate).format(dateDefault.DISPLAY_FORMAT)}
+          {valueToDate(minValue).format(dateDefault.DISPLAY_FORMAT)}
         </Typography>
         <Typography
           sx={{
