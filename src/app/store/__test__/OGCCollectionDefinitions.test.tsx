@@ -83,7 +83,7 @@ describe("OGCCollection", () => {
 
       const result = collection.findThumbnail();
       expect(result).toBe(
-        "https://api.mapbox.com/styles/v1/mapbox/light-v11/static/[110,-45,155,-10]/312x130@2x?padding=20&access_token=test-token"
+        "https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/static/[110,-45,155,-10]/312x130@2x?padding=20&access_token=test-token"
       );
       vi.unstubAllEnvs();
     });
@@ -98,7 +98,7 @@ describe("OGCCollection", () => {
 
       const result = collection.findThumbnail();
       expect(result).toBe(
-        "https://api.mapbox.com/styles/v1/mapbox/light-v11/static/147.3,-43.1,3/312x130@2x?access_token=test-token"
+        "https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/static/147.3,-43.1,3/312x130@2x?access_token=test-token"
       );
       vi.unstubAllEnvs();
     });
@@ -113,7 +113,7 @@ describe("OGCCollection", () => {
 
       const result = collection.findThumbnail();
       expect(result).toBe(
-        "https://api.mapbox.com/styles/v1/mapbox/light-v11/static/[-180,-85,180,85]/312x130@2x?padding=20&access_token=test-token"
+        "https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/static/[-180,-85,180,85]/312x130@2x?padding=20&access_token=test-token"
       );
       vi.unstubAllEnvs();
     });
@@ -146,12 +146,12 @@ describe("OGCCollection", () => {
 
       const result = collection.findThumbnail();
       const match = result.match(
-        /^https:\/\/api\.mapbox\.com\/styles\/v1\/mapbox\/light-v11\/static\/geojson\((.+)\)\/auto\/312x130@2x\?padding=20&access_token=test-token$/
+        /^https:\/\/api\.mapbox\.com\/styles\/v1\/mapbox\/satellite-streets-v12\/static\/geojson\((.+)\)\/auto\/312x130@2x\?padding=20&access_token=test-token$/
       );
       expect(match).not.toBeNull();
       expect(decodeURIComponent(match![1])).toBe(
         '{"type":"FeatureCollection","features":[' +
-          '{"type":"Feature","properties":{"stroke":"#3B6E8F","stroke-width":2,"fill":"#52BDEC","fill-opacity":0.45},' +
+          '{"type":"Feature","properties":{"stroke":"#ffff00","stroke-width":1,"fill":"#ffffff","fill-opacity":0.4},' +
           '"geometry":{"type":"Polygon","coordinates":[[[147,-20],[148,-20],[148,-19],[147,-19],[147,-20]]]}},' +
           '{"type":"Feature","properties":{"marker-size":"small","marker-color":"#3B6E8F"},' +
           '"geometry":{"type":"Point","coordinates":[151.5,-24.5]}}]}'
@@ -172,7 +172,7 @@ describe("OGCCollection", () => {
 
       const result = collection.findThumbnail();
       expect(result).toBe(
-        "https://api.mapbox.com/styles/v1/mapbox/light-v11/static/[-180,-85,180,85]/312x130@2x?padding=20&access_token=test-token"
+        "https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/static/[-180,-85,180,85]/312x130@2x?padding=20&access_token=test-token"
       );
       vi.unstubAllEnvs();
     });
@@ -193,7 +193,7 @@ describe("OGCCollection", () => {
 
       const result = collection.findThumbnail();
       expect(result).toBe(
-        "https://api.mapbox.com/styles/v1/mapbox/light-v11/static/[110,-45,155,-10]/312x130@2x?padding=20&access_token=test-token"
+        "https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/static/[110,-45,155,-10]/312x130@2x?padding=20&access_token=test-token"
       );
       vi.unstubAllEnvs();
     });

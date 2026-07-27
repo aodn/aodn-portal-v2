@@ -93,7 +93,8 @@ const ListResultCard: FC<ListResultCardProps> = ({
 
   const { id: uuid, title, description, findIcon, findThumbnail } = content;
   const isSelectedDataset = uuid === selectedUuid;
-  const thumbnail: string = findThumbnail();
+  // Hide the static-map fallback in list view, only show real thumbnails
+  const thumbnail: string = findThumbnail(false);
   const scope = content.getScope();
 
   // parse update frequency which is 'both' mode, and convert to ['real-time', 'delayed'] list

@@ -198,7 +198,10 @@ const toDatasetType = (link: ILink): DatasetType | undefined => {
 // Please put all OGCCollection interfaces, types, or classes here.
 // Mapbox Static Images API settings for the bbox fallback thumbnail
 const staticMapDefault = {
-  styleUrl: "https://api.mapbox.com/styles/v1/mapbox/light-v11/static",
+  // Match the map's default basemap (ERSI World Imagery, which the Static
+  // Images API cannot render) — satellite imagery plus labels for readability
+  styleUrl:
+    "https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/static",
   imageSize: "312x130@2x", // matches the result card image area
   bboxPadding: 20,
   pointZoomLevel: 3,
@@ -206,12 +209,13 @@ const staticMapDefault = {
   coordPrecision: 3, // keep urls short and cache keys stable
   maxUrlLength: 7500, // the api rejects urls over ~8kb
   worldSpanLimit: 300, // skip overlay when extent covers most of the world
-  // Portal theme colors (theme.ts): #3B6E8F primary.main, #52BDEC primary.light
+  // Same polygon paint as the map view extents (SpatialExtents.tsx):
+  // white fill at 0.4 opacity with a yellow outline
   extentStyle: {
-    stroke: "#3B6E8F",
-    "stroke-width": 2,
-    fill: "#52BDEC",
-    "fill-opacity": 0.45,
+    stroke: "#ffff00",
+    "stroke-width": 1,
+    fill: "#ffffff",
+    "fill-opacity": 0.4,
   },
   pointStyle: { "marker-size": "small", "marker-color": "#3B6E8F" },
 };
@@ -342,15 +346,18 @@ export class OGCCollection {
   }
 
   // Locate the thumbnail from the links array, fallback to a static map
-  // of the spatial extents, then the default placeholder
-  findThumbnail = (): string => {
+  // of the spatial extents (unless disabled), then the default placeholder
+  findThumbnail = (useStaticMapFallback: boolean = true): string => {
     const target = this.links?.find(
       (l) => l.type === "image" && l.rel === RelationType.PREVIEW
     );
     if (target !== undefined && target.href.length > 0) {
       return target.href;
     }
-    return this.createStaticMapUrl() ?? default_thumbnail;
+    return (
+      (useStaticMapFallback ? this.createStaticMapUrl() : undefined) ??
+      default_thumbnail
+    );
   };
 
   // Build a Mapbox Static Images API url showing the spatial extents like
