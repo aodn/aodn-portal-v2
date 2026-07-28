@@ -29,10 +29,12 @@ interface ButtonContainerProps {
   sx?: SxProps;
 }
 
-enum Status {
-  Ongoing = "ongoing",
-  Completed = "completed",
-}
+// Lowercased status values accepted for each button, as the records use several
+// spellings for the same status and may combine codes into one string
+const Status = {
+  Ongoing: ["ongoing", "ongoing | historicalarchive"],
+  Completed: ["completed", "complete"],
+};
 
 const renderStatusButton = (
   shouldHideText: boolean,
@@ -40,7 +42,7 @@ const renderStatusButton = (
   resultCardButtonConfig?: ResultCardButtonConfig
 ) => {
   const status = content?.getStatus()?.toLowerCase().trim();
-  if (status === Status.Completed) {
+  if (status && Status.Completed.includes(status)) {
     return (
       <ResultCardButton
         startIcon={TaskAltSharpIcon}
@@ -50,7 +52,7 @@ const renderStatusButton = (
       />
     );
   }
-  if (status === Status.Ongoing) {
+  if (status && Status.Ongoing.includes(status)) {
     return (
       <ResultCardButton
         startIcon={DoubleArrowIcon}
