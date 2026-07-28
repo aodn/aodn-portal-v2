@@ -17,12 +17,7 @@ import UNSW from "@/assets/logos/unsw-logo.png";
 import UTAS from "@/assets/logos/utas-logo.png";
 import UTS from "@/assets/logos/uts-logo.png";
 import UWA from "@/assets/logos/uniwa-logo.png";
-import {
-  color,
-  fontSize,
-  fontWeight,
-  padding,
-} from "../../../../styles/constants";
+import { color, fontSize, fontWeight, padding } from "@/styles/constants";
 import LogoContainer from "./components/LogoContainer";
 import Logo from "./components/Logo";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
@@ -46,10 +41,10 @@ const LogoList: FC = () => {
           <Grid item xs={12} sm={8} lg={9}>
             <Typography color="#000" textAlign="left" padding={0}>
               Australia&apos;s Integrated Marine Observing System (IMOS) is
-              enabled by the National Collaborative Research Infrastructre
-              Strategy (NCRIS) It is operated by a consortium of institutions as
-              an unincorperated joint venture with the Unviersity of Tasmania as
-              Lead Agent.
+              enabled by the National Collaborative Research Infrastructure
+              Strategy (NCRIS). It is operated by a consortium of institutions
+              as an unincorporated joint venture, with the University of
+              Tasmania as the Lead Agent.
             </Typography>
           </Grid>
         </Grid>
