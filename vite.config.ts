@@ -1,4 +1,4 @@
-import { loadEnv } from "vite";
+import { loadEnv, type ConfigEnv, type ViteDevServer } from "vite";
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react-swc";
 import eslint from "vite-plugin-eslint";
@@ -6,7 +6,7 @@ import path from "path";
 import fs from "fs";
 
 // https://vitejs.dev/config/
-export default ({ mode }) => {
+export default ({ mode }: ConfigEnv) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
 
   const apiPath = process.env.VITE_API_HOST?.replace(/\/$/, "");
@@ -17,7 +17,7 @@ export default ({ mode }) => {
     // https://docs.newrelic.com/docs/browser/new-relic-browser/page-load-timing-resources/instrumentation-browser-monitoring/#javascript-placement
     return {
       name: "inline-javascript",
-      transformIndexHtml(html) {
+      transformIndexHtml(html: string) {
         const inlineJs = fs.readFileSync(
           path.resolve(__dirname, "public/relic_script.js"),
           "utf8"
@@ -38,7 +38,7 @@ export default ({ mode }) => {
   const inlineGoogleAnalyticsPlugin = () => {
     return {
       name: "inline-google-analytics",
-      transformIndexHtml(html) {
+      transformIndexHtml(html: string) {
         // Skip GA in test mode
         if (mode === "test") {
           return html.replace("<!-- google-analytics-js -->", "");
@@ -134,7 +134,7 @@ export default ({ mode }) => {
   const copyRobotsPlugin = () => {
     return {
       name: "copy-robots-txt",
-      configureServer(server) {
+      configureServer(server: ViteDevServer) {
         server.middlewares.use((req, res, next) => {
           if (req.url === "/robots.txt") {
             const file =
