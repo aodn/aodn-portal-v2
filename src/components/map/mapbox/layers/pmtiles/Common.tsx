@@ -35,7 +35,7 @@ export const DEFAULT_TIME_GROUP_BY = TimeGroupBy.Date;
  */
 export const COUNT_KEY_SET_MAX = 2000;
 /** Features to sum + setFeatureState per idle slice (keeps the main thread responsive). */
-export const FEATURE_STATE_CHUNK_SIZE = 400;
+export const FEATURE_STATE_CHUNK_SIZE = 600;
 /**
  * Top density total used by paint interpolate and by the feature-state early-stop.
  * Totals at or above this value all paint the same; full accuracy is only needed

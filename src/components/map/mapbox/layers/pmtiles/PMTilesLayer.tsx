@@ -1534,24 +1534,35 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   }, [collection]);
 
   // The PMTiles visualization only exists for parquet datasets, so in a mixed
-  // zarr/parquet collection, a non-parquet key falls back to the first parquet key
+  // zarr/parquet collection, a non-parquet key falls back to the first parquet key.
+  // Empty / unset selection must not become `.../undefined.pmtiles` or `.../.pmtiles`.
   const resolveParquetKey = useCallback((): string | undefined => {
-    let key = selectedCoKey;
+    let key =
+      typeof selectedCoKey === "string" && selectedCoKey.trim() !== ""
+        ? selectedCoKey.trim()
+        : undefined;
     if (key && collection?.getDatasetTypeByKey(key) !== DatasetType.PARQUET) {
-      key = collection?.getAllParquetKeys()[0] ?? key;
+      key = collection?.getAllParquetKeys()[0];
     }
-    return key;
+    if (!key) {
+      key = collection?.getAllParquetKeys()[0];
+    }
+    return key || undefined;
   }, [collection, selectedCoKey]);
 
-  const formSourceUrl = useCallback(() => {
+  const formSourceUrl = useCallback((): string | undefined => {
     const key = resolveParquetKey();
-    return `https://${bucket}.s3.${region}.amazonaws.com/portal/visualization/${collection?.id}/${key}.pmtiles`;
+    const collectionId = collection?.id;
+    if (!key || !collectionId) return undefined;
+    return `https://${bucket}.s3.${region}.amazonaws.com/portal/visualization/${collectionId}/${key}.pmtiles`;
   }, [collection?.id, resolveParquetKey]);
 
   // Sidecar written next to the archive by batch PMTiles generation
-  const formMetadataUrl = useCallback(() => {
+  const formMetadataUrl = useCallback((): string | undefined => {
     const key = resolveParquetKey();
-    return `https://${bucket}.s3.${region}.amazonaws.com/portal/visualization/${collection?.id}/${key}.metadata`;
+    const collectionId = collection?.id;
+    if (!key || !collectionId) return undefined;
+    return `https://${bucket}.s3.${region}.amazonaws.com/portal/visualization/${collectionId}/${key}.metadata`;
   }, [collection?.id, resolveParquetKey]);
 
   useEffect(() => {
@@ -1581,7 +1592,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     const metadataUrl = formMetadataUrl();
     const abortController = new AbortController();
 
-    // Reset while the new sidecar loads
+    // Reset while the new sidecar loads (or when dataset key is not ready)
     timeGroupByRef.current = DEFAULT_TIME_GROUP_BY;
     periodBoundsRef.current = null;
     startTransition(() => {
@@ -1589,6 +1600,13 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       setPeriodBoundsVersion((v) => v + 1);
     });
     onMetadataPeriodChange?.(null);
+
+    // No parquet dataset name yet — do not fetch `.../.metadata` / `.../undefined.metadata`
+    if (!metadataUrl) {
+      return () => {
+        abortController.abort();
+      };
+    }
 
     fetch(metadataUrl, { signal: abortController.signal })
       .then((response) => {
@@ -1657,6 +1675,8 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     if (!map) return;
 
     const sourceUrl = formSourceUrl();
+    // Dataset name (or collection id) not ready — never add `.../.pmtiles`
+    if (!sourceUrl) return;
 
     const addSourceAndLayers = () => {
       try {
