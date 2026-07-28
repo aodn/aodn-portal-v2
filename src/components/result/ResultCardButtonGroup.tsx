@@ -40,7 +40,7 @@ const renderStatusButton = (
   resultCardButtonConfig?: ResultCardButtonConfig
 ) => {
   const status = content?.getStatus()?.toLowerCase().trim();
-  if (status?.startsWith(Status.Completed)) {
+  if (status === Status.Completed || status === "complete") {
     return (
       <ResultCardButton
         startIcon={TaskAltSharpIcon}
