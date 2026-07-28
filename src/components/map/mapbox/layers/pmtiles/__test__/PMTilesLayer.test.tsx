@@ -44,7 +44,6 @@ import {
   DENSITY_OPACITY_STOPS,
   buildDensityInterpolateStops,
   PLACEHOLDER_FILL_COLOR,
-  buildSumExpression,
 } from "../PMTilesLayer";
 import {
   COUNT_KEY_SET_MAX,
@@ -548,28 +547,6 @@ describe("PMTilesLayer - CountFilterRange (integer + key set)", () => {
     expect(range.endPeriod).toBe(20240120);
     expect(isCountKeyInFilterRange("m20240115", range)).toBe(true);
     expect(isCountKeyInFilterRange("m20240109", range)).toBe(false);
-  });
-});
-
-describe("PMTilesLayer - buildSumExpression", () => {
-  it("returns 0 for no keys", () => {
-    expect(buildSumExpression([])).toBe(0);
-  });
-
-  it("returns a single coalesce expression for one key", () => {
-    expect(buildSumExpression(["m20240110"])).toEqual([
-      "coalesce",
-      ["get", "m20240110"],
-      0,
-    ]);
-  });
-
-  it("returns a sum of coalesce expressions for multiple keys", () => {
-    expect(buildSumExpression(["m20240120", "m20240221"])).toEqual([
-      "+",
-      ["coalesce", ["get", "m20240120"], 0],
-      ["coalesce", ["get", "m20240221"], 0],
-    ]);
   });
 });
 

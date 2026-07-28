@@ -805,13 +805,6 @@ export const buildPopupHtml = (
     .getHtml();
 };
 
-/** @deprecated Prefer feature-state totals; kept for unit tests / tooling. */
-export const buildSumExpression = (keys: string[]) => {
-  if (keys.length === 0) return 0;
-  if (keys.length === 1) return ["coalesce", ["get", keys[0]], 0];
-  return ["+", ...keys.map((k) => ["coalesce", ["get", k], 0])];
-};
-
 /** Density input: sparse total written via setFeatureState (0 when unset). */
 export const buildFeatureStateTotalExpression = (): ExpressionSpecification =>
   [
