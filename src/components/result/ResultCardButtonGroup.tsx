@@ -40,7 +40,7 @@ const renderStatusButton = (
   resultCardButtonConfig?: ResultCardButtonConfig
 ) => {
   const status = content?.getStatus()?.toLowerCase().trim();
-  if (status === Status.Completed) {
+  if (status?.startsWith(Status.Completed)) {
     return (
       <ResultCardButton
         startIcon={TaskAltSharpIcon}
@@ -50,7 +50,7 @@ const renderStatusButton = (
       />
     );
   }
-  if (status === Status.Ongoing) {
+  if (status?.startsWith(Status.Ongoing)) {
     return (
       <ResultCardButton
         startIcon={DoubleArrowIcon}
