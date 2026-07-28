@@ -1,21 +1,40 @@
 /**
  * Generates dist/sitemap.xml so crawlers can discover /details/<uuid> pages.
  * Runs via generateSitemapPlugin in vite.config.ts (prod build only), or
- * standalone: node src/utils/seo/SitemapUtils.js
+ * standalone: npx tsx src/utils/seo/SitemapUtils.ts
  *
- * Keep BASE_URL in sync with canonicalUrl.ts and robots.prod.txt.
+ * BASE_URL comes from constants.ts; keep robots.prod.txt in sync with it.
  */
 
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
+import { BASE_URL } from "./constants";
 
-const BASE_URL = "https://portal-beta.aodn.org.au";
 const API_URL = `${BASE_URL}/api/v1/ogc/collections`;
 const PAGE_SIZE = 1000;
 const MAX_RETRIES = 3;
 
-const fetchJsonWithRetry = async (url) => {
+// The subset of an OGC collection the SEO build steps read
+export interface OgcCollection {
+  id?: string;
+  title?: string;
+  description?: string;
+  extent?: {
+    spatial?: { bbox?: number[][] };
+    temporal?: { interval?: (string | null)[][] };
+  };
+  properties?: { themes?: { concepts?: { id?: string }[] }[] };
+  providers?: { name?: string }[];
+}
+
+interface CollectionsPage {
+  total?: number;
+  collections?: OgcCollection[];
+  search_after?: string[];
+}
+
+const fetchJsonWithRetry = async (url: string): Promise<CollectionsPage> => {
   for (let attempt = 1; ; attempt++) {
     try {
       const response = await fetch(url, {
@@ -27,46 +46,49 @@ const fetchJsonWithRetry = async (url) => {
       return await response.json();
     } catch (error) {
       if (attempt >= MAX_RETRIES) throw error;
-      console.warn(`Attempt ${attempt} failed (${error.message}), retrying...`);
+      const message = error instanceof Error ? error.message : String(error);
+      console.warn(`Attempt ${attempt} failed (${message}), retrying...`);
       await new Promise((resolve) => setTimeout(resolve, 2000 * attempt));
     }
   }
 };
 
 // Same page_size/search_after pagination the portal search uses
-const fetchAllUuids = async () => {
-  const uuids = [];
-  let searchAfter;
-  let total;
+export const fetchAllCollections = async (
+  properties = "id"
+): Promise<OgcCollection[]> => {
+  const collections: OgcCollection[] = [];
+  let searchAfter: string[] | undefined;
+  let total: number | undefined;
 
   for (;;) {
     let filter = `page_size=${PAGE_SIZE}`;
     if (searchAfter) {
       filter += ` AND search_after='${searchAfter.join("||")}'`;
     }
-    const url = `${API_URL}?properties=id&filter=${encodeURIComponent(filter)}`;
+    const url = `${API_URL}?properties=${properties}&filter=${encodeURIComponent(filter)}`;
     const json = await fetchJsonWithRetry(url);
 
     total = json.total;
-    const ids = (json.collections ?? []).map((collection) => collection.id);
-    if (ids.length === 0) break;
-    uuids.push(...ids);
-    console.log(`Fetched ${uuids.length}/${total} collections`);
+    const page = json.collections ?? [];
+    if (page.length === 0) break;
+    collections.push(...page);
+    console.log(`Fetched ${collections.length}/${total} collections`);
 
-    if (!json.search_after || uuids.length >= total) break;
+    if (!json.search_after || collections.length >= (total ?? 0)) break;
     searchAfter = json.search_after;
   }
 
-  if (uuids.length !== total) {
-    console.warn(`Expected ${total} collections but got ${uuids.length}`);
+  if (collections.length !== total) {
+    console.warn(`Expected ${total} collections but got ${collections.length}`);
   }
-  return uuids;
+  return collections;
 };
 
-const escapeXml = (value) =>
+const escapeXml = (value: string) =>
   value.replace(/[<>&'"]/g, (c) => `&#${c.charCodeAt(0)};`);
 
-const toSitemapXml = (uuids) => {
+const toSitemapXml = (uuids: string[]) => {
   const urls = [
     `${BASE_URL}/`,
     ...uuids.map((uuid) => `${BASE_URL}/details/${uuid}`),
@@ -80,8 +102,10 @@ const toSitemapXml = (uuids) => {
   ].join("\n");
 };
 
-export const generateSitemap = async (outDir) => {
-  const uuids = await fetchAllUuids();
+export const generateSitemap = async (outDir: string) => {
+  const uuids = (await fetchAllCollections())
+    .map((collection) => collection.id)
+    .filter((id): id is string => Boolean(id));
   if (uuids.length === 0) {
     throw new Error(
       "No collections returned from the OGC API; refusing to write an empty sitemap."

@@ -32,7 +32,6 @@ import {
 } from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
 import { CloudOptimizedFeature } from "@/app/store/CloudOptimizedDefinitions";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
-import { useDatasetJsonLd } from "@/hooks/useDatasetJsonLd";
 
 interface DetailPageProviderProps {
   children: ReactNode;
@@ -119,8 +118,9 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       });
   }, [dispatch, uuid]);
 
+  // Keep this even though crawlers get the pre-rendered <title>: SPA navigation
+  // never reloads the HTML, so without it the tab would keep showing the previously loaded record's title on this record's page.
   useDocumentTitle(collection?.title);
-  useDatasetJsonLd(collection);
 
   useEffect(() => {
     if (!uuid) return;

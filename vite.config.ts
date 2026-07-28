@@ -113,6 +113,24 @@ export default ({ mode }) => {
     };
   };
 
+  const prerenderDetailsPlugin = () => {
+    return {
+      name: "prerender-details",
+      // Same prod/edge gating and error semantics as generate-sitemap
+      async closeBundle() {
+        if (mode !== "prod" && mode !== "edge") return;
+        try {
+          const { prerenderDetailPages } =
+            await import("./src/utils/seo/PrerenderUtils");
+          await prerenderDetailPages(path.resolve(__dirname, "dist"));
+        } catch (error) {
+          if (mode === "prod") throw error;
+          console.warn("Detail prerender failed (non-prod, ignored):", error);
+        }
+      },
+    };
+  };
+
   const copyRobotsPlugin = () => {
     return {
       name: "copy-robots-txt",
@@ -187,6 +205,7 @@ export default ({ mode }) => {
       inlineGoogleAnalyticsPlugin(),
       inlineSEOPlugin(),
       generateSitemapPlugin(),
+      prerenderDetailsPlugin(),
       copyRobotsPlugin(),
     ].filter(Boolean),
     build: {

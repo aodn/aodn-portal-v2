@@ -1,6 +1,7 @@
 import { describe, expect, test, beforeEach } from "vitest";
 import { createMemoryRouter } from "react-router-dom";
-import { CANONICAL_BASE_URL, syncCanonicalUrl } from "../canonicalUrl";
+import { syncCanonicalUrl } from "../canonicalUrl";
+import { BASE_URL } from "../constants";
 
 const canonicalHref = () =>
   document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.href;
@@ -22,7 +23,7 @@ describe("syncCanonicalUrl", () => {
   test("sets the canonical to the configured base URL for the initial route", () => {
     syncCanonicalUrl(buildRouter("/details/abc-123"));
 
-    expect(canonicalHref()).toBe(`${CANONICAL_BASE_URL}/details/abc-123`);
+    expect(canonicalHref()).toBe(`${BASE_URL}/details/abc-123`);
   });
 
   test("creates the <link rel=canonical> element when the page has none", () => {
@@ -31,7 +32,7 @@ describe("syncCanonicalUrl", () => {
     syncCanonicalUrl(buildRouter("/"));
 
     expect(canonicalCount()).toBe(1);
-    expect(canonicalHref()).toBe(`${CANONICAL_BASE_URL}/`);
+    expect(canonicalHref()).toBe(`${BASE_URL}/`);
   });
 
   test("reuses the existing canonical element instead of adding another", () => {
@@ -42,16 +43,16 @@ describe("syncCanonicalUrl", () => {
     syncCanonicalUrl(buildRouter("/search"));
 
     expect(canonicalCount()).toBe(1);
-    expect(canonicalHref()).toBe(`${CANONICAL_BASE_URL}/search`);
+    expect(canonicalHref()).toBe(`${BASE_URL}/search`);
   });
 
   test("updates the canonical when the route changes", async () => {
     const router = buildRouter("/");
     syncCanonicalUrl(router);
-    expect(canonicalHref()).toBe(`${CANONICAL_BASE_URL}/`);
+    expect(canonicalHref()).toBe(`${BASE_URL}/`);
 
     await router.navigate("/details/xyz");
 
-    expect(canonicalHref()).toBe(`${CANONICAL_BASE_URL}/details/xyz`);
+    expect(canonicalHref()).toBe(`${BASE_URL}/details/xyz`);
   });
 });
