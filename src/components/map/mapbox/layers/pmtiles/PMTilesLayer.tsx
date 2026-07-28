@@ -29,6 +29,7 @@ import {
   PmtilesHexLayerDef,
   PMTilesMetadataRange,
   PeriodInt,
+  HexFillPaint,
   parseTimeGroupBy,
   TimeGroupBy,
   densityStopValue,
@@ -41,6 +42,7 @@ import { InnerHtmlBuilder } from "@/utils/HtmlUtils";
 import { SelectItem } from "@/components/common/dropdown/CommonSelect";
 import { MapDefaultConfig } from "@/components/map/mapbox/constants";
 import MapLayerSelect from "@/components/map/mapbox/component/MapLayerSelect";
+import { dayjsToDayPeriod, dayjsToMonthPeriod } from "@/utils/DateUtils";
 
 const SOURCE_ID = "pmtiles-source-id";
 const HOVER_SOURCE_ID = "pmtiles-hover-source-id";
@@ -458,14 +460,6 @@ export type CountFilterRange = {
   keySet?: ReadonlySet<string>;
 };
 
-/** Calendar day → YYYYMMDD integer (local calendar fields from dayjs). */
-export const dayjsToDayPeriod = (d: Dayjs): number =>
-  d.year() * 10000 + (d.month() + 1) * 100 + d.date();
-
-/** Calendar month → YYYYMM integer. */
-export const dayjsToMonthPeriod = (d: Dayjs): number =>
-  d.year() * 100 + (d.month() + 1);
-
 /**
  * Parse an mYYYYMM / mYYYYMMDD property name without dayjs.
  * Returns null when the key is not a count bucket.
@@ -877,19 +871,9 @@ export const buildFeatureStateHasCountExpression =
 export const buildDensityLayerFilter = (): ExpressionSpecification =>
   ["has", PROMOTE_ID_PROPERTY] as ExpressionSpecification;
 
-/** @deprecated Use buildDensityLayerFilter — feature-state cannot be used in filters. */
-export const buildFeatureStateNonZeroFilter = (): ExpressionSpecification =>
-  buildDensityLayerFilter();
-
 /** Phase A: any hex feature is present (tiles only contain cells with data). */
 export const buildPresenceFilter = (): ExpressionSpecification =>
   ["has", PROMOTE_ID_PROPERTY] as ExpressionSpecification;
-
-export type HexFillPaint = {
-  "fill-color": ExpressionSpecification | string;
-  "fill-opacity": ExpressionSpecification | number;
-  "fill-outline-color": ExpressionSpecification | string;
-};
 
 export const PLACEHOLDER_FILL_COLOR = "#475569";
 export const PLACEHOLDER_FILL_OPACITY = 0.4;

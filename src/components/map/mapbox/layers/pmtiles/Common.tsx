@@ -1,3 +1,5 @@
+import { ExpressionSpecification } from "mapbox-gl";
+
 /** One Mapbox fill band over a PMTiles `hex_z*` source-layer. */
 export type PmtilesHexLayerDef = {
   id: string;
@@ -45,6 +47,12 @@ export const FEATURE_STATE_CHUNK_SIZE = 600;
  * the whole scale rescales (see `DENSITY_COLOR_STOPS` / `DENSITY_OPACITY_STOPS`).
  */
 export const DENSITY_TOTAL_CAP = 10000;
+
+export type HexFillPaint = {
+  "fill-color": ExpressionSpecification | string;
+  "fill-opacity": ExpressionSpecification | number;
+  "fill-outline-color": ExpressionSpecification | string;
+};
 /** Parse sidecar metadata; only `"date"` and `"month"` are accepted. */
 const parseTimeGroupBy = (value: unknown): TimeGroupBy =>
   value === TimeGroupBy.Month

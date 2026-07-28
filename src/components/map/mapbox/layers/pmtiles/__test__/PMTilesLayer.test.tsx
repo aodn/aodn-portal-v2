@@ -32,8 +32,6 @@ import {
   buildCountFilterRangeFromPeriods,
   isCountKeyInFilterRange,
   parseCountPropertyKey,
-  dayjsToDayPeriod,
-  dayjsToMonthPeriod,
   createFeatureStateTotalsSession,
   featureStateSessionKey,
   getActivePmtilesLayers,
@@ -58,6 +56,7 @@ import {
   PMTilesMetadataRange,
   TimeGroupBy,
 } from "../Common";
+import { dayjsToDayPeriod, dayjsToMonthPeriod } from "@/utils/DateUtils";
 
 /** Test helper: parsePeriodInt that throws if parse fails. */
 const requirePeriodInt = (
