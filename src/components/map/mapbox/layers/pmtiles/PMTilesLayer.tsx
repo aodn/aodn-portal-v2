@@ -826,6 +826,15 @@ export const buildFeatureStateTotalIsSetExpression =
     ] as ExpressionSpecification;
 
 /**
+ * True when the sparse total is strictly greater than zero.
+ * Used so zero-count hexes (common after a narrow time-slider window) paint
+ * fully transparent — including outline — rather than leaving a faint border.
+ */
+export const buildFeatureStateHasCountExpression =
+  (): ExpressionSpecification =>
+    [">", buildFeatureStateTotalExpression(), 0] as ExpressionSpecification;
+
+/**
  * Layer filter for density mode.
  *
  * IMPORTANT: Mapbox/MapLibre do **not** allow `feature-state` in filters — only
@@ -846,17 +855,22 @@ export const buildPresenceFilter = (): ExpressionSpecification =>
 export type HexFillPaint = {
   "fill-color": ExpressionSpecification | string;
   "fill-opacity": ExpressionSpecification | number;
-  "fill-outline-color": string;
+  "fill-outline-color": ExpressionSpecification | string;
 };
 
 export const PLACEHOLDER_FILL_COLOR = "#475569";
 export const PLACEHOLDER_FILL_OPACITY = 0.4;
+export const PLACEHOLDER_OUTLINE_COLOR = "rgba(255, 255, 255, 0.4)";
+/** Fully transparent fill/outline when a hex has no records in the filter window. */
+export const ZERO_COUNT_FILL_COLOR = "rgba(0, 0, 0, 0)";
+export const ZERO_COUNT_OUTLINE_COLOR = "rgba(0, 0, 0, 0)";
+export const ZERO_COUNT_FILL_OPACITY = 0;
 
 /** Neutral style while feature-state totals are computed in the background. */
 export const getPlaceholderPaintProperties = (): HexFillPaint => ({
   "fill-color": PLACEHOLDER_FILL_COLOR,
   "fill-opacity": PLACEHOLDER_FILL_OPACITY,
-  "fill-outline-color": "rgba(255, 255, 255, 0.4)",
+  "fill-outline-color": PLACEHOLDER_OUTLINE_COLOR,
 });
 
 /**
@@ -864,7 +878,8 @@ export const getPlaceholderPaintProperties = (): HexFillPaint => ({
  *
  * Unset feature-state (tile not yet processed) keeps the placeholder look so
  * newly loaded hexes do not disappear until their sparse total is written.
- * A real total of 0 paints transparent (out of filter range).
+ * A real total of 0 paints fully transparent fill **and** outline (hexes with
+ * no records in the time-slider window must not appear as empty polygons).
  *
  * Color and opacity breakpoints scale with {@link DENSITY_TOTAL_CAP} via
  * {@link DENSITY_COLOR_STOPS} / {@link DENSITY_OPACITY_STOPS}.
@@ -873,6 +888,7 @@ export const getFeatureStatePaintProperties = (
   cap: number = DENSITY_TOTAL_CAP
 ): HexFillPaint => {
   const totalIsSet = buildFeatureStateTotalIsSetExpression();
+  const hasCount = buildFeatureStateHasCountExpression();
   const sumExpr = buildFeatureStateTotalExpression();
   const colorStops = buildDensityInterpolateStops(
     DENSITY_COLOR_STOPS.map(({ ratio, color }) => ({ ratio, value: color })),
@@ -890,15 +906,28 @@ export const getFeatureStatePaintProperties = (
       "case",
       ["!", totalIsSet],
       PLACEHOLDER_FILL_COLOR,
+      ["!", hasCount],
+      ZERO_COUNT_FILL_COLOR,
       ["interpolate", ["linear"], sumExpr, ...colorStops],
     ] as ExpressionSpecification,
     "fill-opacity": [
       "case",
       ["!", totalIsSet],
       PLACEHOLDER_FILL_OPACITY,
+      ["!", hasCount],
+      ZERO_COUNT_FILL_OPACITY,
       ["interpolate", ["linear"], sumExpr, ...opacityStops],
     ] as ExpressionSpecification,
-    "fill-outline-color": "rgba(255, 255, 255, 0.4)",
+    // Data-driven outline: a constant white border still showed on zero-count
+    // hexes. Fully transparent when total is 0 after the time filter.
+    "fill-outline-color": [
+      "case",
+      ["!", totalIsSet],
+      PLACEHOLDER_OUTLINE_COLOR,
+      ["!", hasCount],
+      ZERO_COUNT_OUTLINE_COLOR,
+      PLACEHOLDER_OUTLINE_COLOR,
+    ] as ExpressionSpecification,
   };
 };
 
@@ -1814,6 +1843,23 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
 
       const feature = e.features?.[0];
       if (!feature) return;
+
+      // Authoritative count for the active filter window (same path as popup HTML).
+      // Zero after a narrow time slider → no popup, no hover border, no pointer.
+      const { total: hoverTotal } = sumSparseCountFromProperties(
+        (feature.properties ?? {}) as Record<string, unknown>,
+        filterStartDateRef.current,
+        filterEndDateRef.current,
+        timeGroupByRef.current,
+        {
+          range: countFilterRangeRef.current,
+          collectMatchedKeys: false,
+        }
+      );
+      if (hoverTotal <= 0) {
+        clearHover();
+        return;
+      }
 
       map.getCanvas().classList.add(CURSOR_POINTER_CLASS);
 
