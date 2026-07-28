@@ -8,8 +8,6 @@ import {
   formatDateKey,
   isCountPropertyInRange,
   buildPopupHtml,
-  buildSumExpression,
-  parseTimeGroupBy,
   periodNumberToDayjs,
   parsePeriodInt,
   parsePMTilesMetadata,
@@ -44,15 +42,19 @@ import {
   DENSITY_TOTAL_CAP,
   DENSITY_COLOR_STOPS,
   DENSITY_OPACITY_STOPS,
-  densityStopValue,
   buildDensityInterpolateStops,
-  COUNT_KEY_SET_MAX,
-  FEATURE_STATE_CHUNK_SIZE,
   PLACEHOLDER_FILL_COLOR,
-  DEFAULT_TIME_GROUP_BY,
-  TimeGroupBy,
-  type PMTilesMetadataRange,
+  buildSumExpression,
 } from "../PMTilesLayer";
+import {
+  COUNT_KEY_SET_MAX,
+  DEFAULT_TIME_GROUP_BY,
+  FEATURE_STATE_CHUNK_SIZE,
+  parseTimeGroupBy,
+  densityStopValue,
+  PMTilesMetadataRange,
+  TimeGroupBy,
+} from "../Common";
 
 /** Test helper: parsePeriodInt that throws if parse fails. */
 const requirePeriodInt = (

@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
-import MapContext from "../MapContext";
+
 import dayjs, { Dayjs } from "dayjs";
 import {
   ExpressionSpecification,
@@ -19,35 +19,60 @@ import {
   Popup,
 } from "mapbox-gl";
 import { FeatureCollection, Geometry } from "geojson";
-import { LayerBasicType } from "./Layers";
-import MapLayerSelect from "../component/MapLayerSelect";
-import { SelectItem } from "../../../common/dropdown/CommonSelect";
-import { InnerHtmlBuilder } from "@/utils/HtmlUtils";
-import { MapDefaultConfig } from "../constants";
-import { playwrightTestIds } from "../../../common/constants";
+
+import {
+  COUNT_KEY_SET_MAX,
+  DEFAULT_TIME_GROUP_BY,
+  FEATURE_STATE_CHUNK_SIZE,
+  DENSITY_TOTAL_CAP,
+  coercePeriodDigits,
+  PmtilesHexLayerDef,
+  PMTilesMetadataRange,
+  PeriodInt,
+  parseTimeGroupBy,
+  TimeGroupBy,
+  densityStopValue,
+} from "./Common";
+import MapContext from "@/components/map/mapbox/MapContext";
 import { DatasetType } from "@/app/store/OGCCollectionDefinitions";
+import { playwrightTestIds } from "@/components/common/constants";
+import { LayerBasicType } from "@/components/map/mapbox/layers/Layers";
+import { InnerHtmlBuilder } from "@/utils/HtmlUtils";
+import { SelectItem } from "@/components/common/dropdown/CommonSelect";
+import { MapDefaultConfig } from "@/components/map/mapbox/constants";
+import MapLayerSelect from "@/components/map/mapbox/component/MapLayerSelect";
 
 const SOURCE_ID = "pmtiles-source-id";
 const HOVER_SOURCE_ID = "pmtiles-hover-source-id";
 const HOVER_OUTLINE_LAYER_ID = "pmtiles-hex-hover-outline";
 const CURSOR_POINTER_CLASS = "map-cursor-pointer";
-/** Feature-state key written by sparse JS sums for density paint/filter. */
-export const FEATURE_STATE_TOTAL = "total";
+/** H3 cell id property; promoted to feature id so feature-state can target hexes. */
+const PROMOTE_ID_PROPERTY = "h";
+const EMPTY_FEATURE_COLLECTION: FeatureCollection = {
+  type: "FeatureCollection",
+  features: [],
+};
+const bucket = import.meta.env.VITE_PMTILES_BUCKET;
+const region = import.meta.env.VITE_AWS_REGION;
+// Caps keep legacy key-list helpers bounded (tests / optional tooling).
+// Day cap is high enough for multi-decade daily PMTiles (~55 years).
+const MONTH_KEY_LIMIT = 1200;
+const DAY_KEY_LIMIT = 20000;
+const DEFAULT_RANGE_START = "2000-01-01";
 /**
- * Top density total used by paint interpolate and by the feature-state early-stop.
- * Totals at or above this value all paint the same; full accuracy is only needed
- * for the hover popup (which does not use this cap).
- *
- * Color/opacity breakpoints are ratios of this value — change only the cap and
- * the whole scale rescales (see `DENSITY_COLOR_STOPS` / `DENSITY_OPACITY_STOPS`).
+ * Trailing debounce so rapid tile `sourcedata` / `idle` events collapse into
+ * one feature-state pass after the viewport settles (avoids partial updates).
  */
-export const DENSITY_TOTAL_CAP = 10000;
+const FEATURE_STATE_DEBOUNCE_MS = 120;
+
+/** Feature-state key written by sparse JS sums for density paint/filter. */
+const FEATURE_STATE_TOTAL = "total";
 
 /**
  * Density fill-color stops as a fraction of {@link DENSITY_TOTAL_CAP}.
  * Ratios must be strictly increasing from 0 to 1.
  */
-export const DENSITY_COLOR_STOPS: ReadonlyArray<{
+const DENSITY_COLOR_STOPS: ReadonlyArray<{
   ratio: number;
   color: string;
 }> = [
@@ -64,7 +89,7 @@ export const DENSITY_COLOR_STOPS: ReadonlyArray<{
  * Density fill-opacity stops as a fraction of {@link DENSITY_TOTAL_CAP}.
  * Ratios must be strictly increasing from 0 toward 1 (need not reach 1).
  */
-export const DENSITY_OPACITY_STOPS: ReadonlyArray<{
+const DENSITY_OPACITY_STOPS: ReadonlyArray<{
   ratio: number;
   opacity: number;
 }> = [
@@ -73,13 +98,6 @@ export const DENSITY_OPACITY_STOPS: ReadonlyArray<{
   { ratio: 0.01, opacity: 0.6 }, // 100
   { ratio: 0.1, opacity: 0.8 }, // 1000
 ];
-
-/** Absolute count at a density ratio (rounded; keeps 0 exact). */
-export const densityStopValue = (
-  ratio: number,
-  cap: number = DENSITY_TOTAL_CAP
-): number => (ratio === 0 ? 0 : Math.max(1, Math.round(ratio * cap)));
-
 /**
  * Flatten ratio-based stops into Mapbox `interpolate` input/output pairs,
  * dropping any non-increasing values after rounding so the expression stays valid.
@@ -99,49 +117,11 @@ export const buildDensityInterpolateStops = <T extends string | number>(
   }
   return pairs;
 };
-/** H3 cell id property; promoted to feature id so feature-state can target hexes. */
-const PROMOTE_ID_PROPERTY = "h";
-const EMPTY_FEATURE_COLLECTION: FeatureCollection = {
-  type: "FeatureCollection",
-  features: [],
-};
-const bucket = import.meta.env.VITE_PMTILES_BUCKET;
-const region = import.meta.env.VITE_AWS_REGION;
-// Caps keep legacy key-list helpers bounded (tests / optional tooling).
-// Day cap is high enough for multi-decade daily PMTiles (~55 years).
-const MONTH_KEY_LIMIT = 1200;
-const DAY_KEY_LIMIT = 20000;
-const DEFAULT_RANGE_START = "2000-01-01";
-/**
- * Build a key allow-set when the filter window has at most this many buckets.
- * Wider day ranges use integer period compares only (building 10k+ keys is wasteful).
- */
-export const COUNT_KEY_SET_MAX = 2000;
-/** Features to sum + setFeatureState per idle slice (keeps the main thread responsive). */
-export const FEATURE_STATE_CHUNK_SIZE = 400;
-
-/** Matches sidecar `{dname}.metadata` `time_group_by` from batch PMTiles gen. */
-export enum TimeGroupBy {
-  Date = "date",
-  Month = "month",
-}
-
-/** Default when `.metadata` is missing or invalid. */
-export const DEFAULT_TIME_GROUP_BY = TimeGroupBy.Date;
-
-/** One Mapbox fill band over a PMTiles `hex_z*` source-layer. */
-export type PmtilesHexLayerDef = {
-  id: string;
-  sourceLayer: string;
-  minzoom: number;
-  maxzoom: number;
-};
-
 /**
  * Zoom bands for hex density fills. Mapbox ranges are half-open:
  * layer is active when `minzoom ≤ zoom < maxzoom` (same as hover gating).
  */
-export const PMTILE_LAYERS: readonly PmtilesHexLayerDef[] = [
+const PMTILE_LAYERS: readonly PmtilesHexLayerDef[] = [
   { id: "pmtiles-hex-z0", sourceLayer: "hex_z0", minzoom: 0, maxzoom: 2 },
   { id: "pmtiles-hex-z2", sourceLayer: "hex_z2", minzoom: 2, maxzoom: 4 },
   { id: "pmtiles-hex-z4", sourceLayer: "hex_z4", minzoom: 4, maxzoom: 6 },
@@ -193,24 +173,6 @@ export const clearInactivePmtilesFeatureState = (
     }
   }
 };
-
-/**
- * Inclusive calendar period as an integer: `YYYYMMDD` (date buckets) or
- * `YYYYMM` (month buckets). Prefer this over Dayjs for all PMTiles internals.
- *
- * Never treat these as unix timestamps — `dayjs(20100815)` is ~1970.
- */
-export type PeriodInt = number;
-
-/**
- * Period coverage from `{dname}.metadata` as integers (same shape as sidecar
- * `min_date` / `max_date` after validation).
- */
-export interface PMTilesMetadataRange {
-  minPeriod: PeriodInt;
-  maxPeriod: PeriodInt;
-}
-
 /**
  * Full coverage range from `{dname}.metadata` including grouping mode.
  */
@@ -234,26 +196,6 @@ const resolveRange = (start?: Dayjs, end?: Dayjs) => ({
   start: start || dayjs(DEFAULT_RANGE_START),
   end: end || dayjs(),
 });
-
-/** Parse sidecar metadata; only `"date"` and `"month"` are accepted. */
-export const parseTimeGroupBy = (value: unknown): TimeGroupBy =>
-  value === TimeGroupBy.Month
-    ? TimeGroupBy.Month
-    : value === TimeGroupBy.Date
-      ? TimeGroupBy.Date
-      : DEFAULT_TIME_GROUP_BY;
-
-/** Digits from a sidecar period number or numeric string (no dayjs). */
-export const coercePeriodDigits = (value: unknown): string | undefined => {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return String(Math.trunc(value));
-  }
-  if (typeof value === "string" && value.trim() !== "") {
-    const n = Number(value.trim());
-    if (Number.isFinite(n)) return String(Math.trunc(n));
-  }
-  return undefined;
-};
 
 /**
  * Parse a sidecar `min_date` / `max_date` into a validated {@link PeriodInt}.
@@ -1179,7 +1121,7 @@ export const scheduleDeferredWork = (work: () => void): (() => void) => {
     };
   }
 
-  const timeoutId = setTimeout(run, 0);
+  const timeoutId = setTimeout(run, 10);
   return () => {
     cancelled = true;
     clearTimeout(timeoutId);
@@ -1216,12 +1158,6 @@ export const scheduleChunkedWork = (
     cancelSlice?.();
   };
 };
-
-/**
- * Trailing debounce so rapid tile `sourcedata` / `idle` events collapse into
- * one feature-state pass after the viewport settles (avoids partial updates).
- */
-export const FEATURE_STATE_DEBOUNCE_MS = 120;
 
 export const scheduleDebouncedWork = (
   work: () => void,
@@ -2025,3 +1961,11 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
 };
 
 export default PMTilesHexLayer;
+
+export {
+  FEATURE_STATE_TOTAL,
+  DENSITY_TOTAL_CAP,
+  DENSITY_COLOR_STOPS,
+  DENSITY_OPACITY_STOPS,
+  PMTILE_LAYERS,
+};
