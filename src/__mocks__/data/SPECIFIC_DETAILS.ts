@@ -1,4 +1,4 @@
-import { IContact } from "../../components/common/store/OGCCollectionDefinitions";
+import { IContact } from "@/app/store/OGCCollectionDefinitions";
 
 export const CONTACT: IContact = {
   name: "",

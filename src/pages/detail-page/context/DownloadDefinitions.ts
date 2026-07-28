@@ -137,6 +137,11 @@ export type WFSDownloadRequest = {
   downloadConditions: IDownloadCondition[];
 };
 
+export type CoEstimateRequest = {
+  uuid: string;
+  downloadConditions: IDownloadCondition[];
+};
+
 export type DownloadCondition = {
   downloadConditions: IDownloadCondition[];
   getAndSetDownloadConditions: (

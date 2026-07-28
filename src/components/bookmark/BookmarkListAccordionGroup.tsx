@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 import { Box, IconButton, Typography } from "@mui/material";
-import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import StyledAccordion from "../common/accordion/StyledAccordion";
 import StyledAccordionSummary from "../common/accordion/StyledAccordionSummary";
 import StyledAccordionDetails from "../common/accordion/StyledAccordionDetails";
@@ -22,8 +22,8 @@ import {
   off,
   removeAllItems,
   initializeBookmarkList,
-} from "../common/store/bookmarkListReducer";
-import store from "../common/store/store";
+} from "@/app/store/bookmarkListReducer";
+import store from "@/app/store/store";
 import {
   BookmarkEvent,
   EVENT_BOOKMARK,
@@ -41,8 +41,7 @@ export interface BookmarkListAccordionGroupBasicType {
   hideHead?: boolean;
 }
 
-interface BookmarkListAccordionGroupProps
-  extends BookmarkListAccordionGroupBasicType {}
+interface BookmarkListAccordionGroupProps extends BookmarkListAccordionGroupBasicType {}
 
 const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
   onDeselectDataset,

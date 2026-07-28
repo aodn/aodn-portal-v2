@@ -8,7 +8,7 @@ import {
 import { userEvent } from "@testing-library/user-event";
 import { Provider } from "react-redux";
 import { describe, expect, it, vi } from "vitest";
-import store from "../../common/store/store";
+import store from "@/app/store/store";
 import {
   clearComponentParam,
   updateHasData,
@@ -17,14 +17,14 @@ import {
   updatePlatform,
   updateUpdateFreq,
   updateFilterStaticAreas,
-} from "../../common/store/componentParamReducer";
+} from "@/app/store/componentParamReducer";
 import {
   fetchMarineParkOptions,
   BoundaryName,
 } from "../../map/mapbox/layers/StaticLayer";
 import { server } from "../../../__mocks__/server";
 import { ThemeProvider } from "@mui/material/styles";
-import AppTheme from "../../../utils/AppTheme";
+import AppTheme from "@/styles/theme";
 
 const theme = AppTheme;
 const clearAllMock = () => {

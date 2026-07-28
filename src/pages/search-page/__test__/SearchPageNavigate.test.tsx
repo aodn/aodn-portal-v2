@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 // Global mock dispatch
 const mockDispatch = vi.fn();
 
-vi.mock("../../../components/common/store/hooks", () => ({
+vi.mock("@/app/store/hooks", () => ({
   useAppDispatch: () => mockDispatch,
   useAppSelector: vi.fn((selector) =>
     selector({
@@ -19,7 +19,7 @@ vi.mock("../../../components/common/store/hooks", () => ({
   ),
 }));
 
-vi.mock("../../../components/common/store/store", () => ({
+vi.mock("@/app/store/store", () => ({
   default: {
     getState: vi.fn().mockReturnValue({
       paramReducer: {
@@ -37,7 +37,7 @@ vi.mock("../../../components/common/store/store", () => ({
   getSearchQueryResult: vi.fn((state) => state.searchReducer),
 }));
 
-vi.mock("../../../components/common/store/componentParamReducer", () => ({
+vi.mock("@/app/store/componentParamReducer", () => ({
   formatToUrlParam: vi.fn(() => "param=1"),
   unFlattenToParameterState: vi.fn(() => ({
     layout: "LIST",
@@ -50,7 +50,7 @@ vi.mock("../../../components/common/store/componentParamReducer", () => ({
   updateZoom: vi.fn(),
 }));
 
-vi.mock("../../../components/common/store/searchReducer", () => ({
+vi.mock("@/app/store/searchReducer", () => ({
   createSearchParamFrom: vi.fn((param, overrides) => ({
     ...param,
     ...overrides,
@@ -65,7 +65,7 @@ vi.mock("../../../components/common/store/searchReducer", () => ({
   jsonToOGCCollections: vi.fn(() => ({ collections: [] })),
 }));
 
-vi.mock("../../../components/common/store/bookmarkListReducer", () => ({
+vi.mock("@/app/store/bookmarkListReducer", () => ({
   on: vi.fn(),
   off: vi.fn(),
   setExpandedItem: vi.fn(),
@@ -94,16 +94,12 @@ vi.mock("../../../hooks/useBreakpoint", () => ({
 }));
 
 // Mock subcomponents to avoid rendering issues
-vi.mock("../sections/ResultSection", () => ({
+vi.mock("../layout/ResultSection", () => ({
   default: () => <div>ResultSection</div>,
 }));
 
-vi.mock("../sections/MapSection", () => ({
+vi.mock("../layout/MapSection", () => ({
   default: () => <div>MapSection</div>,
-}));
-
-vi.mock("../../../components/layout/layout", () => ({
-  default: ({ children }: any) => <div>{children}</div>,
 }));
 
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
@@ -111,7 +107,7 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import SearchPage from "../SearchPage";
 import { pageReferer } from "../../../components/common/constants";
 import { Provider } from "react-redux";
-import store from "../../../components/common/store/store";
+import store from "@/app/store/store";
 import useRedirectSearch from "../../../hooks/useRedirectSearch";
 
 describe("SearchPage with useRedirectSearch", () => {

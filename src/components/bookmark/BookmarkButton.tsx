@@ -3,7 +3,7 @@ import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import { IconButton, Tooltip } from "@mui/material";
 import { color } from "../../styles/constants";
-import { OGCCollection } from "../common/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import {
   addItem,
   checkIsBookmarked,
@@ -13,8 +13,8 @@ import {
   removeItem,
   setExpandedItem,
   setTemporaryItem,
-} from "../common/store/bookmarkListReducer";
-import store from "../common/store/store";
+} from "@/app/store/bookmarkListReducer";
+import store from "@/app/store/store";
 import {
   BookmarkEvent,
   EVENT_BOOKMARK,
@@ -46,7 +46,7 @@ const BookmarkButton: FC<BookmarkButtonProps> = ({
 
   const onClickBookmark = useCallback(
     (
-      event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+      _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
       item: OGCCollection
     ) => {
       const { expandedItem, temporaryItem } = getBookmarkList(store.getState());

@@ -28,7 +28,7 @@ const StyledSlider = styled(Slider)<PlainSliderProps>(({
   return {
     "& .MuiSlider-valueLabel": {
       ...portalTheme.typography.body2Regular,
-      backgroundColor: "transparent",
+      backgroundColor: portalTheme.palette.primary6,
       ...labelPositioning,
       opacity: 0, // Hide text by default
       ...labelPositioningMobile,

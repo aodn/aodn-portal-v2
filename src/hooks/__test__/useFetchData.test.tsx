@@ -1,17 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import useFetchData from "../useFetchData";
-import { useAppDispatch } from "../../components/common/store/hooks";
-import { updateSearchText } from "../../components/common/store/componentParamReducer";
+import { useAppDispatch } from "@/app/store/hooks";
+import { updateSearchText } from "@/app/store/componentParamReducer";
 import { renderHook } from "@testing-library/react";
 import { Provider } from "react-redux";
-import store from "../../components/common/store/store";
+import store from "@/app/store/store";
 import { ReactNode } from "react";
-import * as searchReducer from "../../components/common/store/searchReducer";
+import * as searchReducer from "@/app/store/searchReducer";
 import {
   fetchResultWithStore,
   fetchResultAppendStore,
   ogcAxiosWithRetry,
-} from "../../components/common/store/searchReducer";
+} from "@/app/store/searchReducer";
 import { response1 } from "./data";
 
 // Wrapper to provide Redux store to renderHook

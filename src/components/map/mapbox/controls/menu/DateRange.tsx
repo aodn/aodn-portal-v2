@@ -11,16 +11,16 @@ import {
   DownloadConditionType,
   IDownloadCondition,
   IDownloadConditionCallback,
-} from "../../../../../pages/detail-page/context/DownloadDefinitions";
+} from "@/pages/detail-page/context/DownloadDefinitions";
 import { ControlProps } from "./Definition";
 import { Box, IconButton } from "@mui/material";
 import { switcherIconButtonSx } from "./MenuControl";
 import MenuHintTooltip from "./MenuHintTooltip";
 import dayjs from "dayjs";
 import { dateDefault } from "../../../../common/constants";
-import { TimeRangeIcon } from "../../../../../assets/icons/map/time_range";
+import { TimeRangeIcon } from "@/assets/icons/map/time_range";
 import DateSlider from "../../../../common/slider/DateSlider";
-import { TimeRangeTooltipIcon } from "../../../../../assets/icons/map/tooltip_time_range";
+import { TimeRangeTooltipIcon } from "@/assets/icons/map/tooltip_time_range";
 import MenuTooltip from "./MenuTooltip";
 
 interface DateRangeControlProps extends ControlProps {
@@ -155,7 +155,7 @@ const DateRange: React.FC<DateRangeControlProps> = ({
           <Box
             sx={{
               position: "absolute",
-              bottom: "8px",
+              bottom: "30px",
               left: "0", // Start from left edge of container
               right: "0", // Extend to right edge of container
               pointerEvents: "all",

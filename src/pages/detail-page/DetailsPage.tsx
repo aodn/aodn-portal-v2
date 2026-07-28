@@ -1,13 +1,12 @@
-import Layout from "../../components/layout/layout";
 import { Grid } from "@mui/material";
 import { color, padding } from "../../styles/constants";
 import HeaderSection from "./layout/HeaderSection";
 import SideSection from "./layout/SideSection";
 import { DetailPageProvider } from "./context/detail-page-provider";
 import ContentSection from "./layout/ContentSection";
-import SectionContainer from "../../components/layout/components/SectionContainer";
-import { PAGE_CONTENT_WIDTH_DETAIL } from "../../components/layout/constant";
-import { LngLatBounds, MapMouseEvent } from "mapbox-gl";
+import SectionContainer from "@/components/common/container/SectionContainer";
+import { PAGE_CONTENT_WIDTH_DETAIL } from "@/app/layout/constant";
+import { LngLatBounds } from "mapbox-gl";
 import { useCallback, useState } from "react";
 
 const DetailsPage = () => {
@@ -22,31 +21,29 @@ const DetailsPage = () => {
   );
 
   return (
-    <Layout>
-      <DetailPageProvider>
-        <SectionContainer
-          sectionAreaStyle={{
-            paddingY: padding.large,
-            backgroundColor: color.blue.light,
-          }}
-          contentAreaStyle={{ width: PAGE_CONTENT_WIDTH_DETAIL }}
-        >
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <HeaderSection />
-            </Grid>
-            <Grid item xs={12} md={9}>
-              <ContentSection mapFocusArea={bbox} />
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <SideSection
-                onSpatialCoverageLayerClick={onSpatialCoverageLayerClick}
-              />
-            </Grid>
+    <DetailPageProvider>
+      <SectionContainer
+        sectionAreaStyle={{
+          paddingY: padding.large,
+          backgroundColor: color.blue.light,
+        }}
+        contentAreaStyle={{ width: PAGE_CONTENT_WIDTH_DETAIL }}
+      >
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <HeaderSection />
           </Grid>
-        </SectionContainer>
-      </DetailPageProvider>
-    </Layout>
+          <Grid item xs={12} md={9}>
+            <ContentSection mapFocusArea={bbox} />
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <SideSection
+              onSpatialCoverageLayerClick={onSpatialCoverageLayerClick}
+            />
+          </Grid>
+        </Grid>
+      </SectionContainer>
+    </DetailPageProvider>
   );
 };
 

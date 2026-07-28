@@ -1,4 +1,3 @@
-import React from "react";
 import SideCardContainer from "../layout/SideCardContainer";
 import { Box } from "@mui/material";
 import bgLandingPage from "@/assets/images/bg_landing_page.png";

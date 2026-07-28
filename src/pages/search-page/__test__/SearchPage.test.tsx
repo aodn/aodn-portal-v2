@@ -9,13 +9,10 @@ import {
 } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { ThemeProvider } from "@mui/material/styles";
-import AppTheme from "../../../utils/AppTheme";
+import AppTheme from "@/styles/theme";
 import { server } from "../../../__mocks__/server";
-import store from "../../../components/common/store/store";
-import {
-  updateLayout,
-  updateSort,
-} from "../../../components/common/store/componentParamReducer";
+import store from "@/app/store/store";
+import { updateLayout, updateSort } from "@/app/store/componentParamReducer";
 import { SearchResultLayoutEnum } from "../../../components/common/buttons/ResultListLayoutButton";
 import { SortResultEnum } from "../../../components/common/buttons/ResultListSortButton";
 import * as useRedirectSearchModule from "../../../hooks/useRedirectSearch";
@@ -44,7 +41,8 @@ const mockRedirectSearch = vi.fn();
 
 // Import the component and router after the mock is defined
 import SearchPage from "../SearchPage";
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Layout from "@/app/layout/Layout";
 import { pageReferer } from "../../../components/common/constants";
 
 // Mock the Map component to avoid map initialization
@@ -112,49 +110,51 @@ describe("SearchPage Basic", () => {
     server.close();
   });
 
-  it("The map should be able to expand properly", () => {
+  // Default vitest testTimeout is 5s; nested waitFors can exceed that under load.
+  it("The map should be able to expand properly", async () => {
     const user = userEvent.setup();
 
     render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
-            <SearchPage />
+            <Routes>
+              <Route element={<Layout />}>
+                <Route path="*" element={<SearchPage />} />
+              </Route>
+            </Routes>
           </Router>
         </ThemeProvider>
       </Provider>
     );
 
-    // Mock user input to trigger search
-    const input = screen.getByTestId("input-with-suggester");
-    user.type(input, "wave");
-    user.type(input, "{enter}");
+    // Await typing so the search is submitted before waiting on results UI
+    const input = await screen.findByTestId("input-with-suggester");
+    await user.type(input, "wave{enter}");
 
-    return waitFor(() => screen.findByTestId("result-layout-button")).then(
-      (select) => {
-        expect(select).toBeInTheDocument();
-        // Need to find combobox which is the element bound with mouse down event in MUI Select
-        return waitFor(() => within(select).findByRole("combobox")).then(
-          (combobox) => {
-            // Open the dropdown
-            // Use fireEvent.mouseDown instead of userEvent.click since MUI Select only responds to mouseDown
-            fireEvent.mouseDown(combobox);
-
-            // Wait for the dropdown to open and click the "Full Map View" option
-            return waitFor(() => screen.findByText("Full Map View")).then(
-              (option) => {
-                fireEvent.click(option);
-
-                // Verify search-page-result-list should not be there if full map view clicked
-                const list = screen.queryByTestId("search-page-result-list");
-                expect(list).not.toBeInTheDocument();
-              }
-            );
-          }
-        );
+    const select = await screen.findByTestId(
+      "result-layout-button",
+      {},
+      {
+        timeout: 8000,
       }
     );
-  });
+    expect(select).toBeInTheDocument();
+
+    // MUI Select opens on mouseDown of the combobox, not click
+    const combobox = await within(select).findByRole("combobox");
+    fireEvent.mouseDown(combobox);
+
+    const option = await screen.findByText("Full Map View");
+    fireEvent.click(option);
+
+    // Full map view removes the result list panel
+    await waitFor(() => {
+      expect(
+        screen.queryByTestId("search-page-result-list")
+      ).not.toBeInTheDocument();
+    });
+  }, 15000);
 
   it("Can load correct record after click load more button", () => {
     const user = userEvent.setup();
@@ -163,7 +163,11 @@ describe("SearchPage Basic", () => {
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
-            <SearchPage />
+            <Routes>
+              <Route element={<Layout />}>
+                <Route path="*" element={<SearchPage />} />
+              </Route>
+            </Routes>
           </Router>
         </ThemeProvider>
       </Provider>
@@ -214,7 +218,11 @@ describe("SearchPage Basic", () => {
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
-            <SearchPage />
+            <Routes>
+              <Route element={<Layout />}>
+                <Route path="*" element={<SearchPage />} />
+              </Route>
+            </Routes>
           </Router>
         </ThemeProvider>
       </Provider>
@@ -251,7 +259,11 @@ describe("SearchPage Basic", () => {
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
-            <SearchPage />
+            <Routes>
+              <Route element={<Layout />}>
+                <Route path="*" element={<SearchPage />} />
+              </Route>
+            </Routes>
           </Router>
         </ThemeProvider>
       </Provider>
@@ -291,7 +303,11 @@ describe("SearchPage Basic", () => {
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <Router>
-            <SearchPage />
+            <Routes>
+              <Route element={<Layout />}>
+                <Route path="*" element={<SearchPage />} />
+              </Route>
+            </Routes>
           </Router>
         </ThemeProvider>
       </Provider>

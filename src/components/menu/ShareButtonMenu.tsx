@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
-import { useClipboardContext } from "../../context/clipboard/ClipboardContext";
+import { useClipboardContext } from "@/app/providers/ClipboardContext";
 import ContentCopy from "@mui/icons-material/ContentCopy";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import { disableScroll, enableScroll } from "../../utils/ScrollUtils";

@@ -3,8 +3,8 @@ import { pageDefault } from "../components/common/constants";
 import {
   formatToUrlParam,
   ParameterState,
-} from "../components/common/store/componentParamReducer";
-import store, { getComponentState } from "../components/common/store/store";
+} from "@/app/store/componentParamReducer";
+import store, { getComponentState } from "@/app/store/store";
 
 const useRedirectSearch = () => {
   const navigate = useNavigate();

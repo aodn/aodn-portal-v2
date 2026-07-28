@@ -1,13 +1,13 @@
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { Provider } from "react-redux";
-import store from "../../common/store/store";
+import store from "@/app/store/store";
 import InputWithSuggester from "../InputWithSuggester";
 import { server } from "../../../__mocks__/server";
 import { userEvent } from "@testing-library/user-event";
 import { BrowserRouter as Router } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
-import AppTheme from "../../../utils/AppTheme";
+import AppTheme from "@/styles/theme";
 
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual("react-router-dom");
@@ -190,5 +190,30 @@ describe("InputWithSuggester", () => {
 
     // 4. Verify suggestions are cleared (as per your handleSearchbarClose logic)
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+  });
+
+  it("offers a double-quoted 'Only keyword' option for the typed text", async () => {
+    const user = userEvent.setup();
+    const input = screen.getByTestId("input-with-suggester");
+
+    await user.click(input);
+    await user.clear(input);
+    await user.type(input, "wave");
+
+    await waitFor(() => {
+      expect(screen.queryByRole("listbox")).toBeInTheDocument();
+    });
+
+    // The quoted row and its chip are rendered
+    const quotedOption = await screen.findByText('"wave"');
+    expect(screen.getByTestId("label-chip-Only keyword")).toBeInTheDocument();
+
+    // Selecting it puts the quoted text into the input and Redux
+    await user.click(quotedOption);
+
+    await waitFor(() => {
+      expect(input).toHaveValue('"wave"');
+      expect(store.getState().paramReducer.searchText).toBe('"wave"');
+    });
   });
 });

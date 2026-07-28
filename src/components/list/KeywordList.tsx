@@ -1,7 +1,7 @@
 import React from "react";
-import { IKeyword } from "../common/store/OGCCollectionDefinitions";
-import CollapseItem from "./listItem/CollapseItem";
-import TextArea from "./listItem/subitem/TextArea";
+import { IKeyword } from "@/app/store/OGCCollectionDefinitions";
+import CollapseItem from "./list-item/CollapseItem";
+import TextArea from "./list-item/sub-item/TextArea";
 import ExpandableList from "./ExpandableList";
 
 interface KeywordListProps {

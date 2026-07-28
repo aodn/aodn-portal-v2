@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { useDetailPageContext } from "../context/detail-page-context";
 import imosLogoWithTitle from "@/assets/logos/imos_logo_with_title.png";
-import OrganizationLogo from "../../../components/logo/OrganizationLogo";
+import OrganizationLogo from "../../../components/icon/OrganizationLogo";
 import useRedirectSearch from "../../../hooks/useRedirectSearch";
 import useBreakpoint from "../../../hooks/useBreakpoint";
 import useRedirectHome from "../../../hooks/useRedirectHome";

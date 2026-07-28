@@ -2,11 +2,11 @@ import { FC, useCallback, useMemo } from "react";
 import { Stack, SxProps } from "@mui/material";
 import SearchbarExpandableButton from "./SearchbarExpandableButton";
 import { gap } from "../../styles/constants";
-import { useAppSelector } from "../common/store/hooks";
+import { useAppSelector } from "@/app/store/hooks";
 import {
   DEFAULT_SEARCH_LOCATION,
   ParameterState,
-} from "../common/store/componentParamReducer";
+} from "@/app/store/componentParamReducer";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
 import { booleanEqual } from "@turf/boolean-equal";
@@ -104,7 +104,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
   isPopupOpen,
   sx,
 }) => {
-  const { isMobile, isUnderLaptop } = useBreakpoint();
+  const { isUnderLaptop } = useBreakpoint();
   const filterButtonWidth = isUnderLaptop ? "100%" : "120px";
   const buttonStyleOnDropdownOpen = {
     color: "#fff",

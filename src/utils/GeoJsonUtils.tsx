@@ -5,7 +5,7 @@ import {
   Point,
   Polygon,
 } from "geojson";
-import { OGCCollection } from "../components/common/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import * as turf from "@turf/turf";
 
 export const generateFeatureCollectionFrom = (

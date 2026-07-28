@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import TimeRangeBarChart, { Bucket, DividedBy } from "../TimeRangeBarChart";
-import { OGCCollections } from "../../store/OGCCollectionDefinitions"; // Adjust path as needed
+import { OGCCollections } from "@/app/store/OGCCollectionDefinitions"; // Adjust path as needed
 
 // Helper to access private functions for testing
 // This assumes you add a test-only export at the bottom of TimeRangeBarChart.tsx

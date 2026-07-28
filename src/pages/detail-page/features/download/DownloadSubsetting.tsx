@@ -17,7 +17,7 @@ import {
   DownloadCondition,
   DownloadConditionType,
 } from "../../context/DownloadDefinitions";
-import SubsetConditions from "./SubsetConditions/SubsetConditions";
+import SubsetConditions from "./subset-conditions/SubsetConditions";
 import InfoMessage from "./InfoMessage";
 
 interface DownloadSubsettingProps extends DownloadCondition {

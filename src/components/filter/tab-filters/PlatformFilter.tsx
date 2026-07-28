@@ -1,7 +1,7 @@
 import { FC, useCallback } from "react";
 import { Box, Stack, SxProps, Typography } from "@mui/material";
-import { useAppDispatch } from "../../common/store/hooks";
-import { updatePlatform } from "../../common/store/componentParamReducer";
+import { useAppDispatch } from "@/app/store/hooks";
+import { updatePlatform } from "@/app/store/componentParamReducer";
 import { TabFilterType } from "../Filters";
 import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";

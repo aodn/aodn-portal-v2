@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { ExpandMore } from "@mui/icons-material";
 import { formatToUrl } from "../../../utils/UrlUtils";
-import { MapTileRequest } from "../../../components/common/store/GeoserverDefinitions";
+import { MapTileRequest } from "@/app/store/GeoserverDefinitions";
 
 interface WmsLegendProps {
   uuid: string;

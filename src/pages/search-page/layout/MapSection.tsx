@@ -1,0 +1,231 @@
+import React, { memo, useState } from "react";
+import { MapEvent } from "mapbox-gl";
+import { Paper, SxProps, Theme } from "@mui/material";
+import { borderRadius } from "../../../styles/constants";
+import Map, { MapBasicType } from "../../../components/map/mapbox/Map";
+import Controls from "../../../components/map/mapbox/controls/Controls";
+import ToggleControl, {
+  ToggleControlProps,
+} from "../../../components/map/mapbox/controls/ToggleControl";
+import NavigationControl from "../../../components/map/mapbox/controls/NavigationControl";
+import ScaleControl from "../../../components/map/mapbox/controls/ScaleControl";
+import MenuControl from "../../../components/map/mapbox/controls/menu/MenuControl";
+import BaseMapSwitcher from "../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
+import Layers, {
+  LayerBasicType,
+} from "../../../components/map/mapbox/layers/Layers";
+import ClusterLayer from "../../../components/map/mapbox/layers/ClusterLayer";
+import HeatmapLayer from "../../../components/map/mapbox/layers/HeatmapLayer";
+import UnclusterLayer from "../../../components/map/mapbox/layers/UnclusterLayer";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
+import { generateFeatureCollectionFrom } from "../../../utils/GeoJsonUtils";
+import { capitalizeFirstLetter } from "../../../utils/StringUtils";
+import useTabNavigation, {
+  TabNavigation,
+} from "../../../hooks/useTabNavigation";
+import MapLayerSwitcher, {
+  LayerName,
+  LayerSwitcherLayer,
+} from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
+import BookmarkListMenu, {
+  BookmarkListMenuBasicType,
+} from "../../../components/map/mapbox/controls/menu/BookmarkListMenu";
+import useBreakpoint from "../../../hooks/useBreakpoint";
+import MenuControlGroup from "../../../components/map/mapbox/controls/menu/MenuControlGroup";
+import ReferenceLayerSwitcher, {
+  staticBaseLayerConfig,
+} from "../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
+import { ProgressType } from "../../../components/map/mapbox/MapContext";
+import { createStaticLayers } from "../../../components/map/mapbox/layers/StaticLayer";
+import { fitToDefaultExtent } from "../../../utils/MapUtils";
+
+interface MapSectionProps
+  extends
+    Partial<MapBasicType>,
+    Partial<LayerBasicType>,
+    BookmarkListMenuBasicType,
+    ToggleControlProps {
+  collections: OGCCollection[];
+  onMapZoomOrMove: (event: MapEvent | undefined) => void;
+  progress?: ProgressType;
+  showFullMap: boolean;
+  showFullList: boolean;
+  sx?: SxProps<Theme>;
+}
+
+const mapContainerId = "result-page-main-map";
+
+const createPresentationLayers = (
+  id: string | null,
+  collections: OGCCollection[],
+  selectedUuids: string[] | undefined,
+  tabNavigation: TabNavigation,
+  onClickMapPoint: ((uuids: Array<string>) => void) | undefined
+) => {
+  switch (id) {
+    case LayerName.Heatmap:
+      return (
+        <HeatmapLayer
+          featureCollection={generateFeatureCollectionFrom(collections)}
+          selectedUuids={selectedUuids}
+          onClickMapPoint={onClickMapPoint}
+          tabNavigation={tabNavigation}
+        />
+      );
+
+    case LayerName.Uncluster:
+      return (
+        <UnclusterLayer
+          featureCollection={generateFeatureCollectionFrom(collections)}
+          selectedUuids={selectedUuids}
+          onClickMapPoint={onClickMapPoint}
+          tabNavigation={tabNavigation}
+        />
+      );
+
+    default:
+      return (
+        <ClusterLayer
+          featureCollection={generateFeatureCollectionFrom(collections)}
+          selectedUuids={selectedUuids}
+          onClickMapPoint={onClickMapPoint}
+          tabNavigation={tabNavigation}
+        />
+      );
+  }
+};
+
+const MapSection: React.FC<MapSectionProps> = memo(
+  ({
+    showFullList,
+    showFullMap,
+    bbox,
+    zoom,
+    onMapZoomOrMove,
+    onToggleClicked,
+    onClickMapPoint,
+    collections,
+    sx,
+    selectedUuids,
+    progress,
+    onDeselectDataset,
+  }: MapSectionProps) => {
+    const { isUnderLaptop } = useBreakpoint();
+
+    const [selectedLayer, setSelectedLayer] = useState<LayerName | null>(
+      LayerName.Cluster
+    );
+    const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
+    const tabNavigation = useTabNavigation();
+    // Early return if it is full list view
+    if (showFullList) return null;
+    return (
+      <Paper
+        id={mapContainerId}
+        sx={{
+          position: "relative",
+          height: "100%",
+          width: "100%",
+          borderRadius: borderRadius.small,
+          overflow: "hidden",
+          ...sx,
+        }}
+      >
+        <Map
+          panelId={mapContainerId}
+          bbox={bbox}
+          zoom={zoom}
+          progress={progress}
+          onZoomEvent={onMapZoomOrMove}
+          onMoveEvent={onMapZoomOrMove}
+        >
+          <Controls>
+            <ToggleControl
+              onToggleClicked={onToggleClicked}
+              showFullMap={showFullMap}
+            />
+            <NavigationControl
+              visible={!isUnderLaptop}
+              // Reset flies back to the default Australia-wide extent
+              onReset={(map) => fitToDefaultExtent(map, undefined)}
+            />
+            <ScaleControl />
+            <DisplayCoordinate />
+            <MenuControlGroup>
+              <MenuControl
+                visible={!isUnderLaptop}
+                menu={
+                  <BookmarkListMenu
+                    onDeselectDataset={onDeselectDataset}
+                    tabNavigation={tabNavigation}
+                  />
+                }
+              />
+              <MenuControl menu={<BaseMapSwitcher />} />
+              <MenuControl
+                menu={
+                  <ReferenceLayerSwitcher
+                    layers={staticBaseLayerConfig}
+                    onEvent={(target: EventTarget & HTMLInputElement) =>
+                      setStaticLayer((values) => {
+                        // Remove the item and add it back if selected
+                        const e = values?.filter((i) => i !== target.value);
+                        if (target.checked) {
+                          e.push(target.value);
+                        }
+                        return [...e];
+                      })
+                    }
+                  />
+                }
+              />
+              <MenuControl
+                menu={
+                  <MapLayerSwitcher
+                    layers={[
+                      {
+                        id: LayerName.Cluster,
+                        name: capitalizeFirstLetter(LayerName.Cluster),
+                        selected: selectedLayer === LayerName.Cluster,
+                      },
+                      {
+                        id: LayerName.Uncluster,
+                        name: capitalizeFirstLetter(LayerName.Uncluster),
+                        selected: selectedLayer === LayerName.Uncluster,
+                      },
+                      {
+                        id: LayerName.Heatmap,
+                        name: capitalizeFirstLetter(LayerName.Heatmap),
+                        selected: selectedLayer === LayerName.Heatmap,
+                      },
+                    ]}
+                    onEvent={(
+                      layer: LayerSwitcherLayer<LayerName> | undefined
+                    ) => {
+                      layer && setSelectedLayer(layer.id);
+                    }}
+                  />
+                }
+              />
+            </MenuControlGroup>
+          </Controls>
+          <Layers>
+            {createPresentationLayers(
+              selectedLayer,
+              collections,
+              selectedUuids,
+              tabNavigation,
+              onClickMapPoint
+            )}
+            {createStaticLayers(staticLayer)}
+          </Layers>
+        </Map>
+      </Paper>
+    );
+  }
+);
+
+MapSection.displayName = "MapSection";
+
+export default MapSection;

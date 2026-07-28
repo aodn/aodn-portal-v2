@@ -2,11 +2,11 @@ import { FC, useCallback, useMemo } from "react";
 import { Chip, Stack } from "@mui/material";
 import { useDetailPageContext } from "../context/detail-page-context";
 import SideCardContainer from "../layout/SideCardContainer";
-import { useAppDispatch } from "../../../components/common/store/hooks";
+import { useAppDispatch } from "@/app/store/hooks";
 import {
   clearComponentParam,
   updateParameterVocabs,
-} from "../../../components/common/store/componentParamReducer";
+} from "@/app/store/componentParamReducer";
 import useRedirectSearch from "../../../hooks/useRedirectSearch";
 import { pageReferer } from "../../../components/common/constants";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";

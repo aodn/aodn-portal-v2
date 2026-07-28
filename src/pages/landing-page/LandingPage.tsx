@@ -1,17 +1,16 @@
 import { FC } from "react";
-import Layout from "../../components/layout/layout";
-import Banner from "./subpages/banner/Banner";
+import Banner from "./features/banner/Banner";
 import Searchbar from "../../components/search/Searchbar";
 import { color, padding } from "../../styles/constants";
-import Logos from "./subpages/logo-list/LogoList";
-import News from "./subpages/news/News";
-import SectionContainer from "../../components/layout/components/SectionContainer";
-import { PAGE_CONTENT_WIDTH_LANDING } from "../../components/layout/constant";
-import TopicsPanel from "./subpages/topics-panel/TopicsPanel";
+import Logos from "./features/logo-list/LogoList";
+import News from "./features/news/News";
+import SectionContainer from "@/components/common/container/SectionContainer";
+import { PAGE_CONTENT_WIDTH_LANDING } from "@/app/layout/constant";
+import TopicsPanel from "./features/topics-panel/TopicsPanel";
 
 const LandingPage: FC = () => {
   return (
-    <Layout>
+    <>
       <SectionContainer
         sectionAreaStyle={{
           backgroundColor: "#fff",
@@ -55,7 +54,7 @@ const LandingPage: FC = () => {
       >
         <Logos />
       </SectionContainer>
-    </Layout>
+    </>
   );
 };
 

@@ -30,20 +30,20 @@ import {
   MapFeatureResponse,
   MapLayerResponse,
   MapTileRequest,
-} from "../../../common/store/GeoserverDefinitions";
-import { useAppDispatch } from "../../../common/store/hooks";
+} from "@/app/store/GeoserverDefinitions";
+import { useAppDispatch } from "@/app/store/hooks";
 import {
   fetchGeoServerFieldValues,
   fetchGeoServerMapFeature,
   fetchGeoServerMapFields,
   fetchGeoServerMapLayers,
-} from "../../../common/store/searchReducer";
+} from "@/app/store/searchReducer";
 import { CardContent, Typography } from "@mui/material";
 import { createRoot, Root } from "react-dom/client";
 import dayjs, { Dayjs } from "dayjs";
 import { dateDefault, playwrightTestIds } from "../../../common/constants";
 import MapLayerSelect from "../component/MapLayerSelect";
-import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { ErrorResponse } from "../../../../utils/ErrorBoundary";
 import { SelectItem } from "../../../common/dropdown/CommonSelect";
 import {
@@ -55,7 +55,7 @@ import AdminScreenContext from "../../../admin/AdminScreenContext";
 import { HttpStatusCode } from "axios";
 import { dateToValue } from "../../../../utils/DateUtils";
 import { layernameRoughlyMatch } from "../../../../utils/GeoJsonUtils";
-import { AppDispatch } from "../../../common/store/store";
+import { AppDispatch } from "@/app/store/store";
 
 enum LAYER_VISIBILITY {
   VISIBLE = "visible",

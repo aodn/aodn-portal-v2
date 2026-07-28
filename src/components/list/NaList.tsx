@@ -1,6 +1,6 @@
 import React from "react";
 import { Grid, SxProps } from "@mui/material";
-import NaItem from "./listItem/NaItem";
+import NaItem from "./list-item/NaItem";
 
 interface NaListProps {
   title: string;

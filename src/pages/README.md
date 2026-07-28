@@ -21,5 +21,5 @@ Within a page:
 ├── features/             WHAT renders. Single-file features sit flat;
 │                         multi-file features get their own folder.
 ├── context/              React context shared across the page (optional).
-└── __tests__/            Tests colocated with the page.
+└── __test__/             Tests colocated with the page.
 ```

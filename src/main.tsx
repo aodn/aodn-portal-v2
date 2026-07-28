@@ -1,8 +1,8 @@
-import App from "./App";
+import App from "./app/App";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
-import store from "./components/common/store/store";
+import store from "@/app/store/store";
 import "./index.css";
 import "./styles/fontsRC8";
 

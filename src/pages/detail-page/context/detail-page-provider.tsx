@@ -12,10 +12,10 @@ import {
   fetchDatasetMetadataByUuid,
   fetchFeaturesByUuid,
   fetchResultByUuidNoStore,
-} from "../../../components/common/store/searchReducer";
+} from "@/app/store/searchReducer";
 import { DetailPageContext } from "./detail-page-context";
-import { OGCCollection } from "../../../components/common/store/OGCCollectionDefinitions";
-import { useAppDispatch } from "../../../components/common/store/hooks";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { useAppDispatch } from "@/app/store/hooks";
 import { FeatureCollection, Point } from "geojson";
 import {
   DownloadConditionType,
@@ -30,7 +30,7 @@ import {
   LayerName,
   LayerSwitcherLayer,
 } from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
-import { CloudOptimizedFeature } from "../../../components/common/store/CloudOptimizedDefinitions";
+import { CloudOptimizedFeature } from "@/app/store/CloudOptimizedDefinitions";
 
 interface DetailPageProviderProps {
   children: ReactNode;

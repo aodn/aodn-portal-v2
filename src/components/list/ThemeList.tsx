@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import ExpandableList from "./ExpandableList";
-import ItemBaseGrid from "./listItem/ItemBaseGrid";
+import ItemBaseGrid from "./list-item/ItemBaseGrid";
 import NaList from "./NaList";
 import LabelChip from "../common/label/LabelChip";
 import { addSpacesToCamelCase } from "../../utils/FormatUtils";

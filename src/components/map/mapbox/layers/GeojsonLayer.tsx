@@ -13,7 +13,7 @@ import MapContext from "../MapContext";
 import { stringToColor } from "../../../common/colors/colorsUtils";
 import { Feature, Polygon, Position } from "geojson";
 import { LngLat, LngLatBounds, MapMouseEvent } from "mapbox-gl";
-import { OGCCollection } from "../../../common/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { fitToBound } from "../../../../utils/MapUtils";
 import bluePin from "@/assets/icons/blue_pin.png";
 import { MapEventEnum } from "../constants";

@@ -1,14 +1,14 @@
 import { FC, useCallback, useMemo } from "react";
 import { Box, Typography } from "@mui/material";
 import { useDetailPageContext } from "../context/detail-page-context";
-import LinkCard from "../../../components/list/listItem/subitem/LinkCard";
+import LinkCard from "../../../components/list/list-item/sub-item/LinkCard";
 import { MODE } from "../../../components/list/CommonDef";
 import NaList from "../../../components/list/NaList";
 import {
   DataAccessSubGroup,
   getSubgroup,
   ILink,
-} from "../../../components/common/store/OGCCollectionDefinitions";
+} from "@/app/store/OGCCollectionDefinitions";
 import SideCardContainer from "../layout/SideCardContainer";
 import NavigatablePanel, {
   NavigatablePanelChild,
@@ -19,7 +19,7 @@ import {
   pageReferer,
 } from "../../../components/common/constants";
 import DataList from "../../../components/list/DataList";
-import DocumentList from "../../../components/list/DocumentLIst";
+import DocumentList from "../../../components/list/DocumentList";
 import OtherItemList from "../../../components/list/OtherItemList";
 import CodeTutorialsList from "../../../components/list/CodeTutorialsList";
 import { portalTheme } from "../../../styles";

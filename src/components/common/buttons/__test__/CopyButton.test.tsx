@@ -2,9 +2,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import CopyButton from "../CopyButton";
-import * as ClipboardContext from "../../../../context/clipboard/ClipboardContext";
+import * as ClipboardContext from "@/app/providers/ClipboardContext";
 
-vi.mock("../../../../context/clipboard/ClipboardContext", () => ({
+vi.mock("@/app/providers/ClipboardContext", () => ({
   useClipboardContext: vi.fn(),
 }));
 

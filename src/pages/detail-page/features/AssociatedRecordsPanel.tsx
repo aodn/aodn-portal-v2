@@ -5,7 +5,7 @@ import {
   IAssociatedRecordGroup,
   ILink,
   RelationType,
-} from "../../../components/common/store/OGCCollectionDefinitions";
+} from "@/app/store/OGCCollectionDefinitions";
 import AssociatedRecordList from "../../../components/list/AssociatedRecordList";
 import NavigatablePanel, {
   NavigatablePanelChild,

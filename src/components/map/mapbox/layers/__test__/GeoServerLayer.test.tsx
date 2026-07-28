@@ -2,15 +2,15 @@ import { render, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
-import searchReducer from "../../../../common/store/searchReducer";
+import searchReducer from "@/app/store/searchReducer";
 import GeoServerLayer from "../GeoServerLayer";
 import MapContext from "../../MapContext";
-import { OGCCollection } from "../../../../common/store/OGCCollectionDefinitions";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import AdminScreenContext from "../../../../admin/AdminScreenContext";
 import {
   GeoserverFieldsResponse,
   MapLayerResponse,
-} from "../../../../common/store/GeoserverDefinitions";
+} from "@/app/store/GeoserverDefinitions";
 import { MapEventEnum } from "../../constants";
 import utc from "dayjs/plugin/utc";
 import { extend } from "dayjs";

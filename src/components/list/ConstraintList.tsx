@@ -1,7 +1,7 @@
 import React from "react";
-import CollapseItem from "./listItem/CollapseItem";
+import CollapseItem from "./list-item/CollapseItem";
 import ExpandableList from "./ExpandableList";
-import TextArea from "./listItem/subitem/TextArea";
+import TextArea from "./list-item/sub-item/TextArea";
 
 interface ConstraintListProps {
   constraints: { title: string; content: string[] }[];

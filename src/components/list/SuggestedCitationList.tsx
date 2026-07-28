@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import ExpandableList from "./ExpandableList";
-import ItemBaseGrid from "./listItem/ItemBaseGrid";
-import ExpandableTextArea from "./listItem/subitem/ExpandableTextArea";
+import ItemBaseGrid from "./list-item/ItemBaseGrid";
+import ExpandableTextArea from "./list-item/sub-item/ExpandableTextArea";
 import { MODE } from "./CommonDef";
 import NaList from "./NaList";
 import { Stack, SxProps, Typography } from "@mui/material";

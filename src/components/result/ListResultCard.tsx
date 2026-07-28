@@ -10,12 +10,15 @@ import {
 } from "@mui/material";
 import { border, borderRadius, color, padding } from "../../styles/constants";
 import { FC, Fragment, SyntheticEvent, useRef, useState } from "react";
-import OrganizationLogo from "../logo/OrganizationLogo";
+import OrganizationLogo from "../icon/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import { ResultCardBasicType } from "./ResultCards";
 import BookmarkButton from "../bookmark/BookmarkButton";
 import default_thumbnail from "@/assets/images/default-thumbnail.png";
-import { LIST_CARD_TITLE_HEIGHT } from "./constants";
+import {
+  LIST_CARD_TITLE_HEIGHT,
+  SHOW_RESULT_CARD_THUMBNAIL,
+} from "./constants";
 import { portalTheme } from "../../styles";
 import { OpenType } from "../../hooks/useTabNavigation";
 import ContextMenu, { ContextMenuRef } from "../menu/ContextMenu";
@@ -257,7 +260,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
                 </Box>
               )}
             </Box>
-            {thumbnail !== default_thumbnail && (
+            {SHOW_RESULT_CARD_THUMBNAIL && thumbnail !== default_thumbnail && (
               <Box
                 sx={{
                   maxWidth: 150,
@@ -267,7 +270,8 @@ const ListResultCard: FC<ListResultCardProps> = ({
               >
                 <img
                   src={thumbnail}
-                  alt="org_logo"
+                  alt={`Thumbnail of ${title}`}
+                  loading="lazy"
                   style={{
                     width: "100%",
                     height: "100%",

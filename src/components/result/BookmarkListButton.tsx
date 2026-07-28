@@ -1,10 +1,10 @@
 import { FC, useState } from "react";
 import { Box, Paper, Popper, SxProps } from "@mui/material";
-import store from "../common/store/store";
+import store from "@/app/store/store";
 import {
   removeAllItems,
   selectBookmarkItems,
-} from "../common/store/bookmarkListReducer";
+} from "@/app/store/bookmarkListReducer";
 import { useSelector } from "react-redux";
 import useElementSize from "../../hooks/useElementSize";
 import BookmarkListAccordionGroup from "../bookmark/BookmarkListAccordionGroup";

@@ -13,19 +13,16 @@ import {
   Checkbox,
   FormControlLabel,
   FormGroup,
-  IconButton,
   alpha,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import ReplayIcon from "@mui/icons-material/Replay";
-import { color, fontSize, gap, padding } from "../../styles/constants";
+import { gap, padding } from "../../styles/constants";
 import {
   ParameterState,
   SelectedStaticArea,
   updateFilterPolygon,
   updateFilterStaticAreas,
-} from "../common/store/componentParamReducer";
-import { useAppDispatch, useAppSelector } from "../common/store/hooks";
+} from "@/app/store/componentParamReducer";
+import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { featureCollection, union } from "@turf/turf";
 import {
   fetchAllenCoralAtlasOptions,
@@ -429,23 +426,6 @@ const LocationFilter: FC<LocationFilterProps> = () => {
     ]
   );
 
-  const handleClear = useCallback(() => {
-    dispatch(updateFilterPolygon(undefined));
-    dispatch(updateFilterStaticAreas([]));
-
-    setSelectedMarineParkValues(new Set());
-    setSelectedMarineEcoregionValues(new Set());
-    setSelectedAllenCoralAtlasValues(new Set());
-
-    // Clear drawn features from map and state
-    if (removeFeatureRef.current) {
-      drawFeatures.forEach((f) => {
-        if (f.id) removeFeatureRef.current!(String(f.id));
-      });
-    }
-    startTransition(() => setDrawFeatures([]));
-  }, [dispatch, drawFeatures]);
-
   const handleFeaturesChange = useCallback(
     (
       newFeatures: Feature<Polygon | MultiPolygon>[],
@@ -489,8 +469,7 @@ const LocationFilter: FC<LocationFilterProps> = () => {
   );
 
   const highlightCollection = useMemo(():
-    | FeatureCollection<Polygon | MultiPolygon>
-    | undefined => {
+    FeatureCollection<Polygon | MultiPolygon> | undefined => {
     const allFeats: Feature<Polygon | MultiPolygon>[] = [];
 
     if (selectedMarineParkValues.size > 0) {

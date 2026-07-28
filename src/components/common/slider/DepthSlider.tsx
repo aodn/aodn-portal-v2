@@ -16,7 +16,7 @@ import {
   fontWeight,
   padding,
 } from "../../../styles/constants";
-import { ParameterState } from "../store/componentParamReducer";
+import { ParameterState } from "@/app/store/componentParamReducer";
 import PlainSlider from "./PlainSlider";
 
 interface DepthSliderProps {

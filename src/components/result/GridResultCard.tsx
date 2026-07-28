@@ -1,4 +1,4 @@
-import React, { FC, SyntheticEvent, useRef, useState } from "react";
+import { FC, SyntheticEvent, useRef, useState } from "react";
 import {
   Box,
   Card,
@@ -14,9 +14,10 @@ import {
   gap,
   padding,
 } from "../../styles/constants";
-import OrganizationLogo from "../logo/OrganizationLogo";
+import OrganizationLogo from "../icon/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import { ResultCardBasicType } from "./ResultCards";
+import { SHOW_RESULT_CARD_THUMBNAIL } from "./constants";
 import BookmarkButton from "../bookmark/BookmarkButton";
 import default_thumbnail from "@/assets/images/default-thumbnail.png";
 import { portalTheme } from "../../styles";
@@ -91,12 +92,17 @@ const GridResultCard: FC<GridResultCardProps> = ({
           borderRadius={borderRadius.small}
         >
           <img
-            src={findThumbnail()}
-            alt="org_logo"
+            src={
+              SHOW_RESULT_CARD_THUMBNAIL
+                ? findThumbnail()
+                : (content.createStaticMapUrl() ?? default_thumbnail)
+            }
+            alt={`Thumbnail of ${title}`}
+            loading="lazy"
             style={{
-              objectFit: "fill",
+              objectFit: "cover",
               width: "100%",
-              height: "auto",
+              height: "100%",
             }}
             onError={(e: SyntheticEvent<HTMLImageElement, Event>) => {
               e.preventDefault();

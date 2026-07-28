@@ -5,7 +5,7 @@ import SearchbarButtonGroup, {
   SearchbarButtonNames,
 } from "../SearchbarButtonGroup";
 import { Provider } from "react-redux";
-import store from "../../common/store/store";
+import store from "@/app/store/store";
 
 // Mock useRedirectSearch hook
 const mockRedirectSearch = vi.fn();

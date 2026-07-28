@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import DetailSubtabBtn from "../DetailSubtabBtn";
-import AppTheme from "../../../../utils/AppTheme";
+import AppTheme from "@/styles/theme";
 import { ThemeProvider } from "@mui/material/styles";
 
 describe("DetailSubTabBtn", () => {

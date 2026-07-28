@@ -19,3 +19,5 @@ export enum SearchKeys {
   CSIRO = "csiro",
   IMAS = "imas",
 }
+
+export const DOUBLE_QUOTE_LABEL = "Only keyword";

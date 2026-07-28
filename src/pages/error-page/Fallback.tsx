@@ -1,5 +1,3 @@
-import * as React from "react";
-
 /*
  * Display this page while routes are being loaded
  */

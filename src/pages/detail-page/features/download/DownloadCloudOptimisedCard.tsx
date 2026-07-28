@@ -9,7 +9,7 @@ import {
 import { Stack } from "@mui/material";
 import dayjs from "dayjs";
 import { dateDefault } from "../../../../components/common/constants";
-import DownloadDialog from "./DownloadDialog/DownloadDialog";
+import DownloadDialog from "./download-dialog/DownloadDialog";
 import {
   DownloadCondition,
   DownloadConditionType,
@@ -19,16 +19,24 @@ import {
 import {
   DatasetType,
   OGCCollection,
-} from "../../../../components/common/store/OGCCollectionDefinitions";
+} from "@/app/store/OGCCollectionDefinitions";
 import DownloadButton from "../../../../components/common/buttons/DownloadButton";
 import DownloadSubsetting from "./DownloadSubsetting";
 import DownloadSelect from "./DownloadSelect";
+import useEstimateSize from "../../../../hooks/useEstimateSize";
+import { processCoEstimateSize } from "@/app/store/searchReducer";
 
 const downloadFormats = [
   { label: "NetCDFs", value: "netcdf" },
   { label: "CSV", value: "csv" },
   { label: "GeoTIFF", value: "geotiff" },
 ];
+
+// The CO `estimate-complete` payload reports the size of the actual download
+// output in `estimated_output_bytes` (vs `estimated_uncompressed_bytes`)
+const getCoEstimatedBytes = (data: {
+  estimated_output_bytes?: number;
+}): number | undefined => data.estimated_output_bytes;
 
 interface DownloadCardProps extends DownloadCondition {
   collection: OGCCollection;
@@ -45,6 +53,8 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
   setSelectedCoKey,
 }) => {
   const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
+  const { isEstimating, estimateSize, cancelEstimate, estimatedSizeBytes } =
+    useEstimateSize(processCoEstimateSize, getCoEstimatedBytes);
 
   const dateRangeBounds = useMemo(() => {
     let min = dayjs(dateDefault.min);
@@ -201,6 +211,20 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
     [getAndSetDownloadConditions]
   );
 
+  // Re-estimate whenever the selected data item (key) or download conditions
+  // (format / subsetting) change
+  useEffect(() => {
+    if (!collection?.id || !selectedDataItem) return;
+    estimateSize({ uuid: collection.id, downloadConditions });
+    return () => cancelEstimate();
+  }, [
+    collection?.id,
+    selectedDataItem,
+    downloadConditions,
+    estimateSize,
+    cancelEstimate,
+  ]);
+
   return (
     <Stack>
       <Stack sx={{ p: "16px" }} spacing={2}>
@@ -216,7 +240,11 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
           value={selectedFormat}
           onSelectCallback={onSelectChange}
         />
-        <DownloadButton onDownload={onDownload} />
+        <DownloadButton
+          onDownload={onDownload}
+          isEstimating={isEstimating}
+          estimatedSizeBytes={estimatedSizeBytes}
+        />
       </Stack>
       <DownloadSubsetting
         downloadConditions={downloadConditions}

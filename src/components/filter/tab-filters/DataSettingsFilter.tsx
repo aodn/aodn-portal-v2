@@ -5,15 +5,12 @@ import {
   updateExcludeDocument,
   updateStatus,
   updateUpdateFreq,
-} from "../../common/store/componentParamReducer";
-import { useAppDispatch } from "../../common/store/hooks";
+} from "@/app/store/componentParamReducer";
+import { useAppDispatch } from "@/app/store/hooks";
 import { TabFilterType } from "../Filters";
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
 import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
-import {
-  DatasetFrequency,
-  DatasetStatus,
-} from "../../common/store/searchReducer";
+import { DatasetFrequency, DatasetStatus } from "@/app/store/searchReducer";
 import { IndexDataType, ItemButton } from "../FilterDefinition";
 import { portalTheme } from "../../../styles";
 
