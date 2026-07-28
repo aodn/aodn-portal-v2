@@ -58,7 +58,16 @@ const region = import.meta.env.VITE_AWS_REGION;
 // Day cap is high enough for multi-decade daily PMTiles (~55 years).
 const MONTH_KEY_LIMIT = 1200;
 const DAY_KEY_LIMIT = 20000;
-const DEFAULT_RANGE_START = "2000-01-01";
+/**
+ * Fallback UI window start when the user has not set a date filter **and**
+ * `.metadata` bounds are not yet available.
+ *
+ * Must predate any realistic dataset min (was `"2000-01-01"`, which zeroed
+ * all density for pre-2000 tiles such as single-day `19700121` coverage once
+ * clamped against metadata). Prefer using metadata bounds when present —
+ * see {@link buildCountFilterRange}.
+ */
+const DEFAULT_RANGE_START = "1900-01-01";
 /**
  * Trailing debounce so rapid tile `sourcedata` / `idle` events collapse into
  * one feature-state pass after the viewport settles (avoids partial updates).
@@ -304,6 +313,10 @@ export const clampPeriodsToMetadata = (
  * Intersect the UI filter window with metadata period coverage.
  * Converts Dayjs → period ints, clamps with integers, converts back for callers
  * that still expand key lists via dayjs walkers.
+ *
+ * When the UI has not set a filter (`start`/`end` both undefined) and metadata
+ * bounds exist, use the full tile coverage — do not invent a default calendar
+ * window that can miss pre-2000 data.
  */
 export const clampRangeToMetadata = (
   start?: Dayjs,
@@ -311,6 +324,12 @@ export const clampRangeToMetadata = (
   bounds?: PMTilesMetadataRange | null,
   timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY
 ): { start: Dayjs; end: Dayjs } => {
+  if (start === undefined && end === undefined && bounds) {
+    const minD = periodNumberToDayjs(bounds.minPeriod, timeGroupBy, "start");
+    const maxD = periodNumberToDayjs(bounds.maxPeriod, timeGroupBy, "end");
+    if (minD && maxD) return { start: minD, end: maxD };
+  }
+
   const { start: s0, end: e0 } = resolveRange(start, end);
   const isDate = timeGroupBy === TimeGroupBy.Date;
   const startPeriod = isDate
@@ -533,6 +552,11 @@ export const buildCountFilterRangeFromPeriods = (
  * Build a reusable filter range for density/popup sums.
  * Converts the UI Dayjs window to {@link PeriodInt} once, then clamps/sums
  * with integers. Optionally attaches a key allow-set when the window is narrow.
+ *
+ * Full-coverage path: when the user has not applied a date filter (both ends
+ * undefined) and `.metadata` bounds are known, sum the entire tile period —
+ * including single-day archives such as min=max=`19700121`. A default window
+ * starting in 2000 would clamp to empty against that coverage.
  */
 export const buildCountFilterRange = (
   filterStart?: Dayjs,
@@ -543,6 +567,15 @@ export const buildCountFilterRange = (
     bounds?: PMTilesMetadataRange | null;
   }
 ): CountFilterRange => {
+  if (filterStart === undefined && filterEnd === undefined && options?.bounds) {
+    return buildCountFilterRangeFromPeriods(
+      options.bounds.minPeriod,
+      options.bounds.maxPeriod,
+      timeGroupBy,
+      options
+    );
+  }
+
   const { start, end } = resolveRange(filterStart, filterEnd);
   const rangeStart = start.startOf("day");
   const rangeEnd = end.startOf("day");

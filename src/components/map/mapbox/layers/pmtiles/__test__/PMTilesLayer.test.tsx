@@ -106,10 +106,13 @@ describe("PMTilesLayer - getMonthKeysInRange", () => {
     expect(keys).toEqual([]);
   });
 
-  it("defaults to 2000-01 through the current month when no dates given", () => {
+  it("defaults from 1900-01 when no dates given (capped by MONTH_KEY_LIMIT)", () => {
+    // Fallback only when no UI filter and no .metadata bounds (see DEFAULT_RANGE_START).
+    // 1200 months from 1900-01 stops before the current month.
     const keys = getMonthKeysInRange();
-    expect(keys[0]).toBe("m200001");
-    expect(keys[keys.length - 1]).toBe(`m${dayjs().format("YYYYMM")}`);
+    expect(keys[0]).toBe("m190001");
+    expect(keys.length).toBe(1200);
+    expect(keys[keys.length - 1]).toBe("m199912");
   });
 
   it("caps the number of keys at 1200", () => {
@@ -305,6 +308,17 @@ describe("PMTilesLayer - clampPeriodsToMetadata / clampRangeToMetadata", () => {
     );
     expect(start.format("YYYY-MM-DD")).toBe("2020-01-01");
     expect(end.format("YYYY-MM-DD")).toBe("2020-01-31");
+  });
+
+  it("uses full metadata bounds when no UI filter is provided", () => {
+    const { start, end } = clampRangeToMetadata(
+      undefined,
+      undefined,
+      metaRange(19700121, 19700121, TimeGroupBy.Date),
+      TimeGroupBy.Date
+    );
+    expect(start.format("YYYY-MM-DD")).toBe("1970-01-21");
+    expect(end.format("YYYY-MM-DD")).toBe("1970-01-21");
   });
 });
 
@@ -551,6 +565,45 @@ describe("PMTilesLayer - CountFilterRange (integer + key set)", () => {
     expect(range.endPeriod).toBe(20240120);
     expect(isCountKeyInFilterRange("m20240115", range)).toBe(true);
     expect(isCountKeyInFilterRange("m20240109", range)).toBe(false);
+  });
+
+  it("uses full metadata coverage when no UI filter is set (pre-2000 single day)", () => {
+    // Regression: default window started 2000-01-01, so clamping against
+    // min=max=19700121 produced an empty range and no hexbins at all.
+    const bounds = metaRange(19700121, 19700121, TimeGroupBy.Date);
+    const range = buildCountFilterRange(
+      undefined,
+      undefined,
+      TimeGroupBy.Date,
+      {
+        bounds,
+      }
+    );
+    expect(range.empty).toBe(false);
+    expect(range.startPeriod).toBe(19700121);
+    expect(range.endPeriod).toBe(19700121);
+    expect(isCountKeyInFilterRange("m19700121", range)).toBe(true);
+    expect(isCountKeyInFilterRange("m19700122", range)).toBe(false);
+
+    const { total } = sumSparseCountFromProperties(
+      { h: "cell", m19700121: 42, m20000101: 99 },
+      undefined,
+      undefined,
+      TimeGroupBy.Date,
+      { range }
+    );
+    expect(total).toBe(42);
+  });
+
+  it("still empties when an explicit UI filter is entirely after metadata", () => {
+    const bounds = metaRange(19700121, 19700121, TimeGroupBy.Date);
+    const range = buildCountFilterRange(
+      dayjs("2000-01-01"),
+      dayjs("2020-01-01"),
+      TimeGroupBy.Date,
+      { bounds }
+    );
+    expect(range.empty).toBe(true);
   });
 });
 
