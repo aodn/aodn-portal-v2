@@ -264,6 +264,8 @@ def test_data_bookmark_persistence(desktop_page: Page, data_id: str) -> None:
 
     landing_page.load()
     landing_page.search.search_for(data_id)
+    search_page.wait_for_search_to_complete()
+    search_page.map.wait_for_map_idle()
 
     # Click result card bookmark icon
     search_page.get_bookmark_icon(data_id, search_page.result_card_list).click()
@@ -271,9 +273,15 @@ def test_data_bookmark_persistence(desktop_page: Page, data_id: str) -> None:
 
     # Clear search to show all results
     search_page.search.search_for('')
+    search_page.wait_for_search_to_complete()
     search_page.map.wait_for_map_idle()
     # Search again to see if bookmark persists
     search_page.search.search_for(data_id)
+    search_page.wait_for_search_to_complete()
     search_page.map.wait_for_map_idle()
+    # Ensure the dataset result card is back before checking bookmark state
+    search_page.get_bookmark_icon(
+        data_id, search_page.result_card_list
+    ).wait_for(state='visible')
 
     search_page.assert_bookmark_state(data_id, True)

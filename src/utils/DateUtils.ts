@@ -28,7 +28,17 @@ export const convertDateFormat = (dateString: string): string => {
 };
 
 // Utility function to convert a date to a numeric value
-export const dateToValue = (date: Dayjs): number => date.valueOf();
+export const dateToValue = (date: Dayjs, endOfDay: boolean = false): number => {
+  return endOfDay ? date.endOf("day").valueOf() : date.valueOf();
+};
 
 // Utility function to convert a numeric value back to a date
 export const valueToDate = (value: number): Dayjs => dayjs(value);
+
+/** Calendar day → YYYYMMDD integer (local calendar fields from dayjs). */
+export const dayjsToDayPeriod = (d: Dayjs): number =>
+  d.year() * 10000 + (d.month() + 1) * 100 + d.date();
+
+/** Calendar month → YYYYMM integer. */
+export const dayjsToMonthPeriod = (d: Dayjs): number =>
+  d.year() * 100 + (d.month() + 1);

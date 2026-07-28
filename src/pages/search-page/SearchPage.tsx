@@ -155,6 +155,10 @@ const SearchPage = () => {
 
   const doMapSearch = useCallback(
     async (needNavigate: boolean = false) => {
+      // Drop any pending history rewrite from a prior map search. A delayed
+      // navigate() with stale params can wipe a newer search (e.g. searchText).
+      debounceHistoryUpdateRef?.current?.cancel();
+
       const componentParam: ParameterState = getComponentState(
         store.getState()
       );
@@ -213,14 +217,21 @@ const SearchPage = () => {
             // cause all search cancel. However, we also need to make sure that the controller is not canceled
             // and replace by a new one due to new search
             if (needNavigate && controller === mapSearchAbortRef.current) {
+              // Prefer latest Redux params so a concurrent text search is not
+              // overwritten by the bbox snapshot captured when this map search began.
+              const latestParam = getComponentState(store.getState());
               debounceHistoryUpdateRef?.current?.cancel();
               debounceHistoryUpdateRef?.current?.(
-                pageDefault.search + "?" + formatToUrlParam(componentParam)
+                pageDefault.search + "?" + formatToUrlParam(latestParam)
               );
             }
 
             setProgress(undefined);
-            mapSearchAbortRef.current = null;
+            // Only clear if we are still the active search; a newer search may
+            // already own the ref.
+            if (controller === mapSearchAbortRef.current) {
+              mapSearchAbortRef.current = null;
+            }
           });
       }
     },
@@ -229,6 +240,8 @@ const SearchPage = () => {
 
   const doListSearch = useCallback(
     (needNavigate: boolean = false) => {
+      // Ensure a new list/map search never loses to a pending URL rewrite.
+      debounceHistoryUpdateRef?.current?.cancel();
       if (listSearchAbortRef.current) {
         listSearchAbortRef.current.abort();
       }
@@ -447,11 +460,18 @@ const SearchPage = () => {
   }, []);
 
   const cancelAllSearch = useCallback(() => {
+    debounceHistoryUpdateRef?.current?.cancel();
     mapSearchAbortRef.current?.abort();
     mapSearchAbortRef.current = null;
     listSearchAbortRef.current?.abort();
     listSearchAbortRef.current = null;
   }, []);
+
+  // Any real URL change (search button, layout, paste, etc.) invalidates a
+  // pending map-driven history rewrite that may still hold older filters.
+  useEffect(() => {
+    debounceHistoryUpdateRef?.current?.cancel();
+  }, [location.search]);
 
   // You will see this trigger twice, this is due to use of strict-mode
   // which is ok.
