@@ -1,8 +1,7 @@
 import type { createBrowserRouter } from "react-router-dom";
+import { BASE_URL } from "./constants";
 
 type Router = ReturnType<typeof createBrowserRouter>;
-
-const CANONICAL_BASE_URL = "https://portal.aodn.org.au";
 
 const setCanonicalUrl = (pathname: string) => {
   let link = document.head.querySelector<HTMLLinkElement>(
@@ -13,7 +12,7 @@ const setCanonicalUrl = (pathname: string) => {
     link.rel = "canonical";
     document.head.appendChild(link);
   }
-  link.href = `${CANONICAL_BASE_URL}${pathname}`;
+  link.href = `${BASE_URL}${pathname}`;
 };
 
 export const syncCanonicalUrl = (router: Router) => {

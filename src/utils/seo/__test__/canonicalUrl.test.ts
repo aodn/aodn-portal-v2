@@ -1,6 +1,7 @@
 import { describe, expect, test, beforeEach } from "vitest";
 import { createMemoryRouter } from "react-router-dom";
 import { syncCanonicalUrl } from "../canonicalUrl";
+import { BASE_URL } from "../constants";
 
 const canonicalHref = () =>
   document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.href;
@@ -19,10 +20,10 @@ describe("syncCanonicalUrl", () => {
     document.head.querySelector('link[rel="canonical"]')?.remove();
   });
 
-  test("sets the canonical to the prod URL for the initial route", () => {
+  test("sets the canonical to the configured base URL for the initial route", () => {
     syncCanonicalUrl(buildRouter("/details/abc-123"));
 
-    expect(canonicalHref()).toBe("https://portal.aodn.org.au/details/abc-123");
+    expect(canonicalHref()).toBe(`${BASE_URL}/details/abc-123`);
   });
 
   test("creates the <link rel=canonical> element when the page has none", () => {
@@ -31,7 +32,7 @@ describe("syncCanonicalUrl", () => {
     syncCanonicalUrl(buildRouter("/"));
 
     expect(canonicalCount()).toBe(1);
-    expect(canonicalHref()).toBe("https://portal.aodn.org.au/");
+    expect(canonicalHref()).toBe(`${BASE_URL}/`);
   });
 
   test("reuses the existing canonical element instead of adding another", () => {
@@ -42,16 +43,16 @@ describe("syncCanonicalUrl", () => {
     syncCanonicalUrl(buildRouter("/search"));
 
     expect(canonicalCount()).toBe(1);
-    expect(canonicalHref()).toBe("https://portal.aodn.org.au/search");
+    expect(canonicalHref()).toBe(`${BASE_URL}/search`);
   });
 
   test("updates the canonical when the route changes", async () => {
     const router = buildRouter("/");
     syncCanonicalUrl(router);
-    expect(canonicalHref()).toBe("https://portal.aodn.org.au/");
+    expect(canonicalHref()).toBe(`${BASE_URL}/`);
 
     await router.navigate("/details/xyz");
 
-    expect(canonicalHref()).toBe("https://portal.aodn.org.au/details/xyz");
+    expect(canonicalHref()).toBe(`${BASE_URL}/details/xyz`);
   });
 });
