@@ -33,6 +33,13 @@ type CoordDraft = Record<CoordKey, string>;
 type CoordErrors = Partial<Record<CoordKey, string>>;
 
 const EMPTY_DRAFT: CoordDraft = { N: "", S: "", E: "", W: "" };
+// Narrowest a coordinate column can be. The grid keeps two columns while two of
+// them fit and falls back to one only when they would otherwise collide.
+const COORD_COL_MIN = 70;
+const COORD_COL_GAP = 12;
+// Label (14) + gap (8) + CoordInput (80)
+const INPUT_COL_MIN = 102;
+const INPUT_COL_GAP = 24;
 const SOFT_SHADOW = "1px 1px 4px 0 rgba(0, 0, 0, 0.10)";
 const COORD_RANGES: Record<CoordKey, [number, number]> = {
   N: [-90, 90],
@@ -143,9 +150,11 @@ const BBoxRow: React.FC<BBoxRowProps> = ({
     <Stack
       direction="row"
       alignItems="center"
-      spacing={4}
+      // The coordinates sit centred in a flex:1 box, so a tight gap here barely
+      // shows when there is room but leaves them somewhere to go when there isn't
+      spacing={1}
       sx={{
-        pl: 2.5,
+        pl: 1.5,
         pr: 1.25,
         py: 1,
         backgroundColor: "common.white",
@@ -180,8 +189,16 @@ const BBoxRow: React.FC<BBoxRowProps> = ({
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: "auto auto",
-            columnGap: 3,
+            // auto-fit drops to a single column exactly when two no longer fit;
+            // min() lets that last column shrink instead of overflowing
+            gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, ${COORD_COL_MIN}px), 1fr))`,
+            columnGap: `${COORD_COL_GAP}px`,
+            rowGap: 0.25,
+            // Grid is centred as a block by the parent; values line up on their
+            // left edge inside it rather than each one centring on its own width
+            justifyItems: "start",
+            width: "100%",
+            maxWidth: COORD_COL_MIN * 2 + COORD_COL_GAP,
           }}
         >
           {/* Group latitude bounds (N, S) then longitude bounds (W, E) */}
@@ -399,7 +416,13 @@ const BBoxConditionCard: React.FC<BBoxConditionCardProps> = ({
           <Stack
             spacing={1.5}
             alignItems="center"
-            sx={{ pt: 0.5, px: 1.5, width: "fit-content", mx: "auto" }}
+            sx={{
+              pt: 0.5,
+              px: 1.5,
+              width: "100%",
+              maxWidth: INPUT_COL_MIN * 2 + INPUT_COL_GAP + 24,
+              mx: "auto",
+            }}
           >
             <LabeledCoordInput
               label="N"
@@ -410,7 +433,17 @@ const BBoxConditionCard: React.FC<BBoxConditionCardProps> = ({
               onSubmit={submitDraft}
               disabled={disable}
             />
-            <Stack direction="row" spacing={3}>
+            {/* W and E sit side by side while both fit, then stack */}
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: `repeat(auto-fit, minmax(${INPUT_COL_MIN}px, 1fr))`,
+                columnGap: `${INPUT_COL_GAP}px`,
+                rowGap: 1.5,
+                justifyItems: "center",
+                width: "100%",
+              }}
+            >
               <LabeledCoordInput
                 label="W"
                 value={draft.W}
@@ -429,7 +462,7 @@ const BBoxConditionCard: React.FC<BBoxConditionCardProps> = ({
                 onSubmit={submitDraft}
                 disabled={disable}
               />
-            </Stack>
+            </Box>
             <LabeledCoordInput
               label="S"
               value={draft.S}

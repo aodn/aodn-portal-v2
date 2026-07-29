@@ -77,7 +77,7 @@ const DateRow: React.FC<DateRowProps> = ({
     <PlainDatePicker
       sx={datePickerSx}
       views={["year", "month", "day"]}
-      format={dateDefault.DISPLAY_FORMAT}
+      format={dateDefault.DISPLAY_FORMAT_LONG}
       value={dayjs(value)}
       minDate={minDate}
       maxDate={maxDate}
@@ -109,7 +109,7 @@ const DateRangeConditionCard: React.FC<DateRangeConditionCardProps> = ({
         variant="body1Medium"
         sx={{ color: portalTheme.palette.text1 }}
       >
-        Operate time range slider
+        Operate date range slider
       </Typography>
     </Stack>
   );
