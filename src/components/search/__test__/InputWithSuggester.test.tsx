@@ -192,7 +192,7 @@ describe("InputWithSuggester", () => {
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
   });
 
-  it("offers a double-quoted 'Only keyword' option for the typed text", async () => {
+  it("offers a double-quoted 'Exact match' option for the typed text", async () => {
     const user = userEvent.setup();
     const input = screen.getByTestId("input-with-suggester");
 
@@ -206,7 +206,7 @@ describe("InputWithSuggester", () => {
 
     // The quoted row and its chip are rendered
     const quotedOption = await screen.findByText('"wave"');
-    expect(screen.getByTestId("label-chip-Only keyword")).toBeInTheDocument();
+    expect(screen.getByTestId("label-chip-Exact match")).toBeInTheDocument();
 
     // Selecting it puts the quoted text into the input and Redux
     await user.click(quotedOption);

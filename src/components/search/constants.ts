@@ -20,4 +20,4 @@ export enum SearchKeys {
   IMAS = "imas",
 }
 
-export const DOUBLE_QUOTE_LABEL = "Only keyword";
+export const DOUBLE_QUOTE_LABEL = "Exact match";
