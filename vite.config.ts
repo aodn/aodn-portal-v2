@@ -153,7 +153,7 @@ export default ({ mode }) => {
           target: apiPath,
           changeOrigin: true,
         },
-        "/api/v1/ogc/manage/health": {
+        "/api/v1/ogc/manage": {
           target: apiPath,
           changeOrigin: true,
         },

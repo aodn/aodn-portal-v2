@@ -11,6 +11,7 @@ import {
   Button,
   Chip,
   Stack,
+  CircularProgress,
 } from "@mui/material";
 import AdminPanelSettings from "@mui/icons-material/AdminPanelSettings";
 import Close from "@mui/icons-material/Close";
@@ -18,7 +19,10 @@ import Security from "@mui/icons-material/Security";
 import Map from "@mui/icons-material/Map";
 import Keyboard from "@mui/icons-material/Keyboard";
 import RestartAlt from "@mui/icons-material/RestartAlt";
-import AdminScreenContext from "./AdminScreenContext";
+import InfoOutlined from "@mui/icons-material/InfoOutlined";
+import Refresh from "@mui/icons-material/Refresh";
+import { ogcAxiosWithRetry } from "../../app/store/searchReducer";
+import AdminScreenContext, { OgcInfo } from "./AdminScreenContext";
 
 interface AdminScreenProps {
   visible?: boolean;
@@ -42,9 +46,34 @@ const AdminScreen = ({
   );
   const [centroidError, setCentroidError] = useState<string>("");
 
+  const [info, setInfo] = useState<OgcInfo | null>(null);
+  const [infoLoading, setInfoLoading] = useState<boolean>(false);
+  const [infoError, setInfoError] = useState<string | null>(null);
+
+  const fetchSystemInfo = () => {
+    startTransition(() => {
+      setInfoLoading(true);
+      setInfoError(null);
+      ogcAxiosWithRetry
+        .get<OgcInfo>("/ogc/manage/info")
+        .then((res) => {
+          setInfo(res.data);
+          setInfoLoading(false);
+        })
+        .catch((err) => {
+          setInfoError(err?.message || "Failed to fetch system info");
+          setInfoLoading(false);
+        });
+    });
+  };
+
   useEffect(() => {
     startTransition(() => setOpen(visible));
   }, [visible]);
+
+  useEffect(() => {
+    fetchSystemInfo();
+  }, []);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -96,6 +125,9 @@ const AdminScreen = ({
       value={{
         enableGeoServerWhiteList: enableGeoServerWhiteList,
         getMaxMapCentroids: getMaxMapCentroids,
+        info: info,
+        infoLoading: infoLoading,
+        infoError: infoError,
       }}
     >
       <Drawer
@@ -161,7 +193,243 @@ const AdminScreen = ({
               gap: 2.5,
             }}
           >
-            {/* Section 1: Network & Access Control */}
+            {/* Section 1: Application & Service Versions */}
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2,
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2,
+                backgroundColor: "white",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  mb: 1.5,
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <InfoOutlined color="action" fontSize="small" />
+                  <Typography variant="subtitle2" fontWeight="600">
+                    System & Service Versions
+                  </Typography>
+                </Box>
+                <IconButton
+                  size="small"
+                  onClick={fetchSystemInfo}
+                  disabled={infoLoading}
+                  aria-label="Refresh system info"
+                >
+                  <Refresh fontSize="small" />
+                </IconButton>
+              </Box>
+              <Divider sx={{ mb: 2 }} />
+
+              {infoLoading && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1.5,
+                    py: 1,
+                  }}
+                >
+                  <CircularProgress size={20} />
+                  <Typography variant="caption" color="text.secondary">
+                    Loading system service details...
+                  </Typography>
+                </Box>
+              )}
+
+              {!infoLoading && infoError && !info && (
+                <Box sx={{ py: 1 }}>
+                  <Typography
+                    variant="caption"
+                    color="error"
+                    display="block"
+                    sx={{ mb: 1 }}
+                  >
+                    {infoError}
+                  </Typography>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    color="primary"
+                    onClick={fetchSystemInfo}
+                  >
+                    Retry
+                  </Button>
+                </Box>
+              )}
+
+              {!infoLoading && !infoError && !info && (
+                <Box
+                  sx={{
+                    py: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Typography variant="caption" color="text.secondary">
+                    No system info available.
+                  </Typography>
+                  <Button
+                    size="small"
+                    variant="text"
+                    color="primary"
+                    onClick={fetchSystemInfo}
+                  >
+                    Fetch Info
+                  </Button>
+                </Box>
+              )}
+
+              {info?.application && (
+                <Box sx={{ mb: 2 }}>
+                  <Typography
+                    variant="caption"
+                    fontWeight="600"
+                    color="text.secondary"
+                    display="block"
+                    sx={{
+                      mb: 1,
+                      textTransform: "uppercase",
+                      letterSpacing: 0.5,
+                    }}
+                  >
+                    Application
+                  </Typography>
+                  <Box
+                    sx={{
+                      p: 1.25,
+                      borderRadius: 1,
+                      backgroundColor: "#f8fafc",
+                      border: "1px solid",
+                      borderColor: "divider",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Typography
+                        variant="body2"
+                        fontWeight="600"
+                        color="primary"
+                      >
+                        {info.application.name}
+                      </Typography>
+                      {info.application.version && (
+                        <Chip
+                          label={info.application.version}
+                          size="small"
+                          color="primary"
+                          variant="outlined"
+                          sx={{ height: 20, fontSize: "0.7rem" }}
+                        />
+                      )}
+                    </Box>
+                    {info.application.description && (
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        display="block"
+                        sx={{ mt: 0.5 }}
+                      >
+                        {info.application.description}
+                      </Typography>
+                    )}
+                    {info.git?.commit?.id && (
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        display="block"
+                        sx={{ mt: 0.5, fontFamily: "monospace" }}
+                      >
+                        Commit: {info.git.commit.id}
+                      </Typography>
+                    )}
+                  </Box>
+                </Box>
+              )}
+
+              {info?.depService && Object.keys(info.depService).length > 0 && (
+                <Box>
+                  <Typography
+                    variant="caption"
+                    fontWeight="600"
+                    color="text.secondary"
+                    display="block"
+                    sx={{
+                      mb: 1,
+                      textTransform: "uppercase",
+                      letterSpacing: 0.5,
+                    }}
+                  >
+                    Dependent Services
+                  </Typography>
+                  <Stack spacing={1}>
+                    {Object.entries(info.depService).map(
+                      ([serviceName, serviceDetails]) => (
+                        <Box
+                          key={serviceName}
+                          sx={{
+                            p: 1.25,
+                            borderRadius: 1,
+                            backgroundColor: "#f8fafc",
+                            border: "1px solid",
+                            borderColor: "divider",
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <Typography variant="body2" fontWeight="500">
+                              {serviceName}
+                            </Typography>
+                            <Chip
+                              label={serviceDetails.version || "unknown"}
+                              size="small"
+                              variant="outlined"
+                              color={
+                                serviceDetails.version === "unknown"
+                                  ? "default"
+                                  : "info"
+                              }
+                              sx={{ height: 20, fontSize: "0.7rem" }}
+                            />
+                          </Box>
+                          {serviceDetails.description && (
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              display="block"
+                              sx={{ mt: 0.25 }}
+                            >
+                              {serviceDetails.description}
+                            </Typography>
+                          )}
+                        </Box>
+                      )
+                    )}
+                  </Stack>
+                </Box>
+              )}
+            </Paper>
+
+            {/* Section 2: Network & Access Control */}
             <Paper
               elevation={0}
               sx={{
@@ -212,7 +480,7 @@ const AdminScreen = ({
               </Box>
             </Paper>
 
-            {/* Section 2: Map & Spatial Performance */}
+            {/* Section 3: Map & Spatial Performance */}
             <Paper
               elevation={0}
               sx={{
@@ -281,7 +549,7 @@ const AdminScreen = ({
               </Box>
             </Paper>
 
-            {/* Section 3: Keyboard Shortcuts */}
+            {/* Section 4: Keyboard Shortcuts */}
             <Paper
               elevation={0}
               sx={{
