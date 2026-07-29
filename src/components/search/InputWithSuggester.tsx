@@ -32,7 +32,11 @@ import { borderRadius, color, gap, padding } from "../../styles/constants";
 import { debounce } from "lodash";
 import { sortByRelevance } from "../../utils/Helpers";
 import { useAppDispatch } from "@/app/store/hooks";
-import { DOUBLE_QUOTE_LABEL, TEXT_FIELD_MIN_WIDTH } from "./constants";
+import {
+  DOUBLE_QUOTE_LABEL,
+  SEMANTIC_LABEL,
+  TEXT_FIELD_MIN_WIDTH,
+} from "./constants";
 import { SearchbarButtonNames } from "./SearchbarButtonGroup";
 import { useLocation } from "react-router-dom";
 import { pageDefault } from "../common/constants";
@@ -72,6 +76,7 @@ enum OptionGroup {
   ORGANIZATION = "organization",
   PLATFORM = "platform",
   QUOTED = "quoted",
+  SEMANTIC = "semantic",
 }
 
 const defaultFilter = createFilterOptions<string>();
@@ -131,18 +136,17 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
             const platform = new Set<string>(data.suggested_platform_vocabs);
             const semantic = new Set<string>(data.suggested_semantic);
 
-            // Create an array of all unique suggestions
-            const allSuggestions = new Set([
+            // Create an array of all unique suggestions matched on spelling
+            const lexicalSuggestions = new Set([
               ...organization,
               ...parameter,
               ...phrases,
               ...platform,
-              ...semantic,
             ]);
 
             // Sort suggestions by relevance
             const sortedSuggestions = sortByRelevance(
-              allSuggestions,
+              lexicalSuggestions,
               inputValue
             );
 
@@ -159,6 +163,18 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
                   return { text: suggestion, group: OptionGroup.PLATFORM };
                 }
               }
+            );
+
+            // Semantic suggestions match the input by meaning, so they usually share no characters
+            // with it ("underwater device" -> "Glider") and sortByRelevance would sink every one of
+            // them to the bottom. Append them instead, in the relevance order the backend returned.
+            options.push(
+              ...Array.from(semantic)
+                .filter((suggestion) => !lexicalSuggestions.has(suggestion))
+                .map((suggestion) => ({
+                  text: suggestion,
+                  group: OptionGroup.SEMANTIC,
+                }))
             );
 
             // add an exact-keyword-only option of what the user typed at the second position
@@ -182,6 +198,12 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
       }
     },
     [dispatch, setPendingSearch]
+  );
+
+  // The Autocomplete is given plain strings, so filterOptions and renderOption look the group up here
+  const optionGroups = useMemo(
+    () => new Map(options.map((option) => [option.text, option.group])),
+    [options]
   );
 
   const debounceRefreshOptions = useMemo(
@@ -368,6 +390,16 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
         if (opts.includes(quoted) && !kept.includes(quoted)) {
           kept.splice(1, 0, quoted);
         }
+        // defaultFilter is a substring match against the input, which discards every semantic
+        // suggestion. They were matched by meaning on the backend, so put them back.
+        opts.forEach((opt) => {
+          if (
+            optionGroups.get(opt) === OptionGroup.SEMANTIC &&
+            !kept.includes(opt)
+          ) {
+            kept.push(opt);
+          }
+        });
         return kept;
       }}
       autoComplete
@@ -425,6 +457,16 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
             <LabelChip
               text={[DOUBLE_QUOTE_LABEL]}
               color={portalTheme.palette.tag1}
+              sx={{
+                ml: gap.lg,
+                ...portalTheme.typography.body2Regular,
+              }}
+            />
+          )}
+          {optionGroups.get(option) === OptionGroup.SEMANTIC && (
+            <LabelChip
+              text={[SEMANTIC_LABEL]}
+              color={portalTheme.palette.tag2}
               sx={{
                 ml: gap.lg,
                 ...portalTheme.typography.body2Regular,
