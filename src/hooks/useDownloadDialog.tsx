@@ -26,6 +26,7 @@ import { trackCustomEvent } from "../analytics/customEventTracker";
 import { AnalyticsEvent } from "../analytics/analyticsEvents";
 import { calculateBboxes } from "../analytics/downloadCODataEvent";
 import { MultiPolygon } from "geojson";
+import { pageDefault } from "../components/common/constants";
 
 // ================== CONSTANTS ==================
 const STATUS_CODES = {
@@ -328,7 +329,7 @@ export const useDownloadDialog = (
           output_format: format,
           data_usage: dataUsage,
           collection_title: collection?.title || "",
-          full_metadata_link: collection?.getMetadataUrl() || "",
+          full_metadata_link: `${window.location.origin}${pageDefault.details}/${uuid}`,
           suggested_citation:
             collection?.getCitation()?.suggestedCitation || "",
         },
