@@ -88,6 +88,60 @@ describe("DateSliderRange min floor", () => {
     expect(Number(startThumb.getAttribute("aria-valuenow"))).toBe(expected);
     expect(Number(startThumb.getAttribute("aria-valuemin"))).toBe(expected);
   });
+
+  it("places thumbs at rail ends on init (start-of-day min, end-of-day max)", () => {
+    const onDateRangeChange = vi.fn();
+    const minDate = "2020-01-01";
+    const maxDate = "2020-01-31";
+    const minValue = dateToValue(dayjs(minDate, dateDefault.DATE_FORMAT));
+    const maxValue = dateToValue(dayjs(maxDate, dateDefault.DATE_FORMAT), true);
+
+    render(
+      <DateSliderRange
+        currentMinDate={undefined}
+        currentMaxDate={undefined}
+        minDate={minDate}
+        maxDate={maxDate}
+        onDateRangeChange={onDateRangeChange}
+      />
+    );
+
+    const inputs = screen.getAllByRole("slider");
+    expect(Number(inputs[0].getAttribute("aria-valuenow"))).toBe(minValue);
+    expect(Number(inputs[1].getAttribute("aria-valuenow"))).toBe(maxValue);
+    expect(Number(inputs[0].getAttribute("aria-valuemin"))).toBe(minValue);
+    expect(Number(inputs[0].getAttribute("aria-valuemax"))).toBe(maxValue);
+    // Distinct ends — not both stuck on the left
+    expect(Number(inputs[0].getAttribute("aria-valuenow"))).toBeLessThan(
+      Number(inputs[1].getAttribute("aria-valuenow"))
+    );
+  });
+
+  it("places thumbs at both ends when min and max are the same calendar day", () => {
+    // Regression: end thumb used start-of-day while rail max used end-of-day,
+    // so both values equaled min and MUI stacked both dots on the left.
+    const onDateRangeChange = vi.fn();
+    const day = "1970-01-21";
+    const minValue = dateToValue(dayjs(day, dateDefault.DATE_FORMAT));
+    const maxValue = dateToValue(dayjs(day, dateDefault.DATE_FORMAT), true);
+
+    render(
+      <DateSliderRange
+        currentMinDate={undefined}
+        currentMaxDate={undefined}
+        minDate={day}
+        maxDate={day}
+        onDateRangeChange={onDateRangeChange}
+      />
+    );
+
+    const inputs = screen.getAllByRole("slider");
+    expect(Number(inputs[0].getAttribute("aria-valuenow"))).toBe(minValue);
+    expect(Number(inputs[1].getAttribute("aria-valuenow"))).toBe(maxValue);
+    expect(Number(inputs[0].getAttribute("aria-valuemin"))).toBe(minValue);
+    expect(Number(inputs[0].getAttribute("aria-valuemax"))).toBe(maxValue);
+    expect(maxValue).toBeGreaterThan(minValue);
+  });
 });
 
 describe("DateSliderPoint keyboard", () => {

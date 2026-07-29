@@ -24,12 +24,12 @@ import {
 } from "./DownloadDefinitions";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-import { AnalyticsEvent } from "../../../analytics/analyticsEvents";
-import { trackCustomEvent } from "../../../analytics/customEventTracker";
+import { AnalyticsEvent } from "@/analytics/analyticsEvents";
+import { trackCustomEvent } from "@/analytics/customEventTracker";
 import {
   LayerName,
   LayerSwitcherLayer,
-} from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
+} from "@/components/map/mapbox/controls/menu/MapLayerSwitcher";
 import { CloudOptimizedFeature } from "@/app/store/CloudOptimizedDefinitions";
 
 interface DetailPageProviderProps {
@@ -93,9 +93,11 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
 
   useEffect(() => {
     if (!uuid) return;
+    let cancelled = false;
     dispatch(fetchResultByUuidNoStore(uuid))
       .unwrap()
       .then((collection) => {
+        if (cancelled) return;
         if (!collection) {
           setIsCollectionNotFound(true);
           return;
@@ -112,31 +114,48 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         });
       })
       .catch((error) => {
+        if (cancelled) return;
         console.log("Error fetching collection by UUID:", error);
         setIsCollectionNotFound(true);
       });
+    return () => {
+      cancelled = true;
+    };
   }, [dispatch, uuid]);
 
   useEffect(() => {
     if (!uuid) return;
+    let cancelled = false;
     dispatch(fetchFeaturesByUuid(uuid))
       .unwrap()
       .then((features) => {
-        setFeatures(features);
+        if (!cancelled) {
+          setFeatures(features);
+        }
       });
+    return () => {
+      cancelled = true;
+    };
   }, [dispatch, uuid]);
 
   useEffect(() => {
     if (!uuid) return;
+    let cancelled = false;
     dispatch(fetchDatasetMetadataByUuid(uuid))
       .unwrap()
       .then((metadata) => {
-        setDatasetMetadata(metadata);
+        if (!cancelled) {
+          setDatasetMetadata(metadata);
+        }
       })
       .catch((error) => {
+        if (cancelled) return;
         console.log("Error fetching dataset metadata by UUID:", error);
         setDatasetMetadata(undefined);
       });
+    return () => {
+      cancelled = true;
+    };
   }, [dispatch, uuid]);
 
   // PMTiles layer is supported when the dataset_metadata endpoint returns at least

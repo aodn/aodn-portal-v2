@@ -8,8 +8,6 @@ import {
   formatDateKey,
   isCountPropertyInRange,
   buildPopupHtml,
-  buildSumExpression,
-  parseTimeGroupBy,
   periodNumberToDayjs,
   parsePeriodInt,
   parsePMTilesMetadata,
@@ -20,6 +18,7 @@ import {
   coerceCountValue,
   buildFeatureStateTotalExpression,
   buildFeatureStateTotalIsSetExpression,
+  buildFeatureStateHasCountExpression,
   buildDensityLayerFilter,
   buildPresenceFilter,
   getPlaceholderPaintProperties,
@@ -33,8 +32,6 @@ import {
   buildCountFilterRangeFromPeriods,
   isCountKeyInFilterRange,
   parseCountPropertyKey,
-  dayjsToDayPeriod,
-  dayjsToMonthPeriod,
   createFeatureStateTotalsSession,
   featureStateSessionKey,
   getActivePmtilesLayers,
@@ -44,15 +41,22 @@ import {
   DENSITY_TOTAL_CAP,
   DENSITY_COLOR_STOPS,
   DENSITY_OPACITY_STOPS,
-  densityStopValue,
   buildDensityInterpolateStops,
-  COUNT_KEY_SET_MAX,
-  FEATURE_STATE_CHUNK_SIZE,
   PLACEHOLDER_FILL_COLOR,
-  DEFAULT_TIME_GROUP_BY,
-  TimeGroupBy,
-  type PMTilesMetadataRange,
+  ZERO_COUNT_FILL_COLOR,
+  ZERO_COUNT_FILL_OPACITY,
+  ZERO_COUNT_OUTLINE_COLOR,
 } from "../PMTilesLayer";
+import {
+  COUNT_KEY_SET_MAX,
+  DEFAULT_TIME_GROUP_BY,
+  FEATURE_STATE_CHUNK_SIZE,
+  parseTimeGroupBy,
+  densityStopValue,
+  PMTilesMetadataRange,
+  TimeGroupBy,
+} from "../Common";
+import { dayjsToDayPeriod, dayjsToMonthPeriod } from "@/utils/DateUtils";
 
 /** Test helper: parsePeriodInt that throws if parse fails. */
 const requirePeriodInt = (
@@ -101,10 +105,13 @@ describe("PMTilesLayer - getMonthKeysInRange", () => {
     expect(keys).toEqual([]);
   });
 
-  it("defaults to 2000-01 through the current month when no dates given", () => {
+  it("defaults from 1900-01 when no dates given (capped by MONTH_KEY_LIMIT)", () => {
+    // Fallback only when no UI filter and no .metadata bounds (see DEFAULT_RANGE_START).
+    // 1200 months from 1900-01 stops before the current month.
     const keys = getMonthKeysInRange();
-    expect(keys[0]).toBe("m200001");
-    expect(keys[keys.length - 1]).toBe(`m${dayjs().format("YYYYMM")}`);
+    expect(keys[0]).toBe("m190001");
+    expect(keys.length).toBe(1200);
+    expect(keys[keys.length - 1]).toBe("m199912");
   });
 
   it("caps the number of keys at 1200", () => {
@@ -300,6 +307,17 @@ describe("PMTilesLayer - clampPeriodsToMetadata / clampRangeToMetadata", () => {
     );
     expect(start.format("YYYY-MM-DD")).toBe("2020-01-01");
     expect(end.format("YYYY-MM-DD")).toBe("2020-01-31");
+  });
+
+  it("uses full metadata bounds when no UI filter is provided", () => {
+    const { start, end } = clampRangeToMetadata(
+      undefined,
+      undefined,
+      metaRange(19700121, 19700121, TimeGroupBy.Date),
+      TimeGroupBy.Date
+    );
+    expect(start.format("YYYY-MM-DD")).toBe("1970-01-21");
+    expect(end.format("YYYY-MM-DD")).toBe("1970-01-21");
   });
 });
 
@@ -547,27 +565,44 @@ describe("PMTilesLayer - CountFilterRange (integer + key set)", () => {
     expect(isCountKeyInFilterRange("m20240115", range)).toBe(true);
     expect(isCountKeyInFilterRange("m20240109", range)).toBe(false);
   });
-});
 
-describe("PMTilesLayer - buildSumExpression", () => {
-  it("returns 0 for no keys", () => {
-    expect(buildSumExpression([])).toBe(0);
+  it("uses full metadata coverage when no UI filter is set (pre-2000 single day)", () => {
+    // Regression: default window started 2000-01-01, so clamping against
+    // min=max=19700121 produced an empty range and no hexbins at all.
+    const bounds = metaRange(19700121, 19700121, TimeGroupBy.Date);
+    const range = buildCountFilterRange(
+      undefined,
+      undefined,
+      TimeGroupBy.Date,
+      {
+        bounds,
+      }
+    );
+    expect(range.empty).toBe(false);
+    expect(range.startPeriod).toBe(19700121);
+    expect(range.endPeriod).toBe(19700121);
+    expect(isCountKeyInFilterRange("m19700121", range)).toBe(true);
+    expect(isCountKeyInFilterRange("m19700122", range)).toBe(false);
+
+    const { total } = sumSparseCountFromProperties(
+      { h: "cell", m19700121: 42, m20000101: 99 },
+      undefined,
+      undefined,
+      TimeGroupBy.Date,
+      { range }
+    );
+    expect(total).toBe(42);
   });
 
-  it("returns a single coalesce expression for one key", () => {
-    expect(buildSumExpression(["m20240110"])).toEqual([
-      "coalesce",
-      ["get", "m20240110"],
-      0,
-    ]);
-  });
-
-  it("returns a sum of coalesce expressions for multiple keys", () => {
-    expect(buildSumExpression(["m20240120", "m20240221"])).toEqual([
-      "+",
-      ["coalesce", ["get", "m20240120"], 0],
-      ["coalesce", ["get", "m20240221"], 0],
-    ]);
+  it("still empties when an explicit UI filter is entirely after metadata", () => {
+    const bounds = metaRange(19700121, 19700121, TimeGroupBy.Date);
+    const range = buildCountFilterRange(
+      dayjs("2000-01-01"),
+      dayjs("2020-01-01"),
+      TimeGroupBy.Date,
+      { bounds }
+    );
+    expect(range.empty).toBe(true);
   });
 });
 
@@ -952,6 +987,8 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     // Density paint must reference feature-state, not a dense + of day keys
     const density = getFeatureStatePaintProperties();
     const colorJson = JSON.stringify(density["fill-color"]);
+    const opacityJson = JSON.stringify(density["fill-opacity"]);
+    const outlineJson = JSON.stringify(density["fill-outline-color"]);
     expect(colorJson).toContain("feature-state");
     expect(colorJson).not.toContain("m2024");
     // Top color stop must match the early-stop cap
@@ -959,12 +996,25 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     // Unset feature-state keeps placeholder so mid-load tiles do not vanish
     expect(colorJson).toContain(PLACEHOLDER_FILL_COLOR);
     expect(colorJson).toContain("case");
+    // Zero-count hexes (narrow time slider) must hide fill and outline
+    expect(colorJson).toContain(ZERO_COUNT_FILL_COLOR);
+    expect(opacityJson).toContain(String(ZERO_COUNT_FILL_OPACITY));
+    expect(outlineJson).toContain("feature-state");
+    expect(outlineJson).toContain(ZERO_COUNT_OUTLINE_COLOR);
     // Default cap preserves the historical absolute breakpoints
     expect(colorJson).toContain("#1E293B");
     expect(colorJson).toContain("#14B8A6");
     for (const input of [0, 1, 10, 100, 1000, 5000, DENSITY_TOTAL_CAP]) {
       expect(colorJson).toContain(String(input));
     }
+  });
+
+  it("builds has-count expression for zero-count transparent paint", () => {
+    expect(buildFeatureStateHasCountExpression()).toEqual([
+      ">",
+      ["coalesce", ["feature-state", FEATURE_STATE_TOTAL], 0],
+      0,
+    ]);
   });
 
   it("scales density color breakpoints with the cap", () => {
@@ -1071,6 +1121,53 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
         id: "cell-hot",
       },
       { [FEATURE_STATE_TOTAL]: DENSITY_TOTAL_CAP }
+    );
+  });
+
+  it("writes total 0 when a hex has no records in the time-slider window", () => {
+    // After narrowing the slider to a few days, cells that only have data
+    // outside that window must store total 0 so density paint can hide them.
+    const setFeatureState = vi.fn();
+    const map = {
+      getSource: (id: string) => (id === "pmtiles-source-id" ? {} : undefined),
+      querySourceFeatures: (_source: string, opts: { sourceLayer: string }) => {
+        if (opts.sourceLayer !== "hex_z0") return [];
+        return [
+          {
+            id: "in-range",
+            properties: { h: "in-range", m20240115: 4 },
+          },
+          {
+            id: "out-of-range",
+            properties: { h: "out-of-range", m20240601: 99 },
+          },
+        ];
+      },
+      setFeatureState,
+    } as unknown as Map;
+
+    const { updated } = updateFeatureStateTotals(
+      map,
+      dayjs("2024-01-14"),
+      dayjs("2024-01-16"),
+      TimeGroupBy.Date
+    );
+    expect(updated).toBe(2);
+    expect(setFeatureState).toHaveBeenCalledWith(
+      {
+        source: "pmtiles-source-id",
+        sourceLayer: "hex_z0",
+        id: "in-range",
+      },
+      { [FEATURE_STATE_TOTAL]: 4 }
+    );
+    expect(setFeatureState).toHaveBeenCalledWith(
+      {
+        source: "pmtiles-source-id",
+        sourceLayer: "hex_z0",
+        id: "out-of-range",
+      },
+      { [FEATURE_STATE_TOTAL]: 0 }
     );
   });
 

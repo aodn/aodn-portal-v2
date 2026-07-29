@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { Box } from "@mui/material";
-import { padding } from "../../../styles/constants";
+import { padding } from "@/styles/constants";
 import { useDetailPageContext } from "../context/detail-page-context";
 import Controls from "../../../components/map/mapbox/controls/Controls";
 import NavigationControl from "../../../components/map/mapbox/controls/NavigationControl";
@@ -27,7 +27,7 @@ import {
   PolygonCondition,
   SubsettingType,
 } from "../context/DownloadDefinitions";
-import { dateDefault } from "../../../components/common/constants";
+import { dateDefault } from "@/components/common/constants";
 import {
   Feature,
   FeatureCollection,
@@ -51,22 +51,23 @@ import MenuControlGroup from "../../../components/map/mapbox/controls/menu/MenuC
 import GeojsonLayer from "../../../components/map/mapbox/layers/GeojsonLayer";
 import useBreakpoint from "../../../hooks/useBreakpoint";
 import FitToSpatialExtentsLayer from "../../../components/map/mapbox/layers/FitToSpatialExtentsLayer";
-import { MapEventEnum } from "../../../components/map/mapbox/constants";
-import { fitToDefaultExtent } from "../../../utils/MapUtils";
-import { DateSliderPoint } from "../../../components/common/slider/DateSlider";
-import { dateToValue } from "../../../utils/DateUtils";
+import { MapEventEnum } from "@/components/map/mapbox/constants";
+import { fitToDefaultExtent } from "@/utils/MapUtils";
+import { DateSliderPoint } from "@/components/common/slider/DateSlider";
+import { dateToValue } from "@/utils/DateUtils";
 import { GeoserverFieldsResponse } from "@/app/store/GeoserverDefinitions";
 import * as turf from "@turf/turf";
-import { createStaticLayers } from "../../../components/map/mapbox/layers/StaticLayer";
-import PMTilesHexLayer, {
-  PMTilesMetadata,
-  metadataRangeToDayjs,
-} from "../../../components/map/mapbox/layers/PMTilesLayer";
+import { createStaticLayers } from "@/components/map/mapbox/layers/StaticLayer";
+
 import WmsLegend from "./WmsLegend";
 import {
   DatasetType,
   OGCCollection,
 } from "@/app/store/OGCCollectionDefinitions";
+import PMTilesHexLayer, {
+  metadataRangeToDayjs,
+  PMTilesMetadata,
+} from "@/components/map/mapbox/layers/pmtiles/PMTilesLayer";
 
 const mapContainerId = "map-detail-container-id";
 

@@ -217,11 +217,26 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
 const SLIDER_MIN_FLOOR = dateToValue(dayjs(dateDefault.min));
 
 /**
- * Parse a date string to slider epoch ms, never below {@link SLIDER_MIN_FLOOR}.
- * Dataset coverage can predate 1970; the control still starts at the floor.
+ * Parse a date string to slider epoch ms at **start of day**, never below
+ * {@link SLIDER_MIN_FLOOR}. Used for the left thumb / rail min.
  */
-const dateStringToSliderValue = (date: string): number =>
+const dateStringToSliderMinValue = (date: string): number =>
   Math.max(SLIDER_MIN_FLOOR, dateToValue(dayjs(date, dateDefault.DATE_FORMAT)));
+
+/**
+ * Parse a date string to slider epoch ms at **end of day**. Used for the right
+ * thumb / rail max so a full-coverage selection reaches the right end of the rail
+ * (start-of-day on maxDate sits left of `max` and collapses onto the left when
+ * min and max share the same calendar day).
+ */
+const dateStringToSliderMaxValue = (date: string): number =>
+  dateToValue(dayjs(date, dateDefault.DATE_FORMAT), true);
+
+/** Full-coverage thumb pair for the current rail bounds. */
+const fullCoverageRange = (minValue: number, maxValue: number): number[] => [
+  minValue,
+  maxValue,
+];
 
 const DateSliderRange: React.FC<DateSliderRangeProps> = ({
   currentMinDate,
@@ -231,18 +246,39 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
   onDateRangeChange,
 }) => {
   // Floor dataset min at 1 Jan 1970 so the rail/thumbs never open earlier.
-  const minValue = useMemo(() => dateStringToSliderValue(minDate), [minDate]);
+  const minValue = useMemo(
+    () => dateStringToSliderMinValue(minDate),
+    [minDate]
+  );
+  // End-of-day so the rail max is after the start-of-day min even on a single day.
   const maxValue = useMemo(
-    () => dateToValue(dayjs(maxDate, dateDefault.DATE_FORMAT)),
+    () => dateStringToSliderMaxValue(maxDate),
     [maxDate]
   );
 
-  const [dateRangeStamp, setDateRangeStamp] = useState<number[]>([
-    dateStringToSliderValue(currentMinDate ? currentMinDate : minDate),
-    dateToValue(
-      dayjs(currentMaxDate ? currentMaxDate : maxDate, dateDefault.DATE_FORMAT)
-    ),
-  ]);
+  /**
+   * Day-sized steps need a track at least one day wide. When min/max are the
+   * same calendar day, max-min ≈ 86400000−1 &lt; DAY_MS and MUI pins both thumbs
+   * to min. Use the full track span as the step so left/right ends are valid.
+   */
+  const stepMs = useMemo(() => {
+    const span = maxValue - minValue;
+    if (span <= 0) return DAY_MS;
+    return span < DAY_MS ? span : DAY_MS;
+  }, [minValue, maxValue]);
+
+  const [dateRangeStamp, setDateRangeStamp] = useState<number[]>(() => {
+    if (currentMinDate || currentMaxDate) {
+      return [
+        dateStringToSliderMinValue(currentMinDate ? currentMinDate : minDate),
+        dateStringToSliderMaxValue(currentMaxDate ? currentMaxDate : maxDate),
+      ];
+    }
+    return fullCoverageRange(
+      dateStringToSliderMinValue(minDate),
+      dateStringToSliderMaxValue(maxDate)
+    );
+  });
 
   const applyRangeValue = useCallback(
     (
@@ -297,9 +333,8 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
       );
       if (Number.isNaN(index) || index < 0 || index > 1) return;
 
-      const step = DAY_MS;
       const current = dateRangeStamp[index];
-      let next = current + direction * step;
+      let next = current + direction * stepMs;
       next = Math.min(maxValue, Math.max(minValue, next));
 
       // Keep thumbs ordered without swapping which one is focused.
@@ -321,23 +356,22 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
       event.stopPropagation();
       applyRangeValue(event, newRange);
     },
-    [applyRangeValue, dateRangeStamp, maxValue, minValue]
+    [applyRangeValue, dateRangeStamp, maxValue, minValue, stepMs]
   );
 
   useEffect(() => {
     startTransition(() => {
-      const newDateRangeStamp = [
-        dateStringToSliderValue(currentMinDate ? currentMinDate : minDate),
-        dateToValue(
-          dayjs(
-            currentMaxDate ? currentMaxDate : maxDate,
-            dateDefault.DATE_FORMAT
-          )
-        ),
-      ];
-      setDateRangeStamp(newDateRangeStamp);
+      if (currentMinDate || currentMaxDate) {
+        setDateRangeStamp([
+          dateStringToSliderMinValue(currentMinDate ? currentMinDate : minDate),
+          dateStringToSliderMaxValue(currentMaxDate ? currentMaxDate : maxDate),
+        ]);
+      } else {
+        // Full coverage: left thumb at start-of-day min, right at end-of-day max
+        setDateRangeStamp(fullCoverageRange(minValue, maxValue));
+      }
     });
-  }, [currentMinDate, currentMaxDate, minDate, maxDate]);
+  }, [currentMinDate, currentMaxDate, minDate, maxDate, minValue, maxValue]);
 
   return (
     <Grid
@@ -382,8 +416,9 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
             value={dateRangeStamp}
             min={minValue}
             max={maxValue}
-            // Values are epoch ms; default step of 1ms makes arrow keys appear broken.
-            step={DAY_MS}
+            // Day steps when the track is ≥1 day; shorter tracks (same calendar
+            // day with endOf max) use the full span so both ends are reachable.
+            step={stepMs}
             shiftStep={MONTH_MS}
             onChangeCommitted={(_, value) => onDateRangeChange(_, value)}
             onChange={handleSliderChange}
@@ -436,7 +471,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
             color: portalTheme.palette.text1,
           }}
         >
-          {dayjs(maxDate).format(dateDefault.DISPLAY_FORMAT)}
+          {valueToDate(maxValue).format(dateDefault.DISPLAY_FORMAT)}
         </Typography>
       </Grid>
     </Grid>
