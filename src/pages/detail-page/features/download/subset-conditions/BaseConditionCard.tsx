@@ -9,14 +9,10 @@ import {
   Collapse,
   Divider,
   IconButton,
-  IconButtonProps,
-  Stack,
   SxProps,
   Theme,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import { CloseIcon } from "../../../../../assets/icons/download/close";
 import { portalTheme } from "../../../../../styles";
 import { BboxSelectionIcon } from "../../../../../assets/icons/download/bbox_selection";
 import { PolygonSelectionIcon } from "../../../../../assets/icons/map/polygon_selection";
@@ -31,19 +27,6 @@ interface BaseConditionCardProps {
   contentSx?: SxProps<Theme>;
   headerDivider?: boolean;
 }
-
-interface ExpandProps extends IconButtonProps {
-  expand: boolean;
-}
-
-const ExpandIconButton = styled(({ expand, ...rest }: ExpandProps) => (
-  <IconButton {...rest} />
-))(({ theme, expand }) => ({
-  transform: expand ? "rotate(0deg)" : "rotate(45deg)",
-  transition: theme.transitions.create("transform", {
-    duration: theme.transitions.duration.shortest,
-  }),
-}));
 
 const iconMap: Partial<Record<DownloadConditionType, React.ComponentType>> = {
   [DownloadConditionType.BBOX]: BboxSelectionIcon,
@@ -78,7 +61,7 @@ const getTitle = (type: DownloadConditionType) => {
     case DownloadConditionType.POLYGON:
       return "Polygon Selection";
     case DownloadConditionType.DATE_RANGE:
-      return "Time Range";
+      return "Date Range";
     default:
       return "";
   }
@@ -121,38 +104,44 @@ const BaseConditionCard: React.FC<BaseConditionCardProps> = ({
           color: portalTheme.palette.text1,
         }}
         action={
-          <Stack direction="row" alignItems="center" spacing={0.5}>
-            {removeCallback && (
-              <IconButton
-                onClick={removeCallback}
-                disabled={disable}
-                aria-label="remove"
-                size="small"
-              >
-                <DeleteOutlineIcon
-                  sx={{ color: portalTheme.palette.grey700, fontSize: 18 }}
-                />
-              </IconButton>
-            )}
-            <ExpandIconButton
-              expand={expanded}
-              onClick={toggle}
+          removeCallback && (
+            <IconButton
+              // Stop the click bubbling up to the header, which would toggle the card
+              onClick={(event) => {
+                event.stopPropagation();
+                removeCallback();
+              }}
               disabled={disable}
+              aria-label="remove"
               size="small"
-              aria-expanded={expanded}
-              aria-label={expanded ? "collapse" : "expand"}
             >
-              <CloseIcon
-                color={portalTheme.palette.grey700}
-                width={12}
-                height={12}
+              <DeleteOutlineIcon
+                sx={{ color: portalTheme.palette.grey700, fontSize: 18 }}
               />
-            </ExpandIconButton>
-          </Stack>
+            </IconButton>
+          )
         }
+        // The whole header is the expand/collapse control, so no separate chevron
+        onClick={disable ? undefined : toggle}
+        onKeyDown={(event) => {
+          if (disable) return;
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            toggle();
+          }
+        }}
+        role="button"
+        tabIndex={disable ? -1 : 0}
+        aria-expanded={expanded}
         sx={{
           py: 1,
           px: 1.5,
+          cursor: disable ? "default" : "pointer",
+          "&:hover": {
+            backgroundColor: disable
+              ? "transparent"
+              : portalTheme.palette.primary5,
+          },
           "& .MuiCardHeader-avatar": { mr: 1.5 },
           "& .MuiCardHeader-action": { m: 0, alignSelf: "center" },
         }}

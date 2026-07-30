@@ -4,6 +4,8 @@ const dateDefault = {
   DATE_FORMAT: "YYYY-MM-DD",
   DATE_YEAR_MONTH_FORMAT: "YYYY-MM",
   DISPLAY_FORMAT: "DD/MM/YYYY",
+  // e.g. 05 Jan 2024, matching the download email
+  DISPLAY_FORMAT_LONG: "DD MMM YYYY",
   min: new Date("01/01/1970"),
   max: new Date(),
 };
