@@ -27,6 +27,7 @@ import {
   PolygonCondition,
   SubsettingType,
 } from "../context/DownloadDefinitions";
+import { isValidPolygonFeature } from "@/utils/GeoJsonUtils";
 import { dateDefault } from "@/components/common/constants";
 import {
   Feature,
@@ -475,30 +476,39 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     ) => {
       const bboxConditions: BBoxCondition[] = [];
       const polygonConditions: PolygonCondition[] = [];
+      const validFeatures = newFeatures.filter(isValidPolygonFeature);
 
-      newFeatures.forEach((feature) => {
+      validFeatures.forEach((feature) => {
         const id = String(feature.id);
         const selectionType = feature.properties?.selectionType || "bbox";
         const removeCallback = () => removeFeature(id);
 
         if (selectionType === "polygon") {
           const coords = feature.geometry.coordinates[0];
-          const vertices =
-            coords.length > 1 &&
-            coords[0][0] === coords[coords.length - 1][0] &&
-            coords[0][1] === coords[coords.length - 1][1]
-              ? coords.slice(0, -1)
-              : coords;
-          polygonConditions.push(
-            new PolygonCondition(
-              id,
-              vertices as [number, number][],
-              removeCallback
-            )
-          );
+          if (coords && coords.length >= 4) {
+            const vertices =
+              coords.length > 1 &&
+              coords[0][0] === coords[coords.length - 1][0] &&
+              coords[0][1] === coords[coords.length - 1][1]
+                ? coords.slice(0, -1)
+                : coords;
+            polygonConditions.push(
+              new PolygonCondition(
+                id,
+                vertices as [number, number][],
+                removeCallback
+              )
+            );
+          }
         } else {
-          const bbox = turf.bbox(feature);
-          bboxConditions.push(new BBoxCondition(id, bbox, removeCallback));
+          try {
+            const bbox = turf.bbox(feature);
+            if (bbox && bbox.every((n) => isFinite(n))) {
+              bboxConditions.push(new BBoxCondition(id, bbox, removeCallback));
+            }
+          } catch (e) {
+            console.warn("turf.bbox failed on feature", e, feature);
+          }
         }
       });
 

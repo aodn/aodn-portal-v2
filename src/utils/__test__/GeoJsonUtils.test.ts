@@ -1,6 +1,7 @@
 import {
   combineBBoxesToMultiPolygon,
   combineToMultiPolygon,
+  isValidPolygonFeature,
 } from "../GeoJsonUtils";
 import { MultiPolygon } from "geojson";
 
@@ -120,5 +121,76 @@ describe("combineToMultiPolygon", () => {
     const result = combineToMultiPolygon([], []);
 
     expect(result).toEqual({ type: "MultiPolygon", coordinates: [] });
+  });
+});
+
+describe("isValidPolygonFeature", () => {
+  it("should return false for null, undefined, or missing geometry", () => {
+    expect(isValidPolygonFeature(null)).toBe(false);
+    expect(isValidPolygonFeature({})).toBe(false);
+    expect(isValidPolygonFeature({ geometry: null })).toBe(false);
+  });
+
+  it("should return false for empty or degenerate coordinates", () => {
+    expect(
+      isValidPolygonFeature({
+        type: "Feature",
+        geometry: { type: "Polygon", coordinates: [[]] },
+      })
+    ).toBe(false);
+
+    expect(
+      isValidPolygonFeature({
+        type: "Feature",
+        geometry: {
+          type: "Polygon",
+          coordinates: [
+            [
+              [140, -35],
+              [140, -35],
+              [140, -35],
+              [140, -35],
+            ],
+          ],
+        },
+      })
+    ).toBe(false);
+
+    expect(
+      isValidPolygonFeature({
+        type: "Feature",
+        geometry: {
+          type: "Polygon",
+          coordinates: [
+            [
+              [140, -35],
+              [145, -35],
+              [145, -35],
+              [140, -35],
+            ],
+          ],
+        },
+      })
+    ).toBe(false);
+  });
+
+  it("should return true for valid 2D polygon features", () => {
+    expect(
+      isValidPolygonFeature({
+        type: "Feature",
+        geometry: {
+          type: "Polygon",
+          coordinates: [
+            [
+              [140, -35],
+              [145, -35],
+              [145, -30],
+              [140, -30],
+              [140, -35],
+            ],
+          ],
+        },
+      })
+    ).toBe(true);
   });
 });
