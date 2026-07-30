@@ -113,3 +113,57 @@ export const layernameRoughlyMatch = (text1: string, text2: string) => {
 
   return normalized1 === normalized2;
 };
+
+export const isValidPolygonFeature = (feature: any): boolean => {
+  if (!feature || !feature.geometry) return false;
+  const geom = feature.geometry;
+
+  if (geom.type === "Polygon") {
+    if (!Array.isArray(geom.coordinates) || geom.coordinates.length === 0) {
+      return false;
+    }
+    const ring = geom.coordinates[0];
+    if (!Array.isArray(ring) || ring.length < 4) {
+      return false;
+    }
+    let minX = Infinity,
+      maxX = -Infinity,
+      minY = Infinity,
+      maxY = -Infinity;
+    for (const pt of ring) {
+      if (
+        !Array.isArray(pt) ||
+        pt.length < 2 ||
+        typeof pt[0] !== "number" ||
+        typeof pt[1] !== "number" ||
+        isNaN(pt[0]) ||
+        isNaN(pt[1])
+      ) {
+        return false;
+      }
+      if (pt[0] < minX) minX = pt[0];
+      if (pt[0] > maxX) maxX = pt[0];
+      if (pt[1] < minY) minY = pt[1];
+      if (pt[1] > maxY) maxY = pt[1];
+    }
+    // Must have non-zero width and non-zero height
+    if (minX === maxX || minY === maxY) {
+      return false;
+    }
+    return true;
+  }
+
+  if (geom.type === "MultiPolygon") {
+    if (!Array.isArray(geom.coordinates) || geom.coordinates.length === 0) {
+      return false;
+    }
+    for (const poly of geom.coordinates) {
+      if (!Array.isArray(poly) || poly.length === 0) return false;
+      const ring = poly[0];
+      if (!Array.isArray(ring) || ring.length < 4) return false;
+    }
+    return true;
+  }
+
+  return false;
+};

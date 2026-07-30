@@ -24,6 +24,7 @@ import {
 } from "@/app/store/componentParamReducer";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { featureCollection, union } from "@turf/turf";
+import { isValidPolygonFeature } from "@/utils/GeoJsonUtils";
 import {
   fetchAllenCoralAtlasOptions,
   fetchMarineEcoregionOptions,
@@ -432,44 +433,46 @@ const LocationFilter: FC<LocationFilterProps> = () => {
       removeFeature: (id: string) => void
     ) => {
       removeFeatureRef.current = removeFeature;
-      setDrawFeatures(newFeatures);
+      const validFeatures = newFeatures.filter(isValidPolygonFeature);
+      setDrawFeatures(validFeatures);
 
-      if (newFeatures.length === 0) {
+      if (validFeatures.length === 0) {
         dispatch(updateFilterPolygon(undefined));
         return;
       }
 
       let merged: Feature<Polygon | MultiPolygon> | undefined;
-      if (newFeatures.length === 0) {
-        merged = undefined;
-      } else if (newFeatures.length === 1) {
-        merged = { ...newFeatures[0] };
+      if (validFeatures.length === 1) {
+        merged = { ...validFeatures[0] };
       } else {
         try {
-          merged = union(featureCollection(newFeatures)) ?? undefined;
+          merged = union(featureCollection(validFeatures)) ?? undefined;
         } catch (e) {
           console.error(
             "Turf union failed in handleFeaturesChange:",
             e,
-            newFeatures
+            validFeatures
           );
           merged = undefined;
         }
       }
 
-      if (merged) {
+      if (merged && isValidPolygonFeature(merged)) {
         merged.properties = {
           ...merged.properties,
-          drawFeatures: newFeatures,
+          drawFeatures: validFeatures,
         };
         dispatch(updateFilterPolygon(merged));
+      } else {
+        dispatch(updateFilterPolygon(undefined));
       }
     },
     [dispatch]
   );
 
   const highlightCollection = useMemo(():
-    FeatureCollection<Polygon | MultiPolygon> | undefined => {
+    | FeatureCollection<Polygon | MultiPolygon>
+    | undefined => {
     const allFeats: Feature<Polygon | MultiPolygon>[] = [];
 
     if (selectedMarineParkValues.size > 0) {

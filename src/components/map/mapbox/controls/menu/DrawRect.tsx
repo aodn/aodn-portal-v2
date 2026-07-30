@@ -26,6 +26,7 @@ import { PolygonSelectionTooltipIcon } from "../../../../../assets/icons/map/too
 import { PolygonSelectionIcon } from "../../../../../assets/icons/map/polygon_selection";
 import usePolygonCursorHint from "../../../../../hooks/usePolygonCursorHint";
 import { IControl } from "mapbox-gl";
+import { isValidPolygonFeature } from "../../../../../utils/GeoJsonUtils";
 
 interface DrawControlProps extends ControlProps {
   onChangeFeatures?: (
@@ -113,8 +114,9 @@ const DrawRect: React.FC<DrawControlProps> = ({
         .getAll()
         .features.filter(
           (feature) =>
-            feature.geometry.type === "Polygon" ||
-            feature.geometry.type === "MultiPolygon"
+            (feature.geometry.type === "Polygon" ||
+              feature.geometry.type === "MultiPolygon") &&
+            isValidPolygonFeature(feature)
         ) as Feature<Polygon | MultiPolygon>[];
 
       const removeFeature = (id: string) => {
@@ -216,8 +218,10 @@ const DrawRect: React.FC<DrawControlProps> = ({
 
       // Check if there are any features to enable/disable trash button
       try {
-        const featureCount = mapDraw.getAll().features.length;
-        const hasFeat = featureCount > 0;
+        const validFeatureCount = mapDraw
+          .getAll()
+          .features.filter(isValidPolygonFeature).length;
+        const hasFeat = validFeatureCount > 0;
         setHasFeatures((prev) => (prev !== hasFeat ? hasFeat : prev));
       } catch (e: unknown) {
         // Ignore error
@@ -229,19 +233,23 @@ const DrawRect: React.FC<DrawControlProps> = ({
   useEffect(() => {
     if (map) {
       const onUpdateOrDelete = () => {
-        const features = mapDraw.getAll().features;
-        setHasFeatures(features.length > 0);
+        const validFeatures = mapDraw
+          .getAll()
+          .features.filter(isValidPolygonFeature);
+        setHasFeatures(validFeatures.length > 0);
         syncMapFeaturesToContext(mapDraw);
       };
 
       // Tag newly created features with the active selection type before syncing
       const onCreate = (e: { features: Feature[] }) => {
         e.features?.forEach((feature) => {
-          mapDraw.setFeatureProperty(
-            String(feature.id),
-            "selectionType",
-            activeToolRef.current
-          );
+          if (isValidPolygonFeature(feature)) {
+            mapDraw.setFeatureProperty(
+              String(feature.id),
+              "selectionType",
+              activeToolRef.current
+            );
+          }
         });
         onUpdateOrDelete();
       };
@@ -283,6 +291,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
   const drawnGeometryHash = useMemo(
     () =>
       features
+        .filter(isValidPolygonFeature)
         .map(
           (f) =>
             `${f.geometry.type}|${JSON.stringify(
@@ -298,7 +307,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
     if (!map || !mapDraw) return;
 
     mapDraw.deleteAll();
-    features.forEach((f) => mapDraw.add(f));
+    features.filter(isValidPolygonFeature).forEach((f) => mapDraw.add(f));
 
     // Recreate conditions with new onRemove callback referencing new feature id
     startTransition(() => syncMapFeaturesToContext(mapDraw));
