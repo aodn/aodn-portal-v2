@@ -65,7 +65,12 @@ jobs:
 
       - name: Copy files to the production website with the AWS CLI
         run: |
-          aws s3 sync --delete ${{ env.DIST }} s3://${{ vars.BUCKET }} --region ${{ vars.AWS_REGION }}
+          aws s3 sync --delete ${{ env.DIST }} s3://${{ vars.BUCKET }} --region ${{ vars.AWS_REGION }} --exclude "details/*"
+          # Pre-rendered detail pages are extensionless, so sync would guess
+          # binary/octet-stream; force text/html so browsers render them
+          if [ -d "${{ env.DIST }}/details" ]; then
+            aws s3 sync --delete ${{ env.DIST }}/details s3://${{ vars.BUCKET }}/details --region ${{ vars.AWS_REGION }} --content-type text/html
+          fi
 
       - name: Clear cloudfront cache
         run: |

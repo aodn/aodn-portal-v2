@@ -1,4 +1,4 @@
-import { loadEnv } from "vite";
+import { loadEnv, type ConfigEnv, type ViteDevServer } from "vite";
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react-swc";
 import eslint from "vite-plugin-eslint";
@@ -6,7 +6,7 @@ import path from "path";
 import fs from "fs";
 
 // https://vitejs.dev/config/
-export default ({ mode }) => {
+export default ({ mode }: ConfigEnv) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
 
   const apiPath = process.env.VITE_API_HOST?.replace(/\/$/, "");
@@ -17,7 +17,7 @@ export default ({ mode }) => {
     // https://docs.newrelic.com/docs/browser/new-relic-browser/page-load-timing-resources/instrumentation-browser-monitoring/#javascript-placement
     return {
       name: "inline-javascript",
-      transformIndexHtml(html) {
+      transformIndexHtml(html: string) {
         const inlineJs = fs.readFileSync(
           path.resolve(__dirname, "public/relic_script.js"),
           "utf8"
@@ -38,7 +38,7 @@ export default ({ mode }) => {
   const inlineGoogleAnalyticsPlugin = () => {
     return {
       name: "inline-google-analytics",
-      transformIndexHtml(html) {
+      transformIndexHtml(html: string) {
         // Skip GA in test mode
         if (mode === "test") {
           return html.replace("<!-- google-analytics-js -->", "");
@@ -93,10 +93,48 @@ export default ({ mode }) => {
     };
   };
 
+  const generateSitemapPlugin = () => {
+    return {
+      name: "generate-sitemap",
+      // Generate for prod (the indexable build) and edge (a rehearsal, so a
+      // broken sitemap build is caught on merge day instead of release day)
+      async closeBundle() {
+        if (mode !== "prod" && mode !== "edge") return;
+        try {
+          const { generateSitemap } =
+            await import("./src/utils/seo/SitemapUtils");
+          await generateSitemap(path.resolve(__dirname, "dist"));
+        } catch (error) {
+          // Edge builds run on every merge; a beta API hiccup must not block deploys
+          if (mode === "prod") throw error;
+          console.warn("Sitemap generation failed (non-prod, ignored):", error);
+        }
+      },
+    };
+  };
+
+  const prerenderDetailsPlugin = () => {
+    return {
+      name: "prerender-details",
+      // Same prod/edge gating and error semantics as generate-sitemap
+      async closeBundle() {
+        if (mode !== "prod" && mode !== "edge") return;
+        try {
+          const { prerenderDetailPages } =
+            await import("./src/utils/seo/PrerenderUtils");
+          await prerenderDetailPages(path.resolve(__dirname, "dist"));
+        } catch (error) {
+          if (mode === "prod") throw error;
+          console.warn("Detail prerender failed (non-prod, ignored):", error);
+        }
+      },
+    };
+  };
+
   const copyRobotsPlugin = () => {
     return {
       name: "copy-robots-txt",
-      configureServer(server) {
+      configureServer(server: ViteDevServer) {
         server.middlewares.use((req, res, next) => {
           if (req.url === "/robots.txt") {
             const file =
@@ -153,7 +191,7 @@ export default ({ mode }) => {
           target: apiPath,
           changeOrigin: true,
         },
-        "/api/v1/ogc/manage/health": {
+        "/api/v1/ogc/manage": {
           target: apiPath,
           changeOrigin: true,
         },
@@ -166,6 +204,8 @@ export default ({ mode }) => {
       inlineNewRelicPlugin(),
       inlineGoogleAnalyticsPlugin(),
       inlineSEOPlugin(),
+      generateSitemapPlugin(),
+      prerenderDetailsPlugin(),
       copyRobotsPlugin(),
     ].filter(Boolean),
     build: {

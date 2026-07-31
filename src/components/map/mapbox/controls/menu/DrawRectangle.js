@@ -63,22 +63,32 @@ const DrawRectangle = {
   },
   // Whenever a user clicks on the map, Draw will call `onClick`
   onClick: function (state, e) {
-    // if state.startPoint exist, means its second click
-    //change to  simple_select mode
-    if (
-      state.startPoint &&
-      state.startPoint[0] !== e.lngLat.lng &&
-      state.startPoint[1] !== e.lngLat.lat
-    ) {
+    if (state.startPoint) {
+      // Second click: update final rectangle coordinates
+      this.onMouseMove(state, e);
       this.updateUIClasses({ mouse: "pointer" });
       state.endPoint = [e.lngLat.lng, e.lngLat.lat];
-      // Defer mode change to allow other click handlers to see we're still in draw mode
-      // This prevents accidental popups on the second click
-      setTimeout(() => {
-        this.changeMode("simple_select", { featuresId: state.rectangle.id });
-      }, 0);
+
+      const isZeroArea =
+        state.startPoint[0] === e.lngLat.lng ||
+        state.startPoint[1] === e.lngLat.lat;
+
+      if (isZeroArea) {
+        // Single-click without dragging or zero width/height rectangle -> delete feature
+        this.deleteFeature([state.rectangle.id], { silent: true });
+        setTimeout(() => {
+          this.changeMode("simple_select");
+        }, 0);
+      } else {
+        // Defer mode change to allow other click handlers to see we're still in draw mode
+        // This prevents accidental popups on the second click
+        setTimeout(() => {
+          this.changeMode("simple_select", { featuresId: state.rectangle.id });
+        }, 0);
+      }
+      return;
     }
-    // on first click, save clicked point coords as starting for  rectangle
+    // on first click, save clicked point coords as starting for rectangle
     state.startPoint = [e.lngLat.lng, e.lngLat.lat];
   },
   onMouseMove: function (state, e) {
@@ -121,15 +131,20 @@ const DrawRectangle = {
     // check to see if we've deleted this feature
     if (this.getFeature(state.rectangle.id) === undefined) return;
 
-    //remove last added coordinate
-    state.rectangle.removeCoordinate("0.4");
-    if (state.rectangle.isValid()) {
+    // Verify if rectangle has 5 valid closed coordinates with non-zero width and height
+    const coords = state.rectangle.getCoordinates()[0];
+    const isValidRectangle =
+      coords &&
+      coords.length >= 5 &&
+      coords[0][0] !== coords[2][0] &&
+      coords[0][1] !== coords[2][1];
+
+    if (isValidRectangle && state.rectangle.isValid()) {
       this.map.fire("draw.create", {
         features: [state.rectangle.toGeoJSON()],
       });
     } else {
       this.deleteFeature([state.rectangle.id], { silent: true });
-      this.changeMode("simple_select", {}, { silent: true });
     }
   },
   toDisplayFeatures: function (state, geojson, display) {
@@ -137,8 +152,10 @@ const DrawRectangle = {
     geojson.properties.active = isActivePolygon ? "true" : "false";
     if (!isActivePolygon) return display(geojson);
 
-    // Only render the rectangular polygon if it has the starting point
+    // Only render the rectangular polygon if it has the starting point and valid coordinates
     if (!state.startPoint) return;
+    const coords = state.rectangle.getCoordinates()[0];
+    if (!coords || coords.length < 5) return;
     return display(geojson);
   },
   onTrash: function (state) {
