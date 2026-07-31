@@ -1099,8 +1099,8 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     expect(outlineJson).toContain("feature-state");
     expect(outlineJson).toContain(ZERO_COUNT_OUTLINE_COLOR);
     // Default cap preserves the historical absolute breakpoints
-    expect(colorJson).toContain("#64748B");
-    expect(colorJson).toContain("#99F6E4");
+    expect(colorJson).toContain("#1E293B");
+    expect(colorJson).toContain("#14B8A6");
     for (const input of [0, 1, 10, 100, 1000, 5000, DENSITY_TOTAL_CAP]) {
       expect(colorJson).toContain(String(input));
     }
@@ -1135,7 +1135,7 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     // [input, color, input, color, ...]
     expect(pairs[0]).toBe(0);
     expect(pairs[pairs.length - 2]).toBe(DENSITY_TOTAL_CAP);
-    expect(pairs[pairs.length - 1]).toBe("#99F6E4");
+    expect(pairs[pairs.length - 1]).toBe("#14B8A6");
     for (let i = 2; i < pairs.length; i += 2) {
       expect(pairs[i] as number).toBeGreaterThan(pairs[i - 2] as number);
     }
@@ -1147,7 +1147,7 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
       })),
       DENSITY_TOTAL_CAP
     );
-    expect(opacityPairs).toEqual([0, 0, 1, 0.28, 100, 0.65, 1000, 0.85]);
+    expect(opacityPairs).toEqual([0, 0, 1, 0.4, 100, 0.65, 1000, 0.8]);
     expect(densityStopValue(1)).toBe(DENSITY_TOTAL_CAP);
     expect(densityStopValue(0)).toBe(0);
   });

@@ -105,10 +105,9 @@ const DENSITY_OPACITY_STOPS: ReadonlyArray<{
   opacity: number;
 }> = [
   { ratio: 0, opacity: 0 },
-  // Slightly higher than 0.15 so single-count hexes remain visible on the basemap
-  { ratio: 0.0001, opacity: 0.28 }, // 1 @ cap 10000
+  { ratio: 0.0001, opacity: 0.4 }, // 1 @ cap 10000 — readable on dark water
   { ratio: 0.01, opacity: 0.65 }, // 100
-  { ratio: 0.1, opacity: 0.85 }, // 1000
+  { ratio: 0.1, opacity: 0.8 }, // 1000
 ];
 /**
  * Flatten ratio-based stops into Mapbox `interpolate` input/output pairs,
