@@ -105,9 +105,10 @@ const DENSITY_OPACITY_STOPS: ReadonlyArray<{
   opacity: number;
 }> = [
   { ratio: 0, opacity: 0 },
-  { ratio: 0.0001, opacity: 0.15 }, // 1 @ cap 10000
-  { ratio: 0.01, opacity: 0.6 }, // 100
-  { ratio: 0.1, opacity: 0.8 }, // 1000
+  // Slightly higher than 0.15 so single-count hexes remain visible on the basemap
+  { ratio: 0.0001, opacity: 0.28 }, // 1 @ cap 10000
+  { ratio: 0.01, opacity: 0.65 }, // 100
+  { ratio: 0.1, opacity: 0.85 }, // 1000
 ];
 /**
  * Flatten ratio-based stops into Mapbox `interpolate` input/output pairs,
@@ -185,10 +186,13 @@ export const clearInactivePmtilesFeatureState = (
   }
 };
 /**
- * Full coverage range from `{dname}.metadata` including grouping mode.
+ * Full coverage range from `{dname}.metadata` including grouping mode
+ * and whether the source had a real TIME column (``hasTime``).
  */
 export interface PMTilesMetadata extends PMTilesMetadataRange {
   timeGroupBy: TimeGroupBy;
+  /** Always set by {@link parsePMTilesMetadata} (defaults true for legacy). */
+  hasTime: boolean;
 }
 
 interface PMTilesHexLayerProps extends LayerBasicType {
@@ -319,6 +323,8 @@ export const clampPeriodsToMetadata = (
  * When the UI has not set a filter (`start`/`end` both undefined) and metadata
  * bounds exist, use the full tile coverage — do not invent a default calendar
  * window that can miss pre-2000 data.
+ *
+ * Timeless tiles (``hasTime === false``) always use the full metadata coverage.
  */
 export const clampRangeToMetadata = (
   start?: Dayjs,
@@ -326,7 +332,10 @@ export const clampRangeToMetadata = (
   bounds?: PMTilesMetadataRange | null,
   timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY
 ): { start: Dayjs; end: Dayjs } => {
-  if (start === undefined && end === undefined && bounds) {
+  if (
+    bounds &&
+    (!bounds.hasTime || (start === undefined && end === undefined))
+  ) {
     const minD = periodNumberToDayjs(bounds.minPeriod, timeGroupBy, "start");
     const maxD = periodNumberToDayjs(bounds.maxPeriod, timeGroupBy, "end");
     if (minD && maxD) return { start: minD, end: maxD };
@@ -360,8 +369,24 @@ export const clampRangeToMetadata = (
 };
 
 /**
+ * Parse sidecar `has_time`. Missing → true (legacy timed tiles).
+ */
+const parseHasTime = (value: unknown): boolean => {
+  if (value === undefined || value === null) return true;
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value !== 0;
+  if (typeof value === "string") {
+    const s = value.trim().toLowerCase();
+    if (s === "false" || s === "0" || s === "no") return false;
+    if (s === "true" || s === "1" || s === "yes") return true;
+  }
+  return Boolean(value);
+};
+
+/**
  * Parse the `{dname}.metadata` JSON body into app `PMTilesMetadata`.
- * Accepts the sidecar field names (`min_date`, `max_date`, `time_group_by`).
+ * Accepts the sidecar field names (`min_date`, `max_date`, `time_group_by`,
+ * optional `has_time`).
  * Returns null when either bound is missing or invalid.
  * Bounds are stored as {@link PeriodInt} (not Dayjs).
  */
@@ -373,7 +398,12 @@ export const parsePMTilesMetadata = (data: unknown): PMTilesMetadata | null => {
   const maxPeriod = parsePeriodInt(raw.max_date, timeGroupBy);
   if (minPeriod === undefined || maxPeriod === undefined) return null;
   if (minPeriod > maxPeriod) return null;
-  return { minPeriod, maxPeriod, timeGroupBy };
+  return {
+    minPeriod,
+    maxPeriod,
+    timeGroupBy,
+    hasTime: parseHasTime(raw.has_time),
+  };
 };
 
 // Exported following functions for unit testing
@@ -404,7 +434,8 @@ export const getDayKeysInRange = (start?: Dayjs, end?: Dayjs): string[] => {
     (current.isBefore(last) || current.isSame(last)) &&
     limit < DAY_KEY_LIMIT
   ) {
-    keys.push(`m${current.format("YYYYMMDD")}`);
+    // Date grain uses dYYYYMMDD (month stays mYYYYMM).
+    keys.push(`d${current.format("YYYYMMDD")}`);
     current = current.add(1, "day");
     limit++;
   }
@@ -413,11 +444,11 @@ export const getDayKeysInRange = (start?: Dayjs, end?: Dayjs): string[] => {
 
 /**
  * Count property keys for the filter range, using only the bucket format
- * declared by PMTiles `.metadata` `time_group_by` (`date` → mYYYYMMDD,
+ * declared by PMTiles `.metadata` `time_group_by` (`date` → dYYYYMMDD,
  * `month` → mYYYYMM). When metadata min/max are provided, the range is
  * clamped so paint/filter expressions do not expand empty calendar days
  * outside the tile's actual coverage (counts are already pre-aggregated
- * as m* properties — we only sum those keys).
+ * as period properties — we only sum those keys).
  */
 export const getDateKeysInRange = (
   start?: Dayjs,
@@ -431,17 +462,28 @@ export const getDateKeysInRange = (
     : getMonthKeysInRange(clamped.start, clamped.end);
 };
 
-/** Format mYYYYMM → YYYY-MM or mYYYYMMDD → YYYY-MM-DD. */
+/**
+ * Format period property keys for display:
+ * - ``dYYYYMMDD`` → YYYY-MM-DD
+ * - ``mYYYYMM`` → YYYY-MM
+ */
 export const formatDateKey = (key: string): string => {
-  const digits = key.startsWith("m") ? key.slice(1) : key;
-  if (digits.length >= 8) {
+  const first = key.charCodeAt(0);
+  const digits =
+    first === 100 /* d */ || first === 109 /* m */ || first === 121 /* y */
+      ? key.slice(1)
+      : key;
+  if (digits.length === 8) {
     return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`;
+  }
+  if (digits.length === 4) {
+    return digits; // yYYYY (future multi-grain)
   }
   return `${digits.slice(0, 4)}-${digits.slice(4, 6)}`;
 };
 
 /**
- * Precomputed filter window for sparse m* sums.
+ * Precomputed filter window for sparse period-key sums.
  * Prefer this over dayjs-per-key checks in the density hot path.
  */
 export type CountFilterRange = {
@@ -453,7 +495,7 @@ export type CountFilterRange = {
   /** True when start is after end (sum always 0). */
   empty: boolean;
   /**
-   * Optional allow-set of `m*` keys when the window is small enough
+   * Optional allow-set of period keys when the window is small enough
    * ({@link COUNT_KEY_SET_MAX}). Membership is O(1); wide day ranges omit this
    * and use integer period compares only.
    */
@@ -461,27 +503,36 @@ export type CountFilterRange = {
 };
 
 /**
- * Parse an mYYYYMM / mYYYYMMDD property name without dayjs.
+ * Parse a count property name without dayjs.
+ *
+ * Accepted forms:
+ * - ``dYYYYMMDD`` — date grain
+ * - ``mYYYYMM`` — month grain
+ *
  * Returns null when the key is not a count bucket.
  */
 export const parseCountPropertyKey = (
   key: string
 ): { isDay: boolean; period: number } | null => {
-  // Fast reject non-count props (e.g. promoteId "h") before regex
-  if (key.length < 7 || key.length > 9 || key.charCodeAt(0) !== 109 /* m */) {
-    return null;
-  }
+  if (key.length < 7 || key.length > 9) return null;
+  const prefix = key.charCodeAt(0);
+  // d (100) or m (109) only for now; y (year) lands with multi-grain
+  if (prefix !== 100 && prefix !== 109) return null;
+
   const digits = key.slice(1);
   const len = digits.length;
-  if (len !== 6 && len !== 8) return null;
-  // Require pure digits (same as COUNT_PROPERTY_KEY)
+  // dYYYYMMDD (9 chars total) or mYYYYMM (7 chars total)
+  if (prefix === 100 /* d */ && len !== 8) return null;
+  if (prefix === 109 /* m */ && len !== 6) return null;
+
   for (let i = 0; i < len; i++) {
     const c = digits.charCodeAt(i);
     if (c < 48 || c > 57) return null;
   }
   const period = Number(digits);
   if (!Number.isFinite(period)) return null;
-  return { isDay: len === 8, period };
+
+  return { isDay: prefix === 100 /* d */, period };
 };
 
 /**
@@ -551,6 +602,10 @@ export const buildCountFilterRangeFromPeriods = (
  * undefined) and `.metadata` bounds are known, sum the entire tile period —
  * including single-day archives such as min=max=`19700121`. A default window
  * starting in 2000 would clamp to empty against that coverage.
+ *
+ * Timeless path: when sidecar ``has_time`` is false, always sum the full
+ * synthetic period from metadata — ignore UI date filters so density is not
+ * zeroed by a collection extent that excludes the sentinel period.
  */
 export const buildCountFilterRange = (
   filterStart?: Dayjs,
@@ -561,10 +616,16 @@ export const buildCountFilterRange = (
     bounds?: PMTilesMetadataRange | null;
   }
 ): CountFilterRange => {
-  if (filterStart === undefined && filterEnd === undefined && options?.bounds) {
+  const bounds = options?.bounds;
+  const timeless = bounds != null && !bounds.hasTime;
+
+  if (
+    timeless ||
+    (filterStart === undefined && filterEnd === undefined && bounds)
+  ) {
     return buildCountFilterRangeFromPeriods(
-      options.bounds.minPeriod,
-      options.bounds.maxPeriod,
+      bounds!.minPeriod,
+      bounds!.maxPeriod,
       timeGroupBy,
       options
     );
@@ -619,8 +680,8 @@ export const isCountKeyInFilterRange = (
 
 /**
  * Whether a count property key falls in the filter range for the active
- * `time_group_by`. Keys that do not match the expected bucket length are
- * rejected (month tiles → mYYYYMM only; date tiles → mYYYYMMDD only).
+ * `time_group_by`. Keys that do not match the expected grain are rejected
+ * (month → mYYYYMM; date → dYYYYMMDD).
  *
  * Convenience wrapper that builds a {@link CountFilterRange} each call —
  * prefer {@link isCountKeyInFilterRange} / {@link buildCountFilterRange} in loops.
@@ -804,13 +865,18 @@ export const sumSparseCountFromProperties = (
  * Popup totals come from properties present on the feature (not a pre-built
  * key list), so long day-bucket series are not truncated by DAY_KEY_LIMIT.
  * Only properties matching `time_group_by` are summed.
+ *
+ * When ``hasTime`` is false (timeless / synthetic period tiles), the popup
+ * omits the Time Range line so the synthetic sentinel is not shown as a
+ * real observation date.
  */
 export const buildPopupHtml = (
   properties: Record<string, unknown>,
   filterStartDate?: Dayjs,
   filterEndDate?: Dayjs,
   timeGroupBy: TimeGroupBy = DEFAULT_TIME_GROUP_BY,
-  range?: CountFilterRange
+  range?: CountFilterRange,
+  hasTime: boolean = true
 ): string => {
   const { total, matchedKeys } = sumSparseCountFromProperties(
     properties,
@@ -819,17 +885,21 @@ export const buildPopupHtml = (
     timeGroupBy,
     range ? { range } : undefined
   );
-  const firstKey = matchedKeys[0];
-  const lastKey = matchedKeys[matchedKeys.length - 1];
-  return new InnerHtmlBuilder()
+  const builder = new InnerHtmlBuilder()
     .addTitle("Data Records In This Area:")
-    .addText("Data Record Count: " + total)
-    .addRange(
+    .addText("Data Record Count: " + total);
+
+  if (hasTime) {
+    const firstKey = matchedKeys[0];
+    const lastKey = matchedKeys[matchedKeys.length - 1];
+    builder.addRange(
       "Time Range",
       firstKey ? formatDateKey(firstKey) : "N/A",
       lastKey ? formatDateKey(lastKey) : "N/A"
-    )
-    .getHtml();
+    );
+  }
+
+  return builder.getHtml();
 };
 
 /** Density input: sparse total written via setFeatureState (0 when unset). */
@@ -1619,6 +1689,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         const bounds: PMTilesMetadataRange = {
           minPeriod: metadata.minPeriod,
           maxPeriod: metadata.maxPeriod,
+          hasTime: metadata.hasTime,
         };
         timeGroupByRef.current = metadata.timeGroupBy;
         periodBoundsRef.current = bounds;
@@ -1918,7 +1989,8 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
             filterStartDateRef.current,
             filterEndDateRef.current,
             timeGroupByRef.current,
-            countFilterRangeRef.current
+            countFilterRangeRef.current,
+            periodBoundsRef.current?.hasTime !== false
           )
         );
         setHoverOutline(feature.geometry);

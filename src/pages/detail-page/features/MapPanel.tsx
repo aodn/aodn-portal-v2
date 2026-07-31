@@ -400,8 +400,11 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
         case SubsettingType.TimeSlider:
           return (
             hasSummaryFeature ||
-            // PMTiles density is filtered by date range from `.metadata` coverage
-            (isSupportPMTiles && selectedMapLayerId === LayerName.PMTiles) ||
+            // PMTiles density is filtered by date range from `.metadata` coverage.
+            // Timeless tiles (`has_time: false`) have no real temporal dimension.
+            (isSupportPMTiles &&
+              selectedMapLayerId === LayerName.PMTiles &&
+              pmtilesPeriodRange?.hasTime !== false) ||
             (selectedMapLayerId === LayerName.GeoServer && timeSliderSupport)
           );
         case SubsettingType.DrawRect:
@@ -419,6 +422,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       hasSummaryFeature,
       isSupportPMTiles,
       selectedMapLayerId,
+      pmtilesPeriodRange?.hasTime,
       timeSliderSupport,
       drawRectSupport,
       downloadService,

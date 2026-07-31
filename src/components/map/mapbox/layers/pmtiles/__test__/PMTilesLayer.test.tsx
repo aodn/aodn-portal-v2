@@ -73,10 +73,12 @@ const requirePeriodInt = (
 const metaRange = (
   min: unknown,
   max: unknown,
-  timeGroupBy: TimeGroupBy = TimeGroupBy.Date
+  timeGroupBy: TimeGroupBy = TimeGroupBy.Date,
+  hasTime: boolean = true
 ): PMTilesMetadataRange => ({
   minPeriod: requirePeriodInt(min, timeGroupBy),
   maxPeriod: requirePeriodInt(max, timeGroupBy),
+  hasTime,
 });
 
 describe("PMTilesLayer - parseTimeGroupBy", () => {
@@ -123,12 +125,12 @@ describe("PMTilesLayer - getMonthKeysInRange", () => {
 describe("PMTilesLayer - getDayKeysInRange", () => {
   it("returns one key per day between start and end inclusive", () => {
     const keys = getDayKeysInRange(dayjs("2024-01-30"), dayjs("2024-02-01"));
-    expect(keys).toEqual(["m20240130", "m20240131", "m20240201"]);
+    expect(keys).toEqual(["d20240130", "d20240131", "d20240201"]);
   });
 
   it("returns a single key when start and end are the same day", () => {
     const keys = getDayKeysInRange(dayjs("2024-06-15"), dayjs("2024-06-15"));
-    expect(keys).toEqual(["m20240615"]);
+    expect(keys).toEqual(["d20240615"]);
   });
 
   it("returns an empty array when start is after end", () => {
@@ -139,8 +141,8 @@ describe("PMTilesLayer - getDayKeysInRange", () => {
   it("covers multi-decade spans used by daily PMTiles (no 5000-day truncation)", () => {
     // ~15 years of daily data (typical wireless-sensor series) must fit
     const keys = getDayKeysInRange(dayjs("2008-11-01"), dayjs("2023-06-30"));
-    expect(keys[0]).toBe("m20081101");
-    expect(keys[keys.length - 1]).toBe("m20230630");
+    expect(keys[0]).toBe("d20081101");
+    expect(keys[keys.length - 1]).toBe("d20230630");
     expect(keys.length).toBe(
       dayjs("2023-06-30").diff(dayjs("2008-11-01"), "day") + 1
     );
@@ -202,6 +204,7 @@ describe("PMTilesLayer - parsePMTilesMetadata", () => {
     expect(range?.minPeriod).toBe(20080109);
     expect(range?.maxPeriod).toBe(20260304);
     expect(range?.timeGroupBy).toBe(TimeGroupBy.Date);
+    expect(range?.hasTime).toBe(true); // default when has_time omitted
     // UI conversion at the edge
     const dayjsRange = range
       ? metadataRangeToDayjs(range, range.timeGroupBy)
@@ -215,15 +218,82 @@ describe("PMTilesLayer - parsePMTilesMetadata", () => {
       min_date: 201008,
       max_date: 201010,
       time_group_by: "month",
+      has_time: true,
     });
     expect(range?.minPeriod).toBe(201008);
     expect(range?.maxPeriod).toBe(201010);
     expect(range?.timeGroupBy).toBe(TimeGroupBy.Month);
+    expect(range?.hasTime).toBe(true);
     const dayjsRange = range
       ? metadataRangeToDayjs(range, range.timeGroupBy)
       : null;
     expect(dayjsRange?.minDate.format("YYYY-MM-DD")).toBe("2010-08-01");
     expect(dayjsRange?.maxDate.format("YYYY-MM-DD")).toBe("2010-10-31");
+  });
+
+  it("parses has_time false for synthetic timeless tiles", () => {
+    const range = parsePMTilesMetadata({
+      min_date: 19700101,
+      max_date: 19700101,
+      time_group_by: "date",
+      has_time: false,
+    });
+    expect(range?.minPeriod).toBe(19700101);
+    expect(range?.maxPeriod).toBe(19700101);
+    expect(range?.hasTime).toBe(false);
+  });
+
+  it("treats real single-day archive as has_time true", () => {
+    const range = parsePMTilesMetadata({
+      min_date: 19700101,
+      max_date: 19700101,
+      time_group_by: "date",
+      has_time: true,
+    });
+    expect(range?.hasTime).toBe(true);
+  });
+
+  it("ignores UI date filter for timeless tiles so density is not zeroed", () => {
+    const bounds = {
+      minPeriod: 19700101,
+      maxPeriod: 19700101,
+      hasTime: false as const,
+    };
+    // Filter entirely outside the synthetic period
+    const range = buildCountFilterRange(
+      dayjs("2020-01-01"),
+      dayjs("2024-12-31"),
+      TimeGroupBy.Date,
+      { bounds }
+    );
+    expect(range.empty).toBe(false);
+    expect(range.startPeriod).toBe(19700101);
+    expect(range.endPeriod).toBe(19700101);
+
+    const { total } = sumSparseCountFromProperties(
+      { h: "cell", d19700101: 99 },
+      dayjs("2020-01-01"),
+      dayjs("2024-12-31"),
+      TimeGroupBy.Date,
+      { range }
+    );
+    expect(total).toBe(99);
+  });
+
+  it("still clamps real single-day tiles to the UI filter", () => {
+    const bounds = {
+      minPeriod: 19700101,
+      maxPeriod: 19700101,
+      hasTime: true as const,
+    };
+    const range = buildCountFilterRange(
+      dayjs("2020-01-01"),
+      dayjs("2024-12-31"),
+      TimeGroupBy.Date,
+      { bounds }
+    );
+    // Real 1970 day does not intersect 2020–2024
+    expect(range.empty).toBe(true);
   });
 
   it("accepts numeric strings and rejects incomplete bounds", () => {
@@ -327,14 +397,14 @@ describe("PMTilesLayer - getDateKeysInRange", () => {
 
   it("defaults to day keys when time_group_by is omitted", () => {
     expect(getDateKeysInRange(start, end)).toEqual([
-      "m20240130",
-      "m20240131",
-      "m20240201",
+      "d20240130",
+      "d20240131",
+      "d20240201",
     ]);
     expect(getDateKeysInRange(start, end, TimeGroupBy.Date)).toEqual([
-      "m20240130",
-      "m20240131",
-      "m20240201",
+      "d20240130",
+      "d20240131",
+      "d20240201",
     ]);
   });
 
@@ -370,7 +440,7 @@ describe("PMTilesLayer - getDateKeysInRange", () => {
       TimeGroupBy.Date,
       metaRange(20100814, 20100816, TimeGroupBy.Date)
     );
-    expect(keys).toEqual(["m20100814", "m20100815", "m20100816"]);
+    expect(keys).toEqual(["d20100814", "d20100815", "d20100816"]);
   });
 
   it("clamps month keys to metadata min_date/max_date", () => {
@@ -390,8 +460,8 @@ describe("PMTilesLayer - getDateKeysInRange", () => {
       TimeGroupBy.Date,
       metaRange(20100801, 20100831, TimeGroupBy.Date)
     );
-    expect(keys[0]).toBe("m20100815");
-    expect(keys[keys.length - 1]).toBe("m20100820");
+    expect(keys[0]).toBe("d20100815");
+    expect(keys[keys.length - 1]).toBe("d20100820");
     expect(keys.length).toBe(6);
   });
 });
@@ -403,8 +473,8 @@ describe("PMTilesLayer - formatDateKey", () => {
   });
 
   it("formats a day key for display", () => {
-    expect(formatDateKey("m20240105")).toBe("2024-01-05");
-    expect(formatDateKey("m19991207")).toBe("1999-12-07");
+    expect(formatDateKey("d20240105")).toBe("2024-01-05");
+    expect(formatDateKey("d19991207")).toBe("1999-12-07");
   });
 });
 
@@ -414,22 +484,22 @@ describe("PMTilesLayer - isCountPropertyInRange", () => {
 
   it("includes day keys on days inside the filter when time_group_by is date", () => {
     expect(
-      isCountPropertyInRange("m20240115", start, end, TimeGroupBy.Date)
+      isCountPropertyInRange("d20240115", start, end, TimeGroupBy.Date)
     ).toBe(true);
     expect(
-      isCountPropertyInRange("m20240110", start, end, TimeGroupBy.Date)
+      isCountPropertyInRange("d20240110", start, end, TimeGroupBy.Date)
     ).toBe(true);
     expect(
-      isCountPropertyInRange("m20240120", start, end, TimeGroupBy.Date)
+      isCountPropertyInRange("d20240120", start, end, TimeGroupBy.Date)
     ).toBe(true);
   });
 
   it("excludes day keys outside the filter when time_group_by is date", () => {
     expect(
-      isCountPropertyInRange("m20240109", start, end, TimeGroupBy.Date)
+      isCountPropertyInRange("d20240109", start, end, TimeGroupBy.Date)
     ).toBe(false);
     expect(
-      isCountPropertyInRange("m20240121", start, end, TimeGroupBy.Date)
+      isCountPropertyInRange("d20240121", start, end, TimeGroupBy.Date)
     ).toBe(false);
   });
 
@@ -448,7 +518,7 @@ describe("PMTilesLayer - isCountPropertyInRange", () => {
   it("rejects keys that do not match the active time_group_by format", () => {
     // Month tile must not sum day properties
     expect(
-      isCountPropertyInRange("m20240115", start, end, TimeGroupBy.Month)
+      isCountPropertyInRange("d20240115", start, end, TimeGroupBy.Month)
     ).toBe(false);
     // Date tile must not sum month properties
     expect(
@@ -457,7 +527,7 @@ describe("PMTilesLayer - isCountPropertyInRange", () => {
   });
 
   it("defaults to date grouping when time_group_by is omitted", () => {
-    expect(isCountPropertyInRange("m20240115", start, end)).toBe(true);
+    expect(isCountPropertyInRange("d20240115", start, end)).toBe(true);
     expect(isCountPropertyInRange("m202401", start, end)).toBe(false);
   });
 
@@ -476,7 +546,7 @@ describe("PMTilesLayer - CountFilterRange (integer + key set)", () => {
   const end = dayjs("2024-01-20");
 
   it("parses count keys without dayjs", () => {
-    expect(parseCountPropertyKey("m20240115")).toEqual({
+    expect(parseCountPropertyKey("d20240115")).toEqual({
       isDay: true,
       period: 20240115,
     });
@@ -486,6 +556,8 @@ describe("PMTilesLayer - CountFilterRange (integer + key set)", () => {
     });
     expect(parseCountPropertyKey("h")).toBeNull();
     expect(parseCountPropertyKey("m2024")).toBeNull();
+    expect(parseCountPropertyKey("d202401")).toBeNull(); // d requires 8 digits
+    expect(parseCountPropertyKey("m20240115")).toBeNull(); // m is month only
     expect(parseCountPropertyKey("m202401ab")).toBeNull();
   });
 
@@ -501,15 +573,15 @@ describe("PMTilesLayer - CountFilterRange (integer + key set)", () => {
     expect(range.endPeriod).toBe(20240120);
     // Default path uses integer compares only (safer for small tiles)
     expect(range.keySet).toBeUndefined();
-    expect(isCountKeyInFilterRange("m20240115", range)).toBe(true);
-    expect(isCountKeyInFilterRange("m20240109", range)).toBe(false);
+    expect(isCountKeyInFilterRange("d20240115", range)).toBe(true);
+    expect(isCountKeyInFilterRange("d20240109", range)).toBe(false);
     expect(isCountKeyInFilterRange("m202401", range)).toBe(false);
 
     const withSet = buildCountFilterRange(start, end, TimeGroupBy.Date, {
       includeKeySet: true,
     });
-    expect(withSet.keySet?.has("m20240115")).toBe(true);
-    expect(withSet.keySet?.has("m20240109")).toBe(false);
+    expect(withSet.keySet?.has("d20240115")).toBe(true);
+    expect(withSet.keySet?.has("d20240109")).toBe(false);
   });
 
   it("builds a month range with integer bounds", () => {
@@ -522,7 +594,7 @@ describe("PMTilesLayer - CountFilterRange (integer + key set)", () => {
     expect(range.endPeriod).toBe(202403);
     expect(isCountKeyInFilterRange("m202402", range)).toBe(true);
     expect(isCountKeyInFilterRange("m202312", range)).toBe(false);
-    expect(isCountKeyInFilterRange("m20240115", range)).toBe(false);
+    expect(isCountKeyInFilterRange("d20240115", range)).toBe(false);
   });
 
   it("omits keySet for wide day windows above COUNT_KEY_SET_MAX", () => {
@@ -534,13 +606,13 @@ describe("PMTilesLayer - CountFilterRange (integer + key set)", () => {
     // Integer path still works
     expect(
       isCountKeyInFilterRange(
-        `m${dayjsToDayPeriod(wideStart.add(10, "day"))}`,
+        `d${dayjsToDayPeriod(wideStart.add(10, "day"))}`,
         range
       )
     ).toBe(true);
     expect(
       isCountKeyInFilterRange(
-        `m${dayjsToDayPeriod(wideStart.subtract(1, "day"))}`,
+        `d${dayjsToDayPeriod(wideStart.subtract(1, "day"))}`,
         range
       )
     ).toBe(false);
@@ -549,7 +621,7 @@ describe("PMTilesLayer - CountFilterRange (integer + key set)", () => {
   it("marks empty ranges when start is after end", () => {
     const range = buildCountFilterRange(end, start, TimeGroupBy.Date);
     expect(range.empty).toBe(true);
-    expect(isCountKeyInFilterRange("m20240115", range)).toBe(false);
+    expect(isCountKeyInFilterRange("d20240115", range)).toBe(false);
   });
 
   it("builds ranges from period ints and clamps to metadata bounds", () => {
@@ -562,8 +634,8 @@ describe("PMTilesLayer - CountFilterRange (integer + key set)", () => {
     expect(range.empty).toBe(false);
     expect(range.startPeriod).toBe(20240110);
     expect(range.endPeriod).toBe(20240120);
-    expect(isCountKeyInFilterRange("m20240115", range)).toBe(true);
-    expect(isCountKeyInFilterRange("m20240109", range)).toBe(false);
+    expect(isCountKeyInFilterRange("d20240115", range)).toBe(true);
+    expect(isCountKeyInFilterRange("d20240109", range)).toBe(false);
   });
 
   it("uses full metadata coverage when no UI filter is set (pre-2000 single day)", () => {
@@ -581,11 +653,11 @@ describe("PMTilesLayer - CountFilterRange (integer + key set)", () => {
     expect(range.empty).toBe(false);
     expect(range.startPeriod).toBe(19700121);
     expect(range.endPeriod).toBe(19700121);
-    expect(isCountKeyInFilterRange("m19700121", range)).toBe(true);
-    expect(isCountKeyInFilterRange("m19700122", range)).toBe(false);
+    expect(isCountKeyInFilterRange("d19700121", range)).toBe(true);
+    expect(isCountKeyInFilterRange("d19700122", range)).toBe(false);
 
     const { total } = sumSparseCountFromProperties(
-      { h: "cell", m19700121: 42, m20000101: 99 },
+      { h: "cell", d19700121: 42, d20000101: 99 },
       undefined,
       undefined,
       TimeGroupBy.Date,
@@ -624,7 +696,7 @@ describe("PMTilesLayer - buildPopupHtml", () => {
 
   it("sums daily counts when time_group_by is date", () => {
     const html = buildPopupHtml(
-      { m20240101: 5, m20240302: 7, m20240501: 0 },
+      { d20240101: 5, d20240302: 7, d20240501: 0 },
       filterStart,
       filterEnd,
       TimeGroupBy.Date
@@ -634,9 +706,34 @@ describe("PMTilesLayer - buildPopupHtml", () => {
     expect(html).toContain("Time Range: 2024-01-01 to 2024-03-02");
   });
 
+  it("omits Time Range on timeless (has_time false) tiles", () => {
+    const range = buildCountFilterRange(
+      dayjs("2020-01-01"),
+      dayjs("2024-12-31"),
+      TimeGroupBy.Date,
+      {
+        bounds: {
+          minPeriod: 19700101,
+          maxPeriod: 19700101,
+          hasTime: false,
+        },
+      }
+    );
+    const html = buildPopupHtml(
+      { d19700101: 42 },
+      dayjs("2020-01-01"),
+      dayjs("2024-12-31"),
+      TimeGroupBy.Date,
+      range,
+      false
+    );
+    expect(html).toContain("Data Record Count: 42");
+    expect(html).not.toContain("Time Range");
+  });
+
   it("ignores day keys when time_group_by is month", () => {
     const html = buildPopupHtml(
-      { m202401: 5, m20240101: 99 },
+      { m202401: 5, d20240101: 99 },
       filterStart,
       filterEnd,
       TimeGroupBy.Month
@@ -647,7 +744,7 @@ describe("PMTilesLayer - buildPopupHtml", () => {
 
   it("ignores month keys when time_group_by is date", () => {
     const html = buildPopupHtml(
-      { m202401: 99, m20240101: 5 },
+      { m202401: 99, d20240101: 5 },
       filterStart,
       filterEnd,
       TimeGroupBy.Date
@@ -658,7 +755,7 @@ describe("PMTilesLayer - buildPopupHtml", () => {
 
   it("ignores day keys outside the filter range and non-numeric values", () => {
     const html = buildPopupHtml(
-      { m20240101: 5, m20250601: 99, m20240201: "not-a-number" },
+      { d20240101: 5, d20250601: 99, d20240201: "not-a-number" },
       filterStart,
       filterEnd,
       TimeGroupBy.Date
@@ -680,7 +777,7 @@ describe("PMTilesLayer - buildPopupHtml", () => {
 
   it("shows zero count and N/A range when the hexbin has no records in range", () => {
     const html = buildPopupHtml(
-      { m20250601: 99 },
+      { d20250601: 99 },
       filterStart,
       filterEnd,
       TimeGroupBy.Date
@@ -696,9 +793,9 @@ describe("PMTilesLayer - buildPopupHtml", () => {
     const monthProps = { h: "hex1", m201008: 175196 };
     const dayProps = {
       h: "hex1",
-      m20100801: 50000,
-      m20100815: 75196,
-      m20100831: 50000,
+      d20100801: 50000,
+      d20100815: 75196,
+      d20100831: 50000,
     };
     const monthHtml = buildPopupHtml(monthProps, start, end, TimeGroupBy.Month);
     const dayHtml = buildPopupHtml(dayProps, start, end, TimeGroupBy.Date);
@@ -716,7 +813,7 @@ describe("PMTilesLayer - buildPopupHtml", () => {
       TimeGroupBy.Month
     );
     const dayHtml = buildPopupHtml(
-      { m20100801: 10000, m20100815: 9120, m20100816: 50000 },
+      { d20100801: 10000, d20100815: 9120, d20100816: 50000 },
       start,
       end,
       TimeGroupBy.Date
@@ -736,7 +833,7 @@ describe("PMTilesLayer - buildPopupHtml", () => {
     while (current.isBefore(last) || current.isSame(last, "day")) {
       // sparse non-zero days so the object stays small
       if (current.date() === 1) {
-        props[`m${current.format("YYYYMMDD")}`] = 3;
+        props[`d${current.format("YYYYMMDD")}`] = 3;
         expected += 3;
       }
       current = current.add(1, "day");
@@ -752,7 +849,7 @@ describe("PMTilesLayer - buildPopupHtml", () => {
 
   it("defaults to date grouping when time_group_by is omitted", () => {
     const html = buildPopupHtml(
-      { m202401: 5, m20240101: 99 },
+      { m202401: 5, d20240101: 99 },
       filterStart,
       filterEnd
     );
@@ -850,15 +947,15 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
   const start = dayjs("2024-01-01");
   const end = dayjs("2024-03-31");
 
-  it("sums only in-range m* properties that exist on the feature", () => {
+  it("sums only in-range day properties that exist on the feature", () => {
     const { total, matchedKeys } = sumSparseCountFromProperties(
-      { h: "abc", m20240101: 5, m20240201: 7, m20240501: 99, m202401: 3 },
+      { h: "abc", d20240101: 5, d20240201: 7, d20240501: 99, m202401: 3 },
       start,
       end,
       TimeGroupBy.Date
     );
     expect(total).toBe(12);
-    expect(matchedKeys).toEqual(["m20240101", "m20240201"]);
+    expect(matchedKeys).toEqual(["d20240101", "d20240201"]);
   });
 
   it("coerces string counts from vector tiles", () => {
@@ -866,7 +963,7 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     expect(coerceCountValue(9120)).toBe(9120);
     expect(coerceCountValue("x")).toBeNaN();
     const { total } = sumSparseCountFromProperties(
-      { m20240115: "10", m20240201: "3" },
+      { d20240115: "10", d20240201: "3" },
       start,
       end,
       TimeGroupBy.Date
@@ -877,7 +974,7 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
   it("returns zero when no properties match", () => {
     expect(
       sumSparseCountFromProperties(
-        { h: "abc", m20250601: 1 },
+        { h: "abc", d20250601: 1 },
         start,
         end,
         TimeGroupBy.Date
@@ -891,10 +988,10 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
   it("stops summing at maxTotal so density paint can early-exit", () => {
     const { total, matchedKeys } = sumSparseCountFromProperties(
       {
-        m20240101: 6000,
-        m20240102: 6000,
-        m20240201: 50000,
-        m20240301: 1,
+        d20240101: 6000,
+        d20240102: 6000,
+        d20240201: 50000,
+        d20240301: 1,
       },
       start,
       end,
@@ -908,7 +1005,7 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
 
   it("does not clamp totals below the density cap", () => {
     const { total } = sumSparseCountFromProperties(
-      { m20240101: 5, m20240201: 7 },
+      { d20240101: 5, d20240201: 7 },
       start,
       end,
       TimeGroupBy.Date,
@@ -920,7 +1017,7 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
   it("uses a precomputed CountFilterRange for sparse sums", () => {
     const range = buildCountFilterRange(start, end, TimeGroupBy.Date);
     const { total } = sumSparseCountFromProperties(
-      { m20240115: 4, m20240601: 99 },
+      { d20240115: 4, d20240601: 99 },
       undefined,
       undefined,
       TimeGroupBy.Date,
@@ -955,7 +1052,7 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
 
   it("does not infer when expected-format keys exist but fall outside the filter", () => {
     const { total, timeGroupBy } = sumSparseCountFromProperties(
-      { m20240115: 5, m20240601: 99 },
+      { d20240115: 5, d20240601: 99 },
       dayjs("2024-06-01"),
       dayjs("2024-06-30"),
       TimeGroupBy.Date,
@@ -1002,8 +1099,8 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     expect(outlineJson).toContain("feature-state");
     expect(outlineJson).toContain(ZERO_COUNT_OUTLINE_COLOR);
     // Default cap preserves the historical absolute breakpoints
-    expect(colorJson).toContain("#1E293B");
-    expect(colorJson).toContain("#14B8A6");
+    expect(colorJson).toContain("#64748B");
+    expect(colorJson).toContain("#99F6E4");
     for (const input of [0, 1, 10, 100, 1000, 5000, DENSITY_TOTAL_CAP]) {
       expect(colorJson).toContain(String(input));
     }
@@ -1038,7 +1135,7 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     // [input, color, input, color, ...]
     expect(pairs[0]).toBe(0);
     expect(pairs[pairs.length - 2]).toBe(DENSITY_TOTAL_CAP);
-    expect(pairs[pairs.length - 1]).toBe("#14B8A6");
+    expect(pairs[pairs.length - 1]).toBe("#99F6E4");
     for (let i = 2; i < pairs.length; i += 2) {
       expect(pairs[i] as number).toBeGreaterThan(pairs[i - 2] as number);
     }
@@ -1050,7 +1147,7 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
       })),
       DENSITY_TOTAL_CAP
     );
-    expect(opacityPairs).toEqual([0, 0, 1, 0.15, 100, 0.6, 1000, 0.8]);
+    expect(opacityPairs).toEqual([0, 0, 1, 0.28, 100, 0.65, 1000, 0.85]);
     expect(densityStopValue(1)).toBe(DENSITY_TOTAL_CAP);
     expect(densityStopValue(0)).toBe(0);
   });
@@ -1064,20 +1161,20 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
         return [
           {
             id: "cell-a",
-            properties: { h: "cell-a", m20240115: 10, m20240601: 50 },
+            properties: { h: "cell-a", d20240115: 10, d20240601: 50 },
           },
           {
             id: "cell-b",
-            properties: { h: "cell-b", m20240201: 3 },
+            properties: { h: "cell-b", d20240201: 3 },
           },
           {
             // Hot cell: true sum far above paint max — density stores the cap
             id: "cell-hot",
             properties: {
               h: "cell-hot",
-              m20240101: 8000,
-              m20240102: 8000,
-              m20240201: 50000,
+              d20240101: 8000,
+              d20240102: 8000,
+              d20240201: 50000,
             },
           },
         ];
@@ -1135,11 +1232,11 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
         return [
           {
             id: "in-range",
-            properties: { h: "in-range", m20240115: 4 },
+            properties: { h: "in-range", d20240115: 4 },
           },
           {
             id: "out-of-range",
-            properties: { h: "out-of-range", m20240601: 99 },
+            properties: { h: "out-of-range", d20240601: 99 },
           },
         ];
       },
@@ -1179,11 +1276,11 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     }> = [
       {
         id: "cell-a",
-        properties: { h: "cell-a", m20240115: 10 },
+        properties: { h: "cell-a", d20240115: 10 },
       },
       {
         id: "cell-b",
-        properties: { h: "cell-b", m20240201: 3 },
+        properties: { h: "cell-b", d20240201: 3 },
       },
     ];
     const map = {
@@ -1226,7 +1323,7 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     // New tile feature appears
     features.push({
       id: "cell-c",
-      properties: { h: "cell-c", m20240301: 7 },
+      properties: { h: "cell-c", d20240301: 7 },
     });
     const third = updateFeatureStateTotals(
       map,
@@ -1250,7 +1347,7 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     const setFeatureState = vi.fn();
     const features = Array.from({ length: 5 }, (_, i) => ({
       id: `cell-${i}`,
-      properties: { h: `cell-${i}`, m20240115: i + 1 },
+      properties: { h: `cell-${i}`, d20240115: i + 1 },
     }));
     const map = {
       getSource: () => ({}),
@@ -1307,7 +1404,7 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
           return [
             {
               id: "z0-cell",
-              properties: { h: "z0-cell", m20240115: 10 },
+              properties: { h: "z0-cell", d20240115: 10 },
             },
           ];
         }
@@ -1315,7 +1412,7 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
           return [
             {
               id: "z4-cell",
-              properties: { h: "z4-cell", m20240115: 20 },
+              properties: { h: "z4-cell", d20240115: 20 },
             },
           ];
         }
