@@ -34,9 +34,7 @@ class Map(BasePage):
             'reference-show-hide-menu-button'
         )
         self.layers_menu = self.get_by_id('layer-show-hide-menu-button')
-        self.data_density_layer = page.get_by_role(
-            'radio', name='Data Density'
-        )
+        self.data_density_layer = page.get_by_role('radio', name='Data Density')
         self.geoserver_layer = page.get_by_role('radio', name='GeoServer')
         self.spatial_extent_layer = page.get_by_role(
             'radio', name='Spatial Extent'
