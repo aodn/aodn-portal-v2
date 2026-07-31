@@ -17,8 +17,8 @@ import {
   Paper,
   Popper,
   TextField,
-  Tooltip,
-  Typography,
+  // Tooltip,
+  // Typography,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import {
@@ -36,7 +36,7 @@ import { sortByRelevance } from "../../utils/Helpers";
 import { useAppDispatch } from "@/app/store/hooks";
 import {
   DOUBLE_QUOTE_LABEL,
-  SEMANTIC_DEFINITION_TITLE,
+  // SEMANTIC_DEFINITION_TITLE,
   SEMANTIC_LABEL,
   TEXT_FIELD_MIN_WIDTH,
 } from "./constants";
@@ -47,8 +47,8 @@ import useBreakpoint from "../../hooks/useBreakpoint";
 import { portalTheme } from "../../styles";
 import LabelChip from "../common/label/LabelChip";
 import AIGenStarIcon from "../icon/AIGenStarIcon";
-import InfoCard from "../info/InfoCard";
-import { InfoStatusType } from "../info/InfoDefinition";
+// import InfoCard from "../info/InfoCard";
+// import { InfoStatusType } from "../info/InfoDefinition";
 import {
   isQuotedPhrase,
   quotePhrase,
@@ -159,9 +159,9 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   const { isMobile } = useBreakpoint();
   const [isSearchbarActive, setIsSearchbarActive] = useState(false);
   const [options, setOptions] = useState<OptionType[]>([]);
-  // label -> definition, for the semantic suggestions only. Explains a "Related" term on hover,
-  // which matters because it was matched by meaning and may share no words with what was typed.
-  const [definitions, setDefinitions] = useState<Record<string, string>>({});
+  // label -> definition, for the semantic suggestions only. Kept fetched but unread while the
+  // hover card is held back; `definitions` is what the Tooltip in renderOption reads.
+  const [, setDefinitions] = useState<Record<string, string>>({});
 
   // Redux is the "Single Source of Truth" for the final value
   const searchInput = useSelector(
