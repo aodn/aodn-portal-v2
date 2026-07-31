@@ -946,7 +946,10 @@ export const buildPresenceFilter = (): ExpressionSpecification =>
 
 export const PLACEHOLDER_FILL_COLOR = "#475569";
 export const PLACEHOLDER_FILL_OPACITY = 0.4;
-export const PLACEHOLDER_OUTLINE_COLOR = "rgba(255, 255, 255, 0.4)";
+/** Fully opaque white border (no alpha) so edges stay clear on the basemap. */
+export const PLACEHOLDER_OUTLINE_COLOR = "#FFFFFF";
+/** Fully opaque white border for hexes with a non-zero density total. */
+export const DENSITY_OUTLINE_COLOR = "#FFFFFF";
 /** Fully transparent fill/outline when a hex has no records in the filter window. */
 export const ZERO_COUNT_FILL_COLOR = "rgba(0, 0, 0, 0)";
 export const ZERO_COUNT_OUTLINE_COLOR = "rgba(0, 0, 0, 0)";
@@ -1004,15 +1007,15 @@ export const getFeatureStatePaintProperties = (
       ZERO_COUNT_FILL_OPACITY,
       ["interpolate", ["linear"], sumExpr, ...opacityStops],
     ] as ExpressionSpecification,
-    // Data-driven outline: a constant white border still showed on zero-count
-    // hexes. Fully transparent when total is 0 after the time filter.
+    // Fully opaque white border when total > 0; transparent when total is 0
+    // so empty hexes (after time filter) leave no ghost edges.
     "fill-outline-color": [
       "case",
       ["!", totalIsSet],
       PLACEHOLDER_OUTLINE_COLOR,
       ["!", hasCount],
       ZERO_COUNT_OUTLINE_COLOR,
-      PLACEHOLDER_OUTLINE_COLOR,
+      DENSITY_OUTLINE_COLOR,
     ] as ExpressionSpecification,
   };
 };
