@@ -17,6 +17,8 @@ import {
   Paper,
   Popper,
   TextField,
+  Tooltip,
+  Typography,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import {
@@ -34,6 +36,7 @@ import { sortByRelevance } from "../../utils/Helpers";
 import { useAppDispatch } from "@/app/store/hooks";
 import {
   DOUBLE_QUOTE_LABEL,
+  SEMANTIC_DEFINITION_TITLE,
   SEMANTIC_LABEL,
   TEXT_FIELD_MIN_WIDTH,
 } from "./constants";
@@ -43,6 +46,9 @@ import { pageDefault } from "../common/constants";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import { portalTheme } from "../../styles";
 import LabelChip from "../common/label/LabelChip";
+import AIGenStarIcon from "../icon/AIGenStarIcon";
+import InfoCard from "../info/InfoCard";
+import { InfoStatusType } from "../info/InfoDefinition";
 import {
   isQuotedPhrase,
   quotePhrase,
@@ -82,6 +88,50 @@ enum OptionGroup {
 const defaultFilter = createFilterOptions<string>();
 
 /**
+ * What a "Related" chip shows on hover: the vocabulary definition of a term that was matched by
+ * meaning, so may share no words with what the user typed. Laid out like the detail page's
+ * "Content reformatted" popup (see AIGenTag) - star icon, title, body - so the two read as the same
+ * kind of AI-assisted explanation.
+ */
+// const SemanticDefinitionCard: FC<{ definition: string }> = ({ definition }) => (
+//   <InfoCard
+//     status={InfoStatusType.NONE}
+//     sx={{
+//       display: "flex",
+//       flexDirection: "column",
+//       alignItems: "flex-start",
+//       width: "310px",
+//       height: "auto",
+//       padding: "10px",
+//     }}
+//   >
+//     <Box
+//       display="flex"
+//       alignItems="center"
+//       justifyContent="center"
+//       flexWrap="nowrap"
+//       width="100%"
+//       gap={1}
+//     >
+//       <AIGenStarIcon color={portalTheme.palette.primary1} />
+//       <Typography
+//         sx={{
+//           ...portalTheme.typography.heading4,
+//           color: portalTheme.palette.primary1,
+//           padding: 0,
+//         }}
+//       >
+//         {SEMANTIC_DEFINITION_TITLE}
+//       </Typography>
+//     </Box>
+
+//     <Typography sx={{ ...portalTheme.typography.body2Regular, p: "8px" }}>
+//       {definition}
+//     </Typography>
+//   </InfoCard>
+// );
+
+/**
  * Customized input box with suggester. If more customization is needed, please
  * do as the below nullable props.
  * @param handleEnterPressed handle the event when users press the ENTER on keyboard.
@@ -109,6 +159,9 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
   const { isMobile } = useBreakpoint();
   const [isSearchbarActive, setIsSearchbarActive] = useState(false);
   const [options, setOptions] = useState<OptionType[]>([]);
+  // label -> definition, for the semantic suggestions only. Explains a "Related" term on hover,
+  // which matters because it was matched by meaning and may share no words with what was typed.
+  const [definitions, setDefinitions] = useState<Record<string, string>>({});
 
   // Redux is the "Single Source of Truth" for the final value
   const searchInput = useSelector(
@@ -131,10 +184,12 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
             const parameter = new Set<string>(data.suggested_parameter_vocabs);
             const phrases = new Set<string>(data.suggested_phrases);
             const organization = new Set<string>(
-              data.suggested_organizations_vocabs
+              data.suggested_organisation_vocabs
             );
             const platform = new Set<string>(data.suggested_platform_vocabs);
             const semantic = new Set<string>(data.suggested_semantic);
+            // Absent whenever suggested_semantic is absent, so default rather than assume
+            setDefinitions(data.semantic_definitions ?? {});
 
             // Create an array of all unique suggestions matched on spelling
             const lexicalSuggestions = new Set([
@@ -464,14 +519,46 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
             />
           )}
           {optionGroups.get(option) === OptionGroup.SEMANTIC && (
+            // The definition hover card is held back for now - to restore it, wrap this chip in
+            // the Tooltip below and uncomment SemanticDefinitionCard above.
+            //
+            // <Tooltip
+            //   // An empty title renders no tooltip, so a term without a definition needs no guard.
+            //   title={
+            //     definitions[option] ? (
+            //       <SemanticDefinitionCard definition={definitions[option]} />
+            //     ) : (
+            //       ""
+            //     )
+            //   }
+            //   // To the side, on the hovered row's own line - above or below would cover the
+            //   // neighbouring options, which are what the user is still choosing between.
+            //   placement="right"
+            //   // The delay keeps it quiet while the pointer travels down the list
+            //   enterDelay={700}
+            //   enterNextDelay={700}
+            //   slotProps={{
+            //     // Strip the default dark bubble so the card is the only surface
+            //     tooltip: { sx: { bgcolor: "transparent", p: 0, maxWidth: "unset" } },
+            //   }}
+            // >
             <LabelChip
               text={[SEMANTIC_LABEL]}
               color={portalTheme.palette.tag2}
+              startIcon={
+                // Same blue the detail page uses for its AI-generated badges
+                <AIGenStarIcon
+                  width={12}
+                  height={12}
+                  color={color.brightBlue.medium}
+                />
+              }
               sx={{
                 ml: gap.lg,
                 ...portalTheme.typography.body2Regular,
               }}
             />
+            // </Tooltip>
           )}
           {/* hidden by default, shown on focus, check sx in CustomPaper */}
           <SearchIcon sx={{ display: "none", ml: "auto" }} />
