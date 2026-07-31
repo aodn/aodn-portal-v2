@@ -2,11 +2,11 @@ import { describe, expect, it, vi } from "vitest";
 import dayjs from "dayjs";
 import { FeatureCollection, Point } from "geojson";
 import { buildMapLayerConfig, getMinMaxDateStamps } from "../features/MapPanel";
-import { dateDefault } from "../../../components/common/constants";
+import { dateDefault } from "@/components/common/constants";
 import {
   LayerName,
   LayerSwitcherLayer,
-} from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
+} from "@/components/map/mapbox/controls/menu/MapLayerSwitcher";
 import {
   OGCCollection,
   DatasetType,
@@ -207,10 +207,10 @@ describe("buildMapLayerConfig", () => {
     expect(result).toEqual([]);
   });
 
-  it("builds correct layer config with hexbin support", () => {
+  it("builds correct layer config with PMTiles Data Density support", () => {
     const mockCollection = createMockCollection({
       hasSummaryFeature: true,
-      getDatasetType: () => [DatasetType.PARQUET], // parquet-only -> hexbin support
+      getDatasetType: () => [DatasetType.PARQUET],
       getBBox: () => [0, 0, 1, 1],
     });
 
@@ -221,18 +221,14 @@ describe("buildMapLayerConfig", () => {
       true // isSupportPMTiles
     );
 
-    expect(result).toHaveLength(3);
+    // Hex Grid removed — density is PMTiles only
+    expect(result).toHaveLength(2);
     expect(result[0]).toEqual({
       id: LayerName.PMTiles,
       name: "Data Density",
       selected: true,
     } as LayerSwitcherLayer<LayerName>);
     expect(result[1]).toEqual({
-      id: LayerName.Hexbin,
-      name: "Hex Grid",
-      selected: false, // PMTiles takes priority when both are available
-    } as LayerSwitcherLayer<LayerName>);
-    expect(result[2]).toEqual({
       id: LayerName.GeoServer,
       name: "Geoserver",
       selected: false,
@@ -281,9 +277,9 @@ describe("buildMapLayerConfig", () => {
     } as LayerSwitcherLayer<LayerName>);
   });
 
-  it("builds layer config with multiple layers and correct defaults", () => {
+  it("builds layer config with PMTiles and GeoServer defaults", () => {
     const mockCollection = createMockCollection({
-      getDatasetType: () => [DatasetType.PARQUET], // parquet-only -> hexbin support
+      getDatasetType: () => [DatasetType.PARQUET],
       getBBox: () => [0, 0, 1, 1],
     });
 
@@ -294,18 +290,13 @@ describe("buildMapLayerConfig", () => {
       true // isSupportPMTiles
     );
 
-    expect(result).toHaveLength(3);
+    expect(result).toHaveLength(2);
     expect(result[0]).toEqual({
       id: LayerName.PMTiles,
       name: "Data Density",
       selected: true,
     } as LayerSwitcherLayer<LayerName>);
     expect(result[1]).toEqual({
-      id: LayerName.Hexbin,
-      name: "Hex Grid",
-      selected: false, // Not default because PMTiles takes priority
-    } as LayerSwitcherLayer<LayerName>);
-    expect(result[2]).toEqual({
       id: LayerName.GeoServer,
       name: "Geoserver",
       selected: false, // Not default because PMTiles is available
@@ -314,7 +305,7 @@ describe("buildMapLayerConfig", () => {
 
   it("returns empty array when no layers are available (no preview mode)", () => {
     const mockCollection = createMockCollection({
-      hasSummaryFeature: false, // no hexbin
+      hasSummaryFeature: false,
       getDatasetType: () => undefined, // not zarr
       getBBox: () => undefined, // no spatial extent
     });

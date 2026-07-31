@@ -40,11 +40,14 @@ import { InnerHtmlBuilder } from "@/utils/HtmlUtils";
 import { SelectItem } from "@/components/common/dropdown/CommonSelect";
 import { MapDefaultConfig } from "@/components/map/mapbox/constants";
 import MapLayerSelect from "@/components/map/mapbox/component/MapLayerSelect";
+import { TestHelper } from "@/components/common/test/helper";
 import { dayjsToDayPeriod, dayjsToMonthPeriod } from "@/utils/DateUtils";
 
 const SOURCE_ID = "pmtiles-source-id";
 const HOVER_SOURCE_ID = "pmtiles-hover-source-id";
 const HOVER_OUTLINE_LAYER_ID = "pmtiles-hex-hover-outline";
+/** Stable id for Playwright visibility checks (zoom-band fill layers share one source). */
+export const PMTILES_TEST_LAYER_ID = "pmtiles-hex-z0";
 const CURSOR_POINTER_CLASS = "map-cursor-pointer";
 /** H3 cell id property; promoted to feature id so feature-state can target hexes. */
 const PROMOTE_ID_PROPERTY = "h";
@@ -1917,6 +1920,11 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
           loadingText="Loading Data Density Layers..."
         />
       )}
+      <TestHelper
+        id={map?.getContainer().id || ""}
+        getPmtilesLayer={() => PMTILES_TEST_LAYER_ID}
+        isPmtilesVisible={() => visible}
+      />
     </>
   );
 };

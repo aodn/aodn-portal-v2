@@ -37,7 +37,6 @@ import {
   Polygon,
 } from "geojson";
 import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
-import HexbinLayer from "../../../components/map/mapbox/layers/HexbinLayer";
 import GeoServerLayer, {
   Dimension,
 } from "../../../components/map/mapbox/layers/GeoServerLayer";
@@ -118,17 +117,15 @@ export const buildMapLayerConfig = (
     const datasetTypes = collection.getDatasetType() ?? [];
     const zarrOnlyDataset =
       datasetTypes.length === 1 && datasetTypes[0] === DatasetType.ZARR;
-    const parquetOnlyDataset =
-      datasetTypes.length === 1 && datasetTypes[0] === DatasetType.PARQUET;
-    const zarrParquetDataset =
-      datasetTypes.includes(DatasetType.ZARR) &&
-      datasetTypes.includes(DatasetType.PARQUET);
-
-    const isSupportHexbin = zarrParquetDataset || parquetOnlyDataset;
+    // Parquet / mixed CO density is shown via PMTiles (legacy Hex Grid removed).
+    const hasCoDensity =
+      datasetTypes.includes(DatasetType.PARQUET) ||
+      datasetTypes.includes(DatasetType.ZARR);
 
     const isSupportSpatialExtent =
       hasSpatialExtent &&
-      (zarrOnlyDataset || (!isWMSAvailable && !isSupportHexbin));
+      (zarrOnlyDataset ||
+        (!isWMSAvailable && !hasCoDensity && !isSupportPMTiles));
 
     if (isSupportPMTiles) {
       const pmtiles: LayerSwitcherLayer<LayerName> = {
@@ -139,21 +136,11 @@ export const buildMapLayerConfig = (
       layers.push(pmtiles);
     }
 
-    if (isSupportHexbin) {
-      const l: LayerSwitcherLayer<LayerName> = {
-        id: LayerName.Hexbin,
-        name: "Hex Grid",
-        // PMTiles takes priority when both are available
-        selected: !isSupportPMTiles,
-      };
-      layers.push(l);
-    }
-
     if (isWMSAvailable) {
       const l: LayerSwitcherLayer<LayerName> = {
         id: LayerName.GeoServer,
         name: "Geoserver",
-        selected: !isSupportHexbin && !isSupportPMTiles,
+        selected: !isSupportPMTiles,
       };
       layers.push(l);
     }
@@ -396,8 +383,6 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       switch (subsettingType) {
         case SubsettingType.TimeSlider:
           return (
-            // Hexbin density is filtered by download date range (not summary link).
-            selectedMapLayerId === LayerName.Hexbin ||
             // PMTiles density is filtered by date range from `.metadata` coverage.
             // Timeless tiles (`has_time: false`) have no real temporal dimension.
             (isSupportPMTiles &&
@@ -627,14 +612,6 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
                 onMetadataPeriodChange={handlePmtilesMetadataPeriodChange}
               />
             )}
-            <HexbinLayer
-              featureCollection={featureCollection}
-              filterStartDate={filterStartDate}
-              filterEndDate={filterEndDate}
-              visible={selectedMapLayerId === LayerName.Hexbin}
-              selectedCoKey={selectedCoKey}
-              onSelectCoKey={setSelectedCoKey}
-            />
             <GeoServerLayer
               geoServerLayerConfig={geoServerLayerConfig}
               onWMSAvailabilityChange={onWMSAvailabilityChange}
