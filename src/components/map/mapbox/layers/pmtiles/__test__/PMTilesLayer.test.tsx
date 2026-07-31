@@ -34,6 +34,8 @@ import {
   parseCountPropertyKey,
   createFeatureStateTotalsSession,
   featureStateSessionKey,
+  resolvePmtilesFeatureId,
+  countUnwrittenLoadedFeatures,
   getActivePmtilesLayers,
   clearInactivePmtilesFeatureState,
   PMTILE_LAYERS,
@@ -1341,6 +1343,41 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
       },
       { [FEATURE_STATE_TOTAL]: 7 }
     );
+  });
+
+  it("resolves feature id from promoteId, preferring feature.id", () => {
+    expect(
+      resolvePmtilesFeatureId({ id: "abc", properties: { h: "other" } })
+    ).toBe("abc");
+    expect(resolvePmtilesFeatureId({ properties: { h: "from-prop" } })).toBe(
+      "from-prop"
+    );
+    expect(resolvePmtilesFeatureId({ id: 0, properties: { h: "x" } })).toBe(0);
+    expect(resolvePmtilesFeatureId({ properties: {} })).toBeUndefined();
+  });
+
+  it("counts loaded features that still lack session feature-state", () => {
+    const features = [
+      { id: "cell-a", properties: { h: "cell-a", d20240115: 10 } },
+      { id: "cell-b", properties: { h: "cell-b", d20240201: 3 } },
+      // Same promoteId from an adjacent tile — must not double-count
+      { id: "cell-a", properties: { h: "cell-a", d20240115: 10 } },
+    ];
+    const map = {
+      getSource: () => ({}),
+      querySourceFeatures: (_s: string, opts: { sourceLayer: string }) =>
+        opts.sourceLayer === "hex_z0" ? features : [],
+    } as unknown as Map;
+
+    const session = createFeatureStateTotalsSession();
+    const layers = getActivePmtilesLayers(0);
+    expect(countUnwrittenLoadedFeatures(map, session, layers)).toBe(2);
+
+    session.written.add(featureStateSessionKey("hex_z0", "cell-a"));
+    expect(countUnwrittenLoadedFeatures(map, session, layers)).toBe(1);
+
+    session.written.add(featureStateSessionKey("hex_z0", "cell-b"));
+    expect(countUnwrittenLoadedFeatures(map, session, layers)).toBe(0);
   });
 
   it("chunks feature-state writes when maxFeatures is set", () => {

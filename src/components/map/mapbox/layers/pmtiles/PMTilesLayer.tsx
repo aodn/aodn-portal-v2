@@ -1,6 +1,5 @@
 import {
   FC,
-  startTransition,
   useCallback,
   useContext,
   useEffect,
@@ -23,7 +22,6 @@ import { FeatureCollection, Geometry } from "geojson";
 import {
   COUNT_KEY_SET_MAX,
   DEFAULT_TIME_GROUP_BY,
-  FEATURE_STATE_CHUNK_SIZE,
   DENSITY_TOTAL_CAP,
   coercePeriodDigits,
   PmtilesHexLayerDef,
@@ -1072,6 +1070,68 @@ export const featureStateSessionKey = (
   id: string | number
 ): string => `${sourceLayer}\0${String(id)}`;
 
+/**
+ * Resolve the id Mapbox uses for feature-state on a queried vector feature.
+ * Prefer `feature.id` (set by `promoteId`) so setFeatureState matches paint.
+ * Falling back to a different type than promoteId leaves hexes stuck in
+ * placeholder style while the session thinks they were written.
+ */
+export const resolvePmtilesFeatureId = (feature: {
+  id?: string | number | null;
+  properties?: Record<string, unknown> | null;
+}): string | number | undefined => {
+  const fromId = feature.id;
+  if (fromId !== undefined && fromId !== null && fromId !== "") {
+    return fromId as string | number;
+  }
+  const fromProp = feature.properties?.[PROMOTE_ID_PROPERTY];
+  if (
+    (typeof fromProp === "string" && fromProp !== "") ||
+    typeof fromProp === "number"
+  ) {
+    return fromProp;
+  }
+  return undefined;
+};
+
+/**
+ * How many loaded hexes still need feature-state for this session.
+ * Used to detect half-painted density (teal cells + empty outlined cells).
+ */
+export const countUnwrittenLoadedFeatures = (
+  map: Map,
+  session: FeatureStateTotalsSession,
+  layers: readonly PmtilesHexLayerDef[] = PMTILE_LAYERS
+): number => {
+  if (!map.getSource(SOURCE_ID)) return 0;
+
+  let unwritten = 0;
+  for (const layer of layers) {
+    let features;
+    try {
+      features = map.querySourceFeatures(SOURCE_ID, {
+        sourceLayer: layer.sourceLayer,
+      });
+    } catch {
+      continue;
+    }
+
+    // Same promoteId can appear once per overlapping tile
+    const seenIds = new Set<string>();
+    for (const feature of features) {
+      const id = resolvePmtilesFeatureId(feature);
+      if (id === undefined) continue;
+      const idKey = String(id);
+      if (seenIds.has(idKey)) continue;
+      seenIds.add(idKey);
+      if (!session.written.has(featureStateSessionKey(layer.sourceLayer, id))) {
+        unwritten++;
+      }
+    }
+  }
+  return unwritten;
+};
+
 export type UpdateFeatureStateTotalsOptions = {
   /** Precomputed range (required for hot path; built if omitted). */
   range?: CountFilterRange;
@@ -1153,11 +1213,9 @@ export const updateFeatureStateTotals = (
     }
 
     for (const feature of features) {
-      // promoteId: "h" should populate feature.id; fall back to property
-      const rawId = feature.id ?? feature.properties?.[PROMOTE_ID_PROPERTY];
-      if (rawId === undefined || rawId === null || rawId === "") continue;
-      // Mapbox feature ids are string | number; keep type from promoteId
-      const id = rawId as string | number;
+      // Must match promoteId exactly — wrong type ⇒ paint stays on placeholder
+      const id = resolvePmtilesFeatureId(feature);
+      if (id === undefined) continue;
       seen++;
       const sessionKey = featureStateSessionKey(layer.sourceLayer, id);
       if (session?.written.has(sessionKey)) continue;
@@ -1184,7 +1242,7 @@ export const updateFeatureStateTotals = (
         session?.written.add(sessionKey);
         updated++;
       } catch {
-        // Feature may have left the tile cache
+        // Feature may have left the tile cache — do not mark written
       }
 
       if (maxFeatures !== undefined && updated >= maxFeatures) {
@@ -1283,7 +1341,6 @@ export const scheduleDebouncedWork = (
     clearTimeout(timeoutId);
   };
 };
-
 const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   collection,
   selectedCoKey,
@@ -1294,304 +1351,22 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   onMetadataPeriodChange,
 }) => {
   const { map } = useContext(MapContext);
-  const filterStartDateRef = useRef(filterStartDate);
-  const filterEndDateRef = useRef(filterEndDate);
-  const visibleRef = useRef(visible);
-  const timeGroupByRef = useRef<TimeGroupBy>(DEFAULT_TIME_GROUP_BY);
-  const periodBoundsRef = useRef<PMTilesMetadataRange | null>(null);
-  /** Precomputed integer/key-set range for sparse sums (rebuilt on filter change). */
-  const countFilterRangeRef = useRef<CountFilterRange>(
-    buildCountFilterRange(undefined, undefined, DEFAULT_TIME_GROUP_BY)
-  );
-  /** Incremental feature-state session — cleared when the filter window changes. */
-  const featureStateSessionRef = useRef<FeatureStateTotalsSession>(
-    createFeatureStateTotalsSession()
-  );
-  // Bumps when a newer feature-state pass is scheduled so stale idle work is dropped
-  const featureStateGenRef = useRef(0);
-  // Hover popup is disabled until feature-state density has been applied
-  const densityReadyRef = useRef(false);
-  /**
-   * Single density-pass controller. Tile storms set `dirty` instead of cancelling
-   * mid-chunk (which used to leave feature-state cleared and never re-applied).
-   * Do not wipe Mapbox feature-state on reset — overwrite totals in place so
-   * density colors do not flash off.
-   */
-  const densityPassRef = useRef<{
-    cancelDebounce: (() => void) | null;
-    cancelChunks: (() => void) | null;
-    runningChunks: boolean;
-    dirty: boolean;
-    pendingReset: boolean;
-    /** Only used before density paint has been applied once (initial load). */
-    pendingPlaceholder: boolean;
-  }>({
-    cancelDebounce: null,
-    cancelChunks: null,
-    runningChunks: false,
-    dirty: false,
-    pendingReset: false,
-    pendingPlaceholder: false,
-  });
   const popupRef = useRef<Popup | null>(null);
-  // Drives feature-state refresh once `.metadata` is known (`time_group_by`)
-  const [timeGroupBy, setTimeGroupBy] = useState<TimeGroupBy>(
-    DEFAULT_TIME_GROUP_BY
-  );
 
-  const removePopup = useCallback(() => {
-    popupRef.current?.remove();
-    popupRef.current = null;
-  }, []);
-
-  type ScheduleFeatureStateDensity = (options?: {
-    showPlaceholder?: boolean;
-    delayMs?: number;
-    resetSession?: boolean;
-  }) => () => void;
+  /** True after at least one density write against loaded tiles. */
+  const [densityReady, setDensityReady] = useState(false);
 
   /**
-   * Always call the latest scheduler from idle/chunk completions via this ref.
-   * Avoids a self-reference inside `useCallback` (accessed-before-declaration /
-   * stale closure when the callback identity changes).
+   * Sidecar load result keyed by URL. When the URL changes, derived
+   * `timeGroupBy` / `periodBounds` fall back immediately (no setState reset
+   * in an effect).
    */
-  const scheduleFeatureStateDensityRef = useRef<ScheduleFeatureStateDensity>(
-    () => () => undefined
-  );
+  const [loadedMeta, setLoadedMeta] = useState<{
+    url: string;
+    timeGroupBy: TimeGroupBy;
+    bounds: PMTilesMetadataRange | null;
+  } | null>(null);
 
-  /**
-   * Sparse-sum loaded features into feature-state, then paint from those
-   * totals (no dense day-key Mapbox expression).
-   *
-   * Tile loads set a dirty flag rather than aborting an in-flight chunked pass.
-   * When a pass finishes, a pending dirty re-run processes only new hexes.
-   * Filter changes reset the session (recompute all) but do **not** call
-   * `removeFeatureState` first — that flash was wiping colors before the next
-   * pass could finish, and a cancelled pass left the map empty.
-   *
-   * @param showPlaceholder When true and density has never been ready, show
-   *   neutral presence paint until the first totals land.
-   * @param resetSession When true, drop incremental session so every loaded
-   *   feature is re-summed (date / time_group_by change).
-   */
-  const scheduleFeatureStateDensity = useCallback<ScheduleFeatureStateDensity>(
-    (options) => {
-      if (!map) return () => undefined;
-
-      const pass = densityPassRef.current;
-      const delayMs = options?.delayMs ?? FEATURE_STATE_DEBOUNCE_MS;
-
-      if (options?.resetSession) {
-        pass.pendingReset = true;
-      }
-      if (options?.showPlaceholder) {
-        pass.pendingPlaceholder = true;
-      }
-      pass.dirty = true;
-
-      // Filter change while chunks are running: abort and restart so we do not
-      // keep writing totals for the old window into the new session.
-      if (pass.runningChunks && options?.resetSession) {
-        pass.cancelChunks?.();
-        pass.cancelChunks = null;
-        pass.runningChunks = false;
-        // Invalidate in-flight work so its completion handler does not mark ready
-        featureStateGenRef.current += 1;
-      }
-
-      // Tile-only update while a pass is in flight: finish current pass, then
-      // re-run once for any features that arrived mid-flight.
-      if (pass.runningChunks) {
-        return () => undefined;
-      }
-
-      // Coalesce rapid schedule calls into one debounced start
-      pass.cancelDebounce?.();
-      pass.cancelDebounce = scheduleDebouncedWork(() => {
-        pass.cancelDebounce = null;
-        if (!pass.dirty && !pass.pendingReset) return;
-        if (!map.getSource(SOURCE_ID)) return;
-
-        const doReset = pass.pendingReset;
-        const doPlaceholder = pass.pendingPlaceholder;
-        pass.pendingReset = false;
-        pass.pendingPlaceholder = false;
-        pass.dirty = false;
-
-        if (doReset) {
-          // Active band: overwrite totals in place (avoids empty flash).
-          // Inactive bands: drop feature-state so a later zoom does not paint
-          // stale totals from the previous filter window.
-          featureStateSessionRef.current = createFeatureStateTotalsSession();
-          densityReadyRef.current = false;
-          removePopup();
-          try {
-            clearInactivePmtilesFeatureState(map, map.getZoom());
-          } catch {
-            // Map may already be torn down
-          }
-        }
-
-        // Placeholder only on first load (never after density paint has been applied)
-        if (doPlaceholder && !densityReadyRef.current) {
-          try {
-            applyHexLayerStyle(
-              map,
-              buildPresenceFilter(),
-              getPlaceholderPaintProperties()
-            );
-          } catch {
-            // Map may already be torn down
-          }
-        }
-
-        // Density paint early so each setFeatureState lights up immediately
-        try {
-          applyHexLayerStyle(
-            map,
-            buildDensityLayerFilter(),
-            getFeatureStatePaintProperties()
-          );
-        } catch {
-          // Layers may not exist yet
-        }
-
-        const generation = ++featureStateGenRef.current;
-        pass.runningChunks = true;
-
-        pass.cancelChunks = scheduleChunkedWork(
-          () => {
-            if (generation !== featureStateGenRef.current) {
-              pass.runningChunks = false;
-              return true;
-            }
-            try {
-              // Rebuild range each chunk so late-arriving metadata bounds apply
-              const range = buildCountFilterRange(
-                filterStartDateRef.current,
-                filterEndDateRef.current,
-                timeGroupByRef.current,
-                {
-                  includeKeySet: false,
-                  bounds: periodBoundsRef.current,
-                }
-              );
-              countFilterRangeRef.current = range;
-
-              // Only sum the band visible at the current zoom (each chunk
-              // re-reads zoom so a mid-pass zoom switch targets the new band).
-              const layers = getActivePmtilesLayers(map.getZoom());
-              const { complete, seen } = updateFeatureStateTotals(
-                map,
-                filterStartDateRef.current,
-                filterEndDateRef.current,
-                timeGroupByRef.current,
-                {
-                  range,
-                  session: featureStateSessionRef.current,
-                  maxFeatures: FEATURE_STATE_CHUNK_SIZE,
-                  layers,
-                }
-              );
-              if (!complete) return false;
-
-              if (generation !== featureStateGenRef.current) {
-                pass.runningChunks = false;
-                return true;
-              }
-
-              // Small/fast tiles: first pass often runs before any vector content
-              // is queryable. Mark dirty and retry instead of locking densityReady
-              // with every hex still at transparent total 0 / unset.
-              let sourceLoaded;
-              try {
-                sourceLoaded = map.isSourceLoaded(SOURCE_ID);
-              } catch {
-                sourceLoaded = false;
-              }
-              if (seen === 0 && !sourceLoaded) {
-                pass.runningChunks = false;
-                pass.cancelChunks = null;
-                pass.dirty = true;
-                scheduleFeatureStateDensityRef.current({
-                  showPlaceholder: false,
-                  resetSession: false,
-                  delayMs: 150,
-                });
-                return true;
-              }
-
-              densityReadyRef.current = true;
-              pass.runningChunks = false;
-              pass.cancelChunks = null;
-              // Process hexes that arrived (or a filter reset) during this pass.
-              // Call through the ref so we always hit the latest callback.
-              if (pass.dirty || pass.pendingReset) {
-                scheduleFeatureStateDensityRef.current({
-                  resetSession: pass.pendingReset,
-                  showPlaceholder: false,
-                  delayMs: 0,
-                });
-              }
-              return true;
-            } catch {
-              pass.runningChunks = false;
-              pass.cancelChunks = null;
-              return true;
-            }
-          },
-          () => generation !== featureStateGenRef.current
-        );
-      }, delayMs);
-
-      return () => {
-        // Effect cleanups only cancel the debounce they own when superseded;
-        // in-flight chunks keep running unless a reset aborts them above.
-        // Full teardown is handled by the source effect unmount path.
-      };
-    },
-    [map, removePopup]
-  );
-
-  // Keep ref current so chunk completions never call a stale scheduler
-  useEffect(() => {
-    scheduleFeatureStateDensityRef.current = scheduleFeatureStateDensity;
-  }, [scheduleFeatureStateDensity]);
-
-  /** Abort all density work (source unmount / dataset change). */
-  const cancelAllDensityWork = useCallback(() => {
-    const pass = densityPassRef.current;
-    pass.cancelDebounce?.();
-    pass.cancelChunks?.();
-    pass.cancelDebounce = null;
-    pass.cancelChunks = null;
-    pass.runningChunks = false;
-    pass.dirty = false;
-    pass.pendingReset = false;
-    pass.pendingPlaceholder = false;
-    featureStateGenRef.current += 1;
-    densityReadyRef.current = false;
-  }, []);
-
-  const handleSelectDataset = useCallback(
-    (key: string) => {
-      onSelectCoKey?.(key);
-    },
-    [onSelectCoKey]
-  );
-
-  // Derive dataset options from the collection's CO keys
-  const datasetOptions = useMemo<SelectItem<string>[]>(() => {
-    const coKeys = collection?.getAllCOKeys() ?? [];
-    return coKeys.map((key) => ({
-      value: key,
-      label: key.replace(/\.(zarr|parquet)$/i, ""),
-    }));
-  }, [collection]);
-
-  // The PMTiles visualization only exists for parquet datasets, so in a mixed
-  // zarr/parquet collection, a non-parquet key falls back to the first parquet key.
-  // Empty / unset selection must not become `.../undefined.pmtiles` or `.../.pmtiles`.
   const resolveParquetKey = useCallback((): string | undefined => {
     let key =
       typeof selectedCoKey === "string" && selectedCoKey.trim() !== ""
@@ -1613,7 +1388,6 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     return `https://${bucket}.s3.${region}.amazonaws.com/portal/visualization/${collectionId}/${key}.pmtiles`;
   }, [collection?.id, resolveParquetKey]);
 
-  // Sidecar written next to the archive by batch PMTiles generation
   const formMetadataUrl = useCallback((): string | undefined => {
     const key = resolveParquetKey();
     const collectionId = collection?.id;
@@ -1621,48 +1395,86 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     return `https://${bucket}.s3.${region}.amazonaws.com/portal/visualization/${collectionId}/${key}.metadata`;
   }, [collection?.id, resolveParquetKey]);
 
-  useEffect(() => {
-    filterStartDateRef.current = filterStartDate;
-    filterEndDateRef.current = filterEndDate;
-    visibleRef.current = visible;
-  }, [filterStartDate, filterEndDate, visible]);
+  const metadataUrl = formMetadataUrl();
+  const metaMatchesUrl = loadedMeta != null && loadedMeta.url === metadataUrl;
+  const timeGroupBy = metaMatchesUrl
+    ? loadedMeta.timeGroupBy
+    : DEFAULT_TIME_GROUP_BY;
+  const periodBounds = metaMatchesUrl ? loadedMeta.bounds : null;
+
+  const countFilterRange = useMemo(
+    () =>
+      buildCountFilterRange(filterStartDate, filterEndDate, timeGroupBy, {
+        includeKeySet: false,
+        bounds: periodBounds,
+      }),
+    [filterStartDate, filterEndDate, timeGroupBy, periodBounds]
+  );
 
   /**
-   * Bumps when metadata period bounds change so density recomputes even when
-   * `time_group_by` stays the same (previously small tiles kept stale totals).
+   * Latest values for map event handlers (hover). Updated in an effect — not
+   * during render — so react-hooks/refs stays clean.
    */
-  const [periodBoundsVersion, setPeriodBoundsVersion] = useState(0);
-
-  // Rebuild integer range whenever the filter window, grouping, or bounds change.
+  const hoverCtxRef = useRef({
+    filterStartDate,
+    filterEndDate,
+    timeGroupBy,
+    countFilterRange,
+    hasTime: periodBounds?.hasTime !== false,
+    densityReady,
+    visible,
+  });
   useEffect(() => {
-    countFilterRangeRef.current = buildCountFilterRange(
+    hoverCtxRef.current = {
       filterStartDate,
       filterEndDate,
       timeGroupBy,
-      { includeKeySet: false, bounds: periodBoundsRef.current }
-    );
-  }, [filterStartDate, filterEndDate, timeGroupBy, periodBoundsVersion]);
+      countFilterRange,
+      hasTime: periodBounds?.hasTime !== false,
+      densityReady,
+      visible,
+    };
+  }, [
+    filterStartDate,
+    filterEndDate,
+    timeGroupBy,
+    countFilterRange,
+    periodBounds?.hasTime,
+    densityReady,
+    visible,
+  ]);
 
-  // Load `time_group_by` and period coverage from the `.metadata` sidecar
+  const removePopup = useCallback(() => {
+    popupRef.current?.remove();
+    popupRef.current = null;
+  }, []);
+
+  const handleSelectDataset = useCallback(
+    (key: string) => {
+      onSelectCoKey?.(key);
+    },
+    [onSelectCoKey]
+  );
+
+  const datasetOptions = useMemo<SelectItem<string>[]>(() => {
+    const coKeys = collection?.getAllCOKeys() ?? [];
+    return coKeys.map((key) => ({
+      value: key,
+      label: key.replace(/\.(zarr|parquet)$/i, ""),
+    }));
+  }, [collection]);
+
+  // Load `.metadata`. Parent is notified from fetch callbacks only (not a
+  // synchronous setState reset at effect start).
   useEffect(() => {
-    const metadataUrl = formMetadataUrl();
-    const abortController = new AbortController();
-
-    // Reset while the new sidecar loads (or when dataset key is not ready)
-    timeGroupByRef.current = DEFAULT_TIME_GROUP_BY;
-    periodBoundsRef.current = null;
-    startTransition(() => {
-      setTimeGroupBy(DEFAULT_TIME_GROUP_BY);
-      setPeriodBoundsVersion((v) => v + 1);
-    });
-    onMetadataPeriodChange?.(null);
-
-    // No parquet dataset name yet — do not fetch `.../.metadata` / `.../undefined.metadata`
     if (!metadataUrl) {
-      return () => {
-        abortController.abort();
-      };
+      onMetadataPeriodChange?.(null);
+      return;
     }
+
+    const abortController = new AbortController();
+    // Clear parent slider bounds while the new sidecar loads
+    onMetadataPeriodChange?.(null);
 
     fetch(metadataUrl, { signal: abortController.signal })
       .then((response) => {
@@ -1675,16 +1487,11 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         if (abortController.signal.aborted) return;
         const metadata = parsePMTilesMetadata(data);
         if (!metadata) {
-          timeGroupByRef.current = DEFAULT_TIME_GROUP_BY;
-          periodBoundsRef.current = null;
-          setTimeGroupBy(DEFAULT_TIME_GROUP_BY);
-          setPeriodBoundsVersion((v) => v + 1);
-          countFilterRangeRef.current = buildCountFilterRange(
-            filterStartDateRef.current,
-            filterEndDateRef.current,
-            DEFAULT_TIME_GROUP_BY,
-            { includeKeySet: false, bounds: null }
-          );
+          setLoadedMeta({
+            url: metadataUrl,
+            timeGroupBy: DEFAULT_TIME_GROUP_BY,
+            bounds: null,
+          });
           onMetadataPeriodChange?.(null);
           return;
         }
@@ -1693,125 +1500,96 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
           maxPeriod: metadata.maxPeriod,
           hasTime: metadata.hasTime,
         };
-        timeGroupByRef.current = metadata.timeGroupBy;
-        periodBoundsRef.current = bounds;
-        countFilterRangeRef.current = buildCountFilterRange(
-          filterStartDateRef.current,
-          filterEndDateRef.current,
-          metadata.timeGroupBy,
-          { includeKeySet: false, bounds }
-        );
-        setTimeGroupBy(metadata.timeGroupBy);
-        setPeriodBoundsVersion((v) => v + 1);
+        setLoadedMeta({
+          url: metadataUrl,
+          timeGroupBy: metadata.timeGroupBy,
+          bounds,
+        });
         onMetadataPeriodChange?.(metadata);
       })
       .catch((err: unknown) => {
-        // Abort on unmount / URL change is expected — do not reset state twice
         if (err instanceof DOMException && err.name === "AbortError") return;
-        // Missing or unreadable sidecar → date aggregation, no period clamp
         if (abortController.signal.aborted) return;
-        timeGroupByRef.current = DEFAULT_TIME_GROUP_BY;
-        periodBoundsRef.current = null;
-        countFilterRangeRef.current = buildCountFilterRange(
-          filterStartDateRef.current,
-          filterEndDateRef.current,
-          DEFAULT_TIME_GROUP_BY,
-          { includeKeySet: false, bounds: null }
-        );
-        setTimeGroupBy(DEFAULT_TIME_GROUP_BY);
-        setPeriodBoundsVersion((v) => v + 1);
+        setLoadedMeta({
+          url: metadataUrl,
+          timeGroupBy: DEFAULT_TIME_GROUP_BY,
+          bounds: null,
+        });
         onMetadataPeriodChange?.(null);
       });
 
     return () => {
       abortController.abort();
     };
-  }, [formMetadataUrl, onMetadataPeriodChange]);
+  }, [metadataUrl, onMetadataPeriodChange]);
 
+  // Source + layers lifecycle (dataset URL only).
   useEffect(() => {
     if (!map) return;
 
     const sourceUrl = formSourceUrl();
-    // Dataset name (or collection id) not ready — never add `.../.pmtiles`
     if (!sourceUrl) return;
 
     const addSourceAndLayers = () => {
       try {
-        addSourceAndLayersUnsafe();
-      } catch (error) {
-        // OK to ignore error here
-      }
-    };
+        if (!map.getSource(SOURCE_ID)) {
+          map.addSource(SOURCE_ID, {
+            type: "vector",
+            url: sourceUrl,
+            promoteId: PROMOTE_ID_PROPERTY,
+          });
+        }
 
-    const addSourceAndLayersUnsafe = () => {
-      if (!map.getSource(SOURCE_ID)) {
-        map.addSource(SOURCE_ID, {
-          type: "vector",
-          url: sourceUrl,
-          // Promote H3 cell id so setFeatureState can address each hex
-          promoteId: PROMOTE_ID_PROPERTY,
+        // Density paint from the start (feature-state expressions). Unset totals
+        // use the paint expression's unset branch until refreshDensity writes them.
+        const densityPaint = getFeatureStatePaintProperties();
+        PMTILE_LAYERS.forEach((layer) => {
+          if (!map.getLayer(layer.id)) {
+            map.addLayer({
+              id: layer.id,
+              type: "fill",
+              source: SOURCE_ID,
+              "source-layer": layer.sourceLayer,
+              minzoom: layer.minzoom,
+              maxzoom: layer.maxzoom,
+              filter: buildDensityLayerFilter(),
+              layout: {
+                // Visibility effect owns show/hide; avoid remounting source on toggle
+                visibility: "visible",
+              },
+              paint: {
+                "fill-color": densityPaint["fill-color"],
+                "fill-opacity": densityPaint["fill-opacity"],
+                "fill-outline-color": densityPaint["fill-outline-color"],
+              },
+            });
+          }
         });
-      }
 
-      const placeholderPaint = getPlaceholderPaintProperties();
-      let addedFillLayer = false;
-
-      PMTILE_LAYERS.forEach((layer) => {
-        if (!map.getLayer(layer.id)) {
-          console.log(`Adding layer ${layer.id}`);
-          addedFillLayer = true;
+        if (!map.getSource(HOVER_SOURCE_ID)) {
+          map.addSource(HOVER_SOURCE_ID, {
+            type: "geojson",
+            data: EMPTY_FEATURE_COLLECTION,
+          });
+        }
+        if (!map.getLayer(HOVER_OUTLINE_LAYER_ID)) {
           map.addLayer({
-            id: layer.id,
-            type: "fill",
-            source: SOURCE_ID,
-            "source-layer": layer.sourceLayer,
-            minzoom: layer.minzoom,
-            maxzoom: layer.maxzoom,
-            // Phase A until feature-state totals are written
-            filter: buildPresenceFilter(),
+            id: HOVER_OUTLINE_LAYER_ID,
+            type: "line",
+            source: HOVER_SOURCE_ID,
             layout: {
-              visibility: visibleRef.current ? "visible" : "none",
+              visibility: "visible",
+              "line-join": "round",
+              "line-cap": "round",
             },
             paint: {
-              "fill-color": placeholderPaint["fill-color"],
-              "fill-opacity": placeholderPaint["fill-opacity"],
-              "fill-outline-color": placeholderPaint["fill-outline-color"],
+              "line-color": "rgba(255, 255, 255, 0.9)",
+              "line-width": 1.5,
             },
           });
         }
-      });
-
-      // Highlight outline for the hovered hexbin, drawn above the fill layers
-      if (!map.getSource(HOVER_SOURCE_ID)) {
-        map.addSource(HOVER_SOURCE_ID, {
-          type: "geojson",
-          data: EMPTY_FEATURE_COLLECTION,
-        });
-      }
-      if (!map.getLayer(HOVER_OUTLINE_LAYER_ID)) {
-        map.addLayer({
-          id: HOVER_OUTLINE_LAYER_ID,
-          type: "line",
-          source: HOVER_SOURCE_ID,
-          layout: {
-            visibility: visibleRef.current ? "visible" : "none",
-            "line-join": "round",
-            "line-cap": "round",
-          },
-          paint: {
-            // Brighter and slightly thicker than the fill layers' default
-            // outline (rgba(255, 255, 255, 0.4), 1px)
-            "line-color": "rgba(255, 255, 255, 0.9)",
-            "line-width": 1.5,
-          },
-        });
-      }
-
-      if (addedFillLayer) {
-        scheduleFeatureStateDensity({
-          showPlaceholder: true,
-          resetSession: true,
-        });
+      } catch {
+        // Style may not be ready
       }
     };
 
@@ -1826,44 +1604,9 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     };
     map.on("styledata", onStyleData);
 
-    const rescheduleDensityFromTiles = () => {
-      // Incremental: only new hexes; in-flight passes are not aborted
-      scheduleFeatureStateDensity({
-        showPlaceholder: false,
-        resetSession: false,
-      });
-    };
-
-    // Tile content arrives in waves; re-sum newly loaded features.
-    // Skip metadata-only events. Do not require isSourceLoaded — intermediate
-    // tile batches must still get feature-state or hexes look "half missing".
-    const onSourceData = (e: MapSourceDataEvent) => {
-      if (e.sourceId !== SOURCE_ID) return;
-      if (e.sourceDataType === "metadata") return;
-      rescheduleDensityFromTiles();
-    };
-    map.on("sourcedata", onSourceData);
-
-    // After pan/zoom settles, run another pass for any tiles that finished
-    // loading after the last sourcedata debounce window.
-    const onMoveEnd = () => {
-      rescheduleDensityFromTiles();
-    };
-    map.on("moveend", onMoveEnd);
-
-    // Small archives often finish loading without further sourcedata after the
-    // first empty density pass — idle is the reliable "tiles are queryable" signal.
-    const onIdle = () => {
-      if (densityReadyRef.current && !densityPassRef.current.dirty) return;
-      rescheduleDensityFromTiles();
-    };
-    map.on("idle", onIdle);
-
     return () => {
-      if (!map) return;
-
-      cancelAllDensityWork();
-
+      map.off("styledata", onStyleData);
+      map.off("load", addSourceAndLayers);
       try {
         map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
         clearPmtilesFeatureState(map);
@@ -1875,42 +1618,142 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         if (map.getLayer(HOVER_OUTLINE_LAYER_ID)) {
           map.removeLayer(HOVER_OUTLINE_LAYER_ID);
         }
-        // Removing sources drops tile cache + remaining feature-state
         if (map.getSource(SOURCE_ID)) {
           map.removeSource(SOURCE_ID);
         }
         if (map.getSource(HOVER_SOURCE_ID)) {
           map.removeSource(HOVER_SOURCE_ID);
         }
-      } catch (error) {
-        // OK to ignore error here
-      } finally {
-        map.off("styledata", onStyleData);
-        map.off("sourcedata", onSourceData);
-        map.off("moveend", onMoveEnd);
-        map.off("idle", onIdle);
-        map.off("load", addSourceAndLayers);
-        removePopup();
+      } catch {
+        // Map may already be torn down
       }
+      removePopup();
+      setDensityReady(false);
     };
-  }, [
-    map,
-    collection?.id,
-    selectedCoKey,
-    formSourceUrl,
-    removePopup,
-    scheduleFeatureStateDensity,
-    cancelAllDensityWork,
-  ]);
+  }, [map, formSourceUrl, removePopup]);
 
-  // Show an aggregation-details popup and highlight outline while hovering
-  // a hexbin
+  /**
+   * Density refresh: debounced full rewrite of feature-state for all currently
+   * loaded hexes in the active zoom band.
+   *
+   * No session / generation / dirty-ref machine. Effect-local flags only:
+   * - `needsRefresh` is set by tile/viewport/filter events
+   * - cleared when a pass runs against a fully loaded source (all queryable
+   *   hexes were just written), so setFeatureState → idle does not loop
+   */
   useEffect(() => {
     if (!map) return;
 
-    // Identity of the currently hovered hexbin, so the popup HTML and the
-    // highlight outline are only rebuilt when the cursor moves onto a
-    // different feature
+    let cancelled = false;
+    let debounceTimer: ReturnType<typeof setTimeout> | undefined;
+    let needsRefresh = true;
+
+    const refreshDensity = () => {
+      if (cancelled) return;
+      if (!map.getSource(SOURCE_ID)) return;
+
+      // Claim this pass. Tile events during the write may set needsRefresh again.
+      needsRefresh = false;
+
+      try {
+        applyHexLayerStyle(
+          map,
+          buildDensityLayerFilter(),
+          getFeatureStatePaintProperties()
+        );
+
+        const range = buildCountFilterRange(
+          filterStartDate,
+          filterEndDate,
+          timeGroupBy,
+          { includeKeySet: false, bounds: periodBounds }
+        );
+
+        // Write every loaded feature in the active band (no incremental session).
+        const { seen } = updateFeatureStateTotals(
+          map,
+          filterStartDate,
+          filterEndDate,
+          timeGroupBy,
+          {
+            range,
+            layers: getActivePmtilesLayers(map.getZoom()),
+          }
+        );
+
+        if (seen > 0) {
+          setDensityReady(true);
+        }
+
+        let sourceLoaded;
+        try {
+          sourceLoaded = map.isSourceLoaded(SOURCE_ID);
+        } catch {
+          sourceLoaded = false;
+        }
+        // More tiles may still arrive — keep refreshing on the next idle.
+        // Do not force needsRefresh=false here: a concurrent sourcedata may have
+        // already set it true for tiles that arrived mid-pass.
+        if (!sourceLoaded) {
+          needsRefresh = true;
+        }
+      } catch {
+        // Source/layers may not exist yet — try again on idle/sourcedata
+        needsRefresh = true;
+      }
+    };
+
+    const scheduleRefresh = () => {
+      needsRefresh = true;
+      if (debounceTimer !== undefined) {
+        clearTimeout(debounceTimer);
+      }
+      debounceTimer = setTimeout(refreshDensity, FEATURE_STATE_DEBOUNCE_MS);
+    };
+
+    const onSourceData = (e: MapSourceDataEvent) => {
+      if (e.sourceId !== SOURCE_ID) return;
+      if (e.sourceDataType === "metadata") return;
+      scheduleRefresh();
+    };
+
+    const onIdle = () => {
+      // Only continue while tiles are still arriving / first paint pending.
+      // Avoids idle ↔ setFeatureState infinite loops after a full write.
+      if (needsRefresh) {
+        scheduleRefresh();
+      }
+    };
+
+    map.on("sourcedata", onSourceData);
+    map.on("moveend", scheduleRefresh);
+    map.on("idle", onIdle);
+
+    // Immediate pass when filter/metadata/source deps change
+    scheduleRefresh();
+
+    return () => {
+      cancelled = true;
+      if (debounceTimer !== undefined) {
+        clearTimeout(debounceTimer);
+      }
+      map.off("sourcedata", onSourceData);
+      map.off("moveend", scheduleRefresh);
+      map.off("idle", onIdle);
+    };
+  }, [
+    map,
+    formSourceUrl,
+    filterStartDate,
+    filterEndDate,
+    timeGroupBy,
+    periodBounds,
+  ]);
+
+  // Hover popup + outline
+  useEffect(() => {
+    if (!map) return;
+
     let hoveredId: string | number | undefined;
 
     const setHoverOutline = (geometry?: Geometry) => {
@@ -1926,8 +1769,6 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     };
 
     const clearHover = () => {
-      // The deck.gl overlay (HexbinLayer) rewrites the canvas's inline
-      // cursor on every pointer move, so toggle a CSS class instead
       map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
       hoveredId = undefined;
       setHoverOutline(undefined);
@@ -1938,31 +1779,24 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       layer: (typeof PMTILE_LAYERS)[number],
       e: MapMouseEvent
     ) => {
-      if (!visibleRef.current) return;
-      // Wait until feature-state density totals are applied — popup counts
-      // would be incomplete or wrong during the placeholder phase.
-      if (!densityReadyRef.current) {
+      const ctx = hoverCtxRef.current;
+      if (!ctx.visible || !ctx.densityReady) {
         clearHover();
         return;
       }
-      // queryRenderedFeatures ignores layer minzoom/maxzoom, so retained
-      // lower-zoom tiles can still report hexbins from bands that are no
-      // longer rendered — skip those.
       const zoom = map.getZoom();
       if (zoom < layer.minzoom || zoom >= layer.maxzoom) return;
 
       const feature = e.features?.[0];
       if (!feature) return;
 
-      // Authoritative count for the active filter window (same path as popup HTML).
-      // Zero after a narrow time slider → no popup, no hover border, no pointer.
       const { total: hoverTotal } = sumSparseCountFromProperties(
         (feature.properties ?? {}) as Record<string, unknown>,
-        filterStartDateRef.current,
-        filterEndDateRef.current,
-        timeGroupByRef.current,
+        ctx.filterStartDate,
+        ctx.filterEndDate,
+        ctx.timeGroupBy,
         {
-          range: countFilterRangeRef.current,
+          range: ctx.countFilterRange,
           collectMatchedKeys: false,
         }
       );
@@ -1974,7 +1808,6 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       map.getCanvas().classList.add(CURSOR_POINTER_CLASS);
 
       if (!popupRef.current) {
-        // A hover popup must not show a close button
         popupRef.current = new Popup({
           ...MapDefaultConfig.DEFAULT_POPUP,
           closeButton: false,
@@ -1982,17 +1815,16 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         hoveredId = undefined;
       }
 
-      // Vector tile features may not carry an id; rebuild every event then
       if (feature.id === undefined || feature.id !== hoveredId) {
         hoveredId = feature.id;
         popupRef.current.setHTML(
           buildPopupHtml(
             feature.properties ?? {},
-            filterStartDateRef.current,
-            filterEndDateRef.current,
-            timeGroupByRef.current,
-            countFilterRangeRef.current,
-            periodBoundsRef.current?.hasTime !== false
+            ctx.filterStartDate,
+            ctx.filterEndDate,
+            ctx.timeGroupBy,
+            ctx.countFilterRange,
+            ctx.hasTime
           )
         );
         setHoverOutline(feature.geometry);
@@ -2003,7 +1835,6 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         popupRef.current.addTo(map);
       }
 
-      // add test id for playwright tests
       const popupElement = popupRef.current.getElement();
       if (popupElement) {
         popupElement.dataset.testid = playwrightTestIds.DETAIL_MAP_POPUP;
@@ -2014,8 +1845,6 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       clearHover();
     };
 
-    // Drop any open hover popup/outline when the zoom changes, so a hexbin
-    // hovered just before crossing a zoom band can't linger once hidden
     const onZoom = () => {
       clearHover();
     };
@@ -2039,13 +1868,13 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       map.off("zoom", onZoom);
       try {
         clearHover();
-      } catch (error) {
-        // OK to ignore error here — the map may already be torn down
+      } catch {
+        // Map may already be torn down
       }
     };
   }, [map, removePopup]);
 
-  // Update visibility on changes
+  // Visibility
   useEffect(() => {
     if (!map) return;
     try {
@@ -2065,8 +1894,8 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
           visible ? "visible" : "none"
         );
       }
-    } catch (error) {
-      // OK to ignore error here
+    } catch {
+      // OK to ignore
     }
     if (!visible) {
       map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
@@ -2076,24 +1905,6 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       removePopup();
     }
   }, [map, visible, removePopup]);
-
-  // Full recompute when the date range, time grouping, or metadata bounds change.
-  useEffect(() => {
-    if (!map) return;
-    scheduleFeatureStateDensity({
-      showPlaceholder: true,
-      resetSession: true,
-    });
-    removePopup();
-  }, [
-    map,
-    filterStartDate,
-    filterEndDate,
-    timeGroupBy,
-    periodBoundsVersion,
-    removePopup,
-    scheduleFeatureStateDensity,
-  ]);
 
   return (
     <>
