@@ -180,9 +180,9 @@ def test_map_layer_persists_after_tab_navigation(
     detail_page.load(uuid)
     detail_page.detail_map.wait_for_map_idle()
 
-    # Ensure that the Hex Grid and GeoServer options are displayed in the layers menu
+    # Ensure that Data Density (PMTiles) and GeoServer options are in the layers menu
     detail_page.detail_map.layers_menu.click()
-    expect(detail_page.detail_map.hex_grid_layer).to_be_visible()
+    expect(detail_page.detail_map.data_density_layer).to_be_visible()
     expect(detail_page.detail_map.geoserver_layer).to_be_visible()
 
     # Select Geoserver layer

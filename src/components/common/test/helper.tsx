@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Map, LngLat } from "mapbox-gl";
-import { mergeWithDefaults } from "../../../utils/ObjectUtils";
+import { mergeWithDefaults } from "@/utils/ObjectUtils";
 
 interface TestProps {
   id: string;
@@ -13,8 +13,12 @@ interface TestProps {
   getWorldBoundariesLayer?: () => string;
   getSpiderLayer?: () => string;
   getGeoServerTileLayer?: () => string;
+  /** @deprecated Legacy deck.gl hexbin; prefer getPmtilesLayer */
   getHexbinLayer?: () => string;
   isHexbinVisible?: () => boolean | undefined;
+  /** PMTiles Data Density layer id for e2e visibility checks */
+  getPmtilesLayer?: () => string;
+  isPmtilesVisible?: () => boolean | undefined;
   getSpatialExtentLayer?: () => string;
   getMapClickLngLat?: () => LngLat;
   getSelectedLocationIntersects?: () => any;

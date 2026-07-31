@@ -73,11 +73,11 @@ window.__map_functions = {
       throw new Error("Geoserver layer not found");
     }
   },
-  getHexbinLayer: function (mapId) {
-    if (this.getTestProps(mapId).getHexbinLayer) {
-      return this.getTestProps(mapId).getHexbinLayer();
+  getPmtilesLayer: function (mapId) {
+    if (this.getTestProps(mapId).getPmtilesLayer) {
+      return this.getTestProps(mapId).getPmtilesLayer();
     } else {
-      throw new Error("Hexbin layer not found");
+      throw new Error("PMTiles Data Density layer not found");
     }
   },
   getSpatialExtentLayer: function (mapId) {
@@ -92,15 +92,17 @@ window.__map_functions = {
     console.log("[DEBUG] isMapLayerVisible checking layerId:", layerId);
 
     const testProps = this.getTestProps(mapId);
+    // PMTiles density uses mapbox fill layers; visibility is owned by React
+    // `visible` prop and exposed via TestHelper (same pattern as legacy hexbin).
     if (
       testProps &&
-      typeof testProps.isHexbinVisible === "function" &&
-      typeof testProps.getHexbinLayer === "function"
+      typeof testProps.isPmtilesVisible === "function" &&
+      typeof testProps.getPmtilesLayer === "function"
     ) {
-      if (layerId === testProps.getHexbinLayer()) {
-        const isVisible = testProps.isHexbinVisible();
+      if (layerId === testProps.getPmtilesLayer()) {
+        const isVisible = testProps.isPmtilesVisible();
         console.log(
-          "[DEBUG] Hexbin layer visibility from testProps:",
+          "[DEBUG] PMTiles Data Density visibility from testProps:",
           isVisible
         );
         return !!isVisible;
@@ -115,10 +117,10 @@ window.__map_functions = {
       );
     }
     const layer = map.getLayer(layerId);
-    if (layer == undefined) {
+    if (layer === undefined) {
       console.log("[DEBUG] Layer", layerId, "not found (undefined)");
       return false;
-    } else if (layer.props == undefined) {
+    } else if (layer.props === undefined) {
       console.log(
         "[DEBUG] Layer",
         layerId,

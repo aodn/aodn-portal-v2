@@ -9,7 +9,7 @@ from pages.detail_page import DetailPage
 @pytest.mark.parametrize(
     'uuid',
     [
-        '5e9ea5c7-f86d-425a-b641-7768c3896e6f',  # contains bbox and no Geoserver or Hexbin layer
+        '5e9ea5c7-f86d-425a-b641-7768c3896e6f',  # bbox only; no GeoServer or Data Density
     ],
 )
 def test_map_shows_only_spatial_extent_layer(
