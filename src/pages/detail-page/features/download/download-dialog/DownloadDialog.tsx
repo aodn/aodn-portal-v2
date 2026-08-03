@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import SubsetConditions from "../subset-conditions/SubsetConditions";
 import LicenseStep from "./LicenseStep";
-import { useDownloadDialog } from "../../../../../hooks/useDownloadDialog";
+import { useDownloadDialog } from "@/hooks/useDownloadDialog";
 import EmailInputStep from "./EmailInputStep";
 import { Header } from "./Header";
 import Stepper from "./stepper/Stepper";
@@ -20,7 +20,7 @@ import {
   DownloadCondition,
   DownloadConditionType,
 } from "../../../context/DownloadDefinitions";
-import { disableScroll, enableScroll } from "../../../../../utils/ScrollUtils";
+import { disableScroll, enableScroll } from "@/utils/ScrollUtils";
 
 interface DownloadDialogProps extends DownloadCondition {
   isOpen: boolean;
@@ -140,7 +140,7 @@ const DownloadDialog = ({
                 downloadConditions={downloadConditions}
                 getAndSetDownloadConditions={getAndSetDownloadConditions}
                 removeDownloadCondition={removeDownloadCondition}
-                readOnly
+                readOnly={true}
               />
             </Box>
           )}

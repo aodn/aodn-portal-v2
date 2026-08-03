@@ -44,12 +44,35 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
     ) as PolygonCondition[];
   }, [downloadConditions]);
 
-  const dateRangeCondition: DateRangeCondition[] = useMemo(() => {
-    const timeRangeConditions = downloadConditions.filter(
+  const dateRangeConditions: DateRangeCondition[] = useMemo(() => {
+    return downloadConditions.filter(
       (condition) => condition.type === DownloadConditionType.DATE_RANGE
-    );
-    return timeRangeConditions as DateRangeCondition[];
+    ) as DateRangeCondition[];
   }, [downloadConditions]);
+
+  // Real stored conditions, or a single draft card when empty and editable.
+  // Keeps one DateRangeConditionCard render path for create + update.
+  const dateRangeCards = useMemo(() => {
+    if (dateRangeConditions.length > 0) {
+      return dateRangeConditions.map((condition) => ({
+        condition,
+        isDraft: false as const,
+      }));
+    }
+    if (!readOnly) {
+      return [
+        {
+          condition: new DateRangeCondition(
+            "date-range-initial",
+            dateRangeBounds?.min.format("YYYY-MM-DD") ?? "",
+            dateRangeBounds?.max.format("YYYY-MM-DD") ?? ""
+          ),
+          isDraft: true as const,
+        },
+      ];
+    }
+    return [];
+  }, [dateRangeConditions, dateRangeBounds, readOnly]);
 
   const handleRemove = useCallback(
     (condition: IDownloadConditionCallback & IDownloadCondition) => {
@@ -60,7 +83,15 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
   );
 
   const handleDateRangeChange = useCallback(
-    (existing: DateRangeCondition, start: string, end: string) => {
+    (existing: DateRangeCondition | undefined, start: string, end: string) => {
+      // Draft card: first edit creates a real condition
+      if (!existing) {
+        if (!start && !end) return;
+        getAndSetDownloadConditions(DownloadConditionType.DATE_RANGE, [
+          new DateRangeCondition(`date-range-${Date.now()}`, start, end),
+        ]);
+        return;
+      }
       getAndSetDownloadConditions(DownloadConditionType.DATE_RANGE, [
         new DateRangeCondition(
           existing.id,
@@ -111,27 +142,6 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
     [polygonConditions, getAndSetDownloadConditions]
   );
 
-  const handleDateRangeCreate = useCallback(
-    (start: string, end: string) => {
-      if (!start && !end) return;
-      const id = `date-range-${Date.now()}`;
-      getAndSetDownloadConditions(DownloadConditionType.DATE_RANGE, [
-        new DateRangeCondition(id, start, end),
-      ]);
-    },
-    [getAndSetDownloadConditions]
-  );
-
-  const initialDateRangeCondition = useMemo(
-    () =>
-      new DateRangeCondition(
-        "date-range-initial",
-        dateRangeBounds?.min.format("YYYY-MM-DD") ?? "",
-        dateRangeBounds?.max.format("YYYY-MM-DD") ?? ""
-      ),
-    [dateRangeBounds]
-  );
-
   return (
     <Stack spacing={1} sx={sx}>
       {(!readOnly || bboxConditions.length > 0) && (
@@ -159,22 +169,13 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
           readOnly={readOnly}
         />
       ))}
-      {!readOnly && dateRangeCondition.length === 0 && (
+      {dateRangeCards.map(({ condition, isDraft }) => (
         <DateRangeConditionCard
-          dateRangeCondition={initialDateRangeCondition}
-          onChange={handleDateRangeCreate}
-          disable={disable}
-          minDate={dateRangeBounds?.min}
-          maxDate={dateRangeBounds?.max}
-        />
-      )}
-      {dateRangeCondition.map((dateRangeCondition) => (
-        <DateRangeConditionCard
-          key={dateRangeCondition.id}
-          dateRangeCondition={dateRangeCondition}
-          onRemove={() => handleRemove(dateRangeCondition)}
+          key={condition.id}
+          dateRangeCondition={condition}
+          onRemove={isDraft ? undefined : () => handleRemove(condition)}
           onChange={(start, end) =>
-            handleDateRangeChange(dateRangeCondition, start, end)
+            handleDateRangeChange(isDraft ? undefined : condition, start, end)
           }
           disable={disable}
           readOnly={readOnly}
