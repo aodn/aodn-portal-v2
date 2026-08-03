@@ -152,12 +152,16 @@ export const buildMapLayerConfig = (
       layers.push(l);
     }
 
-    if (lastSelectedLayer) {
-      layers.forEach((l) => (l.selected = l.id === lastSelectedLayer.id));
-    } else if (
-      layers.length > 0 &&
-      layers.find((l) => l.selected) === undefined
+    // The remembered layer only wins when this collection actually builds it -
+    // otherwise every layer would end up unselected and nothing would render
+    if (
+      lastSelectedLayer &&
+      layers.some((l) => l.id === lastSelectedLayer.id)
     ) {
+      layers.forEach((l) => (l.selected = l.id === lastSelectedLayer.id));
+    }
+
+    if (layers.length > 0 && layers.find((l) => l.selected) === undefined) {
       layers[0].selected = true;
     }
   }
@@ -243,6 +247,9 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   const [isWMSAvailable, setIsWMSAvailable] = useState<boolean>(
     collection ? (collection.getWMSLinks()?.length || 0) > 0 : true
   );
+  // `isSupportPMTiles` only tells us the collection has a parquet dataset, not
+  // that its tiles were ever generated. The layer reports the truth back here.
+  const [isPMTilesAvailable, setIsPMTilesAvailable] = useState<boolean>(true);
 
   const [_wmsFields, setWMSFields] = useState<GeoserverFieldsResponse[]>([]);
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(false);
@@ -264,6 +271,17 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     },
     []
   );
+
+  const handlePmtilesAvailabilityChange = useCallback(
+    (isAvailable: boolean) => {
+      setIsPMTilesAvailable(isAvailable);
+    },
+    []
+  );
+
+  // Density is only offerable when the collection has parquet AND its tiles
+  // exist on S3
+  const supportsPMTiles = isSupportPMTiles && isPMTilesAvailable;
 
   const selectedMapLayerId = useMemo(
     () => mapLayerConfig.find((m) => m.selected)?.id,
@@ -326,7 +344,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
           collection,
           isWMSAvailable,
           hasSpatialExtent,
-          isSupportPMTiles,
+          supportsPMTiles,
           lastSelectedMapLayer
         )
       );
@@ -338,7 +356,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     downloadService,
     featureCollection,
     isWMSAvailable,
-    isSupportPMTiles,
+    supportsPMTiles,
     lastSelectedMapLayer,
     selectedMapLayerId,
     pmtilesPeriodRange,
@@ -440,7 +458,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
         hasCloudOptimisedData,
         downloadService,
         selectedMapLayerId,
-        isSupportPMTiles,
+        isSupportPMTiles: supportsPMTiles,
         pmtilesHasTime: pmtilesPeriodRange?.hasTime,
         timeSliderSupport,
         drawRectSupport,
@@ -449,7 +467,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       hasCloudOptimisedData,
       downloadService,
       selectedMapLayerId,
-      isSupportPMTiles,
+      supportsPMTiles,
       pmtilesPeriodRange?.hasTime,
       timeSliderSupport,
       drawRectSupport,
@@ -655,6 +673,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
                 selectedCoKey={selectedCoKey}
                 onSelectCoKey={setSelectedCoKey}
                 onMetadataPeriodChange={handlePmtilesMetadataPeriodChange}
+                onAvailabilityChange={handlePmtilesAvailabilityChange}
               />
             )}
             <GeoServerLayer

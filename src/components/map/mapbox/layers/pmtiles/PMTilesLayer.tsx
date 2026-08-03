@@ -205,6 +205,12 @@ interface PMTilesHexLayerProps extends LayerBasicType {
    * error) so the map time slider can align with tile coverage.
    */
   onMetadataPeriodChange?: (range: PMTilesMetadata | null) => void;
+  /**
+   * Reports whether the `.metadata` sidecar exists on S3. A 404 means tiles were
+   * never generated for this parquet, so the parent can drop the density layer
+   * and fall back to another one.
+   */
+  onAvailabilityChange?: (isAvailable: boolean) => void;
 }
 
 const resolveRange = (start?: Dayjs, end?: Dayjs) => ({
@@ -1352,6 +1358,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   filterEndDate,
   visible = true,
   onMetadataPeriodChange,
+  onAvailabilityChange,
 }) => {
   const { map } = useContext(MapContext);
   const popupRef = useRef<Popup | null>(null);
@@ -1472,15 +1479,28 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   useEffect(() => {
     if (!metadataUrl) {
       onMetadataPeriodChange?.(null);
+      // No parquet key resolvable, so there is nothing for this layer to render
+      onAvailabilityChange?.(false);
       return;
     }
 
     const abortController = new AbortController();
     // Clear parent slider bounds while the new sidecar loads
     onMetadataPeriodChange?.(null);
+    // Optimistic reset: this effect re-runs on every url change, so a new
+    // dataset / CO key always gets a fresh chance before its fetch resolves
+    onAvailabilityChange?.(true);
+
+    // Undefined until a response arrives, so the catch below can tell a network
+    // failure apart from a sidecar that responded but could not be parsed
+    let sidecarFound: boolean | undefined;
 
     fetch(metadataUrl, { signal: abortController.signal })
       .then((response) => {
+        // The sidecar's http status is the availability signal, independent of
+        // whether its body parses
+        sidecarFound = response.ok;
+        onAvailabilityChange?.(response.ok);
         if (!response.ok) {
           throw new Error(`Metadata fetch failed: ${response.status}`);
         }
@@ -1513,6 +1533,12 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       .catch((err: unknown) => {
         if (err instanceof DOMException && err.name === "AbortError") return;
         if (abortController.signal.aborted) return;
+        // Network failure before any response. A sidecar that responded but
+        // failed to parse keeps its reported availability - the tiles can still
+        // render, they just lose their period bounds
+        if (sidecarFound === undefined) {
+          onAvailabilityChange?.(false);
+        }
         setLoadedMeta({
           url: metadataUrl,
           timeGroupBy: DEFAULT_TIME_GROUP_BY,
@@ -1524,7 +1550,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     return () => {
       abortController.abort();
     };
-  }, [metadataUrl, onMetadataPeriodChange]);
+  }, [metadataUrl, onMetadataPeriodChange, onAvailabilityChange]);
 
   // Source + layers lifecycle (dataset URL only).
   useEffect(() => {
