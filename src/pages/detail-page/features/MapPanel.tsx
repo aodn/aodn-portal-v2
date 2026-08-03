@@ -117,15 +117,13 @@ export const buildMapLayerConfig = (
     const datasetTypes = collection.getDatasetType() ?? [];
     const zarrOnlyDataset =
       datasetTypes.length === 1 && datasetTypes[0] === DatasetType.ZARR;
-    // Parquet / mixed CO density is shown via PMTiles (legacy Hex Grid removed).
-    const hasCoDensity =
-      datasetTypes.includes(DatasetType.PARQUET) ||
-      datasetTypes.includes(DatasetType.ZARR);
 
+    // Zarr has no map layer of its own yet, so it always falls back to the
+    // spatial extent. Every other dataset only needs the fallback when neither
+    // PMTiles density nor GeoServer can render anything.
     const isSupportSpatialExtent =
       hasSpatialExtent &&
-      (zarrOnlyDataset ||
-        (!isWMSAvailable && !hasCoDensity && !isSupportPMTiles));
+      (zarrOnlyDataset || (!isWMSAvailable && !isSupportPMTiles));
 
     if (isSupportPMTiles) {
       const pmtiles: LayerSwitcherLayer<LayerName> = {
