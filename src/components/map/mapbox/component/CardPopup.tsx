@@ -274,7 +274,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
                 isGridView
                 onLinks={(type: OpenType | undefined) => onLinks(content, type)}
                 onDownload={
-                  content.hasSummaryFeature()
+                  content.hasCloudOptimisedData()
                     ? (type: OpenType | undefined) => onDownload(content, type)
                     : undefined
                 }

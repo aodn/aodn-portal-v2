@@ -181,15 +181,15 @@ describe("buildMapLayerConfig", () => {
   // Helper function to create a mock OGCCollection
   const createMockCollection = (
     overrides: Partial<{
-      hasSummaryFeature: boolean;
+      hasCloudOptimisedData: boolean;
       getDatasetType: () => DatasetType[] | undefined;
       getBBox: () => any;
     }> = {}
   ) => {
     return {
-      hasSummaryFeature: vi
+      hasCloudOptimisedData: vi
         .fn()
-        .mockReturnValue(overrides.hasSummaryFeature ?? false),
+        .mockReturnValue(overrides.hasCloudOptimisedData ?? false),
       getDatasetType: vi
         .fn()
         .mockReturnValue(overrides.getDatasetType?.() ?? undefined),
@@ -209,7 +209,7 @@ describe("buildMapLayerConfig", () => {
 
   it("builds correct layer config with PMTiles Data Density support", () => {
     const mockCollection = createMockCollection({
-      hasSummaryFeature: true,
+      hasCloudOptimisedData: true,
       getDatasetType: () => [DatasetType.PARQUET],
       getBBox: () => [0, 0, 1, 1],
     });
@@ -237,7 +237,7 @@ describe("buildMapLayerConfig", () => {
 
   it("builds correct layer config for zarr dataset with spatial extent", () => {
     const mockCollection = createMockCollection({
-      hasSummaryFeature: true,
+      hasCloudOptimisedData: true,
       getDatasetType: () => [DatasetType.ZARR], // zarr-only -> spatial extent support
       getBBox: () => [0, 0, 1, 1],
     });
@@ -305,7 +305,7 @@ describe("buildMapLayerConfig", () => {
 
   it("returns empty array when no layers are available (no preview mode)", () => {
     const mockCollection = createMockCollection({
-      hasSummaryFeature: false,
+      hasCloudOptimisedData: false,
       getDatasetType: () => undefined, // not zarr
       getBBox: () => undefined, // no spatial extent
     });

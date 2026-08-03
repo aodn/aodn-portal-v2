@@ -166,6 +166,57 @@ export const buildMapLayerConfig = (
   return layers;
 };
 
+export interface SubsettingSupportInput {
+  hasCloudOptimisedData: boolean;
+  downloadService: DownloadServiceType;
+  selectedMapLayerId?: LayerName;
+  isSupportPMTiles: boolean;
+  pmtilesHasTime?: boolean;
+  timeSliderSupport: boolean;
+  drawRectSupport: boolean;
+}
+
+// Exported for unit tests
+export const checkSubsettingSupport = (
+  subsettingType: SubsettingType,
+  {
+    hasCloudOptimisedData,
+    downloadService,
+    selectedMapLayerId,
+    isSupportPMTiles,
+    pmtilesHasTime,
+    timeSliderSupport,
+    drawRectSupport,
+  }: SubsettingSupportInput
+): boolean => {
+  const isPMTilesSelected =
+    isSupportPMTiles && selectedMapLayerId === LayerName.PMTiles;
+  const isGeoServerSelected = selectedMapLayerId === LayerName.GeoServer;
+
+  switch (subsettingType) {
+    case SubsettingType.TimeSlider:
+      // PMTiles density is filtered by date range from `.metadata` coverage.
+      // Timeless tiles (`has_time: false`) have no real temporal dimension.
+      if (isPMTilesSelected && pmtilesHasTime === false) return false;
+      // Cloud optimised data (zarr / parquet) always supports datetime
+      // subsetting for download, independent of which layer the map renders
+      return (
+        hasCloudOptimisedData ||
+        isPMTilesSelected ||
+        (isGeoServerSelected && timeSliderSupport)
+      );
+    case SubsettingType.DrawRect:
+      // Same as above - cloud optimised downloads always accept a spatial
+      // filter. Checked before `downloadService`, which starts out
+      // `Unavailable` until DownloadCard's effect resolves the real service.
+      if (hasCloudOptimisedData) return true;
+      if (downloadService === DownloadServiceType.Unavailable) return false;
+      return isPMTilesSelected || (isGeoServerSelected && drawRectSupport);
+    default:
+      return false;
+  }
+};
+
 interface MapPanelProps {
   mapFocusArea?: LngLatBounds;
   onMapMoveEnd?: (evt: MapEvent) => void;
@@ -219,6 +270,13 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   const selectedMapLayerId = useMemo(
     () => mapLayerConfig.find((m) => m.selected)?.id,
     [mapLayerConfig]
+  );
+
+  // A `rel=summary` link means the record has cloud optimised (zarr / parquet)
+  // data behind it, which always supports spatial and datetime subsetting
+  const hasCloudOptimisedData = useMemo(
+    () => collection?.hasCloudOptimisedData() ?? false,
+    [collection]
   );
 
   const [noMapPreview, minDateStamp, maxDateStamp] = useMemo(() => {
@@ -378,36 +436,25 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     [onMapMoveEnd]
   );
 
-  const checkSubsettingSupport = useCallback(
-    (subsettingType: SubsettingType) => {
-      switch (subsettingType) {
-        case SubsettingType.TimeSlider:
-          return (
-            // PMTiles density is filtered by date range from `.metadata` coverage.
-            // Timeless tiles (`has_time: false`) have no real temporal dimension.
-            (isSupportPMTiles &&
-              selectedMapLayerId === LayerName.PMTiles &&
-              pmtilesPeriodRange?.hasTime !== false) ||
-            (selectedMapLayerId === LayerName.GeoServer && timeSliderSupport)
-          );
-        case SubsettingType.DrawRect:
-          return (
-            ((isSupportPMTiles && selectedMapLayerId === LayerName.PMTiles) ||
-              (selectedMapLayerId === LayerName.GeoServer &&
-                drawRectSupport)) &&
-            downloadService !== DownloadServiceType.Unavailable
-          );
-        default:
-          return false;
-      }
-    },
+  const isSubsettingSupported = useCallback(
+    (subsettingType: SubsettingType) =>
+      checkSubsettingSupport(subsettingType, {
+        hasCloudOptimisedData,
+        downloadService,
+        selectedMapLayerId,
+        isSupportPMTiles,
+        pmtilesHasTime: pmtilesPeriodRange?.hasTime,
+        timeSliderSupport,
+        drawRectSupport,
+      }),
     [
-      isSupportPMTiles,
+      hasCloudOptimisedData,
+      downloadService,
       selectedMapLayerId,
+      isSupportPMTiles,
       pmtilesPeriodRange?.hasTime,
       timeSliderSupport,
       drawRectSupport,
-      downloadService,
     ]
   );
 
@@ -558,7 +605,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
                 visible={mapLayerConfig.length !== 0}
               />
               <MenuControl
-                visible={checkSubsettingSupport(SubsettingType.TimeSlider)}
+                visible={isSubsettingSupported(SubsettingType.TimeSlider)}
                 menu={
                   <DateRange
                     // Remount when slider bounds change so thumbs reset to full coverage
@@ -585,7 +632,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
                 }
               />
               <MenuControl
-                visible={checkSubsettingSupport(SubsettingType.DrawRect)}
+                visible={isSubsettingSupported(SubsettingType.DrawRect)}
                 menu={
                   <DrawRect
                     onChangeFeatures={handleFeaturesChange}

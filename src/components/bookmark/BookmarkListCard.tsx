@@ -76,7 +76,7 @@ const BookmarkListCard: FC<BookmarkListCardProps> = ({
             handleNavigation(dataset.id, detailPageDefault.DATA_ACCESS, type)
           }
           onDownload={
-            dataset.hasSummaryFeature()
+            dataset.hasCloudOptimisedData()
               ? (type: OpenType | undefined) =>
                   handleNavigation(dataset.id, detailPageDefault.SUMMARY, type)
               : undefined
