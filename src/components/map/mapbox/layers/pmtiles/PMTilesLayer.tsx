@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 
-import dayjs, { Dayjs } from "dayjs";
+import { Dayjs } from "dayjs";
 import {
   ExpressionSpecification,
   GeoJSONSource,
@@ -20,16 +20,18 @@ import {
 import { FeatureCollection, Geometry } from "geojson";
 
 import {
-  COUNTS_PROPERTY,
-  DAYS_KEY,
   DENSITY_TOTAL_CAP,
-  TOTAL_KEY,
-  coercePeriodDigits,
-  PmtilesHexLayerDef,
-  PMTilesMetadataRange,
-  PeriodInt,
   HexFillPaint,
+  PMTilesMetadataRange,
+  PmtilesHexLayerDef,
   densityStopValue,
+  PMTilesMetadata,
+  sumSparseCountFromProperties,
+  CountFilterRange,
+  buildCountFilterRange,
+  parseCountsTree,
+  sumCountsTreeDensityTotal,
+  parsePMTilesMetadata,
 } from "./Common";
 import MapContext from "@/components/map/mapbox/MapContext";
 import { DatasetType } from "@/app/store/OGCCollectionDefinitions";
@@ -40,7 +42,44 @@ import { SelectItem } from "@/components/common/dropdown/CommonSelect";
 import { MapDefaultConfig } from "@/components/map/mapbox/constants";
 import MapLayerSelect from "@/components/map/mapbox/component/MapLayerSelect";
 import { TestHelper } from "@/components/common/test/helper";
-import { dayjsToDayPeriod } from "@/utils/DateUtils";
+
+// Re-export pure helpers so existing imports from PMTilesLayer keep working
+// (e.g. MapPanel: metadataRangeToDayjs, PMTilesMetadata).
+export type {
+  CountFilterRange,
+  CountsTree,
+  PeriodInt,
+  SumSparseCountOptions,
+  SumSparseCountResult,
+  SumTreeResult,
+} from "./Common";
+export type { PMTilesMetadata, PMTilesMetadataRange } from "./Common";
+export {
+  COUNTS_PROPERTY,
+  DAYS_KEY,
+  DEFAULT_RANGE_START,
+  DENSITY_TOTAL_CAP,
+  TOTAL_KEY,
+  buildCountFilterRange,
+  buildCountFilterRangeFromPeriods,
+  clampPeriodsToMetadata,
+  clampRangeToMetadata,
+  clearCountsTreeCache,
+  coerceCountValue,
+  coercePeriodDigits,
+  dayjsToPeriodInt,
+  daysInMonth,
+  densityStopValue,
+  formatPeriodInt,
+  metadataRangeToDayjs,
+  parseCountsTree,
+  parsePMTilesMetadata,
+  parsePeriodInt,
+  periodNumberToDayjs,
+  sumCountsTreeDensityTotal,
+  sumCountsTreeInRange,
+  sumSparseCountFromProperties,
+} from "./Common";
 
 const SOURCE_ID = "pmtiles-source-id";
 const HOVER_SOURCE_ID = "pmtiles-hover-source-id";
@@ -56,16 +95,6 @@ const EMPTY_FEATURE_COLLECTION: FeatureCollection = {
 };
 const bucket = import.meta.env.VITE_PMTILES_BUCKET;
 const region = import.meta.env.VITE_AWS_REGION;
-/**
- * Fallback UI window start when the user has not set a date filter **and**
- * `.metadata` bounds are not yet available.
- *
- * Must predate any realistic dataset min (was `"2000-01-01"`, which zeroed
- * all density for pre-2000 tiles such as single-day `19700121` coverage once
- * clamped against metadata). Prefer using metadata bounds when present —
- * see {@link buildCountFilterRange}.
- */
-const DEFAULT_RANGE_START = "1900-01-01";
 /**
  * Trailing debounce so rapid tile `sourcedata` / `idle` events collapse into
  * one feature-state pass after the viewport settles (avoids partial updates).
@@ -180,15 +209,6 @@ export const clearInactivePmtilesFeatureState = (
     }
   }
 };
-/**
- * Full coverage range from `{dname}.metadata` and whether the source had a
- * real TIME column (``hasTime``). Counts always use the nested all-grain tree.
- */
-export interface PMTilesMetadata extends PMTilesMetadataRange {
-  /** Always set by {@link parsePMTilesMetadata} (defaults true for legacy). */
-  hasTime: boolean;
-}
-
 interface PMTilesHexLayerProps extends LayerBasicType {
   filterStartDate?: Dayjs;
   filterEndDate?: Dayjs;
@@ -200,529 +220,6 @@ interface PMTilesHexLayerProps extends LayerBasicType {
    */
   onMetadataPeriodChange?: (range: PMTilesMetadata | null) => void;
 }
-
-const resolveRange = (start?: Dayjs, end?: Dayjs) => ({
-  start: start || dayjs(DEFAULT_RANGE_START),
-  end: end || dayjs(),
-});
-
-/** UI Dayjs → day period int (`YYYYMMDD`). */
-export const dayjsToPeriodInt = (d: Dayjs): PeriodInt => dayjsToDayPeriod(d);
-
-/** Days in calendar month (1–12); pure integer, no dayjs. */
-export const daysInMonth = (year: number, month: number): number => {
-  // month is 1–12
-  if (month === 2) {
-    const leap = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
-    return leap ? 29 : 28;
-  }
-  if (month === 4 || month === 6 || month === 9 || month === 11) return 30;
-  return 31;
-};
-
-/**
- * Parse a sidecar `min_date` / `max_date` into a validated day {@link PeriodInt}
- * (`YYYYMMDD`). Rejects unix-ms-sized numbers and invalid calendars without
- * using the value as a dayjs timestamp.
- */
-export const parsePeriodInt = (value: unknown): PeriodInt | undefined => {
-  const digits = coercePeriodDigits(value);
-  if (!digits || digits.length !== 8) return undefined;
-  // Guard: real unix-ms timestamps are 12–13 digits
-  const iso = `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`;
-  const day = dayjs(iso);
-  if (!day.isValid() || day.format("YYYY-MM-DD") !== iso) return undefined;
-  return Number(digits);
-};
-
-/**
- * Convert a day period int (or raw sidecar value) to Dayjs for UI edges only.
- *
- * Never call `dayjs(periodNumber)` — dayjs treats numbers as unix ms (→ 1970).
- * Digits are string-sliced into a calendar date, then parsed as ISO.
- */
-export const periodNumberToDayjs = (value: unknown): Dayjs | undefined => {
-  const digits = coercePeriodDigits(value);
-  if (!digits || digits.length !== 8) return undefined;
-  const iso = `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`;
-  const day = dayjs(iso);
-  return day.isValid() && day.format("YYYY-MM-DD") === iso
-    ? day.startOf("day")
-    : undefined;
-};
-
-/**
- * UI helper: Dayjs bounds for a metadata period range (slider / display).
- * Returns null if either bound fails to convert.
- */
-export const metadataRangeToDayjs = (
-  range: PMTilesMetadataRange
-): { minDate: Dayjs; maxDate: Dayjs } | null => {
-  const minDate = periodNumberToDayjs(range.minPeriod);
-  const maxDate = periodNumberToDayjs(range.maxPeriod);
-  if (!minDate || !maxDate) return null;
-  return { minDate, maxDate };
-};
-
-/**
- * Clamp inclusive period ints to metadata coverage (integer-only, no dayjs).
- */
-export const clampPeriodsToMetadata = (
-  startPeriod: PeriodInt,
-  endPeriod: PeriodInt,
-  bounds?: PMTilesMetadataRange | null
-): { startPeriod: PeriodInt; endPeriod: PeriodInt; empty: boolean } => {
-  let s = startPeriod;
-  let e = endPeriod;
-  if (bounds) {
-    if (s < bounds.minPeriod) s = bounds.minPeriod;
-    if (e > bounds.maxPeriod) e = bounds.maxPeriod;
-  }
-  if (s > e) {
-    return { startPeriod: 0, endPeriod: -1, empty: true };
-  }
-  return { startPeriod: s, endPeriod: e, empty: false };
-};
-
-/**
- * Intersect the UI filter window with metadata period coverage.
- * Converts Dayjs → period ints, clamps with integers, converts back for callers
- * that still expand key lists via dayjs walkers.
- *
- * When the UI has not set a filter (`start`/`end` both undefined) and metadata
- * bounds exist, use the full tile coverage — do not invent a default calendar
- * window that can miss pre-2000 data.
- *
- * Timeless tiles (``hasTime === false``) always use the full metadata coverage.
- */
-export const clampRangeToMetadata = (
-  start?: Dayjs,
-  end?: Dayjs,
-  bounds?: PMTilesMetadataRange | null
-): { start: Dayjs; end: Dayjs } => {
-  if (
-    bounds &&
-    (!bounds.hasTime || (start === undefined && end === undefined))
-  ) {
-    const minD = periodNumberToDayjs(bounds.minPeriod);
-    const maxD = periodNumberToDayjs(bounds.maxPeriod);
-    if (minD && maxD) return { start: minD, end: maxD };
-  }
-
-  const { start: s0, end: e0 } = resolveRange(start, end);
-  const startPeriod = dayjsToPeriodInt(s0.startOf("day"));
-  const endPeriod = dayjsToPeriodInt(e0.startOf("day"));
-
-  // Already inverted UI window — keep order so key walkers yield []
-  if (startPeriod > endPeriod) {
-    return { start: s0, end: e0 };
-  }
-
-  const clamped = clampPeriodsToMetadata(startPeriod, endPeriod, bounds);
-  if (clamped.empty) {
-    // No intersection with metadata — force start after end for key walkers
-    const emptyEnd = s0.startOf("day").subtract(1, "day");
-    return { start: s0.startOf("day"), end: emptyEnd };
-  }
-
-  const minD = periodNumberToDayjs(clamped.startPeriod);
-  const maxD = periodNumberToDayjs(clamped.endPeriod);
-  if (!minD || !maxD) return { start: s0, end: e0 };
-  return { start: minD, end: maxD };
-};
-
-/**
- * Parse sidecar `has_time`. Missing → true (legacy timed tiles).
- */
-const parseHasTime = (value: unknown): boolean => {
-  if (value === undefined || value === null) return true;
-  if (typeof value === "boolean") return value;
-  if (typeof value === "number") return value !== 0;
-  if (typeof value === "string") {
-    const s = value.trim().toLowerCase();
-    if (s === "false" || s === "0" || s === "no") return false;
-    if (s === "true" || s === "1" || s === "yes") return true;
-  }
-  return Boolean(value);
-};
-
-/**
- * Parse the `{dname}.metadata` JSON body into app `PMTilesMetadata`.
- * Accepts sidecar field names (`min_date`, `max_date`, optional `has_time`).
- * `time_group_by` is ignored — tiles always use the nested all-grain tree.
- * Returns null when either bound is missing or invalid.
- * Bounds are stored as day {@link PeriodInt} (`YYYYMMDD`, not Dayjs).
- */
-export const parsePMTilesMetadata = (data: unknown): PMTilesMetadata | null => {
-  if (data == null || typeof data !== "object") return null;
-  const raw = data as Record<string, unknown>;
-  const minPeriod = parsePeriodInt(raw.min_date);
-  const maxPeriod = parsePeriodInt(raw.max_date);
-  if (minPeriod === undefined || maxPeriod === undefined) return null;
-  if (minPeriod > maxPeriod) return null;
-  return {
-    minPeriod,
-    maxPeriod,
-    hasTime: parseHasTime(raw.has_time),
-  };
-};
-
-/**
- * Precomputed filter window for nested counts-tree sums.
- * Prefer this over dayjs-per-key checks in the density hot path.
- */
-export type CountFilterRange = {
-  /** Inclusive YYYYMMDD integer bound. */
-  startPeriod: number;
-  /** Inclusive YYYYMMDD integer bound. */
-  endPeriod: number;
-  /** True when start is after end (sum always 0). */
-  empty: boolean;
-};
-
-/**
- * Build a reusable filter range for density/popup sums from period ints.
- * Dayjs is not used on this path — convert at the edge with
- * {@link buildCountFilterRange} when the UI still speaks Dayjs.
- */
-export const buildCountFilterRangeFromPeriods = (
-  startPeriod: PeriodInt,
-  endPeriod: PeriodInt,
-  options?: {
-    bounds?: PMTilesMetadataRange | null;
-  }
-): CountFilterRange => {
-  const clamped = clampPeriodsToMetadata(
-    startPeriod,
-    endPeriod,
-    options?.bounds
-  );
-  if (clamped.empty) {
-    return {
-      startPeriod: 0,
-      endPeriod: -1,
-      empty: true,
-    };
-  }
-
-  return {
-    startPeriod: clamped.startPeriod,
-    endPeriod: clamped.endPeriod,
-    empty: false,
-  };
-};
-
-/**
- * Build a reusable filter range for density/popup sums.
- * Converts the UI Dayjs window to day {@link PeriodInt} once, then clamps/sums
- * with integers against the nested counts tree.
- *
- * Full-coverage path: when the user has not applied a date filter (both ends
- * undefined) and `.metadata` bounds are known, sum the entire tile period —
- * including single-day archives such as min=max=`19700121`. A default window
- * starting in 2000 would clamp to empty against that coverage.
- *
- * Timeless path: when sidecar ``has_time`` is false, always sum the full
- * synthetic period from metadata — ignore UI date filters so density is not
- * zeroed by a collection extent that excludes the sentinel period.
- */
-export const buildCountFilterRange = (
-  filterStart?: Dayjs,
-  filterEnd?: Dayjs,
-  options?: {
-    bounds?: PMTilesMetadataRange | null;
-  }
-): CountFilterRange => {
-  const bounds = options?.bounds;
-  const timeless = bounds != null && !bounds.hasTime;
-
-  if (
-    timeless ||
-    (filterStart === undefined && filterEnd === undefined && bounds)
-  ) {
-    return buildCountFilterRangeFromPeriods(
-      bounds!.minPeriod,
-      bounds!.maxPeriod,
-      options
-    );
-  }
-
-  const { start, end } = resolveRange(filterStart, filterEnd);
-  const rangeStart = start.startOf("day");
-  const rangeEnd = end.startOf("day");
-  if (rangeStart.isAfter(rangeEnd)) {
-    return {
-      startPeriod: 0,
-      endPeriod: -1,
-      empty: true,
-    };
-  }
-
-  return buildCountFilterRangeFromPeriods(
-    dayjsToPeriodInt(rangeStart),
-    dayjsToPeriodInt(rangeEnd),
-    options
-  );
-};
-
-/**
- * Coerce MVT property values to a finite number. Vector tiles often deliver
- * counts as strings; treating only typeof === "number" would zero every total.
- */
-export const coerceCountValue = (value: unknown): number => {
-  if (typeof value === "number" && Number.isFinite(value)) return value;
-  if (typeof value === "string" && value.trim() !== "") {
-    const n = Number(value);
-    if (Number.isFinite(n)) return n;
-  }
-  return NaN;
-};
-
-/** Nested counts tree: year → month → days, with optional `t` totals. */
-export type CountsTree = Record<string, unknown>;
-
-/**
- * Parse feature property {@link COUNTS_PROPERTY} (`c`) into a nested tree.
- * MVT stores it as a JSON string; already-parsed objects are accepted too.
- */
-export const parseCountsTree = (
-  properties: Record<string, unknown> | null | undefined
-): CountsTree | null => {
-  if (!properties) return null;
-  const raw = properties[COUNTS_PROPERTY];
-  if (raw == null) return null;
-  if (typeof raw === "object" && !Array.isArray(raw)) {
-    return raw as CountsTree;
-  }
-  if (typeof raw !== "string" || raw.trim() === "") return null;
-  try {
-    const parsed = JSON.parse(raw) as unknown;
-    if (parsed == null || typeof parsed !== "object" || Array.isArray(parsed)) {
-      return null;
-    }
-    return parsed as CountsTree;
-  } catch {
-    return null;
-  }
-};
-
-/** Format a day period int for popup display: `YYYYMMDD` → `YYYY-MM-DD`. */
-export const formatPeriodInt = (period: PeriodInt): string => {
-  const d = String(Math.trunc(period)).padStart(8, "0");
-  return `${d.slice(0, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)}`;
-};
-
-/** Options for nested counts-tree summing (density vs exact popup). */
-export type SumSparseCountOptions = {
-  /**
-   * When set, stop adding once `total` reaches this value and clamp the result.
-   * Used for density paint (see `DENSITY_TOTAL_CAP`) so large hexes do not walk
-   * every day/month node when the color scale has already saturated.
-   */
-  maxTotal?: number;
-  /**
-   * Track min/max periods that contributed to the total (popup time range).
-   * Density feature-state only needs the total — default false when maxTotal
-   * is set, true otherwise.
-   */
-  collectMatchedKeys?: boolean;
-  /**
-   * Precomputed filter range. When omitted, built from dayjs args (slower).
-   * Density passes should always supply this.
-   */
-  range?: CountFilterRange;
-};
-
-export type SumSparseCountResult = {
-  total: number;
-  /**
-   * Formatted period bounds that contributed (popup). Empty when no matches
-   * or when collection was skipped. Length is 0 or 2 (`[min, max]` as strings
-   * for display via {@link formatPeriodInt}).
-   */
-  matchedKeys: string[];
-  /** Inclusive min day period that contributed (undefined when none / not collected). */
-  minPeriod?: PeriodInt;
-  /** Inclusive max day period that contributed (undefined when none / not collected). */
-  maxPeriod?: PeriodInt;
-};
-
-type SumTreeInternal = {
-  total: number;
-  minPeriod?: PeriodInt;
-  maxPeriod?: PeriodInt;
-  hitCap: boolean;
-};
-
-const notePeriod = (
-  state: SumTreeInternal,
-  period: PeriodInt,
-  collect: boolean
-): void => {
-  if (!collect) return;
-  if (state.minPeriod === undefined || period < state.minPeriod) {
-    state.minPeriod = period;
-  }
-  if (state.maxPeriod === undefined || period > state.maxPeriod) {
-    state.maxPeriod = period;
-  }
-};
-
-const addCount = (
-  state: SumTreeInternal,
-  count: number,
-  period: PeriodInt | undefined,
-  collect: boolean,
-  maxTotal?: number
-): boolean => {
-  // Returns true when maxTotal cap is hit (caller should stop).
-  if (!Number.isFinite(count) || count <= 0) return false;
-  state.total += count;
-  if (period !== undefined) notePeriod(state, period, collect);
-  if (maxTotal !== undefined && state.total >= maxTotal) {
-    state.total = maxTotal;
-    state.hitCap = true;
-    return true;
-  }
-  return false;
-};
-
-/**
- * Hierarchical sum of the nested all-grain counts tree for an inclusive day
- * filter range (`YYYYMMDD`).
- *
- * Uses pre-baked year/month {@link TOTAL_KEY} when a unit is fully covered so
- * multi-year windows are O(years + partial months) rather than O(days).
- * Density (no period bounds) takes those fast paths; popup walks day leaves
- * so min/max observation dates stay accurate.
- */
-export const sumCountsTreeInRange = (
-  tree: CountsTree,
-  range: CountFilterRange,
-  options?: { maxTotal?: number; collectPeriodBounds?: boolean }
-): SumTreeInternal => {
-  const state: SumTreeInternal = { total: 0, hitCap: false };
-  if (range.empty) return state;
-
-  const start = range.startPeriod;
-  const end = range.endPeriod;
-  const maxTotal = options?.maxTotal;
-  const collect = options?.collectPeriodBounds === true;
-  const allowUnitTotals = !collect;
-
-  const startYear = Math.floor(start / 10000);
-  const endYear = Math.floor(end / 10000);
-
-  for (const yearKey of Object.keys(tree)) {
-    const year = Number(yearKey);
-    if (!Number.isFinite(year)) continue;
-    if (year < startYear || year > endYear) continue;
-
-    const yearNode = tree[yearKey];
-    if (yearNode == null || typeof yearNode !== "object") continue;
-    const yNode = yearNode as CountsTree;
-
-    const yearStartDay = year * 10000 + 101;
-    const yearEndDay = year * 10000 + 1231;
-    if (allowUnitTotals && yearStartDay >= start && yearEndDay <= end) {
-      const t = coerceCountValue(yNode[TOTAL_KEY]);
-      if (addCount(state, t, undefined, false, maxTotal)) return state;
-      continue;
-    }
-
-    for (const monthKey of Object.keys(yNode)) {
-      if (monthKey === TOTAL_KEY) continue;
-      const month = Number(monthKey);
-      if (!Number.isFinite(month) || month < 1 || month > 12) continue;
-
-      const monthNode = yNode[monthKey];
-      if (monthNode == null || typeof monthNode !== "object") continue;
-      const mNode = monthNode as CountsTree;
-
-      const dim = daysInMonth(year, month);
-      const monthStartDay = year * 10000 + month * 100 + 1;
-      const monthEndDay = year * 10000 + month * 100 + dim;
-
-      if (monthEndDay < start || monthStartDay > end) continue;
-
-      if (allowUnitTotals && monthStartDay >= start && monthEndDay <= end) {
-        const t = coerceCountValue(mNode[TOTAL_KEY]);
-        if (addCount(state, t, undefined, false, maxTotal)) return state;
-        continue;
-      }
-
-      // Partial month (or popup bounds path): sum day map entries in range.
-      const days = mNode[DAYS_KEY];
-      if (days == null || typeof days !== "object" || Array.isArray(days)) {
-        continue;
-      }
-      for (const dayKey of Object.keys(days as CountsTree)) {
-        const day = Number(dayKey);
-        if (!Number.isFinite(day) || day < 1 || day > 31) continue;
-        const period = year * 10000 + month * 100 + day;
-        if (period < start || period > end) continue;
-        const count = coerceCountValue((days as CountsTree)[dayKey]);
-        if (addCount(state, count, period, collect, maxTotal)) return state;
-      }
-    }
-  }
-
-  return state;
-};
-
-/**
- * Sum nested counts tree (`c`) on a feature for the filter window.
- *
- * Pass `maxTotal` (e.g. `DENSITY_TOTAL_CAP`) for density feature-state so
- * high-count hexes exit early; omit it for popup HTML so counts stay exact.
- * Pass `options.range` from {@link buildCountFilterRange} to avoid dayjs work
- * per feature.
- */
-export const sumSparseCountFromProperties = (
-  properties: Record<string, unknown> | null | undefined,
-  filterStartDate?: Dayjs,
-  filterEndDate?: Dayjs,
-  options?: SumSparseCountOptions
-): SumSparseCountResult => {
-  const empty = (): SumSparseCountResult => ({
-    total: 0,
-    matchedKeys: [],
-  });
-
-  if (!properties) return empty();
-
-  const range =
-    options?.range ?? buildCountFilterRange(filterStartDate, filterEndDate);
-  if (range.empty) return empty();
-
-  const tree = parseCountsTree(properties);
-  if (!tree) return empty();
-
-  const maxTotal = options?.maxTotal;
-  const collectPeriodBounds =
-    options?.collectMatchedKeys ?? maxTotal === undefined;
-
-  const { total, minPeriod, maxPeriod } = sumCountsTreeInRange(tree, range, {
-    maxTotal,
-    collectPeriodBounds,
-  });
-
-  const matchedKeys: string[] = [];
-  if (
-    collectPeriodBounds &&
-    minPeriod !== undefined &&
-    maxPeriod !== undefined
-  ) {
-    matchedKeys.push(formatPeriodInt(minPeriod), formatPeriodInt(maxPeriod));
-  }
-
-  return {
-    total,
-    matchedKeys,
-    minPeriod,
-    maxPeriod,
-  };
-};
 
 /**
  * Popup totals come from the nested counts tree on the feature (`c`).
@@ -1035,11 +532,9 @@ export const updateFeatureStateTotals = (
     options?.range ?? buildCountFilterRange(filterStartDate, filterEndDate);
   const session = options?.session;
   const layers = options?.layers ?? PMTILE_LAYERS;
-  const sumOptions: SumSparseCountOptions = {
-    maxTotal: DENSITY_TOTAL_CAP,
-    collectMatchedKeys: false,
-    range,
-  };
+  const startPeriod = range.startPeriod;
+  const endPeriod = range.endPeriod;
+  const rangeEmpty = range.empty;
 
   let updated = 0;
   let seen = 0;
@@ -1062,14 +557,22 @@ export const updateFeatureStateTotals = (
       const sessionKey = featureStateSessionKey(layer.sourceLayer, id);
       if (session?.written.has(sessionKey)) continue;
 
-      // Cap at paint max — further day keys do not change color/opacity.
-      // Popup uses an uncapped sum via buildPopupHtml for the exact count.
-      const { total } = sumSparseCountFromProperties(
-        feature.properties as Record<string, unknown> | null,
-        filterStartDate,
-        filterEndDate,
-        sumOptions
-      );
+      // Density-only sum: year/month `t` fast paths + tree parse cache.
+      // Cap at paint max — popup uses uncapped sum via buildPopupHtml.
+      let total = 0;
+      if (!rangeEmpty) {
+        const tree = parseCountsTree(
+          feature.properties as Record<string, unknown> | null
+        );
+        if (tree) {
+          total = sumCountsTreeDensityTotal(
+            tree,
+            startPeriod,
+            endPeriod,
+            DENSITY_TOTAL_CAP
+          );
+        }
+      }
 
       try {
         map.setFeatureState(
@@ -1710,7 +1213,6 @@ export default PMTilesHexLayer;
 
 export {
   FEATURE_STATE_TOTAL,
-  DENSITY_TOTAL_CAP,
   DENSITY_COLOR_STOPS,
   DENSITY_OPACITY_STOPS,
   PMTILE_LAYERS,
