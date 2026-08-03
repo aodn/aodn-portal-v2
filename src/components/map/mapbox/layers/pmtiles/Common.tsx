@@ -41,8 +41,6 @@ export const TOTAL_KEY = "t";
 /** Day map key under each month node. */
 export const DAYS_KEY = "d";
 
-/** Features to sum + setFeatureState per idle slice (keeps the main thread responsive). */
-export const FEATURE_STATE_CHUNK_SIZE = 600;
 /**
  * Top density total used by paint interpolate and by the feature-state early-stop.
  * Totals at or above this value all paint the same; full accuracy is only needed

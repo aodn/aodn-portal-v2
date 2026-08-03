@@ -1000,11 +1000,6 @@ export type UpdateFeatureStateTotalsOptions = {
    */
   session?: FeatureStateTotalsSession;
   /**
-   * Max features to write this call. When hit before all loaded features are
-   * processed, `complete` is false so the caller can schedule another chunk.
-   */
-  maxFeatures?: number;
-  /**
    * When set, only query/sum these bands. Default: all {@link PMTILE_LAYERS}
    * (tests and tooling). Density hot path passes the active zoom band only.
    */
@@ -1016,16 +1011,13 @@ export type UpdateFeatureStateTotalsResult = {
   updated: number;
   /** Features seen in querySourceFeatures (including already-written). */
   seen: number;
-  /** False when `maxFeatures` stopped the pass early. */
-  complete: boolean;
 };
 
 /**
- * For each loaded vector feature, sum sparse m* properties in the filter
+ * For each loaded vector feature, sum the nested counts tree in the filter
  * range and write the total to feature-state for paint/filter.
  *
- * Supports incremental updates (skip `session.written`) and chunked work
- * (`maxFeatures`) so wide ranges stay responsive on the main thread.
+ * Supports incremental updates (skip `session.written`).
  * Pass `layers` (e.g. from {@link getActivePmtilesLayers}) to skip bands
  * that are not visible at the current zoom.
  */
@@ -1036,13 +1028,12 @@ export const updateFeatureStateTotals = (
   options?: UpdateFeatureStateTotalsOptions
 ): UpdateFeatureStateTotalsResult => {
   if (!map.getSource(SOURCE_ID)) {
-    return { updated: 0, seen: 0, complete: true };
+    return { updated: 0, seen: 0 };
   }
 
   const range =
     options?.range ?? buildCountFilterRange(filterStartDate, filterEndDate);
   const session = options?.session;
-  const maxFeatures = options?.maxFeatures;
   const layers = options?.layers ?? PMTILE_LAYERS;
   const sumOptions: SumSparseCountOptions = {
     maxTotal: DENSITY_TOTAL_CAP,
@@ -1052,9 +1043,8 @@ export const updateFeatureStateTotals = (
 
   let updated = 0;
   let seen = 0;
-  let stoppedEarly = false;
 
-  outer: for (const layer of layers) {
+  for (const layer of layers) {
     let features;
     try {
       features = map.querySourceFeatures(SOURCE_ID, {
@@ -1095,14 +1085,9 @@ export const updateFeatureStateTotals = (
       } catch {
         // Feature may have left the tile cache — do not mark written
       }
-
-      if (maxFeatures !== undefined && updated >= maxFeatures) {
-        stoppedEarly = true;
-        break outer;
-      }
     }
   }
-  return { updated, seen, complete: !stoppedEarly };
+  return { updated, seen };
 };
 
 /**
@@ -1145,37 +1130,6 @@ export const scheduleDeferredWork = (work: () => void): (() => void) => {
   return () => {
     cancelled = true;
     clearTimeout(timeoutId);
-  };
-};
-
-/**
- * Run `work` in idle slices until it returns true (done) or cancel is called.
- * Each slice is scheduled via {@link scheduleDeferredWork}.
- */
-export const scheduleChunkedWork = (
-  work: () => boolean,
-  isStale?: () => boolean
-): (() => void) => {
-  let cancelled = false;
-  let cancelSlice: (() => void) | undefined;
-
-  const tick = () => {
-    if (cancelled || isStale?.()) return;
-    let done = false;
-    try {
-      done = work();
-    } catch {
-      // Treat errors as terminal for this chain
-      return;
-    }
-    if (cancelled || isStale?.() || done) return;
-    cancelSlice = scheduleDeferredWork(tick);
-  };
-
-  cancelSlice = scheduleDeferredWork(tick);
-  return () => {
-    cancelled = true;
-    cancelSlice?.();
   };
 };
 

@@ -27,7 +27,6 @@ import {
   updateFeatureStateTotals,
   scheduleDeferredWork,
   scheduleDebouncedWork,
-  scheduleChunkedWork,
   buildCountFilterRange,
   buildCountFilterRangeFromPeriods,
   createFeatureStateTotalsSession,
@@ -50,7 +49,6 @@ import {
 import {
   COUNTS_PROPERTY,
   DAYS_KEY,
-  FEATURE_STATE_CHUNK_SIZE,
   TOTAL_KEY,
   densityStopValue,
   PMTilesMetadataRange,
@@ -895,13 +893,12 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
       setPaintProperty: vi.fn(),
     } as unknown as Map;
 
-    const { updated, complete } = updateFeatureStateTotals(
+    const { updated } = updateFeatureStateTotals(
       map,
       dayjs("2024-01-01"),
       dayjs("2024-03-31")
     );
     expect(updated).toBe(3);
-    expect(complete).toBe(true);
     expect(setFeatureState).toHaveBeenCalledWith(
       {
         source: "pmtiles-source-id",
@@ -1149,60 +1146,6 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     expect(countUnwrittenLoadedFeatures(map, session, layers)).toBe(0);
   });
 
-  it("chunks feature-state writes when maxFeatures is set", () => {
-    const setFeatureState = vi.fn();
-    const features = Array.from({ length: 5 }, (_, i) => ({
-      id: `cell-${i}`,
-      properties: countsProps(
-        {
-          "2024": {
-            [TOTAL_KEY]: i + 1,
-            "01": { [TOTAL_KEY]: i + 1, [DAYS_KEY]: { "15": i + 1 } },
-          },
-        },
-        `cell-${i}`
-      ),
-    }));
-    const map = {
-      getSource: () => ({}),
-      querySourceFeatures: (_s: string, opts: { sourceLayer: string }) =>
-        opts.sourceLayer === "hex_z0" ? features : [],
-      setFeatureState,
-    } as unknown as Map;
-
-    const session = createFeatureStateTotalsSession();
-    const range = buildCountFilterRange(
-      dayjs("2024-01-01"),
-      dayjs("2024-03-31")
-    );
-
-    const chunk1 = updateFeatureStateTotals(map, undefined, undefined, {
-      range,
-      session,
-      maxFeatures: 2,
-    });
-    expect(chunk1.updated).toBe(2);
-    expect(chunk1.complete).toBe(false);
-
-    const chunk2 = updateFeatureStateTotals(map, undefined, undefined, {
-      range,
-      session,
-      maxFeatures: 2,
-    });
-    expect(chunk2.updated).toBe(2);
-    expect(chunk2.complete).toBe(false);
-
-    const chunk3 = updateFeatureStateTotals(map, undefined, undefined, {
-      range,
-      session,
-      maxFeatures: 2,
-    });
-    expect(chunk3.updated).toBe(1);
-    expect(chunk3.complete).toBe(true);
-    expect(setFeatureState).toHaveBeenCalledTimes(5);
-    expect(FEATURE_STATE_CHUNK_SIZE).toBeGreaterThan(0);
-  });
-
   it("only queries and writes the layers option (active zoom band)", () => {
     const setFeatureState = vi.fn();
     const querySourceFeatures = vi.fn(
@@ -1251,14 +1194,13 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     const active = getActivePmtilesLayers(5); // hex_z4
     expect(active.map((l) => l.sourceLayer)).toEqual(["hex_z4"]);
 
-    const { updated, complete } = updateFeatureStateTotals(
+    const { updated } = updateFeatureStateTotals(
       map,
       dayjs("2024-01-01"),
       dayjs("2024-03-31"),
       { layers: active }
     );
 
-    expect(complete).toBe(true);
     expect(updated).toBe(1);
     expect(querySourceFeatures).toHaveBeenCalledTimes(1);
     expect(querySourceFeatures).toHaveBeenCalledWith("pmtiles-source-id", {
@@ -1315,29 +1257,5 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     expect(work).not.toHaveBeenCalled();
     await new Promise((r) => setTimeout(r, 40));
     expect(work).toHaveBeenCalledTimes(1);
-  });
-
-  it("runs chunked work until the worker reports done", async () => {
-    let n = 0;
-    const cancel = scheduleChunkedWork(() => {
-      n += 1;
-      return n >= 3;
-    });
-    await new Promise((r) => setTimeout(r, 150));
-    expect(n).toBe(3);
-    cancel();
-  });
-
-  it("stops chunked work when cancelled mid-flight", async () => {
-    let n = 0;
-    const cancel = scheduleChunkedWork(() => {
-      n += 1;
-      return false;
-    });
-    await new Promise((r) => setTimeout(r, 30));
-    cancel();
-    const afterCancel = n;
-    await new Promise((r) => setTimeout(r, 80));
-    expect(n).toBe(afterCancel);
   });
 });
