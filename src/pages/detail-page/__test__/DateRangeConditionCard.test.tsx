@@ -55,6 +55,7 @@ const buildCondition = (start: string, end: string): DateRangeCondition => ({
   type: DownloadConditionType.DATE_RANGE,
   start,
   end,
+  support: true,
 });
 
 // --- DOM helpers -----------------------------------------------------------

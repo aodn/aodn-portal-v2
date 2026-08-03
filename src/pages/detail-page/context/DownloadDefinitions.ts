@@ -11,6 +11,8 @@ export enum DownloadConditionType {
 export interface IDownloadCondition {
   type: DownloadConditionType;
   id: string;
+  /** Whether this download condition type is supported for the current context. */
+  support: boolean;
 }
 
 export interface IDownloadConditionCallback {
@@ -51,18 +53,21 @@ export class DateRangeCondition
   id: string;
   start: string;
   end: string;
+  support: boolean;
   removeCallback?: () => void;
 
   constructor(
     id: string,
     start: string,
     end: string,
-    removeCallback?: () => void
+    removeCallback?: () => void,
+    support: boolean = true
   ) {
     this.id = id;
     this.start = start;
     this.end = end;
     this.removeCallback = removeCallback;
+    this.support = support;
   }
 }
 
@@ -72,13 +77,20 @@ export class BBoxCondition
   type: DownloadConditionType;
   bbox: BBox;
   id: string;
+  support: boolean;
   removeCallback?: () => void;
 
-  constructor(id: string, bbox: BBox, removeCallback?: () => void) {
+  constructor(
+    id: string,
+    bbox: BBox,
+    removeCallback?: () => void,
+    support: boolean = true
+  ) {
     this.type = DownloadConditionType.BBOX;
     this.id = id;
     this.bbox = bbox;
     this.removeCallback = removeCallback;
+    this.support = support;
   }
 }
 
@@ -88,16 +100,19 @@ export class PolygonCondition
   type: DownloadConditionType = DownloadConditionType.POLYGON;
   coordinates: [number, number][];
   id: string;
+  support: boolean;
   removeCallback?: () => void;
 
   constructor(
     id: string,
     coordinates: [number, number][],
-    removeCallback?: () => void
+    removeCallback?: () => void,
+    support: boolean = true
   ) {
     this.id = id;
     this.coordinates = coordinates;
     this.removeCallback = removeCallback;
+    this.support = support;
   }
 }
 
@@ -107,12 +122,19 @@ export class FormatCondition
   type: DownloadConditionType = DownloadConditionType.FORMAT;
   id: string;
   format: string;
+  support: boolean;
   removeCallback?: () => void;
 
-  constructor(id: string, format: string, removeCallback?: () => void) {
+  constructor(
+    id: string,
+    format: string,
+    removeCallback?: () => void,
+    support: boolean = true
+  ) {
     this.id = id;
     this.format = format;
     this.removeCallback = removeCallback;
+    this.support = support;
   }
 }
 
@@ -122,12 +144,19 @@ export class KeyCondition
   type = DownloadConditionType.KEY;
   id: string;
   key: string;
+  support: boolean;
   removeCallback?: () => void;
 
-  constructor(id: string, key: string, removeCallback?: () => void) {
+  constructor(
+    id: string,
+    key: string,
+    removeCallback?: () => void,
+    support: boolean = true
+  ) {
     this.id = id;
     this.key = key;
     this.removeCallback = removeCallback;
+    this.support = support;
   }
 }
 

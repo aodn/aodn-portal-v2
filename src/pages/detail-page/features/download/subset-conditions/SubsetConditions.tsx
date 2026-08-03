@@ -97,7 +97,8 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
           existing.id,
           start,
           end,
-          existing.removeCallback
+          existing.removeCallback,
+          existing.support
         ),
       ]);
     },
@@ -122,7 +123,8 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
           ? new PolygonCondition(
               existing.id,
               coordinates,
-              existing.removeCallback
+              existing.removeCallback,
+              existing.support
             )
           : c
       );
