@@ -329,6 +329,7 @@ const HeaderSection = () => {
             >
               <Typography
                 variant="heading3"
+                component="h1"
                 aria-label="collection title"
                 color={portalTheme.palette.text2}
                 sx={{
