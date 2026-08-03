@@ -130,6 +130,21 @@ describe("renderPage", () => {
     );
   });
 
+  test("replaces a site-wide description from the template with the record's", () => {
+    const templateWithDescription = TEMPLATE.replace(
+      "</head>",
+      '<meta name="description" content="Site-wide description." /></head>'
+    );
+
+    const html = renderPage(templateWithDescription, collection);
+
+    expect(html.match(/<meta name="description"/g)).toHaveLength(1);
+    expect(html).toContain(
+      '<meta name="description" content="Daily SST observations around Australia." />'
+    );
+    expect(html).not.toContain("Site-wide description.");
+  });
+
   test("caps the meta description at 160 characters", () => {
     const html = renderPage(TEMPLATE, {
       id: "abc-123",

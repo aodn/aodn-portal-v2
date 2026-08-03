@@ -75,6 +75,8 @@ export default ({ mode }: ConfigEnv) => {
         const seoTags = `
         <!-- SEO -->
 
+        <meta name="description" content="Open access to Australian marine and climate science data." />
+
         ${
           !isProduction
             ? `<!-- Non-prod: block indexing -->
