@@ -35,7 +35,7 @@ const renderBannerText = () => {
             }}
           >
             IMOS Australian
-          </Typography>
+          </Typography>{" "}
           <Typography
             variant="slogan1"
             sx={{
