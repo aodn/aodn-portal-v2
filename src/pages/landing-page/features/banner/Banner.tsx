@@ -17,6 +17,8 @@ const renderBannerText = () => {
         alignItems="start"
         data-testid="hero-text"
       >
+        {/* Both slogan lines form the page's single h1 (SEO); the flex
+            column keeps them on separate lines exactly as before */}
         <Box
           component="h1"
           m={0}
@@ -35,7 +37,8 @@ const renderBannerText = () => {
             }}
           >
             IMOS Australian
-          </Typography>{" "}
+          </Typography>
+          {/* Without this space the h1 text reads "AustralianOcean" */}{" "}
           <Typography
             variant="slogan1"
             sx={{
