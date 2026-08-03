@@ -9,7 +9,15 @@ import {
   Typography,
 } from "@mui/material";
 import { border, borderRadius, color, padding } from "../../styles/constants";
-import { FC, Fragment, SyntheticEvent, useRef, useState } from "react";
+import {
+  FC,
+  Fragment,
+  MouseEvent,
+  SyntheticEvent,
+  useRef,
+  useState,
+} from "react";
+import { Link as RouterLink } from "react-router-dom";
 import OrganizationLogo from "../icon/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import { ResultCardBasicType } from "./ResultCards";
@@ -23,6 +31,7 @@ import { portalTheme } from "../../styles";
 import { OpenType } from "../../hooks/useTabNavigation";
 import ContextMenu, { ContextMenuRef } from "../menu/ContextMenu";
 import LabelChip from "../common/label/LabelChip";
+import { pageDefault } from "../common/constants";
 
 interface ListResultCardProps extends ResultCardBasicType {}
 
@@ -164,7 +173,12 @@ const ListResultCard: FC<ListResultCardProps> = ({
             }}
             title={
               <Typography
-                onClick={() => onClickDetail?.(uuid)}
+                component={RouterLink}
+                to={`${pageDefault.details}/${uuid}`}
+                onClick={(event: MouseEvent<HTMLAnchorElement>) => {
+                  event.preventDefault();
+                  onClickDetail?.(uuid);
+                }}
                 variant="title1Medium"
                 color={portalTheme.palette.text1}
                 title={title}
@@ -177,6 +191,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
                   WebkitBoxOrient: "vertical",
                   cursor: "pointer",
                   alignItems: "flex-start",
+                  textDecoration: "none",
                 }}
                 data-testid="result-card-title"
                 onContextMenu={(e) => menuRef.current?.openContextMenu(e)}
