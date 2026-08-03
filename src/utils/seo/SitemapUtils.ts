@@ -11,7 +11,10 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { BASE_URL } from "./constants";
 
-const API_URL = `${BASE_URL}/api/v1/ogc/collections`;
+// Fetching may target a different host than the public URLs written into the
+// sitemap, e.g. when BASE_URL is unreachable from the build machine
+const COLLECTIONS_FETCH_BASE = process.env.SEO_API_BASE ?? BASE_URL;
+const API_URL = `${COLLECTIONS_FETCH_BASE}/api/v1/ogc/collections`;
 const PAGE_SIZE = 1000;
 const MAX_RETRIES = 3;
 

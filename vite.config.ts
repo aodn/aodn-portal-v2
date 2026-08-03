@@ -93,6 +93,20 @@ export default ({ mode }: ConfigEnv) => {
     };
   };
 
+  const runningInGithubActions = Boolean(process.env.GITHUB_ACTIONS);
+
+  const warnSeoStepFailed = (step: string, error: unknown) => {
+    const message = error instanceof Error ? error.message : String(error);
+    if (runningInGithubActions) {
+      // "::warning ...::" renders as an annotation on the Actions run page
+      console.warn(
+        `::warning title=${step} failed::${message} — dist is missing SEO artifacts; deploy continues`
+      );
+    } else {
+      console.warn(`${step} failed (non-prod, ignored):`, error);
+    }
+  };
+
   const generateSitemapPlugin = () => {
     return {
       name: "generate-sitemap",
@@ -107,7 +121,7 @@ export default ({ mode }: ConfigEnv) => {
         } catch (error) {
           // Edge builds run on every merge; a beta API hiccup must not block deploys
           if (mode === "prod") throw error;
-          console.warn("Sitemap generation failed (non-prod, ignored):", error);
+          warnSeoStepFailed("Sitemap generation", error);
         }
       },
     };
@@ -125,7 +139,7 @@ export default ({ mode }: ConfigEnv) => {
           await prerenderDetailPages(path.resolve(__dirname, "dist"));
         } catch (error) {
           if (mode === "prod") throw error;
-          console.warn("Detail prerender failed (non-prod, ignored):", error);
+          warnSeoStepFailed("Detail prerender", error);
         }
       },
     };
