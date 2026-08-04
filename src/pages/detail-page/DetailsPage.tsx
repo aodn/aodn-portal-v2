@@ -27,9 +27,16 @@ const DetailsPage = () => {
           paddingY: padding.large,
           backgroundColor: color.blue.light,
         }}
-        contentAreaStyle={{ width: PAGE_CONTENT_WIDTH_DETAIL }}
+        contentAreaStyle={{
+          width: PAGE_CONTENT_WIDTH_DETAIL,
+          // SectionContainer defaults to alignItems: center. Grid2 no longer
+          // forces width:100% on containers, so centered children shrink and
+          // column/row spacing collapses. Stretch so the page grid fills the
+          // content width like legacy Grid did.
+          alignItems: "stretch",
+        }}
       >
-        <Grid container spacing={2}>
+        <Grid container spacing={2} sx={{ width: "100%" }}>
           <Grid size={12}>
             <HeaderSection />
           </Grid>
