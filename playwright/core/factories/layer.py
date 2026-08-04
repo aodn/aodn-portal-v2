@@ -24,8 +24,8 @@ class LayerFactory:
             return self.map.get_Spider_Layer_id()
         elif layer_type == LayerStyle.GEO_SERVER:
             return self.map.get_Geo_Server_Layer_id()
-        elif layer_type == LayerStyle.HEX_GRID:
-            return self.map.get_Hex_Grid_Layer_id()
+        elif layer_type == LayerStyle.DATA_DENSITY:
+            return self.map.get_Data_Density_Layer_id()
         elif layer_type == LayerStyle.SPATIAL_EXTENT:
             return self.map.get_Spatial_Extent_Layer_id()
         else:

@@ -12,6 +12,7 @@ from pages.js_scripts.js_utils import (
 
 class Map(BasePage):
     def __init__(self, page: Page, map_id: str):
+        super().__init__(page)
         self.page = page
         self.map_id = map_id
         load_map_js_functions(page)
@@ -33,7 +34,7 @@ class Map(BasePage):
             'reference-show-hide-menu-button'
         )
         self.layers_menu = self.get_by_id('layer-show-hide-menu-button')
-        self.hex_grid_layer = page.get_by_role('radio', name='Hex Grid')
+        self.data_density_layer = page.get_by_role('radio', name='Data Density')
         self.geoserver_layer = page.get_by_role('radio', name='GeoServer')
         self.spatial_extent_layer = page.get_by_role(
             'radio', name='Spatial Extent'
@@ -220,10 +221,10 @@ class Map(BasePage):
             'getGeoServerLayer', is_map_loading=False
         )
 
-    def get_Hex_Grid_Layer_id(self) -> str:
-        """Get the Hex Grid layer id"""
+    def get_Data_Density_Layer_id(self) -> str:
+        """Get the PMTiles Data Density layer id (for visibility checks)."""
         return self.get_layer_id_from_test_props(
-            'getHexbinLayer', is_map_loading=False
+            'getPmtilesLayer', is_map_loading=False
         )
 
     def get_Spatial_Extent_Layer_id(self) -> str:

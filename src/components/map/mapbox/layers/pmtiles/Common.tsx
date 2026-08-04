@@ -27,6 +27,12 @@ export enum TimeGroupBy {
 export interface PMTilesMetadataRange {
   minPeriod: PeriodInt;
   maxPeriod: PeriodInt;
+  /**
+   * False when the tile used a synthetic period (source parquet had no TIME).
+   * Real single-day archives still have hasTime true even when min === max.
+   * Legacy sidecars without the field are parsed as true.
+   */
+  hasTime: boolean;
 }
 
 /** Default when `.metadata` is missing or invalid. */

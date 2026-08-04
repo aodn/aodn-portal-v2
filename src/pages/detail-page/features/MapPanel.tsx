@@ -37,7 +37,6 @@ import {
   Polygon,
 } from "geojson";
 import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
-import HexbinLayer from "../../../components/map/mapbox/layers/HexbinLayer";
 import GeoServerLayer, {
   Dimension,
 } from "../../../components/map/mapbox/layers/GeoServerLayer";
@@ -118,17 +117,15 @@ export const buildMapLayerConfig = (
     const datasetTypes = collection.getDatasetType() ?? [];
     const zarrOnlyDataset =
       datasetTypes.length === 1 && datasetTypes[0] === DatasetType.ZARR;
-    const parquetOnlyDataset =
-      datasetTypes.length === 1 && datasetTypes[0] === DatasetType.PARQUET;
-    const zarrParquetDataset =
-      datasetTypes.includes(DatasetType.ZARR) &&
-      datasetTypes.includes(DatasetType.PARQUET);
-
-    const isSupportHexbin = zarrParquetDataset || parquetOnlyDataset;
+    // Parquet / mixed CO density is shown via PMTiles (legacy Hex Grid removed).
+    const hasCoDensity =
+      datasetTypes.includes(DatasetType.PARQUET) ||
+      datasetTypes.includes(DatasetType.ZARR);
 
     const isSupportSpatialExtent =
       hasSpatialExtent &&
-      (zarrOnlyDataset || (!isWMSAvailable && !isSupportHexbin));
+      (zarrOnlyDataset ||
+        (!isWMSAvailable && !hasCoDensity && !isSupportPMTiles));
 
     if (isSupportPMTiles) {
       const pmtiles: LayerSwitcherLayer<LayerName> = {
@@ -139,21 +136,11 @@ export const buildMapLayerConfig = (
       layers.push(pmtiles);
     }
 
-    if (isSupportHexbin) {
-      const l: LayerSwitcherLayer<LayerName> = {
-        id: LayerName.Hexbin,
-        name: "Hex Grid",
-        // PMTiles takes priority when both are available
-        selected: !isSupportPMTiles,
-      };
-      layers.push(l);
-    }
-
     if (isWMSAvailable) {
       const l: LayerSwitcherLayer<LayerName> = {
         id: LayerName.GeoServer,
         name: "Geoserver",
-        selected: !isSupportHexbin && !isSupportPMTiles,
+        selected: !isSupportPMTiles,
       };
       layers.push(l);
     }
@@ -234,75 +221,72 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     [mapLayerConfig]
   );
 
-  const [hasSummaryFeature, noMapPreview, minDateStamp, maxDateStamp] =
-    useMemo(() => {
-      const hasSummaryFeature = collection?.hasSummaryFeature() || false;
-      const bbox = collection?.getBBox();
-      const hasSpatialExtent = Array.isArray(bbox) && bbox.length > 0;
-      const scope = collection?.getScope();
-      const isDocumentScope = scope?.toLowerCase() === "document";
-      const noMapPreview = isDocumentScope
-        ? !hasSpatialExtent
-        : downloadService === DownloadServiceType.Unavailable &&
-          !hasSpatialExtent &&
-          !isWMSAvailable;
+  const [noMapPreview, minDateStamp, maxDateStamp] = useMemo(() => {
+    const bbox = collection?.getBBox();
+    const hasSpatialExtent = Array.isArray(bbox) && bbox.length > 0;
+    const scope = collection?.getScope();
+    const isDocumentScope = scope?.toLowerCase() === "document";
+    const noMapPreview = isDocumentScope
+      ? !hasSpatialExtent
+      : downloadService === DownloadServiceType.Unavailable &&
+        !hasSpatialExtent &&
+        !isWMSAvailable;
 
-      let start: Dayjs;
-      let end: Dayjs;
+    let start: Dayjs;
+    let end: Dayjs;
 
-      // PMTiles layer: sidecar periods are ints; convert to Dayjs only for the slider
-      const pmtilesDayjs =
-        selectedMapLayerId === LayerName.PMTiles && pmtilesPeriodRange
-          ? metadataRangeToDayjs(
-              pmtilesPeriodRange,
-              pmtilesPeriodRange.timeGroupBy
-            )
-          : null;
-
-      if (pmtilesDayjs) {
-        start = pmtilesDayjs.minDate;
-        end = pmtilesDayjs.maxDate;
-      } else if (
-        downloadService === DownloadServiceType.CloudOptimised &&
-        featureCollection?.features?.length
-      ) {
-        [start, end] = getMinMaxDateStamps(featureCollection);
-      } else {
-        start = dayjs(dateDefault.min);
-        end = dayjs(dateDefault.max);
-
-        const extent = collection?.getExtent();
-        if (extent) {
-          const [s, e] = extent.getOverallTemporal();
-          start =
-            s === undefined ? start : dayjs(s, dateDefault.DISPLAY_FORMAT);
-          end = e === undefined ? end : dayjs(e, dateDefault.DISPLAY_FORMAT);
-        }
-      }
-
-      startTransition(() => {
-        setMapLayerConfig(
-          buildMapLayerConfig(
-            collection,
-            isWMSAvailable,
-            hasSpatialExtent,
-            isSupportPMTiles,
-            lastSelectedMapLayer
+    // PMTiles layer: sidecar periods are ints; convert to Dayjs only for the slider
+    const pmtilesDayjs =
+      selectedMapLayerId === LayerName.PMTiles && pmtilesPeriodRange
+        ? metadataRangeToDayjs(
+            pmtilesPeriodRange,
+            pmtilesPeriodRange.timeGroupBy
           )
-        );
-      });
+        : null;
 
-      return [hasSummaryFeature, noMapPreview, start, end];
-    }, [
-      collection,
-      downloadService,
-      featureCollection,
-      isWMSAvailable,
-      isSupportPMTiles,
-      lastSelectedMapLayer,
-      selectedMapLayerId,
-      pmtilesPeriodRange,
-    ]);
+    if (pmtilesDayjs) {
+      start = pmtilesDayjs.minDate;
+      end = pmtilesDayjs.maxDate;
+    } else if (
+      downloadService === DownloadServiceType.CloudOptimised &&
+      featureCollection?.features?.length
+    ) {
+      [start, end] = getMinMaxDateStamps(featureCollection);
+    } else {
+      start = dayjs(dateDefault.min);
+      end = dayjs(dateDefault.max);
+
+      const extent = collection?.getExtent();
+      if (extent) {
+        const [s, e] = extent.getOverallTemporal();
+        start = s === undefined ? start : dayjs(s, dateDefault.DISPLAY_FORMAT);
+        end = e === undefined ? end : dayjs(e, dateDefault.DISPLAY_FORMAT);
+      }
+    }
+
+    startTransition(() => {
+      setMapLayerConfig(
+        buildMapLayerConfig(
+          collection,
+          isWMSAvailable,
+          hasSpatialExtent,
+          isSupportPMTiles,
+          lastSelectedMapLayer
+        )
+      );
+    });
+
+    return [noMapPreview, start, end];
+  }, [
+    collection,
+    downloadService,
+    featureCollection,
+    isWMSAvailable,
+    isSupportPMTiles,
+    lastSelectedMapLayer,
+    selectedMapLayerId,
+    pmtilesPeriodRange,
+  ]);
 
   const [filterStartDate, filterEndDate] = useMemo(() => {
     const dateRangeConditionGeneric = downloadConditions.find(
@@ -399,14 +383,16 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       switch (subsettingType) {
         case SubsettingType.TimeSlider:
           return (
-            hasSummaryFeature ||
-            // PMTiles density is filtered by date range from `.metadata` coverage
-            (isSupportPMTiles && selectedMapLayerId === LayerName.PMTiles) ||
+            // PMTiles density is filtered by date range from `.metadata` coverage.
+            // Timeless tiles (`has_time: false`) have no real temporal dimension.
+            (isSupportPMTiles &&
+              selectedMapLayerId === LayerName.PMTiles &&
+              pmtilesPeriodRange?.hasTime !== false) ||
             (selectedMapLayerId === LayerName.GeoServer && timeSliderSupport)
           );
         case SubsettingType.DrawRect:
           return (
-            (hasSummaryFeature ||
+            ((isSupportPMTiles && selectedMapLayerId === LayerName.PMTiles) ||
               (selectedMapLayerId === LayerName.GeoServer &&
                 drawRectSupport)) &&
             downloadService !== DownloadServiceType.Unavailable
@@ -416,9 +402,9 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       }
     },
     [
-      hasSummaryFeature,
       isSupportPMTiles,
       selectedMapLayerId,
+      pmtilesPeriodRange?.hasTime,
       timeSliderSupport,
       drawRectSupport,
       downloadService,
@@ -626,14 +612,6 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
                 onMetadataPeriodChange={handlePmtilesMetadataPeriodChange}
               />
             )}
-            <HexbinLayer
-              featureCollection={featureCollection}
-              filterStartDate={filterStartDate}
-              filterEndDate={filterEndDate}
-              visible={selectedMapLayerId === LayerName.Hexbin}
-              selectedCoKey={selectedCoKey}
-              onSelectCoKey={setSelectedCoKey}
-            />
             <GeoServerLayer
               geoServerLayerConfig={geoServerLayerConfig}
               onWMSAvailabilityChange={onWMSAvailabilityChange}
