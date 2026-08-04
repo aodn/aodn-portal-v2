@@ -1,14 +1,12 @@
 /**
- * SEO — the collections FETCH host is overridable, the PUBLIC host is not.
- *
- * Sitemap and prerender fetch every record at build time. When the build
- * machine cannot reach BASE_URL (e.g. a WAF blocks CI runners), SEO_API_BASE
- * redirects only the fetches; URLs written into the sitemap must keep using
- * the public BASE_URL.
+ * SEO — records are fetched from the API origin (OGC_API_BASE), while the URLs
+ * written into the sitemap use the public site host (BASE_URL). Fetching via
+ * the public host puts the CDN and its WAF between CI and the data it needs.
  */
 
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { BASE_URL } from "../constants";
+import { BASE_URL, OGC_API_BASE } from "../constants";
+import { describeFetchError } from "../SitemapUtils";
 
 // One page with no search_after ends the pagination loop immediately
 const singlePage = { total: 1, collections: [{ id: "abc-123" }] };
@@ -31,31 +29,39 @@ const interceptFetch = () => {
 const requestedUrl = (fetch: ReturnType<typeof interceptFetch>) =>
   String(fetch.mock.calls[0][0]);
 
+describe("describeFetchError", () => {
+  test("surfaces the cause, without which every network failure reads the same", () => {
+    const error = new Error("fetch failed");
+    (error as Error & { cause?: unknown }).cause = new Error(
+      "getaddrinfo ENOTFOUND ogcapi-production.aodn.org.au"
+    );
+
+    expect(describeFetchError(error)).toBe(
+      "fetch failed: getaddrinfo ENOTFOUND ogcapi-production.aodn.org.au"
+    );
+  });
+
+  test("falls back to the message when there is no cause", () => {
+    expect(describeFetchError(new Error("HTTP 503 for /collections"))).toBe(
+      "HTTP 503 for /collections"
+    );
+  });
+});
+
 describe("fetchAllCollections fetch host", () => {
   afterEach(() => {
-    vi.unstubAllEnvs();
     vi.unstubAllGlobals();
   });
 
-  test("without SEO_API_BASE it fetches from the public BASE_URL", async () => {
+  test("fetches from the API origin, not the public site host", async () => {
     const fetch = interceptFetch();
     const { fetchAllCollections } = await importFreshSitemapUtils();
 
     const collections = await fetchAllCollections();
 
     expect(collections).toEqual(singlePage.collections);
-    expect(requestedUrl(fetch)).toContain(`${BASE_URL}/api/v1/ogc/collections`);
-  });
-
-  test("with SEO_API_BASE it fetches from the override host instead", async () => {
-    vi.stubEnv("SEO_API_BASE", "https://api.example.internal");
-    const fetch = interceptFetch();
-    const { fetchAllCollections } = await importFreshSitemapUtils();
-
-    await fetchAllCollections();
-
     expect(requestedUrl(fetch)).toContain(
-      "https://api.example.internal/api/v1/ogc/collections"
+      `${OGC_API_BASE}/api/v1/ogc/collections`
     );
     expect(requestedUrl(fetch)).not.toContain(BASE_URL);
   });

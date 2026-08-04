@@ -1,32 +1,20 @@
 /**
- * SEO — the Vite plugins that wire the SEO build steps together.
+ * SEO — the Vite plugins that build the static parts of the head.
  *
  * What must hold:
  * - the head tags land in index.html in place of the placeholder
- * - sitemap/prerender run on prod and edge builds only
- * - a failing step throws on prod (blocks the release) but only warns on
- *   edge (deploys must not be blocked by an API hiccup)
  * - each environment ships its own robots.txt
+ * - the build never fetches records; sitemap.xml and the pre-rendered
+ *   /details pages come from the Publish SEO Artifacts workflow
  */
 
 import { afterEach, describe, expect, test, vi } from "vitest";
 import fs from "fs";
 import {
   copyRobotsPlugin,
-  generateSitemapPlugin,
   inlineSeoTagsPlugin,
-  prerenderDetailsPlugin,
+  seoPlugins,
 } from "../vitePlugins";
-
-vi.mock("../SitemapUtils", () => ({
-  generateSitemap: vi.fn(),
-}));
-vi.mock("../PrerenderUtils", () => ({
-  prerenderDetailPages: vi.fn(),
-}));
-
-import { generateSitemap } from "../SitemapUtils";
-import { prerenderDetailPages } from "../PrerenderUtils";
 
 const options = (mode: string) => ({ mode, rootDir: "/repo" });
 
@@ -41,48 +29,11 @@ describe("inlineSeoTagsPlugin", () => {
   });
 });
 
-describe("generate-sitemap and prerender-details build steps", () => {
-  afterEach(() => {
-    vi.clearAllMocks();
-    vi.restoreAllMocks();
-  });
+describe("seoPlugins", () => {
+  test("no plugin fetches records at build time", () => {
+    const names = seoPlugins(options("prod")).map((plugin) => plugin.name);
 
-  test("run on prod and edge builds", async () => {
-    for (const mode of ["prod", "edge"]) {
-      await generateSitemapPlugin(options(mode)).closeBundle();
-      await prerenderDetailsPlugin(options(mode)).closeBundle();
-    }
-
-    expect(generateSitemap).toHaveBeenCalledTimes(2);
-    expect(prerenderDetailPages).toHaveBeenCalledTimes(2);
-  });
-
-  test("are skipped on dev and staging builds", async () => {
-    for (const mode of ["dev", "staging", "test"]) {
-      await generateSitemapPlugin(options(mode)).closeBundle();
-      await prerenderDetailsPlugin(options(mode)).closeBundle();
-    }
-
-    expect(generateSitemap).not.toHaveBeenCalled();
-    expect(prerenderDetailPages).not.toHaveBeenCalled();
-  });
-
-  test("a failing step blocks a prod build", async () => {
-    vi.mocked(generateSitemap).mockRejectedValueOnce(new Error("api down"));
-
-    await expect(
-      generateSitemapPlugin(options("prod")).closeBundle()
-    ).rejects.toThrow("api down");
-  });
-
-  test("a failing step only warns on an edge build", async () => {
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    vi.mocked(generateSitemap).mockRejectedValueOnce(new Error("api down"));
-
-    await generateSitemapPlugin(options("edge")).closeBundle();
-
-    expect(warn).toHaveBeenCalled();
-    expect(warn.mock.calls[0].map(String).join(" ")).toContain("api down");
+    expect(names).toEqual(["inline-seo", "copy-robots-txt"]);
   });
 });
 

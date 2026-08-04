@@ -9,12 +9,10 @@
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
-import { BASE_URL } from "./constants";
+import { BASE_URL, OGC_API_BASE } from "./constants";
 
-// Fetching may target a different host than the public URLs written into the
-// sitemap, e.g. when BASE_URL is unreachable from the build machine
-const COLLECTIONS_FETCH_BASE = process.env.SEO_API_BASE ?? BASE_URL;
-const API_URL = `${COLLECTIONS_FETCH_BASE}/api/v1/ogc/collections`;
+// Fetch host is independent of the public URLs written into the sitemap
+const API_URL = `${OGC_API_BASE}/api/v1/ogc/collections`;
 const PAGE_SIZE = 1000;
 const MAX_RETRIES = 3;
 
@@ -37,6 +35,17 @@ interface CollectionsPage {
   search_after?: string[];
 }
 
+// Node reports every network failure as "fetch failed" and puts the reason that
+// actually identifies it — DNS, TLS, connection reset — in error.cause
+export const describeFetchError = (error: unknown) => {
+  if (!(error instanceof Error)) return String(error);
+  // Node has carried .cause since 16.9; the ES2020 lib just does not type it
+  const { cause } = error as Error & { cause?: unknown };
+  return cause instanceof Error
+    ? `${error.message}: ${cause.message}`
+    : error.message;
+};
+
 const fetchJsonWithRetry = async (url: string): Promise<CollectionsPage> => {
   for (let attempt = 1; ; attempt++) {
     try {
@@ -48,9 +57,15 @@ const fetchJsonWithRetry = async (url: string): Promise<CollectionsPage> => {
       }
       return await response.json();
     } catch (error) {
-      if (attempt >= MAX_RETRIES) throw error;
-      const message = error instanceof Error ? error.message : String(error);
-      console.warn(`Attempt ${attempt} failed (${message}), retrying...`);
+      if (attempt >= MAX_RETRIES) {
+        throw new Error(
+          `Gave up after ${MAX_RETRIES} attempts on ${url} — ${describeFetchError(error)}`
+        );
+      }
+      const retryInSeconds = (2000 * attempt) / 1000;
+      console.warn(
+        `Attempt ${attempt}/${MAX_RETRIES} failed (${describeFetchError(error)}), retrying in ${retryInSeconds}s`
+      );
       await new Promise((resolve) => setTimeout(resolve, 2000 * attempt));
     }
   }
@@ -63,6 +78,8 @@ export const fetchAllCollections = async (
   const collections: OgcCollection[] = [];
   let searchAfter: string[] | undefined;
   let total: number | undefined;
+
+  console.log(`Fetching ${properties} from ${API_URL}`);
 
   for (;;) {
     let filter = `page_size=${PAGE_SIZE}`;
@@ -91,13 +108,15 @@ export const fetchAllCollections = async (
 const escapeXml = (value: string) =>
   value.replace(/[<>&'"]/g, (c) => `&#${c.charCodeAt(0)};`);
 
-const toSitemapXml = (uuids: string[]) => {
+export const toSitemapXml = (uuids: string[], generatedAt = new Date()) => {
   const urls = [
     `${BASE_URL}/`,
     ...uuids.map((uuid) => `${BASE_URL}/details/${uuid}`),
   ];
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
+    // Crawlers ignore comments; this tells a human how stale the live file is
+    `<!-- generated ${generatedAt.toISOString()} by the Publish SEO Artifacts workflow -->`,
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
     ...urls.map((url) => `  <url><loc>${escapeXml(url)}</loc></url>`),
     "</urlset>",
@@ -105,8 +124,12 @@ const toSitemapXml = (uuids: string[]) => {
   ].join("\n");
 };
 
-export const generateSitemap = async (outDir: string) => {
-  const uuids = (await fetchAllCollections())
+// Pass collections in to reuse a fetch the caller has already paid for
+export const generateSitemap = async (
+  outDir: string,
+  collections?: OgcCollection[]
+) => {
+  const uuids = (collections ?? (await fetchAllCollections()))
     .map((collection) => collection.id)
     .filter((id): id is string => Boolean(id));
   if (uuids.length === 0) {
