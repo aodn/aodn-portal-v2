@@ -3,6 +3,9 @@ from playwright.sync_api import Page, expect
 
 from pages.detail_page import DetailPage
 
+# dataset_metadata (PMTiles) and WMS layer list can lag under CI load.
+_UI_TIMEOUT_MS = 30_000
+
 
 @pytest.mark.parametrize(
     'uuid',
@@ -23,12 +26,26 @@ def test_map_data_density_layer_from_summary(
     """
     detail_page = DetailPage(desktop_page)
     detail_page.load(uuid)
+    # GeoServer layer-select spinner is independent of PMTiles support, which
+    # only appears after dataset_metadata resolves isSupportPMTiles.
+    detail_page.detail_map.wait_for_map_loading()
     detail_page.detail_map.wait_for_layer_select_loading()
+    detail_page.detail_map.wait_for_map_idle()
 
+    expect(detail_page.detail_map.layers_menu).to_be_visible(
+        timeout=_UI_TIMEOUT_MS
+    )
     detail_page.detail_map.layers_menu.click()
-    expect(detail_page.detail_map.data_density_layer).to_be_visible()
-    expect(detail_page.detail_map.data_density_layer).to_be_checked()
-    expect(detail_page.detail_map.geoserver_layer).to_be_visible()
+    # Data Density mounts only after parquet keys exist in dataset_metadata.
+    expect(detail_page.detail_map.data_density_layer).to_be_visible(
+        timeout=_UI_TIMEOUT_MS
+    )
+    expect(detail_page.detail_map.data_density_layer).to_be_checked(
+        timeout=_UI_TIMEOUT_MS
+    )
+    expect(detail_page.detail_map.geoserver_layer).to_be_visible(
+        timeout=_UI_TIMEOUT_MS
+    )
 
 
 @pytest.mark.parametrize(
@@ -55,9 +72,12 @@ def test_map_popup_from_feature(
     detail_page = DetailPage(desktop_page)
     detail_page.load(uuid)
 
+    detail_page.detail_map.wait_for_map_loading()
     detail_page.detail_map.wait_for_map_idle()
     detail_page.detail_map.hover_map()
     detail_page.detail_map.click_map()
 
-    expect(detail_page.detail_map_popup).to_be_visible()
-    expect(detail_page.detail_map_popup).to_contain_text(data)
+    expect(detail_page.detail_map_popup).to_be_visible(timeout=_UI_TIMEOUT_MS)
+    expect(detail_page.detail_map_popup).to_contain_text(
+        data, timeout=_UI_TIMEOUT_MS
+    )

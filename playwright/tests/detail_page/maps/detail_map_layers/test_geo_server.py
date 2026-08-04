@@ -1,3 +1,4 @@
+import time
 from http import HTTPStatus
 
 import pytest
@@ -6,7 +7,11 @@ from playwright.sync_api import Page, expect
 from core.enums.map_layers.layer_style import LayerStyle
 from core.factories.layer import LayerFactory
 from mocks.api_router import ApiRouter
+from mocks.routes import Routes
 from pages.detail_page import DetailPage
+
+# Map mount / WMS fields round-trip can lag under CI load (esp. mobile map tab).
+_UI_TIMEOUT_MS = 30_000
 
 
 @pytest.mark.parametrize(
@@ -260,7 +265,9 @@ def test_data_not_on_whitelist(responsive_page: Page, uuid: str) -> None:
     It verifies that the GeoServer layer does not appear on the map, while the Spatial Extent layer is displayed.
     """
     detail_page = DetailPage(responsive_page)
-    # Mock WMS downloadable fields API to return 401 Unauthorized
+    # apply_mock already registers wms_fields (200 + [] when no fixture). Replace
+    # all handlers so the app reliably receives 401 Unauthorized (whitelist).
+    responsive_page.unroute(Routes.WMS_FIELDS)
     api_router = ApiRouter(responsive_page)
     api_router.route_wms_fields(
         lambda route: route.fulfill(status=HTTPStatus.UNAUTHORIZED)
@@ -270,12 +277,31 @@ def test_data_not_on_whitelist(responsive_page: Page, uuid: str) -> None:
     detail_page.load(uuid)
     detail_page.go_to_map_tab()
     detail_page.detail_map.wait_for_map_loading()
-
-    # Ensure that the Spatial Extent option is displayed in the layers menu
     detail_page.detail_map.wait_for_map_idle()
-    detail_page.detail_map.layers_menu.click()
-    expect(detail_page.detail_map.spatial_extent_layer).to_be_visible()
 
-    # Verify that the Spatial Extent layer is present and visible on the map
+    # Layer switcher only mounts after mapLayerConfig is built.
+    expect(detail_page.detail_map.layers_menu).to_be_visible(
+        timeout=_UI_TIMEOUT_MS
+    )
+    detail_page.detail_map.layers_menu.click()
+    # Spatial Extent replaces GeoServer only after wms_fields 401 flips
+    # isWMSAvailable — open the menu and wait for that config update.
+    expect(detail_page.detail_map.spatial_extent_layer).to_be_visible(
+        timeout=_UI_TIMEOUT_MS
+    )
+
+    # GeojsonLayer paints after map idle + selectedMapLayerId === SpatialExtent.
     layer_id = layer_factory.get_layer_id(LayerStyle.SPATIAL_EXTENT)
-    assert detail_page.detail_map.is_map_layer_visible(layer_id) is True
+    layer_visible = False
+    deadline = time.monotonic() + (_UI_TIMEOUT_MS / 1000)
+    while time.monotonic() < deadline:
+        if detail_page.detail_map.is_map_layer_visible(
+            layer_id, is_map_loading=False
+        ):
+            layer_visible = True
+            break
+        detail_page.page.wait_for_timeout(250)
+    assert layer_visible is True, (
+        f'Spatial Extent layer {layer_id!r} was not visible within '
+        f'{_UI_TIMEOUT_MS}ms'
+    )

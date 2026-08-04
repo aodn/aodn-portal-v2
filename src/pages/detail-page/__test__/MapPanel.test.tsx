@@ -1,21 +1,28 @@
 import { describe, expect, it, vi } from "vitest";
-import {
-  buildMapLayerConfig,
-  checkSubsettingSupport,
-  SubsettingSupportInput,
-} from "../features/MapPanel";
+import { buildMapLayerConfig } from "../features/MapPanel";
 import {
   DatasetType,
   OGCCollection,
 } from "@/app/store/OGCCollectionDefinitions";
 import {
+  defaultMapSubsettingCapabilities,
   DownloadServiceType,
+  evaluateSubsettingSupport,
+  MapSubsettingCapabilities,
   SubsettingType,
 } from "../context/DownloadDefinitions";
 import {
   LayerName,
   LayerSwitcherLayer,
 } from "@/components/map/mapbox/controls/menu/MapLayerSwitcher";
+
+const layerNames = {
+  PMTiles: LayerName.PMTiles,
+  GeoServer: LayerName.GeoServer,
+};
+
+const isSupported = (type: SubsettingType, caps: MapSubsettingCapabilities) =>
+  evaluateSubsettingSupport(type, caps, layerNames);
 
 // `buildMapLayerConfig` only reads the dataset types off the collection
 const createMockCollection = (datasetTypes?: DatasetType[]) =>
@@ -288,22 +295,21 @@ describe("MapPanel expected behaviour table", () => {
           ? DownloadServiceType.WFS
           : DownloadServiceType.Unavailable;
 
-      const input: SubsettingSupportInput = {
+      const caps: MapSubsettingCapabilities = {
         hasCloudOptimisedData,
-        downloadService,
-        selectedMapLayerId: layers.find((l) => l.selected)?.id,
+        downloadServiceAvailable:
+          downloadService !== DownloadServiceType.Unavailable,
+        selectedLayerId: layers.find((l) => l.selected)?.id ?? null,
         isSupportPMTiles,
-        pmtilesHasTime,
-        timeSliderSupport: wmsHasDatetimeField,
-        drawRectSupport: wmsHasGeomField,
+        pmtilesHasTime: pmtilesHasTime ?? null,
+        geoServerHasTime: wmsHasDatetimeField,
+        geoServerDrawRect: wmsHasGeomField,
       };
 
-      expect(checkSubsettingSupport(SubsettingType.TimeSlider, input)).toBe(
+      expect(isSupported(SubsettingType.TimeSlider, caps)).toBe(
         expectedTimeSlider
       );
-      expect(checkSubsettingSupport(SubsettingType.DrawRect, input)).toBe(
-        expectedDrawRect
-      );
+      expect(isSupported(SubsettingType.DrawRect, caps)).toBe(expectedDrawRect);
     }
   );
 });
@@ -364,32 +370,25 @@ describe("buildMapLayerConfig - lastSelectedLayer", () => {
   });
 });
 
-describe("checkSubsettingSupport", () => {
-  const buildInput = (
-    overrides: Partial<SubsettingSupportInput> = {}
-  ): SubsettingSupportInput => ({
-    hasCloudOptimisedData: false,
-    downloadService: DownloadServiceType.Unavailable,
-    selectedMapLayerId: undefined,
-    isSupportPMTiles: false,
-    pmtilesHasTime: undefined,
-    timeSliderSupport: false,
-    drawRectSupport: false,
+describe("evaluateSubsettingSupport", () => {
+  const buildCaps = (
+    overrides: Partial<MapSubsettingCapabilities> = {}
+  ): MapSubsettingCapabilities => ({
+    ...defaultMapSubsettingCapabilities,
     ...overrides,
   });
 
   describe("TimeSlider", () => {
     const isTimeSliderSupported = (
-      overrides: Partial<SubsettingSupportInput>
-    ) =>
-      checkSubsettingSupport(SubsettingType.TimeSlider, buildInput(overrides));
+      overrides: Partial<MapSubsettingCapabilities>
+    ) => isSupported(SubsettingType.TimeSlider, buildCaps(overrides));
 
     it("is off for timeless pmtiles even when the data is cloud optimised", () => {
       expect(
         isTimeSliderSupported({
           hasCloudOptimisedData: true,
-          downloadService: DownloadServiceType.CloudOptimised,
-          selectedMapLayerId: LayerName.PMTiles,
+          downloadServiceAvailable: true,
+          selectedLayerId: LayerName.PMTiles,
           isSupportPMTiles: true,
           pmtilesHasTime: false,
         })
@@ -400,7 +399,7 @@ describe("checkSubsettingSupport", () => {
       expect(
         isTimeSliderSupported({
           hasCloudOptimisedData: true,
-          selectedMapLayerId: LayerName.PMTiles,
+          selectedLayerId: LayerName.PMTiles,
           isSupportPMTiles: true,
           pmtilesHasTime: true,
         })
@@ -410,9 +409,9 @@ describe("checkSubsettingSupport", () => {
     it("is on for pmtiles before the metadata sidecar has loaded", () => {
       expect(
         isTimeSliderSupported({
-          selectedMapLayerId: LayerName.PMTiles,
+          selectedLayerId: LayerName.PMTiles,
           isSupportPMTiles: true,
-          pmtilesHasTime: undefined,
+          pmtilesHasTime: null,
         })
       ).toBe(true);
     });
@@ -421,8 +420,8 @@ describe("checkSubsettingSupport", () => {
       expect(
         isTimeSliderSupported({
           hasCloudOptimisedData: true,
-          selectedMapLayerId: LayerName.GeoServer,
-          timeSliderSupport: false,
+          selectedLayerId: LayerName.GeoServer,
+          geoServerHasTime: false,
         })
       ).toBe(true);
     });
@@ -430,14 +429,14 @@ describe("checkSubsettingSupport", () => {
     it("follows the wms datetime field when the data is not cloud optimised", () => {
       expect(
         isTimeSliderSupported({
-          selectedMapLayerId: LayerName.GeoServer,
-          timeSliderSupport: true,
+          selectedLayerId: LayerName.GeoServer,
+          geoServerHasTime: true,
         })
       ).toBe(true);
       expect(
         isTimeSliderSupported({
-          selectedMapLayerId: LayerName.GeoServer,
-          timeSliderSupport: false,
+          selectedLayerId: LayerName.GeoServer,
+          geoServerHasTime: false,
         })
       ).toBe(false);
     });
@@ -445,16 +444,17 @@ describe("checkSubsettingSupport", () => {
     it("is off on the spatial extent layer when the data is not cloud optimised", () => {
       expect(
         isTimeSliderSupported({
-          selectedMapLayerId: LayerName.SpatialExtent,
-          timeSliderSupport: true,
+          selectedLayerId: LayerName.SpatialExtent,
+          geoServerHasTime: true,
         })
       ).toBe(false);
     });
   });
 
   describe("DrawRect", () => {
-    const isDrawRectSupported = (overrides: Partial<SubsettingSupportInput>) =>
-      checkSubsettingSupport(SubsettingType.DrawRect, buildInput(overrides));
+    const isDrawRectSupported = (
+      overrides: Partial<MapSubsettingCapabilities>
+    ) => isSupported(SubsettingType.DrawRect, buildCaps(overrides));
 
     it("is on for cloud optimised data before the download service resolves", () => {
       // `downloadService` starts out Unavailable until DownloadCard's effect
@@ -462,8 +462,8 @@ describe("checkSubsettingSupport", () => {
       expect(
         isDrawRectSupported({
           hasCloudOptimisedData: true,
-          downloadService: DownloadServiceType.Unavailable,
-          selectedMapLayerId: LayerName.SpatialExtent,
+          downloadServiceAvailable: false,
+          selectedLayerId: LayerName.SpatialExtent,
         })
       ).toBe(true);
     });
@@ -471,9 +471,9 @@ describe("checkSubsettingSupport", () => {
     it("is off without a download service when the data is not cloud optimised", () => {
       expect(
         isDrawRectSupported({
-          downloadService: DownloadServiceType.Unavailable,
-          selectedMapLayerId: LayerName.GeoServer,
-          drawRectSupport: true,
+          downloadServiceAvailable: false,
+          selectedLayerId: LayerName.GeoServer,
+          geoServerDrawRect: true,
         })
       ).toBe(false);
     });
@@ -481,16 +481,16 @@ describe("checkSubsettingSupport", () => {
     it("follows the wms geom field on a wfs download", () => {
       expect(
         isDrawRectSupported({
-          downloadService: DownloadServiceType.WFS,
-          selectedMapLayerId: LayerName.GeoServer,
-          drawRectSupport: true,
+          downloadServiceAvailable: true,
+          selectedLayerId: LayerName.GeoServer,
+          geoServerDrawRect: true,
         })
       ).toBe(true);
       expect(
         isDrawRectSupported({
-          downloadService: DownloadServiceType.WFS,
-          selectedMapLayerId: LayerName.GeoServer,
-          drawRectSupport: false,
+          downloadServiceAvailable: true,
+          selectedLayerId: LayerName.GeoServer,
+          geoServerDrawRect: false,
         })
       ).toBe(false);
     });
@@ -498,8 +498,8 @@ describe("checkSubsettingSupport", () => {
     it("is on for the pmtiles layer", () => {
       expect(
         isDrawRectSupported({
-          downloadService: DownloadServiceType.WFS,
-          selectedMapLayerId: LayerName.PMTiles,
+          downloadServiceAvailable: true,
+          selectedLayerId: LayerName.PMTiles,
           isSupportPMTiles: true,
         })
       ).toBe(true);
@@ -508,9 +508,9 @@ describe("checkSubsettingSupport", () => {
     it("is off on the spatial extent layer when the data is not cloud optimised", () => {
       expect(
         isDrawRectSupported({
-          downloadService: DownloadServiceType.WFS,
-          selectedMapLayerId: LayerName.SpatialExtent,
-          drawRectSupport: true,
+          downloadServiceAvailable: true,
+          selectedLayerId: LayerName.SpatialExtent,
+          geoServerDrawRect: true,
         })
       ).toBe(false);
     });
@@ -518,9 +518,9 @@ describe("checkSubsettingSupport", () => {
 
   it("is off for an unknown subsetting type", () => {
     expect(
-      checkSubsettingSupport(
+      isSupported(
         "Unknown" as SubsettingType,
-        buildInput({ hasCloudOptimisedData: true })
+        buildCaps({ hasCloudOptimisedData: true })
       )
     ).toBe(false);
   });

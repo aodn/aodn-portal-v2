@@ -32,10 +32,7 @@ vi.mock("../features/download/subset-conditions/BaseConditionCard", () => ({
 }));
 
 import DateRangeConditionCard from "../features/download/subset-conditions/DateRangeConditionCard";
-import {
-  DateRangeCondition,
-  DownloadConditionType,
-} from "../context/DownloadDefinitions";
+import { DateRangeCondition } from "../context/DownloadDefinitions";
 
 // --- Test data -------------------------------------------------------------
 
@@ -50,12 +47,8 @@ const INSIDE_RANGE = "2022-06-15";
 const BEFORE_START = "2020-05-01";
 const AFTER_END = "2024-08-01";
 
-const buildCondition = (start: string, end: string): DateRangeCondition => ({
-  id: "test-date-range",
-  type: DownloadConditionType.DATE_RANGE,
-  start,
-  end,
-});
+const buildCondition = (start: string, end: string): DateRangeCondition =>
+  new DateRangeCondition("test-date-range", start, end);
 
 // --- DOM helpers -----------------------------------------------------------
 

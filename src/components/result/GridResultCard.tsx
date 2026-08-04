@@ -1,4 +1,5 @@
-import { FC, SyntheticEvent, useRef, useState } from "react";
+import { FC, MouseEvent, SyntheticEvent, useRef, useState } from "react";
+import { Link as RouterLink } from "react-router-dom";
 import {
   Box,
   Card,
@@ -23,6 +24,7 @@ import default_thumbnail from "@/assets/images/default-thumbnail.png";
 import { portalTheme } from "../../styles";
 import { OpenType } from "../../hooks/useTabNavigation";
 import ContextMenu, { ContextMenuRef } from "../menu/ContextMenu";
+import { pageDefault } from "../common/constants";
 
 interface GridResultCardProps extends ResultCardBasicType {}
 
@@ -131,7 +133,16 @@ const GridResultCard: FC<GridResultCardProps> = ({
         )}
 
         <Tooltip title="More details ..." placement="top">
-          <CardActionArea onClick={() => onClickDetail?.(uuid)}>
+          {/* A real href so crawlers can discover the detail page; left click
+              still runs the existing handler (which navigates with tab state) */}
+          <CardActionArea
+            component={RouterLink}
+            to={`${pageDefault.details}/${uuid}`}
+            onClick={(event: MouseEvent<HTMLAnchorElement>) => {
+              event.preventDefault();
+              onClickDetail?.(uuid);
+            }}
+          >
             <Box
               display="flex"
               alignItems="center"

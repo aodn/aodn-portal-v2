@@ -2,14 +2,17 @@ import { createContext, Dispatch, SetStateAction, useContext } from "react";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { FeatureCollection, Point } from "geojson";
 import {
+  defaultMapSubsettingCapabilities,
   DownloadConditionType,
   DownloadServiceType,
   IDownloadCondition,
+  MapSubsettingCapabilities,
+  SubsettingType,
 } from "./DownloadDefinitions";
 import {
   LayerName,
   LayerSwitcherLayer,
-} from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
+} from "@/components/map/mapbox/controls/menu/MapLayerSwitcher";
 import { CloudOptimizedFeature } from "@/app/store/CloudOptimizedDefinitions";
 import { DatasetMetadata } from "@/app/store/searchReducer";
 
@@ -17,7 +20,8 @@ export interface DetailPageContextType {
   collection: OGCCollection | undefined;
   setCollection: Dispatch<SetStateAction<OGCCollection | undefined>>;
   featureCollection:
-    FeatureCollection<Point, CloudOptimizedFeature> | undefined;
+    | FeatureCollection<Point, CloudOptimizedFeature>
+    | undefined;
   datasetMetadata: DatasetMetadata | undefined;
   isSupportPMTiles: boolean;
   isCollectionNotFound: boolean;
@@ -37,13 +41,21 @@ export interface DetailPageContextType {
   >;
   downloadService: DownloadServiceType;
   setDownloadService: Dispatch<SetStateAction<DownloadServiceType>>;
+  /** Live map-layer subsetting capabilities (published by MapPanel). */
+  mapSubsettingCapabilities: MapSubsettingCapabilities;
+  setMapSubsettingCapabilities: Dispatch<
+    SetStateAction<MapSubsettingCapabilities>
+  >;
+  /** Layer-aware support check shared by map menu and download subsetting UI. */
+  isSubsettingSupported: (type: SubsettingType) => boolean;
 }
 
-const DetailPageContextDefault = {
+const DetailPageContextDefault: DetailPageContextType = {
   collection: {} as OGCCollection | undefined,
   setCollection: () => {},
   featureCollection: {} as
-    FeatureCollection<Point, CloudOptimizedFeature> | undefined,
+    | FeatureCollection<Point, CloudOptimizedFeature>
+    | undefined,
   datasetMetadata: undefined,
   isSupportPMTiles: false,
   isCollectionNotFound: false,
@@ -58,6 +70,9 @@ const DetailPageContextDefault = {
   setLastSelectedMapLayer: () => {},
   downloadService: DownloadServiceType.Unavailable,
   setDownloadService: () => {},
+  mapSubsettingCapabilities: defaultMapSubsettingCapabilities,
+  setMapSubsettingCapabilities: () => {},
+  isSubsettingSupported: () => false,
 };
 
 const DetailPageContext = createContext<DetailPageContextType>(

@@ -2,6 +2,7 @@ import React, {
   FC,
   startTransition,
   useCallback,
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -64,10 +65,11 @@ import {
   DatasetType,
   OGCCollection,
 } from "@/app/store/OGCCollectionDefinitions";
-import PMTilesHexLayer, {
+import PMTilesHexLayer from "@/components/map/mapbox/layers/pmtiles/PMTilesLayer";
+import {
   metadataRangeToDayjs,
-  PMTilesMetadata,
-} from "@/components/map/mapbox/layers/pmtiles/PMTilesLayer";
+  type PMTilesMetadata,
+} from "@/components/map/mapbox/layers/pmtiles/Common";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -168,57 +170,6 @@ export const buildMapLayerConfig = (
   return layers;
 };
 
-export interface SubsettingSupportInput {
-  hasCloudOptimisedData: boolean;
-  downloadService: DownloadServiceType;
-  selectedMapLayerId?: LayerName;
-  isSupportPMTiles: boolean;
-  pmtilesHasTime?: boolean;
-  timeSliderSupport: boolean;
-  drawRectSupport: boolean;
-}
-
-// Exported for unit tests
-export const checkSubsettingSupport = (
-  subsettingType: SubsettingType,
-  {
-    hasCloudOptimisedData,
-    downloadService,
-    selectedMapLayerId,
-    isSupportPMTiles,
-    pmtilesHasTime,
-    timeSliderSupport,
-    drawRectSupport,
-  }: SubsettingSupportInput
-): boolean => {
-  const isPMTilesSelected =
-    isSupportPMTiles && selectedMapLayerId === LayerName.PMTiles;
-  const isGeoServerSelected = selectedMapLayerId === LayerName.GeoServer;
-
-  switch (subsettingType) {
-    case SubsettingType.TimeSlider:
-      // PMTiles density is filtered by date range from `.metadata` coverage.
-      // Timeless tiles (`has_time: false`) have no real temporal dimension.
-      if (isPMTilesSelected && pmtilesHasTime === false) return false;
-      // Cloud optimised data (zarr / parquet) always supports datetime
-      // subsetting for download, independent of which layer the map renders
-      return (
-        hasCloudOptimisedData ||
-        isPMTilesSelected ||
-        (isGeoServerSelected && timeSliderSupport)
-      );
-    case SubsettingType.DrawRect:
-      // Same as above - cloud optimised downloads always accept a spatial
-      // filter. Checked before `downloadService`, which starts out
-      // `Unavailable` until DownloadCard's effect resolves the real service.
-      if (hasCloudOptimisedData) return true;
-      if (downloadService === DownloadServiceType.Unavailable) return false;
-      return isPMTilesSelected || (isGeoServerSelected && drawRectSupport);
-    default:
-      return false;
-  }
-};
-
 interface MapPanelProps {
   mapFocusArea?: LngLatBounds;
   onMapMoveEnd?: (evt: MapEvent) => void;
@@ -238,6 +189,8 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     selectedCoKey,
     setSelectedCoKey,
     isSupportPMTiles,
+    setMapSubsettingCapabilities,
+    isSubsettingSupported,
   } = useDetailPageContext();
 
   const [mapLayerConfig, setMapLayerConfig] = useState<
@@ -312,10 +265,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     // PMTiles layer: sidecar periods are ints; convert to Dayjs only for the slider
     const pmtilesDayjs =
       selectedMapLayerId === LayerName.PMTiles && pmtilesPeriodRange
-        ? metadataRangeToDayjs(
-            pmtilesPeriodRange,
-            pmtilesPeriodRange.timeGroupBy
-          )
+        ? metadataRangeToDayjs(pmtilesPeriodRange)
         : null;
 
     if (pmtilesDayjs) {
@@ -363,6 +313,10 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   ]);
 
   const [filterStartDate, filterEndDate] = useMemo(() => {
+    // Only apply stored date range to the map when the selected layer supports time
+    if (!isSubsettingSupported(SubsettingType.TimeSlider)) {
+      return [undefined, undefined];
+    }
     const dateRangeConditionGeneric = downloadConditions.find(
       (condition) => condition.type === DownloadConditionType.DATE_RANGE
     );
@@ -376,7 +330,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     );
     const conditionEnd = dayjs(dateRangeCondition.end, dateDefault.DATE_FORMAT);
     return [conditionStart, conditionEnd];
-  }, [downloadConditions]);
+  }, [downloadConditions, isSubsettingSupported]);
 
   const drawFeatures = useMemo(() => {
     const existingBboxConditions = downloadConditions.filter(
@@ -452,27 +406,33 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     [onMapMoveEnd]
   );
 
-  const isSubsettingSupported = useCallback(
-    (subsettingType: SubsettingType) =>
-      checkSubsettingSupport(subsettingType, {
-        hasCloudOptimisedData,
-        downloadService,
-        selectedMapLayerId,
-        isSupportPMTiles: supportsPMTiles,
-        pmtilesHasTime: pmtilesPeriodRange?.hasTime,
-        timeSliderSupport,
-        drawRectSupport,
-      }),
-    [
+  // Publish live layer/capabilities so download subsetting UI can re-evaluate
+  // support independently of when conditions were created.
+  useEffect(() => {
+    setMapSubsettingCapabilities({
+      selectedLayerId: selectedMapLayerId ?? null,
+      // undefined metadata → null (unknown); false = timeless PMTiles
+      pmtilesHasTime:
+        pmtilesPeriodRange == null ? null : pmtilesPeriodRange.hasTime,
+      geoServerHasTime: timeSliderSupport,
+      geoServerDrawRect: drawRectSupport,
+      // Density is only offerable when the collection has parquet AND its
+      // tiles exist on S3, so publish the availability-gated value
+      isSupportPMTiles: supportsPMTiles,
+      downloadServiceAvailable:
+        downloadService !== DownloadServiceType.Unavailable,
       hasCloudOptimisedData,
-      downloadService,
-      selectedMapLayerId,
-      supportsPMTiles,
-      pmtilesPeriodRange?.hasTime,
-      timeSliderSupport,
-      drawRectSupport,
-    ]
-  );
+    });
+  }, [
+    selectedMapLayerId,
+    pmtilesPeriodRange,
+    timeSliderSupport,
+    drawRectSupport,
+    supportsPMTiles,
+    downloadService,
+    hasCloudOptimisedData,
+    setMapSubsettingCapabilities,
+  ]);
 
   const handleMapLayerChange = useCallback(
     (layer: LayerSwitcherLayer<LayerName>) => {

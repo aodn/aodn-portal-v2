@@ -13,7 +13,10 @@ import {
   IDownloadCondition,
   IDownloadConditionCallback,
   type DownloadCondition,
+  SubsettingType,
+  type ConditionSupportContext,
 } from "../../../context/DownloadDefinitions";
+import { useDetailPageContext } from "../../../context/detail-page-context";
 
 interface SubsetConditionsProps extends DownloadCondition {
   sx?: SxProps;
@@ -31,11 +34,20 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
   readOnly,
   dateRangeBounds,
 }) => {
+  const { isSubsettingSupported } = useDetailPageContext();
+
+  const supportCtx: ConditionSupportContext = useMemo(
+    () => ({ isSubsettingSupported }),
+    [isSubsettingSupported]
+  );
+
+  const timeSupported = isSubsettingSupported(SubsettingType.TimeSlider);
+  const spatialSupported = isSubsettingSupported(SubsettingType.DrawRect);
+
   const bboxConditions: BBoxCondition[] = useMemo(() => {
-    const bboxConditions = downloadConditions.filter(
+    return downloadConditions.filter(
       (condition) => condition.type === DownloadConditionType.BBOX
-    );
-    return bboxConditions as BBoxCondition[];
+    ) as BBoxCondition[];
   }, [downloadConditions]);
 
   const polygonConditions: PolygonCondition[] = useMemo(() => {
@@ -44,12 +56,56 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
     ) as PolygonCondition[];
   }, [downloadConditions]);
 
-  const dateRangeCondition: DateRangeCondition[] = useMemo(() => {
-    const timeRangeConditions = downloadConditions.filter(
+  // Real stored polygons, or a single draft card when empty and editable.
+  const polygonCards = useMemo(() => {
+    if (!spatialSupported) return [];
+
+    if (polygonConditions.length > 0) {
+      return polygonConditions.map((condition) => ({
+        condition,
+        isDraft: false as const,
+      }));
+    }
+    if (!readOnly) {
+      return [{ condition: undefined, isDraft: true as const }];
+    }
+    return [];
+  }, [polygonConditions, readOnly, spatialSupported]);
+
+  // Real stored conditions, or a single draft card when empty and editable.
+  const dateRangeCards = useMemo(() => {
+    if (!timeSupported) return [];
+
+    const dateRangeConditions = downloadConditions.filter(
       (condition) => condition.type === DownloadConditionType.DATE_RANGE
-    );
-    return timeRangeConditions as DateRangeCondition[];
-  }, [downloadConditions]);
+    ) as DateRangeCondition[];
+
+    if (dateRangeConditions.length > 0) {
+      return dateRangeConditions.map((condition) => ({
+        condition,
+        isDraft: false as const,
+      }));
+    }
+    if (!readOnly) {
+      return [
+        {
+          condition: new DateRangeCondition(
+            "date-range-initial",
+            dateRangeBounds?.min.format("YYYY-MM-DD") ?? "",
+            dateRangeBounds?.max.format("YYYY-MM-DD") ?? ""
+          ),
+          isDraft: true as const,
+        },
+      ];
+    }
+    return [];
+  }, [
+    dateRangeBounds?.max,
+    dateRangeBounds?.min,
+    downloadConditions,
+    readOnly,
+    timeSupported,
+  ]);
 
   const handleRemove = useCallback(
     (condition: IDownloadConditionCallback & IDownloadCondition) => {
@@ -60,7 +116,15 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
   );
 
   const handleDateRangeChange = useCallback(
-    (existing: DateRangeCondition, start: string, end: string) => {
+    (existing: DateRangeCondition | undefined, start: string, end: string) => {
+      // Draft card: first edit creates a real condition
+      if (!existing) {
+        if (!start && !end) return;
+        getAndSetDownloadConditions(DownloadConditionType.DATE_RANGE, [
+          new DateRangeCondition(`date-range-${Date.now()}`, start, end),
+        ]);
+        return;
+      }
       getAndSetDownloadConditions(DownloadConditionType.DATE_RANGE, [
         new DateRangeCondition(
           existing.id,
@@ -111,30 +175,15 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
     [polygonConditions, getAndSetDownloadConditions]
   );
 
-  const handleDateRangeCreate = useCallback(
-    (start: string, end: string) => {
-      if (!start && !end) return;
-      const id = `date-range-${Date.now()}`;
-      getAndSetDownloadConditions(DownloadConditionType.DATE_RANGE, [
-        new DateRangeCondition(id, start, end),
-      ]);
-    },
-    [getAndSetDownloadConditions]
-  );
-
-  const initialDateRangeCondition = useMemo(
-    () =>
-      new DateRangeCondition(
-        "date-range-initial",
-        dateRangeBounds?.min.format("YYYY-MM-DD") ?? "",
-        dateRangeBounds?.max.format("YYYY-MM-DD") ?? ""
-      ),
-    [dateRangeBounds]
-  );
+  const showBBox =
+    spatialSupported &&
+    (!readOnly || bboxConditions.length > 0) &&
+    (bboxConditions.length === 0 ||
+      bboxConditions.some((c) => c.support(supportCtx)));
 
   return (
     <Stack spacing={1} sx={sx}>
-      {(!readOnly || bboxConditions.length > 0) && (
+      {showBBox && (
         <BBoxConditionCard
           bboxConditions={bboxConditions}
           onRemove={handleRemove}
@@ -143,45 +192,47 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
           readOnly={readOnly}
         />
       )}
-      {!readOnly && polygonConditions.length === 0 && (
-        <PolygonConditionCard
-          onCreate={handlePolygonCreate}
-          disable={disable}
-        />
-      )}
-      {polygonConditions.map((polygonCondition) => (
-        <PolygonConditionCard
-          key={polygonCondition.id}
-          polygonCondition={polygonCondition}
-          onRemove={() => handleRemove(polygonCondition)}
-          onUpdate={(coords) => handlePolygonUpdate(polygonCondition, coords)}
-          disable={disable}
-          readOnly={readOnly}
-        />
-      ))}
-      {!readOnly && dateRangeCondition.length === 0 && (
-        <DateRangeConditionCard
-          dateRangeCondition={initialDateRangeCondition}
-          onChange={handleDateRangeCreate}
-          disable={disable}
-          minDate={dateRangeBounds?.min}
-          maxDate={dateRangeBounds?.max}
-        />
-      )}
-      {dateRangeCondition.map((dateRangeCondition) => (
-        <DateRangeConditionCard
-          key={dateRangeCondition.id}
-          dateRangeCondition={dateRangeCondition}
-          onRemove={() => handleRemove(dateRangeCondition)}
-          onChange={(start, end) =>
-            handleDateRangeChange(dateRangeCondition, start, end)
-          }
-          disable={disable}
-          readOnly={readOnly}
-          minDate={dateRangeBounds?.min}
-          maxDate={dateRangeBounds?.max}
-        />
-      ))}
+      {polygonCards.map(({ condition, isDraft }) => {
+        if (!isDraft && condition && !condition.support(supportCtx)) {
+          return null;
+        }
+
+        return (
+          <PolygonConditionCard
+            key={condition?.id ?? "polygon-draft"}
+            polygonCondition={condition}
+            onCreate={isDraft ? handlePolygonCreate : undefined}
+            onRemove={
+              !isDraft && condition ? () => handleRemove(condition) : undefined
+            }
+            onUpdate={
+              !isDraft && condition
+                ? (coords) => handlePolygonUpdate(condition, coords)
+                : undefined
+            }
+            disable={disable}
+            readOnly={readOnly}
+          />
+        );
+      })}
+      {dateRangeCards.map(({ condition, isDraft }) => {
+        if (!condition.support(supportCtx)) return null;
+
+        return (
+          <DateRangeConditionCard
+            key={condition.id}
+            dateRangeCondition={condition}
+            onRemove={isDraft ? undefined : () => handleRemove(condition)}
+            onChange={(start, end) =>
+              handleDateRangeChange(isDraft ? undefined : condition, start, end)
+            }
+            disable={disable}
+            readOnly={readOnly}
+            minDate={dateRangeBounds?.min}
+            maxDate={dateRangeBounds?.max}
+          />
+        );
+      })}
     </Stack>
   );
 };

@@ -7,10 +7,37 @@ export enum DownloadConditionType {
   FORMAT = "format",
   KEY = "key",
 }
+export enum SubsettingType {
+  TimeSlider = "TimeSlider",
+  DrawRect = "DrawRect",
+}
+
+/**
+ * Live evaluation context for condition.support().
+ * Prefer calling isSubsettingSupported so layer/capabilities stay current.
+ */
+export type ConditionSupportContext = {
+  isSubsettingSupported: (type: SubsettingType) => boolean;
+};
+
+export type ConditionSupportFn = (ctx: ConditionSupportContext) => boolean;
+
+const alwaysSupported: ConditionSupportFn = () => true;
+
+const timeSliderSupported: ConditionSupportFn = ({ isSubsettingSupported }) =>
+  isSubsettingSupported(SubsettingType.TimeSlider);
+
+const drawRectSupported: ConditionSupportFn = ({ isSubsettingSupported }) =>
+  isSubsettingSupported(SubsettingType.DrawRect);
 
 export interface IDownloadCondition {
   type: DownloadConditionType;
   id: string;
+  /**
+   * Whether this condition type is supported for the current map layer /
+   * capabilities. Evaluated at render time — do not cache the result.
+   */
+  support: ConditionSupportFn;
 }
 
 export interface IDownloadConditionCallback {
@@ -51,6 +78,7 @@ export class DateRangeCondition
   id: string;
   start: string;
   end: string;
+  support: ConditionSupportFn = timeSliderSupported;
   removeCallback?: () => void;
 
   constructor(
@@ -72,6 +100,7 @@ export class BBoxCondition
   type: DownloadConditionType;
   bbox: BBox;
   id: string;
+  support: ConditionSupportFn = drawRectSupported;
   removeCallback?: () => void;
 
   constructor(id: string, bbox: BBox, removeCallback?: () => void) {
@@ -88,6 +117,7 @@ export class PolygonCondition
   type: DownloadConditionType = DownloadConditionType.POLYGON;
   coordinates: [number, number][];
   id: string;
+  support: ConditionSupportFn = drawRectSupported;
   removeCallback?: () => void;
 
   constructor(
@@ -107,6 +137,7 @@ export class FormatCondition
   type: DownloadConditionType = DownloadConditionType.FORMAT;
   id: string;
   format: string;
+  support: ConditionSupportFn = alwaysSupported;
   removeCallback?: () => void;
 
   constructor(id: string, format: string, removeCallback?: () => void) {
@@ -122,6 +153,7 @@ export class KeyCondition
   type = DownloadConditionType.KEY;
   id: string;
   key: string;
+  support: ConditionSupportFn = alwaysSupported;
   removeCallback?: () => void;
 
   constructor(id: string, key: string, removeCallback?: () => void) {
@@ -151,13 +183,74 @@ export type DownloadCondition = {
   removeDownloadCondition: (condition: IDownloadCondition) => void;
 };
 
-export enum SubsettingType {
-  TimeSlider = "TimeSlider",
-  DrawRect = "DrawRect",
-}
-
 export enum DownloadServiceType {
   WFS = "WFS",
   CloudOptimised = "CloudOptimised",
   Unavailable = "Unavailable",
 }
+
+/** Live map-layer subsetting capabilities published by MapPanel. */
+export type MapSubsettingCapabilities = {
+  selectedLayerId: string | null;
+  /** null = PMTiles metadata not loaded yet; false = timeless tiles */
+  pmtilesHasTime: boolean | null;
+  geoServerHasTime: boolean;
+  geoServerDrawRect: boolean;
+  /**
+   * The collection has parquet AND its tiles actually exist on S3 - MapPanel
+   * folds the layer's availability report into this before publishing.
+   */
+  isSupportPMTiles: boolean;
+  downloadServiceAvailable: boolean;
+  /** A `rel=summary` link, i.e. zarr / parquet data behind the record. */
+  hasCloudOptimisedData: boolean;
+};
+
+export const defaultMapSubsettingCapabilities: MapSubsettingCapabilities = {
+  selectedLayerId: null,
+  pmtilesHasTime: null,
+  geoServerHasTime: false,
+  geoServerDrawRect: false,
+  isSupportPMTiles: false,
+  downloadServiceAvailable: false,
+  hasCloudOptimisedData: false,
+};
+
+/**
+ * Single source of truth for map menu + download subsetting UI visibility.
+ * Layer-aware: GeoServer time does not imply PMTiles time (and vice versa).
+ */
+export const evaluateSubsettingSupport = (
+  type: SubsettingType,
+  caps: MapSubsettingCapabilities,
+  layerNames: { PMTiles: string; GeoServer: string }
+): boolean => {
+  const isPMTilesSelected =
+    caps.isSupportPMTiles && caps.selectedLayerId === layerNames.PMTiles;
+  const isGeoServerSelected = caps.selectedLayerId === layerNames.GeoServer;
+
+  switch (type) {
+    case SubsettingType.TimeSlider:
+      // PMTiles density is filtered by date range from `.metadata` coverage.
+      // Timeless tiles (`has_time: false`) have no real temporal dimension.
+      if (isPMTilesSelected && caps.pmtilesHasTime === false) return false;
+      // Cloud optimised data (zarr / parquet) always supports datetime
+      // subsetting for download, independent of which layer the map renders
+      return (
+        caps.hasCloudOptimisedData ||
+        isPMTilesSelected ||
+        (isGeoServerSelected && caps.geoServerHasTime)
+      );
+    case SubsettingType.DrawRect:
+      // Same as above - cloud optimised downloads always accept a spatial
+      // filter. Checked before `downloadServiceAvailable`, which starts out
+      // false until DownloadCard's effect resolves the real service.
+      if (caps.hasCloudOptimisedData) return true;
+      if (!caps.downloadServiceAvailable) return false;
+      return (
+        isPMTilesSelected || (isGeoServerSelected && caps.geoServerDrawRect)
+      );
+    default:
+      return false;
+  }
+};

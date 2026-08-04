@@ -18,9 +18,13 @@ import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "@/app/store/hooks";
 import { FeatureCollection, Point } from "geojson";
 import {
+  defaultMapSubsettingCapabilities,
   DownloadConditionType,
   DownloadServiceType,
+  evaluateSubsettingSupport,
   IDownloadCondition,
+  MapSubsettingCapabilities,
+  SubsettingType,
 } from "./DownloadDefinitions";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
@@ -63,6 +67,8 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   const [downloadService, setDownloadService] = useState<DownloadServiceType>(
     DownloadServiceType.Unavailable
   );
+  const [mapSubsettingCapabilities, setMapSubsettingCapabilities] =
+    useState<MapSubsettingCapabilities>(defaultMapSubsettingCapabilities);
 
   const getAndSetDownloadConditions = useCallback(
     (
@@ -172,6 +178,16 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
     return Object.keys(datasetMetadata).some((key) => key.endsWith(".parquet"));
   }, [datasetMetadata]);
 
+  // Layer-aware: GeoServer time support does not imply PMTiles time (and vice versa).
+  const isSubsettingSupported = useCallback(
+    (type: SubsettingType) =>
+      evaluateSubsettingSupport(type, mapSubsettingCapabilities, {
+        PMTiles: LayerName.PMTiles,
+        GeoServer: LayerName.GeoServer,
+      }),
+    [mapSubsettingCapabilities]
+  );
+
   return (
     <DetailPageContext.Provider
       value={{
@@ -192,6 +208,9 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         setLastSelectedMapLayer,
         downloadService,
         setDownloadService,
+        mapSubsettingCapabilities,
+        setMapSubsettingCapabilities,
+        isSubsettingSupported,
       }}
     >
       {children}
