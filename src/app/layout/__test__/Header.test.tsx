@@ -8,7 +8,6 @@ import {
   afterEach,
 } from "vitest";
 import {
-  act,
   fireEvent,
   render,
   screen,
@@ -123,16 +122,13 @@ describe("Header Searchbar Expansion", () => {
     ) as HTMLInputElement;
 
     // 2. Focus expands the wrapper
-    await act(async () => {
-      fireEvent.focus(searchInput);
-    });
+    fireEvent.focus(searchInput);
+
     expect(searchWrapper).toHaveStyle({ minWidth: expectedLaptopWidth });
 
     // 3. Type + blur — still expanded while text remains
-    await act(async () => {
-      fireEvent.change(searchInput, { target: { value: "satellite" } });
-      fireEvent.blur(searchInput);
-    });
+    fireEvent.change(searchInput, { target: { value: "satellite" } });
+    fireEvent.blur(searchInput);
     expect(searchWrapper).toHaveStyle({ minWidth: expectedLaptopWidth });
   });
 
@@ -144,9 +140,7 @@ describe("Header Searchbar Expansion", () => {
     expect(dividers.length).toBe(0);
 
     // 2. Set a filter — wrap dispatch so Header re-render (chips row + ref) is in act
-    await act(async () => {
-      store.dispatch(updateHasData(true));
-    });
+    store.dispatch(updateHasData(true));
 
     // 3. Now the divider (<hr>) should be rendered!
     await waitFor(() => {
