@@ -64,10 +64,11 @@ import {
   DatasetType,
   OGCCollection,
 } from "@/app/store/OGCCollectionDefinitions";
-import PMTilesHexLayer, {
+import PMTilesHexLayer from "@/components/map/mapbox/layers/pmtiles/PMTilesLayer";
+import {
   metadataRangeToDayjs,
-  PMTilesMetadata,
-} from "@/components/map/mapbox/layers/pmtiles/PMTilesLayer";
+  type PMTilesMetadata,
+} from "@/components/map/mapbox/layers/pmtiles/Common";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -238,10 +239,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     // PMTiles layer: sidecar periods are ints; convert to Dayjs only for the slider
     const pmtilesDayjs =
       selectedMapLayerId === LayerName.PMTiles && pmtilesPeriodRange
-        ? metadataRangeToDayjs(
-            pmtilesPeriodRange,
-            pmtilesPeriodRange.timeGroupBy
-          )
+        ? metadataRangeToDayjs(pmtilesPeriodRange)
         : null;
 
     if (pmtilesDayjs) {
