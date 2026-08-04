@@ -32,6 +32,12 @@ vi.mock("@/hooks/useDownloadDialog", () => ({
   useDownloadDialog: vi.fn(() => mockUseDownloadDialog),
 }));
 
+vi.mock("@/pages/detail-page/context/detail-page-context", () => ({
+  useDetailPageContext: vi.fn(() => ({
+    isSubsettingSupported: () => true,
+  })),
+}));
+
 // Mock other components
 vi.mock(
   "@/pages/detail-page/features/download/download-dialog/stepper/StepperButton",

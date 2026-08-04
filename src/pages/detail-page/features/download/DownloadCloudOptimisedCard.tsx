@@ -8,7 +8,7 @@ import {
 } from "react";
 import { Stack } from "@mui/material";
 import dayjs from "dayjs";
-import { dateDefault } from "../../../../components/common/constants";
+import { dateDefault } from "@/components/common/constants";
 import DownloadDialog from "./download-dialog/DownloadDialog";
 import {
   DownloadCondition,
