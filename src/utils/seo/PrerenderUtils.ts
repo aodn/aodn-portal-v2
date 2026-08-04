@@ -101,12 +101,16 @@ export const renderPage = (template: string, collection: SeoCollection) => {
     // JSON.stringify drops undefined-valued fields
     `<script type="application/ld+json">${JSON.stringify(buildJsonLd(collection)).replace(/</g, "\\u003c")}</script>`,
   ].join("\n    ");
-  return template
-    .replace(
-      /<title>.*?<\/title>/s,
-      `<title>${escapeHtml(collection.title)} | ${SITE_NAME}</title>`
-    )
-    .replace("</head>", `${headTags}\n  </head>`);
+  return (
+    template
+      .replace(
+        /<title>.*?<\/title>/s,
+        `<title>${escapeHtml(collection.title)} | ${SITE_NAME}</title>`
+      )
+      // The template carries the site-wide description; the record's replaces it
+      .replace(/\s*<meta name="description"[^>]*\/?>/, "")
+      .replace("</head>", `${headTags}\n  </head>`)
+  );
 };
 
 export const prerenderDetailPages = async (outDir: string) => {

@@ -327,9 +327,13 @@ const HeaderSection = () => {
               }}
               gap={isMobile ? 0 : 1}
             >
+              {/* The collection title is the page's single h1 (SEO);
+                  component only changes the tag, not the styling. No
+                  aria-label here — it would override the title as the
+                  heading's accessible name */}
               <Typography
                 variant="heading3"
-                aria-label="collection title"
+                component="h1"
                 color={portalTheme.palette.text2}
                 sx={{
                   p: 0,

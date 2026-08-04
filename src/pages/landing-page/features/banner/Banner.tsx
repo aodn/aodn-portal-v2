@@ -17,26 +17,39 @@ const renderBannerText = () => {
         alignItems="start"
         data-testid="hero-text"
       >
-        <Typography
-          variant="slogan2"
+        {/* Both slogan lines form the page's single h1 (SEO); the flex
+            column keeps them on separate lines exactly as before */}
+        <Box
+          component="h1"
+          m={0}
           sx={{
-            color: portalTheme.palette.text2,
-            textAlign: "left",
-            p: padding.nil,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "start",
           }}
         >
-          IMOS Australian
-        </Typography>
-        <Typography
-          variant="slogan1"
-          sx={{
-            color: portalTheme.palette.text2,
-            textAlign: "left",
-            p: padding.nil,
-          }}
-        >
-          Ocean Data Portal
-        </Typography>
+          <Typography
+            variant="slogan2"
+            sx={{
+              color: portalTheme.palette.text2,
+              textAlign: "left",
+              p: padding.nil,
+            }}
+          >
+            IMOS Australian
+          </Typography>
+          {/* Without this space the h1 text reads "AustralianOcean" */}{" "}
+          <Typography
+            variant="slogan1"
+            sx={{
+              color: portalTheme.palette.text2,
+              textAlign: "left",
+              p: padding.nil,
+            }}
+          >
+            Ocean Data Portal
+          </Typography>
+        </Box>
         <Typography
           variant="slogan3"
           sx={{
