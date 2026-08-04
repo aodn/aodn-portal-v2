@@ -198,6 +198,8 @@ export type MapSubsettingCapabilities = {
   geoServerDrawRect: boolean;
   isSupportPMTiles: boolean;
   downloadServiceAvailable: boolean;
+  /** A `rel=summary` link, i.e. zarr / parquet data behind the record. */
+  hasCloudOptimisedData: boolean;
 };
 
 export const defaultMapSubsettingCapabilities: MapSubsettingCapabilities = {
@@ -207,6 +209,7 @@ export const defaultMapSubsettingCapabilities: MapSubsettingCapabilities = {
   geoServerDrawRect: false,
   isSupportPMTiles: false,
   downloadServiceAvailable: false,
+  hasCloudOptimisedData: false,
 };
 
 /**
@@ -218,21 +221,30 @@ export const evaluateSubsettingSupport = (
   caps: MapSubsettingCapabilities,
   layerNames: { PMTiles: string; GeoServer: string }
 ): boolean => {
+  const isPMTilesSelected =
+    caps.isSupportPMTiles && caps.selectedLayerId === layerNames.PMTiles;
+  const isGeoServerSelected = caps.selectedLayerId === layerNames.GeoServer;
+
   switch (type) {
     case SubsettingType.TimeSlider:
+      // PMTiles density is filtered by date range from `.metadata` coverage.
+      // Timeless tiles (`has_time: false`) have no real temporal dimension.
+      if (isPMTilesSelected && caps.pmtilesHasTime === false) return false;
+      // Cloud optimised data (zarr / parquet) always supports datetime
+      // subsetting for download, independent of which layer the map renders
       return (
-        (caps.isSupportPMTiles &&
-          caps.selectedLayerId === layerNames.PMTiles &&
-          caps.pmtilesHasTime !== false) ||
-        (caps.selectedLayerId === layerNames.GeoServer && caps.geoServerHasTime)
+        caps.hasCloudOptimisedData ||
+        isPMTilesSelected ||
+        (isGeoServerSelected && caps.geoServerHasTime)
       );
     case SubsettingType.DrawRect:
+      // Same as above - cloud optimised downloads always accept a spatial
+      // filter. Checked before `downloadServiceAvailable`, which starts out
+      // false until DownloadCard's effect resolves the real service.
+      if (caps.hasCloudOptimisedData) return true;
+      if (!caps.downloadServiceAvailable) return false;
       return (
-        ((caps.isSupportPMTiles &&
-          caps.selectedLayerId === layerNames.PMTiles) ||
-          (caps.selectedLayerId === layerNames.GeoServer &&
-            caps.geoServerDrawRect)) &&
-        caps.downloadServiceAvailable
+        isPMTilesSelected || (isGeoServerSelected && caps.geoServerDrawRect)
       );
     default:
       return false;
