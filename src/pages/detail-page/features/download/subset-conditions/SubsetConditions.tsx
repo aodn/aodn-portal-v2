@@ -173,49 +173,47 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
           readOnly={readOnly}
         />
       )}
-      {polygonCards.map(
-        ({ condition, isDraft }) =>
-          condition?.support && (
-            <PolygonConditionCard
-              key={condition?.id ?? "polygon-draft"}
-              polygonCondition={condition}
-              onCreate={isDraft ? handlePolygonCreate : undefined}
-              onRemove={
-                !isDraft && condition
-                  ? () => handleRemove(condition)
-                  : undefined
-              }
-              onUpdate={
-                !isDraft && condition
-                  ? (coords) => handlePolygonUpdate(condition, coords)
-                  : undefined
-              }
-              disable={disable}
-              readOnly={readOnly}
-            />
-          )
-      )}
-      {dateRangeCards.map(
-        ({ condition, isDraft }) =>
-          condition?.support && (
-            <DateRangeConditionCard
-              key={condition.id}
-              dateRangeCondition={condition}
-              onRemove={isDraft ? undefined : () => handleRemove(condition)}
-              onChange={(start, end) =>
-                handleDateRangeChange(
-                  isDraft ? undefined : condition,
-                  start,
-                  end
-                )
-              }
-              disable={disable}
-              readOnly={readOnly}
-              minDate={dateRangeBounds?.min}
-              maxDate={dateRangeBounds?.max}
-            />
-          )
-      )}
+      {polygonCards.map(({ condition, isDraft }) => {
+        // Draft has no condition yet — always show when editable.
+        // Stored conditions respect the support flag.
+        if (!isDraft && !condition?.support) return null;
+
+        return (
+          <PolygonConditionCard
+            key={condition?.id ?? "polygon-draft"}
+            polygonCondition={condition}
+            onCreate={isDraft ? handlePolygonCreate : undefined}
+            onRemove={
+              !isDraft && condition ? () => handleRemove(condition) : undefined
+            }
+            onUpdate={
+              !isDraft && condition
+                ? (coords) => handlePolygonUpdate(condition, coords)
+                : undefined
+            }
+            disable={disable}
+            readOnly={readOnly}
+          />
+        );
+      })}
+      {dateRangeCards.map(({ condition, isDraft }) => {
+        if (!condition.support) return null;
+
+        return (
+          <DateRangeConditionCard
+            key={condition.id}
+            dateRangeCondition={condition}
+            onRemove={isDraft ? undefined : () => handleRemove(condition)}
+            onChange={(start, end) =>
+              handleDateRangeChange(isDraft ? undefined : condition, start, end)
+            }
+            disable={disable}
+            readOnly={readOnly}
+            minDate={dateRangeBounds?.min}
+            maxDate={dateRangeBounds?.max}
+          />
+        );
+      })}
     </Stack>
   );
 };
