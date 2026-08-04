@@ -11,6 +11,42 @@ from utils.map_utils import (
     is_bbox_contained_by_map_bounds,
 )
 
+# dataset_metadata (PMTiles) and WMS layer list can lag under CI load.
+_UI_TIMEOUT_MS = 30_000
+
+
+def _open_layers_menu_until_visible(
+    detail_page: DetailPage, locator, timeout_ms: int = _UI_TIMEOUT_MS
+) -> None:
+    """
+    Open the layer styles menu and wait until ``locator`` is visible.
+
+    Map resize / idle events can dismiss the Popper immediately after click
+    (especially under Grid layout reflows). Re-open only when the menu is
+    closed so we do not toggle it shut while waiting for PMTiles options.
+    """
+    detail_map = detail_page.detail_map
+    page = detail_page.page
+    layers_menu_panel = page.get_by_test_id('layer-style-menu-items')
+    expect(detail_map.layers_menu).to_be_visible(timeout=timeout_ms)
+
+    deadline = page.evaluate('() => Date.now()') + timeout_ms
+    last_error = None
+    while page.evaluate('() => Date.now()') < deadline:
+        # Only click when the menu is closed; avoid toggling it closed while
+        # radios are still mounting (dataset_metadata / isSupportPMTiles).
+        if not layers_menu_panel.is_visible():
+            detail_map.layers_menu.click()
+        try:
+            expect(locator).to_be_visible(timeout=2_000)
+            return
+        except AssertionError as exc:
+            last_error = exc
+            page.wait_for_timeout(200)
+    if last_error is not None:
+        raise last_error
+    expect(locator).to_be_visible(timeout=1_000)
+
 
 @pytest.mark.parametrize(
     'uuid',
@@ -178,12 +214,18 @@ def test_map_layer_persists_after_tab_navigation(
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(uuid)
+    # GeoServer layer-select and dataset_metadata (PMTiles) can lag under CI load.
+    detail_page.detail_map.wait_for_layer_select_loading()
     detail_page.detail_map.wait_for_map_idle()
 
-    # Ensure that Data Density (PMTiles) and GeoServer options are in the layers menu
-    detail_page.detail_map.layers_menu.click()
-    expect(detail_page.detail_map.data_density_layer).to_be_visible()
-    expect(detail_page.detail_map.geoserver_layer).to_be_visible()
+    # Ensure that Data Density (PMTiles) and GeoServer options are in the layers menu.
+    # Data Density mounts only after dataset_metadata resolves isSupportPMTiles.
+    _open_layers_menu_until_visible(
+        detail_page, detail_page.detail_map.data_density_layer
+    )
+    expect(detail_page.detail_map.geoserver_layer).to_be_visible(
+        timeout=_UI_TIMEOUT_MS
+    )
 
     # Select Geoserver layer
     detail_page.detail_map.geoserver_layer.check()
@@ -197,8 +239,12 @@ def test_map_layer_persists_after_tab_navigation(
 
     # Verify that the Geoserver layer is present and visible on the map
     detail_page.detail_map.wait_for_map_idle()
-    detail_page.detail_map.layers_menu.click()
-    expect(detail_page.detail_map.geoserver_layer).to_be_checked()
+    _open_layers_menu_until_visible(
+        detail_page, detail_page.detail_map.geoserver_layer
+    )
+    expect(detail_page.detail_map.geoserver_layer).to_be_checked(
+        timeout=_UI_TIMEOUT_MS
+    )
     layer_id = layer_factory.get_layer_id(LayerStyle.GEO_SERVER)
     assert (
         detail_page.detail_map.is_map_layer_visible(
