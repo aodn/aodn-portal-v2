@@ -13,7 +13,10 @@ import {
   IDownloadCondition,
   IDownloadConditionCallback,
   type DownloadCondition,
+  SubsettingType,
+  type ConditionSupportContext,
 } from "../../../context/DownloadDefinitions";
+import { useDetailPageContext } from "../../../context/detail-page-context";
 
 interface SubsetConditionsProps extends DownloadCondition {
   sx?: SxProps;
@@ -31,11 +34,20 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
   readOnly,
   dateRangeBounds,
 }) => {
+  const { isSubsettingSupported } = useDetailPageContext();
+
+  const supportCtx: ConditionSupportContext = useMemo(
+    () => ({ isSubsettingSupported }),
+    [isSubsettingSupported]
+  );
+
+  const timeSupported = isSubsettingSupported(SubsettingType.TimeSlider);
+  const spatialSupported = isSubsettingSupported(SubsettingType.DrawRect);
+
   const bboxConditions: BBoxCondition[] = useMemo(() => {
-    const bboxConditions = downloadConditions.filter(
+    return downloadConditions.filter(
       (condition) => condition.type === DownloadConditionType.BBOX
-    );
-    return bboxConditions as BBoxCondition[];
+    ) as BBoxCondition[];
   }, [downloadConditions]);
 
   const polygonConditions: PolygonCondition[] = useMemo(() => {
@@ -46,6 +58,8 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
 
   // Real stored polygons, or a single draft card when empty and editable.
   const polygonCards = useMemo(() => {
+    if (!spatialSupported) return [];
+
     if (polygonConditions.length > 0) {
       return polygonConditions.map((condition) => ({
         condition,
@@ -56,11 +70,12 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
       return [{ condition: undefined, isDraft: true as const }];
     }
     return [];
-  }, [polygonConditions, readOnly]);
+  }, [polygonConditions, readOnly, spatialSupported]);
 
   // Real stored conditions, or a single draft card when empty and editable.
-  // Keeps one DateRangeConditionCard render path for create + update.
   const dateRangeCards = useMemo(() => {
+    if (!timeSupported) return [];
+
     const dateRangeConditions = downloadConditions.filter(
       (condition) => condition.type === DownloadConditionType.DATE_RANGE
     ) as DateRangeCondition[];
@@ -89,6 +104,7 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
     dateRangeBounds?.min,
     downloadConditions,
     readOnly,
+    timeSupported,
   ]);
 
   const handleRemove = useCallback(
@@ -114,8 +130,7 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
           existing.id,
           start,
           end,
-          existing.removeCallback,
-          existing.support
+          existing.removeCallback
         ),
       ]);
     },
@@ -140,8 +155,7 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
           ? new PolygonCondition(
               existing.id,
               coordinates,
-              existing.removeCallback,
-              existing.support
+              existing.removeCallback
             )
           : c
       );
@@ -161,10 +175,15 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
     [polygonConditions, getAndSetDownloadConditions]
   );
 
+  const showBBox =
+    spatialSupported &&
+    (!readOnly || bboxConditions.length > 0) &&
+    (bboxConditions.length === 0 ||
+      bboxConditions.some((c) => c.support(supportCtx)));
+
   return (
     <Stack spacing={1} sx={sx}>
-      {(!readOnly ||
-        (bboxConditions.length > 0 && bboxConditions[0].support)) && (
+      {showBBox && (
         <BBoxConditionCard
           bboxConditions={bboxConditions}
           onRemove={handleRemove}
@@ -174,9 +193,9 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
         />
       )}
       {polygonCards.map(({ condition, isDraft }) => {
-        // Draft has no condition yet — always show when editable.
-        // Stored conditions respect the support flag.
-        if (!isDraft && !condition?.support) return null;
+        if (!isDraft && condition && !condition.support(supportCtx)) {
+          return null;
+        }
 
         return (
           <PolygonConditionCard
@@ -197,7 +216,7 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
         );
       })}
       {dateRangeCards.map(({ condition, isDraft }) => {
-        if (!condition.support) return null;
+        if (!condition.support(supportCtx)) return null;
 
         return (
           <DateRangeConditionCard

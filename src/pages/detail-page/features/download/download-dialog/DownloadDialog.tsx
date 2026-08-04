@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import {
   Box,
   Dialog,
@@ -19,8 +19,10 @@ import useBreakpoint from "../../../../../hooks/useBreakpoint";
 import {
   DownloadCondition,
   DownloadConditionType,
+  type ConditionSupportContext,
 } from "../../../context/DownloadDefinitions";
 import { disableScroll, enableScroll } from "@/utils/ScrollUtils";
+import { useDetailPageContext } from "../../../context/detail-page-context";
 
 interface DownloadDialogProps extends DownloadCondition {
   isOpen: boolean;
@@ -46,6 +48,11 @@ const DownloadDialog = ({
 }: DownloadDialogProps) => {
   const theme = useTheme();
   const { isUnderLaptop } = useBreakpoint();
+  const { isSubsettingSupported } = useDetailPageContext();
+  const supportCtx: ConditionSupportContext = useMemo(
+    () => ({ isSubsettingSupported }),
+    [isSubsettingSupported]
+  );
 
   const {
     activeStep,
@@ -83,16 +90,16 @@ const DownloadDialog = ({
   }, [isOpen]);
 
   // Show the section only when there is something visible inside it
-  // (bbox / polygon / date range). Other condition types like FORMAT or KEY
-  // don't render in SubsetConditions and shouldn't keep the section alive.
+  // (bbox / polygon / date range) and supported for the current map layer.
   const shouldShowSubsetConditions =
     hasDownloadConditions &&
     subsettingSelectionCount >= 1 &&
     downloadConditions.some(
       (c) =>
-        c.type === DownloadConditionType.BBOX ||
-        c.type === DownloadConditionType.POLYGON ||
-        c.type === DownloadConditionType.DATE_RANGE
+        (c.type === DownloadConditionType.BBOX ||
+          c.type === DownloadConditionType.POLYGON ||
+          c.type === DownloadConditionType.DATE_RANGE) &&
+        c.support(supportCtx)
     );
 
   const getButtonStatus = () => {

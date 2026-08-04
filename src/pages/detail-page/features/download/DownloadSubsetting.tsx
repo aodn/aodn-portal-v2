@@ -16,9 +16,11 @@ import { portalTheme } from "../../../../styles";
 import {
   DownloadCondition,
   DownloadConditionType,
+  type ConditionSupportContext,
 } from "../../context/DownloadDefinitions";
 import SubsetConditions from "./subset-conditions/SubsetConditions";
 import InfoMessage from "./InfoMessage";
+import { useDetailPageContext } from "../../context/detail-page-context";
 
 interface DownloadSubsettingProps extends DownloadCondition {
   hideInfoMessage?: boolean;
@@ -35,15 +37,22 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
   disable,
   dateRangeBounds,
 }) => {
+  const { isSubsettingSupported } = useDetailPageContext();
+  const supportCtx: ConditionSupportContext = useMemo(
+    () => ({ isSubsettingSupported }),
+    [isSubsettingSupported]
+  );
+
   const [accordionExpanded, setAccordionExpanded] = useState<boolean>(false);
-  // Store the filtered download conditions count
+  // Count only subsetting conditions supported for the current map layer
   const subsettingSelectionCount = useMemo(() => {
     return downloadConditions.filter(
       (condition) =>
         condition.type !== DownloadConditionType.FORMAT &&
-        condition.type !== DownloadConditionType.KEY
+        condition.type !== DownloadConditionType.KEY &&
+        condition.support(supportCtx)
     ).length;
-  }, [downloadConditions]);
+  }, [downloadConditions, supportCtx]);
 
   useEffect(() => {
     startTransition(() => setAccordionExpanded(subsettingSelectionCount > 0));
