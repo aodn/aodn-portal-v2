@@ -94,7 +94,9 @@ const renderListCards: FC<ResultCardsListType> = ({
                 onClickDetail={onClickDetail}
                 onClickLinks={onClickLinks}
                 onClickDownload={
-                  collection.hasSummaryFeature() ? onClickDownload : undefined
+                  collection.hasCloudOptimisedData()
+                    ? onClickDownload
+                    : undefined
                 }
                 selectedUuid={selectedUuid}
                 isSimplified={isSimplified}
@@ -150,7 +152,9 @@ const renderGridCards: FC<ResultCardsListType> = ({
                 onClickDetail={onClickDetail}
                 onClickLinks={onClickLinks}
                 onClickDownload={
-                  collection.hasSummaryFeature() ? onClickDownload : undefined
+                  collection.hasCloudOptimisedData()
+                    ? onClickDownload
+                    : undefined
                 }
                 selectedUuid={selectedUuid}
                 isSimplified={isSimplified}

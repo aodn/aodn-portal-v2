@@ -17,10 +17,10 @@ const DownloadCard: FC = () => {
     setSelectedCoKey,
   } = useDetailPageContext();
 
-  const [wfsLinks, hasSummaryFeature] = useMemo(() => {
+  const [wfsLinks, hasCloudOptimisedData] = useMemo(() => {
     const wfsLinks = collection?.getWFSLinks() || [];
-    const hasSummaryFeature = collection?.hasSummaryFeature() || false;
-    return [wfsLinks, hasSummaryFeature];
+    const hasCloudOptimisedData = collection?.hasCloudOptimisedData() || false;
+    return [wfsLinks, hasCloudOptimisedData];
   }, [collection]);
 
   const onWFSAvailabilityChange = useCallback(
@@ -43,14 +43,14 @@ const DownloadCard: FC = () => {
   useEffect(() => {
     // Set the type of download based on simple  in collection, the value
     // may change by callback if more info available
-    if (hasSummaryFeature) {
+    if (hasCloudOptimisedData) {
       setDownloadService(DownloadServiceType.CloudOptimised);
     } else if (wfsLinks.length > 0) {
       setDownloadService(DownloadServiceType.WFS);
     } else {
       setDownloadService(DownloadServiceType.Unavailable);
     }
-  }, [hasSummaryFeature, setDownloadService, wfsLinks.length]);
+  }, [hasCloudOptimisedData, setDownloadService, wfsLinks.length]);
 
   const downloadCard = useMemo(() => {
     if (!collection) return null;
