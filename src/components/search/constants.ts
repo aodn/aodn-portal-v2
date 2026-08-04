@@ -24,6 +24,3 @@ export const DOUBLE_QUOTE_LABEL = "Exact match";
 
 // Marks a suggestion that matched the input by meaning rather than by spelling
 export const SEMANTIC_LABEL = "Related";
-
-// Heading of the hover card that explains such a suggestion
-export const SEMANTIC_DEFINITION_TITLE = "Semantic related";
