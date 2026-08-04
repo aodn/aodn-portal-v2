@@ -35,3 +35,6 @@ class Routes:
     ESTIMATE_CO_DOWNLOAD = f'{PREFIX}/processes/estimateCOdownload/execution'
 
     STATIC_GEOJSON = f'{PREFIX}/ext/static/*.json'
+
+    # PMTiles sidecar served straight from S3, not through the portal API
+    PMTILES_METADATA = '*/**/portal/visualization/*/*.metadata'

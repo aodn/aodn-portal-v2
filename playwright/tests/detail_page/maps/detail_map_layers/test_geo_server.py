@@ -60,20 +60,17 @@ def test_map_shows_geoserver_layer_with_timeSlider_and_drawRect_support(
         '0dd3832a-cf67-4068-a446-a9c91c77273e',
     ],
 )
-def test_map_shows_geoserver_layer_with_cloud_optimised_subsetting(
+def test_map_shows_geoserver_layer_with_only_timeSlider_support(
     responsive_page: Page, uuid: str
 ) -> None:
     """
-    This test uses a cloud optimised (zarr) dataset with a WMS link whose GeoServer
-    map fields support only time subsetting.
-    Cloud optimised downloads always accept both a spatial and a datetime filter, so
-    both subsetting tools stay available regardless of the GeoServer field support.
+    This test uses a dataset with a WMS link and GeoServer map fields that support only time subsetting.
+    It verifies that the GeoServer layer appears on the map with time slider functionality.
     This test ensures that:
     1. The WMS link header is visible in the UI
     2. A GeoServer layer is added to the map and is visible
     3. The time slider button is visible on the map
-    4. The draw rectangle button is visible on the map, even though GeoServer
-       reports no geometry field
+    4. The draw rectangle button is not visible on the map
     """
     detail_page = DetailPage(responsive_page)
     layer_factory = LayerFactory(detail_page.detail_map)
@@ -101,8 +98,54 @@ def test_map_shows_geoserver_layer_with_cloud_optimised_subsetting(
     expect(
         detail_page.detail_map.daterange_show_hide_menu_button
     ).to_be_visible()
-    # Verify that the draw rectangle button is visible: cloud optimised data
-    # always supports spatial subsetting
+    # Verify that the draw rectangle button is not visible
+    expect(detail_page.detail_map.draw_rect_menu_button).not_to_be_visible()
+
+
+@pytest.mark.parametrize(
+    'uuid',
+    [
+        '27cc65c0-d453-4ba3-a0d6-55e4449fee8c',
+    ],
+)
+def test_map_shows_geoserver_layer_with_cloud_optimised_subsetting(
+    responsive_page: Page, uuid: str
+) -> None:
+    """
+    This test uses a cloud optimised (zarr) dataset with a WMS link whose GeoServer
+    map fields support only time subsetting.
+    Cloud optimised downloads always accept both a spatial and a datetime filter, so
+    both subsetting tools stay available regardless of the GeoServer field support.
+    This test ensures that:
+    1. A GeoServer layer is added to the map and is visible
+    2. The time slider button is visible on the map
+    3. The draw rectangle button is visible on the map, even though GeoServer
+       reports no geometry field
+    """
+    detail_page = DetailPage(responsive_page)
+    layer_factory = LayerFactory(detail_page.detail_map)
+
+    detail_page.load(uuid)
+    detail_page.go_to_map_tab()
+
+    # Ensure that the GeoServer option is displayed in the layers menu
+    detail_page.detail_map.wait_for_map_idle()
+    detail_page.detail_map.layers_menu.click()
+    expect(detail_page.detail_map.geoserver_layer).to_be_visible()
+
+    # Verify that the Geoserver layer is present and visible on the map
+    layer_id = layer_factory.get_layer_id(LayerStyle.GEO_SERVER)
+    assert (
+        detail_page.detail_map.is_map_layer_visible(
+            layer_id, is_map_loading=False
+        )
+        is True
+    )
+    # Verify that both subsetting tools are visible: cloud optimised data always
+    # supports spatial and datetime subsetting
+    expect(
+        detail_page.detail_map.daterange_show_hide_menu_button
+    ).to_be_visible()
     expect(detail_page.detail_map.draw_rect_menu_button).to_be_visible()
 
 

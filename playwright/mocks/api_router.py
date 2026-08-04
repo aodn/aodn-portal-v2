@@ -199,6 +199,14 @@ class ApiRouter:
     ) -> None:
         self.unroute(Routes.ESTIMATE_CO_DOWNLOAD, handler_function)
 
+    def route_pmtiles_metadata(self, handler_function: Callable) -> None:
+        self.route(Routes.PMTILES_METADATA, handler_function)
+
+    def unroute_pmtiles_metadata(
+        self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.PMTILES_METADATA, handler_function)
+
     def route_static_geojson(self, handler_function: Callable) -> None:
         self.route(Routes.STATIC_GEOJSON, handler_function)
 
