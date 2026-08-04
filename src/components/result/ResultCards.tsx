@@ -72,7 +72,7 @@ const renderListCards: FC<ResultCardsListType> = ({
 
   return (
     <Box sx={sx} data-testid="resultcard-result-list">
-      <Grid container spacing={1}>
+      <Grid container spacing={1} sx={{ width: "100%" }}>
         {contents.result.collections.map(
           (collection: OGCCollection, index: number) => (
             <Grid
@@ -130,7 +130,7 @@ const renderGridCards: FC<ResultCardsListType> = ({
 
   return (
     <Box sx={sx} data-testid="resultcard-result-grid">
-      <Grid container spacing={1}>
+      <Grid container spacing={1} sx={{ width: "100%" }}>
         {contents.result.collections.map(
           (collection: OGCCollection, index: number) => (
             <Grid

@@ -8,7 +8,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { border, borderRadius, color, padding } from "../../styles/constants";
+import { border, borderRadius, color, padding } from "@/styles/constants";
 import {
   FC,
   Fragment,
@@ -310,12 +310,14 @@ const ListResultCard: FC<ListResultCardProps> = ({
           </CardContent>
         </Box>
         {(isSelectedDataset || showButtons) && !isSimplified && (
-          <Box>
+          <Box sx={{ width: "100%" }}>
             <CardActions
               sx={{
                 backgroundColor: "white",
                 p: 0,
                 mt: "8px",
+                width: "100%",
+                display: "block",
               }}
             >
               <ResultCardButtonGroup

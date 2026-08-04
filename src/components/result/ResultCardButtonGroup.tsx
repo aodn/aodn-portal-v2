@@ -104,7 +104,13 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
 
   if (!content) return;
   return (
-    <Grid container arial-label="result-list-card-buttons">
+    // Grid v2 containers do not stretch by default; without width the
+    // size={3} columns collapse and labels sit on top of each other.
+    <Grid
+      container
+      arial-label="result-list-card-buttons"
+      sx={{ width: "100%" }}
+    >
       <ButtonContainer isGridView={isGridView}>
         {renderStatusButton(shouldHideText, content, resultCardButtonConfig)}
       </ButtonContainer>

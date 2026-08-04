@@ -246,73 +246,69 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
 
   const renderFilterBy = useCallback(
     (isMobile: boolean, isTablet: boolean) => (
-      <>
-        {(isMobile || isTablet) && (
-          <Grid sx={{ order: 2 }} size={12}>
-            <Divider sx={{ borderColor: theme.palette.primary4 }} />
-          </Grid>
-        )}
-        <Grid
+      <Grid
+        display="flex"
+        justifyContent="flex-start"
+        alignItems="flex-start"
+        // Must be a direct Grid child of the container (no Fragment).
+        // Do not set width:100% — it overrides `size` and stacks columns.
+        sx={{
+          order: isMobile || isTablet ? 3 : 1,
+          borderRight:
+            isMobile || isTablet
+              ? "none"
+              : `1px solid ${color.gray.extraLight}`,
+        }}
+        size={isMobile || isTablet ? 12 : 2}
+      >
+        <Box
           display="flex"
+          flexDirection="column"
           justifyContent="flex-start"
           alignItems="flex-start"
-          sx={{
-            order: isMobile || isTablet ? 3 : 1,
-            borderRight:
-              isMobile || isTablet
-                ? "none"
-                : `1px solid ${color.gray.extraLight}`,
-          }}
-          size={isMobile || isTablet ? 12 : 2}
+          p={padding.large}
+          pt={isMobile || isTablet ? padding.large : padding.triple}
+          width="100%"
         >
-          <Box
-            display="flex"
-            flexDirection="column"
-            justifyContent="flex-start"
-            alignItems="flex-start"
-            p={padding.large}
-            pt={isMobile || isTablet ? padding.large : padding.triple}
-          >
-            <Typography mb={2} variant="title1Medium">
-              Filter by
-            </Typography>
-            <FormControl sx={{ paddingLeft: "20px" }}>
-              <RadioGroup
-                defaultValue={DateRangeOptionValues.Custom}
-                value={selectedOption}
-                onChange={handleRadioChange}
-                sx={{
-                  flexDirection: { xs: "column", sm: "row", md: "column" },
-                }}
-              >
-                {dateRangeOptions.map((item) => (
-                  <FormControlLabel
-                    value={item.value}
-                    control={
-                      <Radio
-                        sx={{
-                          "&.Mui-checked": {
-                            color: theme.palette.secondary2,
-                          }, // e.g., '#ff0000'
-                        }}
-                      />
-                    }
-                    label={item.label}
-                    key={item.value}
-                    data-testid={`radio-${item.label}`}
-                    slotProps={{
-                      typography: {
-                        variant: "body2Regular", // Use the custom variant from themeRC8
-                        sx: { padding: 0 },
-                      },
-                    }}
-                  />
-                ))}
-              </RadioGroup>
-            </FormControl>
-          </Box>
-        </Grid>
-      </>
+          <Typography mb={2} variant="title1Medium">
+            Filter by
+          </Typography>
+          <FormControl sx={{ paddingLeft: "20px" }}>
+            <RadioGroup
+              defaultValue={DateRangeOptionValues.Custom}
+              value={selectedOption}
+              onChange={handleRadioChange}
+              sx={{
+                flexDirection: { xs: "column", sm: "row", md: "column" },
+              }}
+            >
+              {dateRangeOptions.map((item) => (
+                <FormControlLabel
+                  value={item.value}
+                  control={
+                    <Radio
+                      sx={{
+                        "&.Mui-checked": {
+                          color: theme.palette.secondary2,
+                        },
+                      }}
+                    />
+                  }
+                  label={item.label}
+                  key={item.value}
+                  data-testid={`radio-${item.label}`}
+                  slotProps={{
+                    typography: {
+                      variant: "body2Regular",
+                      sx: { padding: 0 },
+                    },
+                  }}
+                />
+              ))}
+            </RadioGroup>
+          </FormControl>
+        </Box>
+      </Grid>
     ),
     [handleRadioChange, selectedOption]
   );
@@ -372,143 +368,141 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Grid container position="relative">
+      {/*
+        Grid v2: only the *container* should force full width.
+        Column items must rely on `size` — width:100% on them stacks the layout.
+      */}
+      <Grid container position="relative" sx={{ width: "100%" }}>
+        {(isMobile || isTablet) && (
+          <Grid sx={{ order: 2 }} size={12}>
+            <Divider sx={{ borderColor: theme.palette.primary4 }} />
+          </Grid>
+        )}
         <Grid
           sx={{ order: isMobile || isTablet ? 1 : 2 }}
           size={isMobile || isTablet ? 12 : 10}
         >
-          <Grid
-            container
-            pt={padding.triple}
-            pb={padding.large}
-            pl={padding.triple}
-            pr={padding.triple}
+          <Box
+            sx={{
+              width: "100%",
+              pt: padding.triple,
+              pb: padding.large,
+              pl: padding.triple,
+              pr: padding.triple,
+            }}
           >
-            <Grid sx={{ display: "flex", justifyContent: "center" }} size={12}>
+            <Box
+              display="flex"
+              flexDirection={isMobile ? "column" : "row"}
+              justifyContent="space-between"
+              width="100%"
+              gap={2}
+            >
               <Box
                 display="flex"
-                flexDirection={isMobile ? "column" : "row"}
-                justifyContent="space-between"
-                width="100%"
-                gap={2}
-              >
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="space-between"
-                  width={{ xs: "100%", md: "auto" }}
-                  gap={2}
-                  data-testid="start-date-picker"
-                >
-                  <Typography
-                    variant="title1Medium"
-                    sx={{ textAlign: "left", minWidth: "85px" }}
-                  >
-                    Start&nbsp;Date
-                  </Typography>
-                  <PlainDatePicker
-                    sx={{ maxWidth: { xs: "216px", sm: "none" } }}
-                    views={["year", "month", "day"]}
-                    format={dateDefault.DISPLAY_FORMAT}
-                    value={minDate}
-                    minDate={initialMinDate}
-                    maxDate={valueToDate(value[1])}
-                    onChange={(date) => handleMinDateChange(date as Dayjs)}
-                    slots={{
-                      openPickerIcon: CalendarIcon,
-                    }}
-                    slotProps={{
-                      ...DEFAULT_DATE_PICKER_SLOT,
-                      openPickerIcon: {
-                        color: theme.palette.grey600,
-                        width: 22,
-                        height: 22,
-                      },
-                    }}
-                  />
-                </Box>
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="space-between"
-                  width={{ xs: "100%", md: "auto" }}
-                  gap={2}
-                  data-testid="end-date-picker"
-                >
-                  <Typography
-                    variant="title1Medium"
-                    sx={{ textAlign: "left", minWidth: "85px" }}
-                  >
-                    End&nbsp;Date
-                  </Typography>
-                  <PlainDatePicker
-                    sx={{ maxWidth: { xs: "216px", sm: "none" } }}
-                    views={["year", "month", "day"]}
-                    format={dateDefault.DISPLAY_FORMAT}
-                    value={maxDate}
-                    minDate={valueToDate(value[0])}
-                    maxDate={initialMaxDate}
-                    onChange={(date) => handleMaxDateChange(date as Dayjs)}
-                    slots={{
-                      openPickerIcon: CalendarIcon,
-                    }}
-                    slotProps={{
-                      ...DEFAULT_DATE_PICKER_SLOT,
-                      openPickerIcon: {
-                        color: theme.palette.grey600,
-                        width: 22,
-                        height: 22,
-                      },
-                    }}
-                  />
-                </Box>
-              </Box>
-            </Grid>
-            {!isMobile && (
-              <Grid
-                display="flex"
-                justifyContent="center"
                 alignItems="center"
-                size={12}
+                justifyContent="space-between"
+                width={{ xs: "100%", md: "auto" }}
+                gap={2}
+                data-testid="start-date-picker"
               >
-                <Box sx={{ width: "100%" }}>
-                  <TimeRangeBarChart
-                    imosDataIds={imosDataIds}
-                    totalDataset={totalDataset}
-                    selectedStartDate={minDate.toDate()}
-                    selectedEndDate={maxDate.toDate()}
-                  />
-                </Box>
-              </Grid>
+                <Typography
+                  variant="title1Medium"
+                  sx={{ textAlign: "left", minWidth: "85px" }}
+                >
+                  Start&nbsp;Date
+                </Typography>
+                <PlainDatePicker
+                  sx={{ maxWidth: { xs: "216px", sm: "none" } }}
+                  views={["year", "month", "day"]}
+                  format={dateDefault.DISPLAY_FORMAT}
+                  value={minDate}
+                  minDate={initialMinDate}
+                  maxDate={valueToDate(value[1])}
+                  onChange={(date) => handleMinDateChange(date as Dayjs)}
+                  slots={{
+                    openPickerIcon: CalendarIcon,
+                  }}
+                  slotProps={{
+                    ...DEFAULT_DATE_PICKER_SLOT,
+                    openPickerIcon: {
+                      color: theme.palette.grey600,
+                      width: 22,
+                      height: 22,
+                    },
+                  }}
+                />
+              </Box>
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+                width={{ xs: "100%", md: "auto" }}
+                gap={2}
+                data-testid="end-date-picker"
+              >
+                <Typography
+                  variant="title1Medium"
+                  sx={{ textAlign: "left", minWidth: "85px" }}
+                >
+                  End&nbsp;Date
+                </Typography>
+                <PlainDatePicker
+                  sx={{ maxWidth: { xs: "216px", sm: "none" } }}
+                  views={["year", "month", "day"]}
+                  format={dateDefault.DISPLAY_FORMAT}
+                  value={maxDate}
+                  minDate={valueToDate(value[0])}
+                  maxDate={initialMaxDate}
+                  onChange={(date) => handleMaxDateChange(date as Dayjs)}
+                  slots={{
+                    openPickerIcon: CalendarIcon,
+                  }}
+                  slotProps={{
+                    ...DEFAULT_DATE_PICKER_SLOT,
+                    openPickerIcon: {
+                      color: theme.palette.grey600,
+                      width: 22,
+                      height: 22,
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+            {!isMobile && (
+              <Box sx={{ width: "100%" }}>
+                <TimeRangeBarChart
+                  imosDataIds={imosDataIds}
+                  totalDataset={totalDataset}
+                  selectedStartDate={minDate.toDate()}
+                  selectedEndDate={maxDate.toDate()}
+                />
+              </Box>
             )}
-            <Grid container>
-              <Grid
+            <Box
+              sx={{
+                width: "90%",
+                mx: "auto",
+                paddingTop: padding.extraLarge,
+              }}
+            >
+              <PlainSlider
+                value={value}
+                min={dateToValue(initialMinDate)}
+                max={dateToValue(initialMaxDate)}
+                step={432000000} // 5 days in mils
+                onChange={handleSliderChange}
+                valueLabelDisplay="auto"
+                valueLabelFormat={(value: number) =>
+                  valueToDate(value).format(dateDefault.DISPLAY_FORMAT)
+                }
+              />
+              <Box
                 sx={{
                   display: "flex",
-                  justifyContent: "center",
+                  justifyContent: "space-between",
                   alignItems: "center",
                 }}
-                size={12}
-              >
-                <Box sx={{ width: "90%", paddingTop: padding.extraLarge }}>
-                  <PlainSlider
-                    value={value}
-                    min={dateToValue(initialMinDate)}
-                    max={dateToValue(initialMaxDate)}
-                    step={432000000} // 5 days in mils
-                    onChange={handleSliderChange}
-                    valueLabelDisplay="auto"
-                    valueLabelFormat={(value: number) =>
-                      valueToDate(value).format(dateDefault.DISPLAY_FORMAT)
-                    }
-                  />
-                </Box>
-              </Grid>
-              <Grid
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                size={12}
               >
                 <Typography padding={0} variant="body2Regular">
                   {initialMinDate.format(dateDefault.DISPLAY_FORMAT)}
@@ -516,9 +510,9 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                 <Typography padding={0} variant="body2Regular">
                   {initialMaxDate.format(dateDefault.DISPLAY_FORMAT)}
                 </Typography>
-              </Grid>
-            </Grid>
-          </Grid>
+              </Box>
+            </Box>
+          </Box>
         </Grid>
         {renderFilterBy(isMobile, isTablet)}
       </Grid>
