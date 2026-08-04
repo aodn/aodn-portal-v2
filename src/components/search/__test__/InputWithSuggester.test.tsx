@@ -233,6 +233,7 @@ describe("InputWithSuggester", () => {
 
     // "Glider" comes from suggested_semantic in the mock and contains no "wave"
     expect(await screen.findByText("Glider")).toBeInTheDocument();
-    expect(screen.getByTestId("label-chip-Related")).toBeInTheDocument();
+    // can have multiple semantic suggestions, so we check that at least one is present
+    expect(screen.getAllByTestId("label-chip-Related")).not.toHaveLength(0);
   });
 });
