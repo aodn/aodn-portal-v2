@@ -18,7 +18,7 @@ const SummaryAndDownloadPanel: FC = () => {
   return (
     collection && (
       <Grid container>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Stack direction="column">
             <Stack position="relative" direction={"row"}>
               <Box position="absolute" top={-6} right={-6}>

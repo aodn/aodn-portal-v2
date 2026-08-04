@@ -10,7 +10,7 @@ import React, {
 import DetailSubtabBtn from "../../../components/common/buttons/DetailSubtabBtn";
 import useBreakpoint from "../../../hooks/useBreakpoint";
 import AIGenTag from "../../../components/info/AIGenTag";
-import { InfoContentType } from "../../../components/info/InfoDefinition";
+import { InfoContentType } from "@/components/info/InfoDefinition";
 
 // the visible height of the navigable panel. May change, according to the design
 const PANEL_VISIBLE_HEIGHT = 850;
@@ -226,12 +226,20 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
   ) : (
     <Grid container>
       {!isUnderLaptop && (
-        <Grid item md={3}>
+        <Grid
+          size={{
+            md: 3,
+          }}
+        >
           <Grid container wrap="nowrap" direction="row">
-            <Grid item md={1}>
+            <Grid
+              size={{
+                md: 1,
+              }}
+            >
               <VerticalIndicator index={selectedIndex} itemRefs={menuRefs} />
             </Grid>
-            <Grid item>
+            <Grid>
               {childrenList.map((child, index) => {
                 return (
                   <DetailSubtabBtn
@@ -244,13 +252,14 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
               })}
             </Grid>
           </Grid>
-          <Grid item md={1} />
+          <Grid
+            size={{
+              md: 1,
+            }}
+          />
         </Grid>
       )}
       <Grid
-        item
-        xs={12}
-        md={9}
         ref={scrollableSectionRef}
         sx={{
           height: PANEL_VISIBLE_HEIGHT + "px",
@@ -259,6 +268,10 @@ const NavigatablePanel: React.FC<NavigatablePanelProps> = ({
         onScroll={handleScroll}
         position="relative"
         data-testid="scrollable-section"
+        size={{
+          xs: 12,
+          md: 9,
+        }}
       >
         {AIGenContent && (
           <Box

@@ -1,9 +1,9 @@
 import React from "react";
 import { Grid, Link, Tooltip, Typography, Box } from "@mui/material";
 import { portalTheme } from "../../../../styles";
-import { MailOutlineIcon } from "../../../../assets/icons/details/mail";
-import { openInNewTab } from "../../../../utils/LinkUtils";
-import { addSpacesToCamelCase } from "../../../../utils/FormatUtils";
+import { MailOutlineIcon } from "@/assets/icons/details/mail";
+import { openInNewTab } from "@/utils/LinkUtils";
+import { addSpacesToCamelCase } from "@/utils/FormatUtils";
 import LabelChip from "../../../common/label/LabelChip";
 
 interface CollapseContactItemTItleProps {
@@ -38,16 +38,15 @@ const CollapseContactItemTitle: React.FC<CollapseContactItemTItleProps> = ({
   };
 
   return (
-    <Grid item container xs={12} data-testid={`collapse-item-${text}`}>
+    <Grid container data-testid={`collapse-item-${text}`} size={12}>
       <Grid
-        item
-        xs={12}
         sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "start",
           gap: 1,
         }}
+        size={12}
       >
         {isExpanded ? (
           <Box

@@ -24,22 +24,24 @@ const RecordNotFoundPanel = () => {
       }}
     >
       <Grid
-        item
-        md={12}
         justifyContent="center"
         display="flex"
         alignContent="center"
+        size={{
+          md: 12,
+        }}
       >
         <Typography variant="detailTitle" sx={{ fontWeight: 500 }}>
           There is no matching result for &quot;{uuid}&quot;
         </Typography>
       </Grid>
       <Grid
-        item
-        md={12}
         justifyContent="center"
         display="flex"
         alignContent="center"
+        size={{
+          md: 12,
+        }}
       >
         <Typography variant="detailTitle" sx={{ fontWeight: 500 }}>
           Please check the related information

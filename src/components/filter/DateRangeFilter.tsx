@@ -21,7 +21,7 @@ import {
 } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { color, padding } from "../../styles/constants";
+import { color, padding } from "@/styles/constants";
 import { dateDefault } from "../common/constants";
 import { updateDateTimeFilterRange } from "@/app/store/componentParamReducer";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
@@ -41,7 +41,7 @@ import {
 import TimeRangeBarChart from "../common/charts/TimeRangeBarChart";
 import PlainDatePicker from "../common/datetime/PlainDatePicker";
 import PlainSlider from "../common/slider/PlainSlider";
-import { dateToValue, valueToDate } from "../../utils/DateUtils";
+import { dateToValue, valueToDate } from "@/utils/DateUtils";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import theme from "../../styles/themeRC8";
 import { CalendarIcon } from "../../assets/icons/search/calendar";
@@ -248,13 +248,11 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
     (isMobile: boolean, isTablet: boolean) => (
       <>
         {(isMobile || isTablet) && (
-          <Grid item xs={12} sx={{ order: 2 }}>
+          <Grid sx={{ order: 2 }} size={12}>
             <Divider sx={{ borderColor: theme.palette.primary4 }} />
           </Grid>
         )}
         <Grid
-          item
-          xs={isMobile || isTablet ? 12 : 2}
           display="flex"
           justifyContent="flex-start"
           alignItems="flex-start"
@@ -265,6 +263,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                 ? "none"
                 : `1px solid ${color.gray.extraLight}`,
           }}
+          size={isMobile || isTablet ? 12 : 2}
         >
           <Box
             display="flex"
@@ -301,9 +300,9 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                     label={item.label}
                     key={item.value}
                     data-testid={`radio-${item.label}`}
-                    componentsProps={{
+                    slotProps={{
                       typography: {
-                        variant: "body2Regular", // Ues the custo" variant from themeRC8
+                        variant: "body2Regular", // Use the custom variant from themeRC8
                         sx: { padding: 0 },
                       },
                     }}
@@ -375,9 +374,8 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Grid container position="relative">
         <Grid
-          item
-          xs={isMobile || isTablet ? 12 : 10}
           sx={{ order: isMobile || isTablet ? 1 : 2 }}
+          size={isMobile || isTablet ? 12 : 10}
         >
           <Grid
             container
@@ -386,11 +384,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
             pl={padding.triple}
             pr={padding.triple}
           >
-            <Grid
-              item
-              xs={12}
-              sx={{ display: "flex", justifyContent: "center" }}
-            >
+            <Grid sx={{ display: "flex", justifyContent: "center" }} size={12}>
               <Box
                 display="flex"
                 flexDirection={isMobile ? "column" : "row"}
@@ -472,11 +466,10 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
             </Grid>
             {!isMobile && (
               <Grid
-                item
-                xs={12}
                 display="flex"
                 justifyContent="center"
                 alignItems="center"
+                size={12}
               >
                 <Box sx={{ width: "100%" }}>
                   <TimeRangeBarChart
@@ -490,13 +483,12 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
             )}
             <Grid container>
               <Grid
-                item
-                xs={12}
                 sx={{
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
                 }}
+                size={12}
               >
                 <Box sx={{ width: "90%", paddingTop: padding.extraLarge }}>
                   <PlainSlider
@@ -513,11 +505,10 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                 </Box>
               </Grid>
               <Grid
-                item
-                xs={12}
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center"
+                size={12}
               >
                 <Typography padding={0} variant="body2Regular">
                   {initialMinDate.format(dateDefault.DISPLAY_FORMAT)}

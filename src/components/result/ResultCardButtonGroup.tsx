@@ -10,7 +10,7 @@ import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import ResultCardButton, {
   ResultCardButtonConfig,
 } from "../common/buttons/ResultCardButton";
-import { color } from "../../styles/constants";
+import { color } from "@/styles/constants";
 import { OpenType } from "../../hooks/useTabNavigation";
 
 interface ResultCardButtonGroupProps {
@@ -81,12 +81,11 @@ const ButtonContainer: FC<ButtonContainerProps> = ({
   sx,
 }) => (
   <Grid
-    item
-    xs={isGridView ? 6 : 3}
     display="flex"
     justifyContent="center"
     alignItems="center"
     sx={{ ...sx }}
+    size={isGridView ? 6 : 3}
   >
     {children}
   </Grid>

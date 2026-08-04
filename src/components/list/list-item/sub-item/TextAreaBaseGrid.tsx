@@ -10,7 +10,7 @@ const TextAreaBaseGrid = ({
   ...props
 }: React.PropsWithChildren<TextAreaGridProps>) => {
   return (
-    <Grid item sx={sx} {...props}>
+    <Grid sx={sx} {...props}>
       {children}
     </Grid>
   );

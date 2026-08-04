@@ -18,7 +18,12 @@ const NaList: React.FC<NaListProps> = ({
   onClick,
 }) => {
   return (
-    <Grid item container md={12}>
+    <Grid
+      container
+      size={{
+        md: 12,
+      }}
+    >
       <NaItem
         title={title}
         message={message}

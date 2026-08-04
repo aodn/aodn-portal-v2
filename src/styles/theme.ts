@@ -137,7 +137,7 @@ declare module "@mui/material/styles" {
   }
 }
 
-declare module "@mui/material/Typography/Typography" {
+declare module "@mui/material/Typography" {
   interface TypographyPropsVariantOverrides {
     detailTitle: true;
     detailContent: true;

@@ -24,14 +24,15 @@ const ShowMoreDetailBtn: FC<ShowMoreDetailButtonProps> = memo(
 
     return (
       <Grid
-        item
-        md={12}
         sx={{
           width: "100%",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
           my: `${id ? "4px" : "12px"}`,
+        }}
+        size={{
+          md: 12,
         }}
       >
         <Button

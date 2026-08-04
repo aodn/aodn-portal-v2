@@ -95,10 +95,9 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
   return (
     <TextAreaBaseGrid sx={{ width: "100%", ...sx }}>
       <Grid
-        item
-        xs={12}
         onMouseEnter={() => setHoverOnContent(true)}
         onMouseLeave={() => setHoverOnContent(false)}
+        size={12}
       >
         <Box
           sx={{
@@ -149,7 +148,7 @@ const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
         </Box>
       </Grid>
       {(needsExpansion || isExpanded) && (
-        <Grid item xs={12} display="flex" justifyContent="flex-end">
+        <Grid display="flex" justifyContent="flex-end" size={12}>
           <Button
             onClick={onShowMoreClick}
             sx={{

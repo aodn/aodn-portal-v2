@@ -145,7 +145,7 @@ declare module "@mui/material/styles" {
   }
 }
 
-declare module "@mui/material/Typography/Typography" {
+declare module "@mui/material/Typography" {
   interface TypographyPropsVariantOverrides {
     slogan1: true;
     slogan2: true;
