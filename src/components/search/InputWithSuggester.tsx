@@ -30,7 +30,13 @@ import {
   createSuggesterParamFrom,
   fetchSuggesterOptions,
 } from "@/app/store/searchReducer";
-import { borderRadius, color, gap, padding } from "../../styles/constants";
+import {
+  borderRadius,
+  color,
+  fontColor,
+  gap,
+  padding,
+} from "../../styles/constants";
 import { debounce } from "lodash";
 import { sortByRelevance } from "../../utils/Helpers";
 import { useAppDispatch } from "@/app/store/hooks";
@@ -84,6 +90,30 @@ enum OptionGroup {
   QUOTED = "quoted",
   SEMANTIC = "semantic",
 }
+
+const suggestionChipSx = {
+  ...portalTheme.typography.body3Small,
+  ml: gap.lg,
+  display: "flex",
+  alignItems: "center",
+} as const;
+
+const exactMatchChipSx = {
+  ...suggestionChipSx,
+  width: "111px",
+  padding: "1.586px 0",
+  justifyContent: "center",
+  gap: "19.034px",
+  borderRadius: "4.759px",
+} as const;
+
+const semanticChipSx = {
+  ...suggestionChipSx,
+  width: "85px",
+  padding: "1.586px 6px",
+  gap: "6px",
+  borderRadius: "4px",
+} as const;
 
 const defaultFilter = createFilterOptions<string>();
 
@@ -511,54 +541,23 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
           {isQuotedPhrase(option) && (
             <LabelChip
               text={[DOUBLE_QUOTE_LABEL]}
-              color={portalTheme.palette.tag1}
-              sx={{
-                ml: gap.lg,
-                ...portalTheme.typography.body2Regular,
-              }}
+              color="#EAD7F4"
+              sx={exactMatchChipSx}
             />
           )}
           {optionGroups.get(option) === OptionGroup.SEMANTIC && (
-            // The definition hover card is held back for now - to restore it, wrap this chip in
-            // the Tooltip below and uncomment SemanticDefinitionCard above.
-            //
-            // <Tooltip
-            //   // An empty title renders no tooltip, so a term without a definition needs no guard.
-            //   title={
-            //     definitions[option] ? (
-            //       <SemanticDefinitionCard definition={definitions[option]} />
-            //     ) : (
-            //       ""
-            //     )
-            //   }
-            //   // To the side, on the hovered row's own line - above or below would cover the
-            //   // neighbouring options, which are what the user is still choosing between.
-            //   placement="right"
-            //   // The delay keeps it quiet while the pointer travels down the list
-            //   enterDelay={700}
-            //   enterNextDelay={700}
-            //   slotProps={{
-            //     // Strip the default dark bubble so the card is the only surface
-            //     tooltip: { sx: { bgcolor: "transparent", p: 0, maxWidth: "unset" } },
-            //   }}
-            // >
             <LabelChip
               text={[SEMANTIC_LABEL]}
-              color={portalTheme.palette.tag2}
+              color="#F1F4D7"
               startIcon={
-                // Same blue the detail page uses for its AI-generated badges
                 <AIGenStarIcon
-                  width={12}
-                  height={12}
-                  color={color.brightBlue.medium}
+                  width={11.2}
+                  height={11.2}
+                  color={fontColor.blue.header}
                 />
               }
-              sx={{
-                ml: gap.lg,
-                ...portalTheme.typography.body2Regular,
-              }}
+              sx={semanticChipSx}
             />
-            // </Tooltip>
           )}
           {/* hidden by default, shown on focus, check sx in CustomPaper */}
           <SearchIcon sx={{ display: "none", ml: "auto" }} />
