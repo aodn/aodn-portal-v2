@@ -1,5 +1,5 @@
 import pytest
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Locator, Page, expect
 
 from core.enums.map_layers.layer_style import LayerStyle
 from core.factories.layer import LayerFactory
@@ -16,7 +16,7 @@ _UI_TIMEOUT_MS = 30_000
 
 
 def _open_layers_menu_until_visible(
-    detail_page: DetailPage, locator, timeout_ms: int = _UI_TIMEOUT_MS
+    detail_page: DetailPage, locator: Locator, timeout_ms: int = _UI_TIMEOUT_MS
 ) -> None:
     """
     Open the layer styles menu and wait until ``locator`` is visible.
