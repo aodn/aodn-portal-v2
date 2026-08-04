@@ -284,8 +284,16 @@ class Map(BasePage):
         bounds = execute_map_js(self.page, 'getMapBounds', self.map_id)
         return dict(bounds)
 
-    def find_and_click_data_point(self, uuid: str) -> bool:
-        """Find and click on a data point on the map"""
-        return execute_map_js(
-            self.page, 'findAndClickDataPoint', self.map_id, uuid
+    def find_and_click_data_point(
+        self, uuid: str, timeout: float = 30000
+    ) -> None:
+        """
+        Find and click a data point by uuid.
+
+        Retries until the feature is rendered on the map (or timeout), so callers
+        do not race the cluster/uncluster layer paint.
+        """
+        self.wait_for_map_idle()
+        wait_for_js_function(
+            self.page, 'findAndClickDataPoint', timeout, self.map_id, uuid
         )
