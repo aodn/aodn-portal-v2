@@ -12,7 +12,12 @@ import { dateDefault } from "../constants";
 import { portalTheme } from "../../../styles";
 import { padding } from "@/styles/constants";
 import PlainSlider from "./PlainSlider";
-import { Mark } from "@mui/material/Slider/useSlider.types";
+
+/** Slider mark shape (was imported from a deep MUI path removed in v7). */
+interface Mark {
+  value: number;
+  label?: React.ReactNode;
+}
 
 interface DateSliderRangeProps {
   visible?: boolean;
@@ -146,8 +151,6 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
       data-testid={COMPONENT_ID}
     >
       <Grid
-        item
-        xs={12}
         display="flex"
         justifyContent="space-between"
         alignItems="center"
@@ -156,6 +159,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
           mt: { xs: "2px", md: "6px" },
           mb: { xs: "2px", md: "6px" },
         }}
+        size={12}
       >
         <Typography
           sx={{
@@ -167,13 +171,12 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
         </Typography>
       </Grid>
       <Grid
-        item
-        xs={12}
         container
         sx={{
           px: padding.medium,
           pt: { xs: "24px", md: padding.small },
         }}
+        size={12}
       >
         <Stack
           width="100%"
@@ -386,13 +389,12 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
       data-testid={COMPONENT_ID}
     >
       <Grid
-        item
-        xs={12}
         container
         sx={{
           px: padding.medium,
           pt: { xs: "24px", md: padding.small },
         }}
+        size={12}
       >
         <Stack
           width="100%"
@@ -446,8 +448,6 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
         </Stack>
       </Grid>
       <Grid
-        item
-        xs={12}
         display="flex"
         justifyContent="space-between"
         alignItems="center"
@@ -456,6 +456,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
           mt: { xs: "2px", md: "6px" },
           mb: { xs: "2px", md: "6px" },
         }}
+        size={12}
       >
         <Typography
           sx={{

@@ -68,12 +68,11 @@ const Footer: FC = () => {
     >
       <Grid container paddingY={{ xs: padding.medium, sm: padding.quadruple }}>
         <Grid
-          item
-          xs={12}
           display="flex"
           flexDirection={{ xs: "column-reverse", sm: "row" }}
           justifyContent="space-between"
           gap={{ xs: 2, sm: 0 }}
+          size={12}
         >
           <AODNSiteLogo />
           <Button onClick={() => scrollToTop()}>
@@ -89,7 +88,7 @@ const Footer: FC = () => {
             </Typography>
           </Button>
         </Grid>
-        <Grid item xs={12} paddingY={padding.large}>
+        <Grid paddingY={padding.large} size={12}>
           {!(pathname === pageDefault.search) && (
             <Typography
               color="#000"
@@ -119,7 +118,7 @@ const Footer: FC = () => {
             borderColor: color.blue.dark,
           }}
         />
-        <Grid item xs={12} paddingY={padding.small}>
+        <Grid paddingY={padding.small} size={12}>
           <Box
             display="flex"
             flexDirection={{ xs: "column", sm: "row" }}
@@ -204,9 +203,14 @@ const Footer: FC = () => {
             borderColor: color.blue.dark,
           }}
         />
-        <Grid item xs={12} paddingY={padding.large}>
+        <Grid paddingY={padding.large} size={12}>
           <Grid container>
-            <Grid item xs={12} sm={7}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 7,
+              }}
+            >
               <Stack
                 direction="row"
                 gap={2}
@@ -233,12 +237,13 @@ const Footer: FC = () => {
               </Typography>
             </Grid>
             <Grid
-              item
-              xs={12}
-              sm={5}
               display="flex"
               justifyContent={{ xs: "center", sm: "end" }}
               alignItems="center"
+              size={{
+                xs: 12,
+                sm: 5,
+              }}
             >
               <Box>
                 <IconButton

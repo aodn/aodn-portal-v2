@@ -37,11 +37,11 @@
     "@luma.gl/shadertools": "^9.0.17",
     "@mapbox/geo-viewport": "^0.5.0",
     "@mapbox/mapbox-gl-draw": "^1.4.3",
-    "@mui/icons-material": "^5.18.0",
-    "@mui/material": "^5.18.0",
-    "@mui/system": "^5.18.0",
-    "@mui/x-charts": "^6.19.3",
-    "@mui/x-date-pickers": "^6.19.3",
+    "@mui/icons-material": "^7.3.11",
+    "@mui/material": "^7.3.11",
+    "@mui/system": "^7.3.11",
+    "@mui/x-charts": "^7.29.1",
+    "@mui/x-date-pickers": "^7.29.4",
     "@reduxjs/toolkit": "^2.1.0",
     "@turf/turf": "7.0.0",
     "axios": "1.15.2",
@@ -60,6 +60,7 @@
     "pmtiles": "^4.4.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-is": "^18.3.1",
     "react-redux": "^9.1.0",
     "react-router-dom": "6.30.3",
     "react-virtualized-auto-sizer": "1.0.24",
@@ -132,6 +133,9 @@
   "engines": {
     "node": ">=20.x",
     "npm": ">=8.0.0"
+  },
+  "resolutions": {
+    "react-is": "^18.3.1"
   },
   "packageManager": "yarn@4.3.0"
 }

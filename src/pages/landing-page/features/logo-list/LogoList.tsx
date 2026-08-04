@@ -31,14 +31,26 @@ const LogoList: FC = () => {
       paddingY={{ xs: padding.medium, sm: padding.quadruple }}
       spacing={2}
     >
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={4} lg={3}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 4,
+              lg: 3,
+            }}
+          >
             <LogoContainer>
               <Logo src={NCRIS} alt={NCRIS} />
             </LogoContainer>
           </Grid>
-          <Grid item xs={12} sm={8} lg={9}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 8,
+              lg: 9,
+            }}
+          >
             <Typography color="#000" textAlign="left" padding={0}>
               Australia&apos;s Integrated Marine Observing System (IMOS) is
               enabled by the National Collaborative Research Infrastructure
@@ -49,34 +61,64 @@ const LogoList: FC = () => {
           </Grid>
         </Grid>
       </Grid>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Typography fontWeight={fontWeight.bold} color="#000">
           Principal Participants
         </Typography>
       </Grid>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Grid container spacing={2}>
-          <Grid item xs={6} sm={4} lg={3}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 4,
+              lg: 3,
+            }}
+          >
             <LogoContainer>
               <Logo src={UTAS} alt={UTAS} height="40px" />
             </LogoContainer>
           </Grid>
-          <Grid item xs={6} sm={4} lg={3}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 4,
+              lg: 3,
+            }}
+          >
             <LogoContainer>
               <Logo src={AUMS} alt={AUMS} height="50px" />
             </LogoContainer>
           </Grid>
-          <Grid item xs={6} sm={4} lg={3}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 4,
+              lg: 3,
+            }}
+          >
             <LogoContainer>
               <Logo src={BM} alt={UTAS} height="100px" />
             </LogoContainer>
           </Grid>
-          <Grid item xs={6} sm={4} lg={3}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 4,
+              lg: 3,
+            }}
+          >
             <LogoContainer>
               <Logo src={CSIRO} alt={CSIRO} height="70px" />
             </LogoContainer>
           </Grid>
-          <Grid item xs={6} sm={4} lg={3}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 4,
+              lg: 3,
+            }}
+          >
             <LogoContainer>
               <Box>
                 <Logo src={GovSA} alt={GovSA} height="75px" />
@@ -86,14 +128,20 @@ const LogoList: FC = () => {
               </Box>
             </LogoContainer>
           </Grid>
-          <Grid item xs={6} sm={4} lg={3}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 4,
+              lg: 3,
+            }}
+          >
             <LogoContainer>
               <Logo src={UWA} alt={UWA} height="60px" />
             </LogoContainer>
           </Grid>
         </Grid>
       </Grid>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <LogoContainer
           sx={{
             minWidth: "100%",
@@ -126,34 +174,58 @@ const LogoList: FC = () => {
           SIMS is a partnership involving four universities
         </Typography>
       </Grid>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Typography fontWeight={fontWeight.bold} color="#000">
           Associate Participants
         </Typography>
       </Grid>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Grid container spacing={2}>
-          <Grid item xs={6} sm={4} lg={3}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 4,
+              lg: 3,
+            }}
+          >
             <LogoContainer>
               <Logo src={CurtinUni} alt={CurtinUni} height="35px" />
             </LogoContainer>
           </Grid>
-          <Grid item xs={6} sm={4} lg={3}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 4,
+              lg: 3,
+            }}
+          >
             <LogoContainer>
               <Logo src={DAWE} alt={DAWE} height="50px" />
             </LogoContainer>
           </Grid>
-          <Grid item xs={6} sm={4} lg={3}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 4,
+              lg: 3,
+            }}
+          >
             <LogoContainer>
               <Logo src={DeakinUni} alt={DeakinUni} height="65px" />
             </LogoContainer>
           </Grid>
-          <Grid item xs={6} sm={4} lg={3}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 4,
+              lg: 3,
+            }}
+          >
             <LogoContainer>
               <Logo src={UMEL} alt={UMEL} height="70px" />
             </LogoContainer>
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <Typography
               variant="title1Medium"
               color={portalTheme.palette.text2}

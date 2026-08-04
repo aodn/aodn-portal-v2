@@ -1,6 +1,5 @@
 import {
   Box,
-  FormControl,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -16,10 +15,10 @@ import {
 } from "react";
 import useElementSize from "../../../hooks/useElementSize";
 import { CommonSelectProps, SelectItem } from "./CommonSelect";
-import { borderRadius, color, margin } from "../../../styles/constants";
+import { borderRadius, color, margin } from "@/styles/constants";
 import { IconProps } from "../../icon/types";
-import { mergeWithDefaults } from "../../../utils/ObjectUtils";
-import { disableScroll, enableScroll } from "../../../utils/ScrollUtils";
+import { mergeWithDefaults } from "@/utils/ObjectUtils";
+import { disableScroll, enableScroll } from "@/utils/ScrollUtils";
 import { portalTheme } from "../../../styles";
 import { SIMPLE_FILTER_DEFAULT_HEIGHT } from "../../filter/ResultPanelSimpleFilter";
 
@@ -197,8 +196,11 @@ const IconSelect = <T extends string | number = string>({
   const config = mergeWithDefaults(defaultColorConfig, colorConfig);
 
   return (
-    <FormControl fullWidth ref={containerRef}>
+    // Prefer Box over FormControl: Select does not need form context here, and
+    // FormControl's filled/focused state updates often fire outside act() in tests.
+    <Box ref={containerRef} sx={{ width: "100%" }}>
       <Select
+        fullWidth
         value={selectedItem || items[0]?.value}
         renderValue={(value) =>
           selectedItem
@@ -260,7 +262,7 @@ const IconSelect = <T extends string | number = string>({
           </MenuItem>
         ))}
       </Select>
-    </FormControl>
+    </Box>
   );
 };
 

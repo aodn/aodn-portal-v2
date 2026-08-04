@@ -72,20 +72,21 @@ const renderListCards: FC<ResultCardsListType> = ({
 
   return (
     <Box sx={sx} data-testid="resultcard-result-list">
-      <Grid container spacing={1}>
+      <Grid container spacing={1} sx={{ width: "100%" }}>
         {contents.result.collections.map(
           (collection: OGCCollection, index: number) => (
             <Grid
-              item
-              xs={12}
-              sm={6}
-              md={isFullListView ? 6 : 12}
-              lg={isFullListView ? 4 : 12}
               key={index}
               sx={{
                 // Must hardcode, else the box will expand if not enough height
                 height: isSimplified ? "auto" : LIST_CARD_HEIGHT,
                 maxHeight: LIST_CARD_HEIGHT,
+              }}
+              size={{
+                xs: 12,
+                sm: 6,
+                md: isFullListView ? 6 : 12,
+                lg: isFullListView ? 4 : 12,
               }}
             >
               <ListResultCard
@@ -103,7 +104,7 @@ const renderListCards: FC<ResultCardsListType> = ({
           )
         )}
         {renderLoadMoreButton && count < total && (
-          <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
+          <Grid sx={{ display: "flex", justifyContent: "center" }} size={12}>
             {renderLoadMoreButton()}
           </Grid>
         )}
@@ -129,19 +130,20 @@ const renderGridCards: FC<ResultCardsListType> = ({
 
   return (
     <Box sx={sx} data-testid="resultcard-result-grid">
-      <Grid container spacing={1}>
+      <Grid container spacing={1} sx={{ width: "100%" }}>
         {contents.result.collections.map(
           (collection: OGCCollection, index: number) => (
             <Grid
-              item
-              xs={6}
-              sm={4}
-              md={6}
-              lg={6}
               key={index}
               sx={{
                 // Must hardcode, else the box will expand if not enough height
                 height: GRID_CARD_HEIGHT,
+              }}
+              size={{
+                xs: 6,
+                sm: 4,
+                md: 6,
+                lg: 6,
               }}
             >
               <GridResultCard
@@ -159,7 +161,7 @@ const renderGridCards: FC<ResultCardsListType> = ({
           )
         )}
         {renderLoadMoreButton && count < total && (
-          <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
+          <Grid sx={{ display: "flex", justifyContent: "center" }} size={12}>
             {renderLoadMoreButton()}
           </Grid>
         )}

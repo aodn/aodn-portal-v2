@@ -24,17 +24,17 @@ import {
   fontSize,
   fontWeight,
   padding,
-} from "../../../styles/constants";
+} from "@/styles/constants";
 import ShareButtonMenu from "../../../components/menu/ShareButtonMenu";
 import DataUsageIcon from "@mui/icons-material/DataUsage";
-import { TemporalIcon } from "../../../assets/icons/details/temporal";
-import { pageReferer } from "../../../components/common/constants";
-import { capitalizeFirstLetter } from "../../../utils/StringUtils";
+import { TemporalIcon } from "@/assets/icons/details/temporal";
+import { pageReferer } from "@/components/common/constants";
+import { capitalizeFirstLetter } from "@/utils/StringUtils";
 import { portalTheme } from "../../../styles";
 import InfoCard from "../../../components/info/InfoCard";
-import { InfoStatusType } from "../../../components/info/InfoDefinition";
-import { DataTestId } from "../../../components/map/mapbox/constants";
-import { ReplyIcon } from "../../../assets/icons/details/back";
+import { InfoStatusType } from "@/components/info/InfoDefinition";
+import { DataTestId } from "@/components/map/mapbox/constants";
+import { ReplyIcon } from "@/assets/icons/details/back";
 import LabelChip from "../../../components/common/label/LabelChip";
 import AIGenStarIcon from "../../../components/icon/AIGenStarIcon";
 
@@ -316,9 +316,6 @@ const HeaderSection = () => {
         {!isCollectionNotFound && (
           <Grid container spacing={1}>
             <Grid
-              item
-              xs={12}
-              sm={10}
               sx={{
                 display: "flex",
                 justifyContent: "center",
@@ -326,6 +323,10 @@ const HeaderSection = () => {
                 flexDirection: "column",
               }}
               gap={isMobile ? 0 : 1}
+              size={{
+                xs: 12,
+                sm: 10,
+              }}
             >
               {/* The collection title is the page's single h1 (SEO);
                   component only changes the tag, not the styling. No
@@ -351,13 +352,14 @@ const HeaderSection = () => {
                 )}
             </Grid>
             <Grid
-              item
-              xs={4}
-              sm={2}
               sx={{
                 display: "flex",
                 justifyContent: "flex-end",
                 alignItems: "flex-start",
+              }}
+              size={{
+                xs: 4,
+                sm: 2,
               }}
             >
               {collection && (
@@ -372,7 +374,12 @@ const HeaderSection = () => {
               )}
             </Grid>
             {isMobile && (
-              <Grid item xs={8} sm={12}>
+              <Grid
+                size={{
+                  xs: 8,
+                  sm: 12,
+                }}
+              >
                 {renderSubTitle(
                   startDate,
                   endDate,

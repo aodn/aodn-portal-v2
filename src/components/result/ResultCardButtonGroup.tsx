@@ -10,7 +10,7 @@ import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import ResultCardButton, {
   ResultCardButtonConfig,
 } from "../common/buttons/ResultCardButton";
-import { color } from "../../styles/constants";
+import { color } from "@/styles/constants";
 import { OpenType } from "../../hooks/useTabNavigation";
 
 interface ResultCardButtonGroupProps {
@@ -81,12 +81,11 @@ const ButtonContainer: FC<ButtonContainerProps> = ({
   sx,
 }) => (
   <Grid
-    item
-    xs={isGridView ? 6 : 3}
     display="flex"
     justifyContent="center"
     alignItems="center"
     sx={{ ...sx }}
+    size={isGridView ? 6 : 3}
   >
     {children}
   </Grid>
@@ -105,7 +104,13 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
 
   if (!content) return;
   return (
-    <Grid container arial-label="result-list-card-buttons">
+    // Grid v2 containers do not stretch by default; without width the
+    // size={3} columns collapse and labels sit on top of each other.
+    <Grid
+      container
+      arial-label="result-list-card-buttons"
+      sx={{ width: "100%" }}
+    >
       <ButtonContainer isGridView={isGridView}>
         {renderStatusButton(shouldHideText, content, resultCardButtonConfig)}
       </ButtonContainer>

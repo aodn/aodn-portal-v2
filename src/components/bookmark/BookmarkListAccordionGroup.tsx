@@ -196,13 +196,21 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
           expanded={bookmarkExpandedItem?.id === item.id}
           onChange={handleChange(item, hoverOnButton)}
         >
-          <StyledAccordionSummary>
+          {/*
+            MUI AccordionSummary is a <button> by default. Nested IconButtons
+            (bookmark + remove) are also <button>s — invalid HTML. Browsers
+            close the outer button early and the title never appears. Render
+            the summary as a div so nested buttons are legal.
+          */}
+          <StyledAccordionSummary component="div">
             <Box
               display="flex"
               flexDirection="row"
               justifyContent="space-between"
+              alignItems="center"
               flexWrap="nowrap"
               width="100%"
+              minWidth={0}
               onContextMenu={(e) =>
                 menuRef.current?.get(item.id)?.openContextMenu(e)
               }
@@ -222,7 +230,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
               <Box
                 onMouseEnter={() => setHoverOnButton(true)}
                 onMouseLeave={() => setHoverOnButton(false)}
-                sx={{ mr: "4px" }}
+                sx={{ mr: "4px", display: "inline-flex", flexShrink: 0 }}
               >
                 <BookmarkButton dataset={item} />
               </Box>
@@ -230,11 +238,14 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
                 sx={{
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
-                  height: "100%",
+                  flex: 1,
+                  minWidth: 0,
+                  overflow: "hidden",
+                  px: 0.5,
                 }}
               >
                 <Typography
+                  component="div"
                   sx={{
                     ...portalTheme.typography.body1Medium,
                     color: portalTheme.palette.text2,
@@ -245,16 +256,26 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
                     display: "-webkit-box",
                     WebkitLineClamp: "2",
                     WebkitBoxOrient: "vertical",
+                    width: "100%",
                   }}
                 >
                   {item.title}
                 </Typography>
               </Box>
-              <Box display="flex" alignItems="center" height={"90%"}>
+              <Box
+                display="flex"
+                alignItems="center"
+                sx={{ flexShrink: 0, height: "90%" }}
+              >
                 <IconButton
-                  onClick={() => onRemoveFromBookmarkList(item)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRemoveFromBookmarkList(item);
+                  }}
                   onMouseEnter={() => setHoverOnButton(true)}
                   onMouseLeave={() => setHoverOnButton(false)}
+                  size="small"
+                  aria-label="Remove bookmark"
                 >
                   <CancelIcon
                     height={12}

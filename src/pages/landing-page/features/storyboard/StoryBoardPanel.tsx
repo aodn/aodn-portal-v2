@@ -4,7 +4,7 @@ import StoryBoard from "./StoryBoard";
 import NotebookModel, {
   NotebookModelProps,
 } from "../../../../components/common/ipython/NotebookModel";
-import { padding } from "../../../../styles/constants";
+import { padding } from "@/styles/constants";
 
 const StoryBoardPanel = () => {
   const [value] = React.useState(0);
@@ -21,11 +21,10 @@ const StoryBoardPanel = () => {
       />
       <Grid container>
         <Grid
-          item
           sx={{
             textAlign: "left",
           }}
-          xs={12}
+          size={12}
         >
           <StoryBoard
             isActive={value === 0}
@@ -84,7 +83,7 @@ const StoryBoardPanel = () => {
             ]}
           />
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={12}>
           {/* <UnderlineTabs value={value} onChange={handleChange}>
             <UnderlineTab />
             <UnderlineTab />

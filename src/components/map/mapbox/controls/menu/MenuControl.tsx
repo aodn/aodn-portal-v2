@@ -17,11 +17,7 @@ import {
   MapControlType,
   MenuControlType,
 } from "./Definition";
-import {
-  borderRadius,
-  fontColor,
-  zIndex,
-} from "../../../../../styles/constants";
+import { borderRadius, fontColor, zIndex } from "@/styles/constants";
 import grey from "../../../../common/colors/grey";
 import { Grid } from "@mui/material";
 import { portalTheme } from "../../../../../styles";
@@ -261,7 +257,6 @@ const MenuControl: React.FC<MenuControlProps> = ({
 
   return (
     <Grid
-      item
       ref={containerRef}
       className={`mapboxgl-ctrl mapboxgl-ctrl-group ${className || ""}`}
       sx={sx}

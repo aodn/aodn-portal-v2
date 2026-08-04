@@ -2,10 +2,10 @@ import React from "react";
 import { IAddress, IContact } from "@/app/store/OGCCollectionDefinitions";
 import { portalTheme } from "../../../../styles";
 import { Grid, Link, Typography, Box } from "@mui/material";
-import { LocationOnOutlinedIcon } from "../../../../assets/icons/details/location";
-import { LanguageOutlinedIcon } from "../../../../assets/icons/details/language";
-import { LocalPhoneOutlinedIcon } from "../../../../assets/icons/details/phone";
-import { PrintOutlinedIcon } from "../../../../assets/icons/details/fax";
+import { LocationOnOutlinedIcon } from "@/assets/icons/details/location";
+import { LanguageOutlinedIcon } from "@/assets/icons/details/language";
+import { LocalPhoneOutlinedIcon } from "@/assets/icons/details/phone";
+import { PrintOutlinedIcon } from "@/assets/icons/details/fax";
 
 interface ContactAreaProps {
   contact: IContact;
@@ -44,9 +44,15 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
 
   return (
     <Grid container spacing={2} sx={{ mt: "1px", mb: "14px" }}>
-      <Grid item container spacing={2}>
+      <Grid container spacing={2}>
         {/* Address */}
-        <Grid item xs={12} sm={12} md={6}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 12,
+            md: 6,
+          }}
+        >
           <Box
             display="flex"
             alignItems="flex-start"
@@ -71,7 +77,14 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
         </Grid>
 
         {/* Phones */}
-        <Grid item xs={12} sm={12} md={6} data-testid="contact-phone">
+        <Grid
+          data-testid="contact-phone"
+          size={{
+            xs: 12,
+            sm: 12,
+            md: 6,
+          }}
+        >
           {phones.length > 0 &&
             phones.map((phone) => (
               <Box
@@ -105,7 +118,7 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
       </Grid>
 
       {/* Links */}
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Box
           display="flex"
           alignItems="flex-start"

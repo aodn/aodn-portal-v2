@@ -16,25 +16,23 @@ const CollapseItemTitle: React.FC<CollapseItemTitleProps> = ({
 }) => {
   return (
     <Grid
-      item
       container
-      xs={12}
       data-testid={
         text && text.length > 0 ? `collapse-item-${text}` : undefined
       }
+      size={12}
     >
       {titleComponent ? (
         titleComponent
       ) : (
         <Grid
-          item
-          xs={12}
           sx={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "start",
             gap: 1,
           }}
+          size={12}
         >
           <Typography
             sx={{

@@ -1,6 +1,6 @@
 import SideCardContainer from "../layout/SideCardContainer";
 import { Box, Grid, Rating, Stack, Typography } from "@mui/material";
-import { borderRadius, color, padding } from "../../../styles/constants";
+import { borderRadius, color, padding } from "@/styles/constants";
 import commentsIcon from "../../../assets/icons/comments.png";
 import feedbackIcon from "../../../assets/icons/feedback.png";
 
@@ -42,13 +42,12 @@ const RatingsAndCommentsCard = () => {
             }}
           >
             <Grid
-              item
-              xs={3}
               sx={{
                 display: "flex",
                 justifyContent: "center",
                 alignContent: "center",
               }}
+              size={3}
             >
               <img
                 src={commentsIcon}
@@ -60,7 +59,7 @@ const RatingsAndCommentsCard = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={9}>
+            <Grid size={9}>
               <Typography padding={0} textAlign="center">
                 All Comments
               </Typography>
@@ -77,13 +76,12 @@ const RatingsAndCommentsCard = () => {
             }}
           >
             <Grid
-              item
-              xs={3}
               sx={{
                 display: "flex",
                 justifyContent: "center",
                 alignContent: "center",
               }}
+              size={3}
             >
               <img
                 src={feedbackIcon}
@@ -95,7 +93,7 @@ const RatingsAndCommentsCard = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={9}>
+            <Grid size={9}>
               <Typography padding={0} textAlign="center">
                 Add Your Feedback
               </Typography>

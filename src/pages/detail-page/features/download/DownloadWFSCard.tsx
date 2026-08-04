@@ -7,7 +7,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { borderRadius } from "../../../../styles/constants";
+import { borderRadius } from "@/styles/constants";
 import { portalTheme } from "../../../../styles";
 import useWFSDownload, {
   DownloadStatus,
@@ -22,20 +22,20 @@ import InfoMessage from "./InfoMessage";
 import DownloadButton from "../../../../components/common/buttons/DownloadButton";
 import DownloadSubsetting from "./DownloadSubsetting";
 import DownloadSelect from "./DownloadSelect";
-import { trackCustomEvent } from "../../../../analytics/customEventTracker";
-import { AnalyticsEvent } from "../../../../analytics/analyticsEvents";
+import { trackCustomEvent } from "@/analytics/customEventTracker";
+import { AnalyticsEvent } from "@/analytics/analyticsEvents";
 import {
   DownloadLayersResponse,
   MapFeatureRequest,
 } from "@/app/store/GeoserverDefinitions";
 import { useAppDispatch } from "@/app/store/hooks";
-import { SelectItem } from "../../../../components/common/dropdown/CommonSelect";
+import { SelectItem } from "@/components/common/dropdown/CommonSelect";
 import {
   fetchGeoServerDownloadLayers,
   processWFSEstimateSize,
 } from "@/app/store/searchReducer";
 import AdminScreenContext from "../../../../components/admin/AdminScreenContext";
-import { formatBytes } from "../../../../utils/Helpers";
+import { formatBytes } from "@/utils/Helpers";
 
 // Currently only CSV is supported for WFS downloading
 // TODO:the format options will be fetched from the backend in the future
@@ -192,7 +192,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
           <Grid container>
             {downloadedBytes > 0 ? (
               <>
-                <Grid item xs={6}>
+                <Grid size={6}>
                   <Typography
                     textAlign="right"
                     sx={{ ...portalTheme.typography.body3Small }}
@@ -200,7 +200,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
                     Downloaded:
                   </Typography>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid size={6}>
                   <Typography
                     width="60%"
                     textAlign="left"
@@ -211,7 +211,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
                 </Grid>
               </>
             ) : (
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <Typography
                   variant="body2"
                   color="textSecondary"

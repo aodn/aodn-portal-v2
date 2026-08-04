@@ -15,7 +15,7 @@ import {
   fontSize,
   fontWeight,
   padding,
-} from "../../../styles/constants";
+} from "@/styles/constants";
 import { ParameterState } from "@/app/store/componentParamReducer";
 import PlainSlider from "./PlainSlider";
 
@@ -93,7 +93,7 @@ const DepthSlider: FC<DepthSliderProps> = memo(() => {
 
   return (
     <Grid container direction={"row"}>
-      <Grid item xs={2}>
+      <Grid size={2}>
         <Stack direction="column" justifyContent="space-between" height="100%">
           {DEPTH_MARKS.map((mark, index) => (
             <Box key={index} sx={markStyle}>
@@ -102,11 +102,7 @@ const DepthSlider: FC<DepthSliderProps> = memo(() => {
           ))}
         </Stack>
       </Grid>
-      <Grid
-        item
-        xs={7}
-        sx={{ height: CONTAINER_HEIGHT, paddingX: padding.small }}
-      >
+      <Grid sx={{ height: CONTAINER_HEIGHT, paddingX: padding.small }} size={7}>
         <SliderLine sliderValue={sliderValues[0]} />
         <SliderLine sliderValue={sliderValues[1]} />
         <img
@@ -119,7 +115,7 @@ const DepthSlider: FC<DepthSliderProps> = memo(() => {
           }}
         />
       </Grid>
-      <Grid item xs={3} sx={{ height: CONTAINER_HEIGHT }}>
+      <Grid sx={{ height: CONTAINER_HEIGHT }} size={3}>
         <PlainSlider
           getAriaLabel={() => "depth"}
           orientation="vertical"

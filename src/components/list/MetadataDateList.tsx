@@ -20,7 +20,12 @@ const MetadataDateList: React.FC<MetadataDateListProps> = ({
     creation || revision ? (
       <ItemBaseGrid container key="Metadata date" sx={{ py: "10px" }}>
         {creation && (
-          <Grid item md={12} sx={{ marginTop: theme.mp.sm }}>
+          <Grid
+            sx={{ marginTop: theme.mp.sm }}
+            size={{
+              md: 12,
+            }}
+          >
             <Typography sx={{ ...portalTheme.typography.body2Regular, p: 0 }}>
               <b>CREATION: </b>
               {creation}
@@ -29,7 +34,12 @@ const MetadataDateList: React.FC<MetadataDateListProps> = ({
         )}
 
         {revision && (
-          <Grid item md={12} sx={{ marginTop: theme.mp.sm }}>
+          <Grid
+            sx={{ marginTop: theme.mp.sm }}
+            size={{
+              md: 12,
+            }}
+          >
             <Typography sx={{ ...portalTheme.typography.body2Regular, p: 0 }}>
               <b>REVISION: </b>
               {revision}

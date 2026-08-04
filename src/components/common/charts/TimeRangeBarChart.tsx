@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from "react";
 import { axisClasses, BarSeriesType, BarChart } from "@mui/x-charts";
 import { OGCCollections } from "@/app/store/OGCCollectionDefinitions";
-import { color } from "../../../styles/constants";
+import { color } from "@/styles/constants";
 import { legendClasses } from "@mui/x-charts/ChartsLegend";
 
 interface TimeRangeBarChartProps {
@@ -164,8 +164,8 @@ const determineXWithBucketsBy = (
   return { xValues, buckets };
 };
 
-const seriesFormatter = (value: number): string => {
-  return `${value}`;
+const seriesFormatter = (value: number | null): string => {
+  return value == null ? "" : `${value}`;
 };
 
 const createSeries = (buckets: Bucket[]) => {
