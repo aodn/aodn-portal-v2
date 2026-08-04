@@ -489,7 +489,8 @@ export class OGCCollection {
     return result?.length ? result : undefined;
   };
   // Check if the collection has any CO dataset type, e.g., zarr or parquet, in its summary links
-  hasSummaryFeature = () => this.links?.some((link) => link.rel === "summary");
+  hasCloudOptimisedData = () =>
+    this.links?.some((link) => link.rel === "summary");
   // Get all CO keys (summary link titles), e.g. ["a.zarr", "b.parquet"]
   getAllCOKeys = (): string[] =>
     this.links

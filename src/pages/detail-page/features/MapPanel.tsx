@@ -225,6 +225,13 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     [mapLayerConfig]
   );
 
+  // A `rel=summary` link means the record has cloud optimised (zarr / parquet)
+  // data behind it, which always supports spatial and datetime subsetting
+  const hasCloudOptimisedData = useMemo(
+    () => collection?.hasCloudOptimisedData() ?? false,
+    [collection]
+  );
+
   const [noMapPreview, minDateStamp, maxDateStamp] = useMemo(() => {
     const bbox = collection?.getBBox();
     const hasSpatialExtent = Array.isArray(bbox) && bbox.length > 0;
@@ -396,6 +403,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       isSupportPMTiles,
       downloadServiceAvailable:
         downloadService !== DownloadServiceType.Unavailable,
+      hasCloudOptimisedData,
     });
   }, [
     selectedMapLayerId,
@@ -404,6 +412,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     drawRectSupport,
     isSupportPMTiles,
     downloadService,
+    hasCloudOptimisedData,
     setMapSubsettingCapabilities,
   ]);
 
