@@ -34,4 +34,21 @@ describe("formatBytes", () => {
     // 236231682 bytes ≈ 225.29 MB
     expect(formatBytes(236231682)).toBe("225.29 MB");
   });
+
+  it("formats exact terabytes", () => {
+    expect(formatBytes(1024 ** 4)).toBe("1 TB");
+  });
+
+  it("formats values in TB range", () => {
+    expect(formatBytes(1.5 * 1024 ** 4)).toBe("1.5 TB");
+  });
+
+  it("formats exact petabytes", () => {
+    expect(formatBytes(1024 ** 5)).toBe("1 PB");
+  });
+
+  it("formats values beyond the largest unit using PB", () => {
+    // 1 EB clamps to the largest available unit (PB)
+    expect(formatBytes(1024 ** 6)).toBe("1024 PB");
+  });
 });
