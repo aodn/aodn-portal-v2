@@ -1,0 +1,107 @@
+name: Publish SEO Artifacts
+
+# Builds sitemap.xml and the pre-rendered /details pages from the live records and
+# publishes them straight to S3, independently of the website bundle.
+#
+# Manual only until it has proven itself; then add a nightly schedule for freshness
+# and a workflow_run on the deploy workflows, so the pre-rendered pages pick up the
+# new bundle's hashed asset URLs.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: seo-artifacts
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        include:
+          - environment: edge
+            site: https://portal-edge.aodn.org.au
+          # Enable once the edge run has proven the OIDC/CloudFront permissions
+          # - environment: production
+          #   site: https://portal-beta.aodn.org.au
+    environment: ${{ matrix.environment }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup node
+        uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+
+      - name: Yarn install
+        run: |
+          yarn install --immutable
+
+      - name: Fetch the deployed index.html as the pre-render template
+        run: |
+          # Pre-rendered pages inherit the live bundle's hashed asset URLs, so the
+          # template must come from the site rather than from a fresh build
+          mkdir -p dist
+          curl -sf "${{ matrix.site }}/index.html" -o dist/index.html
+          grep -q '<div id="root"' dist/index.html \
+            || { echo "::error title=unusable template::${{ matrix.site }}/index.html is not the deployed app shell"; exit 1; }
+          # Names the bundle these pages will boot, so a stale run is obvious in the log
+          echo "Template from ${{ matrix.site }} references $(grep -o '/assets/index-[^"]*' dist/index.html | head -1)"
+
+      - name: Generate sitemap.xml and pre-rendered detail pages
+        run: |
+          yarn seo:artifacts
+          # A good run is ~15000 pages; publishing fewer would prune the live ones
+          page_count=$(find dist/details -type f | wc -l)
+          [ "$page_count" -ge 10000 ] \
+            || { echo "::error title=too few pages::generated $page_count, expected ~15000"; exit 1; }
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          audience: sts.amazonaws.com
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+
+      - name: Copy the artifacts to S3
+        run: |
+          echo "Publishing $(grep -c '<loc>' dist/sitemap.xml) URLs and $(find dist/details -type f | wc -l) pages to s3://${{ vars.BUCKET }}"
+          aws s3 cp dist/sitemap.xml s3://${{ vars.BUCKET }}/sitemap.xml --region ${{ vars.AWS_REGION }}
+          # Detail pages are extensionless, so sync would guess binary/octet-stream
+          aws s3 sync --delete dist/details s3://${{ vars.BUCKET }}/details --region ${{ vars.AWS_REGION }} --content-type text/html
+
+      - name: Clear cloudfront cache for the SEO paths
+        id: invalidation
+        run: |
+          invalidation_id=$(aws cloudfront create-invalidation \
+          --distribution-id ${{ vars.DISTRIBUTION_ID }} \
+          --paths "/sitemap.xml" "/details/*" \
+          --region ${{ vars.AWS_REGION }} \
+          --query Invalidation.Id --output text)
+          echo "id=$invalidation_id" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke check the SEO pages are live on CloudFront
+        env:
+          SITE: ${{ matrix.site }}
+        run: |
+          # Everything above already succeeded, so say so — a bare AWS error here
+          # reads like the publish failed. Needs cloudfront:GetInvalidation.
+          aws cloudfront wait invalidation-completed --distribution-id ${{ vars.DISTRIBUTION_ID }} --id ${{ steps.invalidation.outputs.id }} --region ${{ vars.AWS_REGION }} \
+            || { echo "::error title=could not confirm the invalidation::the artifacts ARE published (see the step above); only this check failed — see the AWS error above"; exit 1; }
+          # CloudFront answers 200 with index.html for a missing file, so check the content
+          curl -s "$SITE/sitemap.xml" | grep -q '<urlset' \
+            || { echo "::error title=sitemap.xml not live::$SITE/sitemap.xml is not being served"; exit 1; }
+          first_detail_uuid=$(curl -s "$SITE/sitemap.xml" | grep -o '/details/[^<]*' | head -1 | cut -d/ -f3)
+          curl -s "$SITE/details/$first_detail_uuid" | grep -q 'application/ld+json' \
+            || { echo "::error title=pre-rendered detail pages not live::$SITE/details/$first_detail_uuid has no Dataset JSON-LD in the served HTML"; exit 1; }

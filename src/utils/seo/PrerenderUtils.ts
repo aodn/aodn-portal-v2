@@ -21,7 +21,8 @@ const SITE_NAME = "AODN Portal";
 // Fields the bulk collections endpoint can return; license/citation/contacts
 // are only available per-record and are optional in Dataset JSON-LD, so they
 // are left out to avoid thousands of extra requests.
-const SEO_PROPERTIES = "id,title,description,bbox,temporal,themes,providers";
+export const SEO_PROPERTIES =
+  "id,title,description,bbox,temporal,themes,providers";
 
 // The id becomes a file name / S3 object key; skip anything unexpected
 const SAFE_ID = /^[A-Za-z0-9._-]+$/;
@@ -113,9 +114,13 @@ export const renderPage = (template: string, collection: SeoCollection) => {
   );
 };
 
-export const prerenderDetailPages = async (outDir: string) => {
+// Pass collections in to reuse a fetch the caller has already paid for
+export const prerenderDetailPages = async (
+  outDir: string,
+  prefetched?: OgcCollection[]
+) => {
   const template = await readFile(path.join(outDir, "index.html"), "utf8");
-  const collections = await fetchAllCollections(SEO_PROPERTIES);
+  const collections = prefetched ?? (await fetchAllCollections(SEO_PROPERTIES));
 
   const detailsDir = path.join(outDir, "details");
   await mkdir(detailsDir, { recursive: true });

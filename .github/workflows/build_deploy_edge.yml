@@ -34,22 +34,6 @@ jobs:
       - name: Build Website
         run: yarn edge
 
-      - name: Verify SEO artifacts were built (warns without blocking the deploy)
-        continue-on-error: true
-        run: |
-          artifacts_missing=0
-          if [ ! -s dist/sitemap.xml ]; then
-            echo "::warning title=sitemap.xml missing::generate-sitemap failed — see the Build Website log for the error"
-            artifacts_missing=1
-          fi
-          pre_rendered_page_count=$(find dist/details -type f 2>/dev/null | wc -l | tr -d ' ')
-          expected_page_count_at_least=1000
-          if [ "$pre_rendered_page_count" -lt "$expected_page_count_at_least" ]; then
-            echo "::warning title=pre-rendered detail pages missing::found $pre_rendered_page_count files in dist/details, expected ~15000 — see the Build Website log for the error"
-            artifacts_missing=1
-          fi
-          exit $artifacts_missing
-
       - uses: actions/upload-artifact@v6
         with:
             name: build
@@ -81,12 +65,13 @@ jobs:
 
       - name: Copy files to the production website with the AWS CLI
         run: |
-          aws s3 sync --delete ${{ env.DIST }} s3://${{ vars.BUCKET }} --region ${{ vars.AWS_REGION }} --exclude "details/*"
-          # Pre-rendered detail pages are extensionless, so sync would guess
-          # binary/octet-stream; force text/html so browsers render them
-          if [ -d "${{ env.DIST }}/details" ]; then
-            aws s3 sync --delete ${{ env.DIST }}/details s3://${{ vars.BUCKET }}/details --region ${{ vars.AWS_REGION }} --content-type text/html
-          fi
+          # sitemap.xml and details/ are owned by the Publish SEO Artifacts workflow;
+          # assets/ is never deleted so its pre-rendered pages keep booting until it reruns
+          aws s3 sync --delete ${{ env.DIST }} s3://${{ vars.BUCKET }} --region ${{ vars.AWS_REGION }} --exclude "details/*" --exclude "sitemap.xml" --exclude "assets/*"
+          aws s3 sync ${{ env.DIST }}/assets s3://${{ vars.BUCKET }}/assets --region ${{ vars.AWS_REGION }}
+          # Seed the fallback sitemap only when the bucket has none
+          aws s3api head-object --bucket ${{ vars.BUCKET }} --key sitemap.xml --region ${{ vars.AWS_REGION }} >/dev/null 2>&1 \
+            || aws s3 cp ${{ env.DIST }}/sitemap.xml s3://${{ vars.BUCKET }}/sitemap.xml --region ${{ vars.AWS_REGION }}
 
       - name: Clear cloudfront cache
         run: |
@@ -94,16 +79,3 @@ jobs:
           --distribution-id ${{ vars.DISTRIBUTION_ID }} \
           --paths "/*" \
           --region ${{ vars.AWS_REGION }}
-
-      - name: Smoke check SEO pages are live on CloudFront (warns without failing the deploy)
-        continue-on-error: true
-        env:
-          SITE: https://portal-edge.aodn.org.au
-          INVALIDATION_PROPAGATION_SECONDS: 30
-        run: |
-          sleep "$INVALIDATION_PROPAGATION_SECONDS"
-          curl -sf -o /dev/null "$SITE/sitemap.xml" \
-            || { echo "::warning title=sitemap.xml not live::$SITE/sitemap.xml is not being served"; exit 1; }
-          first_detail_uuid=$(curl -s "$SITE/sitemap.xml" | grep -o '/details/[^<]*' | head -1 | cut -d/ -f3)
-          curl -s "$SITE/details/$first_detail_uuid" | grep -q 'application/ld+json' \
-            || { echo "::warning title=pre-rendered detail pages not live::$SITE/details/$first_detail_uuid has no Dataset JSON-LD in the served HTML"; exit 1; }
