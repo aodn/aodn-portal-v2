@@ -3,4 +3,4 @@
 export const BASE_URL = "https://portal-beta.aodn.org.au";
 
 // Where the build steps fetch records from; the API origin, not the public CDN
-export const OGC_API_BASE = "https://ogcapi-production.aodn.org.au";
+export const OGC_API_BASE = "https://portal.production.aodn.org.au";
