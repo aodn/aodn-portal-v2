@@ -1,7 +1,7 @@
 /**
- * SEO — records are fetched from the API origin (OGC_API_BASE), while the URLs
- * written into the sitemap use the public site host (BASE_URL). Fetching via
- * the public host puts the CDN and its WAF between CI and the data it needs.
+ * SEO — records are fetched from OGC_API_BASE, while the URLs written into
+ * the sitemap use the site host (BASE_URL). The fetch host must stay distinct
+ * from BASE_URL and must build clean URLs (no "//api" — the server 500s it).
  */
 
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -20,7 +20,7 @@ const importFreshSitemapUtils = async () => {
 const interceptFetch = () => {
   const fetch = vi.fn().mockResolvedValue({
     ok: true,
-    json: async () => singlePage,
+    text: async () => JSON.stringify(singlePage),
   });
   vi.stubGlobal("fetch", fetch);
   return fetch;
@@ -64,5 +64,20 @@ describe("fetchAllCollections fetch host", () => {
       `${OGC_API_BASE}/api/v1/ogc/collections`
     );
     expect(requestedUrl(fetch)).not.toContain(BASE_URL);
+    // A trailing slash in OGC_API_BASE would build "//api" URLs, which 500
+    expect(requestedUrl(fetch)).not.toContain("//api");
+  });
+
+  test("overrides Node's default UA, which WAF bot rules flag", async () => {
+    const fetch = interceptFetch();
+    const { fetchAllCollections } = await importFreshSitemapUtils();
+
+    await fetchAllCollections();
+
+    const headers = (fetch.mock.calls[0][1] as RequestInit).headers as Record<
+      string,
+      string
+    >;
+    expect(headers["User-Agent"]).toContain("Mozilla/5.0");
   });
 });

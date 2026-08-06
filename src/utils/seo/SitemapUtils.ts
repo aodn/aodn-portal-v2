@@ -16,6 +16,11 @@ const API_URL = `${OGC_API_BASE}/api/v1/ogc/collections`;
 const PAGE_SIZE = 1000;
 const MAX_RETRIES = 3;
 
+// Node's fetch defaults to "user-agent: node", which WAF bot rules flag;
+// present a browser-like UA so CI traffic is not challenged
+const USER_AGENT =
+  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
+
 // The subset of an OGC collection the SEO build steps read
 export interface OgcCollection {
   id?: string;
@@ -50,12 +55,21 @@ const fetchJsonWithRetry = async (url: string): Promise<CollectionsPage> => {
   for (let attempt = 1; ; attempt++) {
     try {
       const response = await fetch(url, {
-        headers: { Accept: "application/json" },
+        headers: { Accept: "application/json", "User-Agent": USER_AGENT },
       });
       if (!response.ok) {
         throw new Error(`HTTP ${response.status} for ${url}`);
       }
-      return await response.json();
+      const body = await response.text();
+      try {
+        return JSON.parse(body) as CollectionsPage;
+      } catch {
+        // A 2xx non-JSON body means the CDN answered with a fallback or
+        // challenge page instead of the API; surface what actually came back
+        throw new Error(
+          `Non-JSON response (HTTP ${response.status}, content-type ${response.headers.get("content-type")}) for ${url}; body starts: ${JSON.stringify(body.slice(0, 100))}`
+        );
+      }
     } catch (error) {
       if (attempt >= MAX_RETRIES) {
         throw new Error(
