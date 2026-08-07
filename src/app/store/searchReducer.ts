@@ -22,7 +22,6 @@ import {
   errorHandling,
   ErrorResponse,
 } from "@/utils/ErrorBoundary";
-import { FeatureCollection, Point } from "geojson";
 import { mergeWithDefaults } from "@/utils/ObjectUtils";
 import {
   CoEstimateRequest,
@@ -44,9 +43,6 @@ import {
   MapLayerResponse,
   DownloadLayersResponse,
 } from "./GeoserverDefinitions";
-import dayjs from "dayjs";
-import { dateDefault } from "@/components/common/constants";
-import { CloudOptimizedFeature } from "./CloudOptimizedDefinitions";
 import { Health } from "./systemDefinition";
 
 export enum DatasetFrequency {
@@ -342,30 +338,6 @@ const fetchDatasetMetadataByUuid = createAsyncThunk<
   ogcAxiosWithRetry
     .get<DatasetMetadata>(`/ogc/collections/${id}/items/dataset_metadata`)
     .then((response) => response.data)
-    .catch(errorHandling(thunkApi))
-);
-
-const fetchFeaturesByUuid = createAsyncThunk<
-  FeatureCollection<Point, CloudOptimizedFeature>,
-  string,
-  { rejectValue: ErrorResponse }
->("search/fetchDatasetByUuid", async (id: string, thunkApi: any) =>
-  ogcAxiosWithRetry
-    .get<FeatureCollection<Point>>(`/ogc/collections/${id}/items/summary`)
-    .then((response) => ({
-      ...response.data,
-      features: (response.data?.features || []).map((feature: any) => ({
-        ...feature,
-        properties: {
-          ...feature.properties,
-          timestamp: dayjs(
-            feature.properties?.date,
-            [dateDefault.DATE_YEAR_MONTH_FORMAT, dateDefault.DATE_FORMAT],
-            true
-          ).valueOf(),
-        },
-      })),
-    }))
     .catch(errorHandling(thunkApi))
 );
 
@@ -840,7 +812,6 @@ export {
   fetchResultNoStore,
   fetchResultAppendStore,
   fetchResultByUuidNoStore,
-  fetchFeaturesByUuid,
   fetchDatasetMetadataByUuid,
   fetchParameterVocabsWithStore,
   fetchGeoServerMapFeature,
