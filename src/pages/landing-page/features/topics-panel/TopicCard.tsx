@@ -1,13 +1,19 @@
 import { ComponentType, createElement, FC, SVGProps, useState } from "react";
 import { Box, Paper, Typography } from "@mui/material";
 import { borderRadius, padding, shadow } from "../../../../styles/constants";
-import { TOPICS_CARD_HEIGHT, TOPICS_CARD_ICON_BOX_SIZE } from "./constants";
+import {
+  TOPICS_CARD_HEIGHT,
+  TOPICS_CARD_ICON_BOX_SIZE,
+  TOPICS_CARD_DEFAULT_ICON_SIZE,
+} from "./constants";
 import { portalTheme } from "../../../../styles";
 
 export interface TopicCardType {
   title: string;
   icon: string | ComponentType<SVGProps<SVGSVGElement>>;
   handler?: () => void;
+  iconSize?: number;
+  iconOpacity?: number;
 }
 
 interface TopicCardProps {
@@ -16,6 +22,7 @@ interface TopicCardProps {
 
 const TopicCard: FC<TopicCardProps> = ({ cardData }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const iconSize = cardData.iconSize ?? TOPICS_CARD_DEFAULT_ICON_SIZE;
 
   return (
     <Box
@@ -56,11 +63,22 @@ const TopicCard: FC<TopicCardProps> = ({ cardData }) => {
             }}
           />
         ) : (
-          createElement(cardData.icon, {
-            style: {
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: iconSize,
+              height: iconSize,
+              opacity: cardData.iconOpacity ?? 0.9,
               transform: isHovered ? "scale(1.05)" : "none",
-            },
-          })
+              "& svg": { width: "100%", height: "100%" },
+            }}
+          >
+            {createElement(cardData.icon, {
+              color: portalTheme.palette.grey700,
+            })}
+          </Box>
         )}
       </Paper>
       <Box
