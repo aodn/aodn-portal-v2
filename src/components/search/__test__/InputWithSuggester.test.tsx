@@ -216,4 +216,24 @@ describe("InputWithSuggester", () => {
       expect(store.getState().paramReducer.searchText).toBe('"wave"');
     });
   });
+
+  // Semantic suggestions share no characters with the input, so MUI's own substring filter
+  // would drop every one of them unless InputWithSuggester puts them back explicitly.
+  it("shows semantic suggestions that do not match the typed text", async () => {
+    const user = userEvent.setup();
+    const input = screen.getByTestId("input-with-suggester");
+
+    await user.click(input);
+    await user.clear(input);
+    await user.type(input, "wave");
+
+    await waitFor(() => {
+      expect(screen.queryByRole("listbox")).toBeInTheDocument();
+    });
+
+    // "Glider" comes from suggested_semantic in the mock and contains no "wave"
+    expect(await screen.findByText("Glider")).toBeInTheDocument();
+    // can have multiple semantic suggestions, so we check that at least one is present
+    expect(screen.getAllByTestId("label-chip-Related")).not.toHaveLength(0);
+  });
 });
