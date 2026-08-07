@@ -8,9 +8,9 @@ import {
 } from "react";
 import { Box, IconButton, Typography } from "@mui/material";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
-import StyledAccordion from "../common/accordion/StyledAccordion";
-import StyledAccordionSummary from "../common/accordion/StyledAccordionSummary";
-import StyledAccordionDetails from "../common/accordion/StyledAccordionDetails";
+import StyledAccordion from "@/components/common/accordion/StyledAccordion";
+import StyledAccordionSummary from "@/components/common/accordion/StyledAccordionSummary";
+import StyledAccordionDetails from "@/components/common/accordion/StyledAccordionDetails";
 import BookmarkListCard from "./BookmarkListCard";
 import BookmarkButton from "./BookmarkButton";
 import {
@@ -27,13 +27,13 @@ import store from "@/app/store/store";
 import {
   BookmarkEvent,
   EVENT_BOOKMARK,
-} from "../map/mapbox/controls/menu/Definition";
+} from "@/components/map/mapbox/controls/menu/Definition";
 import BookmarkListHead from "./BookmarkListHead";
-import { OpenType, TabNavigation } from "../../hooks/useTabNavigation";
-import { portalTheme } from "../../styles";
-import { CancelIcon } from "../../assets/icons/download/cancel";
-import ContextMenu, { ContextMenuRef } from "../menu/ContextMenu";
-import { detailPageDefault, pageReferer } from "../common/constants";
+import { OpenType, TabNavigation } from "@/hooks/useTabNavigation";
+import { portalTheme } from "@/styles";
+import { CancelIcon } from "@/assets/icons/download/cancel";
+import ContextMenu, { ContextMenuRef } from "@/components/menu/ContextMenu";
+import { detailPageDefault, pageReferer } from "@/components/common/constants";
 
 export interface BookmarkListAccordionGroupBasicType {
   onDeselectDataset?: () => void;
@@ -230,7 +230,12 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
               <Box
                 onMouseEnter={() => setHoverOnButton(true)}
                 onMouseLeave={() => setHoverOnButton(false)}
-                sx={{ mr: "4px", display: "inline-flex", flexShrink: 0 }}
+                sx={{
+                  mr: "4px",
+                  display: "inline-flex",
+                  flexShrink: 0,
+                  alignSelf: "flex-start",
+                }}
               >
                 <BookmarkButton dataset={item} />
               </Box>

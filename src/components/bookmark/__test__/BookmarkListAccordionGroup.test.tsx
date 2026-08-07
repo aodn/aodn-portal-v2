@@ -115,7 +115,10 @@ describe("Bookmark List Accordion Group", () => {
 
   it("renders nothing bookmark list header correct", () => {
     render(<BookmarkListAccordionGroup />);
-    expect(screen.getByText("Bookmark List")).toBeInTheDocument();
+    // The count badge is only rendered once there is at least one bookmark
+    expect(
+      screen.queryByTestId("bookmark-list-head-count")
+    ).not.toBeInTheDocument();
   });
 
   it("renders bookmark list with two items", () => {
@@ -124,7 +127,9 @@ describe("Bookmark List Accordion Group", () => {
     store.dispatch(addItem(collection2));
 
     render(<BookmarkListAccordionGroup />);
-    expect(screen.getByText("2 Bookmark(s)")).toBeInTheDocument();
+    expect(screen.getByTestId("bookmark-list-head-count")).toHaveTextContent(
+      "2"
+    );
   });
 
   it("renders bookmark list and clear all", () => {
@@ -134,7 +139,9 @@ describe("Bookmark List Accordion Group", () => {
     store.dispatch(setTemporaryItem(collection3));
 
     render(<BookmarkListAccordionGroup />);
-    expect(screen.getByText("2 Bookmark(s)")).toBeInTheDocument();
+    expect(screen.getByTestId("bookmark-list-head-count")).toHaveTextContent(
+      "2"
+    );
 
     const clearAllButton = screen.getByTestId("bookmark-list-head-clearall");
     expect(clearAllButton).toBeInTheDocument();
@@ -143,7 +150,9 @@ describe("Bookmark List Accordion Group", () => {
     userEvent.click(clearAllButton);
 
     return waitFor(() =>
-      expect(screen.getByText("Bookmark List")).toBeInTheDocument()
+      expect(
+        screen.queryByTestId("bookmark-list-head-count")
+      ).not.toBeInTheDocument()
     ).then(() => {
       expect(store.getState().bookmarkList.temporaryItem).toBeUndefined();
     });
@@ -155,7 +164,9 @@ describe("Bookmark List Accordion Group", () => {
     store.dispatch(addItem(collection2));
 
     render(<BookmarkListAccordionGroup />);
-    expect(screen.getByText("2 Bookmark(s)")).toBeInTheDocument();
+    expect(screen.getByTestId("bookmark-list-head-count")).toHaveTextContent(
+      "2"
+    );
 
     // There is no temp bookmark
     expect(store.getState().bookmarkList.temporaryItem).toBeUndefined();
@@ -166,7 +177,9 @@ describe("Bookmark List Accordion Group", () => {
     expect(store.getState().bookmarkList.temporaryItem).not.toBeUndefined();
 
     // Temp item is not count in the bookmark list so the total is still 2
-    expect(screen.getByText("2 Bookmark(s)")).toBeInTheDocument();
+    expect(screen.getByTestId("bookmark-list-head-count")).toHaveTextContent(
+      "2"
+    );
 
     return waitFor(() => screen.getByTestId("item3-iconbutton")).then(
       (button) => {
@@ -176,7 +189,9 @@ describe("Bookmark List Accordion Group", () => {
         return waitFor(() =>
           expect(store.getState().bookmarkList.temporaryItem).toBeUndefined()
         ).then(() => {
-          expect(screen.getByText("3 Bookmark(s)")).toBeInTheDocument();
+          expect(
+            screen.getByTestId("bookmark-list-head-count")
+          ).toHaveTextContent("3");
         });
       }
     );
@@ -189,7 +204,9 @@ describe("Bookmark List Accordion Group", () => {
     render(<BookmarkListAccordionGroup />);
 
     await waitFor(() => {
-      expect(screen.getByText("3 Bookmark(s)")).toBeInTheDocument();
+      expect(screen.getByTestId("bookmark-list-head-count")).toHaveTextContent(
+        "3"
+      );
     });
   });
 
@@ -213,9 +230,9 @@ describe("Bookmark List Accordion Group", () => {
     // Wait for the async initialization to complete and server response
     // As the mock server return fixed mock data array, so the total bookmarks should be that array's length
     await waitFor(() =>
-      expect(
-        screen.getByText(`${mockHttpResponseLength} Bookmark(s)`)
-      ).toBeInTheDocument()
+      expect(screen.getByTestId("bookmark-list-head-count")).toHaveTextContent(
+        `${mockHttpResponseLength}`
+      )
     );
   });
 });
