@@ -56,7 +56,7 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
 
   return (
     <ItemBaseGrid>
-      <Grid container data-testid="collapseItem">
+      <Grid container data-testid="collapseItem" sx={{ width: "100%" }}>
         {/* Title content area (icon + title) */}
         <Grid
           onClick={toggleExpanded}
@@ -121,7 +121,9 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
 
             {/* Collapsible content */}
             <Grid size={12}>
-              <Collapse in={isExpanded}>{children}</Collapse>
+              <Collapse in={isExpanded}>
+                <Box sx={{ pt: "10px" }}>{children}</Box>
+              </Collapse>
             </Grid>
           </>
         )}

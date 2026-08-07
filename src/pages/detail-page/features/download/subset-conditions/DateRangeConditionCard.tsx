@@ -24,6 +24,10 @@ const datePickerSx = {
     ...portalTheme.typography.body2Regular,
     color: portalTheme.palette.text1,
   },
+  "& .MuiInputBase-root": {
+    paddingTop: 0,
+    paddingBottom: 0,
+  },
 } as const;
 
 const datePickerSlotProps = {
