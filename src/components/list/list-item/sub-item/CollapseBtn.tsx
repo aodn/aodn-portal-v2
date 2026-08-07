@@ -14,6 +14,7 @@ const CollapseBtn: React.FC<CollapseBtnProps> = ({ onClick, isExpanded }) => {
     <IconButton
       aria-label="expand or collapse"
       onClick={onClick}
+      edge="end"
       sx={{
         ":hover": { bgcolor: "transparent" },
       }}
