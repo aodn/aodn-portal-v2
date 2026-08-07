@@ -30,13 +30,7 @@ import {
 } from "../context/DownloadDefinitions";
 import { isValidPolygonFeature } from "@/utils/GeoJsonUtils";
 import { dateDefault } from "@/components/common/constants";
-import {
-  Feature,
-  FeatureCollection,
-  MultiPolygon,
-  Point,
-  Polygon,
-} from "geojson";
+import { Feature, MultiPolygon, Polygon } from "geojson";
 import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
 import GeoServerLayer, {
   Dimension,
@@ -72,38 +66,6 @@ import {
 } from "@/components/map/mapbox/layers/pmtiles/Common";
 
 const mapContainerId = "map-detail-container-id";
-
-// Exported for unit tests
-export const getMinMaxDateStamps = (
-  featureCollection?: FeatureCollection<Point>
-): [Dayjs, Dayjs] => {
-  if (!featureCollection?.features?.length) {
-    return [dayjs(dateDefault.min), dayjs(dateDefault.max)];
-  }
-
-  let minDate: Dayjs | null = null;
-  let maxDate: Dayjs | null = null;
-
-  for (const { properties } of featureCollection.features) {
-    const dateStr = properties?.date;
-    if (typeof dateStr !== "string") continue;
-
-    const date = dayjs(dateStr);
-    if (!date.isValid()) continue;
-
-    if (!minDate || date.isBefore(minDate) || date.isSame(minDate)) {
-      minDate = date;
-    }
-    if (!maxDate || date.isAfter(maxDate) || date.isSame(maxDate)) {
-      maxDate = date;
-    }
-  }
-
-  return [
-    minDate && minDate.isValid() ? minDate : dayjs(dateDefault.min),
-    maxDate && maxDate.isValid() ? maxDate : dayjs(dateDefault.max),
-  ];
-};
 
 // Exported for unit tests
 export const buildMapLayerConfig = (
@@ -176,7 +138,6 @@ interface MapPanelProps {
 const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   const {
     collection,
-    featureCollection,
     downloadConditions,
     getAndSetDownloadConditions,
     lastSelectedMapLayer,
@@ -255,11 +216,6 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     if (pmtilesDayjs) {
       start = pmtilesDayjs.minDate;
       end = pmtilesDayjs.maxDate;
-    } else if (
-      downloadService === DownloadServiceType.CloudOptimised &&
-      featureCollection?.features?.length
-    ) {
-      [start, end] = getMinMaxDateStamps(featureCollection);
     } else {
       start = dayjs(dateDefault.min);
       end = dayjs(dateDefault.max);
@@ -288,7 +244,6 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   }, [
     collection,
     downloadService,
-    featureCollection,
     isWMSAvailable,
     isSupportPMTiles,
     lastSelectedMapLayer,

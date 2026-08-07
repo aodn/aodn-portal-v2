@@ -10,13 +10,11 @@ import {
 import {
   DatasetMetadata,
   fetchDatasetMetadataByUuid,
-  fetchFeaturesByUuid,
   fetchResultByUuidNoStore,
 } from "@/app/store/searchReducer";
 import { DetailPageContext } from "./detail-page-context";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "@/app/store/hooks";
-import { FeatureCollection, Point } from "geojson";
 import {
   defaultMapSubsettingCapabilities,
   DownloadConditionType,
@@ -34,7 +32,6 @@ import {
   LayerName,
   LayerSwitcherLayer,
 } from "@/components/map/mapbox/controls/menu/MapLayerSwitcher";
-import { CloudOptimizedFeature } from "@/app/store/CloudOptimizedDefinitions";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 interface DetailPageProviderProps {
@@ -49,9 +46,6 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   const [collection, setCollection] = useState<OGCCollection | undefined>(
     undefined
   );
-  const [features, setFeatures] = useState<
-    FeatureCollection<Point, CloudOptimizedFeature> | undefined
-  >(undefined);
   const [datasetMetadata, setDatasetMetadata] = useState<
     DatasetMetadata | undefined
   >(undefined);
@@ -137,21 +131,6 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   useEffect(() => {
     if (!uuid) return;
     let cancelled = false;
-    dispatch(fetchFeaturesByUuid(uuid))
-      .unwrap()
-      .then((features) => {
-        if (!cancelled) {
-          setFeatures(features);
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [dispatch, uuid]);
-
-  useEffect(() => {
-    if (!uuid) return;
-    let cancelled = false;
     dispatch(fetchDatasetMetadataByUuid(uuid))
       .unwrap()
       .then((metadata) => {
@@ -193,7 +172,6 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       value={{
         collection,
         setCollection,
-        featureCollection: features,
         datasetMetadata,
         isSupportPMTiles,
         isCollectionNotFound,
