@@ -1,4 +1,4 @@
-import { FC, ReactNode, useCallback, useMemo } from "react";
+import { FC, ReactNode, useCallback, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import {
   Box,
@@ -250,20 +250,22 @@ const HeaderSection = () => {
     return [title, startDate, endDate, scope, aiUpdateFrequency];
   }, [collection]);
 
-  // Capture the referer when the detail page first mounts.
-  // Tab switching within the detail page won't overwrite this value.
-  const initRef: string = location.state?.referer;
-
-  const onGoBack = useCallback(
-    (initRef: string) => {
-      if (initRef === pageReferer.SEARCH_PAGE_REFERER) {
-        redirectSearch(pageReferer.DETAIL_PAGE_REFERER, true, false);
-      } else {
-        redirectHome(pageReferer.DETAIL_PAGE_REFERER, true);
-      }
-    },
-    [redirectHome, redirectSearch]
+  // Capture the referer only on first mount (lazy useState init runs once).
+  // In-page navigations (main tabs or side-card "open" arrows) call navigate()
+  // with a new location.state and would otherwise overwrite this — e.g.
+  // Citation/Data Access side cards pass DETAIL_PAGE_REFERER, which made
+  // "back" go to the landing page.
+  const [initialReferer] = useState<string | undefined>(
+    () => location.state?.referer
   );
+
+  const onGoBack = useCallback(() => {
+    if (initialReferer === pageReferer.SEARCH_PAGE_REFERER) {
+      redirectSearch(pageReferer.DETAIL_PAGE_REFERER, true, false);
+    } else {
+      redirectHome(pageReferer.DETAIL_PAGE_REFERER, true);
+    }
+  }, [initialReferer, redirectHome, redirectSearch]);
   return (
     <Box
       display="flex"
@@ -279,7 +281,7 @@ const HeaderSection = () => {
           justifyContent="space-between"
           width="100%"
         >
-          {renderGoBackButton(() => onGoBack(initRef), initRef)}
+          {renderGoBackButton(onGoBack, initialReferer ?? "")}
           {!isCollectionNotFound &&
             renderShareButton({
               hideText: isMobile,
@@ -297,7 +299,7 @@ const HeaderSection = () => {
           flex: 1,
         }}
       >
-        {!isUnderLaptop && renderGoBackButton(() => onGoBack(initRef), initRef)}
+        {!isUnderLaptop && renderGoBackButton(onGoBack, initialReferer ?? "")}
         {isCollectionNotFound && (
           <InfoCard
             infoContent={{
@@ -394,7 +396,7 @@ const HeaderSection = () => {
       </Paper>
       {isTablet && (
         <Box display="flex" flexDirection="column" gap={1}>
-          {renderGoBackButton(() => onGoBack(initRef), initRef)}
+          {renderGoBackButton(onGoBack, initialReferer ?? "")}
           {!isCollectionNotFound &&
             renderShareButton({
               hideText: isMobile,
