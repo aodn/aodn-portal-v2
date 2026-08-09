@@ -18,11 +18,8 @@ def test_map_data_density_layer_from_summary(
 ) -> None:
     """
     Parquet summary collections expose PMTiles Data Density as the default
-    map layer (replaces the legacy deck.gl Hex Grid click-popup flow).
-
-    Hex Grid used summary point features for click aggregation popups. Density
-    is now rendered from PMTiles; tile-backed hover popups need S3 tiles and
-    are not asserted here. This test verifies the layer switcher instead.
+    map layer. Tile-backed hover popups need S3 tiles and are not asserted
+    here. This test verifies the layer switcher instead.
     """
     detail_page = DetailPage(desktop_page)
     detail_page.load(uuid)
