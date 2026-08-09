@@ -19,7 +19,8 @@ import {
 } from "../layers/Layers";
 import { TestHelper } from "../../../common/test/helper";
 import { MapDefaultConfig } from "../constants";
-import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
+import { mergeWithDefaults } from "@/utils/ObjectUtils";
+import { addDataLayer } from "../layerOrder";
 
 interface SpiderifiedClusterInfo {
   id: string;
@@ -284,28 +285,30 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
       });
 
       // Add layers
-      map?.addLayer({
-        id: spiderLinesLayerId,
-        type: "line",
-        source: spiderLinesSourceId,
-        paint: {
-          "line-color": config.lineColor,
-          "line-width": config.lineWidth,
-        },
-      });
+      if (map) {
+        addDataLayer(map, {
+          id: spiderLinesLayerId,
+          type: "line",
+          source: spiderLinesSourceId,
+          paint: {
+            "line-color": config.lineColor,
+            "line-width": config.lineWidth,
+          },
+        });
 
-      map?.addLayer({
-        id: spiderPinsLayerId,
-        type: "circle",
-        source: spiderPinsSourceId,
-        paint: {
-          "circle-radius": config.circleRadius,
-          "circle-color": config.circleColor,
-          "circle-opacity": config.circleOpacity,
-          "circle-stroke-width": config.circleStrokeWidth,
-          "circle-stroke-color": config.circleStrokeColor,
-        },
-      });
+        addDataLayer(map, {
+          id: spiderPinsLayerId,
+          type: "circle",
+          source: spiderPinsSourceId,
+          paint: {
+            "circle-radius": config.circleRadius,
+            "circle-color": config.circleColor,
+            "circle-opacity": config.circleOpacity,
+            "circle-stroke-width": config.circleStrokeWidth,
+            "circle-stroke-color": config.circleStrokeColor,
+          },
+        });
+      }
 
       setSpiderifiedCluster({
         id: clusterCircleId,

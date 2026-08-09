@@ -18,9 +18,10 @@ import SpiderDiagram from "../component/SpiderDiagram";
 import { TestHelper } from "../../../common/test/helper";
 import { FeatureCollection, Point } from "geojson";
 import { MapDefaultConfig } from "../constants";
-import { generateFeatureCollectionFrom } from "../../../../utils/GeoJsonUtils";
-import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
+import { generateFeatureCollectionFrom } from "@/utils/GeoJsonUtils";
+import { mergeWithDefaults } from "@/utils/ObjectUtils";
 import CardPopup from "../component/CardPopup";
+import { addDataLayer } from "../layerOrder";
 
 interface IHeatmapLayer {
   maxZoom: number;
@@ -177,8 +178,8 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         });
       }
 
-      if (!map?.getLayer(heatmapLayer)) {
-        map?.addLayer({
+      if (map && !map.getLayer(heatmapLayer)) {
+        addDataLayer(map, {
           id: heatmapLayer,
           type: "heatmap",
           source: heatmapSourceId,
@@ -209,8 +210,8 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         });
       }
 
-      if (!map?.getLayer(clusterLayer)) {
-        map?.addLayer({
+      if (map && !map.getLayer(clusterLayer)) {
+        addDataLayer(map, {
           id: clusterLayer,
           type: "circle",
           minzoom: config.layer.maxZoom - 1,
@@ -235,8 +236,8 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         });
       }
 
-      if (!map?.getLayer("cluster-count")) {
-        map?.addLayer({
+      if (map && !map.getLayer("cluster-count")) {
+        addDataLayer(map, {
           id: "cluster-count",
           type: "symbol",
           source: clusterSourceId,
@@ -250,8 +251,8 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         });
       }
 
-      if (!map?.getLayer(unClusterPointLayer)) {
-        map?.addLayer({
+      if (map && !map.getLayer(unClusterPointLayer)) {
+        addDataLayer(map, {
           id: unClusterPointLayer,
           type: "circle",
           source: clusterSourceId,

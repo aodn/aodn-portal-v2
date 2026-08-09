@@ -15,7 +15,7 @@ import {
   FormGroup,
   alpha,
 } from "@mui/material";
-import { gap, padding } from "../../styles/constants";
+import { gap, padding } from "@/styles/constants";
 import {
   ParameterState,
   SelectedStaticArea,
@@ -57,6 +57,7 @@ import StyledTabs from "../common/tab/StyledTabs";
 import StyledTab from "../common/tab/StyledTab";
 import { Feature, FeatureCollection, MultiPolygon, Polygon } from "geojson";
 import { stringToColor } from "../common/colors/colorsUtils";
+import { addMenuOverlayLayer } from "../map/mapbox/layerOrder";
 
 const MAP_ID = "location-filter-map";
 
@@ -94,7 +95,7 @@ const SelectedAreaLayer: FC<{
           data,
         });
 
-        map.addLayer({
+        addMenuOverlayLayer(map, {
           id: layerId,
           type: "fill",
           source: sourceId,
@@ -104,7 +105,7 @@ const SelectedAreaLayer: FC<{
           },
         });
 
-        map.addLayer({
+        addMenuOverlayLayer(map, {
           id: labelLayerId,
           type: "symbol",
           source: sourceId,

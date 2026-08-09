@@ -10,9 +10,10 @@ import {
 } from "./Layers";
 import SpatialExtents from "../component/SpatialExtents";
 import { FeatureCollection, Point } from "geojson";
-import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
-import { generateFeatureCollectionFrom } from "../../../../utils/GeoJsonUtils";
+import { mergeWithDefaults } from "@/utils/ObjectUtils";
+import { generateFeatureCollectionFrom } from "@/utils/GeoJsonUtils";
 import CardPopup from "../component/CardPopup";
+import { addDataLayer } from "../layerOrder";
 
 interface UnclusterLayerConfig {
   unclusterPointColor: string;
@@ -82,18 +83,20 @@ const UnclusterLayer: FC<UnclusterLayerProps> = ({
         cluster: false,
       });
 
-      map?.addLayer({
-        id: unclusterLayerId,
-        type: "circle",
-        source: unclusterSourceId,
-        paint: {
-          "circle-opacity": config.unclusterPointOpacity,
-          "circle-color": config.unclusterPointColor,
-          "circle-radius": config.unclusterPointRadius,
-          "circle-stroke-width": config.unclusterPointStrokeWidth,
-          "circle-stroke-color": config.unclusterPointStrokeColor,
-        },
-      });
+      if (map) {
+        addDataLayer(map, {
+          id: unclusterLayerId,
+          type: "circle",
+          source: unclusterSourceId,
+          paint: {
+            "circle-opacity": config.unclusterPointOpacity,
+            "circle-color": config.unclusterPointColor,
+            "circle-radius": config.unclusterPointRadius,
+            "circle-stroke-width": config.unclusterPointStrokeWidth,
+            "circle-stroke-color": config.unclusterPointStrokeColor,
+          },
+        });
+      }
 
       map?.on("mouseenter", unclusterLayerId, defaultMouseEnterEventHandler);
       map?.on("mouseleave", unclusterLayerId, defaultMouseLeaveEventHandler);

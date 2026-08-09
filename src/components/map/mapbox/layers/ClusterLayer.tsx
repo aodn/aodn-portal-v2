@@ -13,9 +13,10 @@ import SpiderDiagram from "../component/SpiderDiagram";
 import { TestHelper } from "../../../common/test/helper";
 import { FeatureCollection, Point } from "geojson";
 import { MapDefaultConfig, MapEventEnum } from "../constants";
-import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
-import { generateFeatureCollectionFrom } from "../../../../utils/GeoJsonUtils";
+import { mergeWithDefaults } from "@/utils/ObjectUtils";
+import { generateFeatureCollectionFrom } from "@/utils/GeoJsonUtils";
 import CardPopup from "../component/CardPopup";
+import { addDataLayer } from "../layerOrder";
 
 interface ClusterSize {
   default?: number | string;
@@ -144,65 +145,67 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
       });
 
       // Add layers for multiple items, that is the cluster
-      map?.addLayer({
-        id: clusterLayer,
-        type: "circle",
-        source: clusterSourceId,
-        filter: ["has", "point_count"],
-        paint: {
-          "circle-stroke-width": config.clusterCircleStrokeWidth,
-          "circle-stroke-color": config.clusterCircleStrokeColor,
-          "circle-opacity": config.clusterCircleOpacity,
-          "circle-color": [
-            "step",
-            ["get", "point_count"],
-            config.clusterCircleColor.default,
-            config.pointCountThresholds.medium,
-            config.clusterCircleColor.medium,
-            config.pointCountThresholds.large,
-            config.clusterCircleColor.large,
-            config.pointCountThresholds.extra_large,
-            config.clusterCircleColor.extra_large,
-          ],
-          "circle-radius": [
-            "step",
-            ["get", "point_count"],
-            config.clusterCircleSize.default,
-            config.pointCountThresholds.medium,
-            config.clusterCircleSize.medium,
-            config.pointCountThresholds.large,
-            config.clusterCircleSize.large,
-            config.pointCountThresholds.extra_large,
-            config.clusterCircleSize.extra_large,
-          ],
-        },
-      });
+      if (map) {
+        addDataLayer(map, {
+          id: clusterLayer,
+          type: "circle",
+          source: clusterSourceId,
+          filter: ["has", "point_count"],
+          paint: {
+            "circle-stroke-width": config.clusterCircleStrokeWidth,
+            "circle-stroke-color": config.clusterCircleStrokeColor,
+            "circle-opacity": config.clusterCircleOpacity,
+            "circle-color": [
+              "step",
+              ["get", "point_count"],
+              config.clusterCircleColor.default,
+              config.pointCountThresholds.medium,
+              config.clusterCircleColor.medium,
+              config.pointCountThresholds.large,
+              config.clusterCircleColor.large,
+              config.pointCountThresholds.extra_large,
+              config.clusterCircleColor.extra_large,
+            ],
+            "circle-radius": [
+              "step",
+              ["get", "point_count"],
+              config.clusterCircleSize.default,
+              config.pointCountThresholds.medium,
+              config.clusterCircleSize.medium,
+              config.pointCountThresholds.large,
+              config.clusterCircleSize.large,
+              config.pointCountThresholds.extra_large,
+              config.clusterCircleSize.extra_large,
+            ],
+          },
+        });
 
-      map?.addLayer({
-        id: `${layerId}-cluster-count`,
-        type: "symbol",
-        source: clusterSourceId,
-        filter: ["has", "point_count"],
-        layout: {
-          "text-field": "{point_count_abbreviated}",
-          "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
-          "text-size": config.clusterCircleTextSize,
-        },
-      });
-      // Layer for only 1 item in the circle
-      map?.addLayer({
-        id: unclusterPointLayer,
-        type: "circle",
-        source: clusterSourceId,
-        filter: ["!", ["has", "point_count"]],
-        paint: {
-          "circle-opacity": config.unclusterPointOpacity,
-          "circle-color": config.unclusterPointColor,
-          "circle-radius": config.unclusterPointRadius,
-          "circle-stroke-width": config.unclusterPointStrokeWidth,
-          "circle-stroke-color": config.unclusterPointStrokeColor,
-        },
-      });
+        addDataLayer(map, {
+          id: `${layerId}-cluster-count`,
+          type: "symbol",
+          source: clusterSourceId,
+          filter: ["has", "point_count"],
+          layout: {
+            "text-field": "{point_count_abbreviated}",
+            "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+            "text-size": config.clusterCircleTextSize,
+          },
+        });
+        // Layer for only 1 item in the circle
+        addDataLayer(map, {
+          id: unclusterPointLayer,
+          type: "circle",
+          source: clusterSourceId,
+          filter: ["!", ["has", "point_count"]],
+          paint: {
+            "circle-opacity": config.unclusterPointOpacity,
+            "circle-color": config.unclusterPointColor,
+            "circle-radius": config.unclusterPointRadius,
+            "circle-stroke-width": config.unclusterPointStrokeWidth,
+            "circle-stroke-color": config.unclusterPointStrokeColor,
+          },
+        });
+      }
 
       // Change the cursor to a pointer for cluster circle/uncluster point
       map?.on("mouseenter", clusterLayer, defaultMouseEnterEventHandler);

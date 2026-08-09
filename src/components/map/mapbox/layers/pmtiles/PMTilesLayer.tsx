@@ -42,6 +42,7 @@ import { SelectItem } from "@/components/common/dropdown/CommonSelect";
 import { MapDefaultConfig } from "@/components/map/mapbox/constants";
 import MapLayerSelect from "@/components/map/mapbox/component/MapLayerSelect";
 import { TestHelper } from "@/components/common/test/helper";
+import { addDataLayer } from "@/components/map/mapbox/layerOrder";
 
 // Re-export pure helpers so existing imports from PMTilesLayer keep working
 // (e.g. MapPanel: metadataRangeToDayjs, PMTilesMetadata).
@@ -841,7 +842,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         const densityPaint = getFeatureStatePaintProperties();
         PMTILE_LAYERS.forEach((layer) => {
           if (!map.getLayer(layer.id)) {
-            map.addLayer({
+            addDataLayer(map, {
               id: layer.id,
               type: "fill",
               source: SOURCE_ID,
@@ -869,7 +870,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
           });
         }
         if (!map.getLayer(HOVER_OUTLINE_LAYER_ID)) {
-          map.addLayer({
+          addDataLayer(map, {
             id: HOVER_OUTLINE_LAYER_ID,
             type: "line",
             source: HOVER_SOURCE_ID,

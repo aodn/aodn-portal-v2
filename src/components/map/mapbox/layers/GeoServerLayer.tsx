@@ -12,9 +12,10 @@ import {
 } from "react";
 import MapContext, { ProgressType } from "../MapContext";
 import { LayerBasicType } from "./Layers";
-import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
-import { formatToUrl } from "../../../../utils/UrlUtils";
+import { mergeWithDefaults } from "@/utils/ObjectUtils";
+import { formatToUrl } from "@/utils/UrlUtils";
 import { MapDefaultConfig, MapEventEnum } from "../constants";
+import { addDataLayer } from "../layerOrder";
 import { Position } from "geojson";
 import { TestHelper } from "../../../common/test/helper";
 import {
@@ -44,17 +45,14 @@ import dayjs, { Dayjs } from "dayjs";
 import { dateDefault, playwrightTestIds } from "../../../common/constants";
 import MapLayerSelect from "../component/MapLayerSelect";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
-import { ErrorResponse } from "../../../../utils/ErrorBoundary";
+import { ErrorResponse } from "@/utils/ErrorBoundary";
 import { SelectItem } from "../../../common/dropdown/CommonSelect";
-import {
-  boundingBoxInEpsg3857,
-  isDrawModeRectangle,
-} from "../../../../utils/MapUtils";
-import { checkEmptyArray } from "../../../../utils/Helpers";
+import { boundingBoxInEpsg3857, isDrawModeRectangle } from "@/utils/MapUtils";
+import { checkEmptyArray } from "@/utils/Helpers";
 import AdminScreenContext from "../../../admin/AdminScreenContext";
 import { HttpStatusCode } from "axios";
-import { dateToValue } from "../../../../utils/DateUtils";
-import { layernameRoughlyMatch } from "../../../../utils/GeoJsonUtils";
+import { dateToValue } from "@/utils/DateUtils";
+import { layernameRoughlyMatch } from "@/utils/GeoJsonUtils";
 import { AppDispatch } from "@/app/store/store";
 
 enum LAYER_VISIBILITY {
@@ -377,8 +375,8 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       // Check WMS availability before adding the layer
       if (isWMSAvailable) {
         // Add the raster layer, do not add any fitBounds here, it makes the map animate strange. Control it at map level
-        if (!map?.getLayer(titleLayerId)) {
-          map?.addLayer({
+        if (map && !map.getLayer(titleLayerId)) {
+          addDataLayer(map, {
             id: titleLayerId,
             type: "raster",
             source: sourceLayerId,

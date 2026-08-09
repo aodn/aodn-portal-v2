@@ -1,6 +1,7 @@
 import { FC, useCallback, useContext, useEffect, useRef } from "react";
 import MapContext from "../MapContext";
 import { TestHelper } from "../../../common/test/helper";
+import { addMenuOverlayLayer } from "../layerOrder";
 
 const sourceId = "mapbox-world-country-boundaries";
 const layerId = "mapbox-world-country-boundaries-layer";
@@ -25,39 +26,47 @@ const MapboxWorldLayer: FC = () => {
       url: "mapbox://mapbox.country-boundaries-v1",
     });
 
-    map?.addLayer({
-      id: layerId,
-      source: sourceId,
-      "source-layer": "country_boundaries",
-      type: "fill",
-      filter: ["==", ["get", "disputed"], "false"],
-      paint: {
-        "fill-color": "rgba(66,100,251, 0.3)",
-        "fill-outline-color": "#0000ff",
-      },
-    });
+    if (map) {
+      addMenuOverlayLayer(map, {
+        id: layerId,
+        source: sourceId,
+        "source-layer": "country_boundaries",
+        type: "fill",
+        filter: ["==", ["get", "disputed"], "false"],
+        paint: {
+          "fill-color": "rgba(66,100,251, 0.3)",
+          "fill-outline-color": "#0000ff",
+        },
+      });
 
-    map?.addLayer({
-      id: undisputedLabelId,
-      source: sourceId,
-      "source-layer": "country_boundaries",
-      type: "symbol",
-      filter: ["==", ["get", "disputed"], "false"],
-      layout: {
-        "text-field": ["step", ["zoom"], ["to-string", ["get", "name"]], 9, ""],
-        "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
-        "text-padding": 5,
-        "text-size": 13,
-        "text-allow-overlap": false,
-        "text-ignore-placement": false,
-        "symbol-placement": "line",
-      },
-      paint: {
-        "text-color": "#ffffff",
-        "text-halo-color": "#000000",
-        "text-halo-width": 1,
-      },
-    });
+      addMenuOverlayLayer(map, {
+        id: undisputedLabelId,
+        source: sourceId,
+        "source-layer": "country_boundaries",
+        type: "symbol",
+        filter: ["==", ["get", "disputed"], "false"],
+        layout: {
+          "text-field": [
+            "step",
+            ["zoom"],
+            ["to-string", ["get", "name"]],
+            9,
+            "",
+          ],
+          "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
+          "text-padding": 5,
+          "text-size": 13,
+          "text-allow-overlap": false,
+          "text-ignore-placement": false,
+          "symbol-placement": "line",
+        },
+        paint: {
+          "text-color": "#ffffff",
+          "text-halo-color": "#000000",
+          "text-halo-width": 1,
+        },
+      });
+    }
     isCreatedRef.current = true;
   }, [map]);
 

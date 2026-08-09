@@ -14,10 +14,11 @@ import { stringToColor } from "../../../common/colors/colorsUtils";
 import { Feature, Polygon, Position } from "geojson";
 import { LngLat, LngLatBounds, MapMouseEvent } from "mapbox-gl";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
-import { fitToBound } from "../../../../utils/MapUtils";
+import { fitToBound } from "@/utils/MapUtils";
 import bluePin from "@/assets/icons/blue_pin.png";
 import { MapEventEnum } from "../constants";
 import { TestHelper } from "../../../common/test/helper";
+import { addDataLayer } from "../layerOrder";
 
 interface SpatialExtentPhoto {
   bbox: Position;
@@ -162,30 +163,32 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
       data: extent?.getGeojsonFromBBox(1),
     });
 
-    map?.addLayer({
-      id: layerPolygonId,
-      type: "fill",
-      source: sourceId,
-      filter: ["!=", ["geometry-type"], "Point"],
-      paint: {
-        "fill-color": stringToColor(collectionId),
-        "fill-outline-color": "yellow",
-      },
-      layout: {
-        visibility: visible ? "visible" : "none",
-      },
-    });
+    if (map) {
+      addDataLayer(map, {
+        id: layerPolygonId,
+        type: "fill",
+        source: sourceId,
+        filter: ["!=", ["geometry-type"], "Point"],
+        paint: {
+          "fill-color": stringToColor(collectionId),
+          "fill-outline-color": "yellow",
+        },
+        layout: {
+          visibility: visible ? "visible" : "none",
+        },
+      });
 
-    map?.addLayer({
-      id: layerPointId,
-      type: "symbol",
-      source: sourceId,
-      filter: ["==", ["geometry-type"], "Point"],
-      layout: {
-        visibility: visible ? "visible" : "none",
-        "icon-image": BLUE_PIN_NAME,
-      },
-    });
+      addDataLayer(map, {
+        id: layerPointId,
+        type: "symbol",
+        source: sourceId,
+        filter: ["==", ["geometry-type"], "Point"],
+        layout: {
+          visibility: visible ? "visible" : "none",
+          "icon-image": BLUE_PIN_NAME,
+        },
+      });
+    }
   }, [
     map,
     sourceId,
