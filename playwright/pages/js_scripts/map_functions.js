@@ -93,7 +93,7 @@ window.__map_functions = {
 
     const testProps = this.getTestProps(mapId);
     // PMTiles density uses mapbox fill layers; visibility is owned by React
-    // `visible` prop and exposed via TestHelper (same pattern as legacy hexbin).
+    // `visible` prop and exposed via TestHelper.
     if (
       testProps &&
       typeof testProps.isPmtilesVisible === "function" &&

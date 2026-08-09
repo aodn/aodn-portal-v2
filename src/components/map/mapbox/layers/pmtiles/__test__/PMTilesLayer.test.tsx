@@ -504,7 +504,7 @@ describe("PMTilesLayer - buildPopupHtml", () => {
     expect(html).toContain("Time Range: 2024-01-01 to 2024-01-01");
   });
 
-  it("shows zero count and N/A range when the hexbin has no records in range", () => {
+  it("shows zero count and N/A range when the density cell has no records in range", () => {
     const html = buildPopupHtml(
       countsProps({
         "2025": {

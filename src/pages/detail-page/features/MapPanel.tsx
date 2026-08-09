@@ -81,7 +81,7 @@ export const buildMapLayerConfig = (
     const datasetTypes = collection.getDatasetType() ?? [];
     const zarrOnlyDataset =
       datasetTypes.length === 1 && datasetTypes[0] === DatasetType.ZARR;
-    // Parquet / mixed CO density is shown via PMTiles (legacy Hex Grid removed).
+    // Parquet / mixed CO density is shown via PMTiles.
     const hasCoDensity =
       datasetTypes.includes(DatasetType.PARQUET) ||
       datasetTypes.includes(DatasetType.ZARR);

@@ -32,12 +32,11 @@ import {
   Popper,
   Divider,
 } from "@mui/material";
-import { SearchStyleIcon } from "../../../../../assets/icons/map/search_style";
+import { SearchStyleIcon } from "@/assets/icons/map/search_style";
 import MenuTitle from "./MenuTitle";
 import { ComponentId, DataTestId } from "../../constants";
 
 export enum LayerName {
-  Hexbin = "hexbin",
   GeoServer = "geoServer",
   PMTiles = "pmtiles",
   SpatialExtent = "spatialExtent",
