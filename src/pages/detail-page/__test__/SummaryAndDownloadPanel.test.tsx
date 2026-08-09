@@ -53,7 +53,7 @@ describe("buildMapLayerConfig", () => {
       true // isSupportPMTiles
     );
 
-    // Hex Grid removed — density is PMTiles only
+    // Density is PMTiles only
     expect(result).toHaveLength(2);
     expect(result[0]).toEqual({
       id: LayerName.PMTiles,
@@ -96,7 +96,7 @@ describe("buildMapLayerConfig", () => {
 
     const result = buildMapLayerConfig(
       mockCollection,
-      false, // isWMSAvailable (no WMS, no hexbin -> spatial extent should be available)
+      false, // isWMSAvailable (no WMS, no density -> spatial extent should be available)
       true, // hasSpatialExtent
       false // isSupportPMTiles
     );

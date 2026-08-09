@@ -13,9 +13,6 @@ interface TestProps {
   getWorldBoundariesLayer?: () => string;
   getSpiderLayer?: () => string;
   getGeoServerTileLayer?: () => string;
-  /** @deprecated Legacy deck.gl hexbin; prefer getPmtilesLayer */
-  getHexbinLayer?: () => string;
-  isHexbinVisible?: () => boolean | undefined;
   /** PMTiles Data Density layer id for e2e visibility checks */
   getPmtilesLayer?: () => string;
   isPmtilesVisible?: () => boolean | undefined;
