@@ -1,8 +1,10 @@
 import React, { FC, useCallback, useEffect, useState } from "react";
-import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
-import BookmarkIcon from "@mui/icons-material/Bookmark";
 import { IconButton, Tooltip } from "@mui/material";
-import { color } from "../../styles/constants";
+import {
+  BookmarkFilledIcon,
+  BookmarkOutlinedIcon,
+} from "@/assets/icons/result/bookmark";
+import { portalTheme } from "@/styles";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import {
   addItem,
@@ -19,6 +21,8 @@ import {
   BookmarkEvent,
   EVENT_BOOKMARK,
 } from "../map/mapbox/controls/menu/Definition";
+
+const BOOKMARK_ICON_SIZE = 19;
 
 export interface BookmarkButtonProps {
   dataset?: OGCCollection;
@@ -119,16 +123,17 @@ const BookmarkButton: FC<BookmarkButtonProps> = ({
           data-testid={`${dataTestId}-iconbutton`}
         >
           {isBookmarked ? (
-            <BookmarkIcon
-              sx={{ color: color.brightBlue.dark }}
+            <BookmarkFilledIcon
+              color={portalTheme.palette.primary1}
+              width={BOOKMARK_ICON_SIZE}
+              height={BOOKMARK_ICON_SIZE}
               data-testid={`${dataTestId}-bookmarkicon`}
             />
           ) : (
-            <BookmarkBorderIcon
-              sx={{
-                color: color.brightBlue.dark,
-                fontSize: "26px",
-              }}
+            <BookmarkOutlinedIcon
+              color={portalTheme.palette.primary1}
+              width={BOOKMARK_ICON_SIZE}
+              height={BOOKMARK_ICON_SIZE}
               data-testid={`${dataTestId}-bookmarkbordericon`}
             />
           )}

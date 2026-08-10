@@ -1,11 +1,11 @@
 import { FC, ReactNode } from "react";
 import { Grid, SxProps } from "@mui/material";
-import DownloadIcon from "@mui/icons-material/Download";
-import InfoIcon from "@mui/icons-material/Info";
-import LinkIcon from "@mui/icons-material/Link";
 import TaskAltSharpIcon from "@mui/icons-material/TaskAltSharp";
-import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
+import { TemporalIcon } from "@/assets/icons/details/temporal";
+import { DataAccessIcon } from "@/assets/icons/result/link";
+import { DownloadsIcon } from "@/assets/icons/result/download";
+import { DetailsIcon } from "@/assets/icons/result/details";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import ResultCardButton, {
   ResultCardButtonConfig,
@@ -36,6 +36,15 @@ const Status = {
   Completed: ["completed", "complete"],
 };
 
+// Rendered size per icon, chosen so each glyph measures the same ink box as the
+// design. They differ because each icon fills a different share of its viewBox.
+const iconSize = {
+  onGoing: 16,
+  dataAccess: 20,
+  downloads: 20,
+  details: 20,
+};
+
 const renderStatusButton = (
   shouldHideText: boolean,
   content: OGCCollection,
@@ -55,8 +64,10 @@ const renderStatusButton = (
   if (status && Status.Ongoing.includes(status)) {
     return (
       <ResultCardButton
-        startIcon={DoubleArrowIcon}
-        text="On Going"
+        startIcon={TemporalIcon}
+        isSvgIcon
+        iconSize={iconSize.onGoing}
+        text="On going"
         resultCardButtonConfig={{
           ...resultCardButtonConfig,
           color: color.success.main,
@@ -117,7 +128,9 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
       <ButtonContainer isGridView={isGridView}>
         {links && (
           <ResultCardButton
-            startIcon={LinkIcon}
+            startIcon={DataAccessIcon}
+            isSvgIcon
+            iconSize={iconSize.dataAccess}
             text="Data Access"
             shouldHideText={shouldHideText}
             onClick={onLinks}
@@ -128,8 +141,10 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
       </ButtonContainer>
       <ButtonContainer isGridView={isGridView}>
         <ResultCardButton
-          startIcon={DownloadIcon}
-          text="Download"
+          startIcon={DownloadsIcon}
+          isSvgIcon
+          iconSize={iconSize.downloads}
+          text="Downloads"
           shouldHideText={shouldHideText}
           disabled={onDownload === undefined}
           onClick={onDownload}
@@ -138,8 +153,10 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
       </ButtonContainer>
       <ButtonContainer isGridView={isGridView}>
         <ResultCardButton
-          startIcon={InfoIcon}
-          text="More details"
+          startIcon={DetailsIcon}
+          isSvgIcon
+          iconSize={iconSize.details}
+          text="Details"
           shouldHideText={shouldHideText}
           disabled={onDetail === undefined}
           onClick={onDetail}

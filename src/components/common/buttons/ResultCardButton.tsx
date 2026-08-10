@@ -30,6 +30,8 @@ interface ResultCardButtonProps {
   sx?: SxProps;
   text?: string | null;
   onClick?: (type: OpenType | undefined) => void;
+  isSvgIcon?: boolean;
+  iconSize?: number;
 }
 
 const buttonStyles = {
@@ -56,6 +58,8 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
   sx,
   shouldHideText = false,
   disabled = false,
+  isSvgIcon = false,
+  iconSize = 20,
 }) => {
   const IconComponent = startIcon as ElementType;
   const menuRef = useRef<ContextMenuRef>(null);
@@ -66,6 +70,14 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
     const hasText = text && !shouldHideText;
     return [config, size, hasText];
   }, [resultCardButtonConfig, shouldHideText, text]);
+
+  const iconStyleProps = useMemo(
+    () =>
+      isSvgIcon
+        ? { color: config.color, width: iconSize, height: iconSize }
+        : { sx: { color: config.color, fontSize: fontSizes[size].icon } },
+    [config.color, iconSize, isSvgIcon, size]
+  );
 
   return (
     <>
@@ -95,9 +107,7 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
                 // Need span to allow tooltip forwardRef()
               }
               <span>
-                <IconComponent
-                  sx={{ color: config.color, fontSize: fontSizes[size].icon }}
-                />
+                <IconComponent {...iconStyleProps} />
               </span>
             </Tooltip>
           ))}
