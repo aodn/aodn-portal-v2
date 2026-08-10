@@ -10,6 +10,7 @@
 | `styles/`     | Theme: colors, fonts, spacing                                                       |
 | `utils/`      | Small helper functions (dates, strings, URLs, ...)                                  |
 | `analytics/`  | Google Analytics tracking                                                           |
+| `seo/`        | Search engine visibility: head tags, sitemap, pre-rendered pages (see its README)   |
 | `assets/`     | Images, icons, logos                                                                |
 | `__mocks__/`  | Fake data for tests                                                                 |
 

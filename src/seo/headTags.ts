@@ -1,8 +1,6 @@
 /**
- * Static SEO head tags injected into index.html at build time (replacing the
- * "<!-- seo-tags -->" placeholder via inlineSEOPlugin in vite.config.ts).
- * Per-route tags are handled elsewhere: canonical at runtime (canonicalUrl.ts)
- * and detail-page title/description/JSON-LD at build time (PrerenderUtils.ts).
+ * Static SEO head tags baked into index.html at build time, replacing the
+ * "<!-- seo-tags -->" placeholder (see vitePlugins.ts).
  */
 
 export const buildSeoHeadTags = (isProduction: boolean) => `

@@ -8,7 +8,7 @@ import ErrorBoundary from "@/utils/ErrorBoundary";
 import { pageDefault } from "../components/common/constants";
 import HealthChecker from "@/utils/HealthChecker";
 import DegradedPage from "../pages/error-page/DegradedPage";
-import { syncCanonicalUrl } from "@/utils/seo/canonicalUrl";
+import { syncCanonicalUrl } from "@/seo/canonicalUrl";
 import Layout from "./layout/Layout";
 import React from "react";
 

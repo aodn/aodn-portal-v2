@@ -1,12 +1,7 @@
 /**
- * Pre-renders dist/details/<uuid> pages (extensionless, matching the request
- * path as S3 object key) from dist/index.html, with per-record <title>,
- * meta description, canonical and schema.org Dataset JSON-LD in the <head>,
- * so crawlers get record metadata without running JS. The body still boots
- * the SPA as usual.
- *
- * Runs via prerenderDetailsPlugin in vite.config.ts, or standalone (needs a
- * prior build): npx tsx src/utils/seo/PrerenderUtils.ts
+ * Pre-renders a static dist/details/<uuid> page per record, with real title,
+ * description, canonical and Dataset JSON-LD in the head — see README.md.
+ * Standalone (needs a prior build): npx tsx src/seo/PrerenderUtils.ts
  */
 
 import { readFile, writeFile, mkdir } from "fs/promises";
@@ -27,7 +22,6 @@ export const SEO_PROPERTIES =
 // The id becomes a file name / S3 object key; skip anything unexpected
 const SAFE_ID = /^[A-Za-z0-9._-]+$/;
 
-// A collection with everything a detail page needs pre-rendered
 type SeoCollection = OgcCollection & {
   id: string;
   title: string;
@@ -114,7 +108,6 @@ export const renderPage = (template: string, collection: SeoCollection) => {
   );
 };
 
-// Pass collections in to reuse a fetch the caller has already paid for
 export const prerenderDetailPages = async (
   outDir: string,
   prefetched?: OgcCollection[]
@@ -152,7 +145,6 @@ export const prerenderDetailPages = async (
   );
 };
 
-// Standalone entry point; no-op when imported by vite.config.ts
 const isRunDirectly =
   process.argv[1] &&
   path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
@@ -160,7 +152,7 @@ const isRunDirectly =
 if (isRunDirectly) {
   const outDir = path.resolve(
     path.dirname(fileURLToPath(import.meta.url)),
-    "../../../dist"
+    "../../dist"
   );
   prerenderDetailPages(outDir).catch((error) => {
     console.error(error);

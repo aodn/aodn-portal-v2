@@ -1,13 +1,6 @@
 /**
- * All SEO-related Vite plugins, assembled into vite.config.ts via
- * seoPlugins(). Only the build pipeline and tests import this module —
- * it uses node APIs and must never be imported by application code.
- *
- * - inline-seo: bakes the static head tags into index.html
- * - copy-robots-txt: serves/copies the per-environment robots.txt
- *
- * sitemap.xml and the pre-rendered /details pages are NOT built here — the
- * Publish SEO Artifacts workflow generates them straight from the live site.
+ * Vite build plugins: inline the static SEO head tags into index.html and
+ * pick the per-environment robots.txt. Node-only — never import in app code.
  */
 
 import fs from "fs";
