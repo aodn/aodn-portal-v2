@@ -1,14 +1,20 @@
 import { describe, expect, it, vi } from "vitest";
-import { MapDefaultConfig } from "../../components/map/mapbox/constants";
+import { MapDefaultConfig } from "@/components/map/mapbox/constants";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import {
   cssFontFamilyToMapboxTextFont,
   fitToBound,
   fitToDefaultExtent,
+  isMapDrawModeActive,
   overallBoundingBox,
 } from "../MapUtils";
-import { FONT_FAMILIES } from "../../styles/fontsRC8";
+import { FONT_FAMILIES } from "@/styles/fontsRC8";
 import { Map as MapboxMap } from "mapbox-gl";
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import {
+  DRAW_POLYGON_MODE,
+  DRAW_RECTANGLE_MODE,
+} from "../../components/map/mapbox/controls/menu/DrawRect";
 
 describe("MapUtils", () => {
   it("cssFontFamilyToMapboxTextFont maps Open Sans token stack to Mapbox glyphs", () => {
@@ -336,5 +342,49 @@ describe("MapUtils", () => {
     expect(map.flyTo).toHaveBeenCalledWith(
       expect.objectContaining({ animate: true })
     );
+  });
+
+  describe("isMapDrawModeActive", () => {
+    const makeMapWithDraw = (mode: string, selectedIds: string[] = []) => {
+      const draw = Object.create(MapboxDraw.prototype) as MapboxDraw;
+      draw.getMode = vi.fn(() => mode) as MapboxDraw["getMode"];
+      draw.getSelectedIds = vi.fn(
+        () => selectedIds
+      ) as MapboxDraw["getSelectedIds"];
+      return {
+        _controls: [draw],
+      } as unknown as MapboxMap;
+    };
+
+    it("is false without map or draw control", () => {
+      expect(isMapDrawModeActive(null)).toBe(false);
+      expect(isMapDrawModeActive(undefined)).toBe(false);
+      expect(
+        isMapDrawModeActive({ _controls: [] } as unknown as MapboxMap)
+      ).toBe(false);
+    });
+
+    it("is true for bbox and polygon draw modes", () => {
+      expect(isMapDrawModeActive(makeMapWithDraw(DRAW_RECTANGLE_MODE))).toBe(
+        true
+      );
+      expect(isMapDrawModeActive(makeMapWithDraw(DRAW_POLYGON_MODE))).toBe(
+        true
+      );
+    });
+
+    it("is true while editing vertices or a feature is selected", () => {
+      expect(isMapDrawModeActive(makeMapWithDraw("direct_select"))).toBe(true);
+      expect(
+        isMapDrawModeActive(makeMapWithDraw("simple_select", ["feat-1"]))
+      ).toBe(true);
+    });
+
+    it("is false when idle so hover can resume", () => {
+      expect(isMapDrawModeActive(makeMapWithDraw("simple_select"))).toBe(false);
+      expect(isMapDrawModeActive(makeMapWithDraw("simple_select", []))).toBe(
+        false
+      );
+    });
   });
 });

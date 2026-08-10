@@ -12,9 +12,10 @@ import {
 } from "react";
 import MapContext, { ProgressType } from "../MapContext";
 import { LayerBasicType } from "./Layers";
-import { mergeWithDefaults } from "../../../../utils/ObjectUtils";
-import { formatToUrl } from "../../../../utils/UrlUtils";
+import { mergeWithDefaults } from "@/utils/ObjectUtils";
+import { formatToUrl } from "@/utils/UrlUtils";
 import { MapDefaultConfig, MapEventEnum } from "../constants";
+import { addDataLayer } from "../layerOrder";
 import { Position } from "geojson";
 import { TestHelper } from "../../../common/test/helper";
 import {
@@ -44,17 +45,14 @@ import dayjs, { Dayjs } from "dayjs";
 import { dateDefault, playwrightTestIds } from "../../../common/constants";
 import MapLayerSelect from "../component/MapLayerSelect";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
-import { ErrorResponse } from "../../../../utils/ErrorBoundary";
+import { ErrorResponse } from "@/utils/ErrorBoundary";
 import { SelectItem } from "../../../common/dropdown/CommonSelect";
-import {
-  boundingBoxInEpsg3857,
-  isDrawModeRectangle,
-} from "../../../../utils/MapUtils";
-import { checkEmptyArray } from "../../../../utils/Helpers";
+import { boundingBoxInEpsg3857, isMapDrawModeActive } from "@/utils/MapUtils";
+import { checkEmptyArray } from "@/utils/Helpers";
 import AdminScreenContext from "../../../admin/AdminScreenContext";
 import { HttpStatusCode } from "axios";
-import { dateToValue } from "../../../../utils/DateUtils";
-import { layernameRoughlyMatch } from "../../../../utils/GeoJsonUtils";
+import { dateToValue } from "@/utils/DateUtils";
+import { layernameRoughlyMatch } from "@/utils/GeoJsonUtils";
 import { AppDispatch } from "@/app/store/store";
 
 enum LAYER_VISIBILITY {
@@ -377,8 +375,8 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       // Check WMS availability before adding the layer
       if (isWMSAvailable) {
         // Add the raster layer, do not add any fitBounds here, it makes the map animate strange. Control it at map level
-        if (!map?.getLayer(titleLayerId)) {
-          map?.addLayer({
+        if (map && !map.getLayer(titleLayerId)) {
+          addDataLayer(map, {
             id: titleLayerId,
             type: "raster",
             source: sourceLayerId,
@@ -495,8 +493,8 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     };
 
     const handlePopup = (event: MapMouseEvent) => {
-      // If user drawing do not popup info box
-      if (!map || isDrawModeRectangle(map)) return;
+      // Suppress feature popup while drawing bbox/polygon selection
+      if (!map || isMapDrawModeActive(map)) return;
 
       const request: MapFeatureRequest = {
         uuid: config.uuid || "",
@@ -548,11 +546,20 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
         });
     };
 
+    const onDrawInteractionChange = () => {
+      if (isMapDrawModeActive(map)) {
+        cleanPopup();
+      }
+    };
+
     if (map) {
       // Register click handler if layer should be visible
       if (visible) {
         map?.on<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
       }
+
+      map.on("draw.modechange", onDrawInteractionChange);
+      map.on("draw.selectionchange", onDrawInteractionChange);
 
       // Handle visibility changes and layer field fetching on IDLE
       // Given the useEffect run in order, the layer creation is call via MapEventEnum.IDLE
@@ -574,6 +581,8 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     }
     return () => {
       map?.off<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
+      map?.off("draw.modechange", onDrawInteractionChange);
+      map?.off("draw.selectionchange", onDrawInteractionChange);
       cleanPopup();
     };
   }, [

@@ -7,6 +7,7 @@ import {
 } from "@/app/store/searchReducer";
 import { MapMouseEvent } from "mapbox-gl";
 import { useAppDispatch } from "@/app/store/hooks";
+import { addDataLayer, getDataLayerBeforeId } from "../layerOrder";
 
 interface SpatialExtentsProps {
   layerId: string;
@@ -82,11 +83,17 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
           });
         }
 
-        // util function to check if layer exists or not and add a before layerId
-        // else you cannot click other dataset because this layer become top
+        // Keep extents under the parent data layer (e.g. cluster) so those stay
+        // clickable; fall back to the data stack beforeId (under menu overlays).
         const addLayerIfNotExists = (id: string, layer: any) => {
-          if (!map?.getLayer(id)) {
-            map?.addLayer(layer, layerId);
+          if (!map || map.getLayer(id)) return;
+          const preferredBefore = map.getLayer(layerId)
+            ? layerId
+            : getDataLayerBeforeId(map);
+          if (preferredBefore && map.getLayer(preferredBefore)) {
+            map.addLayer(layer, preferredBefore);
+          } else {
+            addDataLayer(map, layer);
           }
         };
 

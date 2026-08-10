@@ -42,6 +42,8 @@ import { SelectItem } from "@/components/common/dropdown/CommonSelect";
 import { MapDefaultConfig } from "@/components/map/mapbox/constants";
 import MapLayerSelect from "@/components/map/mapbox/component/MapLayerSelect";
 import { TestHelper } from "@/components/common/test/helper";
+import { addDataLayer } from "@/components/map/mapbox/layerOrder";
+import { isMapDrawModeActive } from "@/utils/MapUtils";
 
 // Re-export pure helpers so existing imports from PMTilesLayer keep working
 // (e.g. MapPanel: metadataRangeToDayjs, PMTilesMetadata).
@@ -841,7 +843,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         const densityPaint = getFeatureStatePaintProperties();
         PMTILE_LAYERS.forEach((layer) => {
           if (!map.getLayer(layer.id)) {
-            map.addLayer({
+            addDataLayer(map, {
               id: layer.id,
               type: "fill",
               source: SOURCE_ID,
@@ -869,7 +871,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
           });
         }
         if (!map.getLayer(HOVER_OUTLINE_LAYER_ID)) {
-          map.addLayer({
+          addDataLayer(map, {
             id: HOVER_OUTLINE_LAYER_ID,
             type: "line",
             source: HOVER_SOURCE_ID,
@@ -1064,6 +1066,12 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       layer: (typeof PMTILE_LAYERS)[number],
       e: MapMouseEvent
     ) => {
+      // While drawing bbox/polygon, skip hover popup/outline so draw clicks win
+      if (isMapDrawModeActive(map)) {
+        clearHover();
+        return;
+      }
+
       const ctx = hoverCtxRef.current;
       if (!ctx.visible || !ctx.densityReady) {
         clearHover();
@@ -1132,6 +1140,14 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       clearHover();
     };
 
+    // Drop open hover when drawing/editing starts or a feature is selected.
+    // mousemove re-enables hover once draw interaction is idle again.
+    const onDrawInteractionChange = () => {
+      if (isMapDrawModeActive(map)) {
+        clearHover();
+      }
+    };
+
     const hoverHandlers = PMTILE_LAYERS.map((layer) => ({
       layerId: layer.id,
       onMouseMove: (e: MapMouseEvent) => onHexHover(layer, e),
@@ -1142,6 +1158,8 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       map.on("mouseleave", layerId, onHexLeave);
     });
     map.on("zoom", onZoom);
+    map.on("draw.modechange", onDrawInteractionChange);
+    map.on("draw.selectionchange", onDrawInteractionChange);
 
     return () => {
       hoverHandlers.forEach(({ layerId, onMouseMove }) => {
@@ -1149,6 +1167,8 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         map.off("mouseleave", layerId, onHexLeave);
       });
       map.off("zoom", onZoom);
+      map.off("draw.modechange", onDrawInteractionChange);
+      map.off("draw.selectionchange", onDrawInteractionChange);
       try {
         clearHover();
       } catch {

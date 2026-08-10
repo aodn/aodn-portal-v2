@@ -12,21 +12,20 @@ import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 
-import _ from "lodash";
 import { Box, IconButton } from "@mui/material";
 import DrawRectangle from "./DrawRectangle";
 import { ControlProps } from "./Definition";
-import { BboxSelectionIcon } from "../../../../../assets/icons/map/bbox_selection";
+import { BboxSelectionIcon } from "@/assets/icons/map/bbox_selection";
 import { switcherIconButtonSx } from "./MenuControl";
 import MenuHintTooltip from "./MenuHintTooltip";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { BboxTooltipIcon } from "../../../../../assets/icons/map/tooltip_bbox";
+import { BboxTooltipIcon } from "@/assets/icons/map/tooltip_bbox";
 import MenuTooltip from "./MenuTooltip";
-import { PolygonSelectionTooltipIcon } from "../../../../../assets/icons/map/tooltip_polygon_selection";
-import { PolygonSelectionIcon } from "../../../../../assets/icons/map/polygon_selection";
+import { PolygonSelectionTooltipIcon } from "@/assets/icons/map/tooltip_polygon_selection";
+import { PolygonSelectionIcon } from "@/assets/icons/map/polygon_selection";
 import usePolygonCursorHint from "../../../../../hooks/usePolygonCursorHint";
 import { IControl } from "mapbox-gl";
-import { isValidPolygonFeature } from "../../../../../utils/GeoJsonUtils";
+import { isValidPolygonFeature } from "@/utils/GeoJsonUtils";
 
 interface DrawControlProps extends ControlProps {
   onChangeFeatures?: (
@@ -183,6 +182,34 @@ const DrawRect: React.FC<DrawControlProps> = ({
       syncMapFeaturesToContext(mapDraw);
     });
   }, [mapDraw, hasFeatures, syncMapFeaturesToContext]);
+
+  // MapboxDraw only wires Delete/Backspace when controls.trash is true.
+  // We hide the stock trash control and use our own button, so re-bind the
+  // keys to the same delete behaviour.
+  useEffect(() => {
+    const isEditableTarget = (target: EventTarget | null) => {
+      if (!(target instanceof HTMLElement)) return false;
+      const tag = target.tagName;
+      return (
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        target.isContentEditable
+      );
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Delete" && event.key !== "Backspace") return;
+      if (!hasFeatures) return;
+      if (isEditableTarget(event.target)) return;
+
+      event.preventDefault();
+      handleTrashClick();
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [hasFeatures, handleTrashClick]);
 
   useEffect(() => {
     if (isDrawingMode) {

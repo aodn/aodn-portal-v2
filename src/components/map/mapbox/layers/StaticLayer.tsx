@@ -25,9 +25,10 @@ import {
   marineParkDefault,
 } from "../../../common/constants";
 import MapboxWorldLayer, { MapboxWorldLayersDef } from "./MapboxWorldLayer";
-import { cssFontFamilyToMapboxTextFont } from "../../../../utils/MapUtils";
+import { cssFontFamilyToMapboxTextFont } from "@/utils/MapUtils";
 import { useTheme } from "@mui/material";
 import { SymbolLayerSpecification } from "mapbox-gl";
+import { addMenuOverlayLayer } from "../layerOrder";
 
 export enum BoundaryName {
   AUSTRALIAN_MARINE_PARKS = "AMP",
@@ -210,31 +211,33 @@ const StaticLayer: FC<Partial<StaticLayersProps>> = ({
       data: features,
     });
 
-    map?.addLayer({
-      id: layerId,
-      type: "fill",
-      source: sourceId,
-      paint: {
-        "fill-color": stringToColor(id!),
-        "fill-outline-color": "black",
-      },
-    });
+    if (map) {
+      addMenuOverlayLayer(map, {
+        id: layerId,
+        type: "fill",
+        source: sourceId,
+        paint: {
+          "fill-color": stringToColor(id!),
+          "fill-outline-color": "black",
+        },
+      });
 
-    // Add a symbol layer to display the names
-    map?.addLayer({
-      id: layerLabelId,
-      type: "symbol",
-      source: sourceId,
-      layout: {
-        ...STATIC_LAYER_LABEL_LAYOUT,
-        "text-font": cssFontFamilyToMapboxTextFont(
-          theme.typography.body2Regular.fontFamily,
-          { fontWeight: theme.typography.body2Regular.fontWeight }
-        ),
-        "text-field": ["get", label],
-      },
-      paint: STATIC_LAYER_LABEL_PAINT,
-    });
+      // Add a symbol layer to display the names
+      addMenuOverlayLayer(map, {
+        id: layerLabelId,
+        type: "symbol",
+        source: sourceId,
+        layout: {
+          ...STATIC_LAYER_LABEL_LAYOUT,
+          "text-font": cssFontFamilyToMapboxTextFont(
+            theme.typography.body2Regular.fontFamily,
+            { fontWeight: theme.typography.body2Regular.fontWeight }
+          ),
+          "text-field": ["get", label],
+        },
+        paint: STATIC_LAYER_LABEL_PAINT,
+      });
+    }
     isCreatedRef.current = true;
   }, [map, layerId, sourceId, layerLabelId, features, id, label, theme]);
 

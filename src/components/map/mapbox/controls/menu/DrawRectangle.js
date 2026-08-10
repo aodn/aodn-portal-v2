@@ -92,36 +92,37 @@ const DrawRectangle = {
     state.startPoint = [e.lngLat.lng, e.lngLat.lat];
   },
   onMouseMove: function (state, e) {
-    // if startPoint, update the feature coordinates, using the bounding box concept
-    // we are simply using the startingPoint coordinates and the current Mouse Position
-    // coordinates to calculate the bounding box on the fly, which will be our rectangle
-    if (state.startPoint) {
-      state.rectangle.updateCoordinate(
-        "0.0",
-        state.startPoint[0],
-        state.startPoint[1]
-      ); //minX, minY - the starting point
-      state.rectangle.updateCoordinate(
-        "0.1",
-        e.lngLat.lng,
-        state.startPoint[1]
-      ); // maxX, minY
-      state.rectangle.updateCoordinate("0.2", e.lngLat.lng, e.lngLat.lat); // maxX, maxY
-      state.rectangle.updateCoordinate(
-        "0.3",
-        state.startPoint[0],
-        e.lngLat.lat
-      ); // minX,maxY
-      state.rectangle.updateCoordinate(
-        "0.4",
-        state.startPoint[0],
-        state.startPoint[1]
-      ); //minX,minY - ending point (equals to starting point)
+    // Bounding box from startPoint → current pointer. One setCoordinates call
+    // marks the feature dirty once; five updateCoordinate calls did it five times.
+    // Polygon stores rings without a closing vertex (getCoordinates re-closes them).
+    if (!state.startPoint) return;
+
+    const { lng, lat } = e.lngLat;
+    // Skip no-op moves (same cell as last update) to avoid useless store/render work
+    if (
+      state.lastPoint &&
+      state.lastPoint[0] === lng &&
+      state.lastPoint[1] === lat
+    ) {
+      return;
     }
+    state.lastPoint = [lng, lat];
+
+    const [startLng, startLat] = state.startPoint;
+    state.rectangle.setCoordinates([
+      [
+        [startLng, startLat],
+        [lng, startLat],
+        [lng, lat],
+        [startLng, lat],
+      ],
+    ]);
   },
   // Whenever a user clicks on a key while focused on the map, it will be sent here
   onKeyUp: function (state, e) {
-    if (e.keyCode === 27) return this.changeMode("simple_select");
+    if (e.key === "Escape" || e.keyCode === 27) {
+      return this.changeMode("simple_select");
+    }
   },
   onStop: function (state) {
     doubleClickZoom.enable(this);
@@ -131,7 +132,8 @@ const DrawRectangle = {
     // check to see if we've deleted this feature
     if (this.getFeature(state.rectangle.id) === undefined) return;
 
-    // Verify if rectangle has 5 valid closed coordinates with non-zero width and height
+    // getCoordinates() re-closes the ring (4 corners → 5 positions).
+    // Require non-zero width and height via opposite corners [0] vs [2].
     const coords = state.rectangle.getCoordinates()[0];
     const isValidRectangle =
       coords &&
@@ -152,7 +154,8 @@ const DrawRectangle = {
     geojson.properties.active = isActivePolygon ? "true" : "false";
     if (!isActivePolygon) return display(geojson);
 
-    // Only render the rectangular polygon if it has the starting point and valid coordinates
+    // Only render after the first corner is set and the ring has 4 corners
+    // (getCoordinates re-closes → length 5)
     if (!state.startPoint) return;
     const coords = state.rectangle.getCoordinates()[0];
     if (!coords || coords.length < 5) return;
