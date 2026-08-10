@@ -35,6 +35,7 @@ html-reports/
 *.env.dev
 *.env.staging
 *.env.edge
+*.env.prod
 package-lock.json
 tsconfig.node.tsbuildinfo
 

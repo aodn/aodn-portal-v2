@@ -81,6 +81,14 @@ We are using [material ui](https://mui.com/material-ui/) and our configuration t
 
 See [`playwright/README.md`](./playwright/README.md).
 
+## SEO
+
+See [`src/seo/README.md`](./src/seo/README.md). Quick reference:
+
+- `yarn seo:artifacts` — build sitemap.xml + pre-rendered detail pages into `dist/`
+- `yarn seo:verify [site-url]` — validate `dist/`, or a deployed site when given its URL
+- `yarn seo:gsc` — submit the sitemap / check indexing via Google Search Console
+
 ## Commit
 
 We are using [gitmoji](https://gitmoji.dev/)(OPTIONAL) with husky and commitlint. Here you have an example of the most used ones:

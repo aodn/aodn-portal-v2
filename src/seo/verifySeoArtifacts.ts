@@ -1,0 +1,211 @@
+/**
+ * Verifies the SEO state, printing every problem and exiting non-zero:
+ *   yarn seo:verify                        checks dist/ after seo:artifacts
+ *   yarn seo:verify https://<site>         checks the deployed site
+ */
+
+import { readdir, readFile } from "fs/promises";
+import path from "path";
+import { fileURLToPath } from "url";
+import { BASE_URL } from "./constants";
+import { sampleEvenly } from "./SearchConsoleUtils";
+
+// The workflow refuses to publish fewer pages — keep in sync with seo.yml
+const MIN_PAGES = 10000;
+const DIST_SAMPLE_SIZE = 20;
+const LIVE_SAMPLE_SIZE = 3;
+
+export const checkSitemap = (xml: string, minUrls = MIN_PAGES) => {
+  const problems: string[] = [];
+  const urls = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(
+    (match) => match[1]
+  );
+  if (!xml.startsWith("<?xml")) {
+    problems.push("does not start with an XML declaration");
+  }
+  if (!urls.includes(`${BASE_URL}/`)) {
+    problems.push("is missing the home page");
+  }
+  if (urls.length < minUrls) {
+    problems.push(`has ${urls.length} URLs, expected at least ${minUrls}`);
+  }
+  const foreign = urls.filter((url) => !url.startsWith(`${BASE_URL}/`));
+  if (foreign.length > 0) {
+    problems.push(
+      `${foreign.length} URLs are not under ${BASE_URL}, e.g. ${foreign[0]}`
+    );
+  }
+  return { urls, problems };
+};
+
+export const checkDetailPage = (html: string, uuid: string): string[] => {
+  const problems: string[] = [];
+  const title = html.match(/<title>(.*?)<\/title>/s)?.[1];
+  if (!title || title.trim() === "AODN Portal") {
+    problems.push("title is missing or still the generic site title");
+  }
+  if (
+    !html.includes(
+      `<link rel="canonical" href="${BASE_URL}/details/${uuid}" />`
+    )
+  ) {
+    problems.push("canonical does not point at this record");
+  }
+  if (!/<meta name="description" content="[^"]/.test(html)) {
+    problems.push("meta description is missing or empty");
+  }
+  const jsonLd = html.match(
+    /<script type="application\/ld\+json">(.*?)<\/script>/s
+  )?.[1];
+  if (!jsonLd) {
+    problems.push("Dataset JSON-LD is missing");
+  } else {
+    try {
+      const dataset = JSON.parse(jsonLd);
+      if (dataset["@type"] !== "Dataset") {
+        problems.push(
+          `JSON-LD @type is "${dataset["@type"]}", expected "Dataset"`
+        );
+      }
+      if (!dataset.name || !dataset.description) {
+        problems.push("JSON-LD is missing name or description");
+      }
+      if (dataset.url !== `${BASE_URL}/details/${uuid}`) {
+        problems.push("JSON-LD url does not match the record");
+      }
+    } catch {
+      problems.push("Dataset JSON-LD is not valid JSON");
+    }
+  }
+  if (!html.includes('<div id="root"')) {
+    problems.push("page no longer boots the app shell");
+  }
+  return problems;
+};
+
+export const checkHomePage = (html: string, production: boolean): string[] => {
+  const problems: string[] = [];
+  if (!/<meta name="description" content="[^"]/.test(html)) {
+    problems.push("meta description is missing or empty");
+  }
+  const noindex = /<meta name="robots" content="noindex/.test(html);
+  if (production && noindex) {
+    problems.push("production must not carry noindex");
+  }
+  if (!production && !noindex) {
+    problems.push("non-prod must carry noindex so Google drops it");
+  }
+  return problems;
+};
+
+export const checkRobotsTxt = (text: string, production: boolean): string[] => {
+  const problems: string[] = [];
+  // A blocked page can never be de-indexed: Google cannot fetch its noindex tag
+  if (/^\s*Disallow:\s*\/\s*$/m.test(text)) {
+    problems.push('blocks all crawling ("Disallow: /")');
+  }
+  if (production && !/^Sitemap:/m.test(text)) {
+    problems.push("production robots.txt should point at the sitemap");
+  }
+  return problems;
+};
+
+const report = (failures: string[], okSummary: string) => {
+  if (failures.length > 0) {
+    for (const failure of failures) console.error(`FAIL ${failure}`);
+    throw new Error(`${failures.length} problems found`);
+  }
+  console.log(`OK: ${okSummary}`);
+};
+
+const verifyDist = async (distDir: string) => {
+  const failures: string[] = [];
+
+  const xml = await readFile(path.join(distDir, "sitemap.xml"), "utf8").catch(
+    () => null
+  );
+  let urls: string[] = [];
+  if (xml === null) {
+    failures.push("sitemap.xml: missing — run yarn seo:artifacts first");
+  } else {
+    const sitemap = checkSitemap(xml);
+    urls = sitemap.urls;
+    failures.push(...sitemap.problems.map((p) => `sitemap.xml: ${p}`));
+  }
+
+  const detailsDir = path.join(distDir, "details");
+  const files = await readdir(detailsDir).catch(() => [] as string[]);
+  if (files.length < MIN_PAGES) {
+    failures.push(
+      `details: ${files.length} pages, expected at least ${MIN_PAGES}`
+    );
+  }
+
+  const sampled = sampleEvenly(files, DIST_SAMPLE_SIZE);
+  for (const uuid of sampled) {
+    const html = await readFile(path.join(detailsDir, uuid), "utf8");
+    failures.push(
+      ...checkDetailPage(html, uuid).map((p) => `details/${uuid}: ${p}`)
+    );
+    if (urls.length > 0 && !urls.includes(`${BASE_URL}/details/${uuid}`)) {
+      failures.push(`details/${uuid}: not listed in sitemap.xml`);
+    }
+  }
+
+  report(
+    failures,
+    `${urls.length} sitemap URLs, ${files.length} detail pages, ${sampled.length} sampled pages all valid`
+  );
+};
+
+const verifyLive = async (site: string) => {
+  const production = site === BASE_URL;
+  const failures: string[] = [];
+  const fetchText = async (pathname: string) =>
+    (await fetch(`${site}${pathname}`)).text();
+
+  failures.push(
+    ...checkHomePage(await fetchText("/"), production).map((p) => `/: ${p}`)
+  );
+  failures.push(
+    ...checkRobotsTxt(await fetchText("/robots.txt"), production).map(
+      (p) => `robots.txt: ${p}`
+    )
+  );
+
+  const { urls, problems } = checkSitemap(await fetchText("/sitemap.xml"));
+  failures.push(...problems.map((p) => `sitemap.xml: ${p}`));
+
+  const detailUuids = urls
+    .filter((url) => url.includes("/details/"))
+    .map((url) => url.split("/details/")[1]);
+  for (const uuid of sampleEvenly(detailUuids, LIVE_SAMPLE_SIZE)) {
+    failures.push(
+      ...checkDetailPage(await fetchText(`/details/${uuid}`), uuid).map(
+        (p) => `details/${uuid}: ${p}`
+      )
+    );
+  }
+
+  report(
+    failures,
+    `${site} (${production ? "production" : "non-prod"}) — home, robots.txt, ${urls.length} sitemap URLs and ${Math.min(LIVE_SAMPLE_SIZE, detailUuids.length)} sampled detail pages all valid`
+  );
+};
+
+const isRunDirectly =
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (isRunDirectly) {
+  const [siteArg] = process.argv.slice(2);
+  const run = siteArg?.startsWith("http")
+    ? verifyLive(siteArg.replace(/\/+$/, ""))
+    : verifyDist(
+        path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../dist")
+      );
+  run.catch((error) => {
+    console.error(String(error));
+    process.exit(1);
+  });
+}

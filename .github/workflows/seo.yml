@@ -1,13 +1,13 @@
 name: Publish SEO Artifacts
 
-# Builds sitemap.xml and the pre-rendered /details pages from the live records and
-# publishes them straight to S3, independently of the website bundle.
-#
-# Manual only until it has proven itself; then add a nightly schedule for freshness
-# and a workflow_run on the deploy workflows, so the pre-rendered pages pick up the
-# new bundle's hashed asset URLs.
+# Builds sitemap.xml and the pre-rendered /details pages from the live records
+# and publishes them straight to S3, independently of app deploys.
+# What the artifacts are and how to test before publishing: src/seo/README.md
 
 on:
+  schedule:
+    # Weekly refresh, Monday morning Hobart time (GitHub cron is UTC)
+    - cron: "0 20 * * 0"
   workflow_dispatch:
 
 permissions:
@@ -28,9 +28,8 @@ jobs:
         include:
           - environment: edge
             site: https://portal-edge.aodn.org.au
-          # Enable once the edge run has proven the OIDC/CloudFront permissions
-          # - environment: production
-          #   site: https://portal-beta.aodn.org.au
+          - environment: production
+            site: https://portal-beta.aodn.org.au
     environment: ${{ matrix.environment }}
     steps:
       - name: Checkout
@@ -62,10 +61,8 @@ jobs:
       - name: Generate sitemap.xml and pre-rendered detail pages
         run: |
           yarn seo:artifacts
-          # A good run is ~15000 pages; publishing fewer would prune the live ones
-          page_count=$(find dist/details -type f | wc -l)
-          [ "$page_count" -ge 10000 ] \
-            || { echo "::error title=too few pages::generated $page_count, expected ~15000"; exit 1; }
+          # Same checks a developer runs locally; refuses to publish a bad batch
+          yarn seo:verify
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
@@ -99,9 +96,16 @@ jobs:
           # reads like the publish failed. Needs cloudfront:GetInvalidation.
           aws cloudfront wait invalidation-completed --distribution-id ${{ vars.DISTRIBUTION_ID }} --id ${{ steps.invalidation.outputs.id }} --region ${{ vars.AWS_REGION }} \
             || { echo "::error title=could not confirm the invalidation::the artifacts ARE published (see the step above); only this check failed — see the AWS error above"; exit 1; }
-          # CloudFront answers 200 with index.html for a missing file, so check the content
-          curl -s "$SITE/sitemap.xml" | grep -q '<urlset' \
-            || { echo "::error title=sitemap.xml not live::$SITE/sitemap.xml is not being served"; exit 1; }
-          first_detail_uuid=$(curl -s "$SITE/sitemap.xml" | grep -o '/details/[^<]*' | head -1 | cut -d/ -f3)
-          curl -s "$SITE/details/$first_detail_uuid" | grep -q 'application/ld+json' \
-            || { echo "::error title=pre-rendered detail pages not live::$SITE/details/$first_detail_uuid has no Dataset JSON-LD in the served HTML"; exit 1; }
+          # CloudFront answers 200 with index.html for a missing file, so verify
+          # the served content, not status codes — same checks as seo:verify locally
+          yarn seo:verify "$SITE"
+
+      # Publishing does not make Google index the pages — this reports coverage
+      # so an indexing stall is noticed. Enable once the sitemap is live.
+      # - name: Submit sitemap and report index coverage in Search Console
+      #   if: matrix.environment == 'production'
+      #   env:
+      #     GSC_SERVICE_ACCOUNT_KEY: ${{ secrets.GSC_SERVICE_ACCOUNT_KEY }}
+      #   run: |
+      #     yarn seo:gsc submit
+      #     yarn seo:gsc inspect 50

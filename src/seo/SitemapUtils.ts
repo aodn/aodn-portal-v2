@@ -1,9 +1,6 @@
 /**
- * Generates dist/sitemap.xml so crawlers can discover /details/<uuid> pages.
- * Runs via generateSitemapPlugin in vite.config.ts (prod build only), or
- * standalone: npx tsx src/utils/seo/SitemapUtils.ts
- *
- * BASE_URL comes from constants.ts; keep robots.prod.txt in sync with it.
+ * Builds dist/sitemap.xml listing the home page and every /details/<uuid>.
+ * Standalone: npx tsx src/seo/SitemapUtils.ts — see README.md
  */
 
 import { writeFile, mkdir } from "fs/promises";
@@ -85,7 +82,6 @@ const fetchJsonWithRetry = async (url: string): Promise<CollectionsPage> => {
   }
 };
 
-// Same page_size/search_after pagination the portal search uses
 export const fetchAllCollections = async (
   properties = "id"
 ): Promise<OgcCollection[]> => {
@@ -138,12 +134,11 @@ export const toSitemapXml = (uuids: string[], generatedAt = new Date()) => {
   ].join("\n");
 };
 
-// Pass collections in to reuse a fetch the caller has already paid for
 export const generateSitemap = async (
   outDir: string,
-  collections?: OgcCollection[]
+  prefetched?: OgcCollection[]
 ) => {
-  const uuids = (collections ?? (await fetchAllCollections()))
+  const uuids = (prefetched ?? (await fetchAllCollections()))
     .map((collection) => collection.id)
     .filter((id): id is string => Boolean(id));
   if (uuids.length === 0) {
@@ -164,7 +159,6 @@ export const generateSitemap = async (
   console.log(`Wrote ${uuids.length + 1} URLs to ${outFile}`);
 };
 
-// Standalone entry point; no-op when imported by vite.config.ts
 const isRunDirectly =
   process.argv[1] &&
   path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
@@ -172,7 +166,7 @@ const isRunDirectly =
 if (isRunDirectly) {
   const outDir = path.resolve(
     path.dirname(fileURLToPath(import.meta.url)),
-    "../../../dist"
+    "../../dist"
   );
   generateSitemap(outDir).catch((error) => {
     console.error(error);

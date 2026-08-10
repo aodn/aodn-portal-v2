@@ -4,7 +4,7 @@ import react from "@vitejs/plugin-react-swc";
 import eslint from "vite-plugin-eslint";
 import path from "path";
 import fs from "fs";
-import { seoPlugins } from "./src/utils/seo/vitePlugins";
+import { seoPlugins } from "./src/seo/vitePlugins";
 
 // https://vitejs.dev/config/
 export default ({ mode }: ConfigEnv) => {
