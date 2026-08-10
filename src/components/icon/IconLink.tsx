@@ -4,9 +4,7 @@ import { portalTheme } from "../../styles";
 export const IconLink: ComponentType<SVGProps<SVGSVGElement>> = ({
   color = portalTheme.palette.grey700,
 }: SVGProps<SVGSVGElement>) => (
-  <span
-    style={{ paddingTop: 6, display: "inline-flex", boxSizing: "border-box" }}
-  >
+  <span style={{ display: "inline-flex" }}>
     <svg
       width={20}
       height={20}

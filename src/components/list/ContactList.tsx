@@ -27,6 +27,7 @@ export const mapContactsToCollapseItems = (
       return (
         <CollapseItem
           key={index}
+          arrowAlignment="top"
           titleComponent={
             <CollapseContactItemTitle
               email={email}

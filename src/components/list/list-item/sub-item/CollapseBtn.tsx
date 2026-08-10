@@ -9,6 +9,9 @@ interface CollapseBtnProps {
   isExpanded: boolean;
 }
 
+// Invisible area around the 36x23 button that reaches the 44px touch target
+const TOUCH_AREA_EXTENSION = "-11px -8px";
+
 const CollapseBtn: React.FC<CollapseBtnProps> = ({ onClick, isExpanded }) => {
   return (
     <IconButton
@@ -17,6 +20,12 @@ const CollapseBtn: React.FC<CollapseBtnProps> = ({ onClick, isExpanded }) => {
       edge="end"
       sx={{
         ":hover": { bgcolor: "transparent" },
+        position: "relative",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          inset: TOUCH_AREA_EXTENSION,
+        },
       }}
     >
       {isExpanded ? (

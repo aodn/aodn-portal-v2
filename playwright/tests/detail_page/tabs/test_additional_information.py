@@ -158,3 +158,54 @@ def test_additional_information_sections_in_mobile(
     expect(keywords_list.get_by_text(keyword_value)).to_be_visible()
 
     expect(detail_page.get_text(lineage_value)).to_be_visible()
+
+
+@pytest.mark.parametrize(
+    'uuid, chip',
+    [
+        (
+            '1fba3a57-35f4-461b-8a0e-551af229714e',
+            'Distributor',
+        ),
+    ],
+)
+def test_collapse_item_chip_aligns_with_arrow_in_desktop(
+    desktop_page: Page,
+    uuid: str,
+    chip: str,
+) -> None:
+    """
+    Verifies the label chip sits right before the collapse arrow, keeping
+    the same spacing as between the arrow and the row's right end.
+    """
+    detail_page = DetailPage(desktop_page)
+
+    detail_page.load(uuid)
+    additional_info = detail_page.tabs.additional_info
+    additional_info.tab.click()
+
+    chip_locator = (
+        desktop_page.get_by_test_id(f'label-chip-{chip}')
+        .locator('visible=true')
+        .first
+    )
+    expect(chip_locator).to_be_visible()
+    row = chip_locator.locator(
+        'xpath=ancestor::*[@data-testid="collapseItem"]'
+    )
+    arrow = row.get_by_label('expand or collapse').locator('svg')
+
+    chip_box = chip_locator.bounding_box()
+    arrow_box = arrow.bounding_box()
+    row_box = row.locator('xpath=..').bounding_box()
+
+    gap_chip_to_arrow = arrow_box['x'] - (chip_box['x'] + chip_box['width'])
+    gap_arrow_to_edge = (row_box['x'] + row_box['width']) - (
+        arrow_box['x'] + arrow_box['width']
+    )
+    assert abs(gap_chip_to_arrow - gap_arrow_to_edge) <= 2
+
+    # Chip and arrow sit on the same (first) title line
+    chip_center_y = chip_box['y'] + chip_box['height'] / 2
+    arrow_center_y = arrow_box['y'] + arrow_box['height'] / 2
+    assert abs(chip_center_y - arrow_center_y) <= 6
