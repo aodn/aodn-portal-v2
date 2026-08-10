@@ -281,6 +281,8 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
     () => ({
       title: "Show Less",
       icon: IconLessTopics,
+      iconSize: 42,
+      iconOpacity: 0.8,
       handler: () => setShowAllTopics((prev) => !prev),
     }),
     [setShowAllTopics]
@@ -290,6 +292,8 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
     () => ({
       title: "Show All",
       icon: IconAllTopics,
+      iconSize: 42,
+      iconOpacity: 0.8,
       handler: () => setShowAllTopics((prev) => !prev),
     }),
     [setShowAllTopics]

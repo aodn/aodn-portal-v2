@@ -117,12 +117,18 @@ class BasePage:
         return self.get_collapse_list(item_list).get_by_test_id('collapseItem')
 
     def get_collapse_item_title(self, title: str) -> Locator:
-        """Returns the given collapse item title"""
-        return self.page.get_by_test_id(f'collapse-item-{title}')
+        """Returns the expand/collapse arrow of the given collapse item"""
+        return (
+            self.page.get_by_test_id(f'collapse-item-{title}')
+            .locator('xpath=ancestor::*[@data-testid="collapseItem"]')
+            .get_by_label('expand or collapse')
+        )
 
     def get_collapse_item_button(self, title: str) -> Locator:
         """Returns the given collapse item button"""
-        return self.page.get_by_test_id(f'collapse-btn-{title}')
+        return self.page.get_by_test_id(f'collapse-btn-{title}').get_by_role(
+            'button'
+        )
 
     def scroll_to_bottom(self) -> None:
         """Scroll to the bottom of the page"""

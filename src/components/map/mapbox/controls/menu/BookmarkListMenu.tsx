@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from "react";
 import { Box, IconButton, Popper } from "@mui/material";
 import { ControlProps, EVENT_MENU, MenuClickedEvent } from "./Definition";
-import { borderRadius } from "../../../../../styles/constants";
+import { borderRadius, zIndex } from "../../../../../styles/constants";
 import { eventEmitter, switcherIconButtonSx } from "./MenuControl";
 import MenuHintTooltip from "./MenuHintTooltip";
 import BookmarkListAccordionGroup, {
@@ -12,8 +12,7 @@ import { BookmarkIcon } from "../../../../../assets/icons/map/bookmark";
 import useBreakpoint from "../../../../../hooks/useBreakpoint";
 
 export interface BookmarkListMenuBasicType
-  extends ControlProps,
-    BookmarkListAccordionGroupBasicType {}
+  extends ControlProps, BookmarkListAccordionGroupBasicType {}
 
 interface BookmarkListMenuProps extends BookmarkListMenuBasicType {}
 
@@ -52,13 +51,15 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
           <BookmarkIcon color={open ? "white" : undefined} />
         </IconButton>
       </MenuHintTooltip>
+      {/* Rendered via portal (outside the mapbox control container) so
+          mapbox-gl.css button styles cannot leak into the list content */}
       <Popper
         id="bookmark-list"
         open={open}
         anchorEl={anchorEl}
         role={undefined}
         placement="left-start"
-        disablePortal
+        sx={{ zIndex: zIndex.MAP_CONTROL }}
         modifiers={[
           {
             name: "offset",

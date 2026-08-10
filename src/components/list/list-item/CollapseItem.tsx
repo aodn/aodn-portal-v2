@@ -14,6 +14,7 @@ interface CollapseItemProps {
   titleComponent?: ReactNode; // Allow custom title component
   titleColor?: string; // Custom title color
   labels?: string[]; // Labels to display next to title
+  arrowAlignment?: "top" | "center"; // "top" aligns arrow with the first title line
 }
 
 const CollapseItem: React.FC<CollapseItemProps> = ({
@@ -25,6 +26,7 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
   onIconClick,
   titleComponent,
   labels,
+  arrowAlignment = "center",
 }) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(isOpen);
 
@@ -56,18 +58,11 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
 
   return (
     <ItemBaseGrid>
-      <Grid container data-testid="collapseItem">
+      <Grid container data-testid="collapseItem" sx={{ width: "100%" }}>
         {/* Title content area (icon + title) */}
-        <Grid
-          onClick={toggleExpanded}
-          size={{
-            xs: children ? 10 : 12,
-            sm: children ? 11 : 12,
-          }}
-        >
+        <Grid size={children ? "grow" : 12}>
           <Box
             sx={{
-              cursor: "pointer",
               display: "flex",
               alignItems: "flex-start",
               gap: 1,
@@ -104,24 +99,27 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
               sx={{
                 display: "flex",
                 justifyContent: "flex-end",
-                alignItems: "center",
+                alignItems: arrowAlignment === "top" ? "flex-start" : "center",
+                // Center the arrow against the label chip on the first line
+                pt: arrowAlignment === "top" ? "4px" : 0,
+                // Keep the same visual gap on both sides of the arrow
+                pl: "10px",
               }}
               data-testid={`collapse-btn-${
                 (titleComponent as any)?.props?.link?.title ??
                 title ??
                 "[ NO TITLE ]"
               }`}
-              size={{
-                xs: 2,
-                sm: 1,
-              }}
+              size="auto"
             >
               <CollapseBtn onClick={toggleExpanded} isExpanded={isExpanded} />
             </Grid>
 
             {/* Collapsible content */}
             <Grid size={12}>
-              <Collapse in={isExpanded}>{children}</Collapse>
+              <Collapse in={isExpanded}>
+                <Box sx={{ pt: "10px" }}>{children}</Box>
+              </Collapse>
             </Grid>
           </>
         )}

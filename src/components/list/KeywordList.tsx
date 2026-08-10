@@ -19,6 +19,7 @@ const KeywordList: React.FC<KeywordListProps> = ({
         title={keyword.title}
         key={index}
         labels={[keyword.description]}
+        arrowAlignment="top"
       >
         {keyword.content && keyword.content.length > 0
           ? keyword.content.map((line, index) => (

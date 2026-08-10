@@ -73,7 +73,8 @@ const LinkCard: FC<LinkCardProps> = ({
       >
         {icon && link.getIcon && (
           <Box display="flex" alignItems="center">
-            <Box width={27}>
+            {/* Flex removes the inline baseline gap that offsets the icon */}
+            <Box width={27} display="flex">
               {typeof link.getIcon() === "string" ? (
                 <img src={link.getIcon() as string} alt={"link icon"} />
               ) : (

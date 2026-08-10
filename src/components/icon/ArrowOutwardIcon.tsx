@@ -16,6 +16,7 @@ export const ArrowOutwardIcon: ComponentType<SVGProps<SVGSVGElement>> = ({
     <path
       d="M1 13.5L13.5 1M13.5 1H4.125M13.5 1V10.375"
       stroke={color}
+      strokeWidth="1.1"
       strokeLinecap="square"
     />
   </svg>
