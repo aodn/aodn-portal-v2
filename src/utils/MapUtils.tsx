@@ -12,7 +12,10 @@ import {
   MapDefaultConfig,
 } from "../components/map/mapbox/constants";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
-import { DRAW_RECTANGLE_MODE } from "../components/map/mapbox/controls/menu/DrawRect";
+import {
+  DRAW_POLYGON_MODE,
+  DRAW_RECTANGLE_MODE,
+} from "../components/map/mapbox/controls/menu/DrawRect";
 
 const DEFAULT_MAPBOX_TEXT_FONT = [
   "Open Sans Regular",
@@ -36,6 +39,7 @@ const isFontWeightAtLeastMedium = (
  * and Arial Unicode faces used elsewhere in this app (`MapboxWorldLayer`, `SpatialExtents`, etc.).
  *
  * @param cssFontFamily - CSS `font-family` string (may include `var()`, quotes, fallbacks).
+ * @param options
  * @param options.fontWeight - MUI / CSS weight; values ≥ 500 pick a bolder Mapbox stack when available.
  */
 export const cssFontFamilyToMapboxTextFont = (
@@ -221,18 +225,43 @@ export const overallBoundingBox = (
   }
   return bbox[0];
 };
+const DRAW_INTERACTION_MODES = new Set([
+  DRAW_RECTANGLE_MODE,
+  DRAW_POLYGON_MODE,
+  "direct_select",
+]);
+
 /**
- * This is use to check if map have inserted the MapboxDraw control and is current set to draw rectangle mode
- * @param map
+ * True when MapboxDraw interaction should block data-layer hover/click popups:
+ * - actively drawing bbox/polygon
+ * - editing vertices (`direct_select`)
+ * - a drawn feature is selected/highlighted (`simple_select` with selection)
+ *
+ * Popups resume in idle `simple_select` with nothing selected.
  */
-export const isDrawModeRectangle = (
+export const isMapDrawModeActive = (
   map: MapboxMap | null | undefined
 ): boolean => {
   if (!map) return false;
   // The control is the instance we added with `map.addControl(draw)`
-  const ctrl = map._controls?.find((c: any) => c instanceof MapboxDraw);
-  return (ctrl as unknown as MapboxDraw)?.getMode() === DRAW_RECTANGLE_MODE;
+  const ctrl = map._controls?.find((c: any) => c instanceof MapboxDraw) as
+    | MapboxDraw
+    | undefined;
+  if (!ctrl) return false;
+
+  const mode = ctrl.getMode?.();
+  if (mode && DRAW_INTERACTION_MODES.has(mode)) return true;
+
+  // Highlighted/selected geometry (ready to drag or enter vertex edit)
+  try {
+    return (ctrl.getSelectedIds?.() ?? []).length > 0;
+  } catch {
+    return false;
+  }
 };
+
+/** @deprecated Prefer {@link isMapDrawModeActive} (draw + edit + selection). */
+export const isDrawModeRectangle = isMapDrawModeActive;
 // Mapbox do not create a bbox box align with EPSG:3857 if you use the bounds value, you need to adjust it
 // with functions, however, if you use the url directly with "{bbox-epsg-3857}", then mapbox will do the cal for you.
 // in case you are not able to use the "{bbox-epsg-3857}" then you need to do the cal yourself

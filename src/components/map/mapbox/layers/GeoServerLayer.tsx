@@ -47,7 +47,7 @@ import MapLayerSelect from "../component/MapLayerSelect";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { ErrorResponse } from "@/utils/ErrorBoundary";
 import { SelectItem } from "../../../common/dropdown/CommonSelect";
-import { boundingBoxInEpsg3857, isDrawModeRectangle } from "@/utils/MapUtils";
+import { boundingBoxInEpsg3857, isMapDrawModeActive } from "@/utils/MapUtils";
 import { checkEmptyArray } from "@/utils/Helpers";
 import AdminScreenContext from "../../../admin/AdminScreenContext";
 import { HttpStatusCode } from "axios";
@@ -493,8 +493,8 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     };
 
     const handlePopup = (event: MapMouseEvent) => {
-      // If user drawing do not popup info box
-      if (!map || isDrawModeRectangle(map)) return;
+      // Suppress feature popup while drawing bbox/polygon selection
+      if (!map || isMapDrawModeActive(map)) return;
 
       const request: MapFeatureRequest = {
         uuid: config.uuid || "",
@@ -546,11 +546,20 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
         });
     };
 
+    const onDrawInteractionChange = () => {
+      if (isMapDrawModeActive(map)) {
+        cleanPopup();
+      }
+    };
+
     if (map) {
       // Register click handler if layer should be visible
       if (visible) {
         map?.on<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
       }
+
+      map.on("draw.modechange", onDrawInteractionChange);
+      map.on("draw.selectionchange", onDrawInteractionChange);
 
       // Handle visibility changes and layer field fetching on IDLE
       // Given the useEffect run in order, the layer creation is call via MapEventEnum.IDLE
@@ -572,6 +581,8 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     }
     return () => {
       map?.off<MapMouseEventType>(MapEventEnum.CLICK, handlePopup);
+      map?.off("draw.modechange", onDrawInteractionChange);
+      map?.off("draw.selectionchange", onDrawInteractionChange);
       cleanPopup();
     };
   }, [

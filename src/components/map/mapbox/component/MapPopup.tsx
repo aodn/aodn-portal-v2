@@ -16,10 +16,10 @@ import AppTheme from "@/styles/theme";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "@/app/store/hooks";
 import ComplexMapHoverTip from "../../../common/hover-tip/ComplexMapHoverTip";
-import { TabNavigation } from "../../../../hooks/useTabNavigation";
+import { TabNavigation } from "@/hooks/useTabNavigation";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
-import { isDrawModeRectangle } from "../../../../utils/MapUtils";
-import { zIndex } from "../../../../styles/constants";
+import { isMapDrawModeActive } from "@/utils/MapUtils";
+import { zIndex } from "@/styles/constants";
 
 interface MapPopupProps {
   layerId: string;
@@ -154,7 +154,7 @@ const MapPopup: React.FC<MapPopupProps> = memo(
       };
 
       const onPointMouseEnter = (ev: MapMouseEvent) => {
-        if (!ev.target || !map || isDrawModeRectangle(map)) return;
+        if (!ev.target || !map || isMapDrawModeActive(map)) return;
 
         ev.target.getCanvas().style.cursor = "pointer";
         if (ev.features && ev.features.length > 0) {
@@ -202,6 +202,12 @@ const MapPopup: React.FC<MapPopupProps> = memo(
       // without the event, the popup will not show but instance still
       // created, so when user enlarge the screen, this popup will work
       // automatically.
+      const onDrawInteractionChange = () => {
+        if (isMapDrawModeActive(map)) {
+          popup.remove();
+        }
+      };
+
       map?.on("mouseleave", layerId, onPointMouseLeave);
       map?.on("mouseenter", layerId, onPointMouseEnter);
 
@@ -209,6 +215,8 @@ const MapPopup: React.FC<MapPopupProps> = memo(
       // Handle case when move out of map without leaving popup box
       // then do a search
       map?.on("sourcedata", onSourceChange);
+      map?.on("draw.modechange", onDrawInteractionChange);
+      map?.on("draw.selectionchange", onDrawInteractionChange);
 
       return () => {
         map?.off("mouseleave", layerId, onPointMouseLeave);
@@ -216,6 +224,8 @@ const MapPopup: React.FC<MapPopupProps> = memo(
 
         map?.off("moveend", onMapMoveEndOrClick);
         map?.off("sourcedata", onSourceChange);
+        map?.off("draw.modechange", onDrawInteractionChange);
+        map?.off("draw.selectionchange", onDrawInteractionChange);
         popup?.remove();
         setTimeout(() => root?.unmount(), 500);
       };
