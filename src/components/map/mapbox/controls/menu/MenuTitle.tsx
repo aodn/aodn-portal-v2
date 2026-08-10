@@ -4,6 +4,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { portalTheme } from "../../../../../styles";
 import { borderRadius } from "../../../../../styles/constants";
 import useBreakpoint from "../../../../../hooks/useBreakpoint";
+import { mapboxIconButtonResetSx } from "./MenuControl";
 
 interface MenuTitleProps {
   title: string;
@@ -11,6 +12,7 @@ interface MenuTitleProps {
 }
 
 export const switcherTitleTypographySx = {
+  position: "relative",
   minHeight: "40px",
   backgroundColor: portalTheme.palette.primary4,
   borderRadius: borderRadius["menuTop"],
@@ -46,9 +48,9 @@ const MenuTitle: React.FC<MenuTitleProps> = ({ title, onClose }) => {
         size="small"
         onClick={handleClose}
         sx={{
-          mt: "4px",
           position: "absolute",
-          right: "4px",
+          right: "6px",
+          ...mapboxIconButtonResetSx,
         }}
       >
         <CloseIcon fontSize="small" />

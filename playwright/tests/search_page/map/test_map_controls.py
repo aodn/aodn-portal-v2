@@ -142,3 +142,47 @@ def test_map_buttons(desktop_page: Page, data_title: str) -> None:
         detail_page.detail_map.daterange_show_hide_menu_button
     ).to_be_visible()
     expect(detail_page.detail_map.draw_rect_menu_button).to_be_visible()
+
+
+def test_map_menu_close_button_keeps_default_style(desktop_page: Page) -> None:
+    """
+    Guards against mapbox-gl.css leaking its square button styles into the
+    menu popup close button, which must keep the default MUI circular shape.
+    """
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
+
+    landing_page.load()
+    landing_page.search.click_search_button()
+    search_page.wait_for_page_stabilization()
+
+    search_page.map.basemap_show_hide_menu.click()
+    close_button = desktop_page.locator(
+        "button:has(svg[data-testid='CloseIcon'])"
+    ).last
+    expect(close_button).to_be_visible()
+    border_radius = close_button.evaluate(
+        'el => getComputedStyle(el).borderRadius'
+    )
+    assert border_radius == '50%'
+
+
+def test_bookmark_list_renders_outside_map_controls(
+    desktop_page: Page,
+) -> None:
+    """
+    The bookmark list popup must render via portal, outside the mapbox
+    control container, so mapbox-gl.css cannot leak into its content.
+    """
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
+
+    landing_page.load()
+    landing_page.search.click_search_button()
+    search_page.wait_for_page_stabilization()
+
+    bookmark_list = desktop_page.locator('#bookmark-list')
+    expect(bookmark_list).to_be_visible()
+    assert (
+        desktop_page.locator('.mapboxgl-ctrl #bookmark-list').count() == 0
+    )

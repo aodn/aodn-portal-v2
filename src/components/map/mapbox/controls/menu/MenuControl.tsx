@@ -61,6 +61,20 @@ export const switcherIconButtonSx = (open: boolean) => ({
   },
 });
 
+export const mapboxIconButtonResetSx = {
+  "&.MuiIconButton-root.MuiIconButton-root": {
+    width: "26px",
+    height: "26px",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: "50%",
+    "&:hover": {
+      backgroundColor: portalTheme.palette.action.hover,
+    },
+  },
+};
+
 export const switcherMenuBoxSx = {
   color: grey["mapMenuText"],
   display: "inline-block",
