@@ -69,42 +69,48 @@ const BookmarkListCard: FC<BookmarkListCardProps> = ({
           </Map>
         </Box>
 
-        <ResultCardButtonGroup
-          content={dataset}
-          isGridView
-          onLinks={(type: OpenType | undefined) =>
-            handleNavigation(dataset.id, detailPageDefault.DATA_ACCESS, type)
-          }
-          onDownload={
-            dataset.hasCloudOptimisedData()
-              ? (type: OpenType | undefined) =>
-                  handleNavigation(dataset.id, detailPageDefault.SUMMARY, type)
-              : undefined
-          }
-          onDetail={(type: OpenType | undefined) =>
-            handleNavigation(dataset.id, detailPageDefault.SUMMARY, type)
-          }
-        />
+        <Box>
+          <ResultCardButtonGroup
+            content={dataset}
+            isGridView
+            onLinks={(type: OpenType | undefined) =>
+              handleNavigation(dataset.id, detailPageDefault.DATA_ACCESS, type)
+            }
+            onDownload={
+              dataset.hasCloudOptimisedData()
+                ? (type: OpenType | undefined) =>
+                    handleNavigation(
+                      dataset.id,
+                      detailPageDefault.SUMMARY,
+                      type
+                    )
+                : undefined
+            }
+            onDetail={(type: OpenType | undefined) =>
+              handleNavigation(dataset.id, detailPageDefault.SUMMARY, type)
+            }
+          />
 
-        <Tooltip title="More detail..." placement="top">
-          <Typography
-            sx={{
-              ...portalTheme.typography.body2Regular,
-              color: portalTheme.palette.grey700,
-              fontWeight: 400,
-              padding: 0,
-              paddingX: padding.small,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              display: "-webkit-box",
-              WebkitLineClamp: "5",
-              WebkitBoxOrient: "vertical",
-              wordBreak: "break-word",
-            }}
-          >
-            {dataset.description}
-          </Typography>
-        </Tooltip>
+          <Tooltip title="More detail..." placement="top">
+            <Typography
+              sx={{
+                ...portalTheme.typography.body2Regular,
+                color: portalTheme.palette.grey700,
+                fontWeight: 400,
+                padding: 0,
+                paddingX: padding.small,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                display: "-webkit-box",
+                WebkitLineClamp: "5",
+                WebkitBoxOrient: "vertical",
+                wordBreak: "break-word",
+              }}
+            >
+              {dataset.description}
+            </Typography>
+          </Tooltip>
+        </Box>
       </Stack>
     </Box>
   );

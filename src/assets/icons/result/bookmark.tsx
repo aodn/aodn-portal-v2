@@ -1,15 +1,5 @@
 import { ComponentType, SVGProps } from "react";
 
-// Both variants draw the same silhouette so the icon does not shift when a
-// dataset is bookmarked: an 18x22 glyph in a 24 viewBox, notch apex 25% up from
-// the bottom edge. Every vertex is a tangent arc — top corners, both bottom
-// corners and the notch apex — rather than a hard vertex softened by
-// strokeLinejoin, which left the bottom corners looking cut off.
-//
-// The outlined path follows the stroke centreline; the filled path is that same
-// polygon offset outward by the half stroke (0.95), so both land on identical
-// outer bounds.
-
 export const BookmarkFilledIcon: ComponentType<SVGProps<SVGSVGElement>> = ({
   color = "currentColor",
   width = 20,
