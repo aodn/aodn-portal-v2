@@ -91,7 +91,6 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
         sx={{
           p: 0,
           gap: "6px",
-          ml: "-14px",
           textTransform: "none",
           opacity: disabled ? 0.5 : 1,
           minWidth: hasText ? "auto" : 0, // Optimize layout when text is hidden
