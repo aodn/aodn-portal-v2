@@ -84,7 +84,7 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
             maxHeight: mapHeight
               ? mapHeight * BOOKMARK_LIST_MAP_HEIGHT_RATIO
               : undefined,
-            overflowY: "auto",
+            overflow: "hidden",
             borderRadius: borderRadius.menu,
             backgroundColor: "#fff",
             zIndex: 1,

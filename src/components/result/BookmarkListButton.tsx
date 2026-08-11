@@ -114,11 +114,13 @@ const BookmarkListButton: FC<BookmarkListButtonProps> = ({
         <Paper
           elevation={1}
           sx={{
+            display: "flex",
+            flexDirection: "column",
             width: "100%",
             borderRadius: "0 0 6px 6px",
             borderTop: `2px solid ${portalTheme.palette.grey300}`,
             maxHeight: BOOKMARK_LIST_RESULTS_MAX_HEIGHT,
-            overflowY: "auto",
+            overflow: "hidden",
           }}
         >
           <BookmarkListAccordionGroup tabNavigation={tabNavigation} hideHead />

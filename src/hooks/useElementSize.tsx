@@ -9,10 +9,9 @@ interface ElementSize {
  * Measures an element with a ResizeObserver.
  *
  * By default, attach the returned `ref` to the element you want measured. Pass
- * `target` instead to measure an element you do not render — one reached
- * through the DOM, say — in which case the returned `ref` goes unused. Because
- * `target` is a dependency, it may resolve after mount (e.g. from a callback
- * ref) and the observer will pick it up when it does.
+ * `target` instead to measure an element you do not render yourself (e.g. a parent element).
+ *
+ * Returns the element's width and height, which update automatically when the element resizes.
  */
 const useElementSize = (target?: HTMLElement | null) => {
   const elementRef = useRef<HTMLDivElement | null>(null);

@@ -41,7 +41,7 @@ const buttonStyles = {
 
 // Memoize font sizes for performance
 const fontSizes = {
-  [ResultCardButtonSize.SMALL]: { icon: "14px", text: "12px" },
+  [ResultCardButtonSize.SMALL]: { icon: "14px", text: "14px" },
   [ResultCardButtonSize.MEDIUM]: { icon: "18px", text: "14px" },
 };
 
@@ -116,7 +116,7 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
             pt={0}
             mt={-0.5}
             whiteSpace="nowrap"
-            sx={buttonStyles}
+            sx={{ ...buttonStyles, fontSize: fontSizes[size].text }}
             data-testid={`result-card-button-${text}`}
           >
             {text}

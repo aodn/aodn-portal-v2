@@ -178,7 +178,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
       sx={{
         width: "100%",
         display: "flex",
-        justifyContent: "space-between",
+        justifyContent: "space-around",
         alignItems: "center",
       }}
     >
