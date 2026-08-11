@@ -6,15 +6,16 @@ import {
   fitToBound,
   fitToDefaultExtent,
   isMapDrawModeActive,
+  MAP_DRAW_INTERACTION_FLAG,
   overallBoundingBox,
+  setMapDrawInteractionActive,
 } from "../MapUtils";
 import { FONT_FAMILIES } from "@/styles/fontsRC8";
 import { Map as MapboxMap } from "mapbox-gl";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
-import {
-  DRAW_POLYGON_MODE,
-  DRAW_RECTANGLE_MODE,
-} from "../../components/map/mapbox/controls/menu/DrawRect";
+
+const DRAW_RECTANGLE_MODE = "draw_rectangle";
+const DRAW_POLYGON_MODE = "draw_polygon";
 
 describe("MapUtils", () => {
   it("cssFontFamilyToMapboxTextFont maps Open Sans token stack to Mapbox glyphs", () => {
@@ -351,6 +352,7 @@ describe("MapUtils", () => {
       draw.getSelectedIds = vi.fn(
         () => selectedIds
       ) as MapboxDraw["getSelectedIds"];
+      draw.changeMode = vi.fn() as MapboxDraw["changeMode"];
       return {
         _controls: [draw],
       } as unknown as MapboxMap;
@@ -385,6 +387,31 @@ describe("MapUtils", () => {
       expect(isMapDrawModeActive(makeMapWithDraw("simple_select", []))).toBe(
         false
       );
+    });
+
+    it("detects duck-typed draw controls when instanceof fails", () => {
+      // Plain object (not MapboxDraw.prototype) — instanceof MapboxDraw is false
+      const draw = {
+        getMode: vi.fn(() => DRAW_POLYGON_MODE),
+        getSelectedIds: vi.fn(() => [] as string[]),
+        changeMode: vi.fn(),
+      };
+      const map = { _controls: [draw] } as unknown as MapboxMap;
+      expect(isMapDrawModeActive(map)).toBe(true);
+    });
+
+    it("honours the DrawRect interaction flag for immediate suppression", () => {
+      const map = { _controls: [] } as unknown as MapboxMap;
+      expect(isMapDrawModeActive(map)).toBe(false);
+
+      setMapDrawInteractionActive(map, true);
+      expect(
+        (map as MapboxMap & Record<string, boolean>)[MAP_DRAW_INTERACTION_FLAG]
+      ).toBe(true);
+      expect(isMapDrawModeActive(map)).toBe(true);
+
+      setMapDrawInteractionActive(map, false);
+      expect(isMapDrawModeActive(map)).toBe(false);
     });
   });
 });

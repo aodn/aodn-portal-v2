@@ -12,10 +12,30 @@ import {
   MapDefaultConfig,
 } from "../components/map/mapbox/constants";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
-import {
-  DRAW_POLYGON_MODE,
-  DRAW_RECTANGLE_MODE,
-} from "../components/map/mapbox/controls/menu/DrawRect";
+
+/** Keep string literals here so MapUtils does not import the DrawRect React module. */
+const DRAW_RECTANGLE_MODE = "draw_rectangle";
+const DRAW_POLYGON_MODE = "draw_polygon";
+
+/**
+ * Flag set on the map instance by {@link setMapDrawInteractionActive} (DrawRect).
+ * Preferred over control inspection: more reliable when `instanceof MapboxDraw`
+ * fails across bundle copies, or `getMode()` is briefly unavailable.
+ */
+export const MAP_DRAW_INTERACTION_FLAG = "__aodnDrawInteractionActive";
+
+/**
+ * Publish whether bbox/polygon draw (or edit/selection) should suppress data popups.
+ * Called from DrawRect when mode/selection changes.
+ */
+export const setMapDrawInteractionActive = (
+  map: MapboxMap | null | undefined,
+  active: boolean
+): void => {
+  if (!map) return;
+  (map as MapboxMap & Record<string, boolean>)[MAP_DRAW_INTERACTION_FLAG] =
+    active;
+};
 
 const DEFAULT_MAPBOX_TEXT_FONT = [
   "Open Sans Regular",
@@ -231,6 +251,41 @@ const DRAW_INTERACTION_MODES = new Set([
   "direct_select",
 ]);
 
+type DrawLikeControl = {
+  getMode?: () => string;
+  getSelectedIds?: () => Array<string | number>;
+  changeMode?: (...args: unknown[]) => unknown;
+  getAll?: () => unknown;
+};
+
+const isDrawLikeControl = (c: unknown): c is DrawLikeControl => {
+  if (!c || typeof c !== "object") return false;
+  const ctrl = c as DrawLikeControl;
+  return (
+    typeof ctrl.getMode === "function" &&
+    typeof ctrl.getSelectedIds === "function" &&
+    typeof ctrl.changeMode === "function"
+  );
+};
+
+const findMapboxDrawControl = (map: MapboxMap): DrawLikeControl | undefined => {
+  const controls = map._controls;
+  if (!controls?.length) return undefined;
+
+  // Prefer instanceof when the same module instance is shared
+  for (const c of controls) {
+    if (c instanceof MapboxDraw) {
+      return c as unknown as DrawLikeControl;
+    }
+  }
+
+  // Duck-type fallback (duplicate package copies break instanceof)
+  for (const c of controls) {
+    if (isDrawLikeControl(c)) return c;
+  }
+  return undefined;
+};
+
 /**
  * True when MapboxDraw interaction should block data-layer hover/click popups:
  * - actively drawing bbox/polygon
@@ -238,24 +293,32 @@ const DRAW_INTERACTION_MODES = new Set([
  * - a drawn feature is selected/highlighted (`simple_select` with selection)
  *
  * Popups resume in idle `simple_select` with nothing selected.
+ *
+ * Prefers the flag published by DrawRect; falls back to inspecting the control.
  */
 export const isMapDrawModeActive = (
   map: MapboxMap | null | undefined
 ): boolean => {
   if (!map) return false;
-  // The control is the instance we added with `map.addControl(draw)`
-  const ctrl = map._controls?.find((c: any) => c instanceof MapboxDraw) as
-    | MapboxDraw
-    | undefined;
+
+  const flagged = (map as MapboxMap & Record<string, boolean | undefined>)[
+    MAP_DRAW_INTERACTION_FLAG
+  ];
+  if (flagged === true) return true;
+  if (flagged === false) {
+    // Explicit idle from DrawRect — still fall through to control check so
+    // transient races (flag cleared slightly early) can re-detect selection.
+  }
+
+  const ctrl = findMapboxDrawControl(map);
   if (!ctrl) return false;
 
-  const mode = ctrl.getMode?.();
-  if (mode && DRAW_INTERACTION_MODES.has(mode)) return true;
-
-  // Highlighted/selected geometry (ready to drag or enter vertex edit)
   try {
+    const mode = ctrl.getMode?.();
+    if (mode && DRAW_INTERACTION_MODES.has(mode)) return true;
     return (ctrl.getSelectedIds?.() ?? []).length > 0;
   } catch {
+    // Control not fully mounted yet (getMode needs events from onAdd)
     return false;
   }
 };
