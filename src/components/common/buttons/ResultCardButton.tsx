@@ -90,7 +90,7 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
         disabled={disabled}
         sx={{
           p: 0,
-          gap: "6px",
+          gap: "10px",
           textTransform: "none",
           opacity: disabled ? 0.5 : 1,
           minWidth: hasText ? "auto" : 0, // Optimize layout when text is hidden
@@ -116,7 +116,13 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
             pt={0}
             mt={-0.5}
             whiteSpace="nowrap"
-            sx={{ ...buttonStyles, fontSize: fontSizes[size].text }}
+            // Label tracks the icon colour, so status buttons (e.g. "On going")
+            // read as one unit rather than a green icon beside a blue label
+            sx={{
+              ...buttonStyles,
+              fontSize: fontSizes[size].text,
+              color: config.color,
+            }}
             data-testid={`result-card-button-${text}`}
           >
             {text}
