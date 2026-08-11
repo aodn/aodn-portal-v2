@@ -10,7 +10,10 @@ import useElementSize from "@/hooks/useElementSize";
 import BookmarkListAccordionGroup from "@/components/bookmark/BookmarkListAccordionGroup";
 import { ExpandLess } from "@/assets/icons/details/expandLess";
 import { ExpandMore } from "@/assets/icons/details/expendMore";
-import { BOOKMARK_LIST_WIDTH_RESULTS } from "./constants";
+import {
+  BOOKMARK_LIST_RESULTS_MAX_HEIGHT,
+  BOOKMARK_LIST_WIDTH_RESULTS,
+} from "./constants";
 import useTabNavigation from "@/hooks/useTabNavigation";
 import BookmarkListHead from "@/components/bookmark/BookmarkListHead";
 import { portalTheme } from "@/styles";
@@ -114,6 +117,8 @@ const BookmarkListButton: FC<BookmarkListButtonProps> = ({
             width: "100%",
             borderRadius: "0 0 6px 6px",
             borderTop: `2px solid ${portalTheme.palette.grey300}`,
+            maxHeight: BOOKMARK_LIST_RESULTS_MAX_HEIGHT,
+            overflowY: "auto",
           }}
         >
           <BookmarkListAccordionGroup tabNavigation={tabNavigation} hideHead />

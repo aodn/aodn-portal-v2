@@ -7,9 +7,13 @@ import MenuHintTooltip from "./MenuHintTooltip";
 import BookmarkListAccordionGroup, {
   BookmarkListAccordionGroupBasicType,
 } from "../../../../bookmark/BookmarkListAccordionGroup";
-import { BOOKMARK_LIST_WIDTH_MAP } from "../../../../result/constants";
+import {
+  BOOKMARK_LIST_MAP_HEIGHT_RATIO,
+  BOOKMARK_LIST_WIDTH_MAP,
+} from "../../../../result/constants";
 import { BookmarkIcon } from "../../../../../assets/icons/map/bookmark";
 import useBreakpoint from "../../../../../hooks/useBreakpoint";
+import useElementSize from "../../../../../hooks/useElementSize";
 
 export interface BookmarkListMenuBasicType
   extends ControlProps, BookmarkListAccordionGroupBasicType {}
@@ -23,6 +27,9 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
   const { isAboveDesktop } = useBreakpoint();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [open, setOpen] = useState<boolean>(isAboveDesktop);
+  const { height: mapHeight } = useElementSize(
+    anchorEl?.closest<HTMLElement>(".mapboxgl-map")
+  );
 
   useEffect(() => {
     // Other menu button clicked, close this menu item
@@ -74,7 +81,9 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
             display: "flex",
             flexDirection: "column",
             width: BOOKMARK_LIST_WIDTH_MAP,
-            maxHeight: "85vh",
+            maxHeight: mapHeight
+              ? mapHeight * BOOKMARK_LIST_MAP_HEIGHT_RATIO
+              : undefined,
             overflowY: "auto",
             borderRadius: borderRadius.menu,
             backgroundColor: "#fff",
