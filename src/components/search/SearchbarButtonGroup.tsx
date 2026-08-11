@@ -9,7 +9,7 @@ import {
 } from "@/app/store/componentParamReducer";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
-import { booleanEqual } from "@turf/boolean-equal";
+import { booleanEqual } from "@turf/turf";
 import { pageReferer } from "../common/constants";
 import { DateRangeIcon } from "../../assets/icons/search/date";
 import { PlaceIcon } from "../../assets/icons/search/location";

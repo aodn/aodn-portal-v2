@@ -5166,6 +5166,7 @@ __metadata:
     geojson: "npm:0.5.0"
     he: "npm:^1.2.0"
     husky: "npm:^9.1.1"
+    immer: "npm:^11.1.8"
     jsdom: "npm:^29.1.1"
     lint-staged: "npm:^15.2.2"
     lodash: "npm:4.17.23"
@@ -8239,6 +8240,13 @@ __metadata:
   version: 11.1.8
   resolution: "immer@npm:11.1.8"
   checksum: 10c0/df971d8a8f6a5312c6dca4a8437e20b3185d6c9cd6830ad526c18ffd50f4037ef8db4f332b0adbcb9f8c5ee2fbe117cf0623e8554e24777105b3cc9faf866d34
+  languageName: node
+  linkType: hard
+
+"immer@npm:^11.1.8":
+  version: 11.1.16
+  resolution: "immer@npm:11.1.16"
+  checksum: 10c0/34670f732f51e465398ec7c64e62a89478565064d9104b789d950ea4e54f6c48c1f9ffa95d002137070878da0c3ad2ecb8e13e8c85a11ef6fa5749945b622f25
   languageName: node
   linkType: hard
 
