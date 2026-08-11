@@ -40,9 +40,9 @@ Before publishing, locally: `yarn test`, then build + `yarn seo:artifacts` +
 `yarn seo:verify` — validates `dist/` without touching S3.
 
 The workflow runs the same checks as steps: `seo:verify` before uploading and
-`seo:verify <site>` after the CloudFront invalidation. A commented-out step is
-ready to submit the sitemap and report index coverage weekly — enable it, with
-the `GSC_SERVICE_ACCOUNT_KEY` secret, once the sitemap is live.
+`seo:verify <site>` after the CloudFront invalidation. On production it then
+submits the sitemap and reports index coverage in the run log (via the
+`GSC_SERVICE_ACCOUNT_KEY` environment secret).
 
 After publishing, against the live site:
 

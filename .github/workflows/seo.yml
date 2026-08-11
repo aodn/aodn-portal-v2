@@ -101,11 +101,11 @@ jobs:
           yarn seo:verify "$SITE"
 
       # Publishing does not make Google index the pages — this reports coverage
-      # so an indexing stall is noticed. Enable once the sitemap is live.
-      # - name: Submit sitemap and report index coverage in Search Console
-      #   if: matrix.environment == 'production'
-      #   env:
-      #     GSC_SERVICE_ACCOUNT_KEY: ${{ secrets.GSC_SERVICE_ACCOUNT_KEY }}
-      #   run: |
-      #     yarn seo:gsc submit
-      #     yarn seo:gsc inspect 50
+      # so an indexing stall is noticed
+      - name: Submit sitemap and report index coverage in Search Console
+        if: matrix.environment == 'production'
+        env:
+          GSC_SERVICE_ACCOUNT_KEY: ${{ secrets.GSC_SERVICE_ACCOUNT_KEY }}
+        run: |
+          yarn seo:gsc submit
+          yarn seo:gsc inspect 50
