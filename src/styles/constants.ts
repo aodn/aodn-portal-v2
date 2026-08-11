@@ -118,7 +118,7 @@ const color = {
     sixTenTransparent: " rgba(255, 255, 255, 0.6  )",
   },
   success: {
-    main: "#4CAF50",
+    main: "#6CBD96",
     light: "#D7EEC6",
   },
   pace: "#D7F4F2",
