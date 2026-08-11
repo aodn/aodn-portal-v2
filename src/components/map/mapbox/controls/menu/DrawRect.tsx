@@ -26,6 +26,7 @@ import { PolygonSelectionIcon } from "@/assets/icons/map/polygon_selection";
 import usePolygonCursorHint from "../../../../../hooks/usePolygonCursorHint";
 import { IControl } from "mapbox-gl";
 import { isValidPolygonFeature } from "@/utils/GeoJsonUtils";
+import { setMapDrawInteractionActive } from "@/utils/MapUtils";
 
 interface DrawControlProps extends ControlProps {
   onChangeFeatures?: (
@@ -77,13 +78,15 @@ const DrawRect: React.FC<DrawControlProps> = ({
       // If tooltip is showing, close it but keep draw mode active
       setShowTooltip(false);
     } else {
+      // Suppress data-layer popups immediately (PMTiles hover etc.)
+      setMapDrawInteractionActive(map, true);
       mapDraw.changeMode(DRAW_RECTANGLE_MODE);
       setShowTooltip(true);
     }
     setActiveTool("bbox");
     activeToolRef.current = "bbox";
     setShowPolygonTooltip(false);
-  }, [mapDraw, showTooltip]);
+  }, [map, mapDraw, showTooltip]);
 
   const handleCloseTooltip = useCallback(() => {
     setShowTooltip(false);
@@ -94,13 +97,14 @@ const DrawRect: React.FC<DrawControlProps> = ({
       // If tooltip is showing, close it but keep draw mode active
       setShowPolygonTooltip(false);
     } else {
+      setMapDrawInteractionActive(map, true);
       mapDraw.changeMode(DRAW_POLYGON_MODE);
       setShowPolygonTooltip(true);
     }
     setActiveTool("polygon");
     activeToolRef.current = "polygon";
     setShowTooltip(false);
-  }, [mapDraw, showPolygonTooltip]);
+  }, [map, mapDraw, showPolygonTooltip]);
 
   const handleClosePolygonTooltip = useCallback(() => {
     setShowPolygonTooltip(false);
@@ -223,39 +227,53 @@ const DrawRect: React.FC<DrawControlProps> = ({
     };
   }, [handleClickOutside, isDrawingMode]);
 
-  // Sync button state with actual draw mode
+  // Sync button state with actual draw mode and publish interaction flag for
+  // data-layer popup suppression (PMTiles hover, GeoServer click, MapPopup).
   useEffect(() => {
+    const publishInteraction = (
+      drawing: boolean,
+      directSelect: boolean,
+      selected: boolean
+    ) => {
+      setMapDrawInteractionActive(map, drawing || directSelect || selected);
+    };
+
     const modePollingInterval = setInterval(() => {
-      const currentMode = mapDraw.getMode();
-      const drawing =
-        currentMode === DRAW_RECTANGLE_MODE ||
-        currentMode === DRAW_POLYGON_MODE;
-      const directSelect = currentMode === "direct_select";
-      const selected = mapDraw.getSelectedIds().length > 0;
-
-      // Update ref for mousemove handler (no re-render needed)
-      syncHasSelected(selected);
-
-      // Only setState when values actually changed to avoid unnecessary re-renders
-      setIsDrawingMode((prev) => (prev !== drawing ? drawing : prev));
-      setIsDirectSelectMode((prev) =>
-        prev !== directSelect ? directSelect : prev
-      );
-      setHasSelectedFeatures((prev) => (prev !== selected ? selected : prev));
-
-      // Check if there are any features to enable/disable trash button
       try {
+        const currentMode = mapDraw.getMode();
+        const drawing =
+          currentMode === DRAW_RECTANGLE_MODE ||
+          currentMode === DRAW_POLYGON_MODE;
+        const directSelect = currentMode === "direct_select";
+        const selected = mapDraw.getSelectedIds().length > 0;
+
+        // Update ref for mousemove handler (no re-render needed)
+        syncHasSelected(selected);
+        publishInteraction(drawing, directSelect, selected);
+
+        // Only setState when values actually changed to avoid unnecessary re-renders
+        setIsDrawingMode((prev) => (prev !== drawing ? drawing : prev));
+        setIsDirectSelectMode((prev) =>
+          prev !== directSelect ? directSelect : prev
+        );
+        setHasSelectedFeatures((prev) => (prev !== selected ? selected : prev));
+
+        // Check if there are any features to enable/disable trash button
         const validFeatureCount = mapDraw
           .getAll()
           .features.filter(isValidPolygonFeature).length;
         const hasFeat = validFeatureCount > 0;
         setHasFeatures((prev) => (prev !== hasFeat ? hasFeat : prev));
-      } catch (e: unknown) {
-        // Ignore error
+      } catch {
+        // getMode throws before MapboxDraw is fully mounted via onAdd
+        publishInteraction(false, false, false);
       }
     }, 100);
-    return () => clearInterval(modePollingInterval);
-  }, [mapDraw, syncHasSelected]);
+    return () => {
+      clearInterval(modePollingInterval);
+      setMapDrawInteractionActive(map, false);
+    };
+  }, [map, mapDraw, syncHasSelected]);
 
   useEffect(() => {
     if (map) {
@@ -281,6 +299,21 @@ const DrawRect: React.FC<DrawControlProps> = ({
         onUpdateOrDelete();
       };
 
+      const publishDrawInteractionFromControl = () => {
+        try {
+          const mode = mapDraw.getMode();
+          const isDrawing =
+            mode === DRAW_RECTANGLE_MODE || mode === DRAW_POLYGON_MODE;
+          const selected = mapDraw.getSelectedIds().length > 0;
+          setMapDrawInteractionActive(
+            map,
+            isDrawing || mode === "direct_select" || selected
+          );
+        } catch {
+          setMapDrawInteractionActive(map, false);
+        }
+      };
+
       const onModeChanged = (e: { mode: string }) => {
         const isDrawing =
           e.mode === DRAW_RECTANGLE_MODE || e.mode === DRAW_POLYGON_MODE;
@@ -289,6 +322,13 @@ const DrawRect: React.FC<DrawControlProps> = ({
         } else {
           map.dragPan.enable();
         }
+        // Immediate flag update (do not wait for the 100ms poll) so PMTiles
+        // hover / other popups suppress as soon as draw mode starts.
+        publishDrawInteractionFromControl();
+      };
+
+      const onSelectionChanged = () => {
+        publishDrawInteractionFromControl();
       };
 
       map.addControl(mapDraw as unknown as IControl);
@@ -296,6 +336,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
       map.on("draw.delete", onUpdateOrDelete);
       map.on("draw.update", onUpdateOrDelete);
       map.on("draw.modechange", onModeChanged);
+      map.on("draw.selectionchange", onSelectionChanged);
 
       return () => {
         try {
@@ -303,7 +344,9 @@ const DrawRect: React.FC<DrawControlProps> = ({
           map.off("draw.delete", onUpdateOrDelete);
           map.off("draw.update", onUpdateOrDelete);
           map.off("draw.modechange", onModeChanged);
+          map.off("draw.selectionchange", onSelectionChanged);
           map.removeControl(mapDraw as unknown as IControl);
+          setMapDrawInteractionActive(map, false);
         } catch (ignored) {
           /* can be ignored */
         }
