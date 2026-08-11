@@ -1,14 +1,14 @@
 /**
  * Pre-renders a static dist/details/<uuid> page per record, with real title,
  * description, canonical and Dataset JSON-LD in the head — see README.md.
- * Standalone (needs a prior build): npx tsx src/seo/PrerenderUtils.ts
+ * Standalone (needs a prior build): npx tsx src/seo/prerender.ts
  */
 
 import { readFile, writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
-import { BASE_URL } from "./constants";
-import { fetchAllCollections, OgcCollection } from "./SitemapUtils";
+import { BASE_URL, SHARE_IMAGE_URL } from "./constants";
+import { fetchAllCollections, OgcCollection } from "./sitemap";
 
 // Keep in sync with useDocumentTitle.ts
 const SITE_NAME = "AODN Portal";
@@ -89,9 +89,18 @@ export const buildJsonLd = (collection: SeoCollection) => ({
 });
 
 export const renderPage = (template: string, collection: SeoCollection) => {
+  const description = escapeHtml(collection.description.slice(0, 160));
+  const pageUrl = `${BASE_URL}/details/${collection.id}`;
   const headTags = [
-    `<link rel="canonical" href="${BASE_URL}/details/${collection.id}" />`,
-    `<meta name="description" content="${escapeHtml(collection.description.slice(0, 160))}" />`,
+    `<link rel="canonical" href="${pageUrl}" />`,
+    `<meta name="description" content="${description}" />`,
+    '<meta property="og:type" content="website" />',
+    `<meta property="og:site_name" content="${SITE_NAME}" />`,
+    `<meta property="og:title" content="${escapeHtml(collection.title)}" />`,
+    `<meta property="og:description" content="${description}" />`,
+    `<meta property="og:url" content="${pageUrl}" />`,
+    `<meta property="og:image" content="${SHARE_IMAGE_URL}" />`,
+    '<meta name="twitter:card" content="summary" />',
     // \u003c-escape keeps a "</script>" inside the JSON from closing the tag early;
     // JSON.stringify drops undefined-valued fields
     `<script type="application/ld+json">${JSON.stringify(buildJsonLd(collection)).replace(/</g, "\\u003c")}</script>`,
@@ -102,8 +111,9 @@ export const renderPage = (template: string, collection: SeoCollection) => {
         /<title>.*?<\/title>/s,
         `<title>${escapeHtml(collection.title)} | ${SITE_NAME}</title>`
       )
-      // The template carries the site-wide description; the record's replaces it
+      // The template carries site-wide description and social tags; the record's replace them
       .replace(/\s*<meta name="description"[^>]*\/?>/, "")
+      .replace(/\s*<meta (?:property="og:|name="twitter:)[^>]*\/?>/g, "")
       .replace("</head>", `${headTags}\n  </head>`)
   );
 };

@@ -5,7 +5,7 @@
 
 import { describe, expect, test } from "vitest";
 import { BASE_URL } from "../constants";
-import { renderPage } from "../PrerenderUtils";
+import { renderPage } from "../prerender";
 import {
   checkDetailPage,
   checkHomePage,
@@ -50,6 +50,16 @@ describe("checkDetailPage", () => {
     );
     expect(checkDetailPage(page, "abc-123")).toContain(
       "Dataset JSON-LD is not valid JSON"
+    );
+  });
+
+  test("flags a page without social preview tags", () => {
+    const page = renderPage(template, collection).replace(
+      /<meta property="og:[^>]*>/g,
+      ""
+    );
+    expect(checkDetailPage(page, "abc-123")).toContain(
+      "social preview (Open Graph) tags are missing"
     );
   });
 

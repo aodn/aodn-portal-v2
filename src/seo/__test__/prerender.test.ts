@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { buildJsonLd, renderPage } from "../PrerenderUtils";
+import { buildJsonLd, renderPage } from "../prerender";
 import { BASE_URL } from "../constants";
 
 const TEMPLATE =
@@ -128,6 +128,32 @@ describe("renderPage", () => {
     expect(extractJsonLd(html).description).toBe(
       'Contains </script><script>alert("x")</script> inline.'
     );
+  });
+
+  test("injects social preview tags for the record", () => {
+    const html = renderPage(TEMPLATE, collection);
+
+    expect(html).toContain(
+      '<meta property="og:title" content="Sea Surface Temperature" />'
+    );
+    expect(html).toContain(
+      `<meta property="og:url" content="${BASE_URL}/details/abc-123" />`
+    );
+    expect(html).toContain('<meta name="twitter:card" content="summary" />');
+  });
+
+  test("replaces the template's site-wide social tags with the record's", () => {
+    const templateWithSocial = TEMPLATE.replace(
+      "</head>",
+      '<meta property="og:title" content="Site title" />' +
+        '<meta name="twitter:card" content="summary" /></head>'
+    );
+
+    const html = renderPage(templateWithSocial, collection);
+
+    expect(html.match(/property="og:title"/g)).toHaveLength(1);
+    expect(html.match(/name="twitter:card"/g)).toHaveLength(1);
+    expect(html).not.toContain("Site title");
   });
 
   test("replaces a site-wide description from the template with the record's", () => {

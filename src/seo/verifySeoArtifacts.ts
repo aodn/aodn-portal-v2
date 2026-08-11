@@ -8,7 +8,7 @@ import { readdir, readFile } from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 import { BASE_URL } from "./constants";
-import { sampleEvenly } from "./SearchConsoleUtils";
+import { sampleEvenly } from "./searchConsole";
 
 // The workflow refuses to publish fewer pages — keep in sync with seo.yml
 const MIN_PAGES = 10000;
@@ -53,6 +53,9 @@ export const checkDetailPage = (html: string, uuid: string): string[] => {
   }
   if (!/<meta name="description" content="[^"]/.test(html)) {
     problems.push("meta description is missing or empty");
+  }
+  if (!html.includes('<meta property="og:title"')) {
+    problems.push("social preview (Open Graph) tags are missing");
   }
   const jsonLd = html.match(
     /<script type="application\/ld\+json">(.*?)<\/script>/s

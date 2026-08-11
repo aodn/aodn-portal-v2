@@ -1,6 +1,6 @@
 /**
  * Builds dist/sitemap.xml listing the home page and every /details/<uuid>.
- * Standalone: npx tsx src/seo/SitemapUtils.ts — see README.md
+ * Standalone: npx tsx src/seo/sitemap.ts — see README.md
  */
 
 import { writeFile, mkdir } from "fs/promises";

@@ -5,8 +5,8 @@
 
 import path from "path";
 import { fileURLToPath } from "url";
-import { prerenderDetailPages, SEO_PROPERTIES } from "./PrerenderUtils";
-import { fetchAllCollections, generateSitemap } from "./SitemapUtils";
+import { prerenderDetailPages, SEO_PROPERTIES } from "./prerender";
+import { fetchAllCollections, generateSitemap } from "./sitemap";
 
 const outDir = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),

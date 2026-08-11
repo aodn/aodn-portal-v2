@@ -11,7 +11,7 @@
     "prod": "bash generateEnv.sh prod && tsc && vitest run && vite build --mode prod",
     "build": "tsc && vite build",
     "seo:artifacts": "tsx src/seo/buildSeoArtifacts.ts",
-    "seo:gsc": "tsx src/seo/SearchConsoleUtils.ts",
+    "seo:gsc": "tsx src/seo/searchConsole.ts",
     "seo:verify": "tsx src/seo/verifySeoArtifacts.ts",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",

@@ -6,15 +6,15 @@
 
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { BASE_URL, OGC_API_BASE } from "../constants";
-import { describeFetchError } from "../SitemapUtils";
+import { describeFetchError } from "../sitemap";
 
 // One page with no search_after ends the pagination loop immediately
 const singlePage = { total: 1, collections: [{ id: "abc-123" }] };
 
 // API_URL is computed when the module loads, so each test imports a fresh copy
-const importFreshSitemapUtils = async () => {
+const importFreshSitemap = async () => {
   vi.resetModules();
-  return await import("../SitemapUtils");
+  return await import("../sitemap");
 };
 
 const interceptFetch = () => {
@@ -55,7 +55,7 @@ describe("fetchAllCollections fetch host", () => {
 
   test("fetches from the API origin, not the public site host", async () => {
     const fetch = interceptFetch();
-    const { fetchAllCollections } = await importFreshSitemapUtils();
+    const { fetchAllCollections } = await importFreshSitemap();
 
     const collections = await fetchAllCollections();
 
@@ -70,7 +70,7 @@ describe("fetchAllCollections fetch host", () => {
 
   test("overrides Node's default UA, which WAF bot rules flag", async () => {
     const fetch = interceptFetch();
-    const { fetchAllCollections } = await importFreshSitemapUtils();
+    const { fetchAllCollections } = await importFreshSitemap();
 
     await fetchAllCollections();
 
