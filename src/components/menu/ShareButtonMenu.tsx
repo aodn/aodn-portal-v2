@@ -57,6 +57,7 @@ const getItems = ({
 
 interface ShareButtonProps {
   hideText?: boolean;
+  defaultBgColor?: string;
   onClose?: () => void;
   sx?: SxProps;
 }
@@ -73,6 +74,7 @@ const copyUrlDefault = () => {
 
 const ShareButtonMenu: FC<ShareButtonProps> = ({
   hideText = false,
+  defaultBgColor = "#fff",
   onClose,
   sx,
 }) => {
@@ -108,7 +110,7 @@ const ShareButtonMenu: FC<ShareButtonProps> = ({
           flexDirection: "column",
           height: "100%",
           width: "100%",
-          bgcolor: isHovered || open ? color.brightBlue.dark : "#fff",
+          bgcolor: isHovered || open ? color.brightBlue.dark : defaultBgColor,
           borderRadius: borderRadius.small,
           ":hover": { cursor: "pointer" },
           ...sx,

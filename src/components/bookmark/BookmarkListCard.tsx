@@ -1,15 +1,15 @@
 import { FC, useCallback } from "react";
 import { Box, Stack, SxProps, Tooltip, Typography } from "@mui/material";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
-import Map from "../map/mapbox/Map";
-import Layers from "../map/mapbox/layers/Layers";
-import GeojsonLayer from "../map/mapbox/layers/GeojsonLayer";
-import ResultCardButtonGroup from "../result/ResultCardButtonGroup";
-import { padding } from "../../styles/constants";
-import { OpenType, TabNavigation } from "../../hooks/useTabNavigation";
-import { detailPageDefault, pageReferer } from "../common/constants";
-import { portalTheme } from "../../styles";
-import FitToSpatialExtentsLayer from "../map/mapbox/layers/FitToSpatialExtentsLayer";
+import Map from "@/components/map/mapbox/Map";
+import Layers from "@/components/map/mapbox/layers/Layers";
+import GeojsonLayer from "@/components/map/mapbox/layers/GeojsonLayer";
+import ResultCardButtonGroup from "@/components/result/ResultCardButtonGroup";
+import { padding } from "@/styles/constants";
+import { OpenType, TabNavigation } from "@/hooks/useTabNavigation";
+import { detailPageDefault, pageReferer } from "@/components/common/constants";
+import { portalTheme } from "@/styles";
+import FitToSpatialExtentsLayer from "@/components/map/mapbox/layers/FitToSpatialExtentsLayer";
 
 export interface BookmarkListCardType {
   dataset: OGCCollection;
@@ -47,7 +47,7 @@ const BookmarkListCard: FC<BookmarkListCardProps> = ({
           id={mapContainerId}
           sx={{
             width: "100%",
-            height: "150px",
+            height: "276px",
           }}
         >
           <Map
@@ -69,42 +69,48 @@ const BookmarkListCard: FC<BookmarkListCardProps> = ({
           </Map>
         </Box>
 
-        <ResultCardButtonGroup
-          content={dataset}
-          isGridView
-          onLinks={(type: OpenType | undefined) =>
-            handleNavigation(dataset.id, detailPageDefault.DATA_ACCESS, type)
-          }
-          onDownload={
-            dataset.hasCloudOptimisedData()
-              ? (type: OpenType | undefined) =>
-                  handleNavigation(dataset.id, detailPageDefault.SUMMARY, type)
-              : undefined
-          }
-          onDetail={(type: OpenType | undefined) =>
-            handleNavigation(dataset.id, detailPageDefault.SUMMARY, type)
-          }
-        />
+        <Box>
+          <ResultCardButtonGroup
+            content={dataset}
+            isGridView
+            onLinks={(type: OpenType | undefined) =>
+              handleNavigation(dataset.id, detailPageDefault.DATA_ACCESS, type)
+            }
+            onDownload={
+              dataset.hasCloudOptimisedData()
+                ? (type: OpenType | undefined) =>
+                    handleNavigation(
+                      dataset.id,
+                      detailPageDefault.SUMMARY,
+                      type
+                    )
+                : undefined
+            }
+            onDetail={(type: OpenType | undefined) =>
+              handleNavigation(dataset.id, detailPageDefault.SUMMARY, type)
+            }
+          />
 
-        <Tooltip title="More detail..." placement="top">
-          <Typography
-            sx={{
-              ...portalTheme.typography.body3Small,
-              color: portalTheme.palette.grey700,
-              fontWeight: 400,
-              padding: 0,
-              paddingX: padding.small,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              display: "-webkit-box",
-              WebkitLineClamp: "5",
-              WebkitBoxOrient: "vertical",
-              wordBreak: "break-word",
-            }}
-          >
-            {dataset.description}
-          </Typography>
-        </Tooltip>
+          <Tooltip title="More detail..." placement="top">
+            <Typography
+              sx={{
+                ...portalTheme.typography.body2Regular,
+                color: portalTheme.palette.grey700,
+                fontWeight: 400,
+                padding: 0,
+                paddingX: padding.small,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                display: "-webkit-box",
+                WebkitLineClamp: "5",
+                WebkitBoxOrient: "vertical",
+                wordBreak: "break-word",
+              }}
+            >
+              {dataset.description}
+            </Typography>
+          </Tooltip>
+        </Box>
       </Stack>
     </Box>
   );

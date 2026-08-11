@@ -16,7 +16,8 @@ import { portalTheme } from "../../styles";
 export const SIMPLE_FILTER_DEFAULT_HEIGHT = 40;
 
 export interface ResultPanelSimpleFilterType
-  extends ResultListLayoutButtonType<SearchResultLayoutEnum>,
+  extends
+    ResultListLayoutButtonType<SearchResultLayoutEnum>,
     ResultListSortButtonType<SortResultEnum> {
   count: number;
   total: number;
@@ -122,6 +123,7 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
         {isUnderLaptop && (
           <ShareButtonMenu
             hideText
+            defaultBgColor={portalTheme.palette.primary6}
             sx={{
               maxHeight: SIMPLE_FILTER_DEFAULT_HEIGHT,
               maxWidth: SIMPLE_FILTER_DEFAULT_HEIGHT * 2,

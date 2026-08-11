@@ -246,10 +246,10 @@ const ListResultCard: FC<ListResultCardProps> = ({
                     hasDocumentTag || hasAiUpdateFrequency
                       ? "4" // show less text for document records on responsive page
                       : isSimplified
-                        ? "5" //default with 5 lines
+                        ? "6" //default with 6 lines
                         : isSelectedDataset || showButtons
                           ? "4" // if mouse hovering or clicked, show 4 lines
-                          : "5",
+                          : "6",
 
                   WebkitBoxOrient: "vertical",
                   wordBreak: "break-word",

@@ -28,9 +28,8 @@ const StyledAccordion = styled((props: AccordionProps) => (
     {...props}
   />
 ))(({ theme }) => ({
-  border: `1px solid ${theme.palette.divider}`,
   "&:not(:last-child)": {
-    borderBottom: 0,
+    borderBottom: `1px solid ${theme.palette.divider}`,
   },
   "&::before": {
     display: "none",

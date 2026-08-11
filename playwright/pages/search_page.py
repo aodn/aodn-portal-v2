@@ -52,14 +52,14 @@ class SearchPage(BasePage):
             'result-card-load-more-btn'
         ).last
         self.result_card_download_button = page.get_by_test_id(
-            'result-card-button-Download'
+            'result-card-button-Downloads'
         )
         self.map_popup_download_button = page.locator(
             '.mapboxgl-popup-content'
-        ).get_by_test_id('result-card-button-Download')
+        ).get_by_test_id('result-card-button-Downloads')
         self.card_popup_download_button = page.locator(
             '#card-popup'
-        ).get_by_test_id('result-card-button-Download')
+        ).get_by_test_id('result-card-button-Downloads')
 
     def wait_for_search_to_complete(self) -> None:
         """

@@ -13,7 +13,7 @@ export const TemporalIcon: ComponentType<SVGProps<SVGSVGElement>> = ({
   >
     <path
       fill={color}
-      d="M1,3 L9,12 L1,21 L8,21 L16,12 L8,3 Z M10,3 L18,12 L10,21 L17,21 L25,12 L17,3 Z"
+      d="M0.96,3 L8.64,12 L0.96,21 L7.68,21 L15.36,12 L7.68,3 Z M9.6,3 L17.28,12 L9.6,21 L16.32,21 L24,12 L16.32,3 Z"
     />
   </svg>
 );

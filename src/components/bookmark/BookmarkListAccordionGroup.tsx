@@ -8,9 +8,9 @@ import {
 } from "react";
 import { Box, IconButton, Typography } from "@mui/material";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
-import StyledAccordion from "../common/accordion/StyledAccordion";
-import StyledAccordionSummary from "../common/accordion/StyledAccordionSummary";
-import StyledAccordionDetails from "../common/accordion/StyledAccordionDetails";
+import StyledAccordion from "@/components/common/accordion/StyledAccordion";
+import StyledAccordionSummary from "@/components/common/accordion/StyledAccordionSummary";
+import StyledAccordionDetails from "@/components/common/accordion/StyledAccordionDetails";
 import BookmarkListCard from "./BookmarkListCard";
 import BookmarkButton from "./BookmarkButton";
 import {
@@ -27,13 +27,13 @@ import store from "@/app/store/store";
 import {
   BookmarkEvent,
   EVENT_BOOKMARK,
-} from "../map/mapbox/controls/menu/Definition";
+} from "@/components/map/mapbox/controls/menu/Definition";
 import BookmarkListHead from "./BookmarkListHead";
-import { OpenType, TabNavigation } from "../../hooks/useTabNavigation";
-import { portalTheme } from "../../styles";
-import { CancelIcon } from "../../assets/icons/download/cancel";
-import ContextMenu, { ContextMenuRef } from "../menu/ContextMenu";
-import { detailPageDefault, pageReferer } from "../common/constants";
+import { OpenType, TabNavigation } from "@/hooks/useTabNavigation";
+import { portalTheme } from "@/styles";
+import { CancelIcon } from "@/assets/icons/download/cancel";
+import ContextMenu, { ContextMenuRef } from "@/components/menu/ContextMenu";
+import { detailPageDefault, pageReferer } from "@/components/common/constants";
 
 export interface BookmarkListAccordionGroupBasicType {
   onDeselectDataset?: () => void;
@@ -190,107 +190,115 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
         />
       )}
 
-      {items.map((item) => (
-        <StyledAccordion
-          key={item.id}
-          expanded={bookmarkExpandedItem?.id === item.id}
-          onChange={handleChange(item, hoverOnButton)}
-        >
-          {/*
+      {/* Only the cards scroll — the head above stays pinned. */}
+      <Box sx={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
+        {items.map((item) => (
+          <StyledAccordion
+            key={item.id}
+            expanded={bookmarkExpandedItem?.id === item.id}
+            onChange={handleChange(item, hoverOnButton)}
+          >
+            {/*
             MUI AccordionSummary is a <button> by default. Nested IconButtons
             (bookmark + remove) are also <button>s — invalid HTML. Browsers
             close the outer button early and the title never appears. Render
             the summary as a div so nested buttons are legal.
           */}
-          <StyledAccordionSummary component="div">
-            <Box
-              display="flex"
-              flexDirection="row"
-              justifyContent="space-between"
-              alignItems="center"
-              flexWrap="nowrap"
-              width="100%"
-              minWidth={0}
-              onContextMenu={(e) =>
-                menuRef.current?.get(item.id)?.openContextMenu(e)
-              }
-            >
-              <ContextMenu
-                ref={(node) => {
-                  if (node) {
-                    menuRef.current.set(item.id, node);
-                  } else {
-                    menuRef.current.delete(item.id);
-                  }
-                }}
-                onClick={(type: OpenType | undefined) =>
-                  onClickBtnDetail(item.id, type)
-                }
-              />
-              <Box
-                onMouseEnter={() => setHoverOnButton(true)}
-                onMouseLeave={() => setHoverOnButton(false)}
-                sx={{ mr: "4px", display: "inline-flex", flexShrink: 0 }}
-              >
-                <BookmarkButton dataset={item} />
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  flex: 1,
-                  minWidth: 0,
-                  overflow: "hidden",
-                  px: 0.5,
-                }}
-              >
-                <Typography
-                  component="div"
-                  sx={{
-                    ...portalTheme.typography.body1Medium,
-                    color: portalTheme.palette.text2,
-                    fontWeight: 500,
-                    pt: 0,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    display: "-webkit-box",
-                    WebkitLineClamp: "2",
-                    WebkitBoxOrient: "vertical",
-                    width: "100%",
-                  }}
-                >
-                  {item.title}
-                </Typography>
-              </Box>
+            <StyledAccordionSummary component="div">
               <Box
                 display="flex"
+                flexDirection="row"
+                justifyContent="space-between"
                 alignItems="center"
-                sx={{ flexShrink: 0, height: "90%" }}
+                flexWrap="nowrap"
+                width="100%"
+                minWidth={0}
+                onContextMenu={(e) =>
+                  menuRef.current?.get(item.id)?.openContextMenu(e)
+                }
               >
-                <IconButton
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onRemoveFromBookmarkList(item);
+                <ContextMenu
+                  ref={(node) => {
+                    if (node) {
+                      menuRef.current.set(item.id, node);
+                    } else {
+                      menuRef.current.delete(item.id);
+                    }
                   }}
+                  onClick={(type: OpenType | undefined) =>
+                    onClickBtnDetail(item.id, type)
+                  }
+                />
+                <Box
                   onMouseEnter={() => setHoverOnButton(true)}
                   onMouseLeave={() => setHoverOnButton(false)}
-                  size="small"
-                  aria-label="Remove bookmark"
+                  sx={{
+                    mr: "4px",
+                    display: "inline-flex",
+                    flexShrink: 0,
+                    alignSelf: "flex-start",
+                  }}
                 >
-                  <CancelIcon
-                    height={12}
-                    width={12}
-                    color={portalTheme.palette.grey700}
-                  />
-                </IconButton>
+                  <BookmarkButton dataset={item} />
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    flex: 1,
+                    minWidth: 0,
+                    overflow: "hidden",
+                    px: 0.5,
+                  }}
+                >
+                  <Typography
+                    component="div"
+                    sx={{
+                      ...portalTheme.typography.body1Medium,
+                      color: portalTheme.palette.text2,
+                      fontWeight: 500,
+                      pt: 0,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      display: "-webkit-box",
+                      WebkitLineClamp: "2",
+                      WebkitBoxOrient: "vertical",
+                      width: "100%",
+                    }}
+                  >
+                    {item.title}
+                  </Typography>
+                </Box>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  sx={{ flexShrink: 0, height: "90%" }}
+                >
+                  <IconButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onRemoveFromBookmarkList(item);
+                    }}
+                    onMouseEnter={() => setHoverOnButton(true)}
+                    onMouseLeave={() => setHoverOnButton(false)}
+                    size="small"
+                    aria-label="Remove bookmark"
+                  >
+                    <CancelIcon
+                      height={12}
+                      width={12}
+                      color={portalTheme.palette.grey700}
+                    />
+                  </IconButton>
+                </Box>
               </Box>
-            </Box>
-          </StyledAccordionSummary>
-          <StyledAccordionDetails>
-            <BookmarkListCard dataset={item} tabNavigation={tabNavigation} />
-          </StyledAccordionDetails>
-        </StyledAccordion>
-      ))}
+            </StyledAccordionSummary>
+            <StyledAccordionDetails>
+              <BookmarkListCard dataset={item} tabNavigation={tabNavigation} />
+            </StyledAccordionDetails>
+          </StyledAccordion>
+        ))}
+      </Box>
     </>
   );
 };

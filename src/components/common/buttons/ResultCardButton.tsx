@@ -30,6 +30,8 @@ interface ResultCardButtonProps {
   sx?: SxProps;
   text?: string | null;
   onClick?: (type: OpenType | undefined) => void;
+  isSvgIcon?: boolean;
+  iconSize?: number;
 }
 
 const buttonStyles = {
@@ -39,7 +41,7 @@ const buttonStyles = {
 
 // Memoize font sizes for performance
 const fontSizes = {
-  [ResultCardButtonSize.SMALL]: { icon: "14px", text: "12px" },
+  [ResultCardButtonSize.SMALL]: { icon: "14px", text: "14px" },
   [ResultCardButtonSize.MEDIUM]: { icon: "18px", text: "14px" },
 };
 
@@ -56,6 +58,8 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
   sx,
   shouldHideText = false,
   disabled = false,
+  isSvgIcon = false,
+  iconSize = 20,
 }) => {
   const IconComponent = startIcon as ElementType;
   const menuRef = useRef<ContextMenuRef>(null);
@@ -66,6 +70,14 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
     const hasText = text && !shouldHideText;
     return [config, size, hasText];
   }, [resultCardButtonConfig, shouldHideText, text]);
+
+  const iconStyleProps = useMemo(
+    () =>
+      isSvgIcon
+        ? { color: config.color, width: iconSize, height: iconSize }
+        : { sx: { color: config.color, fontSize: fontSizes[size].icon } },
+    [config.color, iconSize, isSvgIcon, size]
+  );
 
   return (
     <>
@@ -79,7 +91,6 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
         sx={{
           p: 0,
           gap: "6px",
-          ml: "-14px",
           textTransform: "none",
           opacity: disabled ? 0.5 : 1,
           minWidth: hasText ? "auto" : 0, // Optimize layout when text is hidden
@@ -95,9 +106,7 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
                 // Need span to allow tooltip forwardRef()
               }
               <span>
-                <IconComponent
-                  sx={{ color: config.color, fontSize: fontSizes[size].icon }}
-                />
+                <IconComponent {...iconStyleProps} />
               </span>
             </Tooltip>
           ))}
@@ -107,7 +116,7 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
             pt={0}
             mt={-0.5}
             whiteSpace="nowrap"
-            sx={buttonStyles}
+            sx={{ ...buttonStyles, fontSize: fontSizes[size].text }}
             data-testid={`result-card-button-${text}`}
           >
             {text}
