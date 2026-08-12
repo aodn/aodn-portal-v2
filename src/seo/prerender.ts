@@ -8,7 +8,7 @@ import { readFile, writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 import { BASE_URL, SHARE_IMAGE_URL } from "./constants";
-import { fetchAllCollections, OgcCollection } from "./sitemap";
+import { fetchAllCollections, OGCCollection } from "./sitemap";
 
 // Keep in sync with useDocumentTitle.ts
 const SITE_NAME = "AODN Portal";
@@ -22,13 +22,13 @@ export const SEO_PROPERTIES =
 // The id becomes a file name / S3 object key; skip anything unexpected
 const SAFE_ID = /^[A-Za-z0-9._-]+$/;
 
-type SeoCollection = OgcCollection & {
+type SeoCollection = OGCCollection & {
   id: string;
   title: string;
   description: string;
 };
 
-const hasSeoFields = (collection: OgcCollection): collection is SeoCollection =>
+const hasSeoFields = (collection: OGCCollection): collection is SeoCollection =>
   Boolean(
     collection.id &&
     SAFE_ID.test(collection.id) &&
@@ -120,7 +120,7 @@ export const renderPage = (template: string, collection: SeoCollection) => {
 
 export const prerenderDetailPages = async (
   outDir: string,
-  prefetched?: OgcCollection[]
+  prefetched?: OGCCollection[]
 ) => {
   const template = await readFile(path.join(outDir, "index.html"), "utf8");
   const collections = prefetched ?? (await fetchAllCollections(SEO_PROPERTIES));

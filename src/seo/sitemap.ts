@@ -19,7 +19,7 @@ const USER_AGENT =
   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
 
 // The subset of an OGC collection the SEO build steps read
-export interface OgcCollection {
+export interface OGCCollection {
   id?: string;
   title?: string;
   description?: string;
@@ -33,7 +33,7 @@ export interface OgcCollection {
 
 interface CollectionsPage {
   total?: number;
-  collections?: OgcCollection[];
+  collections?: OGCCollection[];
   search_after?: string[];
 }
 
@@ -84,8 +84,8 @@ const fetchJsonWithRetry = async (url: string): Promise<CollectionsPage> => {
 
 export const fetchAllCollections = async (
   properties = "id"
-): Promise<OgcCollection[]> => {
-  const collections: OgcCollection[] = [];
+): Promise<OGCCollection[]> => {
+  const collections: OGCCollection[] = [];
   let searchAfter: string[] | undefined;
   let total: number | undefined;
 
@@ -136,7 +136,7 @@ export const toSitemapXml = (uuids: string[], generatedAt = new Date()) => {
 
 export const generateSitemap = async (
   outDir: string,
-  prefetched?: OgcCollection[]
+  prefetched?: OGCCollection[]
 ) => {
   const uuids = (prefetched ?? (await fetchAllCollections()))
     .map((collection) => collection.id)
