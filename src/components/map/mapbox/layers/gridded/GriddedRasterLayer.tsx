@@ -176,17 +176,20 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
     return () => clearTimeout(timer);
   }, [map, sourceId, tileUrl]);
 
-  if (!visible) return null;
-
   return (
     <>
-      <MapLayerSelect
-        mapLayersOptions={toSelectItems(products)}
-        selectedItem={selectedProductId}
-        handleSelectItem={onSelectProduct}
-        isLoading={false}
-      />
-      {error && (
+      {/* The dropdown and the retry belong to the layer only while it is the
+          selected one; the test hooks stay mounted either way so e2e can assert
+          the hidden state. */}
+      {visible && (
+        <MapLayerSelect
+          mapLayersOptions={toSelectItems(products)}
+          selectedItem={selectedProductId}
+          handleSelectItem={onSelectProduct}
+          isLoading={false}
+        />
+      )}
+      {visible && error && (
         // Additive and non-blocking: a backend outage must leave the rest of the
         // detail page fully interactive.
         <Stack

@@ -39,6 +39,12 @@ class Map(BasePage):
         self.spatial_extent_layer = page.get_by_role(
             'radio', name='Spatial Extent'
         )
+        self.gridded_data_layer = page.get_by_role(
+            'radio', name='Gridded Data'
+        )
+        self.gridded_raster_error = page.get_by_test_id(
+            'gridded-raster-error'
+        )
 
         self.daterange_show_hide_menu_button = page.get_by_test_id(
             'daterange-show-hide-menu-button'
@@ -231,6 +237,12 @@ class Map(BasePage):
         """Get the Spatial Extent layer id"""
         return self.get_layer_id_from_test_props(
             'getSpatialExtentLayer', is_map_loading=False
+        )
+
+    def get_Gridded_Raster_Layer_id(self) -> str:
+        """Get the gridded raster tile layer id"""
+        return self.get_layer_id_from_test_props(
+            'getGriddedRasterLayer', is_map_loading=False
         )
 
     def is_map_layer_visible(

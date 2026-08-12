@@ -13,6 +13,10 @@ from mocks.api.collections import (
     handle_collections_popup_api,
 )
 from mocks.api.download_dialog import handle_download_dialog_success
+from mocks.api.gridded_tiles import (
+    handle_gridded_tile_image_api,
+    handle_gridded_tile_products_api,
+)
 from mocks.api.download_wfs import (
     handle_download_wfs,
     handle_estimate_co_download,
@@ -50,6 +54,12 @@ def apply_mock(page: Page) -> None:
         handle_collections_all_api,
         handle_collections_popup_api,
     )
+    # Registered BEFORE the collection-detail routes: those patterns are broad
+    # enough that a future widening of them would otherwise swallow the tile
+    # routes and leave the tests silently exercising the wrong payload.
+    api_router.route_gridded_tile_products(handle_gridded_tile_products_api)
+    api_router.route_gridded_tile_image(handle_gridded_tile_image_api)
+
     api_router.route_collection_detail(
         handle_detail_api,
         handle_detail_summary_api,

@@ -21,6 +21,12 @@ class Routes:
         f'{PREFIX}/collections/*/items/dataset_metadata'
     )
 
+    # Gridded raster tiles. The products listing must be registered explicitly
+    # so no broader collection pattern can swallow it, and the tile images are
+    # served from the ordinary collection map/tiles route.
+    GRIDDED_TILE_PRODUCTS = f'{PREFIX}/ext/tiles/collections/*/products'
+    GRIDDED_TILE_IMAGE = f'{PREFIX}/collections/*/map/tiles/**'
+
     WMS_MAP_TILE = '*/**/items/wms_map_tile?*'
     WMS_LAYERS = '*/**/items/wms_layers?*'
     WMS_FIELDS = '*/**/items/wms_fields?*'
