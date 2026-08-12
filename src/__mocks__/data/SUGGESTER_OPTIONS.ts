@@ -24,4 +24,6 @@ export const SUGGESTER_OPTIONS = {
     "wave data",
   ],
   suggested_parameter_vocabs: ["radio wave", "wave"],
+  // Matched by meaning on the backend, so deliberately share no characters with "wave"
+  suggested_semantic: ["Glider", "Sea surface height", "Swell"],
 };
