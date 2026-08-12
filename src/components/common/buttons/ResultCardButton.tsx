@@ -41,13 +41,17 @@ const buttonStyles = {
 
 // Memoize font sizes for performance
 const fontSizes = {
-  [ResultCardButtonSize.SMALL]: { icon: "14px", text: "14px" },
-  [ResultCardButtonSize.MEDIUM]: { icon: "18px", text: "14px" },
+  [ResultCardButtonSize.SMALL]: { icon: "14px", text: "12px" },
+  [ResultCardButtonSize.MEDIUM]: { icon: "14px", text: "14px" },
 };
+
+export const DEFAULT_RESULT_CARD_BUTTON_SIZE = ResultCardButtonSize.MEDIUM;
+
+const DEFAULT_SVG_ICON_SIZE = 20;
 
 const defaultConfig: ResultCardButtonConfig = {
   color: color.blue.dark,
-  size: ResultCardButtonSize.SMALL,
+  size: DEFAULT_RESULT_CARD_BUTTON_SIZE,
 };
 
 const ResultCardButton: FC<ResultCardButtonProps> = ({
@@ -59,7 +63,7 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
   shouldHideText = false,
   disabled = false,
   isSvgIcon = false,
-  iconSize = 20,
+  iconSize = undefined,
 }) => {
   const IconComponent = startIcon as ElementType;
   const menuRef = useRef<ContextMenuRef>(null);
@@ -71,13 +75,19 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
     return [config, size, hasText];
   }, [resultCardButtonConfig, shouldHideText, text]);
 
-  const iconStyleProps = useMemo(
-    () =>
-      isSvgIcon
-        ? { color: config.color, width: iconSize, height: iconSize }
-        : { sx: { color: config.color, fontSize: fontSizes[size].icon } },
-    [config.color, iconSize, isSvgIcon, size]
-  );
+  const iconStyleProps = useMemo(() => {
+    if (isSvgIcon) {
+      const px = iconSize ?? DEFAULT_SVG_ICON_SIZE;
+      return { color: config.color, width: px, height: px };
+    }
+
+    return {
+      sx: {
+        color: config.color,
+        fontSize: iconSize ? `${iconSize}px` : fontSizes[size].icon,
+      },
+    };
+  }, [config.color, iconSize, isSvgIcon, size]);
 
   return (
     <>
