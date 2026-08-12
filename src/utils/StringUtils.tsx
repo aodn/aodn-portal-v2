@@ -49,7 +49,7 @@ export const truncateText = (str: string, truncateCount: number): string => {
 export const decodeHtmlEntities = (str: string): string => {
   try {
     return decode(str, { strict: true });
-  } catch (ignored) {
+  } catch (_ignored) {
     return str;
   }
 };

@@ -179,7 +179,7 @@ export const initializeBookmarkList = createAsyncThunk<
         });
       }, 0.1);
     }
-  } catch (error) {
+  } catch (_error) {
     errorHandling(thunkAPI);
     // Emit INIT with empty array in case of error
     setTimeout(() => {

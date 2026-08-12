@@ -131,14 +131,14 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
       try {
         map?.removeLayer(spiderPinsLayerId);
         map?.removeSource(spiderPinsSourceId);
-      } catch (error) {
+      } catch (_error) {
         // Do nothing
       }
 
       try {
         map?.removeLayer(spiderLinesLayerId);
         map?.removeSource(spiderLinesSourceId);
-      } catch (error) {
+      } catch (_error) {
         // Do nothing
       }
 

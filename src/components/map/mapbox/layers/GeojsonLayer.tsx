@@ -264,7 +264,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
           map?.removeSource(sourceId);
           map?.removeImage(BLUE_PIN_NAME);
         }
-      } catch (error) {
+      } catch (_error) {
         // OK to ignore error here
       } finally {
         map?.off("click", layerPolygonId, handleLayerClick);

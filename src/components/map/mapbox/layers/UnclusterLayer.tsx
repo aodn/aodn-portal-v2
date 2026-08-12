@@ -116,7 +116,7 @@ const UnclusterLayer: FC<UnclusterLayerProps> = ({
         if (map?.getSource(unclusterSourceId)) {
           map?.removeSource(unclusterSourceId);
         }
-      } catch (error) {
+      } catch (_error) {
         // If source not found and throw exception then layer will not exist
         // TODO: handle error in ErrorBoundary
       }
