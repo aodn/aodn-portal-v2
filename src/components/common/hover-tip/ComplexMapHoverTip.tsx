@@ -5,10 +5,12 @@ import {
   fontColor,
   fontSize,
   fontWeight,
+  gap,
   padding,
   zIndex,
 } from "../../../styles/constants";
 import ResultCardButtonGroup from "../../result/ResultCardButtonGroup";
+import { ResultCardButtonSize } from "../buttons/ResultCardButton";
 import Map from "../../map/mapbox/Map";
 import Layers from "../../map/mapbox/layers/Layers";
 import GeojsonLayer from "../../map/mapbox/layers/GeojsonLayer";
@@ -79,7 +81,7 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
           position="relative"
           onContextMenu={(e) => menuRef.current?.openContextMenu(e)}
         >
-          <Box position="absolute" top={-4} right={-4}>
+          <Box position="absolute" sx={{ top: gap.sm, right: gap.md }}>
             <BookmarkButton dataset={collection} />
           </Box>
           <Tooltip title={collection.title} placement="top">
@@ -88,7 +90,7 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
               fontSize={fontSize.label}
               sx={{
                 padding: 0,
-                width: "90%",
+                width: "calc(100% - 36px)",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 display: "-webkit-box",
@@ -120,6 +122,7 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
         <ResultCardButtonGroup
           content={collection}
           isGridView
+          resultCardButtonConfig={{ size: ResultCardButtonSize.SMALL }}
           onLinks={onLinks}
           onDownload={
             collection.hasCloudOptimisedData() ? onDownload : undefined
@@ -131,11 +134,15 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
             color={fontColor.gray.medium}
             fontSize={fontSize.resultCardContent}
             sx={{
+              width: "100%",
               padding: 0,
               paddingX: padding.small,
               overflow: "hidden",
               textOverflow: "ellipsis",
               wordBreak: "break-word",
+              display: "-webkit-box",
+              WebkitLineClamp: "10",
+              WebkitBoxOrient: "vertical",
             }}
           >
             {collection.description}

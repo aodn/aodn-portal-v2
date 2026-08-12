@@ -8,7 +8,9 @@ import { DownloadsIcon } from "@/assets/icons/result/download";
 import { DetailsIcon } from "@/assets/icons/result/details";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import ResultCardButton, {
+  DEFAULT_RESULT_CARD_BUTTON_SIZE,
   ResultCardButtonConfig,
+  ResultCardButtonSize,
 } from "../common/buttons/ResultCardButton";
 import { color, padding } from "@/styles/constants";
 import { OpenType } from "../../hooks/useTabNavigation";
@@ -33,15 +35,28 @@ const Status = {
 // Rendered size per icon, chosen so each glyph measures the same ink box as the
 // design. They differ because each icon fills a different share of its viewBox.
 const iconSize = {
-  onGoing: 16,
-  dataAccess: 20,
-  downloads: 20,
-  details: 20,
+  [ResultCardButtonSize.SMALL]: {
+    onGoing: 13,
+    completed: 16,
+    noStatus: 16,
+    dataAccess: 16,
+    downloads: 16,
+    details: 16,
+  },
+  [ResultCardButtonSize.MEDIUM]: {
+    onGoing: 16,
+    completed: 20,
+    noStatus: 20,
+    dataAccess: 20,
+    downloads: 20,
+    details: 20,
+  },
 };
 
 const renderStatusButton = (
   shouldHideText: boolean,
   content: OGCCollection,
+  size: ResultCardButtonSize,
   resultCardButtonConfig?: ResultCardButtonConfig
 ) => {
   const status = content?.getStatus()?.toLowerCase().trim();
@@ -49,6 +64,7 @@ const renderStatusButton = (
     return (
       <ResultCardButton
         startIcon={TaskAltSharpIcon}
+        iconSize={iconSize[size].completed}
         text="Completed"
         shouldHideText={shouldHideText}
         resultCardButtonConfig={resultCardButtonConfig}
@@ -60,7 +76,7 @@ const renderStatusButton = (
       <ResultCardButton
         startIcon={TemporalIcon}
         isSvgIcon
-        iconSize={iconSize.onGoing}
+        iconSize={iconSize[size].onGoing}
         text="On going"
         resultCardButtonConfig={{
           ...resultCardButtonConfig,
@@ -73,6 +89,7 @@ const renderStatusButton = (
   return (
     <ResultCardButton
       startIcon={QuestionMarkIcon}
+      iconSize={iconSize[size].noStatus}
       text="No Status"
       shouldHideText={shouldHideText}
       resultCardButtonConfig={resultCardButtonConfig}
@@ -93,10 +110,17 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
 
   if (!content) return;
 
+  const size = resultCardButtonConfig?.size ?? DEFAULT_RESULT_CARD_BUTTON_SIZE;
+
   const buttons = [
     {
       key: "status",
-      node: renderStatusButton(shouldHideText, content, resultCardButtonConfig),
+      node: renderStatusButton(
+        shouldHideText,
+        content,
+        size,
+        resultCardButtonConfig
+      ),
     },
     {
       key: "data-access",
@@ -104,7 +128,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
         <ResultCardButton
           startIcon={DataAccessIcon}
           isSvgIcon
-          iconSize={iconSize.dataAccess}
+          iconSize={iconSize[size].dataAccess}
           text="Data Access"
           shouldHideText={shouldHideText}
           onClick={onLinks}
@@ -119,7 +143,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
         <ResultCardButton
           startIcon={DownloadsIcon}
           isSvgIcon
-          iconSize={iconSize.downloads}
+          iconSize={iconSize[size].downloads}
           text="Downloads"
           shouldHideText={shouldHideText}
           disabled={onDownload === undefined}
@@ -134,7 +158,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
         <ResultCardButton
           startIcon={DetailsIcon}
           isSvgIcon
-          iconSize={iconSize.details}
+          iconSize={iconSize[size].details}
           text="Details"
           shouldHideText={shouldHideText}
           disabled={onDetail === undefined}
