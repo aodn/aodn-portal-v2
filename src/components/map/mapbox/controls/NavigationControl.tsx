@@ -20,8 +20,6 @@ interface NavigationControlProps {
   onReset?: (map: Mapbox) => void;
 }
 
-const MAP_LEFT_CONTROL_CONTAINER = "map-left-control-container";
-
 class StyledNavigationControl extends MapboxNavigationControl {
   private readonly zoomReset: HTMLButtonElement | undefined = undefined;
   private map: Mapbox | undefined = undefined;
@@ -88,9 +86,15 @@ class StyledNavigationControl extends MapboxNavigationControl {
     this.onReset = onReset;
   }
 
+  // Multiple maps can be mounted at once (e.g. search page map plus the
+  // location filter map), so lookups must go through the instance's own
+  // container rather than a document-wide id query
+  getContainer(): HTMLDivElement | undefined {
+    return this.container;
+  }
+
   onAdd(map: Mapbox): HTMLElement {
     this.container = super.onAdd(map) as HTMLDivElement;
-    this.container.id = MAP_LEFT_CONTROL_CONTAINER;
     this.container.style.cssText = `
       display: flex;
       flex-direction: column;
@@ -236,20 +240,16 @@ const NavigationControl = ({
   }, [map, showCompass, showZoom, visualizePitch]);
 
   useEffect(() => {
-    const container: HTMLButtonElement | null = document.getElementById(
-      MAP_LEFT_CONTROL_CONTAINER
-    ) as HTMLButtonElement;
-
+    const container = control?.getContainer();
     if (container) {
       // flex keeps the button gap working
       container.style.display = visible ? "flex" : "none";
     }
-  }, [visible]);
+  }, [visible, control]);
 
   // Hover hints for the zoom and reset buttons, shown at their right
   useEffect(() => {
-    if (!control) return;
-    const container = document.getElementById(MAP_LEFT_CONTROL_CONTAINER);
+    const container = control?.getContainer();
     if (!container) return;
 
     const buttons: Array<[string, HTMLButtonElement | null]> = [
@@ -260,7 +260,10 @@ const NavigationControl = ({
     const cleanups: Array<() => void> = [];
     buttons.forEach(([text, button]) => {
       if (!button) return;
-      button.removeAttribute("title"); // the hint replaces the native tooltip
+      // The hint replaces the native tooltip; mapbox-gl sets title on the
+      // inner icon span, not the button itself
+      button.removeAttribute("title");
+      button.querySelector(".mapboxgl-ctrl-icon")?.removeAttribute("title");
       const enter = () => setHint({ text: text, anchor: button });
       const leave = () => setHint(null);
       button.addEventListener("mouseenter", enter);
@@ -278,6 +281,9 @@ const NavigationControl = ({
       open={hint !== null}
       anchorEl={hint?.anchor ?? null}
       placement="right"
+      // The popper portals to document.body, so it needs a z-index above
+      // overlays like the searchbar popup that hosts the location filter map
+      sx={{ zIndex: (theme) => theme.zIndex.tooltip }}
       // The visible circle sits top-left in the button box (the rest is
       // shadow padding): -2 recenters the tip on the circle, 4 makes the
       // visual distance match the menu hints' 10px
