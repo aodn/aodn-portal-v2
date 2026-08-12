@@ -154,4 +154,57 @@ describe("evaluateSubsettingSupport", () => {
       ).toBe(true);
     });
   });
+
+  describe("GriddedRaster", () => {
+    // The real provider passes all three names; `layers` above deliberately
+    // stays two-name to prove the widened signature did not break call sites.
+    const layersWithGridded = {
+      ...layers,
+      GriddedRaster: LayerName.GriddedRaster,
+    };
+
+    it("shows the time slider when the selected product has days", () => {
+      expect(
+        evaluateSubsettingSupport(
+          SubsettingType.TimeSlider,
+          base({
+            selectedLayerId: LayerName.GriddedRaster,
+            hasCloudOptimisedData: false,
+            griddedRasterHasDates: true,
+          }),
+          layersWithGridded
+        )
+      ).toBe(true);
+    });
+
+    it("hides it when the selected product has no days", () => {
+      expect(
+        evaluateSubsettingSupport(
+          SubsettingType.TimeSlider,
+          base({
+            selectedLayerId: LayerName.GriddedRaster,
+            hasCloudOptimisedData: false,
+            griddedRasterHasDates: false,
+          }),
+          layersWithGridded
+        )
+      ).toBe(false);
+    });
+
+    // The term is an OR only — it must never be able to hide the clock icon for
+    // a record that shows it today.
+    it("cannot suppress cloud optimised time support", () => {
+      expect(
+        evaluateSubsettingSupport(
+          SubsettingType.TimeSlider,
+          base({
+            selectedLayerId: LayerName.GriddedRaster,
+            hasCloudOptimisedData: true,
+            griddedRasterHasDates: false,
+          }),
+          layersWithGridded
+        )
+      ).toBe(true);
+    });
+  });
 });

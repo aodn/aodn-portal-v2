@@ -200,6 +200,8 @@ export type MapSubsettingCapabilities = {
   downloadServiceAvailable: boolean;
   /** A `rel=summary` link, i.e. zarr / parquet data behind the record. */
   hasCloudOptimisedData: boolean;
+  /** The selected gridded raster product advertises at least one day. */
+  griddedRasterHasDates: boolean;
 };
 
 export const defaultMapSubsettingCapabilities: MapSubsettingCapabilities = {
@@ -210,6 +212,7 @@ export const defaultMapSubsettingCapabilities: MapSubsettingCapabilities = {
   isSupportPMTiles: false,
   downloadServiceAvailable: false,
   hasCloudOptimisedData: false,
+  griddedRasterHasDates: false,
 };
 
 /**
@@ -219,11 +222,14 @@ export const defaultMapSubsettingCapabilities: MapSubsettingCapabilities = {
 export const evaluateSubsettingSupport = (
   type: SubsettingType,
   caps: MapSubsettingCapabilities,
-  layerNames: { PMTiles: string; GeoServer: string }
+  layerNames: { PMTiles: string; GeoServer: string; GriddedRaster?: string }
 ): boolean => {
   const isPMTilesSelected =
     caps.isSupportPMTiles && caps.selectedLayerId === layerNames.PMTiles;
   const isGeoServerSelected = caps.selectedLayerId === layerNames.GeoServer;
+  const isGriddedRasterSelected =
+    layerNames.GriddedRaster !== undefined &&
+    caps.selectedLayerId === layerNames.GriddedRaster;
 
   switch (type) {
     case SubsettingType.TimeSlider:
@@ -232,10 +238,15 @@ export const evaluateSubsettingSupport = (
       if (isPMTilesSelected && caps.pmtilesHasTime === false) return false;
       // Cloud optimised data (zarr / parquet) always supports datetime
       // subsetting for download, independent of which layer the map renders
+      // The gridded raster term is an OR only, never a branch that can return
+      // false: `hasCloudOptimisedData` already makes this true for every
+      // gridded zarr record, so this must not be able to hide the clock icon
+      // for a record that shows it today.
       return (
         caps.hasCloudOptimisedData ||
         isPMTilesSelected ||
-        (isGeoServerSelected && caps.geoServerHasTime)
+        (isGeoServerSelected && caps.geoServerHasTime) ||
+        (isGriddedRasterSelected && caps.griddedRasterHasDates)
       );
     case SubsettingType.DrawRect:
       // Same as above - cloud optimised downloads always accept a spatial

@@ -64,6 +64,9 @@ import {
   metadataRangeToDayjs,
   type PMTilesMetadata,
 } from "@/components/map/mapbox/layers/pmtiles/Common";
+import GriddedRasterLayer from "@/components/map/mapbox/layers/gridded/GriddedRasterLayer";
+import useGriddedRasterProducts from "@/components/map/mapbox/layers/gridded/useGriddedRasterProducts";
+import { buildTileDateMarks } from "@/components/map/mapbox/layers/gridded/Common";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -73,7 +76,8 @@ export const buildMapLayerConfig = (
   isWMSAvailable: boolean,
   hasSpatialExtent: boolean,
   isSupportPMTiles: boolean,
-  lastSelectedLayer: LayerSwitcherLayer<LayerName> | null = null
+  lastSelectedLayer: LayerSwitcherLayer<LayerName> | null = null,
+  hasGriddedProducts: boolean = false
 ): LayerSwitcherLayer<LayerName>[] => {
   const layers: LayerSwitcherLayer<LayerName>[] = [];
 
@@ -118,8 +122,27 @@ export const buildMapLayerConfig = (
       layers.push(l);
     }
 
-    if (lastSelectedLayer) {
-      layers.forEach((l) => (l.selected = l.id === lastSelectedLayer.id));
+    // Appended LAST, and never pre-selected: the `layers[0]` fallback below
+    // makes it the default only when it is the sole entry. This is what keeps
+    // the change behaviour-neutral — no existing record opens on a different
+    // layer than it does today merely because a new capability appeared.
+    if (hasGriddedProducts) {
+      const l: LayerSwitcherLayer<LayerName> = {
+        id: LayerName.GriddedRaster,
+        name: "Gridded Data",
+        selected: false,
+      };
+      layers.push(l);
+    }
+
+    // A sticky selection that is not in the freshly built list must not win:
+    // the forEach would then set *every* layer to selected = false, the else-if
+    // would never run, and the map would render no layer at all.
+    const lastId = lastSelectedLayer?.id;
+    const lastStillExists =
+      lastId !== undefined && layers.some((l) => l.id === lastId);
+    if (lastStillExists) {
+      layers.forEach((l) => (l.selected = l.id === lastId));
     } else if (
       layers.length > 0 &&
       layers.find((l) => l.selected) === undefined
@@ -193,9 +216,65 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     [collection]
   );
 
-  const [noMapPreview, minDateStamp, maxDateStamp] = useMemo(() => {
+  // Gridded raster tiles. The product list, the selected product and the
+  // selected day all live here rather than in the layer, because
+  // buildMapLayerConfig needs "do products exist?" before the layer is ever
+  // selected, and because MapPanel — not the layer — renders DateSliderPoint.
+  const {
+    products: griddedProducts,
+    error: griddedError,
+    retry: retryGriddedProducts,
+  } = useGriddedRasterProducts(collection);
+  const hasGriddedProducts = griddedProducts.length > 0;
+
+  // Override + fallback rather than reset-in-effect, so a late-arriving product
+  // list or a UUID change self-corrects on the same render.
+  const [griddedProductOverride, setGriddedProductOverride] =
+    useState<string>("");
+  const selectedGriddedProduct = useMemo(
+    () =>
+      griddedProducts.find((p) => p.id === griddedProductOverride) ??
+      griddedProducts[0],
+    [griddedProducts, griddedProductOverride]
+  );
+
+  const griddedDateMarks = useMemo(
+    () => buildTileDateMarks(selectedGriddedProduct?.dates),
+    [selectedGriddedProduct]
+  );
+
+  const [griddedDateOverride, setGriddedDateOverride] = useState<string>("");
+  // Switching product drops an override the new product does not have, so the
+  // day falls back to that product's latest in the same render — no flash of a
+  // tile URL carrying a date the product lacks. Defaulting to the newest day is
+  // also what makes the layer paint without the user opening the clock panel.
+  const selectedGriddedDate = useMemo(
+    () =>
+      griddedDateMarks.dates.includes(griddedDateOverride)
+        ? griddedDateOverride
+        : griddedDateMarks.latest,
+    [griddedDateOverride, griddedDateMarks]
+  );
+
+  const handleGriddedDatePointChange = useCallback(
+    (
+      _event: Event | React.SyntheticEvent<Element, Event> | undefined,
+      value: number | number[]
+    ) => {
+      // Always recovered from the map — never re-derived from the timestamp,
+      // which would be off by a day in a browser west of UTC.
+      const dayKey = griddedDateMarks.byValue.get(value as number);
+      if (dayKey) setGriddedDateOverride(dayKey);
+    },
+    [griddedDateMarks]
+  );
+
+  const hasSpatialExtent = useMemo(() => {
     const bbox = collection?.getBBox();
-    const hasSpatialExtent = Array.isArray(bbox) && bbox.length > 0;
+    return Array.isArray(bbox) && bbox.length > 0;
+  }, [collection]);
+
+  const [noMapPreview, minDateStamp, maxDateStamp] = useMemo(() => {
     const scope = collection?.getScope();
     const isDocumentScope = scope?.toLowerCase() === "document";
     const noMapPreview = isDocumentScope
@@ -228,6 +307,20 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       }
     }
 
+    return [noMapPreview, start, end];
+  }, [
+    collection,
+    downloadService,
+    hasSpatialExtent,
+    isWMSAvailable,
+    selectedMapLayerId,
+    pmtilesPeriodRange,
+  ]);
+
+  // Building the layer config used to live inside the memo above, whose deps
+  // (slider bounds) have nothing to do with which layers exist — which also
+  // created an incidental selectedMapLayerId → memo → setMapLayerConfig loop.
+  useEffect(() => {
     startTransition(() => {
       setMapLayerConfig(
         buildMapLayerConfig(
@@ -235,20 +328,18 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
           isWMSAvailable,
           hasSpatialExtent,
           isSupportPMTiles,
-          lastSelectedMapLayer
+          lastSelectedMapLayer,
+          hasGriddedProducts
         )
       );
     });
-
-    return [noMapPreview, start, end];
   }, [
     collection,
-    downloadService,
     isWMSAvailable,
+    hasSpatialExtent,
     isSupportPMTiles,
     lastSelectedMapLayer,
-    selectedMapLayerId,
-    pmtilesPeriodRange,
+    hasGriddedProducts,
   ]);
 
   const [filterStartDate, filterEndDate] = useMemo(() => {
@@ -359,6 +450,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       downloadServiceAvailable:
         downloadService !== DownloadServiceType.Unavailable,
       hasCloudOptimisedData,
+      griddedRasterHasDates: griddedDateMarks.values.length > 0,
     });
   }, [
     selectedMapLayerId,
@@ -368,6 +460,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     isSupportPMTiles,
     downloadService,
     hasCloudOptimisedData,
+    griddedDateMarks,
     setMapSubsettingCapabilities,
   ]);
 
@@ -393,6 +486,47 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     },
     []
   );
+
+  /**
+   * At most one point slider can exist, so select it by layer id first.
+   * `discreteTimeSliderValues` and `datePointValue` stay strictly WMS-only:
+   * `geoServerLayerConfig` branches on the former, so feeding it tile dates
+   * would corrupt the WMS request. This matters in practice because
+   * GeoServerLayer is always mounted and populates it regardless of which layer
+   * is selected.
+   */
+  const additionalSlider = useMemo(() => {
+    if (selectedMapLayerId === LayerName.GriddedRaster) {
+      if (griddedDateMarks.values.length === 0) return undefined;
+      return (
+        <DateSliderPoint
+          // Remount on product switch so the thumb resets to the new
+          // product's own latest day.
+          key={`gridded-date-${selectedGriddedProduct?.id}`}
+          valid_points={griddedDateMarks.values}
+          formatLabel={(v) => griddedDateMarks.byValue.get(v) ?? ""}
+          onDatePointChange={handleGriddedDatePointChange}
+        />
+      );
+    }
+    if (discreteTimeSliderValues) {
+      return (
+        <DateSliderPoint
+          valid_points={discreteTimeSliderValues?.get(selectedWmsLayer)}
+          onDatePointChange={handleSliderPointChange}
+        />
+      );
+    }
+    return undefined;
+  }, [
+    discreteTimeSliderValues,
+    griddedDateMarks,
+    handleGriddedDatePointChange,
+    handleSliderPointChange,
+    selectedGriddedProduct?.id,
+    selectedMapLayerId,
+    selectedWmsLayer,
+  ]);
 
   const onWMSAvailabilityChange = useCallback((isAvailable: boolean) => {
     setIsWMSAvailable(isAvailable);
@@ -528,18 +662,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
                     getAndSetDownloadConditions={getAndSetDownloadConditions}
                     downloadConditions={downloadConditions}
                     options={
-                      discreteTimeSliderValues
-                        ? {
-                            additionalSlider: (
-                              <DateSliderPoint
-                                valid_points={discreteTimeSliderValues?.get(
-                                  selectedWmsLayer
-                                )}
-                                onDatePointChange={handleSliderPointChange}
-                              />
-                            ),
-                          }
-                        : undefined
+                      additionalSlider ? { additionalSlider } : undefined
                     }
                   />
                 }
@@ -587,11 +710,26 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
               collection={collection}
               visible={selectedMapLayerId === LayerName.SpatialExtent}
             />
+            {hasGriddedProducts && (
+              <GriddedRasterLayer
+                products={griddedProducts}
+                selectedProductId={selectedGriddedProduct?.id ?? ""}
+                onSelectProduct={setGriddedProductOverride}
+                selectedDate={selectedGriddedDate}
+                error={griddedError}
+                onRetry={retryGriddedProducts}
+                visible={selectedMapLayerId === LayerName.GriddedRaster}
+              />
+            )}
           </Layers>
         </MapBox>
       </Box>
       {/* Show the legend exactly when the GeoServer (WMS) layer is the selected
-          map layer - same gate as the GeoServerLayer's own `visible` prop */}
+          map layer - same gate as the GeoServerLayer's own `visible` prop.
+          The gridded raster layer deliberately has no legend: the backend
+          auto-scales each day to that day's own min/max, so a colour bar with
+          no pinned range would be misleading. Pending per-product colormap /
+          rescale / units in the tile products listing. */}
       {mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
         LayerName.GeoServer && (
         <Box sx={{ mb: 1 }}>

@@ -37,6 +37,12 @@ interface DateSliderPointProps {
     event: Event | React.SyntheticEvent<Element, Event> | undefined,
     value: number | number[]
   ) => void;
+  /**
+   * Renders the label for a mark value. Callers whose marks are opaque slider
+   * keys rather than instants (gridded tiles: local-day keys) pass their own
+   * reverse lookup, so the label needs no timezone arithmetic.
+   */
+  formatLabel?: (value: number) => string;
 }
 
 const COMPONENT_ID = "dateslider-daterange-menu-button";
@@ -79,6 +85,7 @@ const stepMarkValue = (
 const DateSliderPoint: React.FC<DateSliderPointProps> = ({
   valid_points,
   onDatePointChange = undefined,
+  formatLabel,
 }) => {
   const sorted_marks: Mark[] = useMemo(() => {
     return [...(valid_points ?? [])]
@@ -91,22 +98,34 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
     [sorted_marks]
   );
 
-  const [datePointStamp, setDatePointStamp] = useState<number | undefined>(
-    sorted_marks.length > 0
-      ? sorted_marks[sorted_marks.length - 1].value
-      : undefined
-  );
+  // The user's pick, which may not survive a change of marks.
+  const [pickedStamp, setPickedStamp] = useState<number | undefined>(undefined);
+
+  /**
+   * Derived rather than stored-and-resynced: marks arrive asynchronously and
+   * change per product, so a pick that the current marks no longer contain must
+   * fall back to the newest mark on the *same* render.
+   *
+   * This deliberately does not notify the parent — the parent derives the same
+   * default from the same source, so both converge without a render loop. It
+   * also fixes the pre-existing WMS bug where switching ncWMS layer stranded
+   * the thumb on the old layer's timestamp.
+   */
+  const datePointStamp =
+    pickedStamp !== undefined && markValues.includes(pickedStamp)
+      ? pickedStamp
+      : markValues[markValues.length - 1];
 
   const handleSliderChange = useCallback(
     (_: Event, newValue: number | number[]) => {
-      setDatePointStamp(newValue as number);
+      setPickedStamp(newValue as number);
     },
     []
   );
 
   const applyPointValue = useCallback(
     (event: Event | React.SyntheticEvent<Element, Event>, newValue: number) => {
-      setDatePointStamp(newValue);
+      setPickedStamp(newValue);
       onDatePointChange?.(event, newValue);
     },
     [onDatePointChange]
@@ -138,6 +157,12 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
     [applyPointValue, datePointStamp, markValues]
   );
 
+  // Must come after every hook. `sorted_marks[0].value` below throws on an empty
+  // array, which is reachable both here (marks arrive async) and on the WMS path
+  // (discreteTimeSliderValues.get() misses whenever the selected layer name
+  // differs from the stored key).
+  if (sorted_marks.length === 0) return null;
+
   return (
     <Grid
       container
@@ -167,7 +192,10 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
             color: portalTheme.palette.text1,
           }}
         >
-          Displaying @ {valueToDate(datePointStamp!).toISOString()}
+          Displaying @{" "}
+          {formatLabel
+            ? formatLabel(datePointStamp!)
+            : valueToDate(datePointStamp!).toISOString()}
         </Typography>
       </Grid>
       <Grid
