@@ -9,7 +9,7 @@ const prettier = require("eslint-plugin-prettier");
 const prettierConfig = require("eslint-config-prettier");
 
 module.exports = [
-  { ignores: ["playwright/.venv/**"] },
+  { ignores: ["playwright/.venv/**", "playwright/pages/js_scripts/**"] },
 
   js.configs.recommended,
 
@@ -60,13 +60,16 @@ module.exports = [
       ...prettierConfig.rules,
 
       "react/react-in-jsx-scope": "off",
-      "no-unused-vars": "off",
+      "no-unused-vars": "off", // replaced by the TS version below
       "@typescript-eslint/no-empty-interface": "off",
       "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-expressions": "off",
       "@typescript-eslint/no-empty-object-type": "off",
-      "no-undef": "off",
+      "no-undef": "off", // tsc already checks this
+
+      // console.log is debug noise; real problems should use warn/error
+      "no-console": ["error", { allow: ["warn", "error"] }],
 
       quotes: ["error", "double", { avoidEscape: true }],
 
@@ -81,6 +84,27 @@ module.exports = [
           json: "always",
         },
       ],
+    },
+  },
+
+  // seo/ = CLI scripts, console output is their UI
+  {
+    files: ["src/seo/**"],
+    rules: {
+      "no-console": "off",
+    },
+  },
+
+  // tests and mocks don't ship to users
+  {
+    files: [
+      "**/__test__/**",
+      "**/__mocks__/**",
+      "**/*.test.{ts,tsx}",
+      "src/setupTests.ts",
+    ],
+    rules: {
+      "no-console": "off",
     },
   },
 ];

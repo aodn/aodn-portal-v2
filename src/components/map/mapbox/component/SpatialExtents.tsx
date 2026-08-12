@@ -144,7 +144,7 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
           if (map?.getLayer(id)) map?.removeLayer(id);
         } catch (error) {
           // Ok to ignore as map gone if we hit this error
-          console.log("Ok to ignore remove layer error", error);
+          console.warn("Ok to ignore remove layer error", error);
           // TODO: handle error in ErrorBoundary
         }
       });
@@ -154,7 +154,7 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
           if (map?.getSource(id)) map?.removeSource(id);
         } catch (error) {
           // Ok to ignore as map gone if we hit this error
-          console.log("Ok to ignore remove source error", error);
+          console.warn("Ok to ignore remove source error", error);
           // TODO: handle error in ErrorBoundary
         }
       });
