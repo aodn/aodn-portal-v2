@@ -268,7 +268,7 @@ const StaticLayer: FC<Partial<StaticLayersProps>> = ({
           map?.removeSource(sourceId);
           isCreatedRef.current = false;
         }
-      } catch (error) {
+      } catch (_error) {
         // OK to ignore error here
       }
     };

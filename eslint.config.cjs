@@ -9,18 +9,30 @@ const prettier = require("eslint-plugin-prettier");
 const prettierConfig = require("eslint-config-prettier");
 
 module.exports = [
-  { ignores: ["playwright/.venv/**"] },
+  {
+    ignores: [
+      "playwright/.venv/**",
+      "playwright/pages/js_scripts/**",
+      "dist/**",
+      "public/**",
+      "node_modules/**",
+    ],
+  },
 
   js.configs.recommended,
 
   {
-    files: ["**/*.{js,jsx,ts,tsx}"],
+    files: ["**/*.{js,jsx,cjs,ts,tsx}"],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
         ecmaFeatures: { jsx: true },
         ecmaVersion: 2021,
         sourceType: "module",
+        projectService: {
+          allowDefaultProject: ["*.ts", "*.js", "*.cjs"],
+        },
+        tsconfigRootDir: __dirname,
       },
       globals: {
         browser: true,
@@ -62,8 +74,16 @@ module.exports = [
       "react/react-in-jsx-scope": "off",
       "no-unused-vars": "off",
       "@typescript-eslint/no-empty-interface": "off",
-      "@typescript-eslint/no-unused-vars": "off",
-      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+          ignoreRestSiblings: true,
+        },
+      ],
+      "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-unused-expressions": "off",
       "@typescript-eslint/no-empty-object-type": "off",
       "no-undef": "off",
@@ -81,6 +101,13 @@ module.exports = [
           json: "always",
         },
       ],
+    },
+  },
+
+  {
+    files: ["**/*.cjs"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
     },
   },
 ];

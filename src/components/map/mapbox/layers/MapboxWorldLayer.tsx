@@ -95,7 +95,7 @@ const MapboxWorldLayer: FC = () => {
           map?.removeLayer(undisputedLabelId);
           map?.removeSource(sourceId);
         }
-      } catch (error) {
+      } catch (_error) {
         // OK to ignore error here
       }
     };

@@ -347,7 +347,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
           map.off("draw.selectionchange", onSelectionChanged);
           map.removeControl(mapDraw as unknown as IControl);
           setMapDrawInteractionActive(map, false);
-        } catch (ignored) {
+        } catch (_ignored) {
           /* can be ignored */
         }
       };

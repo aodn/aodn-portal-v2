@@ -345,7 +345,7 @@ const useWFSDownload = (onCallback?: () => void) => {
 
         // Clean up immediately after processing
         cleanupDownload();
-      } catch (error) {
+      } catch (_error) {
         setDownloadedBytes(0);
         cleanupDownload();
       }

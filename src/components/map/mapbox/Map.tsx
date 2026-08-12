@@ -244,7 +244,7 @@ const ReactMap = memo(
               if (container.offsetWidth > 0 || container.offsetHeight > 0) {
                 map?.resize();
               }
-            } catch (error: any) {
+            } catch (_error) {
               /* empty */
             }
           }, 100)

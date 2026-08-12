@@ -354,7 +354,7 @@ const processDatasetDownload = createAsyncThunk<
         request
       );
       return response.data;
-    } catch (error) {
+    } catch (_error) {
       errorHandling(thunkAPI);
     }
   }
@@ -405,7 +405,7 @@ const processWFSDownload = createAsyncThunk<
           signal: thunkAPI.signal,
         }
       );
-    } catch (error) {
+    } catch (_error) {
       errorHandling(thunkAPI);
     }
   }
@@ -449,7 +449,7 @@ const processWFSEstimateSize = createAsyncThunk<
           signal: thunkAPI.signal,
         }
       );
-    } catch (error) {
+    } catch (_error) {
       errorHandling(thunkAPI);
     }
   }
@@ -497,7 +497,7 @@ const processCoEstimateSize = createAsyncThunk<
           signal: thunkAPI.signal,
         }
       );
-    } catch (error) {
+    } catch (_error) {
       errorHandling(thunkAPI);
     }
   }
