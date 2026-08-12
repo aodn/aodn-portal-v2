@@ -116,7 +116,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       })
       .catch((error) => {
         if (cancelled) return;
-        console.log("Error fetching collection by UUID:", error);
+        console.error("Error fetching collection by UUID:", error);
         setIsCollectionNotFound(true);
       });
     return () => {
@@ -140,7 +140,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       })
       .catch((error) => {
         if (cancelled) return;
-        console.log("Error fetching dataset metadata by UUID:", error);
+        console.error("Error fetching dataset metadata by UUID:", error);
         setDatasetMetadata(undefined);
       });
     return () => {

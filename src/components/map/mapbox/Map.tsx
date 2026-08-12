@@ -198,7 +198,7 @@ const ReactMap = memo(
 
         return newMap;
       } catch (err) {
-        console.log("Map initialization failed:", err);
+        console.error("Map initialization failed:", err);
       }
     }, [panelId, minZoom, maxZoom]);
 
