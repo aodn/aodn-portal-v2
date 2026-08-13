@@ -5661,6 +5661,7 @@ __metadata:
     tsx: "npm:^4.23.5"
     typescript: "npm:^5.4.2"
     vite: "npm:^7.3.5"
+    vite-node: "npm:3.2.4"
     vite-plugin-eslint: "npm:^1.8.1"
     vitest: "npm:^3.2.6"
     web-vitals: "npm:^5.1.0"
