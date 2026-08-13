@@ -8,7 +8,8 @@ crawlers need: head tags, robots.txt, a sitemap, and pre-rendered detail pages.
 
 Ships with the app bundle (wired up in `vite.config.ts`):
 
-- `headTags.ts` — static head tags: site description, `noindex` on non-prod
+- `headTags.ts` — static head tags: site description, social preview (Open
+  Graph) tags, `noindex` on non-prod
 - `vitePlugins.ts` — injects the head tags, picks the right robots.txt
 - `canonicalUrl.ts` — updates the canonical link as the user navigates
 - `constants.ts` — `BASE_URL` (public site) and `OGC_API_BASE` (record source)
@@ -16,15 +17,16 @@ Ships with the app bundle (wired up in `vite.config.ts`):
 Published to S3 by the [Publish SEO Artifacts workflow](../../.github/workflows/seo.yml),
 every Monday morning or manually:
 
-- `SitemapUtils.ts` — builds `sitemap.xml` listing all ~15k `/details/<uuid>` pages
-- `PrerenderUtils.ts` — one static page per record with real title, description
-  and Dataset JSON-LD (extensionless files: S3 key = request path)
+- `sitemap.ts` — builds `sitemap.xml` listing all ~15k `/details/<uuid>` pages
+- `prerender.ts` — fetches records with `fetchResultNoStore`, then writes one
+  static page per record (title, description, Dataset JSON-LD, social tags)
 - `buildSeoArtifacts.ts` — `yarn seo:artifacts`, runs both from one records fetch
+  (vite-node, so store imports resolve assets and `import.meta.env`)
 
 Checks:
 
 - `verifySeoArtifacts.ts` — `yarn seo:verify [site-url]`, validates `dist/` or a deployed site
-- `SearchConsoleUtils.ts` — `yarn seo:gsc`, submits the sitemap and reads index
+- `searchConsole.ts` — `yarn seo:gsc`, submits the sitemap and reads index
   status from Google (setup below)
 
 ## Process
@@ -40,9 +42,9 @@ Before publishing, locally: `yarn test`, then build + `yarn seo:artifacts` +
 `yarn seo:verify` — validates `dist/` without touching S3.
 
 The workflow runs the same checks as steps: `seo:verify` before uploading and
-`seo:verify <site>` after the CloudFront invalidation. A commented-out step is
-ready to submit the sitemap and report index coverage weekly — enable it, with
-the `GSC_SERVICE_ACCOUNT_KEY` secret, once the sitemap is live.
+`seo:verify <site>` after the CloudFront invalidation. On production it then
+submits the sitemap and reports index coverage in the run log (via the
+`GSC_SERVICE_ACCOUNT_KEY` environment secret).
 
 After publishing, against the live site:
 

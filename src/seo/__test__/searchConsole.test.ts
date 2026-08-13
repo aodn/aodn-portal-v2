@@ -13,7 +13,7 @@ import {
   fetchSitemapUrls,
   loadServiceAccountKey,
   sampleEvenly,
-} from "../SearchConsoleUtils";
+} from "../searchConsole";
 
 describe("buildJwtAssertion", () => {
   const { publicKey, privateKey } = generateKeyPairSync("rsa", {

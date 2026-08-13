@@ -10,9 +10,8 @@
 
 import { createSign } from "crypto";
 import { readFile } from "fs/promises";
-import path from "path";
-import { fileURLToPath } from "url";
-import { BASE_URL } from "./constants";
+import { isSeoCli, runCli } from "./cli";
+import { BASE_URL, extractSitemapUrls } from "./constants";
 
 // The verified URL-prefix property (trailing slash matters); GSC_SITE_URL overrides
 const SITE_URL = process.env.GSC_SITE_URL ?? `${BASE_URL}/`;
@@ -121,9 +120,7 @@ export const sampleEvenly = <T>(items: T[], size: number): T[] => {
 export const fetchSitemapUrls = async (): Promise<string[]> => {
   const response = await fetch(SITEMAP_URL);
   const xml = await response.text();
-  const urls = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(
-    (match) => match[1]
-  );
+  const urls = extractSitemapUrls(xml);
   if (urls.length === 0) {
     throw new Error(
       `No <loc> entries at ${SITEMAP_URL} (HTTP ${response.status}) — is the sitemap published?`
@@ -158,30 +155,24 @@ const printIndexCoverage = async (token: string, size: number) => {
   }
 };
 
-const isRunDirectly =
-  process.argv[1] &&
-  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-
-if (isRunDirectly) {
+if (isSeoCli("searchConsole.ts")) {
   const [command, arg] = process.argv.slice(2);
-  const run = async () => {
-    if (!["submit", "status", "inspect"].includes(command)) {
-      throw new Error(
-        "Usage: yarn seo:gsc submit | status | inspect [sampleSize]"
-      );
-    }
-    const token = await fetchAccessToken(await loadServiceAccountKey());
-    if (command === "submit") {
-      await submitSitemap(token);
-      await printSitemapStatus(token);
-    } else if (command === "status") {
-      await printSitemapStatus(token);
-    } else if (command === "inspect") {
-      await printIndexCoverage(token, Number(arg) || 50);
-    }
-  };
-  run().catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+  runCli(
+    (async () => {
+      if (!["submit", "status", "inspect"].includes(command)) {
+        throw new Error(
+          "Usage: yarn seo:gsc submit | status | inspect [sampleSize]"
+        );
+      }
+      const token = await fetchAccessToken(await loadServiceAccountKey());
+      if (command === "submit") {
+        await submitSitemap(token);
+        await printSitemapStatus(token);
+      } else if (command === "status") {
+        await printSitemapStatus(token);
+      } else if (command === "inspect") {
+        await printIndexCoverage(token, Number(arg) || 50);
+      }
+    })()
+  );
 }
