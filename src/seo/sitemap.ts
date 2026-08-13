@@ -5,27 +5,23 @@
 
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
-import { fileURLToPath } from "url";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
-import { BASE_URL } from "./constants";
-
-const isRealCollectionId = (id: string | undefined): id is string =>
-  Boolean(id) && id !== "undefined";
-
-const escapeXml = (value: string) =>
-  value.replace(/[<>&'"]/g, (c) => `&#${c.charCodeAt(0)};`);
+import { isSeoCli, runCli, seoDistDir } from "./cli";
+import {
+  BASE_URL,
+  detailsUrl,
+  escapeEntities,
+  isSafeCollectionId,
+} from "./constants";
 
 export const toSitemapXml = (uuids: string[], generatedAt = new Date()) => {
-  const urls = [
-    `${BASE_URL}/`,
-    ...uuids.map((uuid) => `${BASE_URL}/details/${uuid}`),
-  ];
+  const urls = [`${BASE_URL}/`, ...uuids.map(detailsUrl)];
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
     // Crawlers ignore comments; this tells a human how stale the live file is
     `<!-- generated ${generatedAt.toISOString()} by the Publish SEO Artifacts workflow -->`,
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-    ...urls.map((url) => `  <url><loc>${escapeXml(url)}</loc></url>`),
+    ...urls.map((url) => `  <url><loc>${escapeEntities(url)}</loc></url>`),
     "</urlset>",
     "",
   ].join("\n");
@@ -37,7 +33,7 @@ export const generateSitemap = async (
 ) => {
   const uuids = collections
     .map((collection) => collection.id)
-    .filter(isRealCollectionId);
+    .filter(isSafeCollectionId);
   if (uuids.length === 0) {
     throw new Error(
       "No collections returned from the OGC API; refusing to write an empty sitemap."
@@ -56,20 +52,10 @@ export const generateSitemap = async (
   console.log(`Wrote ${uuids.length + 1} URLs to ${outFile}`);
 };
 
-const isRunDirectly = process.argv.some((arg) =>
-  arg.replace(/\\/g, "/").endsWith("/src/seo/sitemap.ts")
-);
-
-if (isRunDirectly) {
-  const outDir = path.resolve(
-    path.dirname(fileURLToPath(import.meta.url)),
-    "../../dist"
+if (isSeoCli("sitemap.ts")) {
+  runCli(
+    import("./prerender")
+      .then(({ fetchCollections }) => fetchCollections("id"))
+      .then((collections) => generateSitemap(seoDistDir(), collections))
   );
-  import("./prerender")
-    .then(({ fetchCollections }) => fetchCollections("id"))
-    .then((collections) => generateSitemap(outDir, collections))
-    .catch((error) => {
-      console.error(error);
-      process.exit(1);
-    });
 }

@@ -3,15 +3,11 @@
  * dist/index.html must already exist — it is the pre-render template.
  */
 
-import path from "path";
-import { fileURLToPath } from "url";
+import { seoDistDir } from "./cli";
 import { fetchCollections, prerenderDetailPages } from "./prerender";
 import { generateSitemap } from "./sitemap";
 
-const outDir = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "../../dist"
-);
+const outDir = seoDistDir();
 
 // One fetchResultNoStore walk, shared by the sitemap and the detail pages
 const collections = await fetchCollections();

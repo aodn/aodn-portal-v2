@@ -6,8 +6,13 @@
 
 import { readdir, readFile } from "fs/promises";
 import path from "path";
-import { fileURLToPath } from "url";
-import { BASE_URL } from "./constants";
+import { isSeoCli, seoDistDir } from "./cli";
+import {
+  BASE_URL,
+  detailsUrl,
+  extractSitemapUrls,
+  SITE_NAME,
+} from "./constants";
 import { sampleEvenly } from "./searchConsole";
 
 // The workflow refuses to publish fewer pages — keep in sync with seo.yml
@@ -17,9 +22,7 @@ const LIVE_SAMPLE_SIZE = 3;
 
 export const checkSitemap = (xml: string, minUrls = MIN_PAGES) => {
   const problems: string[] = [];
-  const urls = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(
-    (match) => match[1]
-  );
+  const urls = extractSitemapUrls(xml);
   if (!xml.startsWith("<?xml")) {
     problems.push("does not start with an XML declaration");
   }
@@ -41,14 +44,10 @@ export const checkSitemap = (xml: string, minUrls = MIN_PAGES) => {
 export const checkDetailPage = (html: string, uuid: string): string[] => {
   const problems: string[] = [];
   const title = html.match(/<title>(.*?)<\/title>/s)?.[1];
-  if (!title || title.trim() === "AODN Portal") {
+  if (!title || title.trim() === SITE_NAME) {
     problems.push("title is missing or still the generic site title");
   }
-  if (
-    !html.includes(
-      `<link rel="canonical" href="${BASE_URL}/details/${uuid}" />`
-    )
-  ) {
+  if (!html.includes(`<link rel="canonical" href="${detailsUrl(uuid)}" />`)) {
     problems.push("canonical does not point at this record");
   }
   if (!/<meta name="description" content="[^"]/.test(html)) {
@@ -73,7 +72,7 @@ export const checkDetailPage = (html: string, uuid: string): string[] => {
       if (!dataset.name || !dataset.description) {
         problems.push("JSON-LD is missing name or description");
       }
-      if (dataset.url !== `${BASE_URL}/details/${uuid}`) {
+      if (dataset.url !== detailsUrl(uuid)) {
         problems.push("JSON-LD url does not match the record");
       }
     } catch {
@@ -150,7 +149,7 @@ const verifyDist = async (distDir: string) => {
     failures.push(
       ...checkDetailPage(html, uuid).map((p) => `details/${uuid}: ${p}`)
     );
-    if (urls.length > 0 && !urls.includes(`${BASE_URL}/details/${uuid}`)) {
+    if (urls.length > 0 && !urls.includes(detailsUrl(uuid))) {
       failures.push(`details/${uuid}: not listed in sitemap.xml`);
     }
   }
@@ -180,8 +179,8 @@ const verifyLive = async (site: string) => {
   failures.push(...problems.map((p) => `sitemap.xml: ${p}`));
 
   const detailUuids = urls
-    .filter((url) => url.includes("/details/"))
-    .map((url) => url.split("/details/")[1]);
+    .filter((url: string) => url.includes("/details/"))
+    .map((url: string) => url.split("/details/")[1]);
   for (const uuid of sampleEvenly(detailUuids, LIVE_SAMPLE_SIZE)) {
     failures.push(
       ...checkDetailPage(await fetchText(`/details/${uuid}`), uuid).map(
@@ -196,17 +195,11 @@ const verifyLive = async (site: string) => {
   );
 };
 
-const isRunDirectly =
-  process.argv[1] &&
-  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-
-if (isRunDirectly) {
+if (isSeoCli("verifySeoArtifacts.ts")) {
   const [siteArg] = process.argv.slice(2);
   const run = siteArg?.startsWith("http")
     ? verifyLive(siteArg.replace(/\/+$/, ""))
-    : verifyDist(
-        path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../dist")
-      );
+    : verifyDist(seoDistDir());
   run.catch((error) => {
     console.error(String(error));
     process.exit(1);

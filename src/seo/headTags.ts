@@ -3,9 +3,9 @@
  * "<!-- seo-tags -->" placeholder (see vitePlugins.ts).
  */
 
-import { BASE_URL, SHARE_IMAGE_URL } from "./constants";
+import { BASE_URL, SHARE_IMAGE_URL, SITE_NAME } from "./constants";
 
-const SITE_TITLE = "AODN Portal – Australian Ocean Data Network";
+const SITE_TITLE = `${SITE_NAME} – Australian Ocean Data Network`;
 const SITE_DESCRIPTION =
   "Open access to Australian marine and climate science data.";
 
@@ -23,7 +23,7 @@ export const buildSeoHeadTags = (isProduction: boolean) => `
 
         <!-- Social link previews; detail pages replace these during prerender -->
         <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="AODN Portal" />
+        <meta property="og:site_name" content="${SITE_NAME}" />
         <meta property="og:title" content="${SITE_TITLE}" />
         <meta property="og:description" content="${SITE_DESCRIPTION}" />
         <meta property="og:url" content="${BASE_URL}/" />

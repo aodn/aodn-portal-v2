@@ -6,7 +6,6 @@
 
 import { readFile, writeFile, mkdir } from "fs/promises";
 import path from "path";
-import { fileURLToPath } from "url";
 import { configureStore } from "@reduxjs/toolkit";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import {
@@ -15,10 +14,15 @@ import {
   jsonToOGCCollections,
   ogcAxiosWithRetry,
 } from "@/app/store/searchReducer";
-import { BASE_URL, OGC_API_BASE, SHARE_IMAGE_URL } from "./constants";
-
-// Keep in sync with useDocumentTitle.ts
-const SITE_NAME = "AODN Portal";
+import { isSeoCli, runCli, seoDistDir } from "./cli";
+import {
+  detailsUrl,
+  escapeEntities,
+  isSafeCollectionId,
+  OGC_API_BASE,
+  SHARE_IMAGE_URL,
+  SITE_NAME,
+} from "./constants";
 
 // Fields the bulk collections endpoint can return; license/citation/contacts
 // are only available per-record and are optional in Dataset JSON-LD, so they
@@ -46,32 +50,40 @@ export const describeFetchError = (error: unknown) => {
     : error.message;
 };
 
-export const fetchCollections = async (
-  properties = SEO_PROPERTIES
-): Promise<OGCCollection[]> => {
-  const collections: OGCCollection[] = [];
-  let searchAfter: string[] | undefined;
-  let total: number | undefined;
-
-  console.log(`Fetching ${properties} from ${API_URL}`);
-
+const withOgcHost = async <T>(run: () => Promise<T>): Promise<T> => {
   // Point the shared app client at the absolute OGC host; restore afterwards
   // so importing this module in tests does not leak Node-only defaults
   const originalBaseURL = ogcAxiosWithRetry.defaults.baseURL;
   const originalUA = ogcAxiosWithRetry.defaults.headers.common["User-Agent"];
   ogcAxiosWithRetry.defaults.baseURL = `${OGC_API_BASE}/api/v1`;
   ogcAxiosWithRetry.defaults.headers.common["User-Agent"] = USER_AGENT;
-
-  const store = configureStore({ reducer: (state = {}) => state });
-
   try {
+    return await run();
+  } finally {
+    ogcAxiosWithRetry.defaults.baseURL = originalBaseURL;
+    if (originalUA === undefined) {
+      delete ogcAxiosWithRetry.defaults.headers.common["User-Agent"];
+    } else {
+      ogcAxiosWithRetry.defaults.headers.common["User-Agent"] = originalUA;
+    }
+  }
+};
+
+export const fetchCollections = async (
+  properties = SEO_PROPERTIES
+): Promise<OGCCollection[]> => {
+  console.log(`Fetching ${properties} from ${API_URL}`);
+
+  return withOgcHost(async () => {
+    const collections: OGCCollection[] = [];
+    let searchAfter: string[] | undefined;
+    let total: number | undefined;
+    const store = configureStore({ reducer: (state = {}) => state });
+
     for (;;) {
       const params = createSearchParamFrom(
         {},
-        {
-          pagesize: PAGE_SIZE,
-          ...(searchAfter ? { searchafter: searchAfter } : {}),
-        }
+        { pagesize: PAGE_SIZE, searchafter: searchAfter }
       );
       params.properties = properties;
 
@@ -86,9 +98,8 @@ export const fetchCollections = async (
 
       const pageResult = jsonToOGCCollections(payload);
       total = pageResult.total;
-      const page = pageResult.collections;
-      if (page.length === 0) break;
-      collections.push(...page);
+      if (pageResult.collections.length === 0) break;
+      collections.push(...pageResult.collections);
       console.log(`Fetched ${collections.length}/${total} collections`);
 
       if (
@@ -99,35 +110,19 @@ export const fetchCollections = async (
       }
       searchAfter = pageResult.search_after;
     }
-  } finally {
-    ogcAxiosWithRetry.defaults.baseURL = originalBaseURL;
-    if (originalUA === undefined) {
-      delete ogcAxiosWithRetry.defaults.headers.common["User-Agent"];
-    } else {
-      ogcAxiosWithRetry.defaults.headers.common["User-Agent"] = originalUA;
-    }
-  }
 
-  if (collections.length !== total) {
-    console.warn(`Expected ${total} collections but got ${collections.length}`);
-  }
-  return collections;
+    if (collections.length !== total) {
+      console.warn(
+        `Expected ${total} collections but got ${collections.length}`
+      );
+    }
+    return collections;
+  });
 };
 
-// The id becomes a file name / S3 object key; skip anything unexpected
-const SAFE_ID = /^[A-Za-z0-9._-]+$/;
-
 const hasSeoFields = (collection: OGCCollection) =>
-  Boolean(
-    collection.id &&
-    collection.id !== "undefined" &&
-    SAFE_ID.test(collection.id) &&
-    collection.title &&
-    collection.description
-  );
-
-const escapeHtml = (value: string) =>
-  value.replace(/[<>&'"]/g, (c) => `&#${c.charCodeAt(0)};`);
+  isSafeCollectionId(collection.id) &&
+  Boolean(collection.title && collection.description);
 
 // schema.org GeoShape box is "south west north east"; OGC bbox is [west, south, east, north]
 const toSpatialCoverage = (collection: OGCCollection) => {
@@ -157,8 +152,7 @@ const toKeywords = (collection: OGCCollection) => {
 // providers is on the API payload but not modelled on OGCCollection
 const toCreators = (collection: OGCCollection) => {
   const names = (
-    (collection as OGCCollection & { providers?: { name?: string }[] })
-      .providers ?? []
+    (collection as { providers?: { name?: string }[] }).providers ?? []
   )
     .map((provider) => provider.name)
     .filter(Boolean);
@@ -174,7 +168,7 @@ export const buildJsonLd = (collection: OGCCollection) => ({
   name: collection.title,
   // Google recommends descriptions under 5000 characters
   description: collection.description?.slice(0, 5000),
-  url: `${BASE_URL}/details/${collection.id}`,
+  url: detailsUrl(collection.id),
   identifier: collection.id,
   keywords: toKeywords(collection),
   creator: toCreators(collection),
@@ -183,14 +177,17 @@ export const buildJsonLd = (collection: OGCCollection) => ({
 });
 
 export const renderPage = (template: string, collection: OGCCollection) => {
-  const description = escapeHtml((collection.description ?? "").slice(0, 160));
-  const pageUrl = `${BASE_URL}/details/${collection.id}`;
+  const title = escapeEntities(collection.title ?? "");
+  const description = escapeEntities(
+    (collection.description ?? "").slice(0, 160)
+  );
+  const pageUrl = detailsUrl(collection.id);
   const headTags = [
     `<link rel="canonical" href="${pageUrl}" />`,
     `<meta name="description" content="${description}" />`,
     '<meta property="og:type" content="website" />',
     `<meta property="og:site_name" content="${SITE_NAME}" />`,
-    `<meta property="og:title" content="${escapeHtml(collection.title ?? "")}" />`,
+    `<meta property="og:title" content="${title}" />`,
     `<meta property="og:description" content="${description}" />`,
     `<meta property="og:url" content="${pageUrl}" />`,
     `<meta property="og:image" content="${SHARE_IMAGE_URL}" />`,
@@ -201,10 +198,7 @@ export const renderPage = (template: string, collection: OGCCollection) => {
   ].join("\n    ");
   return (
     template
-      .replace(
-        /<title>.*?<\/title>/s,
-        `<title>${escapeHtml(collection.title ?? "")} | ${SITE_NAME}</title>`
-      )
+      .replace(/<title>.*?<\/title>/s, `<title>${title} | ${SITE_NAME}</title>`)
       // The template carries site-wide description and social tags; the record's replace them
       .replace(/\s*<meta name="description"[^>]*\/?>/, "")
       .replace(/\s*<meta (?:property="og:|name="twitter:)[^>]*\/?>/g, "")
@@ -222,44 +216,36 @@ export const prerenderDetailPages = async (
   const detailsDir = path.join(outDir, "details");
   await mkdir(detailsDir, { recursive: true });
 
-  let written = 0;
-  let skipped = 0;
-  for (const collection of collections) {
-    if (!hasSeoFields(collection)) {
-      skipped++;
-      continue;
-    }
-    await writeFile(
-      path.join(detailsDir, collection.id),
-      renderPage(template, collection)
+  const pages = collections.filter(hasSeoFields);
+  const skipped = collections.length - pages.length;
+  // Bound concurrency so ~15k writes do not hit EMFILE
+  const WRITE_CONCURRENCY = 64;
+  for (let i = 0; i < pages.length; i += WRITE_CONCURRENCY) {
+    await Promise.all(
+      pages
+        .slice(i, i + WRITE_CONCURRENCY)
+        .map((collection) =>
+          writeFile(
+            path.join(detailsDir, collection.id),
+            renderPage(template, collection)
+          )
+        )
     );
-    written++;
   }
 
-  if (written === 0) {
+  if (pages.length === 0) {
     throw new Error(
       "No detail pages pre-rendered; refusing to ship an empty details folder."
     );
   }
   console.log(
-    `Pre-rendered ${written} detail pages to ${detailsDir}` +
+    `Pre-rendered ${pages.length} detail pages to ${detailsDir}` +
       (skipped
         ? ` (skipped ${skipped} without valid id/title/description)`
         : "")
   );
 };
 
-const isRunDirectly = process.argv.some((arg) =>
-  arg.replace(/\\/g, "/").endsWith("/src/seo/prerender.ts")
-);
-
-if (isRunDirectly) {
-  const outDir = path.resolve(
-    path.dirname(fileURLToPath(import.meta.url)),
-    "../../dist"
-  );
-  prerenderDetailPages(outDir).catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+if (isSeoCli("prerender.ts")) {
+  runCli(prerenderDetailPages(seoDistDir()));
 }
