@@ -4,6 +4,7 @@
  */
 
 import { describe, expect, test } from "vitest";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { BASE_URL } from "../constants";
 import { renderPage } from "../prerender";
 import {
@@ -14,15 +15,15 @@ import {
 } from "../verifySeoArtifacts";
 
 const template =
-  "<!doctype html><html><head><title>AODN Portal</title>" +
+  "<!doctype html><html lang='en'><head><title>AODN Portal</title>" +
   '<meta name="description" content="site-wide" />' +
   '</head><body><div id="root"></div></body></html>';
 
-const collection = {
+const collection = Object.assign(new OGCCollection(), {
   id: "abc-123",
   title: "Sea Surface Temperature",
   description: "Gridded SST records.",
-};
+});
 
 describe("checkDetailPage", () => {
   test("passes the exact output of renderPage", () => {
@@ -110,7 +111,7 @@ describe("checkSitemap", () => {
 
 describe("checkHomePage", () => {
   const homePage = (extraHeadTags: string) =>
-    "<!doctype html><html><head><title>AODN Portal</title>" +
+    "<!doctype html><html lang='en'><head><title>AODN Portal</title>" +
     '<meta name="description" content="Open access" />' +
     `${extraHeadTags}</head><body><div id="root"></div></body></html>`;
   const NOINDEX = '<meta name="robots" content="noindex, nofollow" />';

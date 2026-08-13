@@ -1,11 +1,22 @@
-import { describe, expect, test } from "vitest";
-import { buildJsonLd, renderPage } from "../prerender";
-import { BASE_URL } from "../constants";
+import { afterEach, describe, expect, test, vi } from "vitest";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { ogcAxiosWithRetry } from "@/app/store/searchReducer";
+import {
+  buildJsonLd,
+  describeFetchError,
+  fetchCollections,
+  renderPage,
+  SEO_PROPERTIES,
+} from "../prerender";
+import { BASE_URL, OGC_API_BASE } from "../constants";
 
 const TEMPLATE =
-  '<!doctype html><html><head><title>AODN Portal</title><meta charset="utf-8"></head><body><div id="root"></div></body></html>';
+  '<!doctype html><html lang="en"><head><title>AODN Portal</title><meta charset="utf-8"></head><body><div id="root"></div></body></html>';
 
-const collection = {
+const toCollection = (data: Record<string, unknown>) =>
+  Object.assign(new OGCCollection(), data);
+
+const collection = toCollection({
   id: "abc-123",
   title: "Sea Surface Temperature",
   description: "Daily SST observations around Australia.",
@@ -19,7 +30,7 @@ const collection = {
     ],
   },
   providers: [{ name: "IMOS" }, { name: "IMOS" }, { name: "CSIRO" }],
-};
+});
 
 const extractJsonLd = (html: string) => {
   const match = html.match(
@@ -55,11 +66,13 @@ describe("buildJsonLd", () => {
   });
 
   test("omits optional fields the record does not have", () => {
-    const jsonLd = buildJsonLd({
-      id: "abc-123",
-      title: "Bare record",
-      description: "No extent, themes or providers.",
-    });
+    const jsonLd = buildJsonLd(
+      toCollection({
+        id: "abc-123",
+        title: "Bare record",
+        description: "No extent, themes or providers.",
+      })
+    );
 
     const serialized = JSON.stringify(jsonLd);
     expect(serialized).not.toContain("keywords");
@@ -70,11 +83,13 @@ describe("buildJsonLd", () => {
   });
 
   test("caps the description at 5000 characters", () => {
-    const jsonLd = buildJsonLd({
-      id: "abc-123",
-      title: "Long record",
-      description: "x".repeat(6000),
-    });
+    const jsonLd = buildJsonLd(
+      toCollection({
+        id: "abc-123",
+        title: "Long record",
+        description: "x".repeat(6000),
+      })
+    );
 
     expect((jsonLd.description as string).length).toBe(5000);
   });
@@ -101,11 +116,14 @@ describe("renderPage", () => {
   });
 
   test("escapes HTML in the title and meta description", () => {
-    const html = renderPage(TEMPLATE, {
-      id: "abc-123",
-      title: 'Temp <"salinity" & more>',
-      description: 'A "quoted" <description> & more',
-    });
+    const html = renderPage(
+      TEMPLATE,
+      toCollection({
+        id: "abc-123",
+        title: 'Temp <"salinity" & more>',
+        description: 'A "quoted" <description> & more',
+      })
+    );
 
     expect(html).toContain(
       "<title>Temp &#60;&#34;salinity&#34; &#38; more&#62; | AODN Portal</title>"
@@ -117,11 +135,14 @@ describe("renderPage", () => {
   });
 
   test("keeps a </script> inside the description from closing the JSON-LD tag", () => {
-    const html = renderPage(TEMPLATE, {
-      id: "abc-123",
-      title: "Sneaky record",
-      description: 'Contains </script><script>alert("x")</script> inline.',
-    });
+    const html = renderPage(
+      TEMPLATE,
+      toCollection({
+        id: "abc-123",
+        title: "Sneaky record",
+        description: 'Contains </script><script>alert("x")</script> inline.',
+      })
+    );
 
     // Still exactly one script open/close pair, and the payload parses back intact
     expect(html.match(/<\/script>/g)).toHaveLength(1);
@@ -172,15 +193,83 @@ describe("renderPage", () => {
   });
 
   test("caps the meta description at 160 characters", () => {
-    const html = renderPage(TEMPLATE, {
-      id: "abc-123",
-      title: "Long record",
-      description: "y".repeat(300),
-    });
+    const html = renderPage(
+      TEMPLATE,
+      toCollection({
+        id: "abc-123",
+        title: "Long record",
+        description: "y".repeat(300),
+      })
+    );
 
     // Only the meta tag is capped; the JSON-LD description keeps up to 5000
     const meta = html.match(/<meta name="description" content="(y+)"/);
     expect(meta![1]).toHaveLength(160);
     expect(extractJsonLd(html).description).toHaveLength(300);
+  });
+});
+
+const singlePage = { total: 1, collections: [{ id: "abc-123" }] };
+
+describe("describeFetchError", () => {
+  test("surfaces the cause, without which every network failure reads the same", () => {
+    const error = new Error("fetch failed");
+    (error as Error & { cause?: unknown }).cause = new Error(
+      "getaddrinfo ENOTFOUND ogcapi-production.aodn.org.au"
+    );
+
+    expect(describeFetchError(error)).toBe(
+      "fetch failed: getaddrinfo ENOTFOUND ogcapi-production.aodn.org.au"
+    );
+  });
+
+  test("falls back to the message when there is no cause", () => {
+    expect(describeFetchError(new Error("HTTP 503 for /collections"))).toBe(
+      "HTTP 503 for /collections"
+    );
+  });
+});
+
+describe("fetchCollections uses fetchResultNoStore", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  test("fetches from the API origin, not the public site host", async () => {
+    const get = vi
+      .spyOn(ogcAxiosWithRetry, "get")
+      .mockImplementation(async () => {
+        expect(ogcAxiosWithRetry.defaults.baseURL).toBe(
+          `${OGC_API_BASE}/api/v1`
+        );
+        expect(ogcAxiosWithRetry.defaults.baseURL).not.toContain(BASE_URL);
+        expect(ogcAxiosWithRetry.defaults.baseURL).not.toContain("//api");
+        return { data: singlePage } as never;
+      });
+
+    const collections = await fetchCollections();
+
+    expect(collections.map((item) => item.id)).toEqual(["abc-123"]);
+    expect(get).toHaveBeenCalledWith(
+      "/ogc/collections",
+      expect.objectContaining({
+        params: expect.objectContaining({
+          properties: SEO_PROPERTIES,
+          filter: "page_size=1000",
+        }),
+      })
+    );
+    expect(ogcAxiosWithRetry.defaults.baseURL).toBe("/api/v1");
+  });
+
+  test("overrides axios's default UA, which WAF bot rules flag", async () => {
+    vi.spyOn(ogcAxiosWithRetry, "get").mockImplementation(async () => {
+      expect(
+        String(ogcAxiosWithRetry.defaults.headers.common["User-Agent"])
+      ).toContain("Mozilla/5.0");
+      return { data: singlePage } as never;
+    });
+
+    await fetchCollections();
   });
 });

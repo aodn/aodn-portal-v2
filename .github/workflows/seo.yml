@@ -60,6 +60,7 @@ jobs:
 
       - name: Generate sitemap.xml and pre-rendered detail pages
         run: |
+          # seo:artifacts runs under vite-node so it can reuse fetchResultNoStore
           yarn seo:artifacts
           # Same checks a developer runs locally; refuses to publish a bad batch
           yarn seo:verify

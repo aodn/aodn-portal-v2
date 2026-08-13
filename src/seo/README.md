@@ -18,9 +18,10 @@ Published to S3 by the [Publish SEO Artifacts workflow](../../.github/workflows/
 every Monday morning or manually:
 
 - `sitemap.ts` — builds `sitemap.xml` listing all ~15k `/details/<uuid>` pages
-- `prerender.ts` — one static page per record with real title, description,
-  Dataset JSON-LD and social preview tags (extensionless: S3 key = request path)
+- `prerender.ts` — fetches records with `fetchResultNoStore`, then writes one
+  static page per record (title, description, Dataset JSON-LD, social tags)
 - `buildSeoArtifacts.ts` — `yarn seo:artifacts`, runs both from one records fetch
+  (vite-node, so store imports resolve assets and `import.meta.env`)
 
 Checks:
 

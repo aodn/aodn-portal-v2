@@ -1,119 +1,16 @@
 /**
  * Builds dist/sitemap.xml listing the home page and every /details/<uuid>.
- * Standalone: npx tsx src/seo/sitemap.ts — see README.md
+ * Standalone: npx vite-node src/seo/sitemap.ts — see README.md
  */
 
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
-import { BASE_URL, OGC_API_BASE } from "./constants";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { BASE_URL } from "./constants";
 
-// Fetch host is independent of the public URLs written into the sitemap
-const API_URL = `${OGC_API_BASE}/api/v1/ogc/collections`;
-const PAGE_SIZE = 1000;
-const MAX_RETRIES = 3;
-
-// Node's fetch defaults to "user-agent: node", which WAF bot rules flag;
-// present a browser-like UA so CI traffic is not challenged
-const USER_AGENT =
-  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
-
-// The subset of an OGC collection the SEO build steps read
-export interface OGCCollection {
-  id?: string;
-  title?: string;
-  description?: string;
-  extent?: {
-    spatial?: { bbox?: number[][] };
-    temporal?: { interval?: (string | null)[][] };
-  };
-  properties?: { themes?: { concepts?: { id?: string }[] }[] };
-  providers?: { name?: string }[];
-}
-
-interface CollectionsPage {
-  total?: number;
-  collections?: OGCCollection[];
-  search_after?: string[];
-}
-
-// Node reports every network failure as "fetch failed" and puts the reason that
-// actually identifies it — DNS, TLS, connection reset — in error.cause
-export const describeFetchError = (error: unknown) => {
-  if (!(error instanceof Error)) return String(error);
-  // Node has carried .cause since 16.9; the ES2020 lib just does not type it
-  const { cause } = error as Error & { cause?: unknown };
-  return cause instanceof Error
-    ? `${error.message}: ${cause.message}`
-    : error.message;
-};
-
-const fetchJsonWithRetry = async (url: string): Promise<CollectionsPage> => {
-  for (let attempt = 1; ; attempt++) {
-    try {
-      const response = await fetch(url, {
-        headers: { Accept: "application/json", "User-Agent": USER_AGENT },
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status} for ${url}`);
-      }
-      const body = await response.text();
-      try {
-        return JSON.parse(body) as CollectionsPage;
-      } catch {
-        // A 2xx non-JSON body means the CDN answered with a fallback or
-        // challenge page instead of the API; surface what actually came back
-        throw new Error(
-          `Non-JSON response (HTTP ${response.status}, content-type ${response.headers.get("content-type")}) for ${url}; body starts: ${JSON.stringify(body.slice(0, 100))}`
-        );
-      }
-    } catch (error) {
-      if (attempt >= MAX_RETRIES) {
-        throw new Error(
-          `Gave up after ${MAX_RETRIES} attempts on ${url} — ${describeFetchError(error)}`
-        );
-      }
-      const retryInSeconds = (2000 * attempt) / 1000;
-      console.warn(
-        `Attempt ${attempt}/${MAX_RETRIES} failed (${describeFetchError(error)}), retrying in ${retryInSeconds}s`
-      );
-      await new Promise((resolve) => setTimeout(resolve, 2000 * attempt));
-    }
-  }
-};
-
-export const fetchAllCollections = async (
-  properties = "id"
-): Promise<OGCCollection[]> => {
-  const collections: OGCCollection[] = [];
-  let searchAfter: string[] | undefined;
-  let total: number | undefined;
-
-  console.log(`Fetching ${properties} from ${API_URL}`);
-
-  for (;;) {
-    let filter = `page_size=${PAGE_SIZE}`;
-    if (searchAfter) {
-      filter += ` AND search_after='${searchAfter.join("||")}'`;
-    }
-    const url = `${API_URL}?properties=${properties}&filter=${encodeURIComponent(filter)}`;
-    const json = await fetchJsonWithRetry(url);
-
-    total = json.total;
-    const page = json.collections ?? [];
-    if (page.length === 0) break;
-    collections.push(...page);
-    console.log(`Fetched ${collections.length}/${total} collections`);
-
-    if (!json.search_after || collections.length >= (total ?? 0)) break;
-    searchAfter = json.search_after;
-  }
-
-  if (collections.length !== total) {
-    console.warn(`Expected ${total} collections but got ${collections.length}`);
-  }
-  return collections;
-};
+const isRealCollectionId = (id: string | undefined): id is string =>
+  Boolean(id) && id !== "undefined";
 
 const escapeXml = (value: string) =>
   value.replace(/[<>&'"]/g, (c) => `&#${c.charCodeAt(0)};`);
@@ -136,11 +33,11 @@ export const toSitemapXml = (uuids: string[], generatedAt = new Date()) => {
 
 export const generateSitemap = async (
   outDir: string,
-  prefetched?: OGCCollection[]
+  collections: OGCCollection[]
 ) => {
-  const uuids = (prefetched ?? (await fetchAllCollections()))
+  const uuids = collections
     .map((collection) => collection.id)
-    .filter((id): id is string => Boolean(id));
+    .filter(isRealCollectionId);
   if (uuids.length === 0) {
     throw new Error(
       "No collections returned from the OGC API; refusing to write an empty sitemap."
@@ -159,17 +56,20 @@ export const generateSitemap = async (
   console.log(`Wrote ${uuids.length + 1} URLs to ${outFile}`);
 };
 
-const isRunDirectly =
-  process.argv[1] &&
-  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+const isRunDirectly = process.argv.some((arg) =>
+  arg.replace(/\\/g, "/").endsWith("/src/seo/sitemap.ts")
+);
 
 if (isRunDirectly) {
   const outDir = path.resolve(
     path.dirname(fileURLToPath(import.meta.url)),
     "../../dist"
   );
-  generateSitemap(outDir).catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+  import("./prerender")
+    .then(({ fetchCollections }) => fetchCollections("id"))
+    .then((collections) => generateSitemap(outDir, collections))
+    .catch((error) => {
+      console.error(error);
+      process.exit(1);
+    });
 }
