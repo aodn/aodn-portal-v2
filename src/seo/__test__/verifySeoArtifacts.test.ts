@@ -1,12 +1,12 @@
 /**
- * SEO — the verifier must accept exactly what renderPage produces, so a valid
+ * SEO — the verifier must accept exactly what renderCrawlerPage produces, so a valid
  * page is built with the real generator rather than a hand-written fixture.
  */
 
 import { describe, expect, test } from "vitest";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { BASE_URL } from "../constants";
-import { renderPage } from "../prerender";
+import { renderCrawlerPage } from "../prerender";
 import {
   checkDetailPage,
   checkHomePage,
@@ -26,8 +26,8 @@ const collection = Object.assign(new OGCCollection(), {
 });
 
 describe("checkDetailPage", () => {
-  test("passes the exact output of renderPage", () => {
-    const page = renderPage(template, collection);
+  test("passes the exact output of renderCrawlerPage", () => {
+    const page = renderCrawlerPage(template, collection);
     expect(checkDetailPage(page, "abc-123")).toEqual([]);
   });
 
@@ -38,14 +38,14 @@ describe("checkDetailPage", () => {
   });
 
   test("flags a canonical pointing at a different record", () => {
-    const page = renderPage(template, collection);
+    const page = renderCrawlerPage(template, collection);
     expect(checkDetailPage(page, "other-uuid")).toContain(
       "canonical does not point at this record"
     );
   });
 
   test("flags JSON-LD that no longer parses", () => {
-    const page = renderPage(template, collection).replace(
+    const page = renderCrawlerPage(template, collection).replace(
       '"@type":"Dataset"',
       '"@type":"Dataset",,'
     );
@@ -55,7 +55,7 @@ describe("checkDetailPage", () => {
   });
 
   test("flags a page without social preview tags", () => {
-    const page = renderPage(template, collection).replace(
+    const page = renderCrawlerPage(template, collection).replace(
       /<meta property="og:[^>]*>/g,
       ""
     );
@@ -65,7 +65,7 @@ describe("checkDetailPage", () => {
   });
 
   test("flags a page that lost the app shell", () => {
-    const page = renderPage(template, collection).replace(
+    const page = renderCrawlerPage(template, collection).replace(
       '<div id="root">',
       "<div>"
     );

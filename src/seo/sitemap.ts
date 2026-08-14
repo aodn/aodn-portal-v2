@@ -5,7 +5,7 @@
 
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
-import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import type { OGCCollection } from "./fetchCollections";
 import { isSeoCli, runCli, seoDistDir } from "./cli";
 import {
   BASE_URL,
@@ -13,19 +13,6 @@ import {
   escapeEntities,
   isSafeCollectionId,
 } from "./constants";
-
-export const toSitemapXml = (uuids: string[], generatedAt = new Date()) => {
-  const urls = [`${BASE_URL}/`, ...uuids.map(detailsUrl)];
-  return [
-    '<?xml version="1.0" encoding="UTF-8"?>',
-    // Crawlers ignore comments; this tells a human how stale the live file is
-    `<!-- generated ${generatedAt.toISOString()} by the Publish SEO Artifacts workflow -->`,
-    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-    ...urls.map((url) => `  <url><loc>${escapeEntities(url)}</loc></url>`),
-    "</urlset>",
-    "",
-  ].join("\n");
-};
 
 export const generateSitemap = async (
   outDir: string,
@@ -52,9 +39,22 @@ export const generateSitemap = async (
   console.log(`Wrote ${uuids.length + 1} URLs to ${outFile}`);
 };
 
+export const toSitemapXml = (uuids: string[], generatedAt = new Date()) => {
+  const urls = [`${BASE_URL}/`, ...uuids.map(detailsUrl)];
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    // Crawlers ignore comments; this tells a human how stale the live file is
+    `<!-- generated ${generatedAt.toISOString()} by the Publish SEO Artifacts workflow -->`,
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ...urls.map((url) => `  <url><loc>${escapeEntities(url)}</loc></url>`),
+    "</urlset>",
+    "",
+  ].join("\n");
+};
+
 if (isSeoCli("sitemap.ts")) {
   runCli(
-    import("./prerender")
+    import("./fetchCollections")
       .then(({ fetchCollections }) => fetchCollections("id"))
       .then((collections) => generateSitemap(seoDistDir(), collections))
   );
