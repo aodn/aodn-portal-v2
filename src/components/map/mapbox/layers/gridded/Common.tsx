@@ -9,32 +9,26 @@ import {
   TileProductsResponse,
 } from "@/app/store/GriddedTileDefinitions";
 
-/**
- * React-free helpers for the gridded raster tile layer, so they unit-test
- * without jsdom or a mapbox mock.
- *
- * This module is where two vocabularies meet. The backend's `"visual"` is a
- * *capability* flag — "can DAS turn this product into a picture at all", as
- * opposed to a data tile carrying numbers for a shader. The portal-side name for
- * what we draw is `GriddedRaster`. So `"visual"` appears here only where it is
- * literally the wire contract (`tile_types`, `visual_tile_url_template`), and
- * never in an identifier we own.
- */
-
 /** A `YYYY-MM-DD` DAS local-day key. */
 const DAY_KEY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
-/** The placeholders a template must still carry for Mapbox to be able to use it. */
-const REQUIRED_TEMPLATE_TOKENS = ["{datetime}", "{z}", "{x}", "{y}"];
+/**
+ * The placeholders a template must still carry. `{tileRow}`/`{tileCol}` are the
+ * backend's OGC path-variable names (tileRow=y, tileCol=x) — not Mapbox's own
+ * `{x}`/`{y}` — because Mapbox only ever fills those in per-tile as the map
+ * pans/zooms, so `buildGriddedTileUrl` must translate the names first.
+ */
+const REQUIRED_TEMPLATE_TOKENS = [
+  "{datetime}",
+  "{z}",
+  "{tileRow}",
+  "{tileCol}",
+];
 
 export interface TileDateMarks {
-  /** Ascending epoch-ms values; feeds `DateSliderPoint.valid_points`. */
   values: number[];
-  /** value -> ORIGINAL day key. The only supported reverse path. */
   byValue: Map<number, string>;
-  /** Ascending original day-key strings. */
   dates: string[];
-  /** The newest day, i.e. `dates.at(-1)`. */
   latest?: string;
 }
 
@@ -152,8 +146,6 @@ export const toGriddedRasterProducts = (
   products.forEach((product) => {
     if (!product || typeof product.id !== "string" || product.id === "") return;
 
-    // Capability is what the backend advertises — never inferred from variable
-    // arity, since a single-variable product can legitimately be data-only.
     if (!product.tile_types?.includes("visual")) return;
 
     const template = product.visual_tile_url_template;
@@ -185,21 +177,34 @@ export const toSelectItems = (
   products.map((product) => ({ value: product.id, label: product.label }));
 
 /**
- * Substitutes the day into a tile template — pure string replacement, nothing
- * else.
+ * Substitutes the day into a tile template and translates the backend's OGC
+ * placeholder names into the ones Mapbox recognises — pure string replacement,
+ * nothing else.
  *
  * Deliberately NOT `new URL()`, `URLSearchParams` or `formatToUrl`: any of them
  * would turn `variable=ucur%2Bvcur` into `ucur+vcur` (which decodes to a space
- * and 400s) or `ucur%252Bvcur`, and would encode the braces of `{z}/{x}/{y}`
- * that Mapbox needs raw.
+ * and 400s) or `ucur%252Bvcur`, and would encode braces that must stay raw.
+ *
+ * `{tileRow}`/`{tileCol}` (not `{x}`/`{y}`) is deliberate on the backend: it
+ * stops the row/col order from being "corrected" back into slippy shape by
+ * someone who doesn't know the swap is intentional (tileRow=y, tileCol=x).
+ * Mapbox's raster source only ever recognises the literal `{z}`/`{x}`/`{y}`
+ * tokens — it fills them in per-tile as the map pans/zooms — so this renames
+ * the placeholders (not their eventual values) before handing the URL to
+ * Mapbox.
  */
 export const buildGriddedTileUrl = (
   template?: string,
   dayKey?: string
 ): string | undefined => {
   if (!template) return undefined;
-  // A missing or malformed date must never yield a URL still carrying a literal
-  // "{datetime}".
+
   if (!dayKey || !DAY_KEY_PATTERN.test(dayKey)) return undefined;
-  return template.split("{datetime}").join(dayKey);
+  return template
+    .split("{datetime}")
+    .join(dayKey)
+    .split("{tileRow}")
+    .join("{y}")
+    .split("{tileCol}")
+    .join("{x}");
 };

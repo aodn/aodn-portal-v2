@@ -16,7 +16,7 @@ const wrapper = ({ children }: { children: ReactNode }) => (
 );
 
 const TEMPLATE =
-  "/api/v1/ogc/collections/uuid-1/map/tiles/WebMercatorQuad/{z}/{x}/{y}" +
+  "/api/v1/ogc/collections/uuid-1/map/tiles/WebMercatorQuad/{z}/{tileRow}/{tileCol}" +
   "?dataset=d&variable=v&datetime={datetime}&f=png";
 
 const payload = (id: string): TileProductsResponse => ({

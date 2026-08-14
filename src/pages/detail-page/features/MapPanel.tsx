@@ -122,10 +122,8 @@ export const buildMapLayerConfig = (
       layers.push(l);
     }
 
-    // Appended LAST, and never pre-selected: the `layers[0]` fallback below
-    // makes it the default only when it is the sole entry. This is what keeps
-    // the change behaviour-neutral — no existing record opens on a different
-    // layer than it does today merely because a new capability appeared.
+    // Appended LAST: the `layers[0]` fallback below
+    // makes it the default only when it is the sole entry.
     if (hasGriddedProducts) {
       const l: LayerSwitcherLayer<LayerName> = {
         id: LayerName.GriddedRaster,
@@ -135,9 +133,6 @@ export const buildMapLayerConfig = (
       layers.push(l);
     }
 
-    // A sticky selection that is not in the freshly built list must not win:
-    // the forEach would then set *every* layer to selected = false, the else-if
-    // would never run, and the map would render no layer at all.
     const lastId = lastSelectedLayer?.id;
     const lastStillExists =
       lastId !== undefined && layers.some((l) => l.id === lastId);
@@ -216,10 +211,6 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     [collection]
   );
 
-  // Gridded raster tiles. The product list, the selected product and the
-  // selected day all live here rather than in the layer, because
-  // buildMapLayerConfig needs "do products exist?" before the layer is ever
-  // selected, and because MapPanel — not the layer — renders DateSliderPoint.
   const {
     products: griddedProducts,
     error: griddedError,
@@ -227,8 +218,6 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   } = useGriddedRasterProducts(collection);
   const hasGriddedProducts = griddedProducts.length > 0;
 
-  // Override + fallback rather than reset-in-effect, so a late-arriving product
-  // list or a UUID change self-corrects on the same render.
   const [griddedProductOverride, setGriddedProductOverride] =
     useState<string>("");
   const selectedGriddedProduct = useMemo(
@@ -244,10 +233,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   );
 
   const [griddedDateOverride, setGriddedDateOverride] = useState<string>("");
-  // Switching product drops an override the new product does not have, so the
-  // day falls back to that product's latest in the same render — no flash of a
-  // tile URL carrying a date the product lacks. Defaulting to the newest day is
-  // also what makes the layer paint without the user opening the clock panel.
+
   const selectedGriddedDate = useMemo(
     () =>
       griddedDateMarks.dates.includes(griddedDateOverride)
@@ -317,9 +303,6 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     pmtilesPeriodRange,
   ]);
 
-  // Building the layer config used to live inside the memo above, whose deps
-  // (slider bounds) have nothing to do with which layers exist — which also
-  // created an incidental selectedMapLayerId → memo → setMapLayerConfig loop.
   useEffect(() => {
     startTransition(() => {
       setMapLayerConfig(
@@ -487,21 +470,11 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     []
   );
 
-  /**
-   * At most one point slider can exist, so select it by layer id first.
-   * `discreteTimeSliderValues` and `datePointValue` stay strictly WMS-only:
-   * `geoServerLayerConfig` branches on the former, so feeding it tile dates
-   * would corrupt the WMS request. This matters in practice because
-   * GeoServerLayer is always mounted and populates it regardless of which layer
-   * is selected.
-   */
   const additionalSlider = useMemo(() => {
     if (selectedMapLayerId === LayerName.GriddedRaster) {
       if (griddedDateMarks.values.length === 0) return undefined;
       return (
         <DateSliderPoint
-          // Remount on product switch so the thumb resets to the new
-          // product's own latest day.
           key={`gridded-date-${selectedGriddedProduct?.id}`}
           valid_points={griddedDateMarks.values}
           formatLabel={(v) => griddedDateMarks.byValue.get(v) ?? ""}
@@ -725,11 +698,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
         </MapBox>
       </Box>
       {/* Show the legend exactly when the GeoServer (WMS) layer is the selected
-          map layer - same gate as the GeoServerLayer's own `visible` prop.
-          The gridded raster layer deliberately has no legend: the backend
-          auto-scales each day to that day's own min/max, so a colour bar with
-          no pinned range would be misleading. Pending per-product colormap /
-          rescale / units in the tile products listing. */}
+          map layer - same gate as the GeoServerLayer's own `visible` prop */}
       {mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
         LayerName.GeoServer && (
         <Box sx={{ mb: 1 }}>

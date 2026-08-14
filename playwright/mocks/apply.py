@@ -54,9 +54,7 @@ def apply_mock(page: Page) -> None:
         handle_collections_all_api,
         handle_collections_popup_api,
     )
-    # Registered BEFORE the collection-detail routes: those patterns are broad
-    # enough that a future widening of them would otherwise swallow the tile
-    # routes and leave the tests silently exercising the wrong payload.
+
     api_router.route_gridded_tile_products(handle_gridded_tile_products_api)
     api_router.route_gridded_tile_image(handle_gridded_tile_image_api)
 

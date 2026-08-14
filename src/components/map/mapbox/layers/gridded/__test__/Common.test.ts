@@ -18,14 +18,14 @@ import {
 } from "@/app/store/OGCCollectionDefinitions";
 
 const VISUAL_TEMPLATE =
-  "/api/v1/ogc/collections/uuid-1/map/tiles/WebMercatorQuad/{z}/{x}/{y}" +
+  "/api/v1/ogc/collections/uuid-1/map/tiles/WebMercatorQuad/{z}/{tileRow}/{tileCol}" +
   "?dataset=model_sea_level_anomaly_gridded_realtime&variable=gsla" +
   "&datetime={datetime}&f=png";
 
 // A two-variable product's `variable` param arrives percent-encoded. The `%2B`
 // must survive verbatim: an unencoded "+" decodes to a space and 400s.
 const TWO_VARIABLE_TEMPLATE =
-  "/api/v1/ogc/collections/uuid-2/map/tiles/WebMercatorQuad/{z}/{x}/{y}" +
+  "/api/v1/ogc/collections/uuid-2/map/tiles/WebMercatorQuad/{z}/{tileRow}/{tileCol}" +
   "?dataset=model_currents&variable=ucur%2Bvcur&datetime={datetime}&f=png";
 
 const visualProduct = (overrides: Partial<TileProduct> = {}): TileProduct => ({
@@ -60,12 +60,18 @@ describe("shouldQueryGriddedTiles", () => {
 });
 
 describe("buildGriddedTileUrl", () => {
-  it("substitutes {datetime} and leaves everything else byte-identical", () => {
+  it("substitutes {datetime} and translates {tileRow}/{tileCol} into Mapbox's {y}/{x}", () => {
     const url = buildGriddedTileUrl(VISUAL_TEMPLATE, "2024-01-02");
-    expect(url).toContain("/WebMercatorQuad/{z}/{x}/{y}");
+    expect(url).toContain("/WebMercatorQuad/{z}/{y}/{x}");
     expect(url).toContain("datetime=2024-01-02");
     expect(url).not.toContain("{datetime}");
-    expect(url).toBe(VISUAL_TEMPLATE.replace("{datetime}", "2024-01-02"));
+    expect(url).not.toContain("{tileRow}");
+    expect(url).not.toContain("{tileCol}");
+    expect(url).toBe(
+      VISUAL_TEMPLATE.replace("{datetime}", "2024-01-02")
+        .replace("{tileRow}", "{y}")
+        .replace("{tileCol}", "{x}")
+    );
   });
 
   it("keeps %2B encoded for a two-variable product", () => {
@@ -232,8 +238,8 @@ describe("toGriddedRasterProducts", () => {
   it.each([
     ["{datetime}", VISUAL_TEMPLATE.replace("{datetime}", "2024-01-01")],
     ["{z}", VISUAL_TEMPLATE.replace("{z}", "5")],
-    ["{x}", VISUAL_TEMPLATE.replace("{x}", "5")],
-    ["{y}", VISUAL_TEMPLATE.replace("{y}", "5")],
+    ["{tileRow}", VISUAL_TEMPLATE.replace("{tileRow}", "5")],
+    ["{tileCol}", VISUAL_TEMPLATE.replace("{tileCol}", "5")],
   ])("drops a template missing %s", (_token, template) => {
     expect(
       toGriddedRasterProducts({

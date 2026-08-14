@@ -625,10 +625,6 @@ const fetchGeoServerDownloadLayers = createAsyncThunk<
   }
 );
 
-/**
- * Lists the gridded raster tile products for one collection. NoStore: nothing
- * outside MapPanel's subtree consumes the listing, so there is no extraReducer.
- */
 const fetchGriddedTileProducts = createAsyncThunk<
   TileProductsResponse,
   { uuid: string },
@@ -640,12 +636,10 @@ const fetchGriddedTileProducts = createAsyncThunk<
       .get<TileProductsResponse>(
         `/ogc/ext/tiles/collections/${request.uuid}/products`,
         {
-          timeout: 20_000,
           signal: thunkApi.signal,
           // This route is the one that depends on DAS being up. The shared
           // instance retries 10x with exponential back-off, which would keep a
-          // DAS warmup 503 generating background traffic for ~17 minutes per
-          // page view. Bound it here instead.
+          // DAS warmup 503 generating background traffic.
           "axios-retry": { retries: 2, retryDelay: (n: number) => 1000 * n },
         }
       )

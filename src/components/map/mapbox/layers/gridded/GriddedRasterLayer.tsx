@@ -19,16 +19,10 @@ enum LAYER_VISIBILITY {
 
 /**
  * Gridded products are ~2-10 km resolution, so asking the backend to render
- * z9-z12 is wasted work — Mapbox overzooms above this instead. A guess pending
- * real per-product resolutions from the DAS team; deliberately a single named
- * constant so it is one edit when that answer arrives.
+ * z9-z12 is wasted work — Mapbox overzooms above this instead.
  */
 export const GRIDDED_RASTER_MAX_ZOOM = 8;
 
-/**
- * `DateSliderPoint`'s keyboard handler fires on every arrow keypress, and each
- * `setTiles` invalidates the whole tile cache into live backend renders.
- */
 const SET_TILES_DEBOUNCE_MS = 250;
 
 const getSourceId = (id: string | undefined) => `${id}-gridded-raster-source`;
@@ -46,11 +40,6 @@ interface GriddedRasterLayerProps extends LayerBasicType {
   onRetry?: () => void;
 }
 
-/**
- * Renders one gridded raster tile product as a Mapbox raster layer, plus the
- * product dropdown. Controlled: the selected product and day are owned by
- * MapPanel, which also feeds the date slider from the same source.
- */
 const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
   products,
   selectedProductId,
@@ -74,18 +63,12 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
     [products, selectedProductId]
   );
 
-  // 1. The tile URL. Pure substitution — see Common.buildGriddedTileUrl for why
-  //    this must never go through URL/URLSearchParams/formatToUrl.
   const tileUrl = useMemo(
     () => buildGriddedTileUrl(selectedProduct?.template, selectedDate),
     [selectedProduct?.template, selectedDate]
   );
   const hasTileUrl = tileUrl !== undefined;
 
-  // The create/re-create effect below and its map event handlers must see the
-  // current visibility and URL *without* re-running when either changes — a
-  // re-run tears the source down, and rebuilding is exactly what effects 3 and 4
-  // exist to avoid. Declared before those effects so it commits first.
   const visibleRef = useRef(visible);
   const tileUrlRef = useRef(tileUrl);
   useEffect(() => {
@@ -93,9 +76,6 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
     tileUrlRef.current = tileUrl;
   });
 
-  // 2. Create on init, re-create when the style reloads. Deliberately keyed on
-  //    *whether* there is a URL, not on the URL itself, so a date or product
-  //    change is handled by effect 4's setTiles rather than a rebuild.
   useEffect(() => {
     if (!map || !hasTileUrl) return;
 
@@ -131,20 +111,15 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
       if (map.isStyleLoaded()) createSourceAndLayer(currentVisibility());
     };
 
-    // A style reload drops every source and layer, so put ours back with the
-    // visibility it had.
     const createOnStyleChange = () => createSourceAndLayer(currentVisibility());
 
-    // Must be `once(IDLE)`: the map is already loaded when this layer is not
-    // the one the page opened on.
     map.once(MapEventEnum.IDLE, createOnInit);
     map.on(MapEventEnum.STYLEDATA, createOnStyleChange);
 
     return () => {
       map.off(MapEventEnum.IDLE, createOnInit);
       map.off(MapEventEnum.STYLEDATA, createOnStyleChange);
-      // The style is undefined while the map unloads, so getLayer/getSource
-      // would throw.
+
       if (map.isStyleLoaded()) {
         if (map.getLayer(tileLayerId)) map.removeLayer(tileLayerId);
         if (map.getSource(sourceId)) map.removeSource(sourceId);
@@ -152,8 +127,6 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
     };
   }, [hasTileUrl, map, sourceId, tileLayerId]);
 
-  // 3. Visibility. Never remove/re-add the layer on toggle — that discards the
-  //    tile cache and re-requests every tile.
   useEffect(() => {
     if (!map || !map.getLayer(tileLayerId)) return;
     map.setLayoutProperty(
@@ -163,8 +136,6 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
     );
   }, [map, tileLayerId, visible]);
 
-  // 4. URL change: swap the tiles on the existing source rather than rebuilding
-  //    it, debounced so arrowing through days does not fan out to the backend.
   useEffect(() => {
     if (!map || !tileUrl) return;
 
@@ -178,9 +149,6 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
 
   return (
     <>
-      {/* The dropdown and the retry belong to the layer only while it is the
-          selected one; the test hooks stay mounted either way so e2e can assert
-          the hidden state. */}
       {visible && (
         <MapLayerSelect
           mapLayersOptions={toSelectItems(products)}
@@ -190,8 +158,6 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
         />
       )}
       {visible && error && (
-        // Additive and non-blocking: a backend outage must leave the rest of the
-        // detail page fully interactive.
         <Stack
           direction="row"
           alignItems="center"

@@ -1,10 +1,3 @@
-/**
- * Wire types for the ogcapi-java gridded tile product listing:
- * `GET /api/v1/ogc/ext/tiles/collections/{uuid}/products`.
- *
- * Every field is optional on purpose — the listing is passthrough-heavy over
- * DAS's own catalogue, so it can grow or drift without the portal breaking.
- */
 export type TileType = "visual" | "data";
 
 export interface TileProduct {
@@ -26,11 +19,6 @@ export interface TileProductsResponse {
   products?: TileProduct[];
 }
 
-/**
- * Post-filter shape the UI consumes — no optionals left. Anything that reaches
- * this type is guaranteed renderable: a usable tile template and at least one
- * valid day.
- */
 export interface GriddedRasterProduct {
   id: string;
   label: string;

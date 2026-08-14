@@ -6,12 +6,15 @@ import { GriddedRasterProduct } from "@/app/store/GriddedTileDefinitions";
 import GriddedRasterLayer, {
   GRIDDED_RASTER_MAX_ZOOM,
 } from "../GriddedRasterLayer";
+import { buildGriddedTileUrl } from "../Common";
 import * as layerOrder from "../../../layerOrder";
 
 vi.mock("mapbox-gl", () => ({}));
 
+// {tileRow}/{tileCol} (not {x}/{y}) is the backend's actual OGC-named shape;
+// buildGriddedTileUrl translates it for Mapbox, which urlFor below relies on.
 const TEMPLATE =
-  "/api/v1/ogc/collections/uuid-1/map/tiles/WebMercatorQuad/{z}/{x}/{y}" +
+  "/api/v1/ogc/collections/uuid-1/map/tiles/WebMercatorQuad/{z}/{tileRow}/{tileCol}" +
   "?dataset=d&variable=ucur%2Bvcur&datetime={datetime}&f=png";
 
 const PRODUCTS: GriddedRasterProduct[] = [
@@ -29,7 +32,7 @@ const PRODUCTS: GriddedRasterProduct[] = [
   },
 ];
 
-const urlFor = (date: string) => TEMPLATE.replace("{datetime}", date);
+const urlFor = (date: string) => buildGriddedTileUrl(TEMPLATE, date) as string;
 
 describe("GriddedRasterLayer", () => {
   let mockMap: any;
