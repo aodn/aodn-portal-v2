@@ -61,13 +61,7 @@ const ExpandableList: React.FC<ExpandableListProps> = ({
       {!childrenList || childrenList.length === 0 ? (
         <NaList title={title ? title : ""} />
       ) : (
-        <Grid
-          container
-          data-testid={`collapse-list-${title}`}
-          size={{
-            md: 12,
-          }}
-        >
+        <Grid container data-testid={`collapse-list-${title}`} size={12}>
           {childrenList.map((child: ReactNode, index: number) => {
             showingCollapseCount++;
             if (!isShowingMore && showingCollapseCount > 5) {
