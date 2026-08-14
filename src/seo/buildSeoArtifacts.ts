@@ -4,7 +4,8 @@
  */
 
 import { seoDistDir } from "./cli";
-import { fetchCollections, prerenderDetailPages } from "./prerender";
+import { fetchCollections } from "./fetchCollections";
+import { prerenderDetailPages } from "./prerender";
 import { generateSitemap } from "./sitemap";
 
 const outDir = seoDistDir();
