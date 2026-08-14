@@ -71,6 +71,7 @@ const Header: FC = () => {
         position: "sticky",
         top: 0,
         zIndex: zIndex.header,
+        flexShrink: 0,
         borderBottom: `${border.sm} ${color.gray.xxLight}`,
         boxShadow: shadow.bottom,
       }}
