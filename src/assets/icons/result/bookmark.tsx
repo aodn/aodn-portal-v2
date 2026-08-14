@@ -40,7 +40,7 @@ export const BookmarkOutlinedIcon: ComponentType<SVGProps<SVGSVGElement>> = ({
     <path
       d="M6.15 1.95L17.85 1.95A2.2 2.2 0 0 1 20.05 4.15L20.05 19.65A1.3 1.3 0 0 1 18.04 20.74L12.6 17.19A1.1 1.1 0 0 0 11.4 17.19L5.96 20.74A1.3 1.3 0 0 1 3.95 19.65L3.95 4.15A2.2 2.2 0 0 1 6.15 1.95Z"
       stroke={color}
-      strokeWidth="1.9"
+      strokeWidth="1.5"
       strokeLinejoin="round"
     />
   </svg>

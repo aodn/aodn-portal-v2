@@ -11,7 +11,7 @@ import {
   fontColor,
   fontSize,
   fontWeight,
-  gap,
+  padding,
   zIndex,
 } from "../../../../styles/constants";
 import MapContext from "../MapContext";
@@ -30,6 +30,7 @@ import { detailPageDefault, pageReferer } from "../../../common/constants";
 import { MapEventEnum } from "../constants";
 import FitToSpatialExtentsLayer from "../layers/FitToSpatialExtentsLayer";
 import ContextMenu, { ContextMenuRef } from "../../../menu/ContextMenu";
+import { ResultCardButtonSize } from "@/components/common/buttons/ResultCardButton";
 
 interface CardPopupProps {
   layerId: string;
@@ -232,14 +233,17 @@ const CardPopup: React.FC<CardPopupProps> = ({
               ref={menuRef}
               onClick={(type: OpenType | undefined) => onDetail(content, type)}
             />
-            <Box position="absolute" sx={{ top: gap.md, right: gap.md }}>
+            <Box
+              position="absolute"
+              sx={{ top: padding.medium, right: padding.medium }}
+            >
               <BookmarkButton dataset={content} />
             </Box>
             <Typography
               fontWeight={fontWeight.bold}
               fontSize={isMobile ? fontSize.label : fontSize.info}
               sx={{
-                width: "95%",
+                width: "calc(100% - 30px)",
                 padding: 0,
                 overflow: "hidden",
                 textOverflow: "ellipsis",
@@ -268,10 +272,11 @@ const CardPopup: React.FC<CardPopupProps> = ({
                 {content?.description}
               </Typography>
             )}
-            {
+            <Box sx={{ mt: 1.5 }}>
               <ResultCardButtonGroup
                 content={content}
                 isGridView
+                resultCardButtonConfig={{ size: ResultCardButtonSize.SMALL }}
                 onLinks={(type: OpenType | undefined) => onLinks(content, type)}
                 onDownload={
                   content.hasCloudOptimisedData()
@@ -282,7 +287,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
                   onDetail(content, type)
                 }
               />
-            }
+            </Box>
           </CardContent>
         </Card>
       </div>

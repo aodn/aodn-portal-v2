@@ -234,6 +234,7 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
                   onMouseLeave={() => setHoverOnButton(false)}
                   sx={{
                     mr: "4px",
+                    mt: 0.5,
                     display: "inline-flex",
                     flexShrink: 0,
                     alignSelf: "flex-start",

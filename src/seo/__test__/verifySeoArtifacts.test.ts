@@ -4,8 +4,9 @@
  */
 
 import { describe, expect, test } from "vitest";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { BASE_URL } from "../constants";
-import { renderPage } from "../PrerenderUtils";
+import { renderPage } from "../prerender";
 import {
   checkDetailPage,
   checkHomePage,
@@ -14,15 +15,15 @@ import {
 } from "../verifySeoArtifacts";
 
 const template =
-  "<!doctype html><html><head><title>AODN Portal</title>" +
+  "<!doctype html><html lang='en'><head><title>AODN Portal</title>" +
   '<meta name="description" content="site-wide" />' +
   '</head><body><div id="root"></div></body></html>';
 
-const collection = {
+const collection = Object.assign(new OGCCollection(), {
   id: "abc-123",
   title: "Sea Surface Temperature",
   description: "Gridded SST records.",
-};
+});
 
 describe("checkDetailPage", () => {
   test("passes the exact output of renderPage", () => {
@@ -50,6 +51,16 @@ describe("checkDetailPage", () => {
     );
     expect(checkDetailPage(page, "abc-123")).toContain(
       "Dataset JSON-LD is not valid JSON"
+    );
+  });
+
+  test("flags a page without social preview tags", () => {
+    const page = renderPage(template, collection).replace(
+      /<meta property="og:[^>]*>/g,
+      ""
+    );
+    expect(checkDetailPage(page, "abc-123")).toContain(
+      "social preview (Open Graph) tags are missing"
     );
   });
 
@@ -100,7 +111,7 @@ describe("checkSitemap", () => {
 
 describe("checkHomePage", () => {
   const homePage = (extraHeadTags: string) =>
-    "<!doctype html><html><head><title>AODN Portal</title>" +
+    "<!doctype html><html lang='en'><head><title>AODN Portal</title>" +
     '<meta name="description" content="Open access" />' +
     `${extraHeadTags}</head><body><div id="root"></div></body></html>`;
   const NOINDEX = '<meta name="robots" content="noindex, nofollow" />';

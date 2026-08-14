@@ -35,8 +35,8 @@ interface PopupConfig {
 }
 
 const defaultPopupConfig: PopupConfig = {
-  popupWidth: 250,
-  popupHeight: 380,
+  popupWidth: 280,
+  popupHeight: 400,
 };
 
 const renderLoadingBox = ({ popupHeight, popupWidth }: PopupConfig) => (

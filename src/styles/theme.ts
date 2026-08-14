@@ -180,7 +180,7 @@ const theme: ThemeOptions = {
       contrastText: "#000000", // not in use yet, so set to black
     },
     success: {
-      main: "#4CAF50",
+      main: "#6CBD96",
       // light: "",
       // dark: "",
     },

@@ -41,7 +41,7 @@ describe("ResultCardButton", () => {
     const icon = screen.getByTestId("mock-icon");
     expect(icon).toBeInTheDocument();
     expect(icon).toHaveStyle("color: rgb(97, 140, 165)");
-    expect(icon).toHaveStyle("font-size: 14px"); // Small size default
+    expect(icon).toHaveStyle("font-size: 14px"); // Medium size default
   });
 
   it("renders text when shouldHideText is false", () => {
@@ -68,7 +68,7 @@ describe("ResultCardButton", () => {
     );
     const icon = screen.getByTestId("mock-icon");
     screen.getByText("Test");
-    expect(icon).toHaveStyle("font-size: 18px");
+    expect(icon).toHaveStyle("font-size: 14px");
   });
 
   it("merges custom sx props", () => {

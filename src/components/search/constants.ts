@@ -21,3 +21,6 @@ export enum SearchKeys {
 }
 
 export const DOUBLE_QUOTE_LABEL = "Exact match";
+
+// Marks a suggestion that matched the input by meaning rather than by spelling
+export const SEMANTIC_LABEL = "Related";

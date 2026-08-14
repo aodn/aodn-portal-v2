@@ -22,6 +22,15 @@ describe("buildSeoHeadTags", () => {
     }
   });
 
+  test("every build carries social link-preview tags", () => {
+    for (const isProduction of [true, false]) {
+      const tags = buildSeoHeadTags(isProduction);
+      expect(tags).toContain('<meta property="og:title"');
+      expect(tags).toContain('<meta property="og:image"');
+      expect(tags).toContain('<meta name="twitter:card" content="summary" />');
+    }
+  });
+
   test("non-prod builds are noindex", () => {
     expect(buildSeoHeadTags(false)).toContain(
       '<meta name="robots" content="noindex, nofollow" />'
