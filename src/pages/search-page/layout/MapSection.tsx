@@ -1,7 +1,6 @@
 import React, { memo, useState } from "react";
 import { MapEvent } from "mapbox-gl";
-import { Paper, SxProps, Theme } from "@mui/material";
-import { borderRadius } from "../../../styles/constants";
+import { Box, Paper, SxProps, Theme } from "@mui/material";
 import Map, { MapBasicType } from "../../../components/map/mapbox/Map";
 import Controls from "../../../components/map/mapbox/controls/Controls";
 import ToggleControl, {
@@ -19,8 +18,8 @@ import HeatmapLayer from "../../../components/map/mapbox/layers/HeatmapLayer";
 import UnclusterLayer from "../../../components/map/mapbox/layers/UnclusterLayer";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
-import { generateFeatureCollectionFrom } from "../../../utils/GeoJsonUtils";
-import { capitalizeFirstLetter } from "../../../utils/StringUtils";
+import { generateFeatureCollectionFrom } from "@/utils/GeoJsonUtils";
+import { capitalizeFirstLetter } from "@/utils/StringUtils";
 import useTabNavigation, {
   TabNavigation,
 } from "../../../hooks/useTabNavigation";
@@ -36,9 +35,10 @@ import MenuControlGroup from "../../../components/map/mapbox/controls/menu/MenuC
 import ReferenceLayerSwitcher, {
   staticBaseLayerConfig,
 } from "../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
-import { ProgressType } from "../../../components/map/mapbox/MapContext";
-import { createStaticLayers } from "../../../components/map/mapbox/layers/StaticLayer";
-import { fitToDefaultExtent } from "../../../utils/MapUtils";
+import { ProgressType } from "@/components/map/mapbox/MapContext";
+import { createStaticLayers } from "@/components/map/mapbox/layers/StaticLayer";
+import { fitToDefaultExtent } from "@/utils/MapUtils";
+import MapFooter from "@/components/map/mapbox/component/MapFooter";
 
 interface MapSectionProps
   extends
@@ -121,107 +121,117 @@ const MapSection: React.FC<MapSectionProps> = memo(
     // Early return if it is full list view
     if (showFullList) return null;
     return (
-      <Paper
-        id={mapContainerId}
+      <Box
         sx={{
-          position: "relative",
           height: "100%",
           width: "100%",
-          borderRadius: borderRadius.small,
-          overflow: "hidden",
-          ...sx,
+          display: "flex",
+          flexDirection: "column",
         }}
       >
-        <Map
-          panelId={mapContainerId}
-          bbox={bbox}
-          zoom={zoom}
-          progress={progress}
-          onZoomEvent={onMapZoomOrMove}
-          onMoveEvent={onMapZoomOrMove}
+        <Paper
+          id={mapContainerId}
+          sx={{
+            position: "relative",
+            flex: 1,
+            minHeight: 0,
+            width: "100%",
+            overflow: "hidden",
+            ...sx,
+          }}
         >
-          <Controls>
-            <ToggleControl
-              onToggleClicked={onToggleClicked}
-              showFullMap={showFullMap}
-            />
-            <NavigationControl
-              visible={!isUnderLaptop}
-              // Reset flies back to the default Australia-wide extent
-              onReset={(map) => fitToDefaultExtent(map, undefined)}
-            />
-            <ScaleControl />
-            <DisplayCoordinate />
-            <MenuControlGroup>
-              <MenuControl
+          <Map
+            panelId={mapContainerId}
+            bbox={bbox}
+            zoom={zoom}
+            progress={progress}
+            onZoomEvent={onMapZoomOrMove}
+            onMoveEvent={onMapZoomOrMove}
+          >
+            <Controls>
+              <ToggleControl
+                onToggleClicked={onToggleClicked}
+                showFullMap={showFullMap}
+              />
+              <NavigationControl
                 visible={!isUnderLaptop}
-                menu={
-                  <BookmarkListMenu
-                    onDeselectDataset={onDeselectDataset}
-                    tabNavigation={tabNavigation}
-                  />
-                }
+                // Reset flies back to the default Australia-wide extent
+                onReset={(map) => fitToDefaultExtent(map, undefined)}
               />
-              <MenuControl menu={<BaseMapSwitcher />} />
-              <MenuControl
-                menu={
-                  <ReferenceLayerSwitcher
-                    layers={staticBaseLayerConfig}
-                    onEvent={(target: EventTarget & HTMLInputElement) =>
-                      setStaticLayer((values) => {
-                        // Remove the item and add it back if selected
-                        const e = values?.filter((i) => i !== target.value);
-                        if (target.checked) {
-                          e.push(target.value);
-                        }
-                        return [...e];
-                      })
-                    }
-                  />
-                }
-              />
-              <MenuControl
-                menu={
-                  <MapLayerSwitcher
-                    layers={[
-                      {
-                        id: LayerName.Cluster,
-                        name: capitalizeFirstLetter(LayerName.Cluster),
-                        selected: selectedLayer === LayerName.Cluster,
-                      },
-                      {
-                        id: LayerName.Uncluster,
-                        name: capitalizeFirstLetter(LayerName.Uncluster),
-                        selected: selectedLayer === LayerName.Uncluster,
-                      },
-                      {
-                        id: LayerName.Heatmap,
-                        name: capitalizeFirstLetter(LayerName.Heatmap),
-                        selected: selectedLayer === LayerName.Heatmap,
-                      },
-                    ]}
-                    onEvent={(
-                      layer: LayerSwitcherLayer<LayerName> | undefined
-                    ) => {
-                      layer && setSelectedLayer(layer.id);
-                    }}
-                  />
-                }
-              />
-            </MenuControlGroup>
-          </Controls>
-          <Layers>
-            {createPresentationLayers(
-              selectedLayer,
-              collections,
-              selectedUuids,
-              tabNavigation,
-              onClickMapPoint
-            )}
-            {createStaticLayers(staticLayer)}
-          </Layers>
-        </Map>
-      </Paper>
+              <ScaleControl />
+              <DisplayCoordinate />
+              <MenuControlGroup>
+                <MenuControl
+                  visible={!isUnderLaptop}
+                  menu={
+                    <BookmarkListMenu
+                      onDeselectDataset={onDeselectDataset}
+                      tabNavigation={tabNavigation}
+                    />
+                  }
+                />
+                <MenuControl menu={<BaseMapSwitcher />} />
+                <MenuControl
+                  menu={
+                    <ReferenceLayerSwitcher
+                      layers={staticBaseLayerConfig}
+                      onEvent={(target: EventTarget & HTMLInputElement) =>
+                        setStaticLayer((values) => {
+                          // Remove the item and add it back if selected
+                          const e = values?.filter((i) => i !== target.value);
+                          if (target.checked) {
+                            e.push(target.value);
+                          }
+                          return [...e];
+                        })
+                      }
+                    />
+                  }
+                />
+                <MenuControl
+                  menu={
+                    <MapLayerSwitcher
+                      layers={[
+                        {
+                          id: LayerName.Cluster,
+                          name: capitalizeFirstLetter(LayerName.Cluster),
+                          selected: selectedLayer === LayerName.Cluster,
+                        },
+                        {
+                          id: LayerName.Uncluster,
+                          name: capitalizeFirstLetter(LayerName.Uncluster),
+                          selected: selectedLayer === LayerName.Uncluster,
+                        },
+                        {
+                          id: LayerName.Heatmap,
+                          name: capitalizeFirstLetter(LayerName.Heatmap),
+                          selected: selectedLayer === LayerName.Heatmap,
+                        },
+                      ]}
+                      onEvent={(
+                        layer: LayerSwitcherLayer<LayerName> | undefined
+                      ) => {
+                        layer && setSelectedLayer(layer.id);
+                      }}
+                    />
+                  }
+                />
+              </MenuControlGroup>
+            </Controls>
+            <Layers>
+              {createPresentationLayers(
+                selectedLayer,
+                collections,
+                selectedUuids,
+                tabNavigation,
+                onClickMapPoint
+              )}
+              {createStaticLayers(staticLayer)}
+            </Layers>
+          </Map>
+        </Paper>
+        <MapFooter />
+      </Box>
     );
   }
 );

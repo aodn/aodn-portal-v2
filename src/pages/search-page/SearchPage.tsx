@@ -44,8 +44,8 @@ import { SearchResultLayoutEnum } from "../../components/common/buttons/ResultLi
 import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
-import { pageDefault, pageReferer } from "../../components/common/constants";
-import { color } from "../../styles/constants";
+import { pageDefault, pageReferer } from "@/components/common/constants";
+import { color } from "@/styles/constants";
 import {
   BookmarkEvent,
   EVENT_BOOKMARK,
@@ -64,7 +64,7 @@ import useRedirectSearch from "../../hooks/useRedirectSearch";
 import {
   MapDefaultConfig,
   MapEventEnum,
-} from "../../components/map/mapbox/constants";
+} from "@/components/map/mapbox/constants";
 import _ from "lodash";
 import useFetchData from "../../hooks/useFetchData";
 import { ProgressType } from "../../components/map/mapbox/MapContext";
