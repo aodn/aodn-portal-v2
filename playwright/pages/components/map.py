@@ -39,12 +39,8 @@ class Map(BasePage):
         self.spatial_extent_layer = page.get_by_role(
             'radio', name='Spatial Extent'
         )
-        self.gridded_data_layer = page.get_by_role(
-            'radio', name='Gridded Data'
-        )
-        self.gridded_raster_error = page.get_by_test_id(
-            'gridded-raster-error'
-        )
+        self.gridded_data_layer = page.get_by_role('radio', name='Gridded Data')
+        self.gridded_raster_error = page.get_by_test_id('gridded-raster-error')
 
         self.daterange_show_hide_menu_button = page.get_by_test_id(
             'daterange-show-hide-menu-button'

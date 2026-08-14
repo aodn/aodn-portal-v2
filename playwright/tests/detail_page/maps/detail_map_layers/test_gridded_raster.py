@@ -268,7 +268,9 @@ def test_switching_product_does_not_retain_a_shared_non_latest_date(
     # product two is selected.
     two_variable_urls = [url for url in tile_urls if 'ucur' in url.lower()]
     assert two_variable_urls
-    assert not any(f'datetime={shared_date}' in url for url in two_variable_urls)
+    assert not any(
+        f'datetime={shared_date}' in url for url in two_variable_urls
+    )
 
 
 def test_gridded_layer_survives_a_basemap_switch_and_hides_on_layer_change(
@@ -334,9 +336,7 @@ def test_failed_discovery_leaves_the_rest_of_the_page_interactive(
     """
     api_router = ApiRouter(responsive_page)
     responsive_page.unroute(Routes.GRIDDED_TILE_PRODUCTS)
-    api_router.route_gridded_tile_products(
-        handle_gridded_tile_products_failure
-    )
+    api_router.route_gridded_tile_products(handle_gridded_tile_products_failure)
 
     detail_page = DetailPage(responsive_page)
     layer_factory = LayerFactory(detail_page.detail_map)
