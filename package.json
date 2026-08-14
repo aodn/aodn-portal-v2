@@ -111,7 +111,7 @@
     "node": ">=20.x",
     "npm": ">=8.0.0"
   },
-  "//": "lint --max-warnings 143 = current no-explicit-any backlog; lower it as warnings get fixed, never raise it",
+  "//": "lint --max-warnings 100 = no-explicit-any ceiling (2 left in Definition.tsx); lower it as warnings get fixed, never raise it",
   "resolutions": {
     "react-is": "^18.3.1"
   },
