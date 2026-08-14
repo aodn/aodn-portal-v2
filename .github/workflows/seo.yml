@@ -2,7 +2,7 @@ name: Publish SEO Artifacts
 
 # Builds sitemap.xml and the pre-rendered /details pages from the live records
 # and publishes them straight to S3, independently of app deploys.
-# What the artifacts are and how to test before publishing: src/seo/README.md
+# What the artifacts are and the commands this workflow runs: src/seo/README.md
 
 on:
   schedule:

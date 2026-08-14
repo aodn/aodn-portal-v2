@@ -44,8 +44,21 @@ export const PAGE_CONTENT_WIDTH_DETAIL = {
 
 export const SEARCHBAR_CONTENT_WIDTH = 0.9;
 
+import { border, padding } from "@/styles/constants";
+
+const px = (value: string) => parseInt(value, 10);
+
 export const AODN_SITE_LOGO_HEIGHT = "72px";
 export const AODN_SITE_LOGO_HEIGHT_MOBILE = "50px";
 
-export const HEADER_HEIGHT = 150;
+// Matches the unpadded header nav row (PlainMenu 16px / 1.75 line-height + 6px py)
+export const HEADER_MENU_ROW_HEIGHT = 40;
+
+// logo row: paddingY medium above and below the logo
+const HEADER_LOGO_ROW_HEIGHT =
+  px(padding.medium) * 2 + px(AODN_SITE_LOGO_HEIGHT);
+
+export const HEADER_HEIGHT =
+  HEADER_MENU_ROW_HEIGHT + HEADER_LOGO_ROW_HEIGHT + px(border.sm);
+
 export const HEADER_HEIGHT_MOBILE = 80;

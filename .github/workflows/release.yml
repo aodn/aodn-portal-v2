@@ -59,13 +59,27 @@ jobs:
 
       - name: Copy files to the production website with the AWS CLI
         run: |
-          # sitemap.xml and details/ are owned by the Publish SEO Artifacts workflow;
-          # assets/ is never deleted so its pre-rendered pages keep booting until it reruns
+          # sitemap.xml and details/ are owned by the Publish SEO Artifacts workflow.
+          # assets/ uses cp, not sync: every deploy re-stamps the live build's files,
+          # so the prune step below can treat old timestamps as unreferenced.
           aws s3 sync --delete ${{ env.DIST }} s3://${{ vars.BUCKET }} --region ${{ vars.AWS_REGION }} --exclude "details/*" --exclude "sitemap.xml" --exclude "assets/*"
-          aws s3 sync ${{ env.DIST }}/assets s3://${{ vars.BUCKET }}/assets --region ${{ vars.AWS_REGION }}
+          aws s3 cp ${{ env.DIST }}/assets s3://${{ vars.BUCKET }}/assets --recursive --region ${{ vars.AWS_REGION }}
           # Seed the fallback sitemap only when the bucket has none
           aws s3api head-object --bucket ${{ vars.BUCKET }} --key sitemap.xml --region ${{ vars.AWS_REGION }} >/dev/null 2>&1 \
             || aws s3 cp ${{ env.DIST }}/sitemap.xml s3://${{ vars.BUCKET }}/sitemap.xml --region ${{ vars.AWS_REGION }}
+
+      - name: Prune assets no live build references
+        run: |
+          # Retention = 4 weekly SEO cycles: pages pin a build for 7 days normally,
+          # so 30 days survives three missed Monday runs and any long-lived tab.
+          # Deliberately deploy-time, not an S3 lifecycle rule: a deploy freeze
+          # then deletes nothing, so a stale-but-live build can never expire.
+          cutoff=$(date -u -d '30 days ago' '+%Y-%m-%dT%H:%M:%S')
+          aws s3api list-objects-v2 --bucket ${{ vars.BUCKET }} --prefix assets/ --region ${{ vars.AWS_REGION }} \
+            --query "Contents[?LastModified<'${cutoff}'].Key" --output text | tr '\t' '\n' \
+            | while read -r key; do
+                [ -n "${key}" ] && [ "${key}" != "None" ] && aws s3 rm "s3://${{ vars.BUCKET }}/${key}" --region ${{ vars.AWS_REGION }}
+              done || true
 
       - name: Clear cloudfront cache
         run: |
@@ -140,13 +154,27 @@ jobs:
 
       - name: Copy files to the production website with the AWS CLI
         run: |
-          # sitemap.xml and details/ are owned by the Publish SEO Artifacts workflow;
-          # assets/ is never deleted so its pre-rendered pages keep booting until it reruns
+          # sitemap.xml and details/ are owned by the Publish SEO Artifacts workflow.
+          # assets/ uses cp, not sync: every deploy re-stamps the live build's files,
+          # so the prune step below can treat old timestamps as unreferenced.
           aws s3 sync --delete ${{ env.DIST }} s3://${{ vars.BUCKET }} --region ${{ vars.AWS_REGION }} --exclude "details/*" --exclude "sitemap.xml" --exclude "assets/*"
-          aws s3 sync ${{ env.DIST }}/assets s3://${{ vars.BUCKET }}/assets --region ${{ vars.AWS_REGION }}
+          aws s3 cp ${{ env.DIST }}/assets s3://${{ vars.BUCKET }}/assets --recursive --region ${{ vars.AWS_REGION }}
           # Seed the fallback sitemap only when the bucket has none
           aws s3api head-object --bucket ${{ vars.BUCKET }} --key sitemap.xml --region ${{ vars.AWS_REGION }} >/dev/null 2>&1 \
             || aws s3 cp ${{ env.DIST }}/sitemap.xml s3://${{ vars.BUCKET }}/sitemap.xml --region ${{ vars.AWS_REGION }}
+
+      - name: Prune assets no live build references
+        run: |
+          # Retention = 4 weekly SEO cycles: pages pin a build for 7 days normally,
+          # so 30 days survives three missed Monday runs and any long-lived tab.
+          # Deliberately deploy-time, not an S3 lifecycle rule: a deploy freeze
+          # then deletes nothing, so a stale-but-live build can never expire.
+          cutoff=$(date -u -d '30 days ago' '+%Y-%m-%dT%H:%M:%S')
+          aws s3api list-objects-v2 --bucket ${{ vars.BUCKET }} --prefix assets/ --region ${{ vars.AWS_REGION }} \
+            --query "Contents[?LastModified<'${cutoff}'].Key" --output text | tr '\t' '\n' \
+            | while read -r key; do
+                [ -n "${key}" ] && [ "${key}" != "None" ] && aws s3 rm "s3://${{ vars.BUCKET }}/${key}" --region ${{ vars.AWS_REGION }}
+              done || true
 
       - name: Clear cloudfront cache
         run: |
