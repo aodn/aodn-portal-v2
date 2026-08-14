@@ -624,6 +624,7 @@ const SearchPage = () => {
       <Box
         sx={{
           flex: isUnderLaptop ? "none" : 1,
+          minWidth: 0,
           height: isUnderLaptop
             ? layout === SearchResultLayoutEnum.FULL_LIST
               ? SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_LIST
