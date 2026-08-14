@@ -8,7 +8,7 @@ import React, {
 import { createRoot } from "react-dom/client";
 import { ThemeProvider } from "@mui/material/styles";
 import { Box, Card, CardContent, CircularProgress } from "@mui/material";
-import { MapEvent, MapMouseEvent, Popup } from "mapbox-gl";
+import { MapEvent, MapMouseEvent, MapSourceDataEvent, Popup } from "mapbox-gl";
 import MapContext from "../MapContext";
 import { Feature, Point } from "geojson";
 import { fetchResultByUuidNoStore } from "@/app/store/searchReducer";
@@ -67,7 +67,7 @@ const MapPopup: React.FC<MapPopupProps> = memo(
         return dispatch(fetchResultByUuidNoStore(uuid))
           .unwrap()
           .then((collection: OGCCollection) => collection)
-          .catch((error: any) => {
+          .catch((error: unknown) => {
             console.error("Error fetching collection data:", error);
             // TODO: handle error in ErrorBoundary
           });
@@ -188,7 +188,7 @@ const MapPopup: React.FC<MapPopupProps> = memo(
         }
       };
 
-      const onSourceChange = (event: any) => {
+      const onSourceChange = (event: MapSourceDataEvent) => {
         if (event.sourceId === layerId && event.isSourceLoaded) {
           popup.remove();
         }

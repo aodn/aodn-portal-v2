@@ -106,7 +106,11 @@ const CollapseItem: React.FC<CollapseItemProps> = ({
                 pl: "10px",
               }}
               data-testid={`collapse-btn-${
-                (titleComponent as any)?.props?.link?.title ??
+                (
+                  titleComponent as
+                    | React.ReactElement<{ link?: { title?: string } }>
+                    | undefined
+                )?.props?.link?.title ??
                 title ??
                 "[ NO TITLE ]"
               }`}

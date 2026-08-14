@@ -17,7 +17,7 @@ const PANEL_VISIBLE_HEIGHT = 850;
 
 export interface NavigatablePanelChild {
   title: string;
-  component: (props: Record<string, any>) => ReactNode;
+  component: (props: Record<string, unknown>) => ReactNode;
 }
 
 interface NavigatablePanelProps {

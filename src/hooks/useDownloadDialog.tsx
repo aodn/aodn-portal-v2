@@ -398,8 +398,8 @@ export const useDownloadDialog = (
 
       setIsProcessing(true);
       const formData = new FormData(event.currentTarget as HTMLFormElement);
-      const formJson = Object.fromEntries((formData as any).entries());
-      const emailFromForm = formJson.email;
+      const formJson = Object.fromEntries(formData.entries());
+      const emailFromForm = formJson.email as string;
 
       if (emailFromForm) {
         submitJob(emailFromForm);

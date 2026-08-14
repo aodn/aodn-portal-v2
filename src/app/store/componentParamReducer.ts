@@ -86,8 +86,8 @@ export interface ParameterState {
   layout?: SearchResultLayoutEnum;
 }
 // Function use to test an input value is of type Vocab
-const isVocabType = (value: any): value is Vocab =>
-  value && (value as Vocab).label !== undefined;
+const isVocabType = (value: unknown): value is Vocab =>
+  !!value && (value as Vocab).label !== undefined;
 
 export interface Vocab {
   // The label is never undefined
@@ -407,17 +407,20 @@ const paramReducer = (
 
 // Flatten the ParameterState json to a properties like array, where key is
 // the name.name.name... that describe multiple level json.
-// Must use any due to multiple type complicated type casting
 const flattenToProperties = (
-  param: any,
+  param: Record<string, unknown>,
   parentKey = "",
-  result: Record<string, any> = {}
+  result: Record<string, unknown> = {}
 ) => {
   for (const key in param) {
     if (Object.prototype.hasOwnProperty.call(param, key)) {
       const propName = parentKey ? `${parentKey}.${key}` : key;
       if (typeof param[key] === "object" && param[key] !== null) {
-        flattenToProperties(param[key], propName, result);
+        flattenToProperties(
+          param[key] as Record<string, unknown>,
+          propName,
+          result
+        );
       } else {
         if (isVocabType(param)) {
           // Special handle for vocab type, we only serializable
@@ -437,7 +440,9 @@ const flattenToProperties = (
 
 // Change the flatten json to xxx=yyy?xxxx=yyyy which can be use in url.
 const formatToUrlParam = (param: ParameterState) => {
-  const result = flattenToProperties(param);
+  const result = flattenToProperties(
+    param as unknown as Record<string, unknown>
+  );
   const parts = [];
   for (const key in result) {
     if (Object.prototype.hasOwnProperty.call(result, key)) {
@@ -448,7 +453,7 @@ const formatToUrlParam = (param: ParameterState) => {
         result[key] !== ""
       ) {
         parts.push(
-          `${encodeURIComponent(key)}=${encodeURIComponent(result[key])}`
+          `${encodeURIComponent(key)}=${encodeURIComponent(String(result[key]))}`
         );
       }
     }
@@ -457,7 +462,7 @@ const formatToUrlParam = (param: ParameterState) => {
 };
 
 const parseQueryString = (queryString: string) => {
-  const obj: Record<string, any> = {};
+  const obj: Record<string, string> = {};
   const pairs = queryString.split("&"); // Split the query string into key-value pairs
 
   pairs.forEach((pair) => {
@@ -484,7 +489,8 @@ const unFlattenToParameterState = (input: string): ParameterState => {
   for (const key in flatObject) {
     if (Object.prototype.hasOwnProperty.call(flatObject, key)) {
       const parts = key.split("."); // Split the key into parts based on '.'
-      let current: any = result; // Must use any, as it can be multiple type during unflattern
+      // The node type changes at every level during unflattern
+      let current = result as unknown as Record<string, unknown>;
 
       for (let i = 0; i < parts.length; i++) {
         const part = parts[i];
@@ -506,7 +512,7 @@ const unFlattenToParameterState = (input: string): ParameterState => {
             const isTypeArray = !isNaN(Number(parts[i + 1]));
             current[part] = isTypeArray ? [] : {};
           }
-          current = current[part];
+          current = current[part] as Record<string, unknown>;
         }
       }
     }

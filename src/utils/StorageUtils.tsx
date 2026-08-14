@@ -3,7 +3,7 @@ import { current } from "@reduxjs/toolkit";
 
 const BOOKMARK_IDS_KEY = "bookmark-list";
 
-export const saveBookmarkIdsToStorage = (items: Array<any>) => {
+export const saveBookmarkIdsToStorage = (items: Array<{ id: string }>) => {
   try {
     if (!items || items.length === 0) {
       localStorage.removeItem(BOOKMARK_IDS_KEY);

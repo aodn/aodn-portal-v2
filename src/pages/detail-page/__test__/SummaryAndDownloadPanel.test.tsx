@@ -15,7 +15,7 @@ describe("buildMapLayerConfig", () => {
     overrides: Partial<{
       hasCloudOptimisedData: boolean;
       getDatasetType: () => DatasetType[] | undefined;
-      getBBox: () => any;
+      getBBox: () => unknown;
     }> = {}
   ) => {
     return {

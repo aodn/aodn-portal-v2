@@ -31,13 +31,10 @@ enum EVENT_CLIPBOARD {
 // you can define your onEvent if you want
 export interface ControlProps<T = any> {
   map?: MapBox;
-  onEvent?: (...args: T extends any[] ? T : [T]) => void;
+  onEvent?: (...args: T extends unknown[] ? T : [T]) => void;
 }
 
-export type MapControlType = React.ReactElement<
-  ControlProps,
-  string | React.JSXElementConstructor<any>
->;
+export type MapControlType = React.ReactElement<ControlProps>;
 
 export interface MenuControlType {
   position?: "bottom-right" | "bottom-left" | "top-right" | "top-left";
@@ -60,7 +57,7 @@ export interface BookmarkEvent {
 
 export interface ClipboardEvent {
   action: string;
-  value: any;
+  value: unknown;
 }
 
 export { EVENT_MAP, EVENT_MENU, EVENT_BOOKMARK, EVENT_CLIPBOARD };

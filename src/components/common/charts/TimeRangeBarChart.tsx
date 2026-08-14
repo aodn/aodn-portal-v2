@@ -301,7 +301,7 @@ const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
 };
 // Test-only exports for private functions
 if (process.env.NODE_ENV === "test") {
-  (TimeRangeBarChart as any).__testExports = {
+  (TimeRangeBarChart as unknown as { __testExports: unknown }).__testExports = {
     determineChartUnit,
     calculateDaysBetween,
     calculateMonthBetween,

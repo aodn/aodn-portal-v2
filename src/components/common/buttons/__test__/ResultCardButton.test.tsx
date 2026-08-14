@@ -5,9 +5,10 @@ import ResultCardButton, {
   ResultCardButtonConfig,
 } from "../ResultCardButton";
 import { userEvent } from "@testing-library/user-event";
+import type { CSSProperties } from "react";
 
 // Mock an icon component
-const MockIcon = ({ sx }: { sx?: any }) => (
+const MockIcon = ({ sx }: { sx?: CSSProperties }) => (
   <span data-testid="mock-icon" style={sx}>
     Icon
   </span>

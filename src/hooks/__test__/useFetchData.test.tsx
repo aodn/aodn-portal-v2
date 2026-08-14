@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import type { Mock } from "vitest";
 import useFetchData from "../useFetchData";
 import { useAppDispatch } from "@/app/store/hooks";
 import { updateSearchText } from "@/app/store/componentParamReducer";
@@ -74,7 +75,7 @@ describe("useFetchData", () => {
     );
 
     // mock return for first call
-    (ogcAxiosWithRetry.get as any).mockImplementation(() =>
+    (ogcAxiosWithRetry.get as Mock).mockImplementation(() =>
       Promise.resolve({ data: response1 })
     );
 

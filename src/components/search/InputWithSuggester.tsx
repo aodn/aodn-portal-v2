@@ -15,7 +15,9 @@ import {
   Box,
   createFilterOptions,
   Paper,
+  PaperProps,
   Popper,
+  PopperProps,
   TextField,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
@@ -338,7 +340,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
 
   // Input suggester popper
   const CustomPopper = useCallback(
-    (props: any): ReactNode => {
+    (props: PopperProps): ReactNode => {
       return (
         <Popper
           {...props}
@@ -368,7 +370,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
 
   // Input suggester paper
   const CustomPaper = useCallback(
-    (props: any): ReactNode => {
+    (props: PaperProps): ReactNode => {
       return (
         <Paper
           elevation={location.pathname === pageDefault.search ? 2 : 1}
@@ -437,7 +439,7 @@ const InputWithSuggester: FC<InputWithSuggesterProps> = ({
       includeInputInList
       disablePortal
       onInputChange={handleInputChange}
-      onChange={(_: any, newValue: string | null) => {
+      onChange={(_: SyntheticEvent, newValue: string | null) => {
         if (newValue !== null) {
           setInputValue(newValue);
           dispatch(updateSearchText(newValue));

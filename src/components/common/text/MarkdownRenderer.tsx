@@ -178,7 +178,7 @@ const parseMarkdown = (text: string): MarkdownElement[] => {
 
 // Process inline markdown (bold, italic, links, etc.)
 const processInlineMarkdown = (text: string) => {
-  const parts: any[] = [];
+  const parts: Array<{ type: ElementType; content: string; url?: string }> = [];
   let currentIndex = 0;
 
   // Combined regex for bold, italic, and links

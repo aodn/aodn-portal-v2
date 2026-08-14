@@ -130,7 +130,7 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
     () => [
       {
         title: TITLE_SUGGESTED_CITATION,
-        component: (props: Record<string, any>) => (
+        component: (props: Record<string, unknown>) => (
           <SuggestedCitationList
             {...props}
             suggestedCitation={suggestedCitation ?? ""}
@@ -139,7 +139,7 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
       },
       {
         title: "Cited Responsible Parties",
-        component: (props: Record<string, any>) => (
+        component: (props: Record<string, unknown>) => (
           <CitedResponsiblePartyList
             {...props}
             responsibleParties={citationContacts}
@@ -148,7 +148,7 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
       },
       {
         title: TITLE_LICENSE,
-        component: (props: Record<string, any>) => (
+        component: (props: Record<string, unknown>) => (
           <LicenseList
             {...props}
             license={license}
@@ -159,19 +159,19 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
       },
       {
         title: "Constraints",
-        component: (props: Record<string, any>) => (
+        component: (props: Record<string, unknown>) => (
           <ConstraintList {...props} constraints={constraints} />
         ),
       },
       {
         title: "Data Contact",
-        component: (props: Record<string, any>) => (
+        component: (props: Record<string, unknown>) => (
           <ContactList {...props} contacts={aboutContacts} />
         ),
       },
       {
         title: "Credits",
-        component: (props: Record<string, any>) => (
+        component: (props: Record<string, unknown>) => (
           <CreditList {...props} credits={credits} />
         ),
       },

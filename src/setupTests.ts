@@ -22,7 +22,7 @@ class ResizeObserver {
   disconnect() {}
 }
 
-(global as any).ResizeObserver = ResizeObserver;
+(global as unknown as Record<string, unknown>).ResizeObserver = ResizeObserver;
 
 class IntersectionObserver {
   callback: IntersectionObserverCallback;
@@ -42,7 +42,8 @@ class IntersectionObserver {
   }
 }
 
-(global as any).IntersectionObserver = IntersectionObserver;
+(global as unknown as Record<string, unknown>).IntersectionObserver =
+  IntersectionObserver;
 
 // A global mock to avoid analytics side effects (window.gtag in a setTimeout)
 // firing after test teardown, you can override in the test file
@@ -53,9 +54,9 @@ vi.mock("./analytics/customEventTracker", () => ({
 // A global mock to avoid real layer fetch calls, if you need different return value
 // you can override in the test file
 vi.mock("./components/map/mapbox/layers/StaticLayer", async () => {
-  const actual = (await vi.importActual(
-    "./components/map/mapbox/layers/StaticLayer"
-  )) as any;
+  const actual = await vi.importActual<
+    typeof import("./components/map/mapbox/layers/StaticLayer")
+  >("./components/map/mapbox/layers/StaticLayer");
   return {
     ...actual,
     fetchMarineParkOptions: vi.fn().mockResolvedValue([]),

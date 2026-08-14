@@ -144,7 +144,7 @@ export const initializeBookmarkList = createAsyncThunk<
   void,
   void,
   { rejectValue: ErrorResponse; state: RootState; dispatch: AppDispatch }
->("bookmarkList/initialize", async (_, thunkAPI: any) => {
+>("bookmarkList/initialize", async (_, thunkAPI) => {
   const { dispatch } = thunkAPI;
 
   try {

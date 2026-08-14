@@ -31,7 +31,7 @@ describe("NavigatablePanel", () => {
   const mockChildren: NavigatablePanelChild[] = [
     {
       title: "Section 1",
-      component: (props: Record<string, any>) => (
+      component: (props: Record<string, unknown>) => (
         <div data-testid="section-1">
           {props.selected ? "Active" : "Inactive"}
         </div>
@@ -39,7 +39,7 @@ describe("NavigatablePanel", () => {
     },
     {
       title: "Section 2",
-      component: (props: Record<string, any>) => (
+      component: (props: Record<string, unknown>) => (
         <div data-testid="section-2">
           {props.selected ? "Active" : "Inactive"}
         </div>

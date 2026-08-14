@@ -112,8 +112,8 @@ describe("createFilterString", () => {
   });
 
   it("should return empty string for non-array input", () => {
-    expect(createFilterString(null as any)).toBe("");
-    expect(createFilterString(undefined as any)).toBe("");
+    expect(createFilterString(null as unknown as Array<string>)).toBe("");
+    expect(createFilterString(undefined as unknown as Array<string>)).toBe("");
   });
 
   it("should create a filter string for a single UUID", () => {

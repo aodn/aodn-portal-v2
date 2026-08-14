@@ -302,10 +302,17 @@ export class OGCCollection {
   readonly description?: string;
   readonly itemType?: string;
 
-  set extent(extents: any) {
+  set extent(extents: {
+    spatial?: { bbox: Array<Position>; crs: string };
+    temporal: { interval: Array<Array<string | null>>; trs?: string };
+  }) {
     this.propExtent = new Spatial(this);
-    this.propExtent.bbox = extents.spatial ? extents.spatial.bbox : undefined;
-    this.propExtent.crs = extents.spatial ? extents.spatial.crs : undefined;
+    this.propExtent.bbox = (
+      extents.spatial ? extents.spatial.bbox : undefined
+    ) as Array<Position>;
+    this.propExtent.crs = (
+      extents.spatial ? extents.spatial.crs : undefined
+    ) as string;
     this.propExtent.temporal = extents.temporal;
   }
 

@@ -64,12 +64,15 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
       {containerNode &&
         Children.toArray(children).map((child, index) => {
           if (isValidElement(child)) {
-            return cloneElement<any>(child, {
-              key: child.key || index,
-              className: className,
-              parentRef: { current: containerNode },
-              sx: childStyles,
-            });
+            return cloneElement(
+              child as React.ReactElement<Record<string, unknown>>,
+              {
+                key: child.key || index,
+                className: className,
+                parentRef: { current: containerNode },
+                sx: childStyles,
+              }
+            );
           }
           return child;
         })}

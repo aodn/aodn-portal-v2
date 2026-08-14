@@ -311,7 +311,7 @@ describe("Searchbar", () => {
       updateFilterStaticAreas([
         {
           boundaryName: BoundaryName.AUSTRALIAN_MARINE_PARKS,
-          value: 3 as any,
+          value: 3 as unknown as string,
         },
       ])
     );

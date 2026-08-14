@@ -176,7 +176,7 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
     () => [
       {
         title: "Data",
-        component: (props: Record<string, any>) => (
+        component: (props: Record<string, unknown>) => (
           <DataList
             {...props}
             title={"Data"}
@@ -186,7 +186,7 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
       },
       {
         title: "Document",
-        component: (props: Record<string, any>) => (
+        component: (props: Record<string, unknown>) => (
           <DocumentList
             {...props}
             title={"Document"}
@@ -196,7 +196,7 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
       },
       {
         title: "Code Tutorials",
-        component: (props: Record<string, any>) => (
+        component: (props: Record<string, unknown>) => (
           <CodeTutorialsList
             {...props}
             title={"Code Tutorials"}
@@ -208,7 +208,7 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
       },
       {
         title: "Other",
-        component: (props: Record<string, any>) => (
+        component: (props: Record<string, unknown>) => (
           <OtherItemList
             {...props}
             title={"Other"}

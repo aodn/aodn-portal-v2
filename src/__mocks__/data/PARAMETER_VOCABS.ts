@@ -1,4 +1,4 @@
-export const PARAMETER_VOCABS: any[] = [
+export const PARAMETER_VOCABS = [
   {
     label: "Physical-Atmosphere",
     definition:

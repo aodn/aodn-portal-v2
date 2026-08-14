@@ -1,7 +1,7 @@
 import { useMemo, useEffect } from "react";
 import debounce from "lodash/debounce";
 
-export const useDebounce = <T extends (...args: any[]) => any>(
+export const useDebounce = <T extends (...args: never[]) => unknown>(
   callback: T,
   delay: number
 ) => {

@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import { AsyncThunk } from "@reduxjs/toolkit";
+import { AsyncThunk, AsyncThunkAction } from "@reduxjs/toolkit";
 import { useAppDispatch } from "@/app/store/hooks";
 import { consumeSSEStream } from "../utils/SSEUtils";
 import { ErrorResponse } from "../utils/ErrorBoundary";
@@ -45,8 +45,8 @@ enum EstimateStatus {
  * differ only by the thunk (the request body) and the `estimate-complete`
  * payload shape, handled by the `getEstimatedBytes` extractor.
  */
-const useEstimateSize = <TArg,>(
-  estimateThunk: AsyncThunk<any, TArg, { rejectValue: ErrorResponse }>,
+const useEstimateSize = <TArg, TReturned = unknown>(
+  estimateThunk: AsyncThunk<TReturned, TArg, { rejectValue: ErrorResponse }>,
   getEstimatedBytes: (
     data: EstimateSSEEventData
   ) => number | undefined = defaultGetEstimatedBytes
@@ -56,7 +56,9 @@ const useEstimateSize = <TArg,>(
     null
   );
   const [status, setStatus] = useState<EstimateStatus>(EstimateStatus.IDLE);
-  const estimatePromiseRef = useRef<any>(null);
+  const estimatePromiseRef = useRef<{
+    abort: (reason?: string) => void;
+  } | null>(null);
 
   const cancelEstimate = useCallback(() => {
     if (estimatePromiseRef.current) {
@@ -81,7 +83,15 @@ const useEstimateSize = <TArg,>(
         // Cast around the AsyncThunk action-creator's generic call signature,
         // which otherwise widens an unconstrained TArg to `TArg & undefined`
         const estimatePromise = dispatch(
-          (estimateThunk as (a: TArg) => any)(arg)
+          (
+            estimateThunk as (
+              a: TArg
+            ) => AsyncThunkAction<
+              TReturned,
+              TArg,
+              { rejectValue: ErrorResponse }
+            >
+          )(arg)
         );
         estimatePromiseRef.current = estimatePromise;
 
@@ -95,7 +105,9 @@ const useEstimateSize = <TArg,>(
           return;
         }
 
-        const responseStream = resultAction.payload?.data as ReadableStream;
+        const responseStream = (
+          resultAction.payload as { data?: ReadableStream } | undefined
+        )?.data;
 
         if (!responseStream) {
           setStatus(EstimateStatus.ERROR);

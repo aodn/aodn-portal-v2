@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import type { Mock } from "vitest";
 import AdminScreen from "../AdminScreen";
 import { ogcAxiosWithRetry } from "../../../app/store/searchReducer";
 
@@ -50,7 +51,7 @@ describe("AdminScreen Component", () => {
       },
     };
 
-    (ogcAxiosWithRetry.get as any).mockResolvedValueOnce({
+    (ogcAxiosWithRetry.get as Mock).mockResolvedValueOnce({
       data: mockInfoData,
     });
 

@@ -30,7 +30,7 @@ const paramReverseLookup = new Map(
  * @param  Object containing baseUrl and params
  * @returns A formatted URL string
  */
-const formatToUrl = <T extends Record<string, any>>({
+const formatToUrl = <T extends object>({
   baseUrl,
   params,
 }: {
