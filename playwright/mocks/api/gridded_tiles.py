@@ -20,9 +20,13 @@ DATA_ONLY_PRODUCT_ID = 'model_temperature:temp'
 
 
 def _tile_template(uuid: str, dataset: str, variable: str) -> str:
+    # {tileRow}/{tileCol} (not {x}/{y}) matches ogcapi-java's actual OGC
+    # placeholder names (tileRow=y, tileCol=x) — the frontend's
+    # REQUIRED_TEMPLATE_TOKENS check drops any product whose template is
+    # missing them, so a stale {x}/{y} mock silently empties the products list.
     return (
         f'/api/v1/ogc/collections/{uuid}/map/tiles/WebMercatorQuad'
-        '/{z}/{x}/{y}'
+        '/{z}/{tileRow}/{tileCol}'
         f'?dataset={dataset}&variable={variable}'
         '&datetime={datetime}&f=png'
     )
