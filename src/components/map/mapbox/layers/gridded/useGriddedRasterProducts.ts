@@ -52,7 +52,11 @@ const useGriddedRasterProducts = (
           `Gridded raster tile product discovery failed for ${uuid}`,
           e
         );
-        setSettled({ uuid, attempt, products: NO_PRODUCTS, error: true });
+        setSettled((prev) => {
+          const priorProducts =
+            prev?.uuid === uuid && !prev.error ? prev.products : NO_PRODUCTS;
+          return { uuid, attempt, products: priorProducts, error: true };
+        });
       });
 
     return () => request.abort();

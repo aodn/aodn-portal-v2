@@ -132,6 +132,33 @@ describe("useGriddedRasterProducts", () => {
     expect(result.current.products.map((p) => p.id)).toEqual(["new:product"]);
   });
 
+  it("keeps a previously successful listing when a later refetch fails", async () => {
+    const spy = vi
+      .spyOn(ogcAxiosWithRetry, "get")
+      .mockResolvedValueOnce({ data: payload("a:one") } as any)
+      .mockRejectedValueOnce(new Error("transient"));
+
+    const { result } = renderHook(
+      () => useGriddedRasterProducts(zarrCollection("uuid-refetch")),
+      { wrapper }
+    );
+
+    await waitFor(() => expect(result.current.products).toHaveLength(1));
+    expect(result.current.error).toBe(false);
+
+    // Nothing in the app currently triggers a spontaneous refetch — this
+    // exercises the same code path retry() would drive, so the fix is
+    // verified independently of whether a retry button is reachable.
+    act(() => result.current.retry());
+
+    await waitFor(() => expect(result.current.error).toBe(true));
+    // The layer must stay mounted with its last-known-good products, not
+    // unmount itself by resetting to an empty list — otherwise the retry
+    // button this error state is supposed to offer would disappear with it.
+    expect(result.current.products.map((p) => p.id)).toEqual(["a:one"]);
+    expect(spy).toHaveBeenCalledTimes(2);
+  });
+
   it("retry() starts a fresh attempt", async () => {
     const spy = vi
       .spyOn(ogcAxiosWithRetry, "get")

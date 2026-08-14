@@ -113,7 +113,11 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
 
     const createOnStyleChange = () => createSourceAndLayer(currentVisibility());
 
-    map.once(MapEventEnum.IDLE, createOnInit);
+    if (map.isStyleLoaded()) {
+      createOnInit();
+    } else {
+      map.once(MapEventEnum.IDLE, createOnInit);
+    }
     map.on(MapEventEnum.STYLEDATA, createOnStyleChange);
 
     return () => {

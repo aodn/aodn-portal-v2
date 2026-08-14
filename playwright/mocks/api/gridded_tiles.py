@@ -12,10 +12,17 @@ UNSUPPORTED_UUID = '19da2ce7-138f-4427-89de-a50c724f5f54'
 # what proves the slider marks re-derive on product switch rather than
 # persisting. The two-variable product carries %2B, which must survive to the
 # wire — an unencoded '+' decodes to a space and 400s.
+#
+# The lists deliberately SHARE one date ('2024-01-05') that is non-latest for
+# both products. That overlap is load-bearing: a date-override bug that
+# survives a product switch merely because the retained date string is still
+# valid for the new product (rather than being cleared/re-keyed on switch) is
+# invisible with fully disjoint date lists — see
+# test_switching_product_does_not_retain_a_shared_non_latest_date.
 PRODUCT_ONE_ID = 'satellite_net_primary_productivity_gsm_1day_aqua:chl_oc3'
 PRODUCT_ONE_DATES = ['2024-01-01', '2024-01-05', '2024-01-09']
 PRODUCT_TWO_ID = 'model_currents:ucur+vcur'
-PRODUCT_TWO_DATES = ['2023-06-02', '2023-06-03']
+PRODUCT_TWO_DATES = ['2023-06-02', '2024-01-05', '2024-03-01']
 DATA_ONLY_PRODUCT_ID = 'model_temperature:temp'
 
 

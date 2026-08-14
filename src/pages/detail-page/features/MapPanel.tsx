@@ -232,15 +232,21 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     [selectedGriddedProduct]
   );
 
-  const [griddedDateOverride, setGriddedDateOverride] = useState<string>("");
+  const [griddedDateOverride, setGriddedDateOverride] = useState<{
+    productId: string;
+    date: string;
+  } | null>(null);
 
-  const selectedGriddedDate = useMemo(
-    () =>
-      griddedDateMarks.dates.includes(griddedDateOverride)
-        ? griddedDateOverride
-        : griddedDateMarks.latest,
-    [griddedDateOverride, griddedDateMarks]
-  );
+  const selectedGriddedDate = useMemo(() => {
+    const override =
+      selectedGriddedProduct &&
+      griddedDateOverride?.productId === selectedGriddedProduct.id
+        ? griddedDateOverride.date
+        : undefined;
+    return override && griddedDateMarks.dates.includes(override)
+      ? override
+      : griddedDateMarks.latest;
+  }, [griddedDateOverride, griddedDateMarks, selectedGriddedProduct]);
 
   const handleGriddedDatePointChange = useCallback(
     (
@@ -250,9 +256,14 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       // Always recovered from the map — never re-derived from the timestamp,
       // which would be off by a day in a browser west of UTC.
       const dayKey = griddedDateMarks.byValue.get(value as number);
-      if (dayKey) setGriddedDateOverride(dayKey);
+      if (dayKey && selectedGriddedProduct) {
+        setGriddedDateOverride({
+          productId: selectedGriddedProduct.id,
+          date: dayKey,
+        });
+      }
     },
-    [griddedDateMarks]
+    [griddedDateMarks, selectedGriddedProduct]
   );
 
   const hasSpatialExtent = useMemo(() => {

@@ -202,7 +202,7 @@ def test_switching_product_resets_the_day_and_the_tile_url(
     thumb.focus()
     responsive_page.keyboard.press('ArrowLeft')
     expect(
-        responsive_page.get_by_text(f'Displaying @ {PRODUCT_TWO_DATES[0]}')
+        responsive_page.get_by_text(f'Displaying @ {PRODUCT_TWO_DATES[-2]}')
     ).to_be_visible()
     responsive_page.wait_for_timeout(1000)
 
@@ -214,6 +214,61 @@ def test_switching_product_resets_the_day_and_the_tile_url(
             detail_page.date_range_condition_box.first.inner_text()
             == text_before
         )
+
+
+def test_switching_product_does_not_retain_a_shared_non_latest_date(
+    responsive_page: Page,
+) -> None:
+    """
+    Regression: product two's date list intentionally shares '2024-01-05' with
+    product one's non-latest, middle date. MapPanel used to keep a date
+    override across a product switch whenever the retained date string was
+    still valid for the *new* product — with fully disjoint date lists that
+    never happens, so it went unnoticed. With an overlapping date, the
+    remounted slider would show product two's latest day while the tile
+    request kept using the stale, shared day from product one.
+    """
+    detail_page = DetailPage(responsive_page)
+    tile_urls = _collect_tile_requests(responsive_page)
+
+    detail_page.load(SUPPORTED_UUID)
+    detail_page.go_to_map_tab()
+    detail_page.detail_map.wait_for_layer_select_loading()
+    _open_gridded_layer(detail_page)
+
+    # Move product one's point off its latest day, onto the day shared with
+    # product two.
+    detail_page.detail_map.daterange_show_hide_menu_button.click()
+    thumb = responsive_page.get_by_role('slider').first
+    thumb.focus()
+    responsive_page.keyboard.press('ArrowLeft')
+    shared_date = PRODUCT_ONE_DATES[-2]
+    expect(
+        responsive_page.get_by_text(f'Displaying @ {shared_date}')
+    ).to_be_visible()
+    responsive_page.wait_for_timeout(1000)
+    assert any(f'datetime={shared_date}' in url for url in tile_urls)
+
+    # Switch to product two, whose own dates also contain that shared date —
+    # but whose latest day is a different one.
+    detail_page.dataset_selection_dropdown.click()
+    responsive_page.get_by_role('option').nth(1).click()
+    detail_page.detail_map.wait_for_map_idle()
+
+    detail_page.detail_map.daterange_show_hide_menu_button.click()
+    product_two_latest = PRODUCT_TWO_DATES[-1]
+    assert product_two_latest != shared_date
+    expect(
+        responsive_page.get_by_text(f'Displaying @ {product_two_latest}')
+    ).to_be_visible()
+
+    responsive_page.wait_for_timeout(1000)
+    assert any(f'datetime={product_two_latest}' in url for url in tile_urls)
+    # The stale, shared date must not be what actually got requested once
+    # product two is selected.
+    two_variable_urls = [url for url in tile_urls if 'ucur' in url.lower()]
+    assert two_variable_urls
+    assert not any(f'datetime={shared_date}' in url for url in two_variable_urls)
 
 
 def test_gridded_layer_survives_a_basemap_switch_and_hides_on_layer_change(

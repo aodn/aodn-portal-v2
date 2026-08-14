@@ -121,6 +121,42 @@ describe("GriddedRasterLayer", () => {
     );
   });
 
+  it("creates the source immediately when the style is already loaded, without relying on a future idle event", () => {
+    // This layer mounts only after async product discovery resolves, so the
+    // map has very often already settled by then. `once('idle', cb)` alone
+    // would then wait for an idle event that may never fire again. `once` is
+    // deliberately a spy that never invokes its callback here, so this test
+    // can only pass via the synchronous "already loaded" branch.
+    mockMap.once = vi.fn();
+    mockMap.isStyleLoaded.mockReturnValue(true);
+
+    renderLayer();
+
+    expect(mockMap.once).not.toHaveBeenCalled();
+    expect(mockMap.addSource).toHaveBeenCalledTimes(1);
+    expect(mockMap.addSource).toHaveBeenCalledWith(
+      "test-map-gridded-raster-source",
+      expect.objectContaining({ tiles: [urlFor("2024-01-03")] })
+    );
+  });
+
+  it("falls back to waiting for idle when the style is not yet loaded", () => {
+    let idleCallback: (() => void) | undefined;
+    mockMap.once = vi.fn((event: string, cb: () => void) => {
+      if (event === MapEventEnum.IDLE) idleCallback = cb;
+    });
+    mockMap.isStyleLoaded.mockReturnValue(false);
+
+    renderLayer();
+
+    expect(mockMap.addSource).not.toHaveBeenCalled();
+
+    mockMap.isStyleLoaded.mockReturnValue(true);
+    idleCallback?.();
+
+    expect(mockMap.addSource).toHaveBeenCalledTimes(1);
+  });
+
   it("keeps %2B intact in the tile url", () => {
     renderLayer();
     const [, spec] = mockMap.addSource.mock.calls[0];
