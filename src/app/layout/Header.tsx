@@ -17,6 +17,8 @@ import { pageDefault } from "@/components/common/constants";
 import Searchbar from "@/components/search/Searchbar";
 import { useAppSelector } from "@/app/store/hooks";
 import {
+  HEADER_HEIGHT_MOBILE,
+  HEADER_MENU_ROW_HEIGHT,
   PAGE_CONTENT_MAX_WIDTH,
   PAGE_CONTENT_WIDTH_HEADER,
   SEARCHBAR_CONTENT_WIDTH,
@@ -77,6 +79,7 @@ const Header: FC = () => {
         <SectionContainer
           sectionAreaStyle={{
             backgroundColor: color.blue.xLight,
+            height: HEADER_MENU_ROW_HEIGHT,
           }}
           contentAreaStyle={{
             alignItems: "end",
@@ -95,7 +98,7 @@ const Header: FC = () => {
       <SectionContainer
         sectionAreaStyle={{
           backgroundColor: "#fff",
-          height: isMobile ? "80px" : undefined,
+          height: isMobile ? HEADER_HEIGHT_MOBILE : undefined,
           paddingY: isMobile ? 0 : padding.medium,
         }}
         contentAreaStyle={{
