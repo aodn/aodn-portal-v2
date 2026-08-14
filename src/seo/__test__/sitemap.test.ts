@@ -1,6 +1,6 @@
 /**
  * SEO — sitemap URLs use the public site host (BASE_URL), not the OGC fetch
- * host. Record fetching lives in prerender.ts (fetchResultNoStore).
+ * host. Record fetching lives in fetchCollections.ts (fetchResultNoStore).
  */
 
 import { describe, expect, test } from "vitest";
