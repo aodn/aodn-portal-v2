@@ -18,6 +18,18 @@ body {
   overflow-y: scroll !important;
 }
 
+/*
+ * Search page is a fixed viewport layout and does not scroll.
+ * overflow-y: scroll always reserves a classic scrollbar gutter
+ * (Edge/Chromium). Firefox overlay scrollbars hide that gap.
+ * Keep page scroll below the laptop breakpoint (stacked map + list).
+ */
+@media (min-width: 1024px) {
+  body.search-page-no-scroll {
+    overflow-y: hidden !important;
+  }
+}
+
 /* Pointer cursor on the map canvas (e.g. draw mode) */
 .map-cursor-pointer {
   cursor: pointer !important;
