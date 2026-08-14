@@ -570,11 +570,13 @@ const SearchPage = () => {
   useEffect(() => {
     startTransition(() => {
       if (urlParamState) {
-        setBbox(
-          new LngLatBounds(
-            urlParamState.bbox?.bbox as [number, number, number, number]
-          )
-        );
+        if (urlParamState.bbox?.bbox) {
+          setBbox(
+            new LngLatBounds(
+              urlParamState.bbox.bbox as [number, number, number, number]
+            )
+          );
+        }
         setZoom(urlParamState.zoom);
       }
     });
