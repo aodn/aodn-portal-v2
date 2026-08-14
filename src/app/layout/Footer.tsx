@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, ReactElement } from "react";
 import {
   Avatar,
   Box,
@@ -17,7 +17,6 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import traditional from "@/assets/icons/traditional.png";
-import dayjs from "dayjs";
 import {
   borderRadius,
   color,
@@ -31,19 +30,20 @@ import SectionContainer from "@/components/common/container/SectionContainer";
 import { openInNewTab } from "@/utils/LinkUtils";
 import { scrollToTop } from "@/utils/ScrollUtils";
 import { useLocation } from "react-router-dom";
-import { pageDefault } from "@/components/common/constants";
+import {
+  dateDefault,
+  imosInfoDefault,
+  pageDefault,
+} from "@/components/common/constants";
 import { NorthIcon } from "@/components/icon/NorthIcon";
 import { BlueskyLogoIcon } from "@/components/icon/BlueskyLogoIcon";
 import { PAGE_CONTENT_WIDTH_LANDING } from "@/app/layout/constant";
 import React from "react";
 
 interface IconContainerProps {
-  children: JSX.Element;
+  children: ReactElement;
   sx?: SxProps;
 }
-
-const recipient = "info@aodn.org.au";
-const subject = "AODN Data Discovery enquiry";
 
 const IconContainer: FC<IconContainerProps> = ({ children, sx }) => (
   <Icon sx={{ color: "#000", display: "flex", alignItems: "center", ...sx }}>
@@ -52,10 +52,9 @@ const IconContainer: FC<IconContainerProps> = ({ children, sx }) => (
 );
 
 const handleClickContactUs = () => {
-  window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}`;
+  window.location.href = `mailto:${imosInfoDefault.EMAIL.RECIPIENT}?subject=${encodeURIComponent(imosInfoDefault.EMAIL.SUBJECT)}`;
 };
 
-const currentYear = dayjs(new Date()).year();
 const version = import.meta.env.VITE_APP_VERSION;
 
 const Footer: FC = () => {
@@ -241,8 +240,8 @@ const Footer: FC = () => {
                     fontSize={fontSize.subscription}
                     textAlign={{ xs: "center", sm: "left" }}
                   >
-                    Copyright © {currentYear}. All rights reserved. Version
-                    :&nbsp;
+                    Copyright © {dateDefault.currentYear}. All rights reserved.
+                    Version :&nbsp;
                     {version}
                   </Typography>
                 </Grid>

@@ -1,20 +1,19 @@
 import React from "react";
 import { Box, Link, Stack, Typography } from "@mui/material";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
-import dayjs from "dayjs";
 import { portalTheme } from "../../../../styles";
 import { gap } from "@/styles/constants";
-import { pageDefault } from "../../../common/constants";
+import {
+  dateDefault,
+  imosInfoDefault,
+  pageDefault,
+} from "../../../common/constants";
 import { openInNewTab } from "@/utils/LinkUtils";
 
 export const MAP_FOOTER_HEIGHT = "22px";
 
-const recipient = "info@aodn.org.au";
-const subject = "AODN Data Discovery enquiry";
-const currentYear = dayjs(new Date()).year();
-
 const handleClickContactUs = () => {
-  window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}`;
+  window.location.href = `mailto:${imosInfoDefault.EMAIL.RECIPIENT}?subject=${encodeURIComponent(imosInfoDefault.EMAIL.SUBJECT)}`;
 };
 
 const linkSx = {
@@ -39,14 +38,10 @@ const MapFooter: React.FC = () => {
         flexShrink: 0,
         width: "100%",
         height: MAP_FOOTER_HEIGHT,
-        opacity: 1,
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        boxSizing: "border-box",
         px: gap.lg,
-        bgcolor: portalTheme.palette.neutral2,
-        border: `1.5px solid ${portalTheme.palette.primary1}`,
         overflow: "hidden",
       }}
     >
@@ -59,7 +54,7 @@ const MapFooter: React.FC = () => {
           whiteSpace: "nowrap",
         }}
       >
-        Copyright © {currentYear}. All rights reserved.
+        Copyright © {dateDefault.currentYear}. All rights reserved.
       </Typography>
       <Stack direction="row" alignItems="center" spacing={2}>
         <Link

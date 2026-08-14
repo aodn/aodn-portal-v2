@@ -136,6 +136,7 @@ const MapSection: React.FC<MapSectionProps> = memo(
             flex: 1,
             minHeight: 0,
             width: "100%",
+            borderRadius: 0,
             overflow: "hidden",
             ...sx,
           }}

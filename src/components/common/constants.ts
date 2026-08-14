@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 const dateDefault = {
   // Must use this format to do search, we care about the time
   DATE_TIME_FORMAT: "YYYY-MM-DDTHH:mm:ss[Z]",
@@ -8,6 +10,7 @@ const dateDefault = {
   DISPLAY_FORMAT_LONG: "DD MMM YYYY",
   min: new Date("01/01/1970"),
   max: new Date(),
+  currentYear: dayjs(new Date()).year(),
 };
 
 const pageDefault = {
@@ -74,6 +77,13 @@ const playwrightTestIds = {
   DETAIL_MAP_POPUP: "map-popup",
 };
 
+const imosInfoDefault = {
+  EMAIL: {
+    RECIPIENT: "info@aodn.org.au",
+    SUBJECT: "AODN Data Discovery enquiry",
+  },
+};
+
 export {
   allenCoralAtlasDefault,
   dateDefault,
@@ -83,5 +93,6 @@ export {
   marineParkDefault,
   marineEcoregionOfWorldDefault,
   contactRoles,
+  imosInfoDefault,
   playwrightTestIds,
 };
