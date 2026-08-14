@@ -31,6 +31,30 @@ come back:
 ⚠️ Regenerate `yarn.lock` with yarn 4 (`corepack yarn install`), not the
 system yarn 1 — yarn 1 rewrites the whole lockfile.
 
+## ESLint rules to enable (found 2026-08)
+
+Type info (`projectService`) is already configured in `eslint.config.cjs`,
+so enabling these type-aware rules costs nothing extra.
+
+- [ ] `@typescript-eslint/no-floating-promises` — 89 unhandled promises,
+      failures are silently swallowed. Enable as `warn` and cap with
+      `--max-warnings` like the `no-explicit-any` backlog, or fix first.
+- [ ] `@typescript-eslint/no-misused-promises` — 16 async callbacks passed
+      where a sync function is expected.
+- [ ] `@typescript-eslint/await-thenable` — 1 violation; fix it and enable
+      as `error` directly.
+- [ ] `eqeqeq` — 27 spots, mostly autofixable with `--fix`.
+
+## Remaining `any` warnings
+
+- [ ] Remove the last 2 `any` in `src/components/map/mapbox/controls/menu/Definition.tsx`
+      (`ControlProps<T = any>` and `BookmarkEvent.value`). Both are relied on
+      by consumers (MapPanel, MapSection, SearchPage, BookmarkListAccordionGroup),
+      so this needs an event-typing refactor: explicit `ControlProps<T>` type
+      arguments per consumer, and `BookmarkEvent` as a discriminated union on
+      `action` with narrowing at the call sites. Lower `--max-warnings` in
+      package.json to 0 once done.
+
 ## Maybe later (fine to ignore)
 
 - Store imports from UI/pages (icons, button enums, page types) — could
