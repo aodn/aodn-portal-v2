@@ -1,4 +1,7 @@
-export const SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_ABOVE_LAPTOP = "80vh";
+import { HEADER_HEIGHT } from "@/app/layout/constant";
+
+// Site footer is hidden on search, so fill the remaining viewport below the header
+export const SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_ABOVE_LAPTOP = `calc(100vh - ${HEADER_HEIGHT}px)`;
 export const SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_UNDER_LAPTOP = "auto";
 
 export const SEARCH_PAGE_MAP_CONTAINER_HEIGHT_ABOVE_LAPTOP = "100%";
