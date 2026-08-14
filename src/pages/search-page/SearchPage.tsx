@@ -53,7 +53,6 @@ import {
 import {
   SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_ABOVE_LAPTOP,
   SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_UNDER_LAPTOP,
-  SEARCH_PAGE_MAP_CONTAINER_HEIGHT_ABOVE_LAPTOP,
   SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_LIST,
   SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_MOBILE,
   SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_TABLET,
@@ -625,6 +624,8 @@ const SearchPage = () => {
         sx={{
           flex: isUnderLaptop ? "none" : 1,
           minWidth: 0,
+          minHeight: 0,
+          alignSelf: "stretch",
           height: isUnderLaptop
             ? layout === SearchResultLayoutEnum.FULL_LIST
               ? SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_LIST
@@ -633,7 +634,7 @@ const SearchPage = () => {
                   ? SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_MOBILE
                   : SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_TABLET
                 : SEARCH_PAGE_MAP_CONTAINER_HEIGHT_UNDER_LAPTOP
-            : SEARCH_PAGE_MAP_CONTAINER_HEIGHT_ABOVE_LAPTOP,
+            : undefined,
         }}
       >
         <MapSection

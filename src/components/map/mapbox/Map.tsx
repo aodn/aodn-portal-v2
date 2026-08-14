@@ -170,7 +170,8 @@ const ReactMap = memo(
           setContainerRef(document.getElementById(panelId));
         }
 
-        // Create new map instance
+        // Create new map instance. A 0-height container makes Chromium/Edge
+        // (especially on Linux) throw "Failed to initialize WebGL".
         const newMap = new mapboxgl.Map({
           container: panelId,
           accessToken: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
@@ -179,6 +180,7 @@ const ReactMap = memo(
           maxZoom: maxZoom,
           testMode: import.meta.env.MODE === "playwright-local",
           attributionControl: true,
+          failIfMajorPerformanceCaveat: false,
           localIdeographFontFamily:
             "'Open Sans', 'Open Sans CJK SC', sans-serif",
         });
@@ -241,7 +243,7 @@ const ReactMap = memo(
           // https://stackoverflow.com/questions/70533564/mapbox-gl-flickers-when-resizing-the-container-div
           setTimeout(() => {
             try {
-              if (container.offsetWidth > 0 || container.offsetHeight > 0) {
+              if (container.offsetWidth > 0 && container.offsetHeight > 0) {
                 map?.resize();
               }
             } catch (error: any) {
@@ -271,17 +273,17 @@ const ReactMap = memo(
         };
       };
 
-      // If the container exists but has zero dimensions it is inside a hidden tab (the `hidden` HTML attribute sets display:none on the ancestor TabPanel).
-      // Initializing Mapbox into a zero-size container corrupts its internal state so defer until the container is visible.
+      // Defer until BOTH width and height are non-zero. Edge often has a
+      // positive width and height 0; creating WebGL then throws
+      // "Failed to initialize WebGL".
       const container = document.getElementById(panelId);
       if (
         container &&
-        container.offsetWidth === 0 &&
-        container.offsetHeight === 0
+        (container.offsetWidth === 0 || container.offsetHeight === 0)
       ) {
         let mapCleanup: (() => void) | undefined;
         const ro = new ResizeObserver(() => {
-          if (container.offsetWidth > 0 || container.offsetHeight > 0) {
+          if (container.offsetWidth > 0 && container.offsetHeight > 0) {
             ro.disconnect();
             mapCleanup = setupMap() ?? undefined;
           }

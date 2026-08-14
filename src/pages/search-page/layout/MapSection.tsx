@@ -38,7 +38,9 @@ import ReferenceLayerSwitcher, {
 import { ProgressType } from "@/components/map/mapbox/MapContext";
 import { createStaticLayers } from "@/components/map/mapbox/layers/StaticLayer";
 import { fitToDefaultExtent } from "@/utils/MapUtils";
-import MapFooter from "@/components/map/mapbox/component/MapFooter";
+import MapFooter, {
+  MAP_FOOTER_HEIGHT,
+} from "@/components/map/mapbox/component/MapFooter";
 
 interface MapSectionProps
   extends
@@ -133,8 +135,8 @@ const MapSection: React.FC<MapSectionProps> = memo(
           id={mapContainerId}
           sx={{
             position: "relative",
-            flex: 1,
-            minHeight: 0,
+            // flex:1 is height 0 in Edge, which makes Mapbox WebGL fail.
+            height: `calc(100% - ${MAP_FOOTER_HEIGHT})`,
             width: "100%",
             borderRadius: 0,
             overflow: "hidden",

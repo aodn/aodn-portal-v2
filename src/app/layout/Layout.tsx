@@ -9,6 +9,9 @@ import ScrollToTop from "@/components/common/scroll/ScrollToTop";
 import { Outlet, useLocation } from "react-router-dom";
 import { trackPageResponseTime } from "@/analytics/pageResTimeEvent";
 import { trackWebVitals } from "@/analytics/webVitalsEvents";
+import { pageDefault } from "@/components/common/constants";
+
+const SEARCH_PAGE_NO_SCROLL_CLASS = "search-page-no-scroll";
 
 const Layout = () => {
   const location = useLocation();
@@ -19,6 +22,15 @@ const Layout = () => {
     trackPageResponseTime();
     // 🎯 web vitals tracking
     trackWebVitals();
+  }, [location.pathname]);
+
+  // Hide the always-on body scrollbar gutter on search (see index.css).
+  useEffect(() => {
+    const isSearchPage = location.pathname === pageDefault.search;
+    document.body.classList.toggle(SEARCH_PAGE_NO_SCROLL_CLASS, isSearchPage);
+    return () => {
+      document.body.classList.remove(SEARCH_PAGE_NO_SCROLL_CLASS);
+    };
   }, [location.pathname]);
 
   return (
