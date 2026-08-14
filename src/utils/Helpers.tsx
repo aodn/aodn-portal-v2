@@ -8,7 +8,9 @@ import { sortBy } from "lodash";
  * @returns The parsed JavaScript object if successful, or null if parsing fails
  * @throws {Error} Logs an error to the console if parsing fails
  */
-export const parseJson = (jsonString: string): any => {
+export const parseJson = <T = Record<string, string>,>(
+  jsonString: string
+): T | null => {
   try {
     return JSON.parse(jsonString);
   } catch (error) {
@@ -42,7 +44,7 @@ export const sortByRelevance = (
 };
 
 // Check if array is undefined, null, empty array, or contains only empty strings
-export const checkEmptyArray = (array?: any[]): boolean => {
+export const checkEmptyArray = (array?: string[]): boolean => {
   return array?.some((item) => item?.toString().trim() !== "") ?? false;
 };
 

@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
+import { AxiosResponse } from "axios";
 import {
   processWFSDownload,
   processWFSEstimateSize,
@@ -19,7 +20,7 @@ describe("searchReducer async thunks", () => {
   it("processWFSDownload sends correct request body", async () => {
     const spy = vi
       .spyOn(ogcAxiosWithRetry, "post")
-      .mockResolvedValue({ data: {} } as any);
+      .mockResolvedValue({ data: {} } as AxiosResponse);
 
     const mockRequest: WFSDownloadRequest = {
       uuid: "test-uuid",
@@ -34,7 +35,7 @@ describe("searchReducer async thunks", () => {
       reducer: (state = {}) => state,
     });
 
-    await store.dispatch(processWFSDownload(mockRequest) as any);
+    await store.dispatch(processWFSDownload(mockRequest));
 
     expect(spy).toHaveBeenCalledWith(
       "/ogc/processes/downloadWfs/execution",
@@ -64,7 +65,7 @@ describe("searchReducer async thunks", () => {
   it("processWFSEstimateSize sends correct request body", async () => {
     const spy = vi
       .spyOn(ogcAxiosWithRetry, "post")
-      .mockResolvedValue({ data: {} } as any);
+      .mockResolvedValue({ data: {} } as AxiosResponse);
 
     const mockRequest: WFSDownloadRequest = {
       uuid: "test-uuid",
@@ -79,7 +80,7 @@ describe("searchReducer async thunks", () => {
       reducer: (state = {}) => state,
     });
 
-    await store.dispatch(processWFSEstimateSize(mockRequest) as any);
+    await store.dispatch(processWFSEstimateSize(mockRequest));
 
     expect(spy).toHaveBeenCalledWith(
       "/ogc/processes/estimateWfsDownload/execution",

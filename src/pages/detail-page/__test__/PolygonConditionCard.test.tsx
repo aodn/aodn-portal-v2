@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { ReactNode } from "react";
 
 // Tests for PolygonConditionCard:
 // - adding vertices builds up a draft and emits onCreate at MIN_VERTICES
@@ -15,7 +16,17 @@ import { render, screen, fireEvent } from "@testing-library/react";
 vi.mock("../features/download/subset-conditions/CoordInput", async () => {
   const React = await import("react");
   return {
-    default: React.forwardRef<HTMLInputElement, any>(function MockCoordInput(
+    default: React.forwardRef<
+      HTMLInputElement,
+      {
+        value: string;
+        onChange: (value: string) => void;
+        onSubmit?: () => void;
+        onCancel?: () => void;
+        ariaLabel: string;
+        disabled?: boolean;
+      }
+    >(function MockCoordInput(
       { value, onChange, onSubmit, onCancel, ariaLabel, disabled },
       ref
     ) {
@@ -38,7 +49,13 @@ vi.mock("../features/download/subset-conditions/CoordInput", async () => {
 
 // BaseConditionCard owns layout/expand state — not under test here.
 vi.mock("../features/download/subset-conditions/BaseConditionCard", () => ({
-  default: ({ children, actions }: any) => (
+  default: ({
+    children,
+    actions,
+  }: {
+    children?: ReactNode;
+    actions?: ReactNode;
+  }) => (
     <div>
       {children}
       {actions}

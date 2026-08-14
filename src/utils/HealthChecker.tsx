@@ -38,11 +38,12 @@ const HealthChecker: React.FC<HealthCheckerProps> = ({ children }) => {
             health.components?.ogcApiHealth?.status?.toUpperCase() || "UNKNOWN";
           setIsHealthy(status === "UP" && ogcStatus === "UP");
         }
-      } catch (err: any) {
+      } catch (err) {
         if (isMounted) {
           // If the request was aborted, don't update health status to unhealthy
+          const e = err as { name?: string; code?: string } | undefined;
           const isCancelled =
-            err?.name === "AbortError" || err?.code === "ERR_CANCELED";
+            e?.name === "AbortError" || e?.code === "ERR_CANCELED";
           if (!isCancelled) {
             console.error("Error checking system health:", err);
             setIsHealthy(false);

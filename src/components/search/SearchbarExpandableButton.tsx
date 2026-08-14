@@ -6,7 +6,7 @@ import useBreakpoint from "../../hooks/useBreakpoint";
 
 interface SearchbarExpandableButtonProps {
   icon: ReactNode;
-  iconProps?: Record<string, any>;
+  iconProps?: Record<string, unknown>;
   text: string;
   onClick?: () => void;
   showText?: boolean;

@@ -2,6 +2,7 @@
 import { ErrorInfo, ReactNode, Component } from "react";
 import { Navigate } from "react-router-dom";
 import axios, { AxiosError } from "axios";
+import { GetThunkAPI } from "@reduxjs/toolkit";
 
 class ErrorResponse extends Error {
   statusCode: number;
@@ -78,7 +79,9 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 }
 
-const errorHandling = (thunkApi: any) => {
+const errorHandling = (
+  thunkApi: GetThunkAPI<{ rejectValue: ErrorResponse }>
+) => {
   return (error: Error | AxiosError | ErrorResponse) => {
     if (axios.isAxiosError(error) && error.response) {
       return thunkApi.rejectWithValue(
@@ -93,7 +96,7 @@ const errorHandling = (thunkApi: any) => {
         )
       );
     } else {
-      return thunkApi.rejectWithValue(error);
+      return thunkApi.rejectWithValue(error as ErrorResponse);
     }
   };
 };

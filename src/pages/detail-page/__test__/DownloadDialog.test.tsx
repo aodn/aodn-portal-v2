@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
+import { Store } from "@reduxjs/toolkit";
 import DownloadDialog from "../features/download/download-dialog/DownloadDialog";
 import { BBoxCondition } from "../context/DownloadDefinitions";
 
@@ -42,7 +43,15 @@ vi.mock("@/pages/detail-page/context/detail-page-context", () => ({
 vi.mock(
   "@/pages/detail-page/features/download/download-dialog/stepper/StepperButton",
   () => ({
-    default: ({ title, onClick, disabled }: any) => (
+    default: ({
+      title,
+      onClick,
+      disabled,
+    }: {
+      title?: string;
+      onClick?: () => void;
+      disabled?: boolean;
+    }) => (
       <button
         onClick={onClick}
         disabled={disabled}
@@ -73,7 +82,11 @@ vi.mock(
 vi.mock(
   "@/pages/detail-page/features/download/download-dialog/EmailInputStep",
   () => ({
-    default: ({ emailInputRef }: any) => (
+    default: ({
+      emailInputRef,
+    }: {
+      emailInputRef?: React.Ref<HTMLInputElement>;
+    }) => (
       <div data-testid="email-input-step">
         <input
           ref={emailInputRef}
@@ -104,7 +117,7 @@ const TestWrapper = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <Provider store={mockStore as any}>
+    <Provider store={mockStore as unknown as Store}>
       <BrowserRouter>
         <ThemeProvider theme={theme}>{children}</ThemeProvider>
       </BrowserRouter>

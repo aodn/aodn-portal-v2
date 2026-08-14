@@ -32,7 +32,7 @@ export interface CopyButtonConfig {
 }
 
 interface CopyButtonBasic {
-  onCopy?: (value?: any) => void;
+  onCopy?: (value?: unknown) => void;
   copyIconConfig?: CopyIconConfig;
   tooltipText?: string[];
 }

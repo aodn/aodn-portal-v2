@@ -1,5 +1,10 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios, { AxiosError } from "axios";
+import {
+  AsyncThunkPayloadCreator,
+  createAsyncThunk,
+  createSlice,
+  GetThunkAPI,
+} from "@reduxjs/toolkit";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import axiosRetry, { isNetworkError, isRetryableError } from "axios-retry";
 import { ParameterState, Vocab } from "./componentParamReducer";
 import {
@@ -101,14 +106,15 @@ const WFS_DOWNLOAD_TIMEOUT =
 const SIZE_ESTIMATE_TIMEOUT =
   Number(import.meta.env.VITE_WFS_ESTIMATE_TIMEOUT) || 300000; // Default 5 minutes timeout for WFS size estimation
 
-const jsonToOGCCollections = (json: any): OGCCollections => {
+const jsonToOGCCollections = (json: unknown): OGCCollections => {
+  const raw = json as OGCCollections;
   return new OGCCollections(
-    json.collections.map((collection: any) =>
+    raw.collections.map((collection) =>
       Object.assign(new OGCCollection(), collection)
     ),
-    json.links,
-    json.total,
-    json.search_after
+    raw.links,
+    raw.total,
+    raw.search_after
   );
 };
 
@@ -172,7 +178,7 @@ ogcAxiosWithRetry.interceptors.response.use(
  */
 const searchResult = async (
   param: SearchParameters & { signal?: AbortSignal },
-  thunkApi: any
+  thunkApi: GetThunkAPI<{ rejectValue: ErrorResponse }>
 ) => {
   const p: OGCSearchParameters = {
     properties:
@@ -219,14 +225,14 @@ const searchResult = async (
           )
         );
       } else {
-        return thunkApi.rejectWithValue(error);
+        return thunkApi.rejectWithValue(error as ErrorResponse);
       }
     });
 };
 // TODO: Why no param needed?
 const searchParameterVocabs = async (
   _param: Map<string, string> | null,
-  thunkApi: any
+  thunkApi: GetThunkAPI<{ rejectValue: ErrorResponse }>
 ) =>
   ogcAxiosWithRetry
     .get<Array<Vocab>>("/ogc/ext/parameter/vocabs", {
@@ -247,19 +253,28 @@ const searchParameterVocabs = async (
           )
         );
       } else {
-        return thunkApi.rejectWithValue(error);
+        return thunkApi.rejectWithValue(error as ErrorResponse);
       }
     });
 
+// Shape of the autocomplete endpoint response
+type SuggesterResponse = {
+  suggested_phrases?: string[];
+  suggested_parameter_vocabs?: string[];
+  suggested_organisation_vocabs?: string[];
+  suggested_platform_vocabs?: string[];
+  suggested_semantic?: string[];
+};
+
 const fetchSuggesterOptions = createAsyncThunk<
-  any,
+  SuggesterResponse,
   SuggesterParameters,
   { rejectValue: ErrorResponse }
 >(
   "search/fetchSuggesterOptions",
-  async (params: SuggesterParameters, thunkApi: any) =>
+  async (params: SuggesterParameters, thunkApi) =>
     ogcAxiosWithRetry
-      .get<any>("/ogc/ext/autocomplete", {
+      .get<SuggesterResponse>("/ogc/ext/autocomplete", {
         params: params,
         timeout: TIMEOUT,
       })
@@ -278,7 +293,7 @@ const fetchSuggesterOptions = createAsyncThunk<
             )
           );
         } else {
-          return thunkApi.rejectWithValue(error);
+          return thunkApi.rejectWithValue(error as ErrorResponse);
         }
       })
 );
@@ -291,7 +306,14 @@ const fetchResultWithStore = createAsyncThunk<
   OGCCollections,
   SearchParameters,
   { rejectValue: ErrorResponse }
->("search/fetchResultWithStore", searchResult);
+>(
+  "search/fetchResultWithStore",
+  searchResult as unknown as AsyncThunkPayloadCreator<
+    OGCCollections,
+    SearchParameters,
+    { rejectValue: ErrorResponse }
+  >
+);
 /**
  * Trunk for async action and update searcher, limited return properties to reduce load time,
  * default it, title,description. This one do not attach extraReducer and must return string due to redux expect
@@ -307,13 +329,20 @@ const fetchResultAppendStore = createAsyncThunk<
   OGCCollections,
   SearchParameters,
   { rejectValue: ErrorResponse }
->("search/fetchResultAppendStore", searchResult);
+>(
+  "search/fetchResultAppendStore",
+  searchResult as unknown as AsyncThunkPayloadCreator<
+    OGCCollections,
+    SearchParameters,
+    { rejectValue: ErrorResponse }
+  >
+);
 
 const fetchResultByUuidNoStore = createAsyncThunk<
   OGCCollection,
   string,
   { rejectValue: ErrorResponse }
->("search/fetchResultByUuidNoStore", async (id: string, thunkApi: any) =>
+>("search/fetchResultByUuidNoStore", async (id: string, thunkApi) =>
   ogcAxiosWithRetry
     .get<OGCCollection>(`/ogc/collections/${id}`)
     .then((response) => Object.assign(new OGCCollection(), response.data))
@@ -334,7 +363,7 @@ const fetchDatasetMetadataByUuid = createAsyncThunk<
   DatasetMetadata,
   string,
   { rejectValue: ErrorResponse }
->("search/fetchDatasetMetadataByUuid", async (id: string, thunkApi: any) =>
+>("search/fetchDatasetMetadataByUuid", async (id: string, thunkApi) =>
   ogcAxiosWithRetry
     .get<DatasetMetadata>(`/ogc/collections/${id}/items/dataset_metadata`)
     .then((response) => response.data)
@@ -342,12 +371,12 @@ const fetchDatasetMetadataByUuid = createAsyncThunk<
 );
 
 const processDatasetDownload = createAsyncThunk<
-  any,
+  { status: { message: string } },
   DatasetDownloadRequest,
   { rejectValue: ErrorResponse }
 >(
   "download/downloadDataset",
-  async (request: DatasetDownloadRequest, thunkAPI: any) => {
+  async (request: DatasetDownloadRequest, thunkAPI) => {
     try {
       const response = await ogcAxiosWithRetry.post(
         "/ogc/processes/download/execution",
@@ -361,147 +390,139 @@ const processDatasetDownload = createAsyncThunk<
 );
 
 const processWFSDownload = createAsyncThunk<
-  any,
+  AxiosResponse,
   WFSDownloadRequest,
   { rejectValue: ErrorResponse }
->(
-  "download/downloadWFS",
-  async (request: WFSDownloadRequest, thunkAPI: any) => {
-    try {
-      // Extract download conditions
-      const dateRange = getDateConditionFrom(request.downloadConditions);
-      const multiPolygon = getMultiPolygonFrom(request.downloadConditions);
-      const format = getFormatFrom(request.downloadConditions);
+>("download/downloadWFS", async (request: WFSDownloadRequest, thunkAPI) => {
+  try {
+    // Extract download conditions
+    const dateRange = getDateConditionFrom(request.downloadConditions);
+    const multiPolygon = getMultiPolygonFrom(request.downloadConditions);
+    const format = getFormatFrom(request.downloadConditions);
 
-      const requestBody = {
-        inputs: {
-          uuid: request.uuid,
-          start_date: dateRange.start,
-          end_date: dateRange.end,
-          multi_polygon: multiPolygon,
-          layer_name: request.layerName,
-          output_format: format,
-        },
-        outputs: {},
-        subscriber: {
-          successUri: "",
-          inProgressUri: "",
-          failedUri: "",
-        },
-      };
+    const requestBody = {
+      inputs: {
+        uuid: request.uuid,
+        start_date: dateRange.start,
+        end_date: dateRange.end,
+        multi_polygon: multiPolygon,
+        layer_name: request.layerName,
+        output_format: format,
+      },
+      outputs: {},
+      subscriber: {
+        successUri: "",
+        inProgressUri: "",
+        failedUri: "",
+      },
+    };
 
-      return ogcAxiosWithRetry.post(
-        "/ogc/processes/downloadWfs/execution",
-        requestBody,
-        {
-          adapter: "fetch", // Use fetch adapter for streaming
-          responseType: "stream",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "text/event-stream",
-            "Cache-Control": "no-cache",
-          },
-          timeout: WFS_DOWNLOAD_TIMEOUT,
-          signal: thunkAPI.signal,
-        }
-      );
-    } catch (_error) {
-      errorHandling(thunkAPI);
-    }
+    return ogcAxiosWithRetry.post(
+      "/ogc/processes/downloadWfs/execution",
+      requestBody,
+      {
+        adapter: "fetch", // Use fetch adapter for streaming
+        responseType: "stream",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "text/event-stream",
+          "Cache-Control": "no-cache",
+        },
+        timeout: WFS_DOWNLOAD_TIMEOUT,
+        signal: thunkAPI.signal,
+      }
+    );
+  } catch (_error) {
+    errorHandling(thunkAPI);
+    return undefined as unknown as AxiosResponse;
   }
-);
+});
 
 const processWFSEstimateSize = createAsyncThunk<
-  any,
+  AxiosResponse | undefined,
   WFSDownloadRequest,
   { rejectValue: ErrorResponse }
->(
-  "download/estimateWFSSize",
-  async (request: WFSDownloadRequest, thunkAPI: any) => {
-    try {
-      const dateRange = getDateConditionFrom(request.downloadConditions);
-      const multiPolygon = getMultiPolygonFrom(request.downloadConditions);
-      const format = getFormatFrom(request.downloadConditions);
+>("download/estimateWFSSize", async (request: WFSDownloadRequest, thunkAPI) => {
+  try {
+    const dateRange = getDateConditionFrom(request.downloadConditions);
+    const multiPolygon = getMultiPolygonFrom(request.downloadConditions);
+    const format = getFormatFrom(request.downloadConditions);
 
-      const requestBody = {
-        inputs: {
-          uuid: request.uuid,
-          layer_name: request.layerName,
-          start_date: dateRange.start,
-          end_date: dateRange.end,
-          output_format: format,
-          multi_polygon: multiPolygon,
+    const requestBody = {
+      inputs: {
+        uuid: request.uuid,
+        layer_name: request.layerName,
+        start_date: dateRange.start,
+        end_date: dateRange.end,
+        output_format: format,
+        multi_polygon: multiPolygon,
+      },
+    };
+
+    return ogcAxiosWithRetry.post(
+      "/ogc/processes/estimateWfsDownload/execution",
+      requestBody,
+      {
+        adapter: "fetch",
+        responseType: "stream",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "text/event-stream",
+          "Cache-Control": "no-cache",
         },
-      };
-
-      return ogcAxiosWithRetry.post(
-        "/ogc/processes/estimateWfsDownload/execution",
-        requestBody,
-        {
-          adapter: "fetch",
-          responseType: "stream",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "text/event-stream",
-            "Cache-Control": "no-cache",
-          },
-          timeout: SIZE_ESTIMATE_TIMEOUT,
-          signal: thunkAPI.signal,
-        }
-      );
-    } catch (_error) {
-      errorHandling(thunkAPI);
-    }
+        timeout: SIZE_ESTIMATE_TIMEOUT,
+        signal: thunkAPI.signal,
+      }
+    );
+  } catch (_error) {
+    errorHandling(thunkAPI);
   }
-);
+});
 
 // Estimate the size of a Cloud Optimised (zarr/parquet) download.
 // Mirrors the WFS estimate SSE flow, but hits the CO estimate endpoint and
 // identifies the dataset by `key` (from the KEY condition) instead of a layer.
 const processCoEstimateSize = createAsyncThunk<
-  any,
+  AxiosResponse | undefined,
   CoEstimateRequest,
   { rejectValue: ErrorResponse }
->(
-  "download/estimateCoSize",
-  async (request: CoEstimateRequest, thunkAPI: any) => {
-    try {
-      const dateRange = getDateConditionFrom(request.downloadConditions);
-      const multiPolygon = getMultiPolygonFrom(request.downloadConditions);
-      const format = getFormatFrom(request.downloadConditions);
-      const key = getKeyFrom(request.downloadConditions);
+>("download/estimateCoSize", async (request: CoEstimateRequest, thunkAPI) => {
+  try {
+    const dateRange = getDateConditionFrom(request.downloadConditions);
+    const multiPolygon = getMultiPolygonFrom(request.downloadConditions);
+    const format = getFormatFrom(request.downloadConditions);
+    const key = getKeyFrom(request.downloadConditions);
 
-      const requestBody = {
-        inputs: {
-          uuid: request.uuid,
-          key,
-          start_date: dateRange.start,
-          end_date: dateRange.end,
-          output_format: format,
-          multi_polygon: multiPolygon,
+    const requestBody = {
+      inputs: {
+        uuid: request.uuid,
+        key,
+        start_date: dateRange.start,
+        end_date: dateRange.end,
+        output_format: format,
+        multi_polygon: multiPolygon,
+      },
+    };
+
+    return ogcAxiosWithRetry.post(
+      "/ogc/processes/estimateCOdownload/execution",
+      requestBody,
+      {
+        adapter: "fetch",
+        responseType: "stream",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "text/event-stream",
+          "Cache-Control": "no-cache",
         },
-      };
-
-      return ogcAxiosWithRetry.post(
-        "/ogc/processes/estimateCOdownload/execution",
-        requestBody,
-        {
-          adapter: "fetch",
-          responseType: "stream",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "text/event-stream",
-            "Cache-Control": "no-cache",
-          },
-          timeout: SIZE_ESTIMATE_TIMEOUT,
-          signal: thunkAPI.signal,
-        }
-      );
-    } catch (_error) {
-      errorHandling(thunkAPI);
-    }
+        timeout: SIZE_ESTIMATE_TIMEOUT,
+        signal: thunkAPI.signal,
+      }
+    );
+  } catch (_error) {
+    errorHandling(thunkAPI);
   }
-);
+});
 
 const fetchParameterVocabsWithStore = createAsyncThunk<
   Array<Vocab>,
@@ -544,7 +565,7 @@ const fetchGeoServerMapFeature = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >(
   "geoserver/fetchGeoServerMapFeature",
-  (request: MapFeatureRequest, thunkApi: any) => {
+  (request: MapFeatureRequest, thunkApi) => {
     return ogcAxiosWithRetry
       .get<MapFeatureResponse>(
         `/ogc/collections/${request.uuid}/items/wms_map_feature`,
@@ -561,9 +582,9 @@ const fetchGeoServerMapFields = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >(
   "geoserver/fetchGeoServerMapFields",
-  (request: MapFeatureRequest, thunkApi: any) => {
+  (request: MapFeatureRequest, thunkApi) => {
     return ogcAxiosWithRetry
-      .get<MapFeatureResponse>(
+      .get<Array<GeoserverFieldsResponse>>(
         `/ogc/collections/${request.uuid}/items/wms_fields`,
         { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
       )
@@ -578,9 +599,9 @@ const fetchGeoServerFieldValues = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >(
   "geoserver/fetchGeoServerFieldValues",
-  (request: MapFeatureRequest, thunkApi: any) => {
+  (request: MapFeatureRequest, thunkApi) => {
     return ogcAxiosWithRetry
-      .get<MapFeatureResponse>(
+      .get<Record<string, Array<object>>>(
         `/ogc/collections/${request.uuid}/items/wfs_field_value`,
         { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
       )
@@ -596,9 +617,9 @@ const fetchGeoServerMapLayers = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >(
   "geoserver/fetchGeoServerMapLayers",
-  (request: MapFeatureRequest, thunkApi: any) => {
+  (request: MapFeatureRequest, thunkApi) => {
     return ogcAxiosWithRetry
-      .get<MapLayerResponse>(
+      .get<Array<MapLayerResponse>>(
         `/ogc/collections/${request.uuid}/items/wms_layers`,
         { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
       )
@@ -613,9 +634,9 @@ const fetchGeoServerDownloadLayers = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >(
   "geoserver/fetchGeoServerDownloadLayers",
-  (request: MapFeatureRequest, thunkApi: any) => {
+  (request: MapFeatureRequest, thunkApi) => {
     return ogcAxiosWithRetry
-      .get<DownloadLayersResponse>(
+      .get<Array<DownloadLayersResponse>>(
         `/ogc/collections/${request.uuid}/items/wfs_layers`,
         { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
       )

@@ -78,7 +78,7 @@ const AssociatedRecordsPanel = () => {
     () => [
       {
         title: "Parent Record",
-        component: (props: Record<string, any>) => (
+        component: (props: Record<string, unknown>) => (
           <AssociatedRecordList
             {...props}
             title={"Parent Record"}
@@ -88,7 +88,7 @@ const AssociatedRecordsPanel = () => {
       },
       {
         title: "Associated Records",
-        component: (props: Record<string, any>) => (
+        component: (props: Record<string, unknown>) => (
           <AssociatedRecordList
             {...props}
             title="Associated Records"
@@ -98,7 +98,7 @@ const AssociatedRecordsPanel = () => {
       },
       {
         title: "Sub Records",
-        component: (props: Record<string, any>) => (
+        component: (props: Record<string, unknown>) => (
           <AssociatedRecordList
             {...props}
             title="Sub Records"

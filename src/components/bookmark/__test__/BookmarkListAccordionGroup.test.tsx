@@ -1,5 +1,6 @@
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { vi, beforeEach, describe, expect, afterAll, afterEach } from "vitest";
+import type { MockInstance } from "vitest";
 import store from "@/app/store/store";
 import {
   removeAllItems,
@@ -79,7 +80,7 @@ Object.defineProperty(window, "localStorage", {
 });
 
 describe("Bookmark List Accordion Group", () => {
-  let mockInitialize: any;
+  let mockInitialize: MockInstance;
 
   beforeAll(() => {
     server.listen();

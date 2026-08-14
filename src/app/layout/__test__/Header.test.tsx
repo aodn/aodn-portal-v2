@@ -72,7 +72,7 @@ const mockLocation = {
   key: "default",
 };
 vi.mock("react-router-dom", async (importOriginal) => {
-  const actual: any = await importOriginal();
+  const actual = await importOriginal<typeof import("react-router-dom")>();
   return {
     ...actual,
     useLocation: () => mockLocation,

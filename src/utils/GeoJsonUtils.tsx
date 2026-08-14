@@ -114,7 +114,12 @@ export const layernameRoughlyMatch = (text1: string, text2: string) => {
   return normalized1 === normalized2;
 };
 
-export const isValidPolygonFeature = (feature: any): boolean => {
+export const isValidPolygonFeature = (
+  feature?: {
+    type?: string;
+    geometry?: { type?: string; coordinates?: unknown } | null;
+  } | null
+): boolean => {
   if (!feature || !feature.geometry) return false;
   const geom = feature.geometry;
 

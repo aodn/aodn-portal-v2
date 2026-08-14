@@ -98,7 +98,7 @@ const StaticLayersDef: Record<string, StaticLayersProps> = {
 };
 
 // Cache for processed GeoJSON data to prevent redundant fetches
-const dataCache: Record<string, any> = {};
+const dataCache: Record<string, Array<BoundaryProperties>> = {};
 
 const loadAndProcessGeoJSON = async (
   url: string,
@@ -314,7 +314,7 @@ const MapBoundaryLayer: FC<StaticLayersProps> = (props) => {
 
     if (fetcher) {
       fetcher()
-        .then((options: any[]) => {
+        .then((options: Array<BoundaryProperties>) => {
           const allFeatures = options.map((o) => o.geo.features[0]);
           setData({
             type: "FeatureCollection",

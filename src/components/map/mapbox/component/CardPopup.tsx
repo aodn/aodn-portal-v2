@@ -18,7 +18,7 @@ import MapContext from "../MapContext";
 import { useAppDispatch } from "@/app/store/hooks";
 import { fetchResultByUuidNoStore } from "@/app/store/searchReducer";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
-import { MapEvent, MapMouseEvent } from "mapbox-gl";
+import { MapEvent, MapMouseEvent, MapSourceDataEvent } from "mapbox-gl";
 import { Feature, Point } from "geojson";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 import Map from "../Map";
@@ -89,7 +89,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
       return dispatch(fetchResultByUuidNoStore(uuid))
         .unwrap()
         .then((collection: OGCCollection) => collection)
-        .catch((error: any) => {
+        .catch((error: unknown) => {
           console.error("Error fetching collection data:", error);
           // TODO: handle error in ErrorBoundary
         });
@@ -147,7 +147,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
       }
     };
 
-    const onSourceChange = (event: any) => {
+    const onSourceChange = (event: MapSourceDataEvent) => {
       if (
         event.sourceId === layerId &&
         event.isSourceLoaded &&

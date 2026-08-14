@@ -1,5 +1,12 @@
-export const emptyAboutInfo = (json: any) => {
-  const jsonToResponse = structuredClone(json);
+// Minimal shape of the collection json these helpers modify
+type CollectionJson = {
+  id?: unknown;
+  links?: unknown[];
+  properties: Record<string, unknown>;
+};
+
+export const emptyAboutInfo = (json: unknown) => {
+  const jsonToResponse = structuredClone(json) as CollectionJson;
   try {
     jsonToResponse.properties.themes = [];
     jsonToResponse.properties.contacts = [];
@@ -9,8 +16,8 @@ export const emptyAboutInfo = (json: any) => {
   }
 };
 
-export const emptyMetadataInfo = (json: any) => {
-  const jsonToResponse = structuredClone(json);
+export const emptyMetadataInfo = (json: unknown) => {
+  const jsonToResponse = structuredClone(json) as CollectionJson;
   try {
     jsonToResponse.properties.contacts = [];
     jsonToResponse.id = null;
@@ -23,8 +30,8 @@ export const emptyMetadataInfo = (json: any) => {
   }
 };
 
-export const emptyCitationInfo = (json: any) => {
-  const jsonToResponse = structuredClone(json);
+export const emptyCitationInfo = (json: unknown) => {
+  const jsonToResponse = structuredClone(json) as CollectionJson;
   try {
     jsonToResponse.properties.license = null;
     jsonToResponse.properties.citation = null;
@@ -37,8 +44,8 @@ export const emptyCitationInfo = (json: any) => {
   }
 };
 
-export const emptyLineageInfo = (json: any) => {
-  const jsonToResponse = structuredClone(json);
+export const emptyLineageInfo = (json: unknown) => {
+  const jsonToResponse = structuredClone(json) as CollectionJson;
   try {
     jsonToResponse.properties.statement = null;
     return jsonToResponse;
@@ -47,8 +54,8 @@ export const emptyLineageInfo = (json: any) => {
   }
 };
 
-export const emptyAssociatedRecordInfo = (json: any) => {
-  const jsonToResponse = structuredClone(json);
+export const emptyAssociatedRecordInfo = (json: unknown) => {
+  const jsonToResponse = structuredClone(json) as CollectionJson;
   try {
     jsonToResponse.links = [];
     return jsonToResponse;

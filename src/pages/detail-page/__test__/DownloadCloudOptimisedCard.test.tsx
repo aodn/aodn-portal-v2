@@ -11,7 +11,17 @@ beforeAll(() => {
 });
 
 vi.mock("../features/download/DownloadSelect", () => ({
-  default: ({ label, items, value, onSelectCallback }: any) => (
+  default: ({
+    label,
+    items,
+    value,
+    onSelectCallback,
+  }: {
+    label: string;
+    items?: { label: string; value: string }[];
+    value?: string;
+    onSelectCallback?: (value: string) => void;
+  }) => (
     <div>
       <label>{label}</label>
       <select
@@ -19,7 +29,7 @@ vi.mock("../features/download/DownloadSelect", () => ({
         value={value || (items && items[0]?.value)}
         onChange={(e) => onSelectCallback?.(e.target.value)}
       >
-        {items?.map((item: any) => (
+        {items?.map((item) => (
           <option key={item.value} value={item.value}>
             {item.label}
           </option>
@@ -35,6 +45,7 @@ import {
   OGCCollection,
 } from "@/app/store/OGCCollectionDefinitions";
 import store from "@/app/store/store";
+import { IDownloadCondition } from "../context/DownloadDefinitions";
 
 const theme = createTheme();
 
@@ -82,7 +93,7 @@ describe("DownloadCloudOptimisedCard", () => {
 
   const renderComponent = (
     collection: OGCCollection = createMockCollection(DatasetType.ZARR),
-    downloadConditions: any[] = [],
+    downloadConditions: IDownloadCondition[] = [],
     selectedCoKey?: string,
     setSelectedCoKey = mockSetSelectedCoKey
   ) => {

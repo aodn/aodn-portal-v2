@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
+import { ReactNode } from "react";
 
 // Tests for DateRangeConditionCard:
 // - the From/To pickers respect cross-field constraints (From <= To)
@@ -12,7 +13,19 @@ import dayjs from "dayjs";
 // Stub MUI's date picker with a plain <input> so we can fire change events
 // and read back min/max bounds without MUI's localization context.
 vi.mock("../../../components/common/datetime/PlainDatePicker", () => ({
-  default: ({ value, minDate, maxDate, onChange, disabled }: any) => (
+  default: ({
+    value,
+    minDate,
+    maxDate,
+    onChange,
+    disabled,
+  }: {
+    value?: Dayjs | null;
+    minDate?: Dayjs;
+    maxDate?: Dayjs;
+    onChange: (value: Dayjs | null) => void;
+    disabled?: boolean;
+  }) => (
     <input
       data-testid="date-picker"
       data-min={minDate?.format?.("YYYY-MM-DD") ?? ""}
@@ -28,7 +41,7 @@ vi.mock("../../../components/common/datetime/PlainDatePicker", () => ({
 
 // BaseConditionCard owns layout/expand state — not under test here.
 vi.mock("../features/download/subset-conditions/BaseConditionCard", () => ({
-  default: ({ children }: any) => <div>{children}</div>,
+  default: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
 }));
 
 import DateRangeConditionCard from "../features/download/subset-conditions/DateRangeConditionCard";

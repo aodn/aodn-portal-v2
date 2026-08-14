@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { ReactNode } from "react";
 
 // Tests for BBoxConditionCard:
 // - the form toggles between "draw on map" and "add bbox" depending on dirtiness
@@ -12,7 +13,21 @@ import { render, screen, fireEvent } from "@testing-library/react";
 // Stub CoordInput to a plain <input> so we can drive it with fireEvent and
 // read back values by aria-label, without dragging in MUI's InputBase.
 vi.mock("../features/download/subset-conditions/CoordInput", () => ({
-  default: ({ value, onChange, onSubmit, ariaLabel, id, disabled }: any) => (
+  default: ({
+    value,
+    onChange,
+    onSubmit,
+    ariaLabel,
+    id,
+    disabled,
+  }: {
+    value: string;
+    onChange: (value: string) => void;
+    onSubmit?: () => void;
+    ariaLabel: string;
+    id?: string;
+    disabled?: boolean;
+  }) => (
     <input
       id={id}
       aria-label={ariaLabel}
@@ -28,7 +43,13 @@ vi.mock("../features/download/subset-conditions/CoordInput", () => ({
 
 // BaseConditionCard owns layout/expand state — not under test here.
 vi.mock("../features/download/subset-conditions/BaseConditionCard", () => ({
-  default: ({ children, actions }: any) => (
+  default: ({
+    children,
+    actions,
+  }: {
+    children?: ReactNode;
+    actions?: ReactNode;
+  }) => (
     <div>
       {children}
       {actions}

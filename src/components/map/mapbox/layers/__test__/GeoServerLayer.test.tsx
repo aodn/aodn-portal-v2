@@ -1,9 +1,10 @@
 import { render, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Provider } from "react-redux";
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, EnhancedStore } from "@reduxjs/toolkit";
 import searchReducer from "@/app/store/searchReducer";
-import GeoServerLayer from "../GeoServerLayer";
+import GeoServerLayer, { GeoServerLayerProps } from "../GeoServerLayer";
+import type { Map as MapBox } from "mapbox-gl";
 import MapContext from "../../MapContext";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import AdminScreenContext from "../../../../admin/AdminScreenContext";
@@ -31,7 +32,7 @@ const mocks = vi.hoisted(() => ({
 
 // 2. Mock axios - Vitest hoists this, but allows 'mockAxiosInstance' because of its name
 vi.mock("axios", async () => {
-  const actual: any = await vi.importActual("axios");
+  const actual = await vi.importActual<typeof import("axios")>("axios");
   return {
     default: {
       ...actual,
@@ -55,8 +56,8 @@ vi.mock("mapbox-gl", () => ({
 }));
 
 describe("GeoServerLayer", () => {
-  let mockMap: any;
-  let store: any;
+  let mockMap: MapBox;
+  let store: EnhancedStore;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -70,13 +71,13 @@ describe("GeoServerLayer", () => {
       removeLayer: vi.fn(),
       on: vi.fn(),
       off: vi.fn(),
-      once: (a: MapEventEnum, b: any) => a === MapEventEnum.IDLE && b(),
+      once: (a: MapEventEnum, b: () => void) => a === MapEventEnum.IDLE && b(),
       isStyleLoaded: vi.fn().mockReturnValue(true),
       getCanvas: () => ({ width: 800, height: 600 }),
       getBounds: () => ({ toArray: () => [[0, 0, 0, 0]] }),
       getLayoutProperty: vi.fn(),
       setLayoutProperty: vi.fn(),
-    };
+    } as unknown as MapBox;
 
     store = configureStore({
       reducer: { search: searchReducer },
@@ -85,7 +86,7 @@ describe("GeoServerLayer", () => {
     });
   });
 
-  const renderComponent = (props: any = {}) => {
+  const renderComponent = (props: Partial<GeoServerLayerProps> = {}) => {
     const collection = Object.assign(new OGCCollection(), {
       id: "test-uuid",
     });
@@ -98,11 +99,9 @@ describe("GeoServerLayer", () => {
     return render(
       <Provider store={store}>
         <AdminScreenContext.Provider
-          value={{ enableGeoServerWhiteList: false } as any}
+          value={{ enableGeoServerWhiteList: false }}
         >
-          <MapContext.Provider
-            value={{ map: mockMap, setLoading: vi.fn() } as any}
-          >
+          <MapContext.Provider value={{ map: mockMap, setLoading: vi.fn() }}>
             <GeoServerLayer
               visible={true}
               collection={collection}

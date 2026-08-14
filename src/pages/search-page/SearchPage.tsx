@@ -258,7 +258,8 @@ const SearchPage = () => {
   const onMapZoomOrMove = useCallback(
     (event: MapEvent | undefined) => {
       if (
-        (event as any)?.originalEvent ||
+        (event as (MapEvent & { originalEvent?: Event }) | undefined)
+          ?.originalEvent ||
         import.meta.env.MODE === "playwright-local"
       ) {
         // Make sure it is user generated event, if we zoom map via api we do not

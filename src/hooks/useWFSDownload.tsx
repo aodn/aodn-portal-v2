@@ -58,7 +58,9 @@ const useWFSDownload = (onCallback?: () => void) => {
   );
   const [progressMessage, setProgressMessage] = useState<string>("");
   const [downloadedBytes, setDownloadedBytes] = useState<number>(0);
-  const downloadPromiseRef = useRef<any>(null);
+  const downloadPromiseRef = useRef<{
+    abort: (reason?: string) => void;
+  } | null>(null);
   const fileChunksRef = useRef<string[]>([]);
   const receivedChunksRef = useRef<Set<number>>(new Set());
   const expectedTotalChunksRef = useRef<number>(0);

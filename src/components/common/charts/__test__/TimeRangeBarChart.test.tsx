@@ -3,16 +3,48 @@ import { render, screen } from "@testing-library/react";
 import TimeRangeBarChart, { Bucket, DividedBy } from "../TimeRangeBarChart";
 import { OGCCollections } from "@/app/store/OGCCollectionDefinitions"; // Adjust path as needed
 
+// Shape of the test-only exports attached to TimeRangeBarChart
+interface PrivateFunctions {
+  determineChartUnit: (start: Date, end: Date) => DividedBy;
+  calculateDaysBetween: (date1: Date, date2: Date) => number;
+  calculateMonthBetween: (date1: Date, date2: Date) => number;
+  calculateYearBetween: (date1: Date, date2: Date) => number;
+  isIncludedInBucket: (
+    targetStart: number,
+    targetEnd: number,
+    bucketStart: number,
+    bucketEnd: number
+  ) => boolean;
+  determineXWithBucketsBy: (
+    start: Date,
+    end: Date,
+    imosDataIds: string[],
+    totalDataset: OGCCollections,
+    unit: string
+  ) => { xValues: Date[]; buckets: Bucket[] };
+  createSeries: (buckets: Bucket[]) => Array<{ data: (number | null)[] }>;
+  MS_PER_DAY: number;
+}
+
 // Helper to access private functions for testing
 // This assumes you add a test-only export at the bottom of TimeRangeBarChart.tsx
 const getPrivateFunctions = () => {
   // This will be available if we add a test-only export (see below)
-  return (TimeRangeBarChart as any).__testExports;
+  return (TimeRangeBarChart as unknown as { __testExports: PrivateFunctions })
+    .__testExports;
 };
 
 // Mock the @mui/x-charts module
 vi.mock("@mui/x-charts", () => ({
-  BarChart: ({ series, xAxis, yAxis }: any) => (
+  BarChart: ({
+    series,
+    xAxis,
+    yAxis,
+  }: {
+    series: unknown;
+    xAxis: Array<{ label?: string }>;
+    yAxis: Array<{ label?: string }>;
+  }) => (
     <div data-testid="bar-chart">
       <div data-testid="x-axis">{xAxis[0].label}</div>
       <div data-testid="y-axis">{yAxis[0].label}</div>

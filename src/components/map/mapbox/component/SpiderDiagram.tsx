@@ -10,7 +10,7 @@ import {
 import MapContext from "../MapContext";
 import { Feature, FeatureCollection, LineString, Point } from "geojson";
 import { createRoot } from "react-dom/client";
-import { GeoJSONSource, MapMouseEvent } from "mapbox-gl";
+import { GeoJSONFeature, GeoJSONSource, MapMouseEvent } from "mapbox-gl";
 import MapPopup, { MapPopupRef } from "./MapPopup";
 import SpatialExtents from "./SpatialExtents";
 import {
@@ -110,9 +110,9 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
 
   // Util function to check if a cluster can spiderify or not
   const shouldCreateSpiderDiagram = useCallback(
-    (features: any[], spiderifyFromZoomLevel: number): boolean => {
+    (features: GeoJSONFeature[], spiderifyFromZoomLevel: number): boolean => {
       const zoom = map?.getZoom() || 0;
-      const clusterCount = features[0].properties.point_count;
+      const clusterCount = features[0].properties?.point_count;
       return (
         (!clusterCount && features.length > 1) || zoom >= spiderifyFromZoomLevel
       );
@@ -455,7 +455,7 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
           // or go to the spiderify-zoomLevel if the expansion zoom beyond spiderify-zoomLevel
           const currentZoom = map?.getZoom();
           map?.easeTo({
-            center: (feature.geometry as any).coordinates,
+            center: feature.geometry.coordinates as [number, number],
             zoom: zoom === currentZoom ? zoom + 1 : zoom,
             duration: 500,
           });

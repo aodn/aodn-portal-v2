@@ -13,7 +13,7 @@
     "seo:artifacts": "vite-node src/seo/buildSeoArtifacts.ts",
     "seo:gsc": "tsx src/seo/searchConsole.ts",
     "seo:verify": "tsx src/seo/verifySeoArtifacts.ts",
-    "lint": "eslint . --report-unused-disable-directives --max-warnings 143",
+    "lint": "eslint . --report-unused-disable-directives --max-warnings 100",
     "preview": "vite preview",
     "postinstall": "husky",
     "test": "vitest",

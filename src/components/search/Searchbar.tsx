@@ -9,6 +9,7 @@ import React, {
   useState,
 } from "react";
 import { Box, Fade, Paper, Popper, ClickAwayListener } from "@mui/material";
+import type { Instance } from "@popperjs/core";
 import InputWithSuggester from "./InputWithSuggester";
 import { border, borderRadius, color, gap } from "../../styles/constants";
 import SearchbarButtonGroup, {
@@ -65,7 +66,7 @@ const Searchbar: FC<SearchbarProps> = ({
   const [pendingSearch, setPendingSearch] = useState<boolean>(false);
   const { ref, width: searchbarWidth } = useElementSize();
   const redirectSearch = useRedirectSearch();
-  const popperRef = useRef<any>(null);
+  const popperRef = useRef<Instance | null>(null);
   const params = useAppSelector((state) => state.paramReducer);
   const { scrollToElement } = useScrollToElement({
     ref: { current: boxRef },

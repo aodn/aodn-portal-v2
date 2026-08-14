@@ -13,7 +13,7 @@ vi.mock("../../../icon/MinusIcon", () => ({
 
 // Mock useTheme
 vi.mock("@mui/material", async (importOriginal) => {
-  const actual: any = await importOriginal();
+  const actual = await importOriginal<typeof import("@mui/material")>();
   return {
     ...actual,
     useTheme: () => ({

@@ -626,7 +626,11 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
           .unwrap()
           .then((layers: MapLayerResponse[]) => {
             // Set fetched layers to wmsLayers because we successfully get the layers from geoserver capabilities
-            if (layers && layers.length > 0 && !(search as any).aborted) {
+            if (
+              layers &&
+              layers.length > 0 &&
+              !(search as { aborted?: boolean }).aborted
+            ) {
               const wmsLayerOptions = formWmsLayerOptions(layers);
               if (wmsLayerOptions && wmsLayerOptions.length > 0) {
                 setWmsLayers(wmsLayerOptions);

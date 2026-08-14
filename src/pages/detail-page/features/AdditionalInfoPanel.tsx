@@ -135,43 +135,43 @@ const AdditionalInfoPanel = () => {
     () => [
       {
         title: "Lineage",
-        component: (props: Record<string, any>) => (
+        component: (props: Record<string, unknown>) => (
           <StatementList {...props} statement={statement} title={"Lineage"} />
         ),
       },
       {
         title: "Themes",
-        component: (props: Record<string, any>) => (
+        component: (props: Record<string, unknown>) => (
           <ThemeList {...props} title={"Themes"} themes={categories} />
         ),
       },
       {
         title: "Keywords",
-        component: (props: Record<string, any>) => (
+        component: (props: Record<string, unknown>) => (
           <KeywordList {...props} keywords={keywords} />
         ),
       },
       {
         title: "Metadata Contact",
-        component: (props: Record<string, any>) => (
+        component: (props: Record<string, unknown>) => (
           <MetadataContactList {...props} contacts={metadataContact} />
         ),
       },
       {
         title: "Metadata Identifier",
-        component: (props: Record<string, any>) => (
+        component: (props: Record<string, unknown>) => (
           <MetadataIdentifierList {...props} identifier={metadataId} />
         ),
       },
       {
         title: "Full Metadata Link",
-        component: (props: Record<string, any>) => (
+        component: (props: Record<string, unknown>) => (
           <MetadataUrlList {...props} url={metadataUrl} />
         ),
       },
       {
         title: "Metadata Dates",
-        component: (props: Record<string, any>) => (
+        component: (props: Record<string, unknown>) => (
           <MetadataDateList
             {...props}
             creation={creation}

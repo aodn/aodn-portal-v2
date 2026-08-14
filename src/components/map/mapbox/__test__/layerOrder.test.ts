@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { Map as MapboxMap } from "mapbox-gl";
+import type { LayerSpecification, Map as MapboxMap } from "mapbox-gl";
 import {
   addDataLayer,
   addMenuOverlayLayer,
@@ -85,7 +85,7 @@ describe("layerOrder", () => {
       ]);
       const layer = { id: "heatmap-layer", type: "heatmap" as const };
 
-      addDataLayer(map, layer as any);
+      addDataLayer(map, layer as unknown as LayerSpecification);
 
       expect(map.addLayer).toHaveBeenCalledWith(
         layer,
@@ -104,7 +104,7 @@ describe("layerOrder", () => {
         type: "fill" as const,
       };
 
-      addMenuOverlayLayer(map, layer as any);
+      addMenuOverlayLayer(map, layer as unknown as LayerSpecification);
 
       expect(map.addLayer).toHaveBeenCalledWith(
         layer,
@@ -116,7 +116,7 @@ describe("layerOrder", () => {
       const map = makeMap(["cluster-layer"]);
       const layer = { id: "new-data", type: "circle" as const };
 
-      addDataLayer(map, layer as any);
+      addDataLayer(map, layer as unknown as LayerSpecification);
 
       expect(map.addLayer).toHaveBeenCalledWith(layer);
     });

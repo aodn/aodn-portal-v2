@@ -5,7 +5,7 @@ import {
   jsonToOGCCollections,
   SearchParameters,
 } from "@/app/store/searchReducer";
-import { MapMouseEvent } from "mapbox-gl";
+import { LayerSpecification, MapMouseEvent } from "mapbox-gl";
 import { useAppDispatch } from "@/app/store/hooks";
 import { addDataLayer, getDataLayerBeforeId } from "../layerOrder";
 
@@ -50,7 +50,7 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
       return dispatch(fetchResultNoStore(param))
         .unwrap()
         .then((value: string) => jsonToOGCCollections(value).collections[0])
-        .catch((error: any) => {
+        .catch((error: unknown) => {
           console.error("Error fetching collection data:", error);
           // TODO: handle error in ErrorBoundary
         });
@@ -85,7 +85,7 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
 
         // Keep extents under the parent data layer (e.g. cluster) so those stay
         // clickable; fall back to the data stack beforeId (under menu overlays).
-        const addLayerIfNotExists = (id: string, layer: any) => {
+        const addLayerIfNotExists = (id: string, layer: LayerSpecification) => {
           if (!map || map.getLayer(id)) return;
           const preferredBefore = map.getLayer(layerId)
             ? layerId
@@ -185,7 +185,7 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
           };
           // Fire a synthetic click event with the custom event
           // This will be captured by CardPopup's event listeners so
-          map?.fire("click", customEvent as any as MapMouseEvent);
+          map?.fire("click", customEvent as unknown as MapMouseEvent);
         } else {
           onDatasetSelected([]);
         }
