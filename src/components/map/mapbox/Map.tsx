@@ -243,7 +243,7 @@ const ReactMap = memo(
           // https://stackoverflow.com/questions/70533564/mapbox-gl-flickers-when-resizing-the-container-div
           setTimeout(() => {
             try {
-              if (container.offsetWidth > 0 && container.offsetHeight > 0) {
+              if (container.offsetWidth > 0 || container.offsetHeight > 0) {
                 map?.resize();
               }
             } catch (error: any) {
