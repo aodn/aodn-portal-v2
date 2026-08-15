@@ -43,24 +43,24 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
   );
 
   return (
-    <Grid container spacing={2} sx={{ mt: "1px", mb: "14px" }}>
-      <Grid container spacing={2}>
-        {/* Address */}
-        <Grid
-          size={{
-            xs: 12,
-            sm: 12,
-            md: 6,
-          }}
-        >
-          <Box
-            display="flex"
-            alignItems="flex-start"
-            gap={1.5}
-            data-testid="contact-address"
-          >
-            {hasAddress && (
-              <>
+    <Grid container spacing={2} size={12} sx={{ mt: "1px", mb: "14px" }}>
+      {(hasAddress || phones.length > 0) && (
+        <Grid container spacing={2} size={12}>
+          {/* Address */}
+          {hasAddress && (
+            <Grid
+              size={{
+                xs: 12,
+                sm: 12,
+                md: 6,
+              }}
+            >
+              <Box
+                display="flex"
+                alignItems="flex-start"
+                gap={1.5}
+                data-testid="contact-address"
+              >
                 <Box sx={{ mt: "4px", flexShrink: 0 }}>
                   <LocationOnOutlinedIcon />
                 </Box>
@@ -71,80 +71,83 @@ const ContactArea: React.FC<ContactAreaProps> = ({ contact }) => {
                   {postal_code && renderTextLine(postal_code)}
                   {country && renderTextLine(country)}
                 </Box>
-              </>
-            )}
-          </Box>
-        </Grid>
-
-        {/* Phones */}
-        <Grid
-          data-testid="contact-phone"
-          size={{
-            xs: 12,
-            sm: 12,
-            md: 6,
-          }}
-        >
-          {phones.length > 0 &&
-            phones.map((phone) => (
-              <Box
-                key={phone.value}
-                display="flex"
-                alignItems="center"
-                gap={1.5}
-                mb={0.5}
-              >
-                {phone.roles.length > 1 && (
-                  <Typography color="error" variant="caption">
-                    Multiple roles found - please implement
-                  </Typography>
-                )}
-
-                <Box sx={{ mt: "4px", flexShrink: 0 }}>
-                  {getPhoneIcon(phone.roles[0])}
-                </Box>
-
-                <Typography
-                  sx={{
-                    ...portalTheme.typography.body2Regular,
-                    pt: 0,
-                  }}
-                >
-                  {`${phone.value} (${phone.roles[0]})`}
-                </Typography>
               </Box>
-            ))}
+            </Grid>
+          )}
+
+          {/* Phones */}
+          {phones.length > 0 && (
+            <Grid
+              data-testid="contact-phone"
+              size={{
+                xs: 12,
+                sm: 12,
+                md: 6,
+              }}
+            >
+              {phones.map((phone) => (
+                <Box
+                  key={phone.value}
+                  display="flex"
+                  alignItems="center"
+                  gap={1.5}
+                  mb={0.5}
+                >
+                  {phone.roles.length > 1 && (
+                    <Typography color="error" variant="caption">
+                      Multiple roles found - please implement
+                    </Typography>
+                  )}
+
+                  <Box sx={{ mt: "4px", flexShrink: 0 }}>
+                    {getPhoneIcon(phone.roles[0])}
+                  </Box>
+
+                  <Typography
+                    sx={{
+                      ...portalTheme.typography.body2Regular,
+                      pt: 0,
+                    }}
+                  >
+                    {`${phone.value} (${phone.roles[0]})`}
+                  </Typography>
+                </Box>
+              ))}
+            </Grid>
+          )}
         </Grid>
-      </Grid>
+      )}
 
       {/* Links */}
-      <Grid size={12}>
-        <Box
-          display="flex"
-          alignItems="flex-start"
-          gap={1.5}
-          data-testid="contact-link"
-        >
-          {links.length > 0 && <LanguageOutlinedIcon />}
-          <Box sx={{ minWidth: 0 }}>
-            {links.length > 0 &&
-              links.map((link, index) => (
-                <Link
-                  key={index}
-                  href={link.href}
-                  display="block"
-                  sx={{
-                    ...portalTheme.typography.body2Regular,
-                    color: portalTheme.palette.primary1,
-                    wordBreak: "break-word",
-                  }}
-                >
-                  {link.title}
-                </Link>
-              ))}
+      {links.length > 0 && (
+        <Grid size={12}>
+          <Box
+            display="flex"
+            alignItems="flex-start"
+            gap={1.5}
+            data-testid="contact-link"
+          >
+            {links.length > 0 && <LanguageOutlinedIcon />}
+            <Box sx={{ minWidth: 0 }}>
+              {links.length > 0 &&
+                links.map((link, index) => (
+                  <Link
+                    key={index}
+                    href={link.href}
+                    display="block"
+                    sx={{
+                      ...portalTheme.typography.body2Regular,
+                      color: portalTheme.palette.primary1,
+                      wordBreak: "break-word",
+                    }}
+                  >
+                    {link.title}
+                  </Link>
+                ))}
+            </Box>
           </Box>
-        </Box>
-      </Grid>
+        </Grid>
+      )}
     </Grid>
   );
 };
