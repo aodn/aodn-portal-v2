@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import PlainAccordion from "../../../../components/common/accordion/PlainAccordion";
 import { portalTheme } from "../../../../styles";
 import {
@@ -21,12 +21,12 @@ import {
 import SubsetConditions from "./subset-conditions/SubsetConditions";
 import InfoMessage from "./InfoMessage";
 import { useDetailPageContext } from "../../context/detail-page-context";
+import { dateDefault } from "@/components/common/constants";
 
 interface DownloadSubsettingProps extends DownloadCondition {
   hideInfoMessage?: boolean;
   sx?: SxProps;
   disable?: boolean;
-  dateRangeBounds?: { min: Dayjs; max: Dayjs };
 }
 
 const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
@@ -35,9 +35,18 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
   getAndSetDownloadConditions,
   removeDownloadCondition,
   disable,
-  dateRangeBounds,
 }) => {
-  const { isSubsettingSupported } = useDetailPageContext();
+  const { isSubsettingSupported, mapSubsettingCapabilities } =
+    useDetailPageContext();
+  const dateRangeBounds: { min: Dayjs; max: Dayjs } | undefined =
+    useMemo(() => {
+      const bounds = mapSubsettingCapabilities.timeRangeBounds;
+      if (!bounds) return undefined;
+
+      const min = dayjs(bounds.min, dateDefault.DATE_FORMAT);
+      const max = dayjs(bounds.max, dateDefault.DATE_FORMAT);
+      return min.isValid() && max.isValid() ? { min, max } : undefined;
+    }, [mapSubsettingCapabilities.timeRangeBounds]);
   const supportCtx: ConditionSupportContext = useMemo(
     () => ({ isSubsettingSupported }),
     [isSubsettingSupported]
