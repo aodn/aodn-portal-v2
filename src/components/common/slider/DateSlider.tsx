@@ -143,6 +143,10 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
 
   if (sorted_marks.length === 0) return null;
 
+  const displayLabel = formatLabel
+    ? formatLabel(datePointStamp!)
+    : valueToDate(datePointStamp!).toISOString();
+
   return (
     <Grid
       container
@@ -172,10 +176,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
             color: portalTheme.palette.text1,
           }}
         >
-          Displaying @{" "}
-          {formatLabel
-            ? formatLabel(datePointStamp!)
-            : valueToDate(datePointStamp!).toISOString()}
+          Displaying @ {displayLabel}
         </Typography>
       </Grid>
       <Grid

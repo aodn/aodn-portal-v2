@@ -40,6 +40,23 @@ export const EMPTY_TILE_DATE_MARKS: TileDateMarks = {
 };
 
 /**
+ * The gridded half of GriddedRasterLayer's props: everything `useGriddedRasterLayer`
+ * owns. `LayerBasicType` (notably `visible`) stays with the call site, the only
+ * place that knows which map layer is currently selected.
+ */
+export interface GriddedRasterLayerControls {
+  products: GriddedRasterProduct[];
+  /** `""` when there is no product yet — GriddedRasterLayer treats it as "none". */
+  selectedProductId: string;
+  onSelectProduct: (id: string) => void;
+  /** `YYYY-MM-DD`, round-tripped from the listing — never derived from a Date. */
+  selectedDate?: string;
+  /** A refetch failed while this layer was selected. */
+  error?: boolean;
+  onRetry?: () => void;
+}
+
+/**
  * Gridded raster tiles exist only for zarr datasets, so skip discovery entirely
  * for everything else rather than asking the backend about every collection.
  */

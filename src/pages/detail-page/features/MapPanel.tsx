@@ -65,8 +65,7 @@ import {
   type PMTilesMetadata,
 } from "@/components/map/mapbox/layers/pmtiles/Common";
 import GriddedRasterLayer from "@/components/map/mapbox/layers/raster-layers/gridded-raster-layer/GriddedRasterLayer";
-import useGriddedRasterProducts from "@/components/map/mapbox/layers/raster-layers/gridded-raster-layer/useGriddedRasterProducts";
-import { buildTileDateMarks } from "@/components/map/mapbox/layers/raster-layers/gridded-raster-layer/Common";
+import useGriddedRasterLayer from "@/components/map/mapbox/layers/raster-layers/gridded-raster-layer/useGriddedRasterLayer";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -212,59 +211,12 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   );
 
   const {
-    products: griddedProducts,
-    error: griddedError,
-    retry: retryGriddedProducts,
-  } = useGriddedRasterProducts(collection);
-  const hasGriddedProducts = griddedProducts.length > 0;
-
-  const [griddedProductOverride, setGriddedProductOverride] =
-    useState<string>("");
-  const selectedGriddedProduct = useMemo(
-    () =>
-      griddedProducts.find((p) => p.id === griddedProductOverride) ??
-      griddedProducts[0],
-    [griddedProducts, griddedProductOverride]
-  );
-
-  const griddedDateMarks = useMemo(
-    () => buildTileDateMarks(selectedGriddedProduct?.dates),
-    [selectedGriddedProduct]
-  );
-
-  const [griddedDateOverride, setGriddedDateOverride] = useState<{
-    productId: string;
-    date: string;
-  } | null>(null);
-
-  const selectedGriddedDate = useMemo(() => {
-    const override =
-      selectedGriddedProduct &&
-      griddedDateOverride?.productId === selectedGriddedProduct.id
-        ? griddedDateOverride.date
-        : undefined;
-    return override && griddedDateMarks.dates.includes(override)
-      ? override
-      : griddedDateMarks.latest;
-  }, [griddedDateOverride, griddedDateMarks, selectedGriddedProduct]);
-
-  const handleGriddedDatePointChange = useCallback(
-    (
-      _event: Event | React.SyntheticEvent<Element, Event> | undefined,
-      value: number | number[]
-    ) => {
-      // Always recovered from the map — never re-derived from the timestamp,
-      // which would be off by a day in a browser west of UTC.
-      const dayKey = griddedDateMarks.byValue.get(value as number);
-      if (dayKey && selectedGriddedProduct) {
-        setGriddedDateOverride({
-          productId: selectedGriddedProduct.id,
-          date: dayKey,
-        });
-      }
-    },
-    [griddedDateMarks, selectedGriddedProduct]
-  );
+    hasProducts: hasGriddedProducts,
+    hasDates: hasGriddedDates,
+    layerProps: griddedLayerProps,
+    dateSliderKey: griddedDateSliderKey,
+    dateSliderProps: griddedDateSliderProps,
+  } = useGriddedRasterLayer(collection);
 
   const hasSpatialExtent = useMemo(() => {
     const bbox = collection?.getBBox();
@@ -444,7 +396,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       downloadServiceAvailable:
         downloadService !== DownloadServiceType.Unavailable,
       hasCloudOptimisedData,
-      griddedRasterHasDates: griddedDateMarks.values.length > 0,
+      griddedRasterHasDates: hasGriddedDates,
     });
   }, [
     selectedMapLayerId,
@@ -454,7 +406,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     isSupportPMTiles,
     downloadService,
     hasCloudOptimisedData,
-    griddedDateMarks,
+    hasGriddedDates,
     setMapSubsettingCapabilities,
   ]);
 
@@ -483,15 +435,12 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
 
   const additionalSlider = useMemo(() => {
     if (selectedMapLayerId === LayerName.GriddedRaster) {
-      if (griddedDateMarks.values.length === 0) return undefined;
-      return (
+      return hasGriddedDates ? (
         <DateSliderPoint
-          key={`gridded-date-${selectedGriddedProduct?.id}`}
-          valid_points={griddedDateMarks.values}
-          formatLabel={(v) => griddedDateMarks.byValue.get(v) ?? ""}
-          onDatePointChange={handleGriddedDatePointChange}
+          key={griddedDateSliderKey}
+          {...griddedDateSliderProps}
         />
-      );
+      ) : undefined;
     }
     if (discreteTimeSliderValues) {
       return (
@@ -504,10 +453,10 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     return undefined;
   }, [
     discreteTimeSliderValues,
-    griddedDateMarks,
-    handleGriddedDatePointChange,
+    griddedDateSliderKey,
+    griddedDateSliderProps,
+    hasGriddedDates,
     handleSliderPointChange,
-    selectedGriddedProduct?.id,
     selectedMapLayerId,
     selectedWmsLayer,
   ]);
@@ -696,12 +645,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
             />
             {hasGriddedProducts && (
               <GriddedRasterLayer
-                products={griddedProducts}
-                selectedProductId={selectedGriddedProduct?.id ?? ""}
-                onSelectProduct={setGriddedProductOverride}
-                selectedDate={selectedGriddedDate}
-                error={griddedError}
-                onRetry={retryGriddedProducts}
+                {...griddedLayerProps}
                 visible={selectedMapLayerId === LayerName.GriddedRaster}
               />
             )}

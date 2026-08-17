@@ -9,8 +9,11 @@ import MapLayerSelect from "../../../component/MapLayerSelect";
 import { TestHelper } from "../../../../../common/test/helper";
 import { borderRadius, zIndex } from "@/styles/constants";
 import { portalTheme } from "@/styles";
-import { GriddedRasterProduct } from "@/app/store/GriddedTileDefinitions";
-import { buildGriddedTileUrl, toSelectItems } from "./Common";
+import {
+  buildGriddedTileUrl,
+  GriddedRasterLayerControls,
+  toSelectItems,
+} from "./Common";
 
 enum LAYER_VISIBILITY {
   VISIBLE = "visible",
@@ -29,16 +32,8 @@ const getSourceId = (id: string | undefined) => `${id}-gridded-raster-source`;
 export const getGriddedRasterLayerId = (id: string | undefined) =>
   `${id}-gridded-raster-layer`;
 
-interface GriddedRasterLayerProps extends LayerBasicType {
-  products: GriddedRasterProduct[];
-  selectedProductId: string;
-  onSelectProduct: (id: string) => void;
-  /** YYYY-MM-DD, round-tripped from the listing — never derived from a Date. */
-  selectedDate?: string;
-  /** A refetch failed while this layer was selected. */
-  error?: boolean;
-  onRetry?: () => void;
-}
+interface GriddedRasterLayerProps
+  extends LayerBasicType, GriddedRasterLayerControls {}
 
 const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
   products,
