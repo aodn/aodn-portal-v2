@@ -1,5 +1,6 @@
 import { createTheme, ThemeOptions } from "@mui/material/styles";
 import { designTokensRC8 as designTokens } from "./designTokensRC8";
+import "./themeRC8Types";
 
 // We create this just to get the helper methods
 const defaultTheme = createTheme();
@@ -206,13 +207,13 @@ const rc8ThemeOptions: ThemeOptions = {
   //   dropdown: "0px 6px 24px rgba(0, 0, 0, 0.12)",
   // },
 
-  // TODO: rc8BorderRadius - custom border radius tokens
-  // rc8BorderRadius: {
-  //   small: "4px",
-  //   medium: "8px",
-  //   large: "12px",
-  //   round: "50%",
-  // },
+  borderRadius: {
+    sm: designTokens.borderRadius.sm,
+    md: designTokens.borderRadius.md,
+    lg: designTokens.borderRadius.lg,
+    xlg: designTokens.borderRadius.xlg,
+    xxlg: designTokens.borderRadius.xxlg,
+  },
 };
 
 const rc8Theme = createTheme(rc8ThemeOptions);
