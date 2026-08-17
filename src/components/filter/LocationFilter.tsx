@@ -471,9 +471,6 @@ const LocationFilter: FC<LocationFilterProps> = () => {
     [dispatch]
   );
 
-  // MapboxDraw is the single rendering source for drawn features. Including
-  // them in this layer creates a non-interactive duplicate that can remain
-  // visible in Firefox after MapboxDraw deletes the selected feature.
   const staticAreaHighlightCollection = useMemo(():
     | FeatureCollection<Polygon | MultiPolygon>
     | undefined => {
