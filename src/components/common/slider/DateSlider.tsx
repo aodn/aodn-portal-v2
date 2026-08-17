@@ -41,6 +41,14 @@ interface DateSliderPointProps {
 
 const COMPONENT_ID = "dateslider-daterange-menu-button";
 
+const sliderCaptionSx = {
+  ...portalTheme.typography.body1Medium,
+  color: portalTheme.palette.text1,
+  whiteSpace: "nowrap",
+  // Override default body1 padding so the bar top isn't pushed down
+  padding: 0,
+} as const;
+
 /** One calendar day in ms — sensible arrow-key step for date timestamps. */
 const DAY_MS = 24 * 60 * 60 * 1000;
 /** ~one month jump for Shift+Arrow / PageUp / PageDown. */
@@ -166,6 +174,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
         display: "flex",
         width: "100%",
         mx: "8px",
+        overflow: "visible",
       }}
       data-testid={COMPONENT_ID}
     >
@@ -173,8 +182,8 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
         container
         sx={{
           px: padding.medium,
-          pt: { xs: "24px", md: padding.small },
-          pb: { xs: "2px", md: "6px" },
+          py: padding.small,
+          overflow: "visible",
         }}
         size={12}
       >
@@ -188,21 +197,13 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
           <Stack flexShrink={0} alignItems="flex-start">
             <Typography
               sx={{
-                ...portalTheme.typography.body1Medium,
-                color: portalTheme.palette.text1,
-                whiteSpace: "nowrap",
+                ...sliderCaptionSx,
                 display: { xs: "none", sm: "block" },
               }}
             >
               Displaying
             </Typography>
-            <Typography
-              sx={{
-                ...portalTheme.typography.body1Medium,
-                color: portalTheme.palette.text1,
-                whiteSpace: "nowrap",
-              }}
-            >
+            <Typography sx={sliderCaptionSx}>
               {datePointStamp !== undefined
                 ? valueToDate(datePointStamp).format(dateDefault.DISPLAY_FORMAT)
                 : ""}
@@ -407,6 +408,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
         display: "flex",
         width: "100%",
         mx: "8px",
+        overflow: "visible",
       }}
       data-testid={COMPONENT_ID}
     >
@@ -414,8 +416,8 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
         container
         sx={{
           px: padding.medium,
-          pt: { xs: "24px", md: padding.small },
-          pb: { xs: "2px", md: "6px" },
+          py: padding.small,
+          overflow: "visible",
         }}
         size={12}
       >
@@ -429,21 +431,13 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
           <Stack flexShrink={0} alignItems="flex-start">
             <Typography
               sx={{
-                ...portalTheme.typography.body1Medium,
-                color: portalTheme.palette.text1,
-                whiteSpace: "nowrap",
+                ...sliderCaptionSx,
                 display: { xs: "none", sm: "block" },
               }}
             >
               Start Date
             </Typography>
-            <Typography
-              sx={{
-                ...portalTheme.typography.body1Medium,
-                color: portalTheme.palette.text1,
-                whiteSpace: "nowrap",
-              }}
-            >
+            <Typography sx={sliderCaptionSx}>
               {valueToDate(minValue).format(dateDefault.DISPLAY_FORMAT)}
             </Typography>
           </Stack>
@@ -471,21 +465,13 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
           <Stack flexShrink={0} alignItems="flex-end">
             <Typography
               sx={{
-                ...portalTheme.typography.body1Medium,
-                color: portalTheme.palette.text1,
-                whiteSpace: "nowrap",
+                ...sliderCaptionSx,
                 display: { xs: "none", sm: "block" },
               }}
             >
               On going
             </Typography>
-            <Typography
-              sx={{
-                ...portalTheme.typography.body1Medium,
-                color: portalTheme.palette.text1,
-                whiteSpace: "nowrap",
-              }}
-            >
+            <Typography sx={sliderCaptionSx}>
               {valueToDate(maxValue).format(dateDefault.DISPLAY_FORMAT)}
             </Typography>
           </Stack>
