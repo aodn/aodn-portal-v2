@@ -18,11 +18,11 @@ from mocks.api.download_wfs import (
     handle_estimate_co_download,
     handle_estimate_wfs_download,
 )
+from mocks.api.pmtiles import handle_pmtiles_metadata_api
 from mocks.api.search_collections import (
     handle_provider_api,
     handle_temporal_api,
 )
-from mocks.api.pmtiles import handle_pmtiles_metadata_api
 from mocks.api.static_geojson import handle_static_geojson_api
 from mocks.api.vocabs import handle_vocabs_api
 from mocks.api.wfs_map import (
