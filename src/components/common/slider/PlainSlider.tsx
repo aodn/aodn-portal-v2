@@ -29,6 +29,14 @@ const StyledSlider = styled(Slider)<PlainSliderProps>(({
     "& .MuiSlider-valueLabel": {
       ...portalTheme.typography.body2Regular,
       backgroundColor: portalTheme.palette.primary6,
+      borderRadius: portalTheme.borderRadius.sm,
+      border: `1px solid ${portalTheme.palette.text1}`,
+      // No 28px size token; MUI default spacing is 8px → 3.5 = 28px
+      height: theme.spacing(3.5),
+      boxSizing: "border-box",
+      "&::before": {
+        display: "none",
+      },
       ...labelPositioning,
       opacity: 0, // Hide text by default
       ...labelPositioningMobile,
