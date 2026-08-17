@@ -97,6 +97,21 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
       : undefined
   );
 
+  // valid_points often arrive after mount; keep the thumb on a real mark.
+  useEffect(() => {
+    startTransition(() => {
+      if (sorted_marks.length === 0) {
+        setDatePointStamp(undefined);
+        return;
+      }
+      setDatePointStamp((current) =>
+        current !== undefined && markValues.includes(current)
+          ? current
+          : sorted_marks[sorted_marks.length - 1].value
+      );
+    });
+  }, [markValues, sorted_marks]);
+
   const handleSliderChange = useCallback(
     (_: Event, newValue: number | number[]) => {
       setDatePointStamp(newValue as number);
@@ -138,6 +153,10 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
     [applyPointValue, datePointStamp, markValues]
   );
 
+  if (sorted_marks.length === 0) {
+    return null;
+  }
+
   return (
     <Grid
       container
@@ -151,30 +170,11 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
       data-testid={COMPONENT_ID}
     >
       <Grid
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{
-          mx: "20px",
-          mt: { xs: "2px", md: "6px" },
-          mb: { xs: "2px", md: "6px" },
-        }}
-        size={12}
-      >
-        <Typography
-          sx={{
-            ...portalTheme.typography.body1Medium,
-            color: portalTheme.palette.text1,
-          }}
-        >
-          Displaying @ {valueToDate(datePointStamp!).toISOString()}
-        </Typography>
-      </Grid>
-      <Grid
         container
         sx={{
           px: padding.medium,
           pt: { xs: "24px", md: padding.small },
+          pb: { xs: "2px", md: "6px" },
         }}
         size={12}
       >
@@ -185,11 +185,34 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
           mx={{ xs: "18px", sm: "6px" }}
           gap="16px"
         >
+          <Stack flexShrink={0} alignItems="flex-start">
+            <Typography
+              sx={{
+                ...portalTheme.typography.body1Medium,
+                color: portalTheme.palette.text1,
+                whiteSpace: "nowrap",
+                display: { xs: "none", sm: "block" },
+              }}
+            >
+              Displaying
+            </Typography>
+            <Typography
+              sx={{
+                ...portalTheme.typography.body1Medium,
+                color: portalTheme.palette.text1,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {datePointStamp !== undefined
+                ? valueToDate(datePointStamp).format(dateDefault.DISPLAY_FORMAT)
+                : ""}
+            </Typography>
+          </Stack>
           <PlainSlider
             step={null} // ← key: disables free sliding
             marks={sorted_marks}
-            min={sorted_marks && sorted_marks[0].value}
-            max={sorted_marks && sorted_marks[sorted_marks.length - 1].value}
+            min={sorted_marks[0].value}
+            max={sorted_marks[sorted_marks.length - 1].value}
             value={datePointStamp}
             defaultValue={datePointStamp}
             onChangeCommitted={(event, value) =>
@@ -203,12 +226,11 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
                 onKeyDown: handleKeyDown,
               },
             }}
-            sx={{
-              "& .MuiSlider-valueLabel": {
-                top: -10, // move above
-                transform: "none",
-              },
-            }}
+            valueLabelDisplay="auto"
+            valueLabelFormat={(value: number) =>
+              valueToDate(value).format(dateDefault.DISPLAY_FORMAT)
+            }
+            sx={{ flex: 1, minWidth: 0 }}
           />
         </Stack>
       </Grid>
