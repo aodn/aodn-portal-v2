@@ -31,9 +31,11 @@ def test_map_shows_data_density_layer(responsive_page: Page, uuid: str) -> None:
     detail_page.go_to_map_tab()
     detail_page.detail_map.wait_for_layer_select_loading()
 
-    # Ensure that the Data Density and GeoServer options are displayed
+    # Data Density appears after the mocked `.metadata` sidecar probe.
     detail_page.detail_map.layers_menu.click()
-    expect(detail_page.detail_map.data_density_layer).to_be_visible()
+    expect(detail_page.detail_map.data_density_layer).to_be_visible(
+        timeout=30_000
+    )
     expect(detail_page.detail_map.geoserver_layer).to_be_visible()
 
     # Verify that Data Density is present and visible on the map by default
