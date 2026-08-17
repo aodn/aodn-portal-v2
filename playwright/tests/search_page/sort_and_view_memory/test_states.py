@@ -93,7 +93,7 @@ def test_sort_and_view_states_persist_across_page(
 
 @pytest.mark.parametrize(
     'sort_type, view_type',
-    [(SearchSortType.POPULARITY, SearchViewLayouts.GRID)],
+    [(SearchSortType.TITLE, SearchViewLayouts.GRID)],
 )
 def test_sort_and_view_states_persist_after_map_toggle(
     desktop_page: Page,
