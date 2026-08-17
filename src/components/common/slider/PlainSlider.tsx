@@ -1,29 +1,18 @@
 import { portalTheme } from "../../../styles";
-import { Slider, SliderProps, styled } from "@mui/material";
-import { useMemo } from "react";
+import { Slider, SliderProps, styled, SxProps, Theme } from "@mui/material";
 
-interface PlainSliderProps extends SliderProps {
-  is_vertical?: boolean;
-}
-
-const StyledSlider = styled(Slider)<PlainSliderProps>(({
-  theme,
-  is_vertical = false,
-}) => {
-  const [labelPositioning, labelPositioningMobile] = useMemo(() => {
-    const labelPositioning = {
-      top: is_vertical ? "calc(100% + 1px)" : "-30px",
-      left: is_vertical ? "calc(100% + 25px)" : "50%",
-      transform: is_vertical ? "none" : "translateX(-50%)",
-    };
-
-    const labelPositioningMobile = {
-      [theme.breakpoints.down("md")]: {
-        top: is_vertical ? "calc(100% + 1px)" : "-30px",
-      },
-    };
-    return [labelPositioning, labelPositioningMobile];
-  }, [is_vertical, theme.breakpoints]);
+const StyledSlider = styled(Slider)<SliderProps>(({ theme, orientation }) => {
+  const isVertical = orientation === "vertical";
+  const labelPositioning = {
+    top: isVertical ? "calc(100% + 1px)" : "-30px",
+    left: isVertical ? "calc(100% + 25px)" : "50%",
+    transform: isVertical ? "none" : "translateX(-50%)",
+  };
+  const labelPositioningMobile = {
+    [theme.breakpoints.down("md")]: {
+      top: isVertical ? "calc(100% + 1px)" : "-30px",
+    },
+  };
 
   return {
     "& .MuiSlider-valueLabel": {
@@ -68,8 +57,12 @@ const StyledSlider = styled(Slider)<PlainSliderProps>(({
   };
 });
 
-const PlainSlider = ({ is_vertical = false, ...props }: PlainSliderProps) => {
-  return <StyledSlider is_vertical={is_vertical} {...props} />;
+interface PlainSliderProps extends SliderProps {
+  sx?: SxProps<Theme>;
+}
+
+const PlainSlider = ({ sx, ...props }: PlainSliderProps) => {
+  return <StyledSlider sx={{ margin: "0 16px", ...sx }} {...props} />;
 };
 
 export default PlainSlider;
