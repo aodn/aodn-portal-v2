@@ -393,6 +393,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
         sx={{
           px: padding.medium,
           pt: { xs: "24px", md: padding.small },
+          pb: { xs: "2px", md: "6px" },
         }}
         size={12}
       >
@@ -403,17 +404,27 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
           mx={{ xs: "18px", sm: "6px" }}
           gap="16px"
         >
-          <Typography
-            sx={{
-              ...portalTheme.typography.title1Medium,
-              color: portalTheme.palette.text1,
-              whiteSpace: "nowrap",
-              mr: "8px",
-              display: { xs: "none", sm: "block" },
-            }}
-          >
-            Start Date
-          </Typography>
+          <Stack flexShrink={0} alignItems="flex-start">
+            <Typography
+              sx={{
+                ...portalTheme.typography.body1Medium,
+                color: portalTheme.palette.text1,
+                whiteSpace: "nowrap",
+                display: { xs: "none", sm: "block" },
+              }}
+            >
+              Start Date
+            </Typography>
+            <Typography
+              sx={{
+                ...portalTheme.typography.body1Medium,
+                color: portalTheme.palette.text1,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {valueToDate(minValue).format(dateDefault.DISPLAY_FORMAT)}
+            </Typography>
+          </Stack>
           <PlainSlider
             value={dateRangeStamp}
             min={minValue}
@@ -433,47 +444,30 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
             valueLabelFormat={(value: number) =>
               valueToDate(value).format(dateDefault.DISPLAY_FORMAT)
             }
+            sx={{ flex: 1, minWidth: 0 }}
           />
-          <Typography
-            sx={{
-              ...portalTheme.typography.title1Medium,
-              color: portalTheme.palette.text1,
-              whiteSpace: "nowrap",
-              ml: "8px",
-              display: { xs: "none", sm: "block" },
-            }}
-          >
-            On going
-          </Typography>
+          <Stack flexShrink={0} alignItems="flex-end">
+            <Typography
+              sx={{
+                ...portalTheme.typography.body1Medium,
+                color: portalTheme.palette.text1,
+                whiteSpace: "nowrap",
+                display: { xs: "none", sm: "block" },
+              }}
+            >
+              On going
+            </Typography>
+            <Typography
+              sx={{
+                ...portalTheme.typography.body1Medium,
+                color: portalTheme.palette.text1,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {valueToDate(maxValue).format(dateDefault.DISPLAY_FORMAT)}
+            </Typography>
+          </Stack>
         </Stack>
-      </Grid>
-      <Grid
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{
-          mx: "20px",
-          mt: { xs: "2px", md: "6px" },
-          mb: { xs: "2px", md: "6px" },
-        }}
-        size={12}
-      >
-        <Typography
-          sx={{
-            ...portalTheme.typography.body1Medium,
-            color: portalTheme.palette.text1,
-          }}
-        >
-          {valueToDate(minValue).format(dateDefault.DISPLAY_FORMAT)}
-        </Typography>
-        <Typography
-          sx={{
-            ...portalTheme.typography.body1Medium,
-            color: portalTheme.palette.text1,
-          }}
-        >
-          {valueToDate(maxValue).format(dateDefault.DISPLAY_FORMAT)}
-        </Typography>
       </Grid>
     </Grid>
   );
