@@ -1,17 +1,6 @@
 import { useParams } from "react-router-dom";
-import {
-  FC,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import {
-  DatasetMetadata,
-  fetchDatasetMetadataByUuid,
-  fetchResultByUuidNoStore,
-} from "@/app/store/searchReducer";
+import { FC, ReactNode, useCallback, useEffect, useState } from "react";
+import { fetchResultByUuidNoStore } from "@/app/store/searchReducer";
 import { DetailPageContext } from "./detail-page-context";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "@/app/store/hooks";
@@ -46,9 +35,6 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   const [collection, setCollection] = useState<OGCCollection | undefined>(
     undefined
   );
-  const [datasetMetadata, setDatasetMetadata] = useState<
-    DatasetMetadata | undefined
-  >(undefined);
   const [isCollectionNotFound, setIsCollectionNotFound] =
     useState<boolean>(false);
   const [downloadConditions, _setDownloadConditions] = useState<
@@ -128,35 +114,6 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   // never reloads the HTML, so without it the tab would keep showing the previously loaded record's title on this record's page.
   useDocumentTitle(collection?.title);
 
-  useEffect(() => {
-    if (!uuid) return;
-    let cancelled = false;
-    dispatch(fetchDatasetMetadataByUuid(uuid))
-      .unwrap()
-      .then((metadata) => {
-        if (!cancelled) {
-          setDatasetMetadata(metadata);
-        }
-      })
-      .catch((error) => {
-        if (cancelled) return;
-        console.log("Error fetching dataset metadata by UUID:", error);
-        setDatasetMetadata(undefined);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [dispatch, uuid]);
-
-  // PMTiles layer is supported when the dataset_metadata endpoint returns at least
-  // one parquet dataset
-  // TODO: This is a temporary solution until the backend provides a more reliable
-  // way to determine PMTiles support. Before that shall we use the CO keys in Collection?
-  const isSupportPMTiles = useMemo<boolean>(() => {
-    if (!datasetMetadata) return false;
-    return Object.keys(datasetMetadata).some((key) => key.endsWith(".parquet"));
-  }, [datasetMetadata]);
-
   // Layer-aware: GeoServer time support does not imply PMTiles time (and vice versa).
   const isSubsettingSupported = useCallback(
     (type: SubsettingType) =>
@@ -172,8 +129,6 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       value={{
         collection,
         setCollection,
-        datasetMetadata,
-        isSupportPMTiles,
         isCollectionNotFound,
         downloadConditions,
         getAndSetDownloadConditions,

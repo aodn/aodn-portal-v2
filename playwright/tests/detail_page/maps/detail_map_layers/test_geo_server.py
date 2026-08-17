@@ -39,10 +39,12 @@ def test_map_shows_geoserver_layer_with_timeSlider_and_drawRect_support(
     # hide this line because in the Data Access side panel only show downloadable links
     # expect(detail_page.wms_link_header).to_be_visible()
 
-    # Ensure that the GeoServer option is displayed in the layers menu
+    # On mobile the map mounts on the Map tab; idle/resize can close the menu.
+    detail_page.detail_map.wait_for_map_loading()
     detail_page.detail_map.wait_for_map_idle()
-    detail_page.detail_map.layers_menu.click()
-    expect(detail_page.detail_map.geoserver_layer).to_be_visible()
+    detail_page.detail_map.open_layers_menu_until_visible(
+        detail_page.detail_map.geoserver_layer
+    )
 
     # Verify that the Geoserver layer is present and visible on the map
     layer_id = layer_factory.get_layer_id(LayerStyle.GEO_SERVER)
@@ -86,10 +88,11 @@ def test_map_shows_geoserver_layer_with_only_timeSlider_support(
     # hide this line because in the Data Access side panel only show downloadable links
     # expect(detail_page.wms_link_header).to_be_visible()
 
-    # Ensure that the GeoServer option is displayed in the layers menu
+    detail_page.detail_map.wait_for_map_loading()
     detail_page.detail_map.wait_for_map_idle()
-    detail_page.detail_map.layers_menu.click()
-    expect(detail_page.detail_map.geoserver_layer).to_be_visible()
+    detail_page.detail_map.open_layers_menu_until_visible(
+        detail_page.detail_map.geoserver_layer
+    )
 
     # Verify that the Geoserver layer is present and visible on the map
     layer_id = layer_factory.get_layer_id(LayerStyle.GEO_SERVER)
@@ -133,10 +136,12 @@ def test_map_shows_geoserver_layer_with_only_drawRect_support(
     # hide this line because in the Data Access side panel only show downloadable links
     # expect(detail_page.wms_link_header).to_be_visible()
 
-    # Ensure that the GeoServer option is displayed in the layers menu
+    # On mobile the map mounts on the Map tab; idle/resize can close the menu.
+    detail_page.detail_map.wait_for_map_loading()
     detail_page.detail_map.wait_for_map_idle()
-    detail_page.detail_map.layers_menu.click()
-    expect(detail_page.detail_map.geoserver_layer).to_be_visible()
+    detail_page.detail_map.open_layers_menu_until_visible(
+        detail_page.detail_map.geoserver_layer
+    )
 
     # Verify that the Geoserver layer is present and visible on the map
     layer_id = layer_factory.get_layer_id(LayerStyle.GEO_SERVER)
@@ -147,7 +152,9 @@ def test_map_shows_geoserver_layer_with_only_drawRect_support(
         is True
     )
     # Verify that the draw rectangle button is visible
-    expect(detail_page.detail_map.draw_rect_menu_button).to_be_visible()
+    expect(detail_page.detail_map.draw_rect_menu_button).to_be_visible(
+        timeout=_UI_TIMEOUT_MS
+    )
     # Verify that the time slider button is not visible
     expect(
         detail_page.detail_map.daterange_show_hide_menu_button
@@ -181,14 +188,14 @@ def test_map_shows_geoserver_layer_without_timeSlider_and_drawRect_support(
 
     detail_page.load(uuid)
     detail_page.go_to_map_tab()
-    detail_page.detail_map.wait_for_map_idle()
     # hide this line because in the Data Access side panel only show downloadable links
     # expect(detail_page.wms_link_header).to_be_visible()
 
-    # Ensure that the GeoServer option is displayed in the layers menu
-    detail_page.detail_map.layers_menu.click()
+    detail_page.detail_map.wait_for_map_loading()
     detail_page.detail_map.wait_for_map_idle()
-    expect(detail_page.detail_map.geoserver_layer).to_be_visible()
+    detail_page.detail_map.open_layers_menu_until_visible(
+        detail_page.detail_map.geoserver_layer
+    )
 
     # Verify that the Geoserver layer is present and visible on the map
     layer_id = layer_factory.get_layer_id(LayerStyle.GEO_SERVER)

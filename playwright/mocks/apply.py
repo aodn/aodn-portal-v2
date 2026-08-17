@@ -18,6 +18,7 @@ from mocks.api.download_wfs import (
     handle_estimate_co_download,
     handle_estimate_wfs_download,
 )
+from mocks.api.pmtiles import handle_pmtiles_metadata_api
 from mocks.api.search_collections import (
     handle_provider_api,
     handle_temporal_api,
@@ -69,3 +70,4 @@ def apply_mock(page: Page) -> None:
     api_router.route_estimate_wfs_download(handle_estimate_wfs_download)
     api_router.route_estimate_co_download(handle_estimate_co_download)
     api_router.route_static_geojson(handle_static_geojson_api)
+    api_router.route_pmtiles_metadata(handle_pmtiles_metadata_api)

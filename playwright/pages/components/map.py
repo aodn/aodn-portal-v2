@@ -1,6 +1,6 @@
 import random
 
-from playwright.sync_api import Page, TimeoutError
+from playwright.sync_api import Locator, Page, TimeoutError, expect
 
 from pages.base_page import BasePage
 from pages.js_scripts.js_utils import (
@@ -62,6 +62,34 @@ class Map(BasePage):
             # assume the search is complete and ignore the exception.
             pass
         self.progress_indicator.wait_for(state='hidden', timeout=30 * 1000)
+
+    def open_layers_menu_until_visible(
+        self, locator: Locator, timeout_ms: int = 30_000
+    ) -> None:
+        """
+        Open the layer styles menu and wait until ``locator`` is visible.
+
+        Map resize / idle events can dismiss the Popper after click. Re-open
+        only when the menu is closed so we do not toggle it shut while
+        PMTiles options are still mounting after the `.metadata` probe.
+        """
+        layers_menu_panel = self.page.get_by_test_id('layer-style-menu-items')
+        expect(self.layers_menu).to_be_visible(timeout=timeout_ms)
+
+        deadline = self.page.evaluate('() => Date.now()') + timeout_ms
+        last_error = None
+        while self.page.evaluate('() => Date.now()') < deadline:
+            if not layers_menu_panel.is_visible():
+                self.layers_menu.click()
+            try:
+                expect(locator).to_be_visible(timeout=2_000)
+                return
+            except AssertionError as exc:
+                last_error = exc
+                self.page.wait_for_timeout(200)
+        if last_error is not None:
+            raise last_error
+        expect(locator).to_be_visible(timeout=1_000)
 
     def wait_for_layer_select_loading(self) -> None:
         """

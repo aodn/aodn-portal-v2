@@ -147,10 +147,11 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     downloadService,
     selectedCoKey,
     setSelectedCoKey,
-    isSupportPMTiles,
     setMapSubsettingCapabilities,
     isSubsettingSupported,
   } = useDetailPageContext();
+
+  const [isSupportPMTiles, setIsSupportPMTiles] = useState(false);
 
   const [mapLayerConfig, setMapLayerConfig] = useState<
     LayerSwitcherLayer<LayerName>[]
@@ -561,17 +562,16 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
               bbox={mapFocusArea}
             />
             {createStaticLayers(staticLayer)}
-            {isSupportPMTiles && ( // Avoid fetching S3 when not support PMTiles
-              <PMTilesHexLayer
-                collection={collection}
-                filterStartDate={filterStartDate}
-                filterEndDate={filterEndDate}
-                visible={selectedMapLayerId === LayerName.PMTiles}
-                selectedCoKey={selectedCoKey}
-                onSelectCoKey={setSelectedCoKey}
-                onMetadataPeriodChange={handlePmtilesMetadataPeriodChange}
-              />
-            )}
+            <PMTilesHexLayer
+              collection={collection}
+              filterStartDate={filterStartDate}
+              filterEndDate={filterEndDate}
+              visible={selectedMapLayerId === LayerName.PMTiles}
+              selectedCoKey={selectedCoKey}
+              onSelectCoKey={setSelectedCoKey}
+              onMetadataPeriodChange={handlePmtilesMetadataPeriodChange}
+              onSupportChange={setIsSupportPMTiles}
+            />
             <GeoServerLayer
               geoServerLayerConfig={geoServerLayerConfig}
               onWMSAvailabilityChange={onWMSAvailabilityChange}
