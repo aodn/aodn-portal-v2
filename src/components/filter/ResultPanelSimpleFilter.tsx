@@ -74,7 +74,7 @@ const ResultPanelSimpleFilter: FC<ResultPanelSimpleFilterProps> = ({
           height: SIMPLE_FILTER_DEFAULT_HEIGHT,
           border: `0.5px solid ${portalTheme.palette.grey500}`,
           borderRadius: "6px",
-          bgcolor: portalTheme.palette.primary6,
+          backgroundColor: portalTheme.palette.primary6,
           flexGrow: 1,
         }}
         data-testid="show-result-count"

@@ -204,6 +204,18 @@ export const designTokensRC8 = {
       tag2: "#F6F0ED",
     },
   },
+
+  // ===========================
+  // Border radius
+  // Same scale as legacy theme.borderRadius (sm–xxlg)
+  // ===========================
+  borderRadius: {
+    sm: "5px",
+    md: "8px",
+    lg: "10px",
+    xlg: "15px",
+    xxlg: "20px",
+  },
 };
 
 // Convenience exports

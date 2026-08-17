@@ -82,11 +82,11 @@ class SearchComponent(BasePage):
         This method simulates user interactions to apply search criteria including date range, location,
         parameters, platforms, organisation, data update frequency, and optionally data availability
         for download.
-        """
-        self.date_button.click()
-        self.get_radio_input(date).click()
-        expect(self.get_radio_input(date)).to_be_checked()
 
+        Date is applied last. Switching away from the date popup unmounts
+        DateRangeFilter, and a late map/URL sync can restore an empty
+        dateTimeFilterRange over the radio we just chose.
+        """
         self.location_button.click()
         self.page.get_by_label(location).click()
         expect(self.page.get_by_label(location)).to_be_checked()
@@ -120,6 +120,10 @@ class SearchComponent(BasePage):
         if filter_data_download != '':
             self.get_popup_button(filter_data_download).click()
             self.assert_toggle_button_pressed(filter_data_download)
+
+        self.date_button.click()
+        self.get_radio_input(date).click()
+        expect(self.get_radio_input(date)).to_be_checked()
 
     def assert_search_state_persisted(
         self,

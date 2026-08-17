@@ -52,6 +52,10 @@ import {
   buildCountFilterRange,
   buildCountFilterRangeFromPeriods,
   PMTilesMetadataRange,
+  buildPmtilesSourceUrl,
+  buildPmtilesMetadataUrl,
+  parquetKeyCandidates,
+  probePmtilesMetadata,
 } from "../Common";
 
 /** Test helper: parsePeriodInt that throws if parse fails. */
@@ -1257,5 +1261,90 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     expect(work).not.toHaveBeenCalled();
     await new Promise((r) => setTimeout(r, 40));
     expect(work).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("PMTilesLayer - URL helpers and metadata probe", () => {
+  const collectionId = "collection-id";
+
+  it("builds sibling .pmtiles and .metadata URLs", () => {
+    const source = buildPmtilesSourceUrl(collectionId, "soop_ba.parquet");
+    const metadata = buildPmtilesMetadataUrl(collectionId, "soop_ba.parquet");
+    expect(source).toContain(
+      `/portal/visualization/${collectionId}/soop_ba.parquet.pmtiles`
+    );
+    expect(metadata).toContain(
+      `/portal/visualization/${collectionId}/soop_ba.parquet.metadata`
+    );
+    expect(source.replace(".pmtiles", ".metadata")).toBe(metadata);
+  });
+
+  it("puts the selected parquet key first among candidates", () => {
+    expect(
+      parquetKeyCandidates(["a.parquet", "b.parquet"], "b.parquet")
+    ).toEqual(["b.parquet", "a.parquet"]);
+    expect(parquetKeyCandidates(["a.parquet"], "zarr-only.zarr")).toEqual([
+      "a.parquet",
+    ]);
+    expect(parquetKeyCandidates(["a.parquet"], "  ")).toEqual(["a.parquet"]);
+  });
+
+  it("treats HTTP OK as support even when JSON is malformed", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.reject(new Error("not json")),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await probePmtilesMetadata(collectionId, ["a.parquet"]);
+    expect(result).toEqual({
+      key: "a.parquet",
+      metadataUrl: buildPmtilesMetadataUrl(collectionId, "a.parquet"),
+      data: null,
+    });
+    vi.unstubAllGlobals();
+  });
+
+  it("walks remaining keys after 404 and skips failed fetches", async () => {
+    const fetchMock = vi.fn(async (url: string) => {
+      if (String(url).includes("missing.parquet")) {
+        return { ok: false, status: 404, json: async () => ({}) };
+      }
+      return {
+        ok: true,
+        json: async () => ({ min_date: 20100101, max_date: 20101231 }),
+      };
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await probePmtilesMetadata(collectionId, [
+      "missing.parquet",
+      "ok.parquet",
+    ]);
+    expect(result?.key).toBe("ok.parquet");
+    expect(result?.data).toEqual({
+      min_date: 20100101,
+      max_date: 20101231,
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    vi.unstubAllGlobals();
+  });
+
+  it("returns null when no sidecar exists so no source URL can be built", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 404,
+        json: async () => ({}),
+      })
+    );
+
+    const result = await probePmtilesMetadata(collectionId, ["gone.parquet"]);
+    expect(result).toBeNull();
+    expect(
+      result ? buildPmtilesSourceUrl(collectionId, result.key) : undefined
+    ).toBeUndefined();
+    vi.unstubAllGlobals();
   });
 });

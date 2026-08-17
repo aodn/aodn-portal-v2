@@ -29,11 +29,15 @@ def test_map_shows_data_density_layer(responsive_page: Page, uuid: str) -> None:
 
     detail_page.load(uuid)
     detail_page.go_to_map_tab()
+    detail_page.detail_map.wait_for_map_loading()
     detail_page.detail_map.wait_for_layer_select_loading()
+    detail_page.detail_map.wait_for_map_idle()
 
-    # Ensure that the Data Density and GeoServer options are displayed
-    detail_page.detail_map.layers_menu.click()
-    expect(detail_page.detail_map.data_density_layer).to_be_visible()
+    # Data Density appears after the mocked `.metadata` sidecar probe, and
+    # map idle/resize can close the layer menu before the radio mounts.
+    detail_page.detail_map.open_layers_menu_until_visible(
+        detail_page.detail_map.data_density_layer
+    )
     expect(detail_page.detail_map.geoserver_layer).to_be_visible()
 
     # Verify that Data Density is present and visible on the map by default

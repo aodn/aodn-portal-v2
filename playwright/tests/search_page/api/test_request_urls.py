@@ -346,6 +346,8 @@ def test_search_api_request_urls_reflect_parameter_updates(
 
     # Update search state
     search_page.search.clear_all_button.click()  # Reset before update
+    # Let map/URL debounce from clear-all finish before applying new filters.
+    search_page.wait_for_page_stabilization()
     search_page.search.set_search_state(
         updated_date,
         updated_location,

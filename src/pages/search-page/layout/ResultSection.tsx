@@ -12,7 +12,7 @@ import { RootState, getSearchQueryResult } from "@/app/store/store";
 import BookmarkListButton, {
   BookmarkListButtonBasicType,
 } from "../../../components/result/BookmarkListButton";
-import { SearchResultLayoutEnum } from "../../../components/common/buttons/ResultListLayoutButton";
+import { SearchResultLayoutEnum } from "@/components/common/buttons/ResultListLayoutButton";
 import useBreakpoint from "../../../hooks/useBreakpoint";
 import {
   SEARCH_PAGE_RESULT_SECTION_CONTAINER_MAX_WIDTH,

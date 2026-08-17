@@ -590,6 +590,8 @@ const SearchPage = () => {
         justifyContent: "space-between",
         alignItems: "stretch",
         width: "100%",
+        flex: { md: 1 },
+        minHeight: { md: 0 },
         height: {
           xs:
             layout === SearchResultLayoutEnum.FULL_MAP
@@ -598,6 +600,7 @@ const SearchPage = () => {
           md: SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_ABOVE_LAPTOP,
         },
         overflowX: "hidden",
+        overflowY: { md: "hidden" },
         padding: isUnderLaptop ? "10px" : "24px",
         bgcolor: color.blue.light,
       }}

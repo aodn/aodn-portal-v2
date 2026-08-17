@@ -36,7 +36,6 @@
  * LEGACY FEATURES (to be removed after migration):
  * - theme.border.* (detailBtnLight, detailSubtabBtn, detailNa)
  * - theme.mp.* (nil, xs, sm, md, lg, xlg, xxlg)
- * - theme.borderRadius.* (sm, md, lg, xlg, xxlg)
  * - theme.palette.detail.*
  * - Typography variants: detailTitle, detailContent
  *
@@ -44,7 +43,8 @@
  * - theme.designTokens.* (complete RC8 design system)
  * - Typography variants: slogan1, slogan2, heading1-4, title1Medium, etc.
  * - Palette: primary1-6, secondary1, text1-3, grey100-700, etc.
- * - Future: rc8Spacing, rc8Breakpoints, rc8Elevation, rc8BorderRadius
+ * - theme.borderRadius.* (sm, md, lg, xlg, xxlg) — on portalTheme
+ * - Future: rc8Spacing, rc8Breakpoints, rc8Elevation
  */
 
 import { createTheme, Shadows, ThemeOptions } from "@mui/material/styles";
