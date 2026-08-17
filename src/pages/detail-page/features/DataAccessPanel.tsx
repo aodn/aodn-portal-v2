@@ -39,10 +39,10 @@ const getOptimizedPythonNotebookLinks = (
   if (!links) return undefined;
 
   // First, try to find optimized Python notebook links
-  const optimizedLinks = links.filter(
-    (link) =>
-      link.title.toLowerCase() ===
-      OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE.toLowerCase()
+  const optimizedLinks = links.filter((link) =>
+    link.title
+      .toLowerCase()
+      .includes(OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE.toLowerCase())
   );
 
   // If found, return them
@@ -51,10 +51,10 @@ const getOptimizedPythonNotebookLinks = (
   }
 
   // Otherwise, fall back to example links
-  const exampleLinks = links.filter(
-    (link) =>
-      link.title.toLowerCase() ===
-      PYTHON_NOTEBOOK_EXAMPLE_LINK_TITLE.toLowerCase()
+  const exampleLinks = links.filter((link) =>
+    link.title
+      .toLowerCase()
+      .includes(PYTHON_NOTEBOOK_EXAMPLE_LINK_TITLE.toLowerCase())
   );
 
   return exampleLinks.length > 0 ? exampleLinks : undefined;
@@ -68,11 +68,14 @@ const getVisibleTutorialLinks = (
   if (!links) return undefined;
 
   const notebookTitles = [
-    OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE.toLowerCase(),
-    PYTHON_NOTEBOOK_EXAMPLE_LINK_TITLE.toLowerCase(),
+    OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE,
+    PYTHON_NOTEBOOK_EXAMPLE_LINK_TITLE,
   ];
   const otherTutorialLinks = links.filter(
-    (link) => !notebookTitles.includes(link.title.toLowerCase())
+    (link) =>
+      !notebookTitles.some((title) =>
+        link.title.toLowerCase().includes(title.toLowerCase())
+      )
   );
   const preferredNotebookLinks = getOptimizedPythonNotebookLinks(links) ?? [];
 
