@@ -40,5 +40,5 @@ class Routes:
 
     # S3 sidecar next to `{key}.pmtiles` — used to decide PMTiles support.
     PMTILES_METADATA = re.compile(
-        r'https://[^/]+\.amazonaws\.com/portal/visualization/.+\.metadata(?:\?.*)?$'
+        r'.*/portal/visualization/.+\.metadata(?:\?.*)?$'
     )
