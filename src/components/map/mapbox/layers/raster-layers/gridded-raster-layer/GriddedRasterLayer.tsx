@@ -1,12 +1,12 @@
 import { FC, useContext, useEffect, useMemo, useRef } from "react";
 import { Button, Stack, Typography } from "@mui/material";
 import { RasterTileSource } from "mapbox-gl";
-import MapContext from "../../MapContext";
-import { LayerBasicType } from "../Layers";
-import { MapDefaultConfig, MapEventEnum } from "../../constants";
-import { addDataLayer } from "../../layerOrder";
-import MapLayerSelect from "../../component/MapLayerSelect";
-import { TestHelper } from "../../../../common/test/helper";
+import MapContext from "../../../MapContext";
+import { LayerBasicType } from "../../Layers";
+import { MapDefaultConfig, MapEventEnum } from "../../../constants";
+import { addDataLayer } from "../../../layerOrder";
+import MapLayerSelect from "../../../component/MapLayerSelect";
+import { TestHelper } from "../../../../../common/test/helper";
 import { borderRadius, zIndex } from "@/styles/constants";
 import { portalTheme } from "@/styles";
 import { GriddedRasterProduct } from "@/app/store/GriddedTileDefinitions";

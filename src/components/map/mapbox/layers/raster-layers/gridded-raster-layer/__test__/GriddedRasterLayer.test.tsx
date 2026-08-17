@@ -1,13 +1,13 @@
 import { act, render, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import MapContext from "../../../MapContext";
-import { MapEventEnum } from "../../../constants";
+import MapContext from "../../../../MapContext";
+import { MapEventEnum } from "../../../../constants";
 import { GriddedRasterProduct } from "@/app/store/GriddedTileDefinitions";
 import GriddedRasterLayer, {
   GRIDDED_RASTER_MAX_ZOOM,
 } from "../GriddedRasterLayer";
 import { buildGriddedTileUrl } from "../Common";
-import * as layerOrder from "../../../layerOrder";
+import * as layerOrder from "../../../../layerOrder";
 
 vi.mock("mapbox-gl", () => ({}));
 

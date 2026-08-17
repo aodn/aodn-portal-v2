@@ -34,7 +34,7 @@ import { Feature, MultiPolygon, Polygon } from "geojson";
 import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
 import GeoServerLayer, {
   Dimension,
-} from "../../../components/map/mapbox/layers/GeoServerLayer";
+} from "../../../components/map/mapbox/layers/raster-layers/GeoServerLayer";
 import MapLayerSwitcher, {
   LayerName,
   LayerSwitcherLayer,
@@ -64,9 +64,9 @@ import {
   metadataRangeToDayjs,
   type PMTilesMetadata,
 } from "@/components/map/mapbox/layers/pmtiles/Common";
-import GriddedRasterLayer from "@/components/map/mapbox/layers/gridded/GriddedRasterLayer";
-import useGriddedRasterProducts from "@/components/map/mapbox/layers/gridded/useGriddedRasterProducts";
-import { buildTileDateMarks } from "@/components/map/mapbox/layers/gridded/Common";
+import GriddedRasterLayer from "@/components/map/mapbox/layers/raster-layers/gridded-raster-layer/GriddedRasterLayer";
+import useGriddedRasterProducts from "@/components/map/mapbox/layers/raster-layers/gridded-raster-layer/useGriddedRasterProducts";
+import { buildTileDateMarks } from "@/components/map/mapbox/layers/raster-layers/gridded-raster-layer/Common";
 
 const mapContainerId = "map-detail-container-id";
 
