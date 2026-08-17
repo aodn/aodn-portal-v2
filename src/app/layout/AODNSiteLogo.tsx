@@ -1,4 +1,5 @@
 import { Box } from "@mui/material";
+import { useLocation } from "react-router-dom";
 import useBreakpoint from "@/hooks/useBreakpoint";
 import useRedirectHome from "@/hooks/useRedirectHome";
 import {
@@ -10,7 +11,10 @@ import { IconImosLogoWithTitle } from "@/components/icon/IconImosLogoWithTitle";
 
 const AODNSiteLogo = () => {
   const { isMobile } = useBreakpoint();
+  const { pathname } = useLocation();
   const redirectHome = useRedirectHome();
+  const isLandingPage = pathname === pageDefault.landing;
+
   return (
     <Box
       component={"a"}
@@ -20,7 +24,7 @@ const AODNSiteLogo = () => {
         justifyContent: "flex-start",
         height: isMobile ? AODN_SITE_LOGO_HEIGHT_MOBILE : AODN_SITE_LOGO_HEIGHT,
         minWidth: isMobile ? "0" : "320px",
-        cursor: "pointer",
+        cursor: isLandingPage ? "default" : "pointer",
         "& svg": {
           maxWidth: "100%",
           height: "auto",

@@ -148,4 +148,22 @@ describe("Header Searchbar Expansion", () => {
       expect(updatedDividers.length).toBe(1);
     });
   });
+
+  it("should use the default cursor for the home logo on the landing page", () => {
+    mockLocation.pathname = "/";
+
+    renderHeader();
+
+    expect(screen.getByTestId("aodn-home-link")).toHaveStyle({
+      cursor: "default",
+    });
+  });
+
+  it("should keep the pointer cursor for the home logo on other pages", () => {
+    renderHeader();
+
+    expect(screen.getByTestId("aodn-home-link")).toHaveStyle({
+      cursor: "pointer",
+    });
+  });
 });
