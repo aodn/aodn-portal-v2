@@ -89,8 +89,8 @@ const MapLayerSelect: FC<MapLayerSelectProps> = ({
           sx={{
             backgroundColor: "#fff",
             border: "none",
-            borderRadius: `${borderRadius.small} ${borderRadius.small} 0 0`,
-            boxShadow: theme.shadows[1],
+            borderRadius: 0,
+            boxShadow: "none",
             alignContent: "center",
             alignItems: "center",
             p: "12px",
@@ -127,8 +127,8 @@ const MapLayerSelect: FC<MapLayerSelectProps> = ({
           sx={{
             backgroundColor: "#fff",
             border: "none",
-            borderRadius: `${borderRadius.small} ${borderRadius.small} 0 0`,
-            boxShadow: theme.shadows[1],
+            borderRadius: 0,
+            boxShadow: "none",
             alignContent: "center",
             alignItems: "center",
           }}
