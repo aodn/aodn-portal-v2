@@ -1231,9 +1231,9 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     <>
       {visible && (
         <MapLayerSelect
-          mapLayersOptions={datasetOptions}
-          selectedItem={selectedCoKey || ""}
-          handleSelectItem={handleSelectDataset}
+          layersOptions={datasetOptions}
+          selectedLayer={selectedCoKey || ""}
+          handleSelectLayer={handleSelectDataset}
           isLoading={false}
           loadingText="Loading Data Density Layers..."
         />

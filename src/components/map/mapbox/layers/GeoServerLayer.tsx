@@ -715,9 +715,9 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     <>
       {visible && (
         <MapLayerSelect
-          mapLayersOptions={wmsLayers}
-          selectedItem={selectedWmsLayer}
-          handleSelectItem={(value: string) => handleWmsLayerChange(value)}
+          layersOptions={wmsLayers}
+          selectedLayer={selectedWmsLayer}
+          handleSelectLayer={(value: string) => handleWmsLayerChange(value)}
           isLoading={isFetchingWmsLayers}
           loadingText="Fetching Geoserver Layers..."
         />
