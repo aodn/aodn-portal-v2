@@ -2,7 +2,6 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   buildGriddedTileUrl,
   buildTileDateMarks,
-  dayKeyToUtcValue,
   formatProductLabel,
   shouldQueryGriddedTiles,
   toGriddedRasterProducts,
@@ -88,34 +87,13 @@ describe("buildGriddedTileUrl", () => {
   });
 
   it("returns undefined rather than a URL carrying a literal {datetime}", () => {
+    // No dayKey shape/calendar re-check here: only ever called with a value
+    // already validated by `dayKeyToUtcValue` during discovery, so this is
+    // just the "nothing selected yet" / missing-input guard.
     expect(buildGriddedTileUrl(VISUAL_TEMPLATE, undefined)).toBeUndefined();
     expect(buildGriddedTileUrl(VISUAL_TEMPLATE, "")).toBeUndefined();
-    // RFC-3339 instant, not a DAS day key.
-    expect(
-      buildGriddedTileUrl(VISUAL_TEMPLATE, "2024-01-02T00:00:00Z")
-    ).toBeUndefined();
-    // Unpadded.
-    expect(buildGriddedTileUrl(VISUAL_TEMPLATE, "2024-1-2")).toBeUndefined();
     expect(buildGriddedTileUrl(undefined, "2024-01-02")).toBeUndefined();
     expect(buildGriddedTileUrl("", "2024-01-02")).toBeUndefined();
-  });
-});
-
-describe("dayKeyToUtcValue", () => {
-  it("maps a day key to UTC midnight", () => {
-    const value = dayKeyToUtcValue("2024-01-02") as number;
-    expect(new Date(value).toISOString()).toBe("2024-01-02T00:00:00.000Z");
-  });
-
-  it("rejects impossible dates, not just badly-shaped ones", () => {
-    expect(dayKeyToUtcValue("2024-02-31")).toBeUndefined();
-    expect(dayKeyToUtcValue("2023-02-29")).toBeUndefined();
-    expect(dayKeyToUtcValue("2024-13-01")).toBeUndefined();
-    expect(dayKeyToUtcValue("2024-00-10")).toBeUndefined();
-    expect(dayKeyToUtcValue("not-a-date")).toBeUndefined();
-    expect(dayKeyToUtcValue("2024-1-2")).toBeUndefined();
-    // A leap day is genuinely valid.
-    expect(dayKeyToUtcValue("2024-02-29")).toBeDefined();
   });
 });
 

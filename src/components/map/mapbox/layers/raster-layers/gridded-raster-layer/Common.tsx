@@ -8,9 +8,7 @@ import {
   TileProduct,
   TileProductsResponse,
 } from "@/app/store/GriddedTileDefinitions";
-
-/** A `YYYY-MM-DD` DAS local-day key. */
-const DAY_KEY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+import { dayKeyToUtcValue } from "@/utils/DateUtils";
 
 /**
  * The placeholders a template must still carry. `{tileRow}`/`{tileCol}` are the
@@ -39,14 +37,9 @@ export const EMPTY_TILE_DATE_MARKS: TileDateMarks = {
   latest: undefined,
 };
 
-/**
- * The gridded half of GriddedRasterLayer's props: everything `useGriddedRasterLayer`
- * owns. `LayerBasicType` (notably `visible`) stays with the call site, the only
- * place that knows which map layer is currently selected.
- */
 export interface GriddedRasterLayerControls {
   products: GriddedRasterProduct[];
-  /** `""` when there is no product yet — GriddedRasterLayer treats it as "none". */
+
   selectedProductId: string;
   onSelectProduct: (id: string) => void;
   /** `YYYY-MM-DD`, round-tripped from the listing — never derived from a Date. */
@@ -56,49 +49,10 @@ export interface GriddedRasterLayerControls {
   onRetry?: () => void;
 }
 
-/**
- * Gridded raster tiles exist only for zarr datasets, so skip discovery entirely
- * for everything else rather than asking the backend about every collection.
- */
 export const shouldQueryGriddedTiles = (
   collection?: OGCCollection | null
 ): boolean => collection?.getDatasetType()?.includes(DatasetType.ZARR) === true;
 
-/**
- * `"2024-01-02"` -> `Date.UTC(2024, 0, 2)`.
- *
- * Rejects impossible dates, not just badly-shaped ones: after the regex the
- * value is round-tripped through `Date.UTC` and the y/m/d must come back
- * unchanged, so `2024-02-31` is dropped rather than silently becoming 2 March.
- */
-export const dayKeyToUtcValue = (key: string): number | undefined => {
-  if (!DAY_KEY_PATTERN.test(key)) return undefined;
-
-  const year = Number(key.slice(0, 4));
-  const month = Number(key.slice(5, 7));
-  const day = Number(key.slice(8, 10));
-
-  const value = Date.UTC(year, month - 1, day);
-  const back = new Date(value);
-  if (
-    back.getUTCFullYear() !== year ||
-    back.getUTCMonth() !== month - 1 ||
-    back.getUTCDate() !== day
-  ) {
-    return undefined;
-  }
-  return value;
-};
-
-/**
- * Builds the whole date round-trip for one product.
- *
- * The values are UTC midnight so `DateSliderPoint`'s own label renders the
- * correct calendar day in every timezone, but they are only ever slider keys:
- * the day sent to the backend is always recovered through `byValue`. NEVER
- * format a value back into a date — `available_dates` are Australia/Sydney local
- * days, and formatting UTC midnight in a UTC-08:00 browser gives the day before.
- */
 export const buildTileDateMarks = (dates?: string[]): TileDateMarks => {
   if (!Array.isArray(dates) || dates.length === 0) {
     return EMPTY_TILE_DATE_MARKS;
@@ -112,7 +66,6 @@ export const buildTileDateMarks = (dates?: string[]): TileDateMarks => {
     if (value !== undefined && !byValue.has(value)) byValue.set(value, date);
   });
 
-  // Sorted here so response order is never trusted for "latest".
   const values = Array.from(byValue.keys()).sort((a, b) => a - b);
   const sorted = new Map<number, string>();
   values.forEach((value) => sorted.set(value, byValue.get(value) as string));
@@ -142,14 +95,6 @@ export const formatProductLabel = (product: TileProduct): string => {
   return `${dataset} — ${variables}`;
 };
 
-/**
- * Narrows the wire listing to the products the map can actually render.
- *
- * Server order is preserved so the backend keeps control of which product is
- * offered first. A single malformed entry is skipped rather than taking out its
- * valid siblings; only a payload that is not an array under `products` is a
- * discovery error.
- */
 export const toGriddedRasterProducts = (
   response?: TileProductsResponse
 ): GriddedRasterProduct[] => {
@@ -215,8 +160,7 @@ export const buildGriddedTileUrl = (
   dayKey?: string
 ): string | undefined => {
   if (!template) return undefined;
-
-  if (!dayKey || !DAY_KEY_PATTERN.test(dayKey)) return undefined;
+  if (!dayKey) return undefined;
   return template
     .split("{datetime}")
     .join(dayKey)

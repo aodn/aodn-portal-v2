@@ -9,7 +9,7 @@ import {
   OGCCollection,
 } from "@/app/store/OGCCollectionDefinitions";
 import { TileProduct } from "@/app/store/GriddedTileDefinitions";
-import { dayKeyToUtcValue } from "../Common";
+import { dayKeyToUtcValue } from "@/utils/DateUtils";
 import useGriddedRasterLayer from "../useGriddedRasterLayer";
 
 const wrapper = ({ children }: { children: ReactNode }) => (

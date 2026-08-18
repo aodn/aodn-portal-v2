@@ -1,6 +1,7 @@
 // This file is only for date time related helper methods e.g comparing dates, convert timezone, etc.
 
-import dayjs, { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "@/utils/DayjsUtils";
+import { dateDefault } from "@/components/common/constants";
 
 /**
  * Converts a date string from ISO 8601 format to a more readable format.
@@ -42,3 +43,8 @@ export const dayjsToDayPeriod = (d: Dayjs): number =>
 /** Calendar month → YYYYMM integer. */
 export const dayjsToMonthPeriod = (d: Dayjs): number =>
   d.year() * 100 + (d.month() + 1);
+
+export const dayKeyToUtcValue = (key: string): number | undefined => {
+  const parsed = dayjs.utc(key, dateDefault.DATE_FORMAT, true);
+  return parsed.isValid() ? parsed.valueOf() : undefined;
+};
