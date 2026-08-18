@@ -34,7 +34,7 @@ import { Feature, MultiPolygon, Polygon } from "geojson";
 import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
 import GeoServerLayer, {
   Dimension,
-} from "../../../components/map/mapbox/layers/GeoServerLayer";
+} from "../../../components/map/mapbox/layers/raster-layers/GeoServerLayer";
 import MapLayerSwitcher, {
   LayerName,
   LayerSwitcherLayer,
@@ -64,6 +64,8 @@ import {
   metadataRangeToDayjs,
   type PMTilesMetadata,
 } from "@/components/map/mapbox/layers/pmtiles/Common";
+import GriddedRasterLayer from "@/components/map/mapbox/layers/raster-layers/gridded-raster-layer/GriddedRasterLayer";
+import useGriddedRasterLayer from "@/components/map/mapbox/layers/raster-layers/gridded-raster-layer/useGriddedRasterLayer";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -73,7 +75,8 @@ export const buildMapLayerConfig = (
   isWMSAvailable: boolean,
   hasSpatialExtent: boolean,
   isSupportPMTiles: boolean,
-  lastSelectedLayer: LayerSwitcherLayer<LayerName> | null = null
+  lastSelectedLayer: LayerSwitcherLayer<LayerName> | null = null,
+  hasGriddedProducts: boolean = false
 ): LayerSwitcherLayer<LayerName>[] => {
   const layers: LayerSwitcherLayer<LayerName>[] = [];
 
@@ -86,8 +89,12 @@ export const buildMapLayerConfig = (
       datasetTypes.includes(DatasetType.PARQUET) ||
       datasetTypes.includes(DatasetType.ZARR);
 
+    // Gridded Data takes priority over Spatial Extent — when a zarr record
+    // has gridded raster products, there is no need to also offer the
+    // Spatial Extent layer.
     const isSupportSpatialExtent =
       hasSpatialExtent &&
+      !hasGriddedProducts &&
       (zarrOnlyDataset ||
         (!isWMSAvailable && !hasCoDensity && !isSupportPMTiles));
 
@@ -109,6 +116,15 @@ export const buildMapLayerConfig = (
       layers.push(l);
     }
 
+    if (hasGriddedProducts) {
+      const l: LayerSwitcherLayer<LayerName> = {
+        id: LayerName.GriddedRaster,
+        name: "Gridded Data",
+        selected: false,
+      };
+      layers.push(l);
+    }
+
     if (isSupportSpatialExtent) {
       const l: LayerSwitcherLayer<LayerName> = {
         id: LayerName.SpatialExtent,
@@ -118,8 +134,11 @@ export const buildMapLayerConfig = (
       layers.push(l);
     }
 
-    if (lastSelectedLayer) {
-      layers.forEach((l) => (l.selected = l.id === lastSelectedLayer.id));
+    const lastId = lastSelectedLayer?.id;
+    const lastStillExists =
+      lastId !== undefined && layers.some((l) => l.id === lastId);
+    if (lastStillExists) {
+      layers.forEach((l) => (l.selected = l.id === lastId));
     } else if (
       layers.length > 0 &&
       layers.find((l) => l.selected) === undefined
@@ -194,9 +213,27 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     [collection]
   );
 
-  const [noMapPreview, minDateStamp, maxDateStamp] = useMemo(() => {
+  const {
+    hasProducts: hasGriddedProducts,
+    hasDates: hasGriddedDates,
+    layerProps: griddedLayerProps,
+    dateSliderKey: griddedDateSliderKey,
+    dateSliderProps: griddedDateSliderProps,
+  } = useGriddedRasterLayer(collection);
+
+  // Only surface the gridded-layer's fetch error while it's the selected map
+  // layer — an error in a hidden layer shouldn't announce itself.
+  const griddedRasterErrorAnnouncement =
+    selectedMapLayerId === LayerName.GriddedRaster && griddedLayerProps.error
+      ? "Gridded Data is temporarily unavailable"
+      : undefined;
+
+  const hasSpatialExtent = useMemo(() => {
     const bbox = collection?.getBBox();
-    const hasSpatialExtent = Array.isArray(bbox) && bbox.length > 0;
+    return Array.isArray(bbox) && bbox.length > 0;
+  }, [collection]);
+
+  const [noMapPreview, minDateStamp, maxDateStamp] = useMemo(() => {
     const scope = collection?.getScope();
     const isDocumentScope = scope?.toLowerCase() === "document";
     const noMapPreview = isDocumentScope
@@ -229,6 +266,17 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       }
     }
 
+    return [noMapPreview, start, end];
+  }, [
+    collection,
+    downloadService,
+    hasSpatialExtent,
+    isWMSAvailable,
+    selectedMapLayerId,
+    pmtilesPeriodRange,
+  ]);
+
+  useEffect(() => {
     startTransition(() => {
       setMapLayerConfig(
         buildMapLayerConfig(
@@ -236,20 +284,18 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
           isWMSAvailable,
           hasSpatialExtent,
           isSupportPMTiles,
-          lastSelectedMapLayer
+          lastSelectedMapLayer,
+          hasGriddedProducts
         )
       );
     });
-
-    return [noMapPreview, start, end];
   }, [
     collection,
-    downloadService,
     isWMSAvailable,
+    hasSpatialExtent,
     isSupportPMTiles,
     lastSelectedMapLayer,
-    selectedMapLayerId,
-    pmtilesPeriodRange,
+    hasGriddedProducts,
   ]);
 
   const [filterStartDate, filterEndDate] = useMemo(() => {
@@ -364,6 +410,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       downloadServiceAvailable:
         downloadService !== DownloadServiceType.Unavailable,
       hasCloudOptimisedData,
+      griddedRasterHasDates: hasGriddedDates,
     });
   }, [
     selectedMapLayerId,
@@ -375,6 +422,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     hasCloudOptimisedData,
     minDateStamp,
     maxDateStamp,
+    hasGriddedDates,
     setMapSubsettingCapabilities,
   ]);
 
@@ -400,6 +448,34 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     },
     []
   );
+
+  const additionalSlider = useMemo(() => {
+    if (selectedMapLayerId === LayerName.GriddedRaster) {
+      return hasGriddedDates ? (
+        <DateSliderPoint
+          key={griddedDateSliderKey}
+          {...griddedDateSliderProps}
+        />
+      ) : undefined;
+    }
+    if (discreteTimeSliderValues) {
+      return (
+        <DateSliderPoint
+          valid_points={discreteTimeSliderValues?.get(selectedWmsLayer)}
+          onDatePointChange={handleSliderPointChange}
+        />
+      );
+    }
+    return undefined;
+  }, [
+    discreteTimeSliderValues,
+    griddedDateSliderKey,
+    griddedDateSliderProps,
+    hasGriddedDates,
+    handleSliderPointChange,
+    selectedMapLayerId,
+    selectedWmsLayer,
+  ]);
 
   const onWMSAvailabilityChange = useCallback((isAvailable: boolean) => {
     setIsWMSAvailable(isAvailable);
@@ -492,7 +568,9 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
           panelId={mapContainerId}
           projection={"mercator"}
           announcement={
-            noMapPreview ? "Dataset preview is not available" : undefined
+            noMapPreview
+              ? "Dataset preview is not available"
+              : griddedRasterErrorAnnouncement
           }
           onMoveEvent={handleMapChange}
           onZoomEvent={handleMapChange}
@@ -535,18 +613,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
                     getAndSetDownloadConditions={getAndSetDownloadConditions}
                     downloadConditions={downloadConditions}
                     options={
-                      discreteTimeSliderValues
-                        ? {
-                            additionalSlider: (
-                              <DateSliderPoint
-                                valid_points={discreteTimeSliderValues?.get(
-                                  selectedWmsLayer
-                                )}
-                                onDatePointChange={handleSliderPointChange}
-                              />
-                            ),
-                          }
-                        : undefined
+                      additionalSlider ? { additionalSlider } : undefined
                     }
                   />
                 }
@@ -593,6 +660,12 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
               collection={collection}
               visible={selectedMapLayerId === LayerName.SpatialExtent}
             />
+            {hasGriddedProducts && (
+              <GriddedRasterLayer
+                {...griddedLayerProps}
+                visible={selectedMapLayerId === LayerName.GriddedRaster}
+              />
+            )}
           </Layers>
         </MapBox>
       </Box>

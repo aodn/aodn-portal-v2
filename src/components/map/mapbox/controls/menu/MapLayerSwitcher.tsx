@@ -40,6 +40,7 @@ export enum LayerName {
   GeoServer = "geoServer",
   PMTiles = "pmtiles",
   SpatialExtent = "spatialExtent",
+  GriddedRaster = "griddedRaster",
   Heatmap = "centre points (heatmap)",
   Cluster = "centre points (clustered)",
   Uncluster = "centre points (unclustered)",

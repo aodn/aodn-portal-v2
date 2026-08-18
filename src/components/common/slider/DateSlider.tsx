@@ -99,20 +99,21 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
     [sorted_marks]
   );
 
-  const [datePointStamp, setDatePointStamp] = useState<number | undefined>(
-    sorted_marks.length > 0
-      ? sorted_marks[sorted_marks.length - 1].value
-      : undefined
-  );
+  const [pickedStamp, setPickedStamp] = useState<number | undefined>(undefined);
+
+  const datePointStamp =
+    pickedStamp !== undefined && markValues.includes(pickedStamp)
+      ? pickedStamp
+      : markValues[markValues.length - 1];
 
   // valid_points often arrive after mount; keep the thumb on a real mark.
   useEffect(() => {
     startTransition(() => {
       if (sorted_marks.length === 0) {
-        setDatePointStamp(undefined);
+        setPickedStamp(undefined);
         return;
       }
-      setDatePointStamp((current) =>
+      setPickedStamp((current) =>
         current !== undefined && markValues.includes(current)
           ? current
           : sorted_marks[sorted_marks.length - 1].value
@@ -122,14 +123,14 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
 
   const handleSliderChange = useCallback(
     (_: Event, newValue: number | number[]) => {
-      setDatePointStamp(newValue as number);
+      setPickedStamp(newValue as number);
     },
     []
   );
 
   const applyPointValue = useCallback(
     (event: Event | React.SyntheticEvent<Element, Event>, newValue: number) => {
-      setDatePointStamp(newValue);
+      setPickedStamp(newValue);
       onDatePointChange?.(event, newValue);
     },
     [onDatePointChange]

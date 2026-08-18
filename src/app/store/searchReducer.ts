@@ -44,6 +44,7 @@ import {
   DownloadLayersResponse,
 } from "./GeoserverDefinitions";
 import { Health } from "./systemDefinition";
+import { TileProductsResponse } from "./GriddedTileDefinitions";
 
 export enum DatasetFrequency {
   REALTIME = "real-time",
@@ -624,6 +625,28 @@ const fetchGeoServerDownloadLayers = createAsyncThunk<
   }
 );
 
+const fetchGriddedTileProducts = createAsyncThunk<
+  TileProductsResponse,
+  { uuid: string },
+  { rejectValue: ErrorResponse }
+>(
+  "griddedTiles/fetchGriddedTileProducts",
+  (request: { uuid: string }, thunkApi: any) =>
+    ogcAxiosWithRetry
+      .get<TileProductsResponse>(
+        `/ogc/ext/tiles/collections/${request.uuid}/products`,
+        {
+          signal: thunkApi.signal,
+          // This route is the one that depends on DAS being up. The shared
+          // instance retries 10x with exponential back-off, which would keep a
+          // DAS warmup 503 generating background traffic.
+          "axios-retry": { retries: 2, retryDelay: (n: number) => 1000 * n },
+        }
+      )
+      .then((response) => response.data)
+      .catch(errorHandling(thunkApi))
+);
+
 const fetchSystemHealthNoStore = createAsyncThunk<
   Health,
   void,
@@ -820,6 +843,7 @@ export {
   fetchGeoServerDownloadLayers,
   fetchGeoServerFieldValues,
   fetchSystemHealthNoStore,
+  fetchGriddedTileProducts,
   processDatasetDownload,
   processWFSDownload,
   processWFSEstimateSize,

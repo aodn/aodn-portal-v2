@@ -151,4 +151,146 @@ describe("buildMapLayerConfig", () => {
     expect(result).toEqual([]);
     expect(result.length).toBe(0);
   });
+
+  describe("gridded raster layer", () => {
+    const zarrCollection = (bbox?: any) =>
+      createMockCollection({
+        hasCloudOptimisedData: true,
+        getDatasetType: () => [DatasetType.ZARR],
+        getBBox: () => bbox,
+      });
+
+    it("appends Gridded Data last without changing the PMTiles default", () => {
+      const result = buildMapLayerConfig(
+        createMockCollection({
+          getDatasetType: () => [DatasetType.PARQUET],
+          getBBox: () => [0, 0, 1, 1],
+        }),
+        true, // isWMSAvailable
+        true, // hasSpatialExtent
+        true, // isSupportPMTiles
+        null,
+        true // hasGriddedProducts
+      );
+
+      expect(result.map((l) => l.id)).toEqual([
+        LayerName.PMTiles,
+        LayerName.GeoServer,
+        LayerName.GriddedRaster,
+      ]);
+      expect(result.find((l) => l.selected)?.id).toBe(LayerName.PMTiles);
+    });
+
+    it("leaves a WMS record defaulting to Geoserver", () => {
+      const result = buildMapLayerConfig(
+        createMockCollection({
+          getDatasetType: () => [DatasetType.ZARR],
+          getBBox: () => undefined,
+        }),
+        true, // isWMSAvailable
+        false, // hasSpatialExtent
+        false, // isSupportPMTiles
+        null,
+        true // hasGriddedProducts
+      );
+
+      expect(result.map((l) => l.id)).toEqual([
+        LayerName.GeoServer,
+        LayerName.GriddedRaster,
+      ]);
+      expect(result.find((l) => l.selected)?.id).toBe(LayerName.GeoServer);
+    });
+
+    // Gridded Data takes priority: a zarr record with a bbox would otherwise
+    // qualify for Spatial Extent too, but that's redundant once gridded
+    // raster tiles are offered, so Spatial Extent is suppressed entirely.
+    it("hides Spatial Extent when Gridded Data is available, even for a zarr record with a bbox", () => {
+      const result = buildMapLayerConfig(
+        zarrCollection([0, 0, 1, 1]),
+        false, // isWMSAvailable
+        true, // hasSpatialExtent
+        false, // isSupportPMTiles
+        null,
+        true // hasGriddedProducts
+      );
+
+      expect(result.map((l) => l.id)).toEqual([LayerName.GriddedRaster]);
+      expect(result.find((l) => l.selected)?.id).toBe(LayerName.GriddedRaster);
+    });
+
+    it("selects Gridded Data only when it is the sole entry", () => {
+      const result = buildMapLayerConfig(
+        zarrCollection(undefined),
+        false, // isWMSAvailable
+        false, // hasSpatialExtent
+        false, // isSupportPMTiles
+        null,
+        true // hasGriddedProducts
+      );
+
+      expect(result).toEqual([
+        {
+          id: LayerName.GriddedRaster,
+          name: "Gridded Data",
+          selected: true,
+        } as LayerSwitcherLayer<LayerName>,
+      ]);
+    });
+
+    it("adds no entry when the listing came back empty", () => {
+      const result = buildMapLayerConfig(
+        zarrCollection([0, 0, 1, 1]),
+        false, // isWMSAvailable
+        true, // hasSpatialExtent
+        false, // isSupportPMTiles
+        null,
+        false // hasGriddedProducts
+      );
+
+      expect(result.map((l) => l.id)).toEqual([LayerName.SpatialExtent]);
+      expect(result.find((l) => l.selected)?.id).toBe(LayerName.SpatialExtent);
+    });
+
+    it("honours a sticky Gridded Data selection over PMTiles", () => {
+      const result = buildMapLayerConfig(
+        createMockCollection({
+          getDatasetType: () => [DatasetType.ZARR],
+          getBBox: () => [0, 0, 1, 1],
+        }),
+        false, // isWMSAvailable
+        true, // hasSpatialExtent
+        true, // isSupportPMTiles
+        { id: LayerName.GriddedRaster, name: "Gridded Data" },
+        true // hasGriddedProducts
+      );
+
+      // Spatial Extent would otherwise qualify (zarr + bbox) but is
+      // suppressed since Gridded Data is available.
+      expect(result.map((l) => l.id)).toEqual([
+        LayerName.PMTiles,
+        LayerName.GriddedRaster,
+      ]);
+      expect(result.find((l) => l.selected)?.id).toBe(LayerName.GriddedRaster);
+    });
+
+    // The staleness guard. DetailPageProvider is not remounted on a UUID change
+    // (the route carries no key), so lastSelectedMapLayer survives navigation to
+    // a record that has no gridded products.
+    it("never leaves zero layers selected when the sticky layer is gone", () => {
+      const result = buildMapLayerConfig(
+        createMockCollection({
+          getDatasetType: () => [DatasetType.PARQUET],
+          getBBox: () => [0, 0, 1, 1],
+        }),
+        true, // isWMSAvailable
+        true, // hasSpatialExtent
+        true, // isSupportPMTiles
+        { id: LayerName.GriddedRaster, name: "Gridded Data" },
+        false // hasGriddedProducts — this collection has none
+      );
+
+      expect(result.filter((l) => l.selected)).toHaveLength(1);
+      expect(result.find((l) => l.selected)?.id).toBe(LayerName.PMTiles);
+    });
+  });
 });

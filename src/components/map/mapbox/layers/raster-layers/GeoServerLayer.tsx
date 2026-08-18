@@ -10,14 +10,14 @@ import {
   useRef,
   useState,
 } from "react";
-import MapContext, { ProgressType } from "../MapContext";
-import { LayerBasicType, LayerSelectable } from "./Layers";
+import MapContext, { ProgressType } from "../../MapContext";
+import { LayerBasicType, LayerSelectable } from "../Layers";
 import { mergeWithDefaults } from "@/utils/ObjectUtils";
 import { formatToUrl } from "@/utils/UrlUtils";
-import { MapDefaultConfig, MapEventEnum } from "../constants";
-import { addDataLayer } from "../layerOrder";
+import { MapDefaultConfig, MapEventEnum } from "../../constants";
+import { addDataLayer } from "../../layerOrder";
 import { Position } from "geojson";
-import { TestHelper } from "../../../common/test/helper";
+import { TestHelper } from "../../../../common/test/helper";
 import {
   MapMouseEvent,
   MapMouseEventType,
@@ -42,14 +42,14 @@ import {
 import { CardContent, Typography } from "@mui/material";
 import { createRoot, Root } from "react-dom/client";
 import dayjs, { Dayjs } from "dayjs";
-import { dateDefault, playwrightTestIds } from "../../../common/constants";
-import MapLayerSelect from "../component/MapLayerSelect";
+import { dateDefault, playwrightTestIds } from "../../../../common/constants";
+import MapLayerSelect from "../../component/MapLayerSelect";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { ErrorResponse } from "@/utils/ErrorBoundary";
-import { SelectItem } from "../../../common/dropdown/CommonSelect";
+import { SelectItem } from "../../../../common/dropdown/CommonSelect";
 import { boundingBoxInEpsg3857, isMapDrawModeActive } from "@/utils/MapUtils";
 import { checkEmptyArray } from "@/utils/Helpers";
-import AdminScreenContext from "../../../admin/AdminScreenContext";
+import AdminScreenContext from "../../../../admin/AdminScreenContext";
 import { HttpStatusCode } from "axios";
 import { dateToValue } from "@/utils/DateUtils";
 import { layernameRoughlyMatch } from "@/utils/GeoJsonUtils";

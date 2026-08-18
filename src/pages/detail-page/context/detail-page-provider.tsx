@@ -120,6 +120,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       evaluateSubsettingSupport(type, mapSubsettingCapabilities, {
         PMTiles: LayerName.PMTiles,
         GeoServer: LayerName.GeoServer,
+        GriddedRaster: LayerName.GriddedRaster,
       }),
     [mapSubsettingCapabilities]
   );

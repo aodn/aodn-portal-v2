@@ -28,5 +28,7 @@ class LayerFactory:
             return self.map.get_Data_Density_Layer_id()
         elif layer_type == LayerStyle.SPATIAL_EXTENT:
             return self.map.get_Spatial_Extent_Layer_id()
+        elif layer_type == LayerStyle.GRIDDED_RASTER:
+            return self.map.get_Gridded_Raster_Layer_id()
         else:
             raise ValueError('Invalid Layer type value.')

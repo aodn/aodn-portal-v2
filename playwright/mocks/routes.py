@@ -23,6 +23,9 @@ class Routes:
         f'{PREFIX}/collections/*/items/dataset_metadata'
     )
 
+    GRIDDED_TILE_PRODUCTS = f'{PREFIX}/ext/tiles/collections/*/products'
+    GRIDDED_TILE_IMAGE = f'{PREFIX}/collections/*/map/tiles/**'
+
     WMS_MAP_TILE = '*/**/items/wms_map_tile?*'
     WMS_LAYERS = '*/**/items/wms_layers?*'
     WMS_FIELDS = '*/**/items/wms_fields?*'

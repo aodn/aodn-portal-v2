@@ -4,14 +4,14 @@ import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import searchReducer from "@/app/store/searchReducer";
 import GeoServerLayer from "../GeoServerLayer";
-import MapContext from "../../MapContext";
+import MapContext from "../../../MapContext";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
-import AdminScreenContext from "../../../../admin/AdminScreenContext";
+import AdminScreenContext from "../../../../../admin/AdminScreenContext";
 import {
   GeoserverFieldsResponse,
   MapLayerResponse,
 } from "@/app/store/GeoserverDefinitions";
-import { MapEventEnum } from "../../constants";
+import { MapEventEnum } from "../../../constants";
 import utc from "dayjs/plugin/utc";
 import { extend } from "dayjs";
 

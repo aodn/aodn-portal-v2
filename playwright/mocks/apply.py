@@ -18,6 +18,10 @@ from mocks.api.download_wfs import (
     handle_estimate_co_download,
     handle_estimate_wfs_download,
 )
+from mocks.api.gridded_tiles import (
+    handle_gridded_tile_image_api,
+    handle_gridded_tile_products_api,
+)
 from mocks.api.pmtiles import handle_pmtiles_metadata_api
 from mocks.api.search_collections import (
     handle_provider_api,
@@ -51,6 +55,10 @@ def apply_mock(page: Page) -> None:
         handle_collections_all_api,
         handle_collections_popup_api,
     )
+
+    api_router.route_gridded_tile_products(handle_gridded_tile_products_api)
+    api_router.route_gridded_tile_image(handle_gridded_tile_image_api)
+
     api_router.route_collection_detail(
         handle_detail_api,
         handle_detail_summary_api,
