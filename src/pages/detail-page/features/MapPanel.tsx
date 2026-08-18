@@ -221,6 +221,13 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     dateSliderProps: griddedDateSliderProps,
   } = useGriddedRasterLayer(collection);
 
+  // Only surface the gridded-layer's fetch error while it's the selected map
+  // layer — an error in a hidden layer shouldn't announce itself.
+  const griddedRasterErrorAnnouncement =
+    selectedMapLayerId === LayerName.GriddedRaster && griddedLayerProps.error
+      ? "Gridded Data is temporarily unavailable"
+      : undefined;
+
   const hasSpatialExtent = useMemo(() => {
     const bbox = collection?.getBBox();
     return Array.isArray(bbox) && bbox.length > 0;
@@ -561,7 +568,9 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
           panelId={mapContainerId}
           projection={"mercator"}
           announcement={
-            noMapPreview ? "Dataset preview is not available" : undefined
+            noMapPreview
+              ? "Dataset preview is not available"
+              : griddedRasterErrorAnnouncement
           }
           onMoveEvent={handleMapChange}
           onZoomEvent={handleMapChange}

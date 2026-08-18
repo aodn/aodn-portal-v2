@@ -249,27 +249,17 @@ describe("DateSliderPoint resync", () => {
   });
 });
 
-describe("DateSliderPoint formatLabel", () => {
+describe("DateSliderPoint display", () => {
   const points = [Date.UTC(2024, 0, 1), Date.UTC(2024, 0, 2)];
 
-  it("renders the supplied label instead of an ISO instant", () => {
-    render(
-      <DateSliderPoint
-        valid_points={[...points]}
-        formatLabel={(v) => (v === points[1] ? "2024-01-02" : "2024-01-01")}
-      />
-    );
-
-    expect(screen.getByText(/Displaying @/)).toHaveTextContent(
-      "Displaying @ 2024-01-02"
-    );
-  });
-
-  it("keeps the ISO string when formatLabel is omitted", () => {
+  it("shows the selected date formatted as DD/MM/YYYY", () => {
     render(<DateSliderPoint valid_points={[...points]} />);
 
-    expect(screen.getByText(/Displaying @/).textContent).toContain(
-      new Date(points[1]).toISOString()
-    );
+    expect(screen.getByText("Displaying")).toBeInTheDocument();
+    // { selector: "p" } excludes the slider's own value-label tooltip, which
+    // renders the same formatted date in a sibling span.
+    expect(
+      screen.getByText("02/01/2024", { selector: "p" })
+    ).toBeInTheDocument();
   });
 });

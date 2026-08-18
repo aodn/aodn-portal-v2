@@ -37,7 +37,6 @@ interface DateSliderPointProps {
     event: Event | React.SyntheticEvent<Element, Event> | undefined,
     value: number | number[]
   ) => void;
-  formatLabel?: (value: number) => string;
 }
 
 const COMPONENT_ID = "dateslider-daterange-menu-button";
@@ -88,7 +87,6 @@ const stepMarkValue = (
 const DateSliderPoint: React.FC<DateSliderPointProps> = ({
   valid_points,
   onDatePointChange = undefined,
-  formatLabel,
 }) => {
   const sorted_marks: Mark[] = useMemo(() => {
     return [...(valid_points ?? [])]

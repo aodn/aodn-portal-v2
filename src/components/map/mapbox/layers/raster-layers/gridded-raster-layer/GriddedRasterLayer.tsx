@@ -1,5 +1,4 @@
 import { FC, useContext, useEffect, useMemo, useRef } from "react";
-import { Button, Stack, Typography } from "@mui/material";
 import { RasterTileSource } from "mapbox-gl";
 import MapContext from "../../../MapContext";
 import { LayerBasicType } from "../../Layers";
@@ -7,8 +6,6 @@ import { MapDefaultConfig, MapEventEnum } from "../../../constants";
 import { addDataLayer } from "../../../layerOrder";
 import MapLayerSelect from "../../../component/MapLayerSelect";
 import { TestHelper } from "../../../../../common/test/helper";
-import { borderRadius, zIndex } from "@/styles/constants";
-import { portalTheme } from "@/styles";
 import {
   buildGriddedTileUrl,
   GriddedRasterLayerControls,
@@ -40,8 +37,6 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
   selectedProductId,
   onSelectProduct,
   selectedDate,
-  error,
-  onRetry,
   visible = false,
 }) => {
   const { map } = useContext(MapContext);
@@ -150,36 +145,11 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
     <>
       {visible && (
         <MapLayerSelect
-          mapLayersOptions={toSelectItems(products)}
-          selectedItem={selectedProductId}
-          handleSelectItem={onSelectProduct}
+          layersOptions={toSelectItems(products)}
+          selectedLayer={selectedProductId}
+          handleSelectLayer={onSelectProduct}
           isLoading={false}
         />
-      )}
-      {visible && error && (
-        <Stack
-          direction="row"
-          alignItems="center"
-          gap={1}
-          data-testid="gridded-raster-error"
-          sx={{
-            position: "absolute",
-            top: "60px",
-            left: "10px",
-            zIndex: zIndex.MAP_BASE,
-            backgroundColor: "#fff",
-            borderRadius: borderRadius.small,
-            boxShadow: portalTheme.shadows[5],
-            padding: "8px 12px",
-          }}
-        >
-          <Typography sx={{ ...portalTheme.typography.body1Medium }}>
-            Gridded Data is temporarily unavailable
-          </Typography>
-          <Button size="small" onClick={onRetry}>
-            Retry
-          </Button>
-        </Stack>
       )}
       <TestHelper
         id={mapContainerId ?? ""}

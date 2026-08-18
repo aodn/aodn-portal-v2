@@ -305,17 +305,4 @@ describe("GriddedRasterLayer", () => {
     );
     expect(queryByTestId("layer-select-dropdown")).not.toBeInTheDocument();
   });
-
-  it("offers a retry when a refetch failed, without replacing the dropdown", async () => {
-    const onRetry = vi.fn();
-    const { getByTestId, getByRole } = renderLayer({ error: true, onRetry });
-
-    expect(getByTestId("gridded-raster-error")).toBeInTheDocument();
-    expect(getByTestId("layer-select-dropdown")).toBeInTheDocument();
-
-    await act(async () => {
-      getByRole("button", { name: /retry/i }).click();
-    });
-    expect(onRetry).toHaveBeenCalled();
-  });
 });
