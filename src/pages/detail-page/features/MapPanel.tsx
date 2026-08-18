@@ -567,15 +567,15 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
               filterStartDate={filterStartDate}
               filterEndDate={filterEndDate}
               visible={selectedMapLayerId === LayerName.PMTiles}
-              selectedCoKey={selectedCoKey}
-              onSelectCoKey={setSelectedCoKey}
+              layerConfig={selectedCoKey}
+              onLayerChange={setSelectedCoKey}
               onMetadataPeriodChange={handlePmtilesMetadataPeriodChange}
               onSupportChange={setIsSupportPMTiles}
             />
             <GeoServerLayer
-              geoServerLayerConfig={geoServerLayerConfig}
+              layerConfig={geoServerLayerConfig}
               onWMSAvailabilityChange={onWMSAvailabilityChange}
-              onWmsLayerChange={onWmsLayerChange}
+              onLayerChange={onWmsLayerChange}
               setWmsFields={setWMSFields}
               setTimeSliderSupport={setTimeSliderSupport}
               setDiscreteTimeSliderValues={setDiscreteTimeSliderValues}
