@@ -2,7 +2,7 @@ import { Dispatch, PropsWithChildren, SetStateAction } from "react";
 import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson";
 import { LngLatBounds, MapMouseEvent, LngLat, Map as Mapbox } from "mapbox-gl";
 import * as turf from "@turf/turf";
-import { TabNavigation } from "../../../../hooks/useTabNavigation";
+import { TabNavigation } from "@/hooks/useTabNavigation";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 
 export interface LayerBasicType<P = GeoJsonProperties> {
@@ -24,6 +24,11 @@ export interface LayerBasicType<P = GeoJsonProperties> {
   >;
   setDrawRectSupportSupport?: Dispatch<SetStateAction<boolean>>;
   collection?: OGCCollection;
+}
+
+export interface LayerSelectable<T> {
+  layerConfig: T;
+  onLayerChange?: (layerName: string) => void;
 }
 
 const normalizeLongitude = (lng: number) =>
