@@ -73,9 +73,15 @@ const DrawRect: React.FC<DrawControlProps> = ({
     []
   );
 
+  const disableDrawingMode = useCallback(() => {
+    mapDraw.changeMode("simple_select");
+    setMapDrawInteractionActive(map, false);
+    setIsDrawingMode(false);
+  }, [map, mapDraw]);
+
   const handleIconClick = useCallback(() => {
-    if (showTooltip) {
-      // If tooltip is showing, close it but keep draw mode active
+    if (mapDraw.getMode() === DRAW_RECTANGLE_MODE) {
+      disableDrawingMode();
       setShowTooltip(false);
     } else {
       // Suppress data-layer popups immediately (PMTiles hover etc.)
@@ -86,15 +92,15 @@ const DrawRect: React.FC<DrawControlProps> = ({
     setActiveTool("bbox");
     activeToolRef.current = "bbox";
     setShowPolygonTooltip(false);
-  }, [map, mapDraw, showTooltip]);
+  }, [disableDrawingMode, map, mapDraw]);
 
   const handleCloseTooltip = useCallback(() => {
     setShowTooltip(false);
   }, []);
 
   const handlePolygonClick = useCallback(() => {
-    if (showPolygonTooltip) {
-      // If tooltip is showing, close it but keep draw mode active
+    if (mapDraw.getMode() === DRAW_POLYGON_MODE) {
+      disableDrawingMode();
       setShowPolygonTooltip(false);
     } else {
       setMapDrawInteractionActive(map, true);
@@ -104,7 +110,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
     setActiveTool("polygon");
     activeToolRef.current = "polygon";
     setShowTooltip(false);
-  }, [map, mapDraw, showPolygonTooltip]);
+  }, [disableDrawingMode, map, mapDraw]);
 
   const handleClosePolygonTooltip = useCallback(() => {
     setShowPolygonTooltip(false);
