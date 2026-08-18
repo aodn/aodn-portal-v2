@@ -136,7 +136,11 @@ const MapSection: React.FC<MapSectionProps> = memo(
           sx={{
             position: "relative",
             // flex:1 is height 0 in Edge, which makes Mapbox WebGL fail.
-            height: `calc(100% - ${MAP_FOOTER_HEIGHT})`,
+            // Map footer is hidden on mobile, so the map can use full height.
+            height: {
+              xs: "100%",
+              sm: `calc(100% - ${MAP_FOOTER_HEIGHT})`,
+            },
             width: "100%",
             borderRadius: 0,
             overflow: "hidden",

@@ -38,7 +38,7 @@ const MapFooter: React.FC = () => {
         flexShrink: 0,
         width: "100%",
         height: MAP_FOOTER_HEIGHT,
-        display: "flex",
+        display: { xs: "none", sm: "flex" },
         alignItems: "center",
         justifyContent: "space-between",
         px: gap.lg,
