@@ -76,8 +76,8 @@ const useGriddedRasterLayer = (
       hasDates: marks.values.length > 0,
       layerProps: {
         products,
-        selectedProductId: selectedProduct?.id ?? "",
-        onSelectProduct: setProductOverride,
+        layerConfig: selectedProduct?.id ?? "",
+        onLayerChange: setProductOverride,
         selectedDate,
         error,
         onRetry: retry,

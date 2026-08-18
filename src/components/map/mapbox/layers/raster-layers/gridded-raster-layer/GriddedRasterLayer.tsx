@@ -34,8 +34,8 @@ interface GriddedRasterLayerProps
 
 const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
   products,
-  selectedProductId,
-  onSelectProduct,
+  layerConfig,
+  onLayerChange,
   selectedDate,
   visible = false,
 }) => {
@@ -49,8 +49,8 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
   );
 
   const selectedProduct = useMemo(
-    () => products.find((p) => p.id === selectedProductId),
-    [products, selectedProductId]
+    () => products.find((p) => p.id === layerConfig),
+    [products, layerConfig]
   );
 
   const tileUrl = useMemo(
@@ -146,8 +146,8 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
       {visible && (
         <MapLayerSelect
           layersOptions={toSelectItems(products)}
-          selectedLayer={selectedProductId}
-          handleSelectLayer={onSelectProduct}
+          selectedLayer={layerConfig}
+          handleSelectLayer={onLayerChange}
           isLoading={false}
         />
       )}
