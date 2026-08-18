@@ -5,7 +5,6 @@ export interface TileProduct {
   id: string;
   variable?: string | string[];
   tile_types?: TileType[];
-  // Australia/Sydney local-day keys, NOT UTC instants.
   available_dates?: string[];
   full_date_range?: { start?: string; end?: string };
   // Present only when tile_types includes "visual".

@@ -3,7 +3,6 @@ import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import useGriddedRasterProducts from "./useGriddedRasterProducts";
 import { buildTileDateMarks, GriddedRasterLayerControls } from "./Common";
 
-/** Shaped to spread directly onto `<DateSliderPoint>` — see `DateSliderPointProps`. */
 export interface GriddedRasterDateSliderProps {
   valid_points: number[];
   formatLabel: (value: number) => string;
@@ -14,27 +13,13 @@ export interface GriddedRasterDateSliderProps {
 }
 
 export interface GriddedRasterLayerState {
-  /** At least one renderable product for this collection. */
   hasProducts: boolean;
-  /** The selected product advertises at least one day (drives `griddedRasterHasDates`). */
   hasDates: boolean;
   layerProps: GriddedRasterLayerControls;
-  /**
-   * `key` can't travel through a spread prop — React strips it before the
-   * component ever sees it — so it's returned separately. Write it explicitly:
-   * `<DateSliderPoint key={dateSliderKey} {...dateSliderProps} />`. Forces a
-   * remount on product change, since that's the only way DateSliderPoint
-   * resets its picked value to the new product's latest day.
-   */
   dateSliderKey: string;
   dateSliderProps: GriddedRasterDateSliderProps;
 }
 
-/**
- * Owns all gridded-raster state (product listing, product/date overrides, and
- * their fallbacks) so `MapPanel` only wires the result to the layer switcher,
- * the subsetting capabilities, and the map layer/date slider.
- */
 const useGriddedRasterLayer = (
   collection?: OGCCollection | null
 ): GriddedRasterLayerState => {
@@ -80,9 +65,7 @@ const useGriddedRasterLayer = (
   );
 
   const formatLabel = useCallback(
-    // The slider values are only ever keys. NEVER format the number back into a
-    // date: available_dates are Australia/Sydney local days and UTC midnight
-    // formatted in a UTC-08:00 browser renders the previous day.
+    // The slider values are only ever keys. NEVER format the number back into a date
     (value: number) => marks.byValue.get(value) ?? "",
     [marks]
   );

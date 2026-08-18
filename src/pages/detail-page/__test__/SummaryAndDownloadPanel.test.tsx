@@ -201,10 +201,10 @@ describe("buildMapLayerConfig", () => {
       expect(result.find((l) => l.selected)?.id).toBe(LayerName.GeoServer);
     });
 
-    // The conservative case that keeps this change behaviour-neutral: nearly
-    // every zarr record has a bbox, so in practice Gridded Data is offered but
-    // is not the default.
-    it("leaves a zarr record with a bbox defaulting to Spatial Extent", () => {
+    // Gridded Data takes priority: a zarr record with a bbox would otherwise
+    // qualify for Spatial Extent too, but that's redundant once gridded
+    // raster tiles are offered, so Spatial Extent is suppressed entirely.
+    it("hides Spatial Extent when Gridded Data is available, even for a zarr record with a bbox", () => {
       const result = buildMapLayerConfig(
         zarrCollection([0, 0, 1, 1]),
         false, // isWMSAvailable
@@ -214,11 +214,8 @@ describe("buildMapLayerConfig", () => {
         true // hasGriddedProducts
       );
 
-      expect(result.map((l) => l.id)).toEqual([
-        LayerName.SpatialExtent,
-        LayerName.GriddedRaster,
-      ]);
-      expect(result.find((l) => l.selected)?.id).toBe(LayerName.SpatialExtent);
+      expect(result.map((l) => l.id)).toEqual([LayerName.GriddedRaster]);
+      expect(result.find((l) => l.selected)?.id).toBe(LayerName.GriddedRaster);
     });
 
     it("selects Gridded Data only when it is the sole entry", () => {
@@ -267,6 +264,12 @@ describe("buildMapLayerConfig", () => {
         true // hasGriddedProducts
       );
 
+      // Spatial Extent would otherwise qualify (zarr + bbox) but is
+      // suppressed since Gridded Data is available.
+      expect(result.map((l) => l.id)).toEqual([
+        LayerName.PMTiles,
+        LayerName.GriddedRaster,
+      ]);
       expect(result.find((l) => l.selected)?.id).toBe(LayerName.GriddedRaster);
     });
 

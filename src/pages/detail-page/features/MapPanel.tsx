@@ -89,8 +89,12 @@ export const buildMapLayerConfig = (
       datasetTypes.includes(DatasetType.PARQUET) ||
       datasetTypes.includes(DatasetType.ZARR);
 
+    // Gridded Data takes priority over Spatial Extent — when a zarr record
+    // has gridded raster products, there is no need to also offer the
+    // Spatial Extent layer.
     const isSupportSpatialExtent =
       hasSpatialExtent &&
+      !hasGriddedProducts &&
       (zarrOnlyDataset ||
         (!isWMSAvailable && !hasCoDensity && !isSupportPMTiles));
 
@@ -112,21 +116,19 @@ export const buildMapLayerConfig = (
       layers.push(l);
     }
 
-    if (isSupportSpatialExtent) {
+    if (hasGriddedProducts) {
       const l: LayerSwitcherLayer<LayerName> = {
-        id: LayerName.SpatialExtent,
-        name: "Spatial Extent",
+        id: LayerName.GriddedRaster,
+        name: "Gridded Data",
         selected: false,
       };
       layers.push(l);
     }
 
-    // Appended LAST: the `layers[0]` fallback below
-    // makes it the default only when it is the sole entry.
-    if (hasGriddedProducts) {
+    if (isSupportSpatialExtent) {
       const l: LayerSwitcherLayer<LayerName> = {
-        id: LayerName.GriddedRaster,
-        name: "Gridded Data",
+        id: LayerName.SpatialExtent,
+        name: "Spatial Extent",
         selected: false,
       };
       layers.push(l);
