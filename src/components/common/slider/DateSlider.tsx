@@ -168,10 +168,6 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
     return null;
   }
 
-  const displayLabel = formatLabel
-    ? formatLabel(datePointStamp!)
-    : valueToDate(datePointStamp!).toISOString();
-
   return (
     <Grid
       container
@@ -185,26 +181,6 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
       }}
       data-testid={COMPONENT_ID}
     >
-      <Grid
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{
-          mx: "20px",
-          mt: { xs: "2px", md: "6px" },
-          mb: { xs: "2px", md: "6px" },
-        }}
-        size={12}
-      >
-        <Typography
-          sx={{
-            ...portalTheme.typography.body1Medium,
-            color: portalTheme.palette.text1,
-          }}
-        >
-          Displaying @ {displayLabel}
-        </Typography>
-      </Grid>
       <Grid
         container
         sx={{
