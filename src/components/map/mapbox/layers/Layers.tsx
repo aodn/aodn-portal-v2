@@ -26,6 +26,7 @@ export interface LayerBasicType<P = GeoJsonProperties> {
   collection?: OGCCollection;
 }
 
+/** Layer-owned dataset/product picker. UI is portaled above the map. */
 export interface LayerSelectable<T> {
   layerConfig: T;
   onLayerChange?: (layerName: string) => void;

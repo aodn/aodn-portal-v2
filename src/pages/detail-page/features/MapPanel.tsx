@@ -55,6 +55,7 @@ import * as turf from "@turf/turf";
 import { createStaticLayers } from "@/components/map/mapbox/layers/StaticLayer";
 
 import WmsLegend from "./WmsLegend";
+import { MAP_DATASET_SELECT_SLOT_ID } from "@/components/map/mapbox/component/MapLayerSelect";
 import {
   DatasetType,
   OGCCollection,
@@ -555,12 +556,16 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   return (
     <>
       <Box
+        id={MAP_DATASET_SELECT_SLOT_ID}
+        sx={{ width: "100%", mt: padding.large }}
+      />
+      <Box
         arial-label="map"
         id={mapContainerId}
         sx={{
           width: "100%",
-          minHeight: "550px",
-          marginY: padding.large,
+          minHeight: "588px",
+          marginBottom: padding.large,
         }}
       >
         <MapBox
