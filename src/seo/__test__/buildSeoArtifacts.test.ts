@@ -1,8 +1,8 @@
 /**
  * Pipeline test on controlled data: mocks the API (the only external input),
- * runs the real fetch → sitemap → prerender chain into a temp dir, then
- * asserts the files on disk. Mirrors buildSeoArtifacts.ts, which cannot be
- * imported directly — importing it runs the build.
+ * runs the real fetch → browse → sitemap → prerender chain into a temp dir,
+ * then asserts the files on disk. Mirrors buildSeoArtifacts.ts, which cannot
+ * be imported directly — importing it runs the build.
  */
 
 import { mkdtemp, readFile, readdir, writeFile } from "fs/promises";
@@ -10,6 +10,7 @@ import { tmpdir } from "os";
 import path from "path";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { ogcAxiosWithRetry } from "@/app/store/searchReducer";
+import { generateBrowsePages } from "../browse";
 import { fetchCollections } from "../fetchCollections";
 import { generateSitemap } from "../sitemap";
 import { prerenderDetailPages } from "../prerender";
@@ -19,16 +20,23 @@ import { BASE_URL } from "../constants";
 const TEMPLATE =
   '<!doctype html><html lang="en"><head><title>AODN Portal</title></head><body><div id="root"></div></body></html>';
 
+const themed = (id: string, title: string) => ({
+  id,
+  title,
+  description: `About ${title}.`,
+  properties: {
+    themes: [{ scheme: "theme", concepts: [{ id: "Ocean Temperature" }] }],
+  },
+});
+
 const page = {
-  total: 2,
+  total: 4,
   collections: [
-    {
-      id: "rec-1",
-      title: "Sea Surface Temperature",
-      description: "Daily SST observations around Australia.",
-    },
-    // no description: sitemap lists it, prerender skips it
-    { id: "rec-2", title: "Half-filled record" },
+    themed("rec-1", "Sea Surface Temperature"),
+    themed("rec-2", "Mooring Temperatures"),
+    themed("rec-3", "Satellite SST"),
+    // no description: sitemap lists it, prerender and browse skip it
+    { id: "rec-4", title: "Half-filled record" },
   ],
   search_after: [],
 };
@@ -48,19 +56,40 @@ describe("the artifacts pipeline on controlled data", () => {
     vi.restoreAllMocks();
   });
 
-  test("writes the sitemap and detail pages the verifier accepts", async () => {
+  test("writes the browse, sitemap and detail pages the verifier accepts", async () => {
     const collections = await fetchCollections();
-    await generateSitemap(outDir, collections);
+    const browseUrls = await generateBrowsePages(outDir, collections);
+    await generateSitemap(outDir, collections, browseUrls);
     await prerenderDetailPages(outDir, collections);
 
     const sitemap = await readFile(path.join(outDir, "sitemap.xml"), "utf8");
     expect(sitemap).toContain(`<loc>${BASE_URL}/</loc>`);
     expect(sitemap).toContain(`<loc>${BASE_URL}/details/rec-1</loc>`);
-    expect(sitemap).toContain(`<loc>${BASE_URL}/details/rec-2</loc>`);
-    expect(sitemap.match(/<loc>/g)).toHaveLength(3);
+    expect(sitemap).toContain(`<loc>${BASE_URL}/details/rec-4</loc>`);
+    expect(sitemap).toContain(
+      `<loc>${BASE_URL}/browse/ocean-temperature</loc>`
+    );
+    expect(sitemap.match(/<loc>/g)).toHaveLength(6);
 
-    // only the record with id, title and description becomes a page
-    expect(await readdir(path.join(outDir, "details"))).toEqual(["rec-1"]);
+    // only records with id, title and description are paged and linked
+    expect(await readdir(path.join(outDir, "browse"))).toEqual([
+      "ocean-temperature",
+    ]);
+    const browsePage = await readFile(
+      path.join(outDir, "browse", "ocean-temperature"),
+      "utf8"
+    );
+    expect(browsePage).toContain(
+      `<a href="${BASE_URL}/details/rec-1">Sea Surface Temperature</a>`
+    );
+    expect(browsePage).toContain(`<a href="${BASE_URL}/details/rec-3">`);
+    expect(browsePage).not.toContain("rec-4");
+
+    expect(await readdir(path.join(outDir, "details"))).toEqual([
+      "rec-1",
+      "rec-2",
+      "rec-3",
+    ]);
     const detailPage = await readFile(
       path.join(outDir, "details", "rec-1"),
       "utf8"

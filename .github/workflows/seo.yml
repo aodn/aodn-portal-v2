@@ -78,13 +78,14 @@ jobs:
           aws s3 cp dist/sitemap.xml s3://${{ vars.BUCKET }}/sitemap.xml --region ${{ vars.AWS_REGION }}
           # Detail pages are extensionless, so sync would guess binary/octet-stream
           aws s3 sync --delete dist/details s3://${{ vars.BUCKET }}/details --region ${{ vars.AWS_REGION }} --content-type text/html
+          aws s3 sync --delete dist/browse s3://${{ vars.BUCKET }}/browse --region ${{ vars.AWS_REGION }} --content-type text/html
 
       - name: Clear cloudfront cache for the SEO paths
         id: invalidation
         run: |
           invalidation_id=$(aws cloudfront create-invalidation \
           --distribution-id ${{ vars.DISTRIBUTION_ID }} \
-          --paths "/sitemap.xml" "/details/*" \
+          --paths "/sitemap.xml" "/details/*" "/browse/*" \
           --region ${{ vars.AWS_REGION }} \
           --query Invalidation.Id --output text)
           echo "id=$invalidation_id" >> "$GITHUB_OUTPUT"

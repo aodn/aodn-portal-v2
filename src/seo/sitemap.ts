@@ -16,7 +16,8 @@ import {
 
 export const generateSitemap = async (
   outDir: string,
-  collections: OGCCollection[]
+  collections: OGCCollection[],
+  extraUrls: string[] = []
 ) => {
   const uuids = collections
     .map((collection) => collection.id)
@@ -27,20 +28,26 @@ export const generateSitemap = async (
     );
   }
   // sitemaps.org caps a single file at 50,000 URLs
-  if (uuids.length >= 50000) {
+  if (uuids.length + extraUrls.length >= 50000) {
     throw new Error(
-      `${uuids.length} URLs exceed the 50,000-per-sitemap limit; split into a sitemap index.`
+      `${uuids.length + extraUrls.length} URLs exceed the 50,000-per-sitemap limit; split into a sitemap index.`
     );
   }
 
   await mkdir(outDir, { recursive: true });
   const outFile = path.join(outDir, "sitemap.xml");
-  await writeFile(outFile, toSitemapXml(uuids));
-  console.log(`Wrote ${uuids.length + 1} URLs to ${outFile}`);
+  await writeFile(outFile, toSitemapXml(uuids, new Date(), extraUrls));
+  console.log(
+    `Wrote ${uuids.length + extraUrls.length + 1} URLs to ${outFile}`
+  );
 };
 
-export const toSitemapXml = (uuids: string[], generatedAt = new Date()) => {
-  const urls = [`${BASE_URL}/`, ...uuids.map(detailsUrl)];
+export const toSitemapXml = (
+  uuids: string[],
+  generatedAt = new Date(),
+  extraUrls: string[] = []
+) => {
+  const urls = [`${BASE_URL}/`, ...uuids.map(detailsUrl), ...extraUrls];
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
     // Crawlers ignore comments; this tells a human how stale the live file is

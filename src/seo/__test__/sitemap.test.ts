@@ -15,4 +15,12 @@ describe("toSitemapXml", () => {
     expect(xml).toContain(`<loc>${BASE_URL}/details/abc-123</loc>`);
     expect(xml).toContain("2026-01-01T00:00:00.000Z");
   });
+
+  test("appends extra URLs, e.g. the browse pages", () => {
+    const xml = toSitemapXml(["abc-123"], new Date("2026-01-01T00:00:00Z"), [
+      `${BASE_URL}/browse/ocean-temperature`,
+    ]);
+
+    expect(xml).toContain(`<loc>${BASE_URL}/browse/ocean-temperature</loc>`);
+  });
 });

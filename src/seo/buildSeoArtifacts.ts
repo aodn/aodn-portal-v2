@@ -4,13 +4,15 @@
  */
 
 import { seoDistDir } from "./cli";
+import { generateBrowsePages } from "./browse";
 import { fetchCollections } from "./fetchCollections";
 import { prerenderDetailPages } from "./prerender";
 import { generateSitemap } from "./sitemap";
 
 const outDir = seoDistDir();
 
-// One fetchResultNoStore walk, shared by the sitemap and the detail pages
+// One fetchResultNoStore walk, shared by all three artifacts
 const collections = await fetchCollections();
-await generateSitemap(outDir, collections);
+const browseUrls = await generateBrowsePages(outDir, collections);
+await generateSitemap(outDir, collections, browseUrls);
 await prerenderDetailPages(outDir, collections);

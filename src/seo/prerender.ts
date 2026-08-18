@@ -54,7 +54,7 @@ export const renderCrawlerPage = (
   );
 };
 
-const hasSeoFields = (collection: OGCCollection) =>
+export const hasSeoFields = (collection: OGCCollection) =>
   isSafeCollectionId(collection.id) &&
   Boolean(collection.title && collection.description);
 

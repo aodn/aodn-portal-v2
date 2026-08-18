@@ -59,10 +59,10 @@ jobs:
 
       - name: Copy files to the production website with the AWS CLI
         run: |
-          # sitemap.xml and details/ are owned by the Publish SEO Artifacts workflow.
+          # sitemap.xml, details/ and browse/ are owned by the Publish SEO Artifacts workflow.
           # assets/ uses cp, not sync: every deploy re-stamps the live build's files,
           # so the prune step below can treat old timestamps as unreferenced.
-          aws s3 sync --delete ${{ env.DIST }} s3://${{ vars.BUCKET }} --region ${{ vars.AWS_REGION }} --exclude "details/*" --exclude "sitemap.xml" --exclude "assets/*"
+          aws s3 sync --delete ${{ env.DIST }} s3://${{ vars.BUCKET }} --region ${{ vars.AWS_REGION }} --exclude "details/*" --exclude "browse/*" --exclude "sitemap.xml" --exclude "assets/*"
           aws s3 cp ${{ env.DIST }}/assets s3://${{ vars.BUCKET }}/assets --recursive --region ${{ vars.AWS_REGION }}
           # Seed the fallback sitemap only when the bucket has none
           aws s3api head-object --bucket ${{ vars.BUCKET }} --key sitemap.xml --region ${{ vars.AWS_REGION }} >/dev/null 2>&1 \
@@ -154,10 +154,10 @@ jobs:
 
       - name: Copy files to the production website with the AWS CLI
         run: |
-          # sitemap.xml and details/ are owned by the Publish SEO Artifacts workflow.
+          # sitemap.xml, details/ and browse/ are owned by the Publish SEO Artifacts workflow.
           # assets/ uses cp, not sync: every deploy re-stamps the live build's files,
           # so the prune step below can treat old timestamps as unreferenced.
-          aws s3 sync --delete ${{ env.DIST }} s3://${{ vars.BUCKET }} --region ${{ vars.AWS_REGION }} --exclude "details/*" --exclude "sitemap.xml" --exclude "assets/*"
+          aws s3 sync --delete ${{ env.DIST }} s3://${{ vars.BUCKET }} --region ${{ vars.AWS_REGION }} --exclude "details/*" --exclude "browse/*" --exclude "sitemap.xml" --exclude "assets/*"
           aws s3 cp ${{ env.DIST }}/assets s3://${{ vars.BUCKET }}/assets --recursive --region ${{ vars.AWS_REGION }}
           # Seed the fallback sitemap only when the bucket has none
           aws s3api head-object --bucket ${{ vars.BUCKET }} --key sitemap.xml --region ${{ vars.AWS_REGION }} >/dev/null 2>&1 \
