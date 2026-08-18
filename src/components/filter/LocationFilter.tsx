@@ -471,7 +471,7 @@ const LocationFilter: FC<LocationFilterProps> = () => {
     [dispatch]
   );
 
-  const highlightCollection = useMemo(():
+  const staticAreaHighlightCollection = useMemo(():
     | FeatureCollection<Polygon | MultiPolygon>
     | undefined => {
     const allFeats: Feature<Polygon | MultiPolygon>[] = [];
@@ -527,18 +527,6 @@ const LocationFilter: FC<LocationFilterProps> = () => {
         });
     }
 
-    if (drawFeatures.length > 0) {
-      drawFeatures.forEach((f) => {
-        allFeats.push({
-          ...f,
-          properties: {
-            ...f.properties,
-            name: f.properties?.name ?? "Drawn Area",
-          },
-        });
-      });
-    }
-
     if (allFeats.length === 0) return undefined;
     return { type: "FeatureCollection", features: allFeats };
   }, [
@@ -548,7 +536,6 @@ const LocationFilter: FC<LocationFilterProps> = () => {
     selectedMarineEcoregionValues,
     allenCoralAtlasOptions,
     selectedAllenCoralAtlasValues,
-    drawFeatures,
   ]);
 
   const mergedPolygonForTests = useMemo(() => {
@@ -707,7 +694,7 @@ const LocationFilter: FC<LocationFilterProps> = () => {
           >
             <ReactMap panelId={MAP_ID} zoom={0}>
               <Controls>
-                <SelectedAreaLayer areas={highlightCollection} />
+                <SelectedAreaLayer areas={staticAreaHighlightCollection} />
                 <NavigationControl
                   // Reset flies back to the world view centred on Australia
                   onReset={(map) =>
