@@ -1,5 +1,5 @@
 import { FC, useCallback } from "react";
-import { Box, Stack, SxProps, Tooltip, Typography } from "@mui/material";
+import { Box, Stack, SxProps, Typography } from "@mui/material";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import Map from "@/components/map/mapbox/Map";
 import Layers from "@/components/map/mapbox/layers/Layers";
@@ -91,25 +91,22 @@ const BookmarkListCard: FC<BookmarkListCardProps> = ({
             }
           />
 
-          <Tooltip title="More detail..." placement="top">
-            <Typography
-              sx={{
-                ...portalTheme.typography.body2Regular,
-                color: portalTheme.palette.grey700,
-                fontWeight: 400,
-                padding: 0,
-                paddingX: padding.small,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                display: "-webkit-box",
-                WebkitLineClamp: "5",
-                WebkitBoxOrient: "vertical",
-                wordBreak: "break-word",
-              }}
-            >
-              {dataset.description}
-            </Typography>
-          </Tooltip>
+          <Typography
+            sx={{
+              ...portalTheme.typography.body3Small,
+              color: portalTheme.palette.text2,
+              padding: 0,
+              paddingX: padding.small,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
+              WebkitLineClamp: "5",
+              WebkitBoxOrient: "vertical",
+              wordBreak: "break-word",
+            }}
+          >
+            {dataset.description}
+          </Typography>
         </Box>
       </Stack>
     </Box>

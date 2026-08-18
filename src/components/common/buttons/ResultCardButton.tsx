@@ -88,56 +88,59 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
     };
   }, [config.color, iconSize, isSvgIcon, size]);
 
+  const button = (
+    <Button
+      onContextMenu={(e) =>
+        onClick ? menuRef.current?.openContextMenu(e) : undefined
+      }
+      onClick={() => onClick?.(undefined)}
+      disabled={disabled}
+      sx={{
+        p: 0.5,
+        gap: "10px",
+        textTransform: "none",
+        opacity: disabled ? 0.5 : 1,
+        minWidth: hasText ? "auto" : 0, // Optimize layout when text is hidden
+        ...sx,
+      }}
+    >
+      {startIcon &&
+        (isValidElement(startIcon) ? (
+          startIcon
+        ) : (
+          <IconComponent {...iconStyleProps} />
+        ))}
+
+      {hasText && (
+        <Typography
+          pt={0}
+          mt={-0.5}
+          whiteSpace="nowrap"
+          // Label tracks the icon colour, so status buttons (e.g. "On going")
+          // read as one unit rather than a green icon beside a blue label
+          sx={{
+            ...buttonStyles,
+            fontSize: fontSizes[size].text,
+            color: config.color,
+          }}
+          data-testid={`result-card-button-${text}`}
+        >
+          {text}
+        </Typography>
+      )}
+    </Button>
+  );
+
   return (
     <>
       <ContextMenu ref={menuRef} onClick={onClick} sx={buttonStyles} />
-      <Button
-        onContextMenu={(e) =>
-          onClick ? menuRef.current?.openContextMenu(e) : undefined
-        }
-        onClick={() => onClick?.(undefined)}
-        disabled={disabled}
-        sx={{
-          p: 0,
-          gap: "10px",
-          textTransform: "none",
-          opacity: disabled ? 0.5 : 1,
-          minWidth: hasText ? "auto" : 0, // Optimize layout when text is hidden
-          ...sx,
-        }}
-      >
-        {startIcon &&
-          (isValidElement(startIcon) ? (
-            startIcon
-          ) : (
-            <Tooltip title={text || ""} placement="top">
-              {
-                // Need span to allow tooltip forwardRef()
-              }
-              <span>
-                <IconComponent {...iconStyleProps} />
-              </span>
-            </Tooltip>
-          ))}
-
-        {hasText && (
-          <Typography
-            pt={0}
-            mt={-0.5}
-            whiteSpace="nowrap"
-            // Label tracks the icon colour, so status buttons (e.g. "On going")
-            // read as one unit rather than a green icon beside a blue label
-            sx={{
-              ...buttonStyles,
-              fontSize: fontSizes[size].text,
-              color: config.color,
-            }}
-            data-testid={`result-card-button-${text}`}
-          >
-            {text}
-          </Typography>
-        )}
-      </Button>
+      {shouldHideText ? (
+        <Tooltip title={text || ""} placement="top">
+          {button}
+        </Tooltip>
+      ) : (
+        button
+      )}
     </>
   );
 };
