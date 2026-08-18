@@ -106,11 +106,12 @@ describe("GeoServerLayer", () => {
               visible={true}
               collection={collection}
               onWMSAvailabilityChange={vi.fn()}
-              onWmsLayerChange={vi.fn()}
+              onLayerChange={vi.fn()}
               setTimeSliderSupport={vi.fn()}
               setDrawRectSupportSupport={vi.fn()}
               setDiscreteTimeSliderValues={vi.fn()}
               setWmsFields={vi.fn()}
+              layerConfig={{}}
               {...props}
             />
           </MapContext.Provider>
@@ -295,7 +296,7 @@ describe("GeoServerLayer", () => {
     });
 
     const onWMSAvailabilityChange = vi.fn();
-    const onWmsLayerChange = vi.fn();
+    const onLayerChange = vi.fn();
     const setDiscreteTimeSliderValues = vi.fn();
     // In real case, it is a useState but we cannot have useState in vitest, so we define
     // a function that do the same actio as useState function update.
@@ -308,10 +309,10 @@ describe("GeoServerLayer", () => {
 
     renderComponent({
       onWMSAvailabilityChange,
-      onWmsLayerChange,
+      onLayerChange,
       setDiscreteTimeSliderValues,
       setWmsFields,
-      geoServerLayerConfig: { uuid: "test-uuid" },
+      layerConfig: { uuid: "test-uuid" },
     });
 
     return waitFor(() => {
