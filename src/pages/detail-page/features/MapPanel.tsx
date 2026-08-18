@@ -351,6 +351,10 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   useEffect(() => {
     setMapSubsettingCapabilities({
       selectedLayerId: selectedMapLayerId ?? null,
+      timeRangeBounds: {
+        min: minDateStamp.format(dateDefault.DATE_FORMAT),
+        max: maxDateStamp.format(dateDefault.DATE_FORMAT),
+      },
       // undefined metadata → null (unknown); false = timeless PMTiles
       pmtilesHasTime:
         pmtilesPeriodRange == null ? null : pmtilesPeriodRange.hasTime,
@@ -369,6 +373,8 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     isSupportPMTiles,
     downloadService,
     hasCloudOptimisedData,
+    minDateStamp,
+    maxDateStamp,
     setMapSubsettingCapabilities,
   ]);
 

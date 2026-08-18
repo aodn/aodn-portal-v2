@@ -192,6 +192,8 @@ export enum DownloadServiceType {
 /** Live map-layer subsetting capabilities published by MapPanel. */
 export type MapSubsettingCapabilities = {
   selectedLayerId: string | null;
+  /** Effective calendar-day bounds displayed by the map time slider. */
+  timeRangeBounds: { min: string; max: string } | null;
   /** null = PMTiles metadata not loaded yet; false = timeless tiles */
   pmtilesHasTime: boolean | null;
   geoServerHasTime: boolean;
@@ -204,6 +206,7 @@ export type MapSubsettingCapabilities = {
 
 export const defaultMapSubsettingCapabilities: MapSubsettingCapabilities = {
   selectedLayerId: null,
+  timeRangeBounds: null,
   pmtilesHasTime: null,
   geoServerHasTime: false,
   geoServerDrawRect: false,
