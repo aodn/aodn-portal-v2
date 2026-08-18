@@ -23,12 +23,13 @@ declare module "@mui/material/styles" {
     //   tooltip: string;
     //   dropdown: string;
     // };
-    // rc8BorderRadius: {
-    //   small: string;
-    //   medium: string;
-    //   large: string;
-    //   round: string;
-    // };
+    borderRadius: {
+      sm: string;
+      md: string;
+      lg: string;
+      xlg: string;
+      xxlg: string;
+    };
   }
 
   interface ThemeOptions {
@@ -53,12 +54,13 @@ declare module "@mui/material/styles" {
     //   tooltip?: string;
     //   dropdown?: string;
     // };
-    // rc8BorderRadius?: {
-    //   small?: string;
-    //   medium?: string;
-    //   large?: string;
-    //   round?: string;
-    // };
+    borderRadius?: {
+      sm?: string;
+      md?: string;
+      lg?: string;
+      xlg?: string;
+      xxlg?: string;
+    };
   }
 
   interface TypographyVariants {

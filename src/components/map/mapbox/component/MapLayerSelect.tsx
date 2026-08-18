@@ -7,7 +7,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { borderRadius, zIndex } from "../../../../styles/constants";
+import { borderRadius, zIndex } from "@/styles/constants";
 import CommonSelect, {
   SelectItem,
 } from "../../../common/dropdown/CommonSelect";
@@ -15,17 +15,17 @@ import { portalTheme } from "../../../../styles";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 
 interface MapLayerSelectProps {
-  mapLayersOptions: SelectItem<string>[];
-  selectedItem: string;
-  handleSelectItem: (value: string) => void;
+  layersOptions: SelectItem<string>[];
+  selectedLayer: string;
+  handleSelectLayer: (value: string) => void;
   isLoading: boolean;
   loadingText?: string;
 }
 
 const MapLayerSelect: FC<MapLayerSelectProps> = ({
-  mapLayersOptions,
-  selectedItem,
-  handleSelectItem,
+  layersOptions,
+  selectedLayer,
+  handleSelectLayer,
   isLoading,
   loadingText = "Loading Layers...",
 }) => {
@@ -112,7 +112,7 @@ const MapLayerSelect: FC<MapLayerSelectProps> = ({
             }}
           />
         </Stack>
-      ) : mapLayersOptions.length > 0 ? (
+      ) : layersOptions.length > 0 ? (
         <Stack
           direction="row"
           sx={{
@@ -147,9 +147,9 @@ const MapLayerSelect: FC<MapLayerSelectProps> = ({
             </>
           )}
           <CommonSelect
-            items={mapLayersOptions}
-            value={selectedItem}
-            onSelectCallback={handleSelectItem}
+            items={layersOptions}
+            value={selectedLayer}
+            onSelectCallback={handleSelectLayer}
             menuProps={menuProps}
             selectSx={selectProps}
             dataTestId="layer-select-dropdown"

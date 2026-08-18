@@ -11,7 +11,7 @@ from utils.map_utils import (
     is_bbox_contained_by_map_bounds,
 )
 
-# dataset_metadata (PMTiles) and WMS layer list can lag under CI load.
+# PMTiles .metadata sidecar probe and WMS layer list can lag under CI load.
 _UI_TIMEOUT_MS = 30_000
 
 
@@ -34,7 +34,7 @@ def _open_layers_menu_until_visible(
     last_error = None
     while page.evaluate('() => Date.now()') < deadline:
         # Only click when the menu is closed; avoid toggling it closed while
-        # radios are still mounting (dataset_metadata / isSupportPMTiles).
+        # radios are still mounting (PMTiles .metadata sidecar probe).
         if not layers_menu_panel.is_visible():
             detail_map.layers_menu.click()
         try:
@@ -214,12 +214,12 @@ def test_map_layer_persists_after_tab_navigation(
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(uuid)
-    # GeoServer layer-select and dataset_metadata (PMTiles) can lag under CI load.
+    # GeoServer layer-select and the PMTiles .metadata sidecar probe can lag under CI load.
     detail_page.detail_map.wait_for_layer_select_loading()
     detail_page.detail_map.wait_for_map_idle()
 
     # Ensure that Data Density (PMTiles) and GeoServer options are in the layers menu.
-    # Data Density mounts only after dataset_metadata resolves isSupportPMTiles.
+    # Data Density mounts only after the PMTiles .metadata sidecar exists.
     _open_layers_menu_until_visible(
         detail_page, detail_page.detail_map.data_density_layer
     )

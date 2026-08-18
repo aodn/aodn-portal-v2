@@ -166,10 +166,11 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     downloadService,
     selectedCoKey,
     setSelectedCoKey,
-    isSupportPMTiles,
     setMapSubsettingCapabilities,
     isSubsettingSupported,
   } = useDetailPageContext();
+
+  const [isSupportPMTiles, setIsSupportPMTiles] = useState(false);
 
   const [mapLayerConfig, setMapLayerConfig] = useState<
     LayerSwitcherLayer<LayerName>[]
@@ -389,6 +390,10 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   useEffect(() => {
     setMapSubsettingCapabilities({
       selectedLayerId: selectedMapLayerId ?? null,
+      timeRangeBounds: {
+        min: minDateStamp.format(dateDefault.DATE_FORMAT),
+        max: maxDateStamp.format(dateDefault.DATE_FORMAT),
+      },
       // undefined metadata → null (unknown); false = timeless PMTiles
       pmtilesHasTime:
         pmtilesPeriodRange == null ? null : pmtilesPeriodRange.hasTime,
@@ -408,6 +413,8 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     isSupportPMTiles,
     downloadService,
     hasCloudOptimisedData,
+    minDateStamp,
+    maxDateStamp,
     hasGriddedDates,
     setMapSubsettingCapabilities,
   ]);
@@ -619,21 +626,20 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
               bbox={mapFocusArea}
             />
             {createStaticLayers(staticLayer)}
-            {isSupportPMTiles && ( // Avoid fetching S3 when not support PMTiles
-              <PMTilesHexLayer
-                collection={collection}
-                filterStartDate={filterStartDate}
-                filterEndDate={filterEndDate}
-                visible={selectedMapLayerId === LayerName.PMTiles}
-                selectedCoKey={selectedCoKey}
-                onSelectCoKey={setSelectedCoKey}
-                onMetadataPeriodChange={handlePmtilesMetadataPeriodChange}
-              />
-            )}
+            <PMTilesHexLayer
+              collection={collection}
+              filterStartDate={filterStartDate}
+              filterEndDate={filterEndDate}
+              visible={selectedMapLayerId === LayerName.PMTiles}
+              layerConfig={selectedCoKey}
+              onLayerChange={setSelectedCoKey}
+              onMetadataPeriodChange={handlePmtilesMetadataPeriodChange}
+              onSupportChange={setIsSupportPMTiles}
+            />
             <GeoServerLayer
-              geoServerLayerConfig={geoServerLayerConfig}
+              layerConfig={geoServerLayerConfig}
+              onLayerChange={onWmsLayerChange}
               onWMSAvailabilityChange={onWMSAvailabilityChange}
-              onWmsLayerChange={onWmsLayerChange}
               setWmsFields={setWMSFields}
               setTimeSliderSupport={setTimeSliderSupport}
               setDiscreteTimeSliderValues={setDiscreteTimeSliderValues}

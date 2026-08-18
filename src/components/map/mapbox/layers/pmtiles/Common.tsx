@@ -65,6 +65,74 @@ export const DENSITY_TOTAL_CAP = 10000;
  */
 export const DEFAULT_RANGE_START = "1900-01-01";
 
+const pmtilesBucket = import.meta.env.VITE_PMTILES_BUCKET;
+const pmtilesRegion = import.meta.env.VITE_AWS_REGION;
+
+const pmtilesVisualizationBase = (collectionId: string, key: string): string =>
+  `https://${pmtilesBucket}.s3.${pmtilesRegion}.amazonaws.com/portal/visualization/${collectionId}/${key}`;
+
+/** S3 vector-tile URL for a collection parquet key. */
+export const buildPmtilesSourceUrl = (
+  collectionId: string,
+  key: string
+): string => `${pmtilesVisualizationBase(collectionId, key)}.pmtiles`;
+
+/** S3 sidecar URL next to the `.pmtiles` object. */
+export const buildPmtilesMetadataUrl = (
+  collectionId: string,
+  key: string
+): string => `${pmtilesVisualizationBase(collectionId, key)}.metadata`;
+
+/**
+ * Ordered parquet keys to probe for a `.metadata` sidecar.
+ * Selected parquet key first (if it is one of the collection keys), then the rest.
+ */
+export const parquetKeyCandidates = (
+  parquetKeys: readonly string[],
+  selectedCoKey?: string
+): string[] => {
+  const selected = selectedCoKey?.trim() ?? "";
+  if (selected !== "" && parquetKeys.includes(selected)) {
+    return [selected, ...parquetKeys.filter((key) => key !== selected)];
+  }
+  return [...parquetKeys];
+};
+
+export type PmtilesMetadataProbeResult = {
+  key: string;
+  metadataUrl: string;
+  data: unknown;
+};
+
+/**
+ * GET each `{key}.metadata` until one returns HTTP OK.
+ * A 200 with unparsable JSON still counts as the file existing.
+ */
+export const probePmtilesMetadata = async (
+  collectionId: string,
+  keys: readonly string[],
+  signal?: AbortSignal
+): Promise<PmtilesMetadataProbeResult | null> => {
+  for (const key of keys) {
+    if (signal?.aborted) return null;
+    const metadataUrl = buildPmtilesMetadataUrl(collectionId, key);
+    try {
+      const response = await fetch(metadataUrl, { signal });
+      if (!response.ok) continue;
+      let data: unknown = null;
+      try {
+        data = await response.json();
+      } catch {
+        data = null;
+      }
+      return { key, metadataUrl, data };
+    } catch {
+      if (signal?.aborted) return null;
+    }
+  }
+  return null;
+};
+
 /** Cap on parsed counts-tree cache entries (string keys from MVT property `c`). */
 const COUNTS_TREE_CACHE_MAX = 4000;
 

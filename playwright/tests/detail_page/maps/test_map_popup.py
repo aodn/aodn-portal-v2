@@ -3,7 +3,7 @@ from playwright.sync_api import Page, expect
 
 from pages.detail_page import DetailPage
 
-# dataset_metadata (PMTiles) and WMS layer list can lag under CI load.
+# PMTiles .metadata sidecar probe and WMS layer list can lag under CI load.
 _UI_TIMEOUT_MS = 30_000
 
 
@@ -24,7 +24,7 @@ def test_map_data_density_layer_from_summary(
     detail_page = DetailPage(desktop_page)
     detail_page.load(uuid)
     # GeoServer layer-select spinner is independent of PMTiles support, which
-    # only appears after dataset_metadata resolves isSupportPMTiles.
+    # only appears after the PMTiles .metadata sidecar probe succeeds.
     detail_page.detail_map.wait_for_map_loading()
     detail_page.detail_map.wait_for_layer_select_loading()
     detail_page.detail_map.wait_for_map_idle()
@@ -33,7 +33,7 @@ def test_map_data_density_layer_from_summary(
         timeout=_UI_TIMEOUT_MS
     )
     detail_page.detail_map.layers_menu.click()
-    # Data Density mounts only after parquet keys exist in dataset_metadata.
+    # Data Density mounts only after the PMTiles .metadata sidecar exists.
     expect(detail_page.detail_map.data_density_layer).to_be_visible(
         timeout=_UI_TIMEOUT_MS
     )

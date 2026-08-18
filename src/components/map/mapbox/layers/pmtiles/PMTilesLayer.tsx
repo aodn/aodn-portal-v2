@@ -32,11 +32,17 @@ import {
   parseCountsTree,
   sumCountsTreeDensityTotal,
   parsePMTilesMetadata,
+  buildPmtilesSourceUrl,
+  buildPmtilesMetadataUrl,
+  parquetKeyCandidates,
+  probePmtilesMetadata,
 } from "./Common";
 import MapContext from "@/components/map/mapbox/MapContext";
-import { DatasetType } from "@/app/store/OGCCollectionDefinitions";
 import { playwrightTestIds } from "@/components/common/constants";
-import { LayerBasicType } from "@/components/map/mapbox/layers/Layers";
+import {
+  LayerBasicType,
+  LayerSelectable,
+} from "@/components/map/mapbox/layers/Layers";
 import { InnerHtmlBuilder } from "@/utils/HtmlUtils";
 import { SelectItem } from "@/components/common/dropdown/CommonSelect";
 import { MapDefaultConfig } from "@/components/map/mapbox/constants";
@@ -78,6 +84,10 @@ export {
   parsePMTilesMetadata,
   parsePeriodInt,
   periodNumberToDayjs,
+  probePmtilesMetadata,
+  parquetKeyCandidates,
+  buildPmtilesSourceUrl,
+  buildPmtilesMetadataUrl,
   sumCountsTreeDensityTotal,
   sumCountsTreeInRange,
   sumSparseCountFromProperties,
@@ -95,8 +105,6 @@ const EMPTY_FEATURE_COLLECTION: FeatureCollection = {
   type: "FeatureCollection",
   features: [],
 };
-const bucket = import.meta.env.VITE_PMTILES_BUCKET;
-const region = import.meta.env.VITE_AWS_REGION;
 /**
  * Trailing debounce so rapid tile `sourcedata` / `idle` events collapse into
  * one feature-state pass after the viewport settles (avoids partial updates).
@@ -211,16 +219,19 @@ export const clearInactivePmtilesFeatureState = (
     }
   }
 };
-interface PMTilesHexLayerProps extends LayerBasicType {
+interface PMTilesHexLayerProps extends LayerBasicType, LayerSelectable<string> {
   filterStartDate?: Dayjs;
   filterEndDate?: Dayjs;
-  selectedCoKey?: string;
-  onSelectCoKey?: (key: string) => void;
   /**
    * Fired when the `.metadata` sidecar is loaded (or cleared on dataset change /
    * error) so the map time slider can align with tile coverage.
    */
   onMetadataPeriodChange?: (range: PMTilesMetadata | null) => void;
+  /**
+   * Fired after probing S3 for `{key}.metadata`. True only when the sidecar
+   * exists (HTTP OK). Used by the parent to show Data Density.
+   */
+  onSupportChange?: (supported: boolean) => void;
 }
 
 /**
@@ -653,12 +664,13 @@ export const scheduleDebouncedWork = (
 };
 const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   collection,
-  selectedCoKey,
-  onSelectCoKey,
+  layerConfig,
+  onLayerChange,
   filterStartDate,
   filterEndDate,
   visible = true,
   onMetadataPeriodChange,
+  onSupportChange,
 }) => {
   const { map } = useContext(MapContext);
   const popupRef = useRef<Popup | null>(null);
@@ -675,35 +687,30 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     bounds: PMTilesMetadataRange | null;
   } | null>(null);
 
-  const resolveParquetKey = useCallback((): string | undefined => {
-    let key =
-      typeof selectedCoKey === "string" && selectedCoKey.trim() !== ""
-        ? selectedCoKey.trim()
-        : undefined;
-    if (key && collection?.getDatasetTypeByKey(key) !== DatasetType.PARQUET) {
-      key = collection?.getAllParquetKeys()[0];
-    }
-    if (!key) {
-      key = collection?.getAllParquetKeys()[0];
-    }
-    return key || undefined;
-  }, [collection, selectedCoKey]);
+  /**
+   * Probe result keyed by collection id. When the collection changes, derived
+   * `supportedKey` falls back immediately so a stale key cannot load tiles.
+   */
+  const [supported, setSupported] = useState<{
+    collectionId: string;
+    key: string;
+  } | null>(null);
+
+  const collectionId = collection?.id;
+  const supportedKey =
+    supported != null && supported.collectionId === collectionId
+      ? supported.key
+      : undefined;
 
   const formSourceUrl = useCallback((): string | undefined => {
-    const key = resolveParquetKey();
-    const collectionId = collection?.id;
-    if (!key || !collectionId) return undefined;
-    return `https://${bucket}.s3.${region}.amazonaws.com/portal/visualization/${collectionId}/${key}.pmtiles`;
-  }, [collection?.id, resolveParquetKey]);
+    if (!collectionId || !supportedKey) return undefined;
+    return buildPmtilesSourceUrl(collectionId, supportedKey);
+  }, [collectionId, supportedKey]);
 
-  const formMetadataUrl = useCallback((): string | undefined => {
-    const key = resolveParquetKey();
-    const collectionId = collection?.id;
-    if (!key || !collectionId) return undefined;
-    return `https://${bucket}.s3.${region}.amazonaws.com/portal/visualization/${collectionId}/${key}.metadata`;
-  }, [collection?.id, resolveParquetKey]);
-
-  const metadataUrl = formMetadataUrl();
+  const metadataUrl =
+    collectionId && supportedKey
+      ? buildPmtilesMetadataUrl(collectionId, supportedKey)
+      : undefined;
   const metaMatchesUrl = loadedMeta != null && loadedMeta.url === metadataUrl;
   const periodBounds = metaMatchesUrl ? loadedMeta.bounds : null;
 
@@ -752,9 +759,9 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
 
   const handleSelectDataset = useCallback(
     (key: string) => {
-      onSelectCoKey?.(key);
+      onLayerChange?.(key);
     },
-    [onSelectCoKey]
+    [onLayerChange]
   );
 
   const datasetOptions = useMemo<SelectItem<string>[]>(() => {
@@ -765,31 +772,38 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     }));
   }, [collection]);
 
-  // Load `.metadata`. Parent is notified from fetch callbacks only (not a
-  // synchronous setState reset at effect start).
+  // Probe `{key}.metadata` on S3. Support and slider bounds are reported from
+  // fetch callbacks only (no synchronous parent setState at effect start).
   useEffect(() => {
-    if (!metadataUrl) {
+    const keys = parquetKeyCandidates(
+      collection?.getAllParquetKeys() ?? [],
+      layerConfig
+    );
+    if (!collectionId || keys.length === 0) {
+      onSupportChange?.(false);
       onMetadataPeriodChange?.(null);
       return;
     }
 
     const abortController = new AbortController();
-    // Clear parent slider bounds while the new sidecar loads
     onMetadataPeriodChange?.(null);
 
-    fetch(metadataUrl, { signal: abortController.signal })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Metadata fetch failed: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data: unknown) => {
+    probePmtilesMetadata(collectionId, keys, abortController.signal)
+      .then((result) => {
         if (abortController.signal.aborted) return;
-        const metadata = parsePMTilesMetadata(data);
+        if (!result) {
+          setSupported(null);
+          setLoadedMeta(null);
+          onSupportChange?.(false);
+          onMetadataPeriodChange?.(null);
+          return;
+        }
+        setSupported({ collectionId, key: result.key });
+        onSupportChange?.(true);
+        const metadata = parsePMTilesMetadata(result.data);
         if (!metadata) {
           setLoadedMeta({
-            url: metadataUrl,
+            url: result.metadataUrl,
             bounds: null,
           });
           onMetadataPeriodChange?.(null);
@@ -801,7 +815,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
           hasTime: metadata.hasTime,
         };
         setLoadedMeta({
-          url: metadataUrl,
+          url: result.metadataUrl,
           bounds,
         });
         onMetadataPeriodChange?.(metadata);
@@ -809,17 +823,22 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       .catch((err: unknown) => {
         if (err instanceof DOMException && err.name === "AbortError") return;
         if (abortController.signal.aborted) return;
-        setLoadedMeta({
-          url: metadataUrl,
-          bounds: null,
-        });
+        setSupported(null);
+        setLoadedMeta(null);
+        onSupportChange?.(false);
         onMetadataPeriodChange?.(null);
       });
 
     return () => {
       abortController.abort();
     };
-  }, [metadataUrl, onMetadataPeriodChange]);
+  }, [
+    collection,
+    collectionId,
+    layerConfig,
+    onMetadataPeriodChange,
+    onSupportChange,
+  ]);
 
   // Source + layers lifecycle (dataset URL only).
   useEffect(() => {
@@ -1213,9 +1232,9 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     <>
       {visible && (
         <MapLayerSelect
-          mapLayersOptions={datasetOptions}
-          selectedItem={selectedCoKey || ""}
-          handleSelectItem={handleSelectDataset}
+          layersOptions={datasetOptions}
+          selectedLayer={layerConfig || ""}
+          handleSelectLayer={handleSelectDataset}
           isLoading={false}
           loadingText="Loading Data Density Layers..."
         />

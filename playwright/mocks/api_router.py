@@ -1,8 +1,10 @@
-from typing import Callable, Optional
+from typing import Callable, Optional, Pattern, Union
 
 from playwright.sync_api import Page
 
 from mocks.routes import Routes
+
+RouteUrl = Union[str, Pattern[str]]
 
 
 class ApiRouter:
@@ -10,12 +12,12 @@ class ApiRouter:
         self.page = page
         self.routes: dict = {}
 
-    def route(self, route_url: str, handler_function: Callable) -> None:
+    def route(self, route_url: RouteUrl, handler_function: Callable) -> None:
         self.page.route(route_url, handler_function)
         self.routes[route_url] = handler_function
 
     def unroute(
-        self, route_url: str, handler_function: Optional[Callable] = None
+        self, route_url: RouteUrl, handler_function: Optional[Callable] = None
     ) -> None:
         if handler_function:
             self.page.unroute(route_url, handler_function)
@@ -214,6 +216,14 @@ class ApiRouter:
         self, handler_function: Optional[Callable] = None
     ) -> None:
         self.unroute(Routes.ESTIMATE_CO_DOWNLOAD, handler_function)
+
+    def route_pmtiles_metadata(self, handler_function: Callable) -> None:
+        self.route(Routes.PMTILES_METADATA, handler_function)
+
+    def unroute_pmtiles_metadata(
+        self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.PMTILES_METADATA, handler_function)
 
     def route_static_geojson(self, handler_function: Callable) -> None:
         self.route(Routes.STATIC_GEOJSON, handler_function)

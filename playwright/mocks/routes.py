@@ -1,3 +1,5 @@
+import re
+
 PREFIX = '*/**/api/v1/ogc'
 
 
@@ -38,3 +40,8 @@ class Routes:
     ESTIMATE_CO_DOWNLOAD = f'{PREFIX}/processes/estimateCOdownload/execution'
 
     STATIC_GEOJSON = f'{PREFIX}/ext/static/*.json'
+
+    # S3 sidecar next to `{key}.pmtiles` — used to decide PMTiles support.
+    PMTILES_METADATA = re.compile(
+        r'.*/portal/visualization/.+\.metadata(?:\?.*)?$'
+    )

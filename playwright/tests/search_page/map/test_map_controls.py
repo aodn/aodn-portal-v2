@@ -122,6 +122,7 @@ def test_map_buttons(desktop_page: Page, data_title: str) -> None:
 
     search_page.result_title.get_by_text(data_title).click()
     detail_page.detail_map.wait_for_map_loading()
+    detail_page.detail_map.wait_for_map_idle()
 
     # Check the visibility of detail page map buttons
     expect(detail_page.detail_map.basemap_show_hide_menu).to_be_visible()
@@ -133,8 +134,11 @@ def test_map_buttons(desktop_page: Page, data_title: str) -> None:
     expect(detail_page.detail_map.draw_rect_menu_button).to_be_visible()
     expect(detail_page.detail_map.delete_button).to_be_visible()
 
-    # Select the Geoserver layer
-    detail_page.detail_map.layers_menu.click()
+    # Data Density is default once the `.metadata` probe succeeds; map idle
+    # can close the layer menu before GeoServer is clickable.
+    detail_page.detail_map.open_layers_menu_until_visible(
+        detail_page.detail_map.geoserver_layer
+    )
     detail_page.detail_map.geoserver_layer.click()
 
     # users now should be able to draw a rectangle and select a date range in any layers

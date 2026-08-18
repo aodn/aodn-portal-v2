@@ -134,11 +134,11 @@ describe("GeoServerLayer", () => {
     });
 
     const onWMSAvailabilityChange = vi.fn();
-    const onWmsLayerChange = vi.fn();
+    const onLayerChange = vi.fn();
 
     renderComponent({
       onWMSAvailabilityChange,
-      onWmsLayerChange,
+      onLayerChange,
     });
 
     await waitFor(() => {
@@ -147,7 +147,7 @@ describe("GeoServerLayer", () => {
         expect.anything()
       );
       expect(onWMSAvailabilityChange).toHaveBeenCalledWith(true);
-      expect(onWmsLayerChange).toHaveBeenCalledWith("test_layer");
+      expect(onLayerChange).toHaveBeenCalledWith("test_layer");
     });
 
     await waitFor(() => {
@@ -188,16 +188,16 @@ describe("GeoServerLayer", () => {
     });
 
     const onWMSAvailabilityChange = vi.fn();
-    const onWmsLayerChange = vi.fn();
+    const onLayerChange = vi.fn();
 
     renderComponent({
       onWMSAvailabilityChange,
-      onWmsLayerChange,
+      onLayerChange,
     });
 
     return waitFor(() => {
       expect(onWMSAvailabilityChange).toHaveBeenCalledWith(true);
-      expect(onWmsLayerChange).toHaveBeenCalledWith("fallback");
+      expect(onLayerChange).toHaveBeenCalledWith("fallback");
     });
   });
 
@@ -256,18 +256,18 @@ describe("GeoServerLayer", () => {
     });
 
     const onWMSAvailabilityChange = vi.fn();
-    const onWmsLayerChange = vi.fn();
+    const onLayerChange = vi.fn();
     const setDiscreteTimeSliderValues = vi.fn();
 
     renderComponent({
       onWMSAvailabilityChange,
-      onWmsLayerChange,
+      onLayerChange,
       setDiscreteTimeSliderValues,
     });
 
     await waitFor(() => {
       expect(onWMSAvailabilityChange).toHaveBeenCalledWith(true);
-      expect(onWmsLayerChange).toHaveBeenCalledWith("single");
+      expect(onLayerChange).toHaveBeenCalledWith("single");
     });
   });
 

@@ -12,13 +12,10 @@ import {
   LayerName,
   LayerSwitcherLayer,
 } from "@/components/map/mapbox/controls/menu/MapLayerSwitcher";
-import { DatasetMetadata } from "@/app/store/searchReducer";
 
 export interface DetailPageContextType {
   collection: OGCCollection | undefined;
   setCollection: Dispatch<SetStateAction<OGCCollection | undefined>>;
-  datasetMetadata: DatasetMetadata | undefined;
-  isSupportPMTiles: boolean;
   isCollectionNotFound: boolean;
   downloadConditions: IDownloadCondition[];
   getAndSetDownloadConditions: (
@@ -48,8 +45,6 @@ export interface DetailPageContextType {
 const DetailPageContextDefault: DetailPageContextType = {
   collection: {} as OGCCollection | undefined,
   setCollection: () => {},
-  datasetMetadata: undefined,
-  isSupportPMTiles: false,
   isCollectionNotFound: false,
   downloadConditions: [],
   getAndSetDownloadConditions: () => [],

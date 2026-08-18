@@ -18,6 +18,7 @@ from mocks.api.download_wfs import (
     handle_estimate_co_download,
     handle_estimate_wfs_download,
 )
+from mocks.api.pmtiles import handle_pmtiles_metadata_api
 from mocks.api.gridded_tiles import (
     handle_gridded_tile_image_api,
     handle_gridded_tile_products_api,
@@ -77,3 +78,4 @@ def apply_mock(page: Page) -> None:
     api_router.route_estimate_wfs_download(handle_estimate_wfs_download)
     api_router.route_estimate_co_download(handle_estimate_co_download)
     api_router.route_static_geojson(handle_static_geojson_api)
+    api_router.route_pmtiles_metadata(handle_pmtiles_metadata_api)
