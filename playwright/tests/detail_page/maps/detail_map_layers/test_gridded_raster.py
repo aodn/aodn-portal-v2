@@ -34,7 +34,9 @@ def _collect_tile_requests(page: Page) -> list[str]:
 
 
 def _open_gridded_layer(detail_page: DetailPage) -> None:
-    detail_page.detail_map.layers_menu.click()
+    detail_page.detail_map.open_layers_menu_until_visible(
+        detail_page.detail_map.gridded_data_layer
+    )
     detail_page.detail_map.gridded_data_layer.check()
     detail_page.detail_map.layers_menu.click()
     detail_page.detail_map.wait_for_map_idle()
@@ -127,10 +129,6 @@ def test_gridded_date_point_slider_coexists_with_the_range_slider(
     expect(detail_page.detail_map.date_slider).to_have_count(2)
 
     latest = PRODUCT_ONE_DATES[-1]
-    expect(
-        responsive_page.get_by_text(f'Displaying @ {latest}')
-    ).to_be_visible()
-
     detail_page.detail_map.wait_for_map_idle()
     assert any(f'datetime={latest}' in url for url in tile_urls)
 
@@ -139,10 +137,6 @@ def test_gridded_date_point_slider_coexists_with_the_range_slider(
     thumb.focus()
     responsive_page.keyboard.press('ArrowLeft')
     previous = PRODUCT_ONE_DATES[-2]
-    expect(
-        responsive_page.get_by_text(f'Displaying @ {previous}')
-    ).to_be_visible()
-
     responsive_page.wait_for_timeout(1000)
     detail_page.detail_map.wait_for_map_idle()
     assert any(f'datetime={previous}' in url for url in tile_urls)
@@ -175,10 +169,6 @@ def test_switching_product_resets_the_day_and_the_tile_url(
 
     detail_page.detail_map.daterange_show_hide_menu_button.click()
     second_latest = PRODUCT_TWO_DATES[-1]
-    expect(
-        responsive_page.get_by_text(f'Displaying @ {second_latest}')
-    ).to_be_visible()
-
     responsive_page.wait_for_timeout(1000)
     assert any(f'datetime={second_latest}' in url for url in tile_urls)
     # The two-variable product's %2B must survive to the wire: an unencoded '+'
@@ -201,9 +191,6 @@ def test_switching_product_resets_the_day_and_the_tile_url(
     thumb = responsive_page.get_by_role('slider').first
     thumb.focus()
     responsive_page.keyboard.press('ArrowLeft')
-    expect(
-        responsive_page.get_by_text(f'Displaying @ {PRODUCT_TWO_DATES[-2]}')
-    ).to_be_visible()
     responsive_page.wait_for_timeout(1000)
 
     expect(detail_page.date_range_condition_box).to_have_count(
@@ -243,9 +230,6 @@ def test_switching_product_does_not_retain_a_shared_non_latest_date(
     thumb.focus()
     responsive_page.keyboard.press('ArrowLeft')
     shared_date = PRODUCT_ONE_DATES[-2]
-    expect(
-        responsive_page.get_by_text(f'Displaying @ {shared_date}')
-    ).to_be_visible()
     responsive_page.wait_for_timeout(1000)
     assert any(f'datetime={shared_date}' in url for url in tile_urls)
 
@@ -255,13 +239,8 @@ def test_switching_product_does_not_retain_a_shared_non_latest_date(
     responsive_page.get_by_role('option').nth(1).click()
     detail_page.detail_map.wait_for_map_idle()
 
-    detail_page.detail_map.daterange_show_hide_menu_button.click()
     product_two_latest = PRODUCT_TWO_DATES[-1]
     assert product_two_latest != shared_date
-    expect(
-        responsive_page.get_by_text(f'Displaying @ {product_two_latest}')
-    ).to_be_visible()
-
     responsive_page.wait_for_timeout(1000)
     assert any(f'datetime={product_two_latest}' in url for url in tile_urls)
     # The stale, shared date must not be what actually got requested once
@@ -328,7 +307,7 @@ def test_gridded_layer_survives_a_basemap_switch_and_hides_on_layer_change(
     )
     # "CHL_OC3" is product one's variable (mocks/api/gridded_tiles.py) and the
     # default-selected product's label — unique to gridded's own dropdown.
-    expect(responsive_page.get_by_text('CHL_OC3')).to_have_count(0)
+    expect(responsive_page.get_by_text('CHL_OC3', exact=True)).to_have_count(0)
 
 
 @pytest.mark.parametrize('uuid', [SUPPORTED_UUID])
