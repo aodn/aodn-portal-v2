@@ -658,7 +658,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
                   // If is not allowed likely due to whitelist, we should set the wms not support to block display WMS layer
                   onWMSAvailabilityChange?.(false);
                 } else {
-                  console.log("Failed to fetch fields, ok to ignore", error);
+                  console.warn("Failed to fetch fields, ok to ignore", error);
                 }
               })
               .finally(() => {

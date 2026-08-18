@@ -360,7 +360,7 @@ export const useDownloadDialog = (
               }
             }
           } else {
-            console.log("Internal server error.");
+            console.error("Internal server error.");
             setProcessingStatus(STATUS_CODES.SERVER_ERROR);
           }
           setIsProcessing(false);
@@ -370,7 +370,7 @@ export const useDownloadDialog = (
             if (error?.response?.status) {
               setProcessingStatus(error.response.status.toString());
             } else {
-              console.log("Internal server error.");
+              console.error("Internal server error.");
               setProcessingStatus(STATUS_CODES.SERVER_ERROR);
             }
             setIsProcessing(false);

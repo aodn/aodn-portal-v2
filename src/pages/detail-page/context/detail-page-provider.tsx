@@ -102,7 +102,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       })
       .catch((error) => {
         if (cancelled) return;
-        console.log("Error fetching collection by UUID:", error);
+        console.error("Error fetching collection by UUID:", error);
         setIsCollectionNotFound(true);
       });
     return () => {
