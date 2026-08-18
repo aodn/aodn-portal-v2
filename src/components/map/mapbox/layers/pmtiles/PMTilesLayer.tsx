@@ -412,11 +412,16 @@ export const applyHexLayerStyle = (
 /** Drop all feature-state for the PMTiles vector source (if present). */
 export const clearPmtilesFeatureState = (map: Map): void => {
   if (!map.getSource(SOURCE_ID)) return;
-  try {
-    // Clears every feature-state entry for this source (all source-layers)
-    map.removeFeatureState({ source: SOURCE_ID });
-  } catch {
-    // Source may already be gone or style unloaded
+  // Vector sources require sourceLayer, so clear each hex band explicitly
+  for (const layer of PMTILE_LAYERS) {
+    try {
+      map.removeFeatureState({
+        source: SOURCE_ID,
+        sourceLayer: layer.sourceLayer,
+      });
+    } catch {
+      // Source may already be gone or style unloaded
+    }
   }
 };
 
