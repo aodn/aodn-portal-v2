@@ -574,8 +574,8 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
             />
             <GeoServerLayer
               layerConfig={geoServerLayerConfig}
-              onWMSAvailabilityChange={onWMSAvailabilityChange}
               onLayerChange={onWmsLayerChange}
+              onWMSAvailabilityChange={onWMSAvailabilityChange}
               setWmsFields={setWMSFields}
               setTimeSliderSupport={setTimeSliderSupport}
               setDiscreteTimeSliderValues={setDiscreteTimeSliderValues}
