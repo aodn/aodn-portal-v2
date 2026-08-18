@@ -1,9 +1,14 @@
+import time
+
 import pytest
 from playwright.sync_api import Page, expect
 
 from core.enums.map_layers.layer_style import LayerStyle
 from core.factories.layer import LayerFactory
 from pages.detail_page import DetailPage
+
+# Map mount / GeojsonLayer paint can lag under CI load (esp. mobile map tab).
+_UI_TIMEOUT_MS = 30_000
 
 
 @pytest.mark.parametrize(
@@ -29,15 +34,30 @@ def test_map_shows_only_spatial_extent_layer(
 
     detail_page.load(uuid)
     detail_page.go_to_map_tab()
+    detail_page.detail_map.wait_for_map_loading()
     detail_page.detail_map.wait_for_layer_select_loading()
+    detail_page.detail_map.wait_for_map_idle()
 
-    # Ensure that the Spatial Extent option is displayed in the layers menu
-    detail_page.detail_map.layers_menu.click()
-    expect(detail_page.detail_map.spatial_extent_layer).to_be_visible()
+    # Map resize / idle can dismiss the Popper after a single click (CI/mobile).
+    detail_page.detail_map.open_layers_menu_until_visible(
+        detail_page.detail_map.spatial_extent_layer
+    )
 
-    # Verify that the Spatial Extent layer is present and visible on the map
+    # GeojsonLayer paints after map idle + selectedMapLayerId === SpatialExtent.
     layer_id = layer_factory.get_layer_id(LayerStyle.SPATIAL_EXTENT)
-    assert detail_page.detail_map.is_map_layer_visible(layer_id) is True
+    layer_visible = False
+    deadline = time.monotonic() + (_UI_TIMEOUT_MS / 1000)
+    while time.monotonic() < deadline:
+        if detail_page.detail_map.is_map_layer_visible(
+            layer_id, is_map_loading=False
+        ):
+            layer_visible = True
+            break
+        detail_page.page.wait_for_timeout(250)
+    assert layer_visible is True, (
+        f'Spatial Extent layer {layer_id!r} was not visible within '
+        f'{_UI_TIMEOUT_MS}ms'
+    )
 
 
 @pytest.mark.parametrize(
