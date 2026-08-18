@@ -18,11 +18,11 @@ from mocks.api.download_wfs import (
     handle_estimate_co_download,
     handle_estimate_wfs_download,
 )
-from mocks.api.pmtiles import handle_pmtiles_metadata_api
 from mocks.api.gridded_tiles import (
     handle_gridded_tile_image_api,
     handle_gridded_tile_products_api,
 )
+from mocks.api.pmtiles import handle_pmtiles_metadata_api
 from mocks.api.search_collections import (
     handle_provider_api,
     handle_temporal_api,
