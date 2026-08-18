@@ -7,7 +7,6 @@ import {
   useRef,
 } from "react";
 import { Button, SxProps, Tooltip, Typography } from "@mui/material";
-import { color } from "../../../styles/constants";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 import { OpenType } from "../../../hooks/useTabNavigation";
 import { portalTheme } from "../../../styles";
@@ -50,7 +49,7 @@ export const DEFAULT_RESULT_CARD_BUTTON_SIZE = ResultCardButtonSize.MEDIUM;
 const DEFAULT_SVG_ICON_SIZE = 20;
 
 const defaultConfig: ResultCardButtonConfig = {
-  color: color.blue.dark,
+  color: portalTheme.palette.primary1,
   size: DEFAULT_RESULT_CARD_BUTTON_SIZE,
 };
 
