@@ -11,7 +11,7 @@ import {
   useState,
 } from "react";
 import MapContext, { ProgressType } from "../MapContext";
-import { LayerBasicType } from "./Layers";
+import { LayerBasicType, LayerSelectable } from "./Layers";
 import { mergeWithDefaults } from "@/utils/ObjectUtils";
 import { formatToUrl } from "@/utils/UrlUtils";
 import { MapDefaultConfig, MapEventEnum } from "../constants";
@@ -88,10 +88,9 @@ interface GeoServerLayerConfig {
   bbox: Position;
 }
 
-export interface GeoServerLayerProps extends LayerBasicType {
-  geoServerLayerConfig?: Partial<GeoServerLayerConfig>;
+export interface GeoServerLayerProps
+  extends LayerBasicType, LayerSelectable<Partial<GeoServerLayerConfig>> {
   onWMSAvailabilityChange?: (isWMSAvailable: boolean) => void;
-  onWmsLayerChange?: (wmsLayerName: string) => void;
   setWmsFields: Dispatch<SetStateAction<GeoserverFieldsResponse[]>>;
 }
 
@@ -213,11 +212,11 @@ const checkSupportDiscreteTimeSlider = (
 };
 
 const GeoServerLayer: FC<GeoServerLayerProps> = ({
-  geoServerLayerConfig,
+  layerConfig,
+  onLayerChange,
   visible,
   collection,
   onWMSAvailabilityChange,
-  onWmsLayerChange,
   setWmsFields,
   setTimeSliderSupport,
   setDrawRectSupportSupport,
@@ -246,10 +245,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   }, [map]);
 
   const [config, isWMSAvailable] = useMemo(() => {
-    let config = mergeWithDefaults(
-      DEFAULT_WMS_MAP_CONFIG,
-      geoServerLayerConfig
-    );
+    let config = mergeWithDefaults(DEFAULT_WMS_MAP_CONFIG, layerConfig);
 
     if (selectedWmsLayer && selectedWmsLayer.length > 0) {
       config = mergeWithDefaults(config, {
@@ -265,7 +261,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     return [config, isWMSAvailable];
   }, [
     collection?.id,
-    geoServerLayerConfig,
+    layerConfig,
     isFetchingWmsLayers,
     onWMSAvailabilityChange,
     selectedWmsLayer,
@@ -318,7 +314,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   const handleWmsLayerChange = useCallback(
     (value: string, shouldCheckDiscreteTimeSlider: boolean = true) => {
       setSelectedWmsLayer(value);
-      onWmsLayerChange?.(value);
+      onLayerChange?.(value);
       setWmsFields?.((prev) => {
         if (prev && prev.length > 0) {
           // Check the field support for the selected wms layer, and then decide if we should enable time slider or draw rect support
@@ -340,7 +336,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       });
     },
     [
-      onWmsLayerChange,
+      onLayerChange,
       setWmsFields,
       setTimeSliderSupport,
       setDrawRectSupportSupport,

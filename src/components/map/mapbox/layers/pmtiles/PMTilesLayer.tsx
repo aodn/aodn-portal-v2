@@ -39,7 +39,10 @@ import {
 } from "./Common";
 import MapContext from "@/components/map/mapbox/MapContext";
 import { playwrightTestIds } from "@/components/common/constants";
-import { LayerBasicType } from "@/components/map/mapbox/layers/Layers";
+import {
+  LayerBasicType,
+  LayerSelectable,
+} from "@/components/map/mapbox/layers/Layers";
 import { InnerHtmlBuilder } from "@/utils/HtmlUtils";
 import { SelectItem } from "@/components/common/dropdown/CommonSelect";
 import { MapDefaultConfig } from "@/components/map/mapbox/constants";
@@ -216,11 +219,9 @@ export const clearInactivePmtilesFeatureState = (
     }
   }
 };
-interface PMTilesHexLayerProps extends LayerBasicType {
+interface PMTilesHexLayerProps extends LayerBasicType, LayerSelectable<string> {
   filterStartDate?: Dayjs;
   filterEndDate?: Dayjs;
-  selectedCoKey?: string;
-  onSelectCoKey?: (key: string) => void;
   /**
    * Fired when the `.metadata` sidecar is loaded (or cleared on dataset change /
    * error) so the map time slider can align with tile coverage.
@@ -663,8 +664,8 @@ export const scheduleDebouncedWork = (
 };
 const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   collection,
-  selectedCoKey,
-  onSelectCoKey,
+  layerConfig,
+  onLayerChange,
   filterStartDate,
   filterEndDate,
   visible = true,
@@ -758,9 +759,9 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
 
   const handleSelectDataset = useCallback(
     (key: string) => {
-      onSelectCoKey?.(key);
+      onLayerChange?.(key);
     },
-    [onSelectCoKey]
+    [onLayerChange]
   );
 
   const datasetOptions = useMemo<SelectItem<string>[]>(() => {
@@ -776,7 +777,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   useEffect(() => {
     const keys = parquetKeyCandidates(
       collection?.getAllParquetKeys() ?? [],
-      selectedCoKey
+      layerConfig
     );
     if (!collectionId || keys.length === 0) {
       onSupportChange?.(false);
@@ -834,7 +835,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   }, [
     collection,
     collectionId,
-    selectedCoKey,
+    layerConfig,
     onMetadataPeriodChange,
     onSupportChange,
   ]);
@@ -1232,7 +1233,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       {visible && (
         <MapLayerSelect
           layersOptions={datasetOptions}
-          selectedLayer={selectedCoKey || ""}
+          selectedLayer={layerConfig || ""}
           handleSelectLayer={handleSelectDataset}
           isLoading={false}
           loadingText="Loading Data Density Layers..."
