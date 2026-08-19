@@ -52,6 +52,28 @@ const sliderCaptionSx = {
   padding: 0,
 } as const;
 
+/** Diamond thumb for the single-point time slider (range slider stays circular). */
+const diamondThumbSx = {
+  flex: 1,
+  minWidth: 0,
+  "& .MuiSlider-thumb": {
+    width: 20,
+    height: 20,
+    backgroundColor: "transparent",
+    boxShadow: "none",
+    "&::before": {
+      width: 16,
+      height: 16,
+      borderRadius: "3px",
+      backgroundColor: portalTheme.palette.secondary2,
+      border: "3px solid #FFF",
+      boxSizing: "border-box",
+      transform: "rotate(45deg)",
+      boxShadow: "0px 0px 3px rgba(0, 0, 0, 0.50)",
+    },
+  },
+} as const;
+
 /** One calendar day in ms — sensible arrow-key step for date timestamps. */
 const DAY_MS = 24 * 60 * 60 * 1000;
 /** ~one month jump for Shift+Arrow / PageUp / PageDown. */
@@ -226,7 +248,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
             valueLabelFormat={(value: number) =>
               valueToDate(value).format(dateDefault.DISPLAY_FORMAT)
             }
-            sx={{ flex: 1, minWidth: 0 }}
+            sx={diamondThumbSx}
           />
         </Stack>
       </Grid>
