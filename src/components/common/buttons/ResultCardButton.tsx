@@ -92,6 +92,7 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
 
   const button = (
     <Button
+      aria-label={text ?? undefined}
       onContextMenu={(e) =>
         onClick ? menuRef.current?.openContextMenu(e) : undefined
       }
