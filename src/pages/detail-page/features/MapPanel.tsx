@@ -6,8 +6,8 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { Box } from "@mui/material";
-import { padding } from "@/styles/constants";
+import { Box, useTheme } from "@mui/material";
+import { borderRadius, padding } from "@/styles/constants";
 import { useDetailPageContext } from "../context/detail-page-context";
 import Controls from "../../../components/map/mapbox/controls/Controls";
 import NavigationControl from "../../../components/map/mapbox/controls/NavigationControl";
@@ -55,6 +55,7 @@ import * as turf from "@turf/turf";
 import { createStaticLayers } from "@/components/map/mapbox/layers/StaticLayer";
 
 import WmsLegend from "./WmsLegend";
+import { MAP_DATASET_SELECT_SLOT_ID } from "@/components/map/mapbox/component/MapLayerSelect";
 import {
   DatasetType,
   OGCCollection,
@@ -193,6 +194,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   const [pmtilesPeriodRange, setPmtilesPeriodRange] =
     useState<PMTilesMetadata | null>(null);
   const { isUnderLaptop } = useBreakpoint();
+  const theme = useTheme();
 
   const handlePmtilesMetadataPeriodChange = useCallback(
     (range: PMTilesMetadata | null) => {
@@ -555,119 +557,130 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   return (
     <>
       <Box
-        arial-label="map"
-        id={mapContainerId}
         sx={{
           width: "100%",
-          minHeight: "550px",
-          marginY: padding.large,
+          mt: padding.large,
+          mb: padding.large,
+          borderRadius: borderRadius.small,
+          boxShadow: theme.shadows[1],
+          overflow: "hidden",
         }}
       >
-        <MapBox
-          animate={false}
-          panelId={mapContainerId}
-          projection={"mercator"}
-          announcement={
-            noMapPreview
-              ? "Dataset preview is not available"
-              : griddedRasterErrorAnnouncement
-          }
-          onMoveEvent={handleMapChange}
-          onZoomEvent={handleMapChange}
+        <Box id={MAP_DATASET_SELECT_SLOT_ID} sx={{ width: "100%" }} />
+        <Box
+          aria-label="map"
+          id={mapContainerId}
+          sx={{
+            width: "100%",
+            minHeight: "588px",
+          }}
         >
-          <Controls>
-            <NavigationControl
-              visible={!isUnderLaptop}
-              // Reset flies back to this collection's spatial extent
-              onReset={(map) => fitToDefaultExtent(map, collection)}
-            />
-            <ScaleControl />
-            <DisplayCoordinate />
-            <MenuControlGroup>
-              <MenuControl menu={<BaseMapSwitcher />} />
-              <MenuControl
-                menu={
-                  <ReferenceLayerSwitcher
-                    layers={staticBaseLayerConfig}
-                    onEvent={handleBaseMapSwitch}
-                  />
-                }
+          <MapBox
+            animate={false}
+            panelId={mapContainerId}
+            projection={"mercator"}
+            announcement={
+              noMapPreview
+                ? "Dataset preview is not available"
+                : griddedRasterErrorAnnouncement
+            }
+            onMoveEvent={handleMapChange}
+            onZoomEvent={handleMapChange}
+          >
+            <Controls>
+              <NavigationControl
+                visible={!isUnderLaptop}
+                // Reset flies back to this collection's spatial extent
+                onReset={(map) => fitToDefaultExtent(map, collection)}
               />
-              <MenuControl
-                menu={
-                  <MapLayerSwitcher
-                    layers={mapLayerConfig}
-                    onEvent={handleMapLayerChange}
-                  />
-                }
-                visible={mapLayerConfig.length !== 0}
+              <ScaleControl />
+              <DisplayCoordinate />
+              <MenuControlGroup>
+                <MenuControl menu={<BaseMapSwitcher />} />
+                <MenuControl
+                  menu={
+                    <ReferenceLayerSwitcher
+                      layers={staticBaseLayerConfig}
+                      onEvent={handleBaseMapSwitch}
+                    />
+                  }
+                />
+                <MenuControl
+                  menu={
+                    <MapLayerSwitcher
+                      layers={mapLayerConfig}
+                      onEvent={handleMapLayerChange}
+                    />
+                  }
+                  visible={mapLayerConfig.length !== 0}
+                />
+                <MenuControl
+                  visible={isSubsettingSupported(SubsettingType.TimeSlider)}
+                  menu={
+                    <DateRange
+                      // Remount when slider bounds change so thumbs reset to full coverage
+                      key={`date-range-${minDateStamp.format(dateDefault.DATE_FORMAT)}-${maxDateStamp.format(dateDefault.DATE_FORMAT)}`}
+                      minDate={minDateStamp.format(dateDefault.DATE_FORMAT)}
+                      maxDate={maxDateStamp.format(dateDefault.DATE_FORMAT)}
+                      getAndSetDownloadConditions={getAndSetDownloadConditions}
+                      downloadConditions={downloadConditions}
+                      options={
+                        additionalSlider ? { additionalSlider } : undefined
+                      }
+                    />
+                  }
+                />
+                <MenuControl
+                  visible={isSubsettingSupported(SubsettingType.DrawRect)}
+                  menu={
+                    <DrawRect
+                      onChangeFeatures={handleFeaturesChange}
+                      features={drawFeatures}
+                    />
+                  }
+                />
+              </MenuControlGroup>
+            </Controls>
+            <Layers>
+              <FitToSpatialExtentsLayer
+                collection={collection}
+                bbox={mapFocusArea}
               />
-              <MenuControl
-                visible={isSubsettingSupported(SubsettingType.TimeSlider)}
-                menu={
-                  <DateRange
-                    // Remount when slider bounds change so thumbs reset to full coverage
-                    key={`date-range-${minDateStamp.format(dateDefault.DATE_FORMAT)}-${maxDateStamp.format(dateDefault.DATE_FORMAT)}`}
-                    minDate={minDateStamp.format(dateDefault.DATE_FORMAT)}
-                    maxDate={maxDateStamp.format(dateDefault.DATE_FORMAT)}
-                    getAndSetDownloadConditions={getAndSetDownloadConditions}
-                    downloadConditions={downloadConditions}
-                    options={
-                      additionalSlider ? { additionalSlider } : undefined
-                    }
-                  />
-                }
+              {createStaticLayers(staticLayer)}
+              <PMTilesHexLayer
+                collection={collection}
+                filterStartDate={filterStartDate}
+                filterEndDate={filterEndDate}
+                visible={selectedMapLayerId === LayerName.PMTiles}
+                layerConfig={selectedCoKey}
+                onLayerChange={setSelectedCoKey}
+                onMetadataPeriodChange={handlePmtilesMetadataPeriodChange}
+                onSupportChange={setIsSupportPMTiles}
               />
-              <MenuControl
-                visible={isSubsettingSupported(SubsettingType.DrawRect)}
-                menu={
-                  <DrawRect
-                    onChangeFeatures={handleFeaturesChange}
-                    features={drawFeatures}
-                  />
-                }
+              <GeoServerLayer
+                layerConfig={geoServerLayerConfig}
+                onLayerChange={onWmsLayerChange}
+                onWMSAvailabilityChange={onWMSAvailabilityChange}
+                setWmsFields={setWMSFields}
+                setTimeSliderSupport={setTimeSliderSupport}
+                setDiscreteTimeSliderValues={setDiscreteTimeSliderValues}
+                setDrawRectSupportSupport={setDrawRectSupportSupport}
+                collection={collection}
+                visible={selectedMapLayerId === LayerName.GeoServer}
               />
-            </MenuControlGroup>
-          </Controls>
-          <Layers>
-            <FitToSpatialExtentsLayer
-              collection={collection}
-              bbox={mapFocusArea}
-            />
-            {createStaticLayers(staticLayer)}
-            <PMTilesHexLayer
-              collection={collection}
-              filterStartDate={filterStartDate}
-              filterEndDate={filterEndDate}
-              visible={selectedMapLayerId === LayerName.PMTiles}
-              layerConfig={selectedCoKey}
-              onLayerChange={setSelectedCoKey}
-              onMetadataPeriodChange={handlePmtilesMetadataPeriodChange}
-              onSupportChange={setIsSupportPMTiles}
-            />
-            <GeoServerLayer
-              layerConfig={geoServerLayerConfig}
-              onLayerChange={onWmsLayerChange}
-              onWMSAvailabilityChange={onWMSAvailabilityChange}
-              setWmsFields={setWMSFields}
-              setTimeSliderSupport={setTimeSliderSupport}
-              setDiscreteTimeSliderValues={setDiscreteTimeSliderValues}
-              setDrawRectSupportSupport={setDrawRectSupportSupport}
-              collection={collection}
-              visible={selectedMapLayerId === LayerName.GeoServer}
-            />
-            <GeojsonLayer
-              collection={collection}
-              visible={selectedMapLayerId === LayerName.SpatialExtent}
-            />
-            {hasGriddedProducts && (
-              <GriddedRasterLayer
-                {...griddedLayerProps}
-                visible={selectedMapLayerId === LayerName.GriddedRaster}
+              <GeojsonLayer
+                collection={collection}
+                visible={selectedMapLayerId === LayerName.SpatialExtent}
               />
-            )}
-          </Layers>
-        </MapBox>
+              {hasGriddedProducts && (
+                <GriddedRasterLayer
+                  {...griddedLayerProps}
+                  visible={selectedMapLayerId === LayerName.GriddedRaster}
+                />
+              )}
+            </Layers>
+          </MapBox>
+        </Box>
       </Box>
       {/* Show the legend exactly when the GeoServer (WMS) layer is the selected
           map layer - same gate as the GeoServerLayer's own `visible` prop */}
