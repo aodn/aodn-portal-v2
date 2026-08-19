@@ -75,7 +75,7 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
 
   return (
     <Box flex={1} sx={{ zIndex: zIndex.MAP_POPUP, ...sx }}>
-      <Stack direction="column" spacing={1}>
+      <Stack direction="column">
         <ContextMenu ref={menuRef} onClick={onDetail} />
         <Box
           position="relative"
@@ -89,7 +89,8 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
               fontWeight={fontWeight.bold}
               fontSize={fontSize.label}
               sx={{
-                padding: 0,
+                p: 0,
+                pb: padding.extraSmall,
                 width: "calc(100% - 36px)",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
@@ -141,7 +142,7 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
               textOverflow: "ellipsis",
               wordBreak: "break-word",
               display: "-webkit-box",
-              WebkitLineClamp: "10",
+              WebkitLineClamp: "9",
               WebkitBoxOrient: "vertical",
             }}
           >

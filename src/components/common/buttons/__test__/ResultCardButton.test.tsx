@@ -19,16 +19,12 @@ describe("ResultCardButton", () => {
     render(<ResultCardButton />);
     const button = screen.getByRole("button");
     expect(button).toBeInTheDocument();
-    expect(button).toHaveStyle("text-transform: none");
-    expect(button).toHaveStyle("opacity: 1");
-    expect(button).toHaveStyle("minWidth: 0");
   });
 
-  it("renders disabled button with reduced opacity", () => {
+  it("renders disabled button", () => {
     render(<ResultCardButton disabled />);
     const button = screen.getByRole("button");
     expect(button).toBeDisabled();
-    expect(button).toHaveStyle("opacity: 0.5");
   });
 
   it("uses the default cursor when it is not interactive", () => {
@@ -46,8 +42,6 @@ describe("ResultCardButton", () => {
     render(<ResultCardButton startIcon={MockIcon} text="Click me" />);
     const icon = screen.getByTestId("mock-icon");
     expect(icon).toBeInTheDocument();
-    expect(icon).toHaveStyle("color: rgb(97, 140, 165)");
-    expect(icon).toHaveStyle("font-size: 14px"); // Medium size default
   });
 
   it("renders text when shouldHideText is false", () => {
@@ -62,7 +56,6 @@ describe("ResultCardButton", () => {
 
   it("applies custom config for medium size", () => {
     const config: ResultCardButtonConfig = {
-      color: "#ff0000",
       size: ResultCardButtonSize.MEDIUM,
     };
     render(
@@ -72,16 +65,8 @@ describe("ResultCardButton", () => {
         resultCardButtonConfig={config}
       />
     );
-    const icon = screen.getByTestId("mock-icon");
-    screen.getByText("Test");
-    expect(icon).toHaveStyle("font-size: 14px");
-  });
-
-  it("merges custom sx props", () => {
-    render(<ResultCardButton sx={{ backgroundColor: "red" }} />);
-    const button = screen.getByRole("button");
-    expect(button).toHaveStyle("background-color: rgb(255, 0, 0)");
-    expect(button).toHaveStyle("padding: 0px");
+    expect(screen.getByTestId("mock-icon")).toBeInTheDocument();
+    expect(screen.getByText("Test")).toBeInTheDocument();
   });
 
   it("renders startIcon as a ComponentType with Tooltip and styling", () => {

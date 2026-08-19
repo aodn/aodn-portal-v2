@@ -7,7 +7,6 @@ import {
   useRef,
 } from "react";
 import { Button, SxProps, Tooltip, Typography } from "@mui/material";
-import { color } from "../../../styles/constants";
 import { mergeWithDefaults } from "../../../utils/ObjectUtils";
 import { OpenType } from "../../../hooks/useTabNavigation";
 import { portalTheme } from "../../../styles";
@@ -51,7 +50,7 @@ export const DEFAULT_RESULT_CARD_BUTTON_SIZE = ResultCardButtonSize.MEDIUM;
 const DEFAULT_SVG_ICON_SIZE = 20;
 
 const defaultConfig: ResultCardButtonConfig = {
-  color: color.blue.dark,
+  color: portalTheme.palette.primary1,
   size: DEFAULT_RESULT_CARD_BUTTON_SIZE,
 };
 
@@ -91,57 +90,61 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
     };
   }, [config.color, iconSize, isSvgIcon, size]);
 
+  const button = (
+    <Button
+      aria-label={text ?? undefined}
+      onContextMenu={(e) =>
+        onClick ? menuRef.current?.openContextMenu(e) : undefined
+      }
+      onClick={() => onClick?.(undefined)}
+      disabled={disabled}
+      sx={{
+        p: "4px",
+        gap: "12px",
+        textTransform: "none",
+        opacity: disabled ? 0.5 : 1,
+        minWidth: hasText ? "auto" : 0, // Optimize layout when text is hidden
+        cursor: isInteractive ? undefined : "default",
+        "&:hover": { backgroundColor: "transparent" },
+        ...sx,
+      }}
+    >
+      {startIcon &&
+        (isValidElement(startIcon) ? (
+          startIcon
+        ) : (
+          <IconComponent {...iconStyleProps} />
+        ))}
+
+      {hasText && (
+        <Typography
+          pt={0}
+          whiteSpace="nowrap"
+          // Label tracks the icon colour, so status buttons (e.g. "On going")
+          // read as one unit rather than a green icon beside a blue label
+          sx={{
+            ...buttonStyles,
+            fontSize: fontSizes[size].text,
+            color: config.color,
+          }}
+          data-testid={`result-card-button-${text}`}
+        >
+          {text}
+        </Typography>
+      )}
+    </Button>
+  );
+
   return (
     <>
       <ContextMenu ref={menuRef} onClick={onClick} sx={buttonStyles} />
-      <Button
-        onContextMenu={(e) =>
-          onClick ? menuRef.current?.openContextMenu(e) : undefined
-        }
-        onClick={() => onClick?.(undefined)}
-        disabled={disabled}
-        sx={{
-          p: 0,
-          gap: "10px",
-          textTransform: "none",
-          opacity: disabled ? 0.5 : 1,
-          minWidth: hasText ? "auto" : 0, // Optimize layout when text is hidden
-          cursor: isInteractive ? undefined : "default",
-          ...sx,
-        }}
-      >
-        {startIcon &&
-          (isValidElement(startIcon) ? (
-            startIcon
-          ) : (
-            <Tooltip title={text || ""} placement="top">
-              {
-                // Need span to allow tooltip forwardRef()
-              }
-              <span>
-                <IconComponent {...iconStyleProps} />
-              </span>
-            </Tooltip>
-          ))}
-
-        {hasText && (
-          <Typography
-            pt={0}
-            mt={-0.5}
-            whiteSpace="nowrap"
-            // Label tracks the icon colour, so status buttons (e.g. "On going")
-            // read as one unit rather than a green icon beside a blue label
-            sx={{
-              ...buttonStyles,
-              fontSize: fontSizes[size].text,
-              color: config.color,
-            }}
-            data-testid={`result-card-button-${text}`}
-          >
-            {text}
-          </Typography>
-        )}
-      </Button>
+      {shouldHideText ? (
+        <Tooltip title={text || ""} placement="top">
+          {button}
+        </Tooltip>
+      ) : (
+        button
+      )}
     </>
   );
 };
