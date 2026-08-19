@@ -29,6 +29,8 @@ enum EVENT_CLIPBOARD {
 // For those who use MenuControl, please extend you props with this interface
 // and the MenuControl will inject the map instance automatically for you
 // you can define your onEvent if you want
+// TODO: give consumers explicit ControlProps<T> args, see src/app/TECH_DEBT.md
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface ControlProps<T = any> {
   map?: MapBox;
   onEvent?: (...args: T extends unknown[] ? T : [T]) => void;
@@ -52,6 +54,8 @@ export interface BookmarkEvent {
   event: MouseEvent;
   id: string;
   action: string;
+  // TODO: type per action via a discriminated union, see src/app/TECH_DEBT.md
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any;
 }
 
