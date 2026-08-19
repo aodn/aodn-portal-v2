@@ -16,6 +16,7 @@ from mocks.api_router import ApiRouter
 from mocks.routes import Routes
 from pages.detail_page import DetailPage
 
+_UI_TIMEOUT_MS = 30_000
 TILE_PATH_FRAGMENT = '/map/tiles/WebMercatorQuad/'
 
 
@@ -31,6 +32,13 @@ def _collect_tile_requests(page: Page) -> list[str]:
         ),
     )
     return urls
+
+
+def _prepare_detail_map(detail_page: DetailPage) -> None:
+    detail_page.go_to_map_tab()
+    detail_page.detail_map.wait_for_map_loading()
+    detail_page.detail_map.wait_for_layer_select_loading()
+    detail_page.detail_map.wait_for_map_idle()
 
 
 def _open_gridded_layer(detail_page: DetailPage) -> None:
@@ -53,16 +61,20 @@ def test_gridded_layer_appears_only_for_a_catalogued_collection(
     detail_page = DetailPage(responsive_page)
 
     detail_page.load(SUPPORTED_UUID)
-    detail_page.go_to_map_tab()
-    detail_page.detail_map.wait_for_layer_select_loading()
-    detail_page.detail_map.layers_menu.click()
+    _prepare_detail_map(detail_page)
+    detail_page.detail_map.open_layers_menu_until_visible(
+        detail_page.detail_map.gridded_data_layer
+    )
     expect(detail_page.detail_map.gridded_data_layer).to_be_visible()
     detail_page.detail_map.layers_menu.click()
 
     detail_page.load(UNSUPPORTED_UUID)
-    detail_page.go_to_map_tab()
-    detail_page.detail_map.wait_for_layer_select_loading()
-    detail_page.detail_map.layers_menu.click()
+    _prepare_detail_map(detail_page)
+    # Empty listing still offers GeoServer; keep the menu open long enough to
+    # confirm Gridded Data never mounts.
+    detail_page.detail_map.open_layers_menu_until_visible(
+        detail_page.detail_map.geoserver_layer
+    )
     expect(detail_page.detail_map.gridded_data_layer).to_have_count(0)
     # An empty listing is a normal 200, not a failure.
     expect(detail_page.detail_map.gridded_raster_error).to_have_count(0)
@@ -79,18 +91,12 @@ def test_gridded_layer_renders_and_offers_only_visual_products(
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(SUPPORTED_UUID)
-    detail_page.go_to_map_tab()
-    detail_page.detail_map.wait_for_layer_select_loading()
+    _prepare_detail_map(detail_page)
 
     _open_gridded_layer(detail_page)
 
     layer_id = layer_factory.get_layer_id(LayerStyle.GRIDDED_RASTER)
-    assert (
-        detail_page.detail_map.is_map_layer_visible(
-            layer_id, is_map_loading=False
-        )
-        is True
-    )
+    detail_page.detail_map.wait_until_map_layer_visible(layer_id)
 
     expect(detail_page.dataset_selection_dropdown).to_be_visible()
     expect(
@@ -118,8 +124,7 @@ def test_gridded_date_point_slider_coexists_with_the_range_slider(
     tile_urls = _collect_tile_requests(responsive_page)
 
     detail_page.load(SUPPORTED_UUID)
-    detail_page.go_to_map_tab()
-    detail_page.detail_map.wait_for_layer_select_loading()
+    _prepare_detail_map(detail_page)
     _open_gridded_layer(detail_page)
 
     detail_page.detail_map.daterange_show_hide_menu_button.click()
@@ -159,8 +164,7 @@ def test_switching_product_resets_the_day_and_the_tile_url(
     tile_urls = _collect_tile_requests(responsive_page)
 
     detail_page.load(SUPPORTED_UUID)
-    detail_page.go_to_map_tab()
-    detail_page.detail_map.wait_for_layer_select_loading()
+    _prepare_detail_map(detail_page)
     _open_gridded_layer(detail_page)
 
     detail_page.dataset_selection_dropdown.click()
@@ -219,8 +223,7 @@ def test_switching_product_does_not_retain_a_shared_non_latest_date(
     tile_urls = _collect_tile_requests(responsive_page)
 
     detail_page.load(SUPPORTED_UUID)
-    detail_page.go_to_map_tab()
-    detail_page.detail_map.wait_for_layer_select_loading()
+    _prepare_detail_map(detail_page)
     _open_gridded_layer(detail_page)
 
     # Move product one's point off its latest day, onto the day shared with
@@ -263,17 +266,11 @@ def test_gridded_layer_survives_a_basemap_switch_and_hides_on_layer_change(
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(SUPPORTED_UUID)
-    detail_page.go_to_map_tab()
-    detail_page.detail_map.wait_for_layer_select_loading()
+    _prepare_detail_map(detail_page)
     _open_gridded_layer(detail_page)
 
     layer_id = layer_factory.get_layer_id(LayerStyle.GRIDDED_RASTER)
-    assert (
-        detail_page.detail_map.is_map_layer_visible(
-            layer_id, is_map_loading=False
-        )
-        is True
-    )
+    detail_page.detail_map.wait_until_map_layer_visible(layer_id)
 
     detail_page.detail_map.basemap_show_hide_menu.click()
     responsive_page.get_by_role('radio').last.check()
@@ -326,24 +323,22 @@ def test_failed_discovery_leaves_the_rest_of_the_page_interactive(
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(uuid)
-    detail_page.go_to_map_tab()
-    detail_page.detail_map.wait_for_layer_select_loading()
+    _prepare_detail_map(detail_page)
 
-    detail_page.detail_map.layers_menu.click()
     # Failure and "genuinely no products" are indistinguishable from the
     # browser, so neither shows an entry and neither shows a banner.
+    # Keep the menu open (idle/resize can close it on CI).
+    detail_page.detail_map.open_layers_menu_until_visible(
+        detail_page.detail_map.geoserver_layer
+    )
     expect(detail_page.detail_map.gridded_data_layer).to_have_count(0)
     expect(detail_page.detail_map.gridded_raster_error).to_have_count(0)
 
     # The rest of the map still works.
-    expect(detail_page.detail_map.geoserver_layer).to_be_visible()
     detail_page.detail_map.geoserver_layer.check()
     detail_page.detail_map.layers_menu.click()
     detail_page.detail_map.wait_for_map_idle()
     layer_id = layer_factory.get_layer_id(LayerStyle.GEO_SERVER)
-    assert (
-        detail_page.detail_map.is_map_layer_visible(
-            layer_id, is_map_loading=False
-        )
-        is True
+    detail_page.detail_map.wait_until_map_layer_visible(
+        layer_id, timeout_ms=_UI_TIMEOUT_MS
     )
