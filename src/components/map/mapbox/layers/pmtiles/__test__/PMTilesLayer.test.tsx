@@ -20,6 +20,7 @@ import {
   countUnwrittenLoadedFeatures,
   getActivePmtilesLayers,
   clearInactivePmtilesFeatureState,
+  addPmtilesSourceAndLayers,
   PMTILE_LAYERS,
   FEATURE_STATE_TOTAL,
   DENSITY_TOTAL_CAP,
@@ -1261,6 +1262,42 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     expect(work).not.toHaveBeenCalled();
     await new Promise((r) => setTimeout(r, 40));
     expect(work).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("PMTilesLayer - base style restoration", () => {
+  it("restores PMTiles layers as hidden while another style is selected", () => {
+    const addLayer = vi.fn();
+    const map = {
+      getSource: vi.fn().mockReturnValue(undefined),
+      addSource: vi.fn(),
+      getLayer: vi.fn().mockReturnValue(undefined),
+      getStyle: vi.fn().mockReturnValue({ layers: [] }),
+      addLayer,
+    } as unknown as Map;
+
+    addPmtilesSourceAndLayers(map, "pmtiles://density", false);
+
+    const restoredLayers = addLayer.mock.calls.map(([layer]) => layer);
+    expect(restoredLayers).toHaveLength(PMTILE_LAYERS.length + 1);
+    expect(restoredLayers).toEqual(
+      expect.arrayContaining(
+        PMTILE_LAYERS.map((layer) =>
+          expect.objectContaining({
+            id: layer.id,
+            layout: expect.objectContaining({ visibility: "none" }),
+          })
+        )
+      )
+    );
+    expect(restoredLayers).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "pmtiles-hex-hover-outline",
+          layout: expect.objectContaining({ visibility: "none" }),
+        }),
+      ])
+    );
   });
 });
 
