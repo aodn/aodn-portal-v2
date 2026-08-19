@@ -1,7 +1,7 @@
 import { loadEnv, type ConfigEnv } from "vite";
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react-swc";
-import eslint from "vite-plugin-eslint";
+import eslint from "vite-plugin-eslint2";
 import path from "path";
 import fs from "fs";
 import { seoPlugins } from "./src/seo/vitePlugins";
