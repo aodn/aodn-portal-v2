@@ -8,14 +8,14 @@ import {
   gap,
   padding,
   zIndex,
-} from "../../../styles/constants";
+} from "@/styles/constants";
 import ResultCardButtonGroup from "../../result/ResultCardButtonGroup";
 import { ResultCardButtonSize } from "../buttons/ResultCardButton";
 import Map from "../../map/mapbox/Map";
 import Layers from "../../map/mapbox/layers/Layers";
 import GeojsonLayer from "../../map/mapbox/layers/GeojsonLayer";
 import BookmarkButton from "../../bookmark/BookmarkButton";
-import { OpenType, TabNavigation } from "../../../hooks/useTabNavigation";
+import { OpenType, TabNavigation } from "@/hooks/useTabNavigation";
 import { detailPageDefault, pageReferer } from "../constants";
 import FitToSpatialExtentsLayer from "../../map/mapbox/layers/FitToSpatialExtentsLayer";
 import ContextMenu, { ContextMenuRef } from "../../menu/ContextMenu";
@@ -104,7 +104,7 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
           </Tooltip>
         </Box>
         <Box
-          arial-label="map"
+          aria-label="map"
           id={`${mapContainerId}-${collection.id}`}
           width="100%"
           height="130px"

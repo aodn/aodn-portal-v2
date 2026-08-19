@@ -202,7 +202,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
   // the gaps.
   return (
     <Box
-      arial-label="result-list-card-buttons"
+      aria-label="result-list-card-buttons"
       sx={{
         width: "100%",
         display: "flex",
