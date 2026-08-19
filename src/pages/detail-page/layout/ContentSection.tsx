@@ -5,24 +5,21 @@ import CitationPanel from "../features/CitationPanel";
 import SummaryAndDownloadPanel from "../features/SummaryAndDownloadPanel";
 import AssociatedRecordsPanel from "../features/AssociatedRecordsPanel";
 import MapPanel from "../features/MapPanel";
-import { IconSummary } from "../../../components/icon/tabs/IconSummary";
-import { IconDataAccess } from "../../../components/icon/tabs/IconDataAccess";
-import { IconCitation } from "../../../components/icon/tabs/IconCitation";
-import { IconInformation } from "../../../components/icon/tabs/IconInformation3";
-import { IconRelatedResources } from "../../../components/icon/tabs/IconRelatedResources";
-import { IconMap } from "../../../components/icon/tabs/IconMap";
+import { IconSummary } from "@/components/icon/tabs/IconSummary";
+import { IconDataAccess } from "@/components/icon/tabs/IconDataAccess";
+import { IconCitation } from "@/components/icon/tabs/IconCitation";
+import { IconInformation } from "@/components/icon/tabs/IconInformation3";
+import { IconRelatedResources } from "@/components/icon/tabs/IconRelatedResources";
+import { IconMap } from "@/components/icon/tabs/IconMap";
 import { Box, Card } from "@mui/material";
-import { borderRadius } from "../../../styles/constants";
+import { borderRadius } from "@/styles/constants";
 import { useDetailPageContext } from "../context/detail-page-context";
 import TabsPanelContainer, {
   Tab,
 } from "../../../components/common/tab/TabsPanelContainer";
 import { useLocation, useParams } from "react-router-dom";
 import { LngLatBounds, MapEvent } from "mapbox-gl";
-import {
-  detailPageDefault,
-  pageReferer,
-} from "../../../components/common/constants";
+import { detailPageDefault, pageReferer } from "@/components/common/constants";
 import useTabNavigation from "../../../hooks/useTabNavigation";
 import useBreakpoint from "../../../hooks/useBreakpoint";
 import notMatchingRecordImage from "@/assets/images/no_matching_record.png";
@@ -66,39 +63,19 @@ const associatedRecordsPanelTab: Tab = {
   icon: <IconRelatedResources />,
 };
 
-const summaryOnlyTab: Tab = {
+const summaryTab: Tab = {
   label: "Summary",
   value: detailPageDefault.SUMMARY,
   component: <SummaryAndDownloadPanel />,
   icon: <IconSummary />,
 };
 
-const summaryWithMapTab = (
-  mapFocusArea: LngLatBounds | undefined,
-  onMapMoveEnd?: (evt: MapEvent) => void
-): Tab => ({
-  label: "Summary",
-  value: detailPageDefault.SUMMARY,
-  component: (
-    <>
-      <SummaryAndDownloadPanel />
-      <MapPanel mapFocusArea={mapFocusArea} onMapMoveEnd={onMapMoveEnd} />
-    </>
-  ),
-  icon: <IconSummary />,
-});
-
-const mapPanelTab = (
-  mapFocusArea: LngLatBounds | undefined,
-  onMapMoveEnd?: (evt: MapEvent) => void
-): Tab => ({
+const mapPanelTab: Tab = {
   label: "Map",
   value: detailPageDefault.MAP,
-  component: (
-    <MapPanel mapFocusArea={mapFocusArea} onMapMoveEnd={onMapMoveEnd} />
-  ),
+  component: <></>,
   icon: <IconMap />,
-});
+};
 
 const ContentSection: FC<ContentSectionProps> = ({
   mapFocusArea,
@@ -112,21 +89,21 @@ const ContentSection: FC<ContentSectionProps> = ({
     () =>
       isMobile
         ? [
-            summaryOnlyTab,
-            mapPanelTab(mapFocusArea, onMapMoveEnd),
+            summaryTab,
+            mapPanelTab,
             dataAccessPanelTab,
             citationPanelTab,
             additionalInfoPanelTab,
             associatedRecordsPanelTab,
           ]
         : [
-            summaryWithMapTab(mapFocusArea, onMapMoveEnd),
+            summaryTab,
             dataAccessPanelTab,
             citationPanelTab,
             additionalInfoPanelTab,
             associatedRecordsPanelTab,
           ],
-    [mapFocusArea, onMapMoveEnd, isMobile]
+    [isMobile]
   );
 
   const location = useLocation();
@@ -168,19 +145,33 @@ const ContentSection: FC<ContentSectionProps> = ({
     );
   }
 
+  const selectedTabValue = TABS[findTabIndex(params, TABS)]?.value;
+  const showMapPane = isMobile
+    ? selectedTabValue === detailPageDefault.MAP
+    : selectedTabValue === detailPageDefault.SUMMARY;
+
   return (
-    <Card
-      sx={{
-        backgroundColor: "white",
-        borderRadius: borderRadius.small,
-      }}
-    >
-      <TabsPanelContainer
-        tabs={TABS}
-        tabValue={findTabIndex(params, TABS)}
-        handleTabChange={handleTabChange}
-      />
-    </Card>
+    <>
+      <Card
+        sx={{
+          backgroundColor: "white",
+          borderRadius: borderRadius.small,
+        }}
+      >
+        <TabsPanelContainer
+          tabs={TABS}
+          tabValue={findTabIndex(params, TABS)}
+          handleTabChange={handleTabChange}
+        />
+      </Card>
+      <Box
+        sx={{
+          display: showMapPane ? "block" : "none",
+        }}
+      >
+        <MapPanel mapFocusArea={mapFocusArea} onMapMoveEnd={onMapMoveEnd} />
+      </Box>
+    </>
   );
 };
 

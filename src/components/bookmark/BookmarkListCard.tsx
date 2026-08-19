@@ -43,7 +43,7 @@ const BookmarkListCard: FC<BookmarkListCardProps> = ({
     <Box sx={{ flex: 1, ...sx }}>
       <Stack direction="column" spacing={1}>
         <Box
-          arial-label="map"
+          aria-label="map"
           id={mapContainerId}
           sx={{
             width: "100%",
