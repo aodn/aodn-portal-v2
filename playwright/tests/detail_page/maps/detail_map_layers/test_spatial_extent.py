@@ -1,5 +1,5 @@
-from collections.abc import Callable
 import time
+from collections.abc import Callable
 
 import pytest
 from playwright.sync_api import Page, Response, expect
