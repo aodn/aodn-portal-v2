@@ -44,8 +44,8 @@ describe("GriddedRasterLayer", () => {
       <MapContext.Provider value={{ map: mockMap } as any}>
         <GriddedRasterLayer
           products={PRODUCTS}
-          selectedProductId="a:one"
-          onSelectProduct={vi.fn()}
+          layerConfig="a:one"
+          onLayerChange={vi.fn()}
           selectedDate="2024-01-03"
           visible
           {...props}
@@ -172,8 +172,8 @@ describe("GriddedRasterLayer", () => {
       <MapContext.Provider value={{ map: mockMap } as any}>
         <GriddedRasterLayer
           products={PRODUCTS}
-          selectedProductId="a:one"
-          onSelectProduct={vi.fn()}
+          layerConfig="a:one"
+          onLayerChange={vi.fn()}
           selectedDate="2024-01-01"
           visible
         />
@@ -197,8 +197,8 @@ describe("GriddedRasterLayer", () => {
         <MapContext.Provider value={{ map: mockMap } as any}>
           <GriddedRasterLayer
             products={PRODUCTS}
-            selectedProductId="a:one"
-            onSelectProduct={vi.fn()}
+            layerConfig="a:one"
+            onLayerChange={vi.fn()}
             selectedDate={date}
             visible
           />
@@ -221,8 +221,8 @@ describe("GriddedRasterLayer", () => {
       <MapContext.Provider value={{ map: mockMap } as any}>
         <GriddedRasterLayer
           products={PRODUCTS}
-          selectedProductId="a:one"
-          onSelectProduct={vi.fn()}
+          layerConfig="a:one"
+          onLayerChange={vi.fn()}
           selectedDate="2024-01-03"
           visible={false}
         />
@@ -282,7 +282,7 @@ describe("GriddedRasterLayer", () => {
     renderLayer({ selectedDate: undefined });
     expect(mockMap.addSource).not.toHaveBeenCalled();
 
-    renderLayer({ selectedProductId: "does-not-exist" });
+    renderLayer({ layerConfig: "does-not-exist" });
     expect(mockMap.addSource).not.toHaveBeenCalled();
   });
 
@@ -296,8 +296,8 @@ describe("GriddedRasterLayer", () => {
       <MapContext.Provider value={{ map: mockMap } as any}>
         <GriddedRasterLayer
           products={PRODUCTS}
-          selectedProductId="a:one"
-          onSelectProduct={vi.fn()}
+          layerConfig="a:one"
+          onLayerChange={vi.fn()}
           selectedDate="2024-01-03"
           visible={false}
         />
