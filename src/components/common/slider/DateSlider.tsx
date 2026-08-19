@@ -14,6 +14,10 @@ import { portalTheme } from "../../../styles";
 import { padding } from "@/styles/constants";
 import PlainSlider from "./PlainSlider";
 
+enum ThumbType {
+  DIAMOND = "diamond",
+  CIRCLE = "circle",
+}
 /** Slider mark shape (was imported from a deep MUI path removed in v7). */
 interface Mark {
   value: number;
@@ -40,6 +44,7 @@ interface DateSliderPointProps {
   ) => void;
   /** Merged onto the default overlay container styles. */
   sx?: SxProps<Theme>;
+  thumbType?: ThumbType;
 }
 
 const COMPONENT_ID = "dateslider-daterange-menu-button";
@@ -113,6 +118,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
   valid_points,
   onDatePointChange = undefined,
   sx,
+  thumbType = ThumbType.CIRCLE,
 }) => {
   const sorted_marks: Mark[] = useMemo(() => {
     return [...(valid_points ?? [])]
@@ -248,7 +254,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
             valueLabelFormat={(value: number) =>
               valueToDate(value).format(dateDefault.DISPLAY_FORMAT)
             }
-            sx={diamondThumbSx}
+            sx={thumbType === ThumbType.DIAMOND ? diamondThumbSx : undefined}
           />
         </Stack>
       </Grid>
@@ -498,5 +504,5 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
   );
 };
 
-export { DateSliderPoint };
+export { DateSliderPoint, ThumbType };
 export default DateSliderRange;

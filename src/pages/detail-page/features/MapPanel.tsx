@@ -48,7 +48,10 @@ import useBreakpoint from "../../../hooks/useBreakpoint";
 import FitToSpatialExtentsLayer from "../../../components/map/mapbox/layers/FitToSpatialExtentsLayer";
 import { MapEventEnum } from "@/components/map/mapbox/constants";
 import { fitToDefaultExtent } from "@/utils/MapUtils";
-import { DateSliderPoint } from "@/components/common/slider/DateSlider";
+import {
+  DateSliderPoint,
+  ThumbType,
+} from "@/components/common/slider/DateSlider";
 import { dateToValue } from "@/utils/DateUtils";
 import { GeoserverFieldsResponse } from "@/app/store/GeoserverDefinitions";
 import * as turf from "@turf/turf";
@@ -465,6 +468,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
           key={griddedDateSliderKey}
           {...griddedDateSliderProps}
           sx={additionalSliderSx}
+          thumbType={ThumbType.DIAMOND}
         />
       ) : undefined;
     }
@@ -474,6 +478,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
           valid_points={discreteTimeSliderValues?.get(selectedWmsLayer)}
           onDatePointChange={handleSliderPointChange}
           sx={additionalSliderSx}
+          thumbType={ThumbType.DIAMOND}
         />
       );
     }
