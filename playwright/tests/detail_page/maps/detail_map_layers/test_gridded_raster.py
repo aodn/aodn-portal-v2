@@ -41,6 +41,28 @@ def _prepare_detail_map(detail_page: DetailPage) -> None:
     detail_page.detail_map.wait_for_map_idle()
 
 
+def _is_products_response(uuid: str):
+    def _matches(response) -> bool:
+        return (
+            f'/ext/tiles/collections/{uuid}/products' in response.url
+            and response.request.method == 'GET'
+        )
+
+    return _matches
+
+
+def _load_map_and_wait_for_products(detail_page: DetailPage, uuid: str) -> None:
+    """
+    Discovery only runs while MapPanel is mounted. On mobile that is after the
+    Map tab click; on desktop it starts during load().
+    """
+    with detail_page.page.expect_response(
+        _is_products_response(uuid), timeout=_UI_TIMEOUT_MS
+    ):
+        detail_page.load(uuid)
+        detail_page.go_to_map_tab()
+
+
 def _open_gridded_layer(detail_page: DetailPage) -> None:
     detail_page.detail_map.open_layers_menu_until_visible(
         detail_page.detail_map.gridded_data_layer
@@ -60,20 +82,18 @@ def test_gridded_layer_appears_only_for_a_catalogued_collection(
     """
     detail_page = DetailPage(responsive_page)
 
-    detail_page.load(SUPPORTED_UUID)
-    _prepare_detail_map(detail_page)
+    _load_map_and_wait_for_products(detail_page, SUPPORTED_UUID)
     detail_page.detail_map.open_layers_menu_until_visible(
         detail_page.detail_map.gridded_data_layer
     )
     expect(detail_page.detail_map.gridded_data_layer).to_be_visible()
     detail_page.detail_map.layers_menu.click()
 
-    detail_page.load(UNSUPPORTED_UUID)
-    _prepare_detail_map(detail_page)
-    # Empty listing still offers GeoServer; keep the menu open long enough to
-    # confirm Gridded Data never mounts.
+    _load_map_and_wait_for_products(detail_page, UNSUPPORTED_UUID)
+    # 19da2ce7 has WMS links but no wms_layers fixture, so GeoServer is
+    # dropped after the availability check. Spatial Extent remains.
     detail_page.detail_map.open_layers_menu_until_visible(
-        detail_page.detail_map.geoserver_layer
+        detail_page.detail_map.spatial_extent_layer
     )
     expect(detail_page.detail_map.gridded_data_layer).to_have_count(0)
     # An empty listing is a normal 200, not a failure.
