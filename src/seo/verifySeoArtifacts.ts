@@ -9,8 +9,10 @@ import path from "path";
 import { isSeoCli, seoDistDir } from "./cli";
 import {
   BASE_URL,
+  CRAWLER_UA,
   detailsUrl,
   extractSitemapUrls,
+  PRERENDER_DETAILS_DIR,
   SITE_NAME,
 } from "./constants";
 import { sampleEvenly } from "./searchConsole";
@@ -135,22 +137,29 @@ const verifyDist = async (distDir: string) => {
     failures.push(...sitemap.problems.map((p) => `sitemap.xml: ${p}`));
   }
 
-  const detailsDir = path.join(distDir, "details");
+  const detailsDir = path.join(distDir, PRERENDER_DETAILS_DIR);
   const files = await readdir(detailsDir).catch(() => [] as string[]);
   if (files.length < MIN_PAGES) {
     failures.push(
-      `details: ${files.length} pages, expected at least ${MIN_PAGES}`
+      `${PRERENDER_DETAILS_DIR}: ${files.length} pages, expected at least ${MIN_PAGES}`
     );
   }
 
   const sampled = sampleEvenly(files, DIST_SAMPLE_SIZE);
   for (const uuid of sampled) {
-    const html = await readFile(path.join(detailsDir, uuid), "utf8");
+    const html = await readFile(
+      path.join(detailsDir, uuid, "index.html"),
+      "utf8"
+    );
     failures.push(
-      ...checkDetailPage(html, uuid).map((p) => `details/${uuid}: ${p}`)
+      ...checkDetailPage(html, uuid).map(
+        (p) => `${PRERENDER_DETAILS_DIR}/${uuid}: ${p}`
+      )
     );
     if (urls.length > 0 && !urls.includes(detailsUrl(uuid))) {
-      failures.push(`details/${uuid}: not listed in sitemap.xml`);
+      failures.push(
+        `${PRERENDER_DETAILS_DIR}/${uuid}: not listed in sitemap.xml`
+      );
     }
   }
 
@@ -164,7 +173,11 @@ const verifyLive = async (site: string) => {
   const production = site === BASE_URL;
   const failures: string[] = [];
   const fetchText = async (pathname: string) =>
-    (await fetch(`${site}${pathname}`)).text();
+    (
+      await fetch(`${site}${pathname}`, {
+        headers: { "user-agent": CRAWLER_UA },
+      })
+    ).text();
 
   failures.push(
     ...checkHomePage(await fetchText("/"), production).map((p) => `/: ${p}`)
