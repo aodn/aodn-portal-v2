@@ -1,7 +1,8 @@
+from collections.abc import Callable
 from urllib.parse import unquote
 
 import pytest
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page, Response, expect
 
 from core.enums.map_layers.layer_style import LayerStyle
 from core.factories.layer import LayerFactory
@@ -41,8 +42,8 @@ def _prepare_detail_map(detail_page: DetailPage) -> None:
     detail_page.detail_map.wait_for_map_idle()
 
 
-def _is_products_response(uuid: str):
-    def _matches(response) -> bool:
+def _is_products_response(uuid: str) -> Callable[[Response], bool]:
+    def _matches(response: Response) -> bool:
         return (
             f'/ext/tiles/collections/{uuid}/products' in response.url
             and response.request.method == 'GET'
