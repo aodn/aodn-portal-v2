@@ -65,6 +65,7 @@ const renderStatusButton = (
       <ResultCardButton
         startIcon={TaskAltSharpIcon}
         iconSize={iconSize[size].completed}
+        isInteractive={false}
         text="Completed"
         shouldHideText={shouldHideText}
         resultCardButtonConfig={resultCardButtonConfig}
@@ -77,6 +78,7 @@ const renderStatusButton = (
         startIcon={TemporalIcon}
         isSvgIcon
         iconSize={iconSize[size].onGoing}
+        isInteractive={false}
         text="On going"
         resultCardButtonConfig={{
           ...resultCardButtonConfig,
@@ -90,6 +92,7 @@ const renderStatusButton = (
     <ResultCardButton
       startIcon={QuestionMarkIcon}
       iconSize={iconSize[size].noStatus}
+      isInteractive={false}
       text="No Status"
       shouldHideText={shouldHideText}
       resultCardButtonConfig={resultCardButtonConfig}
