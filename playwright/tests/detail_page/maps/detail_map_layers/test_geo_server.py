@@ -2,7 +2,7 @@ import time
 from http import HTTPStatus
 
 import pytest
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Error, Page, expect
 
 from core.enums.map_layers.layer_style import LayerStyle
 from core.factories.layer import LayerFactory
@@ -237,31 +237,34 @@ def test_data_not_on_whitelist(responsive_page: Page, uuid: str) -> None:
     detail_page.load(uuid)
     detail_page.go_to_map_tab()
     detail_page.detail_map.wait_for_map_loading()
+    detail_page.detail_map.wait_for_layer_select_loading()
     detail_page.detail_map.wait_for_map_idle()
 
-    # Layer switcher only mounts after mapLayerConfig is built.
-    expect(detail_page.detail_map.layers_menu).to_be_visible(
-        timeout=_UI_TIMEOUT_MS
-    )
-    detail_page.detail_map.layers_menu.click()
     # Spatial Extent replaces GeoServer only after wms_fields 401 flips
-    # isWMSAvailable — open the menu and wait for that config update.
-    expect(detail_page.detail_map.spatial_extent_layer).to_be_visible(
-        timeout=_UI_TIMEOUT_MS
+    # isWMSAvailable. Idle/resize can close the Popper (CI/mobile).
+    detail_page.detail_map.open_layers_menu_until_visible(
+        detail_page.detail_map.spatial_extent_layer
     )
 
-    # GeojsonLayer paints after map idle + selectedMapLayerId === SpatialExtent.
-    layer_id = layer_factory.get_layer_id(LayerStyle.SPATIAL_EXTENT)
-    layer_visible = False
+    # GeojsonLayer / TestHelper may mount after that config flip.
+    layer_id = None
     deadline = time.monotonic() + (_UI_TIMEOUT_MS / 1000)
+    last_error = None
     while time.monotonic() < deadline:
-        if detail_page.detail_map.is_map_layer_visible(
-            layer_id, is_map_loading=False
-        ):
-            layer_visible = True
-            break
+        try:
+            layer_id = layer_factory.get_layer_id(LayerStyle.SPATIAL_EXTENT)
+            if detail_page.detail_map.is_map_layer_visible(
+                layer_id, is_map_loading=False
+            ):
+                break
+        except Error as exc:
+            last_error = exc
+            layer_id = None
         detail_page.page.wait_for_timeout(250)
-    assert layer_visible is True, (
-        f'Spatial Extent layer {layer_id!r} was not visible within '
-        f'{_UI_TIMEOUT_MS}ms'
+    assert layer_id is not None, (
+        f'Spatial Extent layer id was not available within {_UI_TIMEOUT_MS}ms'
+        f'{f": {last_error}" if last_error else ""}'
+    )
+    detail_page.detail_map.wait_until_map_layer_visible(
+        layer_id, timeout_ms=_UI_TIMEOUT_MS
     )

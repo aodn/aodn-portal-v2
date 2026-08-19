@@ -9,6 +9,34 @@ from core.factories.device_configs import get_desktop_config, get_mobile_config
 from mocks.apply import apply_mock
 from utils.trace_utils import get_trace_dir_path
 
+# CI/headless Chromium has no GPU. Opt into SwiftShader so Chromium does not
+# log the deprecated automatic software-WebGL fallback warning.
+_SWIFTSHADER_LAUNCH_ARGS = (
+    '--enable-unsafe-swiftshader',
+    '--use-gl=angle',
+    '--use-angle=swiftshader',
+)
+
+# Chromium still emits these on software GL; they are not test failures.
+_IGNORED_CONSOLE_FRAGMENTS = (
+    'Automatic fallback to software WebGL has been deprecated',
+    'GL Driver Message',
+    'GPU stall due to ReadPixels',
+    'GroupMarkerNotSet',
+)
+
+
+def _merge_launch_args(browser_type_launch_args: dict) -> dict:
+    launch_args = list(browser_type_launch_args.get('args') or [])
+    for flag in _SWIFTSHADER_LAUNCH_ARGS:
+        if flag not in launch_args:
+            launch_args.append(flag)
+    return {**browser_type_launch_args, 'args': launch_args}
+
+
+def _should_print_console(text: str) -> bool:
+    return not any(fragment in text for fragment in _IGNORED_CONSOLE_FRAGMENTS)
+
 
 def setup_page(
     playwright: Playwright,
@@ -16,7 +44,9 @@ def setup_page(
     browser_type_launch_args: dict,
 ) -> tuple[Browser, BrowserContext, Page]:
     # Use the browser launch args that include --headed flag
-    browser = playwright.chromium.launch(**browser_type_launch_args)
+    browser = playwright.chromium.launch(
+        **_merge_launch_args(browser_type_launch_args)
+    )
     context_kwargs = device_config.device_config or {}
 
     # If the device config doesn't specify a viewport, use the one from the device configuration
@@ -26,7 +56,14 @@ def setup_page(
     # Create a new browser context with the device configuration
     context = browser.new_context(**context_kwargs)
     page = context.new_page()
-    page.on('console', lambda msg: print(f'[BROWSER CONSOLE] {msg.text}'))
+    page.on(
+        'console',
+        lambda msg: (
+            print(f'[BROWSER CONSOLE] {msg.text}')
+            if _should_print_console(msg.text)
+            else None
+        ),
+    )
     apply_mock(page)
     return browser, context, page
 

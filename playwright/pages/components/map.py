@@ -1,6 +1,7 @@
 import random
+import time
 
-from playwright.sync_api import Locator, Page, TimeoutError, expect
+from playwright.sync_api import Error, Locator, Page, TimeoutError, expect
 
 from pages.base_page import BasePage
 from pages.js_scripts.js_utils import (
@@ -92,6 +93,25 @@ class Map(BasePage):
         if last_error is not None:
             raise last_error
         expect(locator).to_be_visible(timeout=1_000)
+
+    def wait_until_map_layer_visible(
+        self, layer_id: str, timeout_ms: int = 30_000
+    ) -> None:
+        """Poll until Mapbox reports ``layer_id`` visible, or raise."""
+        deadline = time.monotonic() + (timeout_ms / 1000)
+        last_error: Exception | None = None
+        while time.monotonic() < deadline:
+            try:
+                if self.is_map_layer_visible(layer_id, is_map_loading=False):
+                    return
+            except Error as exc:
+                last_error = exc
+            self.page.wait_for_timeout(250)
+        detail = f': {last_error}' if last_error else ''
+        raise AssertionError(
+            f'Map layer {layer_id!r} was not visible within {timeout_ms}ms'
+            f'{detail}'
+        )
 
     def wait_for_layer_select_loading(self) -> None:
         """

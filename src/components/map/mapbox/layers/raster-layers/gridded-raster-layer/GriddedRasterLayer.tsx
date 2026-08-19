@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect, useMemo, useRef } from "react";
+import { FC, useContext, useEffect, useRef } from "react";
 import { RasterTileSource } from "mapbox-gl";
 import MapContext from "../../../MapContext";
 import { LayerBasicType } from "../../Layers";
@@ -32,33 +32,28 @@ export const getGriddedRasterLayerId = (id: string | undefined) =>
 interface GriddedRasterLayerProps
   extends LayerBasicType, GriddedRasterLayerControls {}
 
+const visibilityOf = (visible: boolean) =>
+  visible ? LAYER_VISIBILITY.VISIBLE : LAYER_VISIBILITY.NONE;
+
 const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
   products,
-  selectedProductId,
-  onSelectProduct,
+  layerConfig,
+  onLayerChange,
   selectedDate,
   visible = false,
 }) => {
   const { map } = useContext(MapContext);
-
   const mapContainerId = map?.getContainer().id;
-  const sourceId = useMemo(() => getSourceId(mapContainerId), [mapContainerId]);
-  const tileLayerId = useMemo(
-    () => getGriddedRasterLayerId(mapContainerId),
-    [mapContainerId]
-  );
-
-  const selectedProduct = useMemo(
-    () => products.find((p) => p.id === selectedProductId),
-    [products, selectedProductId]
-  );
-
-  const tileUrl = useMemo(
-    () => buildGriddedTileUrl(selectedProduct?.template, selectedDate),
-    [selectedProduct?.template, selectedDate]
+  const sourceId = getSourceId(mapContainerId);
+  const tileLayerId = getGriddedRasterLayerId(mapContainerId);
+  const tileUrl = buildGriddedTileUrl(
+    products.find((p) => p.id === layerConfig)?.template,
+    selectedDate
   );
   const hasTileUrl = tileUrl !== undefined;
 
+  // Latest values for STYLEDATA rebuilds — that effect must not depend on
+  // tileUrl/visible or a date change would tear down the source.
   const visibleRef = useRef(visible);
   const tileUrlRef = useRef(tileUrl);
   useEffect(() => {
@@ -69,7 +64,7 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
   useEffect(() => {
     if (!map || !hasTileUrl) return;
 
-    const createSourceAndLayer = (visibility: LAYER_VISIBILITY) => {
+    const createSourceAndLayer = () => {
       const url = tileUrlRef.current;
       if (!url) return;
       if (!map.getSource(sourceId)) {
@@ -82,62 +77,49 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
         });
       }
       if (!map.getLayer(tileLayerId)) {
-        // addDataLayer, never map.addLayer: this keeps the raster below the
-        // reference/menu overlays and the gl-draw rectangle.
+        // addDataLayer, never map.addLayer: keeps the raster below overlays
+        // and the gl-draw rectangle.
         addDataLayer(map, {
           id: tileLayerId,
           type: "raster",
           source: sourceId,
           paint: { "raster-opacity": 0.8 },
-          layout: { visibility },
+          layout: { visibility: visibilityOf(visibleRef.current) },
         });
       }
     };
 
-    const currentVisibility = () =>
-      visibleRef.current ? LAYER_VISIBILITY.VISIBLE : LAYER_VISIBILITY.NONE;
-
-    const createOnInit = () => {
-      if (map.isStyleLoaded()) createSourceAndLayer(currentVisibility());
+    const createOnIdle = () => {
+      if (map.isStyleLoaded()) createSourceAndLayer();
     };
 
-    const createOnStyleChange = () => createSourceAndLayer(currentVisibility());
-
-    if (map.isStyleLoaded()) {
-      createOnInit();
-    } else {
-      map.once(MapEventEnum.IDLE, createOnInit);
-    }
-    map.on(MapEventEnum.STYLEDATA, createOnStyleChange);
+    if (map.isStyleLoaded()) createSourceAndLayer();
+    else map.once(MapEventEnum.IDLE, createOnIdle);
+    map.on(MapEventEnum.STYLEDATA, createSourceAndLayer);
 
     return () => {
-      map.off(MapEventEnum.IDLE, createOnInit);
-      map.off(MapEventEnum.STYLEDATA, createOnStyleChange);
-
+      map.off(MapEventEnum.IDLE, createOnIdle);
+      map.off(MapEventEnum.STYLEDATA, createSourceAndLayer);
       if (map.isStyleLoaded()) {
         if (map.getLayer(tileLayerId)) map.removeLayer(tileLayerId);
         if (map.getSource(sourceId)) map.removeSource(sourceId);
       }
     };
+    // Intentionally omit tileUrl: date swaps go through setTiles below.
   }, [hasTileUrl, map, sourceId, tileLayerId]);
 
   useEffect(() => {
-    if (!map || !map.getLayer(tileLayerId)) return;
-    map.setLayoutProperty(
-      tileLayerId,
-      "visibility",
-      visible ? LAYER_VISIBILITY.VISIBLE : LAYER_VISIBILITY.NONE
-    );
+    if (!map?.getLayer(tileLayerId)) return;
+    map.setLayoutProperty(tileLayerId, "visibility", visibilityOf(visible));
   }, [map, tileLayerId, visible]);
 
   useEffect(() => {
     if (!map || !tileUrl) return;
-
     const timer = setTimeout(() => {
-      const source = map.getSource(sourceId) as RasterTileSource | undefined;
-      source?.setTiles?.([tileUrl]);
+      (map.getSource(sourceId) as RasterTileSource | undefined)?.setTiles?.([
+        tileUrl,
+      ]);
     }, SET_TILES_DEBOUNCE_MS);
-
     return () => clearTimeout(timer);
   }, [map, sourceId, tileUrl]);
 
@@ -146,8 +128,8 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
       {visible && (
         <MapLayerSelect
           layersOptions={toSelectItems(products)}
-          selectedLayer={selectedProductId}
-          handleSelectLayer={onSelectProduct}
+          selectedLayer={layerConfig}
+          handleSelectLayer={onLayerChange}
           isLoading={false}
         />
       )}
