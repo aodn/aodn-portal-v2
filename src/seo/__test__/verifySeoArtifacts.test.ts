@@ -5,7 +5,7 @@
 
 import { describe, expect, test } from "vitest";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
-import { BASE_URL } from "../constants";
+import { BASE_URL, CRAWLER_UA, CRAWLER_UA_PATTERN } from "../constants";
 import { renderCrawlerPage } from "../prerender";
 import {
   checkDetailPage,
@@ -138,6 +138,32 @@ describe("checkHomePage", () => {
     expect(checkHomePage(page, false)).toEqual([
       "meta description is missing or empty",
     ]);
+  });
+});
+
+describe("CRAWLER_UA_PATTERN", () => {
+  test("matches our verify UA and common crawlers", () => {
+    const crawlers = [
+      CRAWLER_UA,
+      "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+      "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; GPTBot/1.0",
+      "Mozilla/5.0 (compatible; ClaudeBot/1.0; +claudebot@anthropic.com)",
+      "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)",
+    ];
+    for (const ua of crawlers) {
+      expect(ua).toMatch(CRAWLER_UA_PATTERN);
+    }
+  });
+
+  test("does not match real browsers", () => {
+    const browsers = [
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+      "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1",
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:127.0) Gecko/20100101 Firefox/127.0",
+    ];
+    for (const ua of browsers) {
+      expect(ua).not.toMatch(CRAWLER_UA_PATTERN);
+    }
   });
 });
 
