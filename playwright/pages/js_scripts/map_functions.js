@@ -87,6 +87,13 @@ window.__map_functions = {
       throw new Error("Spatial Extent layer not found");
     }
   },
+  getGriddedRasterLayer: function (mapId) {
+    if (this.getTestProps(mapId).getGriddedRasterLayer) {
+      return this.getTestProps(mapId).getGriddedRasterLayer();
+    } else {
+      throw new Error("Gridded raster layer not found");
+    }
+  },
   isMapLayerVisible: function (mapId, layerId) {
     const map = this.getMap(mapId);
     console.log("[DEBUG] isMapLayerVisible checking layerId:", layerId);
@@ -103,6 +110,24 @@ window.__map_functions = {
         const isVisible = testProps.isPmtilesVisible();
         console.log(
           "[DEBUG] PMTiles Data Density visibility from testProps:",
+          isVisible
+        );
+        return !!isVisible;
+      }
+    }
+
+    // The gridded raster layer stays in the style when hidden (visibility is
+    // toggled via setLayoutProperty, never by removing the layer), so the
+    // generic "layer exists" check below would always say visible.
+    if (
+      testProps &&
+      typeof testProps.isGriddedRasterVisible === "function" &&
+      typeof testProps.getGriddedRasterLayer === "function"
+    ) {
+      if (layerId === testProps.getGriddedRasterLayer()) {
+        const isVisible = testProps.isGriddedRasterVisible();
+        console.log(
+          "[DEBUG] Gridded raster visibility from testProps:",
           isVisible
         );
         return !!isVisible;

@@ -92,6 +92,10 @@ export default ({ mode }: ConfigEnv) => {
           target: apiPath,
           changeOrigin: true,
         },
+        "/api/v1/ogc/ext/tiles": {
+          target: apiPath,
+          changeOrigin: true,
+        },
         "/api/v1/ogc/processes": {
           target: apiPath,
           changeOrigin: true,

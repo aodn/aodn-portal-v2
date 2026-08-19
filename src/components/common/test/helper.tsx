@@ -16,6 +16,9 @@ interface TestProps {
   /** PMTiles Data Density layer id for e2e visibility checks */
   getPmtilesLayer?: () => string;
   isPmtilesVisible?: () => boolean | undefined;
+  /** Gridded raster tile layer id for e2e visibility checks */
+  getGriddedRasterLayer?: () => string;
+  isGriddedRasterVisible?: () => boolean | undefined;
   getSpatialExtentLayer?: () => string;
   getMapClickLngLat?: () => LngLat;
   getSelectedLocationIntersects?: () => any;

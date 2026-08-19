@@ -23,6 +23,9 @@ class Routes:
         f'{PREFIX}/collections/*/items/dataset_metadata'
     )
 
+    GRIDDED_TILE_PRODUCTS = f'{PREFIX}/ext/tiles/collections/*/products'
+    GRIDDED_TILE_IMAGE = f'{PREFIX}/collections/*/map/tiles/**'
+
     WMS_MAP_TILE = '*/**/items/wms_map_tile?*'
     WMS_LAYERS = '*/**/items/wms_layers?*'
     WMS_FIELDS = '*/**/items/wms_fields?*'
@@ -37,6 +40,7 @@ class Routes:
     ESTIMATE_CO_DOWNLOAD = f'{PREFIX}/processes/estimateCOdownload/execution'
 
     STATIC_GEOJSON = f'{PREFIX}/ext/static/*.json'
+    MANAGE_INFO = f'{PREFIX}/manage/info'
 
     # S3 sidecar next to `{key}.pmtiles` — used to decide PMTiles support.
     PMTILES_METADATA = re.compile(

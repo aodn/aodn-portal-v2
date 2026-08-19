@@ -121,6 +121,22 @@ class ApiRouter:
             detail_dataset_metadata_handler,
         )
 
+    def route_gridded_tile_products(self, handler_function: Callable) -> None:
+        self.route(Routes.GRIDDED_TILE_PRODUCTS, handler_function)
+
+    def unroute_gridded_tile_products(
+        self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.GRIDDED_TILE_PRODUCTS, handler_function)
+
+    def route_gridded_tile_image(self, handler_function: Callable) -> None:
+        self.route(Routes.GRIDDED_TILE_IMAGE, handler_function)
+
+    def unroute_gridded_tile_image(
+        self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.GRIDDED_TILE_IMAGE, handler_function)
+
     def route_wms_map_tile(self, handler_function: Callable) -> None:
         self.route(Routes.WMS_MAP_TILE, handler_function)
 
@@ -208,6 +224,14 @@ class ApiRouter:
         self, handler_function: Optional[Callable] = None
     ) -> None:
         self.unroute(Routes.PMTILES_METADATA, handler_function)
+
+    def route_manage_info(self, handler_function: Callable) -> None:
+        self.route(Routes.MANAGE_INFO, handler_function)
+
+    def unroute_manage_info(
+        self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.MANAGE_INFO, handler_function)
 
     def route_static_geojson(self, handler_function: Callable) -> None:
         self.route(Routes.STATIC_GEOJSON, handler_function)

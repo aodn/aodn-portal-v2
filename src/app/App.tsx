@@ -9,13 +9,7 @@ import Scrollbar from "@/components/common/scroll/ScrollBar";
 import GlobalLoader from "@/components/loading/GlobalLoader";
 import AdminScreen from "@/components/admin/AdminScreen";
 import { ClipboardProvider } from "@/app/providers/ClipboardProvider";
-import { extend } from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
-
-// Turn on dayjs timezone support
-extend(utc);
-extend(timezone);
+import "@/utils/DayjsUtils";
 
 const app = () => {
   return (

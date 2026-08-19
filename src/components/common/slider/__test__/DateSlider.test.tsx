@@ -186,3 +186,80 @@ describe("DateSliderPoint keyboard", () => {
     expect(Number(thumb.getAttribute("aria-valuenow"))).toBe(points[1]);
   });
 });
+
+describe("DateSliderPoint empty marks", () => {
+  // Reachable on the tile path (marks arrive async) and on the WMS path, where
+  // discreteTimeSliderValues.get() misses whenever the selected layer name
+  // differs from the stored key. Both used to throw on sorted_marks[0].value.
+  it.each([[[]], [undefined]])(
+    "renders nothing for %j without throwing",
+    (points) => {
+      const onDatePointChange = vi.fn();
+
+      expect(() =>
+        render(
+          <DateSliderPoint
+            valid_points={points}
+            onDatePointChange={onDatePointChange}
+          />
+        )
+      ).not.toThrow();
+
+      expect(screen.queryByRole("slider")).not.toBeInTheDocument();
+      expect(onDatePointChange).not.toHaveBeenCalled();
+    }
+  );
+});
+
+describe("DateSliderPoint resync", () => {
+  it("snaps to the new last mark when marks change, without notifying", () => {
+    const onDatePointChange = vi.fn();
+    const first = [
+      dayjs("2020-01-01").valueOf(),
+      dayjs("2020-01-15").valueOf(),
+    ];
+    const second = [
+      dayjs("2021-06-01").valueOf(),
+      dayjs("2021-06-02").valueOf(),
+    ];
+
+    const { rerender } = render(
+      <DateSliderPoint
+        valid_points={[...first]}
+        onDatePointChange={onDatePointChange}
+      />
+    );
+    expect(
+      Number(screen.getByRole("slider").getAttribute("aria-valuenow"))
+    ).toBe(first[1]);
+
+    rerender(
+      <DateSliderPoint
+        valid_points={[...second]}
+        onDatePointChange={onDatePointChange}
+      />
+    );
+
+    expect(
+      Number(screen.getByRole("slider").getAttribute("aria-valuenow"))
+    ).toBe(second[1]);
+    // The parent derives the same default from the same source; notifying here
+    // would be a render loop.
+    expect(onDatePointChange).not.toHaveBeenCalled();
+  });
+});
+
+describe("DateSliderPoint display", () => {
+  const points = [Date.UTC(2024, 0, 1), Date.UTC(2024, 0, 2)];
+
+  it("shows the selected date formatted as DD/MM/YYYY", () => {
+    render(<DateSliderPoint valid_points={[...points]} />);
+
+    expect(screen.getByText("Displaying")).toBeInTheDocument();
+    // { selector: "p" } excludes the slider's own value-label tooltip, which
+    // renders the same formatted date in a sibling span.
+    expect(
+      screen.getByText("02/01/2024", { selector: "p" })
+    ).toBeInTheDocument();
+  });
+});
