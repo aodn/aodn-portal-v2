@@ -67,6 +67,7 @@ import {
 } from "@/components/map/mapbox/layers/pmtiles/Common";
 import GriddedRasterLayer from "@/components/map/mapbox/layers/raster-layers/gridded-raster-layer/GriddedRasterLayer";
 import useGriddedRasterLayer from "@/components/map/mapbox/layers/raster-layers/gridded-raster-layer/useGriddedRasterLayer";
+import { portalTheme } from "@/styles";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -452,11 +453,18 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   );
 
   const additionalSlider = useMemo(() => {
+    const additionalSliderSx = {
+      mx: 0,
+      borderRadius: 0,
+      backgroundColor: portalTheme.palette.primary6,
+    };
+
     if (selectedMapLayerId === LayerName.GriddedRaster) {
       return hasGriddedDates ? (
         <DateSliderPoint
           key={griddedDateSliderKey}
           {...griddedDateSliderProps}
+          sx={additionalSliderSx}
         />
       ) : undefined;
     }
@@ -465,6 +473,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
         <DateSliderPoint
           valid_points={discreteTimeSliderValues?.get(selectedWmsLayer)}
           onDatePointChange={handleSliderPointChange}
+          sx={additionalSliderSx}
         />
       );
     }
