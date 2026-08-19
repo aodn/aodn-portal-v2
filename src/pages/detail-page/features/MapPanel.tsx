@@ -568,7 +568,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       >
         <Box id={MAP_DATASET_SELECT_SLOT_ID} sx={{ width: "100%" }} />
         <Box
-          arial-label="map"
+          aria-label="map"
           id={mapContainerId}
           sx={{
             width: "100%",

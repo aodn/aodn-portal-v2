@@ -175,7 +175,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
     return (
       <Grid
         container
-        arial-label="result-list-card-buttons"
+        aria-label="result-list-card-buttons"
         sx={{ width: "100%", pl: padding.double }}
       >
         {buttons.map(({ key, node }) => (
@@ -198,7 +198,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
   // the gaps.
   return (
     <Box
-      arial-label="result-list-card-buttons"
+      aria-label="result-list-card-buttons"
       sx={{
         width: "100%",
         display: "flex",
