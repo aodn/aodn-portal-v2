@@ -7,9 +7,15 @@ crawlers need, delivered two ways:
 - **With the app bundle** (wired in `vite.config.ts`): head tags, robots.txt
   and a live canonical link — `headTags.ts`, `vitePlugins.ts`, `canonicalUrl.ts`
 - **Weekly to S3** (the [Publish SEO Artifacts workflow](../../.github/workflows/seo.yml)):
-  `sitemap.xml` plus ~15k pre-rendered `/details/<uuid>` pages —
+  `sitemap.xml` plus ~15k pre-rendered detail pages under
+  `prerender/details/<uuid>/index.html` —
   `fetchCollections.ts` feeds `sitemap.ts` and `prerender.ts` (which embeds
   `jsonLd.ts`); `fetchCollections.ts` is the only module importing app-store code
+
+A CloudFront function (in the appdeploy repo) rewrites crawler requests for
+`/details/<uuid>` to the pre-rendered pages; real users always get the latest
+SPA shell. The `prerender/` folder never appears in a public URL, sitemap or
+canonical, and robots.txt disallows crawling it directly.
 
 ## Commands
 

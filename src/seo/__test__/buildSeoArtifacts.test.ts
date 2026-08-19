@@ -60,9 +60,10 @@ describe("the artifacts pipeline on controlled data", () => {
     expect(sitemap.match(/<loc>/g)).toHaveLength(3);
 
     // only the record with id, title and description becomes a page
-    expect(await readdir(path.join(outDir, "details"))).toEqual(["rec-1"]);
+    const detailsDir = path.join(outDir, "prerender", "details");
+    expect(await readdir(detailsDir)).toEqual(["rec-1"]);
     const detailPage = await readFile(
-      path.join(outDir, "details", "rec-1"),
+      path.join(detailsDir, "rec-1", "index.html"),
       "utf8"
     );
     expect(detailPage).toContain(
