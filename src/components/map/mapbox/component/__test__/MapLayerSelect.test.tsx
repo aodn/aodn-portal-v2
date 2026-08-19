@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import MapLayerSelect, { MAP_DATASET_SELECT_SLOT_ID } from "../MapLayerSelect";
 
 const items = [
