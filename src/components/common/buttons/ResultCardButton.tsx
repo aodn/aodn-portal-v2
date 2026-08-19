@@ -23,6 +23,7 @@ export interface ResultCardButtonConfig {
 
 interface ResultCardButtonProps {
   disabled?: boolean;
+  isInteractive?: boolean;
   resultCardButtonConfig?: ResultCardButtonConfig;
   startIcon?: ElementType | ReactNode;
   shouldHideText?: boolean;
@@ -61,6 +62,7 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
   sx,
   shouldHideText = false,
   disabled = false,
+  isInteractive = true,
   isSvgIcon = false,
   iconSize = undefined,
 }) => {
@@ -101,6 +103,7 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
         textTransform: "none",
         opacity: disabled ? 0.5 : 1,
         minWidth: hasText ? "auto" : 0, // Optimize layout when text is hidden
+        cursor: isInteractive ? undefined : "default",
         ...sx,
       }}
     >

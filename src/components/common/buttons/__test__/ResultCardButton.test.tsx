@@ -26,6 +26,11 @@ describe("ResultCardButton", () => {
     expect(button).toBeDisabled();
   });
 
+  it("uses the default cursor when it is not interactive", () => {
+    render(<ResultCardButton isInteractive={false} />);
+    expect(screen.getByRole("button")).toHaveStyle("cursor: default");
+  });
+
   it("renders startIcon as an element when valid", () => {
     const iconElement = <span data-testid="custom-icon">Custom</span>;
     render(<ResultCardButton startIcon={iconElement} />);
