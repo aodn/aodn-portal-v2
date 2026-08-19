@@ -85,6 +85,7 @@ const renderStatusButton = (
           color: color.success.main,
         }}
         shouldHideText={shouldHideText}
+        sx={{ gap: "14px" }}
       />
     );
   }
@@ -179,7 +180,7 @@ const ResultCardButtonGroup: FC<ResultCardButtonGroupProps> = ({
       <Grid
         container
         arial-label="result-list-card-buttons"
-        sx={{ width: "100%", pl: padding.double }}
+        sx={{ width: "100%", p: padding.extraSmall, pl: padding.large }}
       >
         {buttons.map(({ key, node }) => (
           <Grid

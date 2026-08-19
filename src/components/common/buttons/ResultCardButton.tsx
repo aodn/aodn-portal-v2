@@ -98,12 +98,13 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
       onClick={() => onClick?.(undefined)}
       disabled={disabled}
       sx={{
-        p: 0.5,
-        gap: "10px",
+        p: "4px",
+        gap: "12px",
         textTransform: "none",
         opacity: disabled ? 0.5 : 1,
         minWidth: hasText ? "auto" : 0, // Optimize layout when text is hidden
         cursor: isInteractive ? undefined : "default",
+        "&:hover": { backgroundColor: "transparent" },
         ...sx,
       }}
     >
@@ -117,7 +118,6 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
       {hasText && (
         <Typography
           pt={0}
-          mt={-0.5}
           whiteSpace="nowrap"
           // Label tracks the icon colour, so status buttons (e.g. "On going")
           // read as one unit rather than a green icon beside a blue label

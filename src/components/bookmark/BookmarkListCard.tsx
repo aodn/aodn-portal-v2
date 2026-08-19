@@ -41,7 +41,7 @@ const BookmarkListCard: FC<BookmarkListCardProps> = ({
 
   return (
     <Box sx={{ flex: 1, ...sx }}>
-      <Stack direction="column" spacing={1}>
+      <Stack direction="column">
         <Box
           arial-label="map"
           id={mapContainerId}
