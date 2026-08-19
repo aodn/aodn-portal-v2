@@ -567,6 +567,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
         }}
       >
         <Box id={MAP_DATASET_SELECT_SLOT_ID} sx={{ width: "100%" }} />
+        {additionalSlider}
         <Box
           aria-label="map"
           id={mapContainerId}
@@ -624,9 +625,6 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
                       maxDate={maxDateStamp.format(dateDefault.DATE_FORMAT)}
                       getAndSetDownloadConditions={getAndSetDownloadConditions}
                       downloadConditions={downloadConditions}
-                      options={
-                        additionalSlider ? { additionalSlider } : undefined
-                      }
                     />
                   }
                 />
