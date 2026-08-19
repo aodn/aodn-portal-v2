@@ -1,7 +1,8 @@
+from collections.abc import Callable
 import time
 
 import pytest
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page, Response, expect
 
 from core.enums.map_layers.layer_style import LayerStyle
 from core.factories.layer import LayerFactory
@@ -9,6 +10,16 @@ from pages.detail_page import DetailPage
 
 # Map mount / GeojsonLayer paint can lag under CI load (esp. mobile map tab).
 _UI_TIMEOUT_MS = 30_000
+
+
+def _is_products_response(uuid: str) -> Callable[[Response], bool]:
+    def _matches(response: Response) -> bool:
+        return (
+            f'/ext/tiles/collections/{uuid}/products' in response.url
+            and response.request.method == 'GET'
+        )
+
+    return _matches
 
 
 @pytest.mark.parametrize(
@@ -85,22 +96,24 @@ def test_map_hides_spatial_extent_when_gridded_data_is_available(
 
     layer_factory = LayerFactory(detail_page.detail_map)
 
-    detail_page.load(uuid)
-    detail_page.go_to_map_tab()
-    detail_page.detail_map.wait_for_layer_select_loading()
+    # Spatial Extent is offered until discovery returns products; only then
+    # is it suppressed. Wait for that response (mobile: after Map tab).
+    with responsive_page.expect_response(
+        _is_products_response(uuid), timeout=_UI_TIMEOUT_MS
+    ):
+        detail_page.load(uuid)
+        detail_page.go_to_map_tab()
 
-    detail_page.detail_map.layers_menu.click()
+    # Idle/resize can close the Popper; Gridded Data is the late radio.
+    detail_page.detail_map.open_layers_menu_until_visible(
+        detail_page.detail_map.gridded_data_layer
+    )
     expect(detail_page.detail_map.geoserver_layer).to_be_visible()
-    expect(detail_page.detail_map.gridded_data_layer).to_be_visible()
     expect(detail_page.detail_map.spatial_extent_layer).to_have_count(0)
 
-    # Verify that the Geoserver layer is present and visible on the map
     layer_id = layer_factory.get_layer_id(LayerStyle.GEO_SERVER)
-    assert (
-        detail_page.detail_map.is_map_layer_visible(
-            layer_id, is_map_loading=False
-        )
-        is True
+    detail_page.detail_map.wait_until_map_layer_visible(
+        layer_id, timeout_ms=_UI_TIMEOUT_MS
     )
 
 
