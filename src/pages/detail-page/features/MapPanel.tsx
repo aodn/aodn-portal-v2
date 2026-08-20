@@ -189,7 +189,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(false);
   const [drawRectSupport, setDrawRectSupportSupport] = useState<boolean>(false);
   const [discreteTimeSliderValues, setDiscreteTimeSliderValues] = useState<
-    Map<string, Array<number>> | undefined
+    Map<string, Array<number>> | null | undefined
   >(undefined);
   const [datePointValue, setDatePointValue] = useState<number>(
     dateToValue(dayjs(dateDefault.min))
@@ -370,25 +370,52 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     return features;
   }, [downloadConditions]);
 
+  // Snap the single-time thumb onto a real mark once discrete times load.
+  useEffect(() => {
+    startTransition(() => {
+      if (!discreteTimeSliderValues || !selectedWmsLayer) return;
+      const times = discreteTimeSliderValues.get(selectedWmsLayer);
+      if (!times?.length) return;
+      if (!times.includes(datePointValue)) {
+        setDatePointValue(times[times.length - 1]);
+      }
+    });
+  }, [datePointValue, discreteTimeSliderValues, selectedWmsLayer]);
+
   const geoServerLayerConfig = useMemo(() => {
-    return discreteTimeSliderValues
-      ? {
-          urlParams: {
-            TIME: dayjs.utc(datePointValue!),
-            MODE: Dimension.SINGLE,
-          },
-        }
-      : {
-          urlParams: {
-            START_DATE: filterStartDate,
-            END_DATE: filterEndDate,
-          },
-        };
+    // `undefined` = still probing whether the WMS layer is single-time (ncWMS)
+    // or a range. Omit MODE so GeoServerLayer does not request tiles yet.
+    if (discreteTimeSliderValues === undefined) {
+      return { urlParams: {} };
+    }
+    if (discreteTimeSliderValues) {
+      const times = selectedWmsLayer
+        ? discreteTimeSliderValues.get(selectedWmsLayer)
+        : undefined;
+      const timeValue =
+        times?.includes(datePointValue) && datePointValue
+          ? datePointValue
+          : times?.[times.length - 1];
+      return {
+        urlParams: {
+          TIME: timeValue !== undefined ? dayjs.utc(timeValue) : undefined,
+          MODE: Dimension.SINGLE,
+        },
+      };
+    }
+    return {
+      urlParams: {
+        START_DATE: filterStartDate,
+        END_DATE: filterEndDate,
+        MODE: Dimension.RANGE,
+      },
+    };
   }, [
     discreteTimeSliderValues,
     datePointValue,
     filterStartDate,
     filterEndDate,
+    selectedWmsLayer,
   ]);
 
   const handleMapChange = useCallback(
