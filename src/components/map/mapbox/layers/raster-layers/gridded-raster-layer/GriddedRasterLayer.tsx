@@ -29,7 +29,7 @@ const getSourceId = (id: string | undefined) => `${id}-gridded-raster-source`;
 export const getGriddedRasterLayerId = (id: string | undefined) =>
   `${id}-gridded-raster-layer`;
 
-interface GriddedRasterLayerProps
+export interface GriddedRasterLayerProps
   extends LayerBasicType, GriddedRasterLayerControls {}
 
 const visibilityOf = (visible: boolean) =>

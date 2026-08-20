@@ -39,7 +39,7 @@ const datePickerSlotProps = {
   },
 } as const;
 
-interface DateRangeConditionCardProps {
+export interface DateRangeConditionCardProps {
   dateRangeCondition: DateRangeCondition;
   onChange: (start: string, end: string) => void;
   onRemove?: () => void;

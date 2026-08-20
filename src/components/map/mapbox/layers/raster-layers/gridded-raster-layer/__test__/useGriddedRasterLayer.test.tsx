@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { AxiosResponse } from "axios";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -51,7 +52,7 @@ describe("useGriddedRasterLayer", () => {
           productPayload("b:two", ["2024-02-01", "2024-02-10"]),
         ],
       },
-    } as any);
+    } as AxiosResponse);
 
     const { result } = renderHook(
       () => useGriddedRasterLayer(zarrCollection("uuid-1")),
@@ -95,7 +96,7 @@ describe("useGriddedRasterLayer", () => {
           productPayload("b:two", ["2024-01-05", "2024-01-20"]),
         ],
       },
-    } as any);
+    } as AxiosResponse);
 
     const { result } = renderHook(
       () => useGriddedRasterLayer(zarrCollection("uuid-1")),
@@ -131,7 +132,7 @@ describe("useGriddedRasterLayer", () => {
   it("onDatePointChange is a no-op for a value with no matching day key", async () => {
     vi.spyOn(ogcAxiosWithRetry, "get").mockResolvedValue({
       data: { products: [productPayload("a:one", ["2024-01-01"])] },
-    } as any);
+    } as AxiosResponse);
 
     const { result } = renderHook(
       () => useGriddedRasterLayer(zarrCollection("uuid-1")),
@@ -158,10 +159,10 @@ describe("useGriddedRasterLayer", () => {
             productPayload("b:two", ["2024-02-01"]),
           ],
         },
-      } as any)
+      } as AxiosResponse)
       .mockResolvedValueOnce({
         data: { products: [productPayload("c:three", ["2024-03-01"])] },
-      } as any);
+      } as AxiosResponse);
 
     const { result } = renderHook(
       () => useGriddedRasterLayer(zarrCollection("uuid-1")),

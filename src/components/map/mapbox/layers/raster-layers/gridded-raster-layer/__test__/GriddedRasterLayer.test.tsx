@@ -1,10 +1,13 @@
 import { act, render, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { Mock } from "vitest";
+import type { Map as MapBox } from "mapbox-gl";
 import MapContext from "../../../../MapContext";
 import { MapEventEnum } from "../../../../constants";
 import { GriddedRasterProduct } from "@/app/store/GriddedTileDefinitions";
 import GriddedRasterLayer, {
   GRIDDED_RASTER_MAX_ZOOM,
+  GriddedRasterLayerProps,
 } from "../GriddedRasterLayer";
 import { buildGriddedTileUrl } from "../Common";
 import * as layerOrder from "../../../../layerOrder";
@@ -34,14 +37,45 @@ const PRODUCTS: GriddedRasterProduct[] = [
 
 const urlFor = (date: string) => buildGriddedTileUrl(TEMPLATE, date) as string;
 
+// Just the shapes this component actually feeds the map — not mapbox's full specs.
+type RasterSourceSpec = {
+  type: string;
+  tiles: string[];
+  tileSize: number;
+  maxzoom: number;
+};
+type MockRasterSource = RasterSourceSpec & { setTiles: Mock };
+type MockLayerSpec = {
+  id: string;
+  type: string;
+  source: string;
+  layout?: Record<string, string>;
+};
+
+type MockMap = {
+  getContainer: () => { id: string };
+  getSource: Mock<(id: string) => MockRasterSource>;
+  addSource: Mock<(id: string, spec: RasterSourceSpec) => void>;
+  getLayer: Mock<(id: string) => MockLayerSpec>;
+  addLayer: Mock<(spec: MockLayerSpec) => void>;
+  removeLayer: Mock<(id: string) => void>;
+  removeSource: Mock<(id: string) => void>;
+  on: Mock<(event: string, cb: () => void) => void>;
+  off: Mock;
+  once: (event: string, cb: () => void) => void;
+  isStyleLoaded: Mock<() => boolean>;
+  setLayoutProperty: Mock<(id: string, prop: string, value: string) => void>;
+  getLayoutProperty: Mock<(id: string, prop: string) => string | undefined>;
+};
+
 describe("GriddedRasterLayer", () => {
-  let mockMap: any;
+  let mockMap: MockMap;
   // Captured so a test can fire the map's own STYLEDATA handler.
   let styleDataHandlers: Array<() => void>;
 
-  const renderLayer = (props: Partial<Record<string, any>> = {}) =>
+  const renderLayer = (props: Partial<GriddedRasterLayerProps> = {}) =>
     render(
-      <MapContext.Provider value={{ map: mockMap } as any}>
+      <MapContext.Provider value={{ map: mockMap as unknown as MapBox }}>
         <GriddedRasterLayer
           products={PRODUCTS}
           layerConfig="a:one"
@@ -58,17 +92,17 @@ describe("GriddedRasterLayer", () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     styleDataHandlers = [];
 
-    const sources: Record<string, any> = {};
-    const layers: Record<string, any> = {};
+    const sources: Record<string, MockRasterSource> = {};
+    const layers: Record<string, MockLayerSpec> = {};
 
     mockMap = {
       getContainer: () => ({ id: "test-map" }),
       getSource: vi.fn((id: string) => sources[id]),
-      addSource: vi.fn((id: string, spec: any) => {
+      addSource: vi.fn((id: string, spec: RasterSourceSpec) => {
         sources[id] = { ...spec, setTiles: vi.fn() };
       }),
       getLayer: vi.fn((id: string) => layers[id]),
-      addLayer: vi.fn((spec: any) => {
+      addLayer: vi.fn((spec: MockLayerSpec) => {
         layers[spec.id] = spec;
       }),
       removeLayer: vi.fn((id: string) => {
@@ -169,7 +203,7 @@ describe("GriddedRasterLayer", () => {
     const source = mockMap.getSource("test-map-gridded-raster-source");
 
     rerender(
-      <MapContext.Provider value={{ map: mockMap } as any}>
+      <MapContext.Provider value={{ map: mockMap as unknown as MapBox }}>
         <GriddedRasterLayer
           products={PRODUCTS}
           layerConfig="a:one"
@@ -194,7 +228,7 @@ describe("GriddedRasterLayer", () => {
 
     ["2024-01-01", "2024-01-02", "2024-01-03"].forEach((date) => {
       rerender(
-        <MapContext.Provider value={{ map: mockMap } as any}>
+        <MapContext.Provider value={{ map: mockMap as unknown as MapBox }}>
           <GriddedRasterLayer
             products={PRODUCTS}
             layerConfig="a:one"
@@ -218,7 +252,7 @@ describe("GriddedRasterLayer", () => {
     const { rerender } = renderLayer();
 
     rerender(
-      <MapContext.Provider value={{ map: mockMap } as any}>
+      <MapContext.Provider value={{ map: mockMap as unknown as MapBox }}>
         <GriddedRasterLayer
           products={PRODUCTS}
           layerConfig="a:one"
@@ -257,7 +291,7 @@ describe("GriddedRasterLayer", () => {
     const { unmount } = renderLayer();
     unmount();
 
-    const offEvents = mockMap.off.mock.calls.map((c: any[]) => c[0]);
+    const offEvents = mockMap.off.mock.calls.map((c) => c[0]);
     expect(offEvents).toContain(MapEventEnum.IDLE);
     expect(offEvents).toContain(MapEventEnum.STYLEDATA);
     expect(mockMap.removeLayer).toHaveBeenCalledWith(
@@ -293,7 +327,7 @@ describe("GriddedRasterLayer", () => {
     );
 
     rerender(
-      <MapContext.Provider value={{ map: mockMap } as any}>
+      <MapContext.Provider value={{ map: mockMap as unknown as MapBox }}>
         <GriddedRasterLayer
           products={PRODUCTS}
           layerConfig="a:one"

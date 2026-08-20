@@ -153,7 +153,7 @@ describe("buildMapLayerConfig", () => {
   });
 
   describe("gridded raster layer", () => {
-    const zarrCollection = (bbox?: any) =>
+    const zarrCollection = (bbox?: unknown) =>
       createMockCollection({
         hasCloudOptimisedData: true,
         getDatasetType: () => [DatasetType.ZARR],

@@ -105,15 +105,13 @@ describe("searchReducer async thunks", () => {
   it("fetchGriddedTileProducts requests the uuid-scoped OGC products path", async () => {
     const spy = vi
       .spyOn(ogcAxiosWithRetry, "get")
-      .mockResolvedValue({ data: { products: [] } } as any);
+      .mockResolvedValue({ data: { products: [] } } as AxiosResponse);
 
     const store = configureStore({
       reducer: (state = {}) => state,
     });
 
-    await store.dispatch(
-      fetchGriddedTileProducts({ uuid: "test-uuid" }) as any
-    );
+    await store.dispatch(fetchGriddedTileProducts({ uuid: "test-uuid" }));
 
     expect(spy).toHaveBeenCalledTimes(1);
     const [path, config] = spy.mock.calls[0];
@@ -123,7 +121,7 @@ describe("searchReducer async thunks", () => {
     expect(config?.signal).toBeDefined();
     // The shared instance retries 10x; a DAS warmup 503 must not stay alive for
     // ~17 minutes per page view.
-    expect((config as any)["axios-retry"]).toEqual(
+    expect(config?.["axios-retry"]).toEqual(
       expect.objectContaining({ retries: 2 })
     );
   });

@@ -652,7 +652,7 @@ const fetchGriddedTileProducts = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >(
   "griddedTiles/fetchGriddedTileProducts",
-  (request: { uuid: string }, thunkApi: any) =>
+  (request: { uuid: string }, thunkApi) =>
     ogcAxiosWithRetry
       .get<TileProductsResponse>(
         `/ogc/ext/tiles/collections/${request.uuid}/products`,

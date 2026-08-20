@@ -13,7 +13,7 @@
     "seo:artifacts": "vite-node src/seo/buildSeoArtifacts.ts",
     "seo:gsc": "tsx src/seo/searchConsole.ts",
     "seo:verify": "tsx src/seo/verifySeoArtifacts.ts",
-    "lint": "eslint . --report-unused-disable-directives --max-warnings 100",
+    "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "postinstall": "husky",
     "test": "vitest",
@@ -130,7 +130,6 @@
     "node": ">=20.x",
     "npm": ">=8.0.0"
   },
-  "//": "lint --max-warnings 100 = no-explicit-any ceiling; lower it as warnings get fixed, never raise it",
   "resolutions": {
     "react-is": "^18.3.1"
   },

@@ -52,8 +52,8 @@ so enabling these type-aware rules costs nothing extra.
       by consumers (MapPanel, MapSection, SearchPage, BookmarkListAccordionGroup),
       so this needs an event-typing refactor: explicit `ControlProps<T>` type
       arguments per consumer, and `BookmarkEvent` as a discriminated union on
-      `action` with narrowing at the call sites. Lower `--max-warnings` in
-      package.json to 0 once done.
+      `action` with narrowing at the call sites. `--max-warnings` is already
+      0; remove the inline `eslint-disable` suppressions when done.
 
 ## Maybe later (fine to ignore)
 

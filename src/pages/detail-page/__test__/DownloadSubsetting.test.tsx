@@ -11,11 +11,17 @@ import {
   DetailPageContextDefault,
 } from "../context/detail-page-context";
 import DownloadSubsetting from "../features/download/DownloadSubsetting";
+import type { DateRangeConditionCardProps } from "../features/download/subset-conditions/DateRangeConditionCard";
 
 vi.mock(
   "../features/download/subset-conditions/DateRangeConditionCard",
   () => ({
-    default: ({ dateRangeCondition, minDate, maxDate, onChange }: any) => (
+    default: ({
+      dateRangeCondition,
+      minDate,
+      maxDate,
+      onChange,
+    }: DateRangeConditionCardProps) => (
       <div data-testid="date-range-card">
         <span data-testid="from-date">{dateRangeCondition.start}</span>
         <span data-testid="to-date">{dateRangeCondition.end}</span>

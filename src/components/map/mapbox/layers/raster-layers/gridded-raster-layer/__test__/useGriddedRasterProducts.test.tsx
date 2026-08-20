@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { AxiosResponse } from "axios";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
@@ -55,7 +56,7 @@ describe("useGriddedRasterProducts", () => {
   it("requests the uuid-scoped OGC products path", async () => {
     const spy = vi
       .spyOn(ogcAxiosWithRetry, "get")
-      .mockResolvedValue({ data: payload("a:one") } as any);
+      .mockResolvedValue({ data: payload("a:one") } as AxiosResponse);
 
     const { result } = renderHook(
       () => useGriddedRasterProducts(zarrCollection("uuid-1")),
@@ -73,7 +74,7 @@ describe("useGriddedRasterProducts", () => {
   it("treats an empty listing as success, not failure", async () => {
     vi.spyOn(ogcAxiosWithRetry, "get").mockResolvedValue({
       data: { products: [] },
-    } as any);
+    } as AxiosResponse);
 
     const { result } = renderHook(
       () => useGriddedRasterProducts(zarrCollection("uuid-empty")),
@@ -109,8 +110,8 @@ describe("useGriddedRasterProducts", () => {
 
     vi.spyOn(ogcAxiosWithRetry, "get").mockImplementation((path: string) =>
       path.includes("uuid-old")
-        ? (first as any)
-        : (Promise.resolve({ data: payload("new:product") }) as any)
+        ? (first as Promise<AxiosResponse>)
+        : Promise.resolve({ data: payload("new:product") } as AxiosResponse)
     );
 
     const { result, rerender } = renderHook(
@@ -135,7 +136,7 @@ describe("useGriddedRasterProducts", () => {
   it("keeps a previously successful listing when a later refetch fails", async () => {
     const spy = vi
       .spyOn(ogcAxiosWithRetry, "get")
-      .mockResolvedValueOnce({ data: payload("a:one") } as any)
+      .mockResolvedValueOnce({ data: payload("a:one") } as AxiosResponse)
       .mockRejectedValueOnce(new Error("transient"));
 
     const { result } = renderHook(
@@ -163,7 +164,7 @@ describe("useGriddedRasterProducts", () => {
     const spy = vi
       .spyOn(ogcAxiosWithRetry, "get")
       .mockRejectedValueOnce(new Error("transient"))
-      .mockResolvedValue({ data: payload("a:one") } as any);
+      .mockResolvedValue({ data: payload("a:one") } as AxiosResponse);
 
     const { result } = renderHook(
       () => useGriddedRasterProducts(zarrCollection("uuid-retry")),
