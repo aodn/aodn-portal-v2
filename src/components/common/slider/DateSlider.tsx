@@ -12,12 +12,7 @@ import { dateToValue, valueToDate } from "@/utils/DateUtils";
 import { dateDefault } from "../constants";
 import { portalTheme } from "../../../styles";
 import { padding } from "@/styles/constants";
-import PlainSlider from "./PlainSlider";
-
-enum ThumbType {
-  DIAMOND = "diamond",
-  CIRCLE = "circle",
-}
+import PlainSlider, { ConcentrationSlider, ThumbType } from "./PlainSlider";
 /** Slider mark shape (was imported from a deep MUI path removed in v7). */
 interface Mark {
   value: number;
@@ -55,28 +50,6 @@ const sliderCaptionSx = {
   whiteSpace: "nowrap",
   // Override default body1 padding so the bar top isn't pushed down
   padding: 0,
-} as const;
-
-/** Diamond thumb for the single-point time slider (range slider stays circular). */
-const diamondThumbSx = {
-  flex: 1,
-  minWidth: 0,
-  "& .MuiSlider-thumb": {
-    width: 20,
-    height: 20,
-    backgroundColor: "transparent",
-    boxShadow: "none",
-    "&::before": {
-      width: 16,
-      height: 16,
-      borderRadius: "3px",
-      backgroundColor: portalTheme.palette.secondary2,
-      border: "3px solid #FFF",
-      boxSizing: "border-box",
-      transform: "rotate(45deg)",
-      boxShadow: "0px 0px 3px rgba(0, 0, 0, 0.50)",
-    },
-  },
 } as const;
 
 /** One calendar day in ms — sensible arrow-key step for date timestamps. */
@@ -232,7 +205,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
                 : ""}
             </Typography>
           </Stack>
-          <PlainSlider
+          <ConcentrationSlider
             step={null} // ← key: disables free sliding
             marks={sorted_marks}
             min={sorted_marks[0].value}
@@ -254,7 +227,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
             valueLabelFormat={(value: number) =>
               valueToDate(value).format(dateDefault.DISPLAY_FORMAT)
             }
-            sx={thumbType === ThumbType.DIAMOND ? diamondThumbSx : undefined}
+            thumb={thumbType}
           />
         </Stack>
       </Grid>

@@ -1,5 +1,95 @@
+import { useMemo } from "react";
 import { portalTheme } from "../../../styles";
 import { Slider, SliderProps, styled, SxProps, Theme } from "@mui/material";
+
+enum ThumbType {
+  DIAMOND = "diamond",
+  CIRCLE = "circle",
+}
+
+interface PlainSliderProps extends SliderProps {
+  sx?: SxProps<Theme>;
+}
+
+interface ConcentrationSliderProps extends SliderProps {
+  sx?: SxProps<Theme>;
+  thumb?: ThumbType;
+}
+
+const RAIL_IDLE = "rgba(0,0,0,0.04)";
+const DENSITY_COLOR = "#2E6F9E";
+/** Cap CSS color-stops. Firefox can crash on huge / non-monotonic gradients. */
+const MAX_DENSITY_BARS = 96;
+const BAR_WIDTH_PERCENT = 0.35;
+
+const formatPercent = (value: number) =>
+  Math.min(100, Math.max(0, value)).toFixed(3);
+
+/** Diamond thumb for the single-point time slider (range slider stays circular). */
+const diamondThumbSx: SxProps<Theme> = {
+  flex: 1,
+  minWidth: 0,
+  "& .MuiSlider-thumb": {
+    width: 20,
+    height: 20,
+    backgroundColor: "transparent",
+    boxShadow: "none",
+    "&::before": {
+      width: 16,
+      height: 16,
+      borderRadius: "3px",
+      backgroundColor: portalTheme.palette.secondary2,
+      border: "3px solid #FFF",
+      boxSizing: "border-box",
+      transform: "rotate(45deg)",
+      boxShadow: "0px 0px 3px rgba(0, 0, 0, 0.50)",
+    },
+  },
+};
+/**
+ * CSS linear-gradient of barcode-style density marks along the slider rail.
+ * `marks` is the MUI Slider prop: `false`/`true` (no custom points) or
+ * `{ value, label? }[]`.
+ */
+const createDensityGradient = (
+  marks: SliderProps["marks"],
+  min = 0,
+  max = 100
+): string => {
+  const range = max - min;
+  if (!(range > 0) || !Array.isArray(marks) || marks.length === 0) {
+    return `linear-gradient(to right, ${RAIL_IDLE} 0%, ${RAIL_IDLE} 100%)`;
+  }
+
+  const occupied = new Uint8Array(MAX_DENSITY_BARS);
+  for (const mark of marks) {
+    const t = (mark.value - min) / range;
+    if (!Number.isFinite(t) || t < 0 || t > 1) continue;
+    occupied[Math.min(MAX_DENSITY_BARS - 1, Math.floor(t * MAX_DENSITY_BARS))] =
+      1;
+  }
+
+  const binWidth = 100 / MAX_DENSITY_BARS;
+  const tickWidth = Math.min(BAR_WIDTH_PERCENT, binWidth);
+  const gradientStops: string[] = [`${RAIL_IDLE} 0%`];
+  let lastEnd = 0;
+
+  for (let i = 0; i < MAX_DENSITY_BARS; i++) {
+    if (!occupied[i]) continue;
+    const start = Math.max(lastEnd, i * binWidth);
+    const end = Math.min(100, start + tickWidth);
+    if (end <= lastEnd) continue;
+
+    gradientStops.push(`${RAIL_IDLE} ${formatPercent(start)}%`);
+    gradientStops.push(`${DENSITY_COLOR} ${formatPercent(start)}%`);
+    gradientStops.push(`${DENSITY_COLOR} ${formatPercent(end)}%`);
+    gradientStops.push(`${RAIL_IDLE} ${formatPercent(end)}%`);
+    lastEnd = end;
+  }
+
+  gradientStops.push(`${RAIL_IDLE} 100%`);
+  return `linear-gradient(to right, ${gradientStops.join(", ")})`;
+};
 
 const StyledSlider = styled(Slider)<SliderProps>(({ theme, orientation }) => {
   const isVertical = orientation === "vertical";
@@ -57,12 +147,58 @@ const StyledSlider = styled(Slider)<SliderProps>(({ theme, orientation }) => {
   };
 });
 
-interface PlainSliderProps extends SliderProps {
-  sx?: SxProps<Theme>;
-}
-
 const PlainSlider = ({ sx, ...props }: PlainSliderProps) => {
   return <StyledSlider sx={{ margin: "0 16px", ...sx }} {...props} />;
 };
 
+const ConcentrationSlider = ({
+  marks,
+  min = 0,
+  max = 100,
+  thumb = ThumbType.CIRCLE,
+  sx,
+  ...props
+}: ConcentrationSliderProps) => {
+  const gradientStr = useMemo(
+    () => createDensityGradient(marks, Number(min), Number(max)),
+    [marks, min, max]
+  );
+
+  // PlainSlider spreads `sx` into an object (`{ margin, ...sx }`), so an array
+  // of style objects is ignored. Merge into one object so the rail gradient
+  // actually reaches the DOM.
+  return (
+    <PlainSlider
+      min={min}
+      max={max}
+      marks={marks}
+      sx={{
+        "& .MuiSlider-rail": {
+          height: 8,
+          borderRadius: 2,
+          border: "1px solid #B0B0B0",
+          backgroundColor: "transparent",
+          backgroundImage: gradientStr,
+          opacity: 1,
+        },
+        "& .MuiSlider-track": {
+          height: 8,
+          backgroundColor: "transparent",
+          backgroundImage: "none",
+          boxShadow: "none",
+          border: "none",
+          opacity: 0,
+        },
+        "& .MuiSlider-mark": {
+          display: "none",
+        },
+        ...(thumb === ThumbType.DIAMOND ? diamondThumbSx : {}),
+        ...(sx && !Array.isArray(sx) && typeof sx === "object" ? sx : {}),
+      }}
+      {...props}
+    />
+  );
+};
+
+export { ConcentrationSlider, createDensityGradient, ThumbType };
 export default PlainSlider;
