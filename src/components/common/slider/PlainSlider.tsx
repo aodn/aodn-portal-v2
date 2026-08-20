@@ -152,7 +152,12 @@ const StyledSlider = styled(Slider)<SliderProps>(({ theme, orientation }) => {
 });
 
 const PlainSlider = ({ sx, ...props }: PlainSliderProps) => {
-  return <StyledSlider sx={{ margin: "0 16px", ...sx }} {...props} />;
+  return (
+    <StyledSlider
+      sx={[{ margin: "0 16px" }, ...(Array.isArray(sx) ? sx : [sx])]}
+      {...props}
+    />
+  );
 };
 
 const valueLabelOpenSelectors =
@@ -163,7 +168,7 @@ const valueLabelEdgeAlign = (
   value: SliderProps["value"],
   min: number,
   max: number
-): SxProps<Theme> => {
+): { left?: number | string; right?: number; transform?: string } => {
   const thumbValue = Array.isArray(value) ? value[value.length - 1] : value;
   const range = max - min;
   if (!(range > 0) || !Number.isFinite(Number(thumbValue))) return {};
@@ -192,44 +197,43 @@ const ConcentrationSlider = ({
   );
   const edgeAlign = valueLabelEdgeAlign(value, Number(min), Number(max));
 
-  // PlainSlider spreads `sx` into an object (`{ margin, ...sx }`), so an array
-  // of style objects is ignored. Merge into one object so the rail gradient
-  // actually reaches the DOM.
   return (
     <PlainSlider
       min={min}
       max={max}
       marks={marks}
       value={value}
-      sx={{
-        overflow: "visible",
-        "& .MuiSlider-thumb": {
+      sx={[
+        {
           overflow: "visible",
+          "& .MuiSlider-thumb": {
+            overflow: "visible",
+          },
+          "& .MuiSlider-rail": {
+            height: 8,
+            borderRadius: 2,
+            border: "1px solid #B0B0B0",
+            backgroundColor: "transparent",
+            backgroundImage: gradientStr,
+            opacity: 1,
+          },
+          "& .MuiSlider-track": {
+            height: 8,
+            backgroundColor: "transparent",
+            backgroundImage: "none",
+            boxShadow: "none",
+            border: "none",
+            opacity: 0,
+          },
+          "& .MuiSlider-mark": {
+            display: "none",
+          },
+          "& .MuiSlider-valueLabel": edgeAlign,
+          [valueLabelOpenSelectors]: edgeAlign,
         },
-        "& .MuiSlider-rail": {
-          height: 8,
-          borderRadius: 2,
-          border: "1px solid #B0B0B0",
-          backgroundColor: "transparent",
-          backgroundImage: gradientStr,
-          opacity: 1,
-        },
-        "& .MuiSlider-track": {
-          height: 8,
-          backgroundColor: "transparent",
-          backgroundImage: "none",
-          boxShadow: "none",
-          border: "none",
-          opacity: 0,
-        },
-        "& .MuiSlider-mark": {
-          display: "none",
-        },
-        "& .MuiSlider-valueLabel": edgeAlign,
-        [valueLabelOpenSelectors]: edgeAlign,
-        ...(thumb === ThumbType.DIAMOND ? diamondThumbSx : {}),
-        ...(sx && !Array.isArray(sx) && typeof sx === "object" ? sx : {}),
-      }}
+        thumb === ThumbType.DIAMOND ? diamondThumbSx : false,
+        ...(Array.isArray(sx) ? sx : [sx]),
+      ]}
       {...props}
     />
   );
