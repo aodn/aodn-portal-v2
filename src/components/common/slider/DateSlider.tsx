@@ -182,6 +182,8 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
           width: "100%",
           mx: "8px",
           overflow: "visible",
+          position: "relative",
+          zIndex: 2,
         },
         ...(Array.isArray(sx) ? sx : [sx]),
       ]}

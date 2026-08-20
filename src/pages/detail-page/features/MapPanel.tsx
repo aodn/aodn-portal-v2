@@ -577,10 +577,19 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
           mb: padding.large,
           borderRadius: borderRadius.small,
           boxShadow: theme.shadows[1],
-          overflow: "hidden",
+          // Visible so the date-slider value label can extend past the rail.
+          overflow: "visible",
         }}
       >
-        <Box id={MAP_DATASET_SELECT_SLOT_ID} sx={{ width: "100%" }} />
+        <Box
+          id={MAP_DATASET_SELECT_SLOT_ID}
+          sx={{
+            width: "100%",
+            overflow: "hidden",
+            borderTopLeftRadius: borderRadius.small,
+            borderTopRightRadius: borderRadius.small,
+          }}
+        />
         {additionalSlider}
         <Box
           aria-label="map"
@@ -588,6 +597,9 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
           sx={{
             width: "100%",
             minHeight: "588px",
+            overflow: "hidden",
+            borderBottomLeftRadius: borderRadius.small,
+            borderBottomRightRadius: borderRadius.small,
           }}
         >
           <MapBox

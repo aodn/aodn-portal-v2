@@ -115,6 +115,8 @@ const StyledSlider = styled(Slider)<SliderProps>(({ theme, orientation }) => {
       // No 28px size token; MUI default spacing is 8px → 3.5 = 28px
       height: theme.spacing(3.5),
       boxSizing: "border-box",
+      overflow: "visible",
+      whiteSpace: "nowrap",
       "&::before": {
         display: "none",
       },
@@ -153,18 +155,42 @@ const PlainSlider = ({ sx, ...props }: PlainSliderProps) => {
   return <StyledSlider sx={{ margin: "0 16px", ...sx }} {...props} />;
 };
 
+const valueLabelOpenSelectors =
+  "& .MuiSlider-thumb:hover .MuiSlider-valueLabel, & .MuiSlider-thumb:focus .MuiSlider-valueLabel, & .MuiSlider-thumb.Mui-active .MuiSlider-valueLabel, & .MuiSlider-thumb.Mui-focusVisible .MuiSlider-valueLabel";
+
+/** Keep the popup fully on-screen when the thumb sits at either end. */
+const valueLabelEdgeAlign = (
+  value: SliderProps["value"],
+  min: number,
+  max: number
+): SxProps<Theme> => {
+  const thumbValue = Array.isArray(value) ? value[value.length - 1] : value;
+  const range = max - min;
+  if (!(range > 0) || !Number.isFinite(Number(thumbValue))) return {};
+  const t = (Number(thumbValue) - min) / range;
+  if (t >= 0.9) {
+    return { left: "auto", right: 0, transform: "none" };
+  }
+  if (t <= 0.1) {
+    return { left: 0, transform: "none" };
+  }
+  return {};
+};
+
 const ConcentrationSlider = ({
   marks,
   min = 0,
   max = 100,
   thumb = ThumbType.CIRCLE,
   sx,
+  value,
   ...props
 }: ConcentrationSliderProps) => {
   const gradientStr = useMemo(
     () => createDensityGradient(marks, Number(min), Number(max)),
     [marks, min, max]
   );
+  const edgeAlign = valueLabelEdgeAlign(value, Number(min), Number(max));
 
   // PlainSlider spreads `sx` into an object (`{ margin, ...sx }`), so an array
   // of style objects is ignored. Merge into one object so the rail gradient
@@ -174,7 +200,12 @@ const ConcentrationSlider = ({
       min={min}
       max={max}
       marks={marks}
+      value={value}
       sx={{
+        overflow: "visible",
+        "& .MuiSlider-thumb": {
+          overflow: "visible",
+        },
         "& .MuiSlider-rail": {
           height: 8,
           borderRadius: 2,
@@ -194,6 +225,8 @@ const ConcentrationSlider = ({
         "& .MuiSlider-mark": {
           display: "none",
         },
+        "& .MuiSlider-valueLabel": edgeAlign,
+        [valueLabelOpenSelectors]: edgeAlign,
         ...(thumb === ThumbType.DIAMOND ? diamondThumbSx : {}),
         ...(sx && !Array.isArray(sx) && typeof sx === "object" ? sx : {}),
       }}
