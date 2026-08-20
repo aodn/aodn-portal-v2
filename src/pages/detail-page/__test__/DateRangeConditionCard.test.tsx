@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import dayjs, { Dayjs } from "dayjs";
-import { ReactNode } from "react";
+import dayjs from "dayjs";
+import type { ComponentProps } from "react";
+import type PlainDatePicker from "../../../components/common/datetime/PlainDatePicker";
+import type { BaseConditionCardProps } from "../features/download/subset-conditions/BaseConditionCard";
 
 // Tests for DateRangeConditionCard:
 // - the From/To pickers respect cross-field constraints (From <= To)
@@ -19,13 +21,7 @@ vi.mock("../../../components/common/datetime/PlainDatePicker", () => ({
     maxDate,
     onChange,
     disabled,
-  }: {
-    value?: Dayjs | null;
-    minDate?: Dayjs;
-    maxDate?: Dayjs;
-    onChange: (value: Dayjs | null) => void;
-    disabled?: boolean;
-  }) => (
+  }: ComponentProps<typeof PlainDatePicker>) => (
     <input
       data-testid="date-picker"
       data-min={minDate?.format?.("YYYY-MM-DD") ?? ""}
@@ -33,7 +29,9 @@ vi.mock("../../../components/common/datetime/PlainDatePicker", () => ({
       value={value?.format?.("YYYY-MM-DD") ?? ""}
       disabled={disabled}
       onChange={(e) =>
-        onChange(e.target.value === "" ? null : dayjs(e.target.value))
+        onChange?.(e.target.value === "" ? null : dayjs(e.target.value), {
+          validationError: null,
+        })
       }
     />
   ),
@@ -41,7 +39,7 @@ vi.mock("../../../components/common/datetime/PlainDatePicker", () => ({
 
 // BaseConditionCard owns layout/expand state — not under test here.
 vi.mock("../features/download/subset-conditions/BaseConditionCard", () => ({
-  default: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
+  default: ({ children }: BaseConditionCardProps) => <div>{children}</div>,
 }));
 
 import DateRangeConditionCard from "../features/download/subset-conditions/DateRangeConditionCard";

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { ReactNode } from "react";
+import type { CoordInputProps } from "../features/download/subset-conditions/CoordInput";
+import type { BaseConditionCardProps } from "../features/download/subset-conditions/BaseConditionCard";
 
 // Tests for BBoxConditionCard:
 // - the form toggles between "draw on map" and "add bbox" depending on dirtiness
@@ -20,14 +21,7 @@ vi.mock("../features/download/subset-conditions/CoordInput", () => ({
     ariaLabel,
     id,
     disabled,
-  }: {
-    value: string;
-    onChange: (value: string) => void;
-    onSubmit?: () => void;
-    ariaLabel: string;
-    id?: string;
-    disabled?: boolean;
-  }) => (
+  }: CoordInputProps) => (
     <input
       id={id}
       aria-label={ariaLabel}
@@ -43,13 +37,7 @@ vi.mock("../features/download/subset-conditions/CoordInput", () => ({
 
 // BaseConditionCard owns layout/expand state — not under test here.
 vi.mock("../features/download/subset-conditions/BaseConditionCard", () => ({
-  default: ({
-    children,
-    actions,
-  }: {
-    children?: ReactNode;
-    actions?: ReactNode;
-  }) => (
+  default: ({ children, actions }: BaseConditionCardProps) => (
     <div>
       {children}
       {actions}

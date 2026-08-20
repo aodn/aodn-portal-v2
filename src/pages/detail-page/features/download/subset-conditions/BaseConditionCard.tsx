@@ -18,7 +18,7 @@ import { BboxSelectionIcon } from "../../../../../assets/icons/download/bbox_sel
 import { PolygonSelectionIcon } from "../../../../../assets/icons/map/polygon_selection";
 import { TimeRangeIcon } from "../../../../../assets/icons/download/time_range";
 
-interface BaseConditionCardProps {
+export interface BaseConditionCardProps {
   type: DownloadConditionType;
   children: React.ReactNode;
   actions?: React.ReactNode;
