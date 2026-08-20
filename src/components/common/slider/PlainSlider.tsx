@@ -19,8 +19,7 @@ interface ConcentrationSliderProps extends SliderProps {
 const RAIL_IDLE = "rgba(0,0,0,0.04)";
 const DENSITY_COLOR = "#2E6F9E";
 /** Cap CSS color-stops. Firefox can crash on huge / non-monotonic gradients. */
-const MAX_DENSITY_BARS = 96;
-const BAR_WIDTH_PERCENT = 0.35;
+const MAX_DENSITY_BARS = 192;
 
 const formatPercent = (value: number) =>
   Math.min(100, Math.max(0, value)).toFixed(3);
@@ -48,8 +47,9 @@ const diamondThumbSx: SxProps<Theme> = {
 };
 /**
  * CSS linear-gradient of barcode-style density marks along the slider rail.
- * `marks` is the MUI Slider prop: `false`/`true` (no custom points) or
- * `{ value, label? }[]`.
+ * It chopped the rail to MAX_DENSITY_BARS of bucket, if values there it will
+ * set a deeper color. The reason is, if we put a very large number of
+ * array, the linear-gradient will crash the browser.
  */
 const createDensityGradient = (
   marks: SliderProps["marks"],
@@ -70,21 +70,23 @@ const createDensityGradient = (
   }
 
   const binWidth = 100 / MAX_DENSITY_BARS;
-  const tickWidth = Math.min(BAR_WIDTH_PERCENT, binWidth);
   const gradientStops: string[] = [`${RAIL_IDLE} 0%`];
-  let lastEnd = 0;
 
-  for (let i = 0; i < MAX_DENSITY_BARS; i++) {
-    if (!occupied[i]) continue;
-    const start = Math.max(lastEnd, i * binWidth);
-    const end = Math.min(100, start + tickWidth);
-    if (end <= lastEnd) continue;
+  let i = 0;
+  while (i < MAX_DENSITY_BARS) {
+    if (!occupied[i]) {
+      i += 1;
+      continue;
+    }
+    const runStart = i;
+    while (i < MAX_DENSITY_BARS && occupied[i]) i += 1;
+    const start = runStart * binWidth;
+    const end = Math.min(100, i * binWidth);
 
     gradientStops.push(`${RAIL_IDLE} ${formatPercent(start)}%`);
     gradientStops.push(`${DENSITY_COLOR} ${formatPercent(start)}%`);
     gradientStops.push(`${DENSITY_COLOR} ${formatPercent(end)}%`);
     gradientStops.push(`${RAIL_IDLE} ${formatPercent(end)}%`);
-    lastEnd = end;
   }
 
   gradientStops.push(`${RAIL_IDLE} 100%`);

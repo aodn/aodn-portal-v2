@@ -20,7 +20,8 @@ describe("createDensityGradient", () => {
     const marks = Array.from({ length: 5000 }, (_, i) => ({ value: i }));
     const gradient = createDensityGradient(marks, 0, 4999);
     const stopCount = gradient.split("#2E6F9E").length - 1;
-    expect(stopCount).toBeLessThanOrEqual(96 * 2);
+    // Consecutive marks collapse into one occupied run (two color stops).
+    expect(stopCount).toBe(2);
   });
 
   it("skips point conversion when min equals max", () => {
