@@ -48,7 +48,10 @@ import useBreakpoint from "../../../hooks/useBreakpoint";
 import FitToSpatialExtentsLayer from "../../../components/map/mapbox/layers/FitToSpatialExtentsLayer";
 import { MapEventEnum } from "@/components/map/mapbox/constants";
 import { fitToDefaultExtent } from "@/utils/MapUtils";
-import { DateSliderPoint } from "@/components/common/slider/DateSlider";
+import {
+  DateSliderPoint,
+  ThumbType,
+} from "@/components/common/slider/DateSlider";
 import { dateToValue } from "@/utils/DateUtils";
 import { GeoserverFieldsResponse } from "@/app/store/GeoserverDefinitions";
 import * as turf from "@turf/turf";
@@ -67,6 +70,7 @@ import {
 } from "@/components/map/mapbox/layers/pmtiles/Common";
 import GriddedRasterLayer from "@/components/map/mapbox/layers/raster-layers/gridded-raster-layer/GriddedRasterLayer";
 import useGriddedRasterLayer from "@/components/map/mapbox/layers/raster-layers/gridded-raster-layer/useGriddedRasterLayer";
+import { portalTheme } from "@/styles";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -185,7 +189,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(false);
   const [drawRectSupport, setDrawRectSupportSupport] = useState<boolean>(false);
   const [discreteTimeSliderValues, setDiscreteTimeSliderValues] = useState<
-    Map<string, Array<number>> | undefined
+    Map<string, Array<number>> | null | undefined
   >(undefined);
   const [datePointValue, setDatePointValue] = useState<number>(
     dateToValue(dayjs(dateDefault.min))
@@ -366,25 +370,52 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     return features;
   }, [downloadConditions]);
 
+  // Snap the single-time thumb onto a real mark once discrete times load.
+  useEffect(() => {
+    startTransition(() => {
+      if (!discreteTimeSliderValues || !selectedWmsLayer) return;
+      const times = discreteTimeSliderValues.get(selectedWmsLayer);
+      if (!times?.length) return;
+      if (!times.includes(datePointValue)) {
+        setDatePointValue(times[times.length - 1]);
+      }
+    });
+  }, [datePointValue, discreteTimeSliderValues, selectedWmsLayer]);
+
   const geoServerLayerConfig = useMemo(() => {
-    return discreteTimeSliderValues
-      ? {
-          urlParams: {
-            TIME: dayjs.utc(datePointValue!),
-            MODE: Dimension.SINGLE,
-          },
-        }
-      : {
-          urlParams: {
-            START_DATE: filterStartDate,
-            END_DATE: filterEndDate,
-          },
-        };
+    // `undefined` = still probing whether the WMS layer is single-time (ncWMS)
+    // or a range. Omit MODE so GeoServerLayer does not request tiles yet.
+    if (discreteTimeSliderValues === undefined) {
+      return { urlParams: {} };
+    }
+    if (discreteTimeSliderValues) {
+      const times = selectedWmsLayer
+        ? discreteTimeSliderValues.get(selectedWmsLayer)
+        : undefined;
+      const timeValue =
+        times?.includes(datePointValue) && datePointValue
+          ? datePointValue
+          : times?.[times.length - 1];
+      return {
+        urlParams: {
+          TIME: timeValue !== undefined ? dayjs.utc(timeValue) : undefined,
+          MODE: Dimension.SINGLE,
+        },
+      };
+    }
+    return {
+      urlParams: {
+        START_DATE: filterStartDate,
+        END_DATE: filterEndDate,
+        MODE: Dimension.RANGE,
+      },
+    };
   }, [
     discreteTimeSliderValues,
     datePointValue,
     filterStartDate,
     filterEndDate,
+    selectedWmsLayer,
   ]);
 
   const handleMapChange = useCallback(
@@ -452,11 +483,19 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   );
 
   const additionalSlider = useMemo(() => {
+    const additionalSliderSx = {
+      mx: 0,
+      borderRadius: 0,
+      backgroundColor: portalTheme.palette.primary6,
+    };
+
     if (selectedMapLayerId === LayerName.GriddedRaster) {
       return hasGriddedDates ? (
         <DateSliderPoint
           key={griddedDateSliderKey}
           {...griddedDateSliderProps}
+          sx={additionalSliderSx}
+          thumbType={ThumbType.DIAMOND}
         />
       ) : undefined;
     }
@@ -465,6 +504,8 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
         <DateSliderPoint
           valid_points={discreteTimeSliderValues?.get(selectedWmsLayer)}
           onDatePointChange={handleSliderPointChange}
+          sx={additionalSliderSx}
+          thumbType={ThumbType.DIAMOND}
         />
       );
     }
@@ -563,16 +604,29 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
           mb: padding.large,
           borderRadius: borderRadius.small,
           boxShadow: theme.shadows[1],
-          overflow: "hidden",
+          // Visible so the date-slider value label can extend past the rail.
+          overflow: "visible",
         }}
       >
-        <Box id={MAP_DATASET_SELECT_SLOT_ID} sx={{ width: "100%" }} />
+        <Box
+          id={MAP_DATASET_SELECT_SLOT_ID}
+          sx={{
+            width: "100%",
+            overflow: "hidden",
+            borderTopLeftRadius: borderRadius.small,
+            borderTopRightRadius: borderRadius.small,
+          }}
+        />
+        {additionalSlider}
         <Box
           aria-label="map"
           id={mapContainerId}
           sx={{
             width: "100%",
             minHeight: "588px",
+            overflow: "hidden",
+            borderBottomLeftRadius: borderRadius.small,
+            borderBottomRightRadius: borderRadius.small,
           }}
         >
           <MapBox
@@ -624,9 +678,6 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
                       maxDate={maxDateStamp.format(dateDefault.DATE_FORMAT)}
                       getAndSetDownloadConditions={getAndSetDownloadConditions}
                       downloadConditions={downloadConditions}
-                      options={
-                        additionalSlider ? { additionalSlider } : undefined
-                      }
                     />
                   }
                 />

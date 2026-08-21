@@ -135,10 +135,12 @@ describe("GeoServerLayer", () => {
 
     const onWMSAvailabilityChange = vi.fn();
     const onLayerChange = vi.fn();
+    const setDiscreteTimeSliderValues = vi.fn();
 
     renderComponent({
       onWMSAvailabilityChange,
       onLayerChange,
+      setDiscreteTimeSliderValues,
     });
 
     await waitFor(() => {
@@ -148,6 +150,7 @@ describe("GeoServerLayer", () => {
       );
       expect(onWMSAvailabilityChange).toHaveBeenCalledWith(true);
       expect(onLayerChange).toHaveBeenCalledWith("test_layer");
+      expect(setDiscreteTimeSliderValues).toHaveBeenCalledWith(null);
     });
 
     await waitFor(() => {

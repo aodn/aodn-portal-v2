@@ -179,9 +179,9 @@ const checkSupportDiscreteTimeSlider = (
   dispatch: AppDispatch,
   id: string,
   layerName: string,
-  setDiscreteTimeSliderValues?: Dispatch<
-    SetStateAction<Map<string, Array<number>> | undefined>
-  >
+  setDiscreteTimeSliderValues?: (
+    value: Map<string, Array<number>> | null
+  ) => void
 ) => {
   if (id && layerName) {
     const request: MapFeatureRequest = {
@@ -200,13 +200,14 @@ const checkSupportDiscreteTimeSlider = (
           );
           setDiscreteTimeSliderValues?.(result);
         } else {
-          setDiscreteTimeSliderValues?.(undefined);
+          // Resolved: layer does not use a discrete (single) time axis.
+          setDiscreteTimeSliderValues?.(null);
         }
       })
       .catch(() => {
         // Some dataset do not support this function call, in this case
         // assume it didn't support discrete time slider
-        setDiscreteTimeSliderValues?.(undefined);
+        setDiscreteTimeSliderValues?.(null);
       });
   }
 };
@@ -232,6 +233,9 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   const popupRootRef = useRef<Root | null>();
   const [wmsLayers, setWmsLayers] = useState<SelectItem[]>([]);
   const [selectedWmsLayer, setSelectedWmsLayer] = useState<string>(""); // Only handle single wms layer for now. Could be extended to multi-layer in multi-select in future
+  const [resolvedTimeMode, setResolvedTimeMode] = useState<
+    Dimension | undefined
+  >(undefined);
 
   const [isFetchingWmsLayers, setIsFetchingWmsLayers] = useState(
     collection ? (getWmsLayerNames(collection)?.length || 0) > 0 : true
@@ -268,6 +272,14 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   ]);
 
   const tileUrl = useMemo(() => {
+    const layerName = config.urlParams.LAYERS?.join(",") || "";
+    const timeMode = config.urlParams.MODE ?? resolvedTimeMode;
+    // Wait until single-vs-range time is known. ncWMS layers reject a
+    // datetime range, so a default 1970/now request would 500.
+    if (!config.uuid || !layerName || timeMode === undefined) {
+      return [];
+    }
+
     const start =
       config.urlParams.START_DATE === undefined
         ? dayjs(dateDefault.min)
@@ -284,23 +296,25 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
         ? undefined
         : config.urlParams.TIME;
 
+    if (timeMode === Dimension.SINGLE && !time) {
+      return [];
+    }
+
     const datetime =
-      config?.urlParams?.MODE === Dimension.SINGLE
+      timeMode === Dimension.SINGLE
         ? `${time?.toISOString()}` // Must ISO format, any slight diff in format will cause internal server error
         : `${start.format(dateDefault.DATE_TIME_FORMAT)}/${end.format(dateDefault.DATE_TIME_FORMAT)}`;
 
-    return config.uuid
-      ? [
-          formatToUrl<MapTileRequest>({
-            baseUrl: `/api/v1/ogc/collections/${config.uuid}/items/wms_map_tile`,
-            params: {
-              layerName: config.urlParams.LAYERS?.join(",") || "",
-              bbox: config?.urlParams?.BBOX,
-              ...(datetime !== undefined && { datetime }),
-            },
-          }),
-        ]
-      : [];
+    return [
+      formatToUrl<MapTileRequest>({
+        baseUrl: `/api/v1/ogc/collections/${config.uuid}/items/wms_map_tile`,
+        params: {
+          layerName,
+          bbox: config?.urlParams?.BBOX,
+          datetime,
+        },
+      }),
+    ];
   }, [
     config.urlParams.BBOX,
     config.urlParams.END_DATE,
@@ -309,6 +323,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     config.urlParams.START_DATE,
     config.urlParams.TIME,
     config.uuid,
+    resolvedTimeMode,
   ]);
 
   const handleWmsLayerChange = useCallback(
@@ -324,16 +339,25 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             setTimeSliderSupport,
             setDrawRectSupportSupport
           );
-          shouldCheckDiscreteTimeSlider &&
-            checkSupportDiscreteTimeSlider(
-              dispatch,
-              config.uuid,
-              value,
-              setDiscreteTimeSliderValues
-            );
         }
         return prev;
       });
+      if (shouldCheckDiscreteTimeSlider) {
+        // Pause tiles until we know whether this layer is single-time or range.
+        setResolvedTimeMode(undefined);
+        setDiscreteTimeSliderValues?.(undefined);
+        checkSupportDiscreteTimeSlider(dispatch, config.uuid, value, (next) => {
+          setDiscreteTimeSliderValues?.(next);
+          if (next instanceof Map) {
+            setResolvedTimeMode(Dimension.SINGLE);
+          } else if (next === null) {
+            setResolvedTimeMode(Dimension.RANGE);
+          }
+        });
+      } else {
+        setResolvedTimeMode(Dimension.RANGE);
+        setDiscreteTimeSliderValues?.(null);
+      }
     },
     [
       onLayerChange,
@@ -403,6 +427,10 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
         createLayers(); // Use default LAYER_VISIBILITY.NONE for initial creation
       }
     };
+
+    // If tile URLs arrive after the first idle (time mode resolved late),
+    // create the source immediately when the style is already loaded.
+    createLayersOnInit();
 
     const cleanUp = () => {
       if (map === null || map === undefined) return;
@@ -599,6 +627,8 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     setMapLoading?.(ProgressType.CIRCLE);
 
     const fetchLayers = () => {
+      setResolvedTimeMode(undefined);
+      setDiscreteTimeSliderValues?.(undefined);
       const layerName = getWmsLayerNames(collection)?.[0] || "";
 
       const wmsFieldsRequest: MapFeatureRequest = {
