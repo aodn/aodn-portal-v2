@@ -1,13 +1,13 @@
 import React from "react";
 import { Box, Link, Stack, Typography } from "@mui/material";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
-import { portalTheme } from "../../../../styles";
+import { portalTheme } from "../../styles";
 import { gap } from "@/styles/constants";
 import {
   dateDefault,
   imosInfoDefault,
   pageDefault,
-} from "../../../common/constants";
+} from "@/components/common/constants";
 import { openInNewTab } from "@/utils/LinkUtils";
 
 export const MAP_FOOTER_HEIGHT = "22px";
@@ -29,7 +29,7 @@ const linkSx = {
   cursor: "pointer",
 };
 
-const MapFooter: React.FC = () => {
+const MiniFooter: React.FC = () => {
   return (
     <Box
       component="footer"
@@ -101,4 +101,4 @@ const MapFooter: React.FC = () => {
   );
 };
 
-export default MapFooter;
+export default MiniFooter;
