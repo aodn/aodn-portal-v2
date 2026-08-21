@@ -38,9 +38,7 @@ import ReferenceLayerSwitcher, {
 import { ProgressType } from "@/components/map/mapbox/MapContext";
 import { createStaticLayers } from "@/components/map/mapbox/layers/StaticLayer";
 import { fitToDefaultExtent } from "@/utils/MapUtils";
-import MapFooter, {
-  MAP_FOOTER_HEIGHT,
-} from "@/components/map/mapbox/component/MapFooter";
+import MiniFooter, { MAP_FOOTER_HEIGHT } from "@/app/layout/MiniFooter";
 
 interface MapSectionProps
   extends
@@ -237,7 +235,7 @@ const MapSection: React.FC<MapSectionProps> = memo(
             </Layers>
           </Map>
         </Paper>
-        <MapFooter />
+        <MiniFooter />
       </Box>
     );
   }
