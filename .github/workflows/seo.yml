@@ -29,8 +29,8 @@ jobs:
         include:
           - environment: edge
             site: https://portal-edge.aodn.org.au
-          - environment: production
-            site: https://portal-beta.aodn.org.au
+          #- environment: production
+          #  site: https://portal-beta.aodn.org.au
     environment: ${{ matrix.environment }}
     steps:
       - name: Checkout
