@@ -7,12 +7,12 @@ import React, {
 } from "react";
 import dayjs from "dayjs";
 import { Grid, Stack, Typography } from "@mui/material";
+import type { SxProps, Theme } from "@mui/material/styles";
 import { dateToValue, valueToDate } from "@/utils/DateUtils";
 import { dateDefault } from "../constants";
 import { portalTheme } from "../../../styles";
 import { padding } from "@/styles/constants";
-import PlainSlider from "./PlainSlider";
-
+import PlainSlider, { ConcentrationSlider, ThumbType } from "./PlainSlider";
 /** Slider mark shape (was imported from a deep MUI path removed in v7). */
 interface Mark {
   value: number;
@@ -37,6 +37,9 @@ interface DateSliderPointProps {
     event: Event | React.SyntheticEvent<Element, Event> | undefined,
     value: number | number[]
   ) => void;
+  /** Merged onto the default overlay container styles. */
+  sx?: SxProps<Theme>;
+  thumbType?: ThumbType;
 }
 
 const COMPONENT_ID = "dateslider-daterange-menu-button";
@@ -87,6 +90,8 @@ const stepMarkValue = (
 const DateSliderPoint: React.FC<DateSliderPointProps> = ({
   valid_points,
   onDatePointChange = undefined,
+  sx,
+  thumbType = ThumbType.CIRCLE,
 }) => {
   const sorted_marks: Mark[] = useMemo(() => {
     return [...(valid_points ?? [])]
@@ -169,14 +174,19 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
   return (
     <Grid
       container
-      sx={{
-        backgroundColor: portalTheme.palette.primary6,
-        borderRadius: "6px",
-        display: "flex",
-        width: "100%",
-        mx: "8px",
-        overflow: "visible",
-      }}
+      sx={[
+        {
+          backgroundColor: portalTheme.palette.primary6,
+          borderRadius: "6px",
+          display: "flex",
+          width: "100%",
+          mx: "8px",
+          overflow: "visible",
+          position: "relative",
+          zIndex: 2,
+        },
+        ...(Array.isArray(sx) ? sx : [sx]),
+      ]}
       data-testid={COMPONENT_ID}
     >
       <Grid
@@ -188,29 +198,16 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
         }}
         size={12}
       >
-        <Stack
-          width="100%"
-          direction="row"
-          alignItems="center"
-          mx={{ xs: "18px", sm: "6px" }}
-          gap="16px"
-        >
+        <Stack width="100%" direction="row" alignItems="center">
           <Stack flexShrink={0} alignItems="flex-start">
-            <Typography
-              sx={{
-                ...sliderCaptionSx,
-                display: { xs: "none", sm: "block" },
-              }}
-            >
-              Displaying
-            </Typography>
             <Typography sx={sliderCaptionSx}>
+              Displaying{" "}
               {datePointStamp !== undefined
                 ? valueToDate(datePointStamp).format(dateDefault.DISPLAY_FORMAT)
                 : ""}
             </Typography>
           </Stack>
-          <PlainSlider
+          <ConcentrationSlider
             step={null} // ← key: disables free sliding
             marks={sorted_marks}
             min={sorted_marks[0].value}
@@ -232,7 +229,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
             valueLabelFormat={(value: number) =>
               valueToDate(value).format(dateDefault.DISPLAY_FORMAT)
             }
-            sx={{ flex: 1, minWidth: 0 }}
+            thumb={thumbType}
           />
         </Stack>
       </Grid>
@@ -482,5 +479,5 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
   );
 };
 
-export { DateSliderPoint };
+export { DateSliderPoint, ThumbType };
 export default DateSliderRange;

@@ -20,7 +20,7 @@ export interface LayerBasicType<P = GeoJsonProperties> {
   visible?: boolean;
   setTimeSliderSupport?: Dispatch<SetStateAction<boolean>>;
   setDiscreteTimeSliderValues?: Dispatch<
-    SetStateAction<Map<string, Array<number>> | undefined>
+    SetStateAction<Map<string, Array<number>> | null | undefined>
   >;
   setDrawRectSupportSupport?: Dispatch<SetStateAction<boolean>>;
   collection?: OGCCollection;

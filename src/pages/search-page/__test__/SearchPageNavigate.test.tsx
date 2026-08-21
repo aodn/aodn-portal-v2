@@ -105,7 +105,7 @@ vi.mock("../layout/MapSection", () => ({
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import SearchPage from "../SearchPage";
-import { pageReferer } from "../../../components/common/constants";
+import { pageReferer } from "@/components/common/constants";
 import { Provider } from "react-redux";
 import store from "@/app/store/store";
 import useRedirectSearch from "../../../hooks/useRedirectSearch";
@@ -166,7 +166,13 @@ describe("SearchPage with useRedirectSearch", () => {
   it("verifies repeat calls to useRedirectSearch trigger handleNavigation and searches", () => {
     // Any search param works as we do not doing search in this test
     const TestApp = () => (
-      <MemoryRouter initialEntries={["/search?param=1"]}>
+      <MemoryRouter
+        initialEntries={["/search?param=1"]}
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <Provider store={store}>
           <Routes>
             <Route path="/search" element={<SearchPageWrapper />} />

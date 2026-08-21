@@ -1,6 +1,8 @@
 /**
- * Pre-renders a static dist/details/<uuid> page per record, with real title,
- * description, canonical and Dataset JSON-LD in the head — see README.md.
+ * Pre-renders a static dist/prerender/details/<uuid>/index.html per record,
+ * with real title, description, canonical and Dataset JSON-LD in the head —
+ * see README.md. CloudFront rewrites crawler requests for /details/<uuid>
+ * to these pages; real users always get the live SPA shell.
  * Standalone (needs a prior build): npx vite-node src/seo/prerender.ts
  */
 
@@ -14,6 +16,7 @@ import {
   detailsUrl,
   escapeEntities,
   isSafeCollectionId,
+  PRERENDER_DETAILS_DIR,
   SHARE_IMAGE_URL,
   SITE_NAME,
 } from "./constants";
@@ -65,7 +68,7 @@ export const prerenderDetailPages = async (
   const template = await readFile(path.join(outDir, "index.html"), "utf8");
   const collections = prefetched ?? (await fetchCollections());
 
-  const detailsDir = path.join(outDir, "details");
+  const detailsDir = path.join(outDir, PRERENDER_DETAILS_DIR);
   await mkdir(detailsDir, { recursive: true });
 
   const pages = collections.filter(hasSeoFields);
@@ -74,20 +77,20 @@ export const prerenderDetailPages = async (
   const WRITE_CONCURRENCY = 64;
   for (let i = 0; i < pages.length; i += WRITE_CONCURRENCY) {
     await Promise.all(
-      pages
-        .slice(i, i + WRITE_CONCURRENCY)
-        .map((collection) =>
-          writeFile(
-            path.join(detailsDir, collection.id),
-            renderCrawlerPage(template, collection)
-          )
-        )
+      pages.slice(i, i + WRITE_CONCURRENCY).map(async (collection) => {
+        const pageDir = path.join(detailsDir, collection.id);
+        await mkdir(pageDir, { recursive: true });
+        await writeFile(
+          path.join(pageDir, "index.html"),
+          renderCrawlerPage(template, collection)
+        );
+      })
     );
   }
 
   if (pages.length === 0) {
     throw new Error(
-      "No detail pages pre-rendered; refusing to ship an empty details folder."
+      "No detail pages pre-rendered; refusing to ship an empty prerender folder."
     );
   }
   console.log(

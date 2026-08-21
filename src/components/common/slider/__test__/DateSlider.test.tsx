@@ -255,11 +255,25 @@ describe("DateSliderPoint display", () => {
   it("shows the selected date formatted as DD/MM/YYYY", () => {
     render(<DateSliderPoint valid_points={[...points]} />);
 
-    expect(screen.getByText("Displaying")).toBeInTheDocument();
-    // { selector: "p" } excludes the slider's own value-label tooltip, which
-    // renders the same formatted date in a sibling span.
     expect(
-      screen.getByText("02/01/2024", { selector: "p" })
+      screen.getByText("Displaying 02/01/2024", { selector: "p" })
     ).toBeInTheDocument();
+  });
+
+  it("applies sx overrides on the container", () => {
+    render(
+      <DateSliderPoint
+        valid_points={[...points]}
+        sx={{ mx: 0, borderRadius: 0, backgroundColor: "#fff" }}
+      />
+    );
+
+    const container = screen.getByTestId("dateslider-daterange-menu-button");
+    expect(container).toHaveStyle({
+      marginLeft: "0px",
+      marginRight: "0px",
+      borderRadius: "0px",
+      backgroundColor: "#fff",
+    });
   });
 });
