@@ -51,7 +51,7 @@ import { boundingBoxInEpsg3857, isMapDrawModeActive } from "@/utils/MapUtils";
 import { checkEmptyArray } from "@/utils/Helpers";
 import AdminScreenContext from "../../../../admin/AdminScreenContext";
 import { HttpStatusCode } from "axios";
-import { dateToValue } from "@/utils/DateUtils";
+import { dateToValue, formatUtcDateTime } from "@/utils/DateUtils";
 import { layernameRoughlyMatch } from "@/utils/GeoJsonUtils";
 import { AppDispatch } from "@/app/store/store";
 
@@ -282,17 +282,17 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
 
     const start =
       config.urlParams.START_DATE === undefined
-        ? dayjs(dateDefault.min)
+        ? dateDefault.min
         : config.urlParams.START_DATE;
 
     const end =
       config.urlParams.END_DATE === undefined
-        ? dayjs(dateDefault.max)
+        ? dateDefault.max
         : config.urlParams.END_DATE;
 
     const time =
       config.urlParams.TIME === undefined ||
-      config?.urlParams.TIME.isSame(dayjs(dateDefault.min))
+      config?.urlParams.TIME.isSame(dateDefault.min)
         ? undefined
         : config.urlParams.TIME;
 
@@ -303,7 +303,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     const datetime =
       timeMode === Dimension.SINGLE
         ? `${time?.toISOString()}` // Must ISO format, any slight diff in format will cause internal server error
-        : `${start.format(dateDefault.DATE_TIME_FORMAT)}/${end.format(dateDefault.DATE_TIME_FORMAT)}`;
+        : `${formatUtcDateTime(start)}/${formatUtcDateTime(end)}`;
 
     return [
       formatToUrl<MapTileRequest>({

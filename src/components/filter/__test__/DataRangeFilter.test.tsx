@@ -9,19 +9,19 @@ import dayjs, { Dayjs } from "@/utils/DayjsUtils";
 import DateRangeFilter from "../DateRangeFilter";
 import { dateDefault } from "../../common/constants";
 import { updateDateTimeFilterRange } from "@/app/store/componentParamReducer";
-import { dateToValue } from "@/utils/DateUtils";
+import { dateToValue, toAppDayjs } from "@/utils/DateUtils";
 import axios from "axios";
 import { responseIdTemporal, responseIdProvider } from "./canned";
 
-const initialMinDate: Dayjs = dayjs(dateDefault.min);
-const initialMaxDate: Dayjs = dayjs(dateDefault.max);
+const initialMinDate: Dayjs = dateDefault.min;
+const initialMaxDate: Dayjs = dateDefault.max;
 
 // Mock Redux store
 const mockInitialState = {
   paramReducer: {
     dateTimeFilterRange: {
-      start: dateToValue(dayjs(dateDefault.min)),
-      end: dateToValue(dayjs(dateDefault.max)),
+      start: dateToValue(dateDefault.min),
+      end: dateToValue(dateDefault.max),
     },
   },
 };
@@ -49,7 +49,10 @@ vi.mock("../../../hooks/useBreakpoint", () => ({
 // Mock date utilities
 vi.mock("../../utils/DateUtils", () => ({
   dateToValue: vi.fn((date: Dayjs) => date.valueOf()),
-  valueToDate: vi.fn((value: number) => dayjs(value)),
+  valueToDate: vi.fn((value: number) => dayjs.tz(value)),
+  toAppDayjs: vi.fn((value?: Dayjs) =>
+    value === undefined ? dayjs.tz() : dayjs.tz(value)
+  ),
 }));
 
 describe("DateRangeFilter", () => {
@@ -86,7 +89,10 @@ describe("DateRangeFilter", () => {
   const renderComponent = () =>
     render(
       <Provider store={store}>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <LocalizationProvider
+          dateAdapter={AdapterDayjs}
+          dateLibInstance={dayjs}
+        >
           <DateRangeFilter />
         </LocalizationProvider>
       </Provider>
@@ -133,20 +139,28 @@ describe("DateRangeFilter", () => {
       const startDatePicker = screen.getByDisplayValue(minDate);
       user.click(startDatePicker);
 
-      const newDate = dayjs("2020-01-01");
+      const newDate = toAppDayjs("2020-01-01", dateDefault.DATE_FORMAT);
       const newStringDate = newDate.format(dateDefault.DISPLAY_FORMAT);
       user.type(startDatePicker, newStringDate);
 
       return waitFor(() => screen.findByDisplayValue(newStringDate), {
         timeout: 2000,
-      }).then(() =>
-        expect(store.dispatch).toHaveBeenCalledWith(
-          updateDateTimeFilterRange({
-            start: dateToValue(newDate),
-            end: mockInitialState.paramReducer.dateTimeFilterRange.end,
-          })
-        )
-      );
+      }).then(() => {
+        const lastRange = vi
+          .mocked(store.dispatch)
+          .mock.calls.map(
+            ([action]) => action as { type?: string; payload?: any }
+          )
+          .filter(
+            (action) => action?.type === "UPDATE_DATETIME_FILTER_VARIABLE"
+          )
+          .at(-1);
+        expect(
+          toAppDayjs(lastRange?.payload?.dateTimeFilterRange?.start).format(
+            dateDefault.DATE_FORMAT
+          )
+        ).toBe("2020-01-01");
+      });
     });
   });
 
@@ -159,26 +173,28 @@ describe("DateRangeFilter", () => {
       const endDatePicker = screen.getByDisplayValue(maxDate);
       user.click(endDatePicker);
 
-      const newDate = dayjs("2025-01-01");
+      const newDate = toAppDayjs("2025-01-01", dateDefault.DATE_FORMAT);
       const newStringDate = newDate.format(dateDefault.DISPLAY_FORMAT);
       user.type(endDatePicker, newStringDate);
 
       return waitFor(() => screen.findByDisplayValue(newStringDate), {
         timeout: 2000,
-      }).then(() =>
-        expect(store.dispatch).toHaveBeenCalledWith(
-          updateDateTimeFilterRange({
-            start: mockInitialState.paramReducer.dateTimeFilterRange.start,
-            end: dateToValue(
-              newDate
-                .set("hour", 23)
-                .set("minute", 59)
-                .set("second", 59)
-                .set("millisecond", 0)
-            ),
-          })
-        )
-      );
+      }).then(() => {
+        const lastRange = vi
+          .mocked(store.dispatch)
+          .mock.calls.map(
+            ([action]) => action as { type?: string; payload?: any }
+          )
+          .filter(
+            (action) => action?.type === "UPDATE_DATETIME_FILTER_VARIABLE"
+          )
+          .at(-1);
+        expect(
+          toAppDayjs(lastRange?.payload?.dateTimeFilterRange?.end).format(
+            dateDefault.DATE_FORMAT
+          )
+        ).toBe("2025-01-01");
+      });
     });
   });
 

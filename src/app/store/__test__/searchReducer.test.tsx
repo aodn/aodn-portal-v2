@@ -125,8 +125,8 @@ describe("Search Reducer Function Test", () => {
   it("should include time in dateRange, start is 00:00:00 end is 23:59:59", () => {
     const param: ParameterState = {
       dateTimeFilterRange: {
-        start: dayjs("2025-05-07T00:00:00").valueOf(),
-        end: dayjs("2025-05-07T23:59:59").valueOf(),
+        start: dayjs.utc("2025-05-07T00:00:00").valueOf(),
+        end: dayjs.utc("2025-05-07T23:59:59").valueOf(),
       } as DateTimeFilterRange,
     };
 

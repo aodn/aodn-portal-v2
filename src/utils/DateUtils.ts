@@ -1,5 +1,21 @@
-import dayjs, { Dayjs } from "@/utils/DayjsUtils";
+import dayjs, { Dayjs, getAppTimezone } from "@/utils/DayjsUtils";
 import { dateDefault } from "@/components/common/constants";
+
+/** Instant in the app timezone (`setAppTimezone` / UTC by default). */
+export const toAppDayjs = (
+  value?: string | number | Date | Dayjs,
+  format?: string
+): Dayjs => {
+  if (format) {
+    return dayjs.tz(value, format, getAppTimezone());
+  }
+  return value === undefined ? dayjs.tz() : dayjs.tz(value);
+};
+
+/** CQL / WMS datetimes: UTC wall clock plus a literal Z. */
+export const formatUtcDateTime = (
+  value: string | number | Date | Dayjs
+): string => dayjs.utc(value).format(dateDefault.DATE_TIME_FORMAT);
 
 export const convertDateFormat = (dateString: string): string => {
   const date = new Date(dateString);
@@ -16,7 +32,7 @@ export const dateToValue = (date: Dayjs, endOfDay: boolean = false): number => {
   return endOfDay ? date.endOf("day").valueOf() : date.valueOf();
 };
 
-export const valueToDate = (value: number): Dayjs => dayjs(value);
+export const valueToDate = (value: number): Dayjs => dayjs.tz(value);
 
 /** Calendar day → YYYYMMDD integer. */
 export const dayjsToDayPeriod = (d: Dayjs): number =>
