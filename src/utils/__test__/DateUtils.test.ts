@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import dayjs from "../dayjs";
 import {
-  convertDateFormat,
+  formatMetadataDate,
   dayKeyToUtcValue,
   formatDate,
   formatDateRange,
@@ -9,7 +9,6 @@ import {
 import { dateDefault } from "@/components/common/constants";
 
 describe("formatDate", () => {
-  // Every call site holds its date in a different shape, so the union matters.
   it("accepts an ISO string, Date, epoch number or Dayjs", () => {
     const expected = "02 Jan 2024";
     expect(formatDate("2024-01-02T00:00:00.000Z")).toBe(expected);
@@ -66,17 +65,17 @@ describe("formatDateRange", () => {
   });
 });
 
-describe("convertDateFormat", () => {
+describe("formatMetadataDate", () => {
   it("renders a metadata date with its time, labelled GMT+0000", () => {
     // Rendered in local time but labelled GMT+0000 — see the TODO on the fn.
     const local = dayjs("2021-08-01T00:00:00.000Z");
-    expect(convertDateFormat("2021-08-01T00:00:00.000Z")).toBe(
-      `${local.format("DD MMM YYYY HH:mm")} GMT+0000`
+    expect(formatMetadataDate("2021-08-01T00:00:00.000Z")).toBe(
+      `${local.format("ddd DD MMM YYYY HH:mm:ss")} GMT+0000`
     );
   });
 
   it("returns empty for an unparseable date", () => {
-    expect(convertDateFormat("not-a-date")).toBe("");
+    expect(formatMetadataDate("not-a-date")).toBe("");
   });
 });
 

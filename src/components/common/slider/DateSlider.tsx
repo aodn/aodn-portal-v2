@@ -232,9 +232,6 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
             valueLabelDisplay="auto"
             valueLabelFormat={(value: number) => formatDate(valueToDate(value))}
             thumb={thumbType}
-            // The caption is nowrap + flexShrink 0, so the rail must be the
-            // part that gives way — otherwise a wide date pushes it off-screen.
-            sx={{ flex: 1, minWidth: 0 }}
           />
         </Stack>
       </Grid>

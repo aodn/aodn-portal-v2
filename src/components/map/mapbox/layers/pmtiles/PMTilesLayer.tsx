@@ -261,7 +261,6 @@ export const buildPopupHtml = (
     .addText("Data Record Count: " + total);
 
   if (hasTime) {
-    // matchedKeys are ISO day keys from the tile data; format at the display boundary.
     const first = matchedKeys[0];
     const last = matchedKeys[matchedKeys.length - 1];
     builder.addRange(

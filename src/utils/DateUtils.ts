@@ -3,7 +3,6 @@
 import dayjs, { Dayjs } from "@/utils/dayjs";
 import { dateDefault } from "@/components/common/constants";
 
-/** Anything a caller might reasonably hold a date in. */
 export type DateInput = string | number | Date | Dayjs | null | undefined;
 
 /**
@@ -52,16 +51,26 @@ export const formatDateRange = (
 };
 
 /**
- * Formats a metadata creation/revision date, which shows a time as well as a day.
+ * Converts a metadata creation/revision date from ISO 8601 format to a more
+ * readable format. Scoped to GeoNetwork metadata dates on purpose — the
+ * GMT+0000 label below is a workaround, so don't reuse this as a general
+ * "date with time" formatter. Reach for formatDate() instead.
  *
  * @param dateString A date string in ISO 8601 format (e.g., "2021-08-01T00:00:00.000Z")
- * @returns e.g. "01 Aug 2021 05:30 GMT+0000"
+ * @returns A string representing the date in a more readable format (e.g., "Sun 01 Aug 2021 05:30:00 GMT+0000")
  *
- * @note The time is rendered in the local timezone but labelled GMT+0000.
+ * @example
+ * const isoDate = "2021-08-01T00:00:00.000Z";
+ * const result = formatMetadataDate(isoDate);
+ * // result: "Sun 01 Aug 2021 05:30:00 GMT+0000" (actual result may vary based on local timezone)
+ *
+ * @note The exact output may vary depending on the local timezone of the system running the code.
+ * @note An invalid or empty input returns an empty string.
+ *
  * TODO: hard code using GMT+0000 for now. Change the implementation after
  *  the issue in geonetwork is resolved.
  */
-export const convertDateFormat = (dateString: string): string =>
+export const formatMetadataDate = (dateString: DateInput): string =>
   formatDate(dateString, dateDefault.DISPLAY_FORMAT_WITH_TIME);
 
 // Utility function to convert a date to a numeric value
