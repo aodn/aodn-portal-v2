@@ -15,7 +15,7 @@ import { ControlProps } from "./Definition";
 import { Box, IconButton } from "@mui/material";
 import { switcherIconButtonSx } from "./MenuControl";
 import MenuHintTooltip from "./MenuHintTooltip";
-import dayjs from "dayjs";
+import dayjs from "@/utils/dayjs";
 import { dateDefault } from "../../../../common/constants";
 import { TimeRangeIcon } from "@/assets/icons/map/time_range";
 import DateSlider from "../../../../common/slider/DateSlider";

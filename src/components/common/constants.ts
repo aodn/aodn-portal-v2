@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import dayjs from "@/utils/dayjs";
 
 const dateDefault = {
   // --- Wire formats: sent to / received from APIs. NOT for display. ---

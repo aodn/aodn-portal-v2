@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 
-import { Dayjs } from "dayjs";
+import { Dayjs } from "@/utils/dayjs";
 import {
   ExpressionSpecification,
   GeoJSONSource,

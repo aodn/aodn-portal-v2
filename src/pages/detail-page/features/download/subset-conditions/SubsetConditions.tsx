@@ -1,6 +1,6 @@
 import { FC, useCallback, useMemo } from "react";
 import { Stack, SxProps } from "@mui/material";
-import { Dayjs } from "dayjs";
+import { Dayjs } from "@/utils/dayjs";
 import { BBox } from "geojson";
 import BBoxConditionCard from "./BBoxConditionCard";
 import PolygonConditionCard from "./PolygonConditionCard";

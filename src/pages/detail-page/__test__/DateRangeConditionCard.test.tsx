@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import dayjs from "dayjs";
+import dayjs from "@/utils/dayjs";
 
 // Tests for DateRangeConditionCard:
 // - the From/To pickers respect cross-field constraints (From <= To)

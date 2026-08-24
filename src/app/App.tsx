@@ -1,4 +1,3 @@
-// React import is not required in React 17 or later
 import { RouterProvider } from "react-router-dom";
 import Fallback from "@/pages/error-page/Fallback";
 import { ThemeProvider } from "@mui/material/styles";
@@ -9,7 +8,6 @@ import Scrollbar from "@/components/common/scroll/ScrollBar";
 import GlobalLoader from "@/components/loading/GlobalLoader";
 import AdminScreen from "@/components/admin/AdminScreen";
 import { ClipboardProvider } from "@/app/providers/ClipboardProvider";
-import "@/utils/DayjsUtils";
 
 const app = () => {
   return (

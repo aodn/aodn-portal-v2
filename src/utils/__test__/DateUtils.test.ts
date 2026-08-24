@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import dayjs from "../DayjsUtils";
+import dayjs from "../dayjs";
 import {
   convertDateFormat,
   dayKeyToUtcValue,

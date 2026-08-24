@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "@/utils/dayjs";
 import PlainAccordion from "../../../../components/common/accordion/PlainAccordion";
 import { portalTheme } from "../../../../styles";
 import {

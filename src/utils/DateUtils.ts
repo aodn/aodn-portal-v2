@@ -1,6 +1,6 @@
 // This file is only for date time related helper methods e.g comparing dates, convert timezone, etc.
 
-import dayjs, { Dayjs } from "@/utils/DayjsUtils";
+import dayjs, { Dayjs } from "@/utils/dayjs";
 import { dateDefault } from "@/components/common/constants";
 
 /** Anything a caller might reasonably hold a date in. */

@@ -5,7 +5,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import dayjs from "dayjs";
+import dayjs from "@/utils/dayjs";
 import { Grid, Stack, Typography } from "@mui/material";
 import type { SxProps, Theme } from "@mui/material/styles";
 import { dateToValue, formatDate, valueToDate } from "@/utils/DateUtils";
