@@ -85,6 +85,13 @@ describe("No Record Found", () => {
       expect(
         screen.getByRole("img", { name: "not found image" })
       ).toBeInTheDocument();
+
+      // SEO: the page answers HTTP 200, so it must tell crawlers to skip it
+      // and must not keep a previously viewed record's title
+      expect(document.title).toBe("Record not found | AODN Portal");
+      expect(
+        document.head.querySelector('meta[name="robots"][content="noindex"]')
+      ).not.toBeNull();
     });
   });
 });

@@ -1,7 +1,11 @@
 import { Box, Typography } from "@mui/material";
 import notFoundImage from "@/assets/images/no_matching_record.png";
+import { useDocumentTitle } from "@/seo/useDocumentTitle";
+import { useRobotsNoIndex } from "@/seo/useRobotsNoIndex";
 
 const NotFoundPage = () => {
+  useDocumentTitle("Page not found");
+  useRobotsNoIndex();
   return (
     <Box
       sx={{

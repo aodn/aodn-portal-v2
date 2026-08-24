@@ -2,7 +2,6 @@
 // domain, update this and robots.prod.txt together.
 export const BASE_URL = "https://portal-beta.aodn.org.au";
 
-// Keep in sync with useDocumentTitle.ts
 export const SITE_NAME = "AODN Portal";
 
 // Where the build steps fetch records from. The portal domain, not

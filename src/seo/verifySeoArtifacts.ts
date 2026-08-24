@@ -16,6 +16,7 @@ import {
   SITE_NAME,
 } from "./constants";
 import { sampleEvenly } from "./searchConsole";
+import { SITE_TITLE } from "./headTags";
 
 // The workflow refuses to publish fewer pages — keep in sync with seo.yml
 const MIN_PAGES = 10000;
@@ -46,7 +47,9 @@ export const checkSitemap = (xml: string, minUrls = MIN_PAGES) => {
 export const checkDetailPage = (html: string, uuid: string): string[] => {
   const problems: string[] = [];
   const title = html.match(/<title>(.*?)<\/title>/s)?.[1];
-  if (!title || title.trim() === SITE_NAME) {
+  // SITE_TITLE is what an unrendered app shell carries — a crawler request
+  // that missed the pre-rendered page comes back with exactly that
+  if (!title || [SITE_NAME, SITE_TITLE].includes(title.trim())) {
     problems.push("title is missing or still the generic site title");
   }
   if (!html.includes(`<link rel="canonical" href="${detailsUrl(uuid)}" />`)) {

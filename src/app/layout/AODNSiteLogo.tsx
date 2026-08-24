@@ -31,6 +31,7 @@ const AODNSiteLogo = () => {
         },
       }}
       href={pageDefault.landing}
+      aria-label="AODN Portal home"
       onClick={(e) => {
         e.preventDefault();
         redirectHome("AODNSiteLogo", true);
