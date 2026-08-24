@@ -24,7 +24,6 @@ interface EstimateSSEEventData {
   size?: number;
   estimated_output_bytes?: number;
   estimated_uncompressed_bytes?: number;
-  error?: string;
 }
 
 // Default extractor matches the WFS `estimate-complete` payload
@@ -102,6 +101,8 @@ const useEstimateSize = <TArg,>(
           return;
         }
 
+        let sawOutcome = false;
+
         await consumeSSEStream(responseStream, async (eventType, data) => {
           const eventData = data as EstimateSSEEventData;
           switch (eventType) {
@@ -111,6 +112,7 @@ const useEstimateSize = <TArg,>(
               break;
 
             case EstimateEventName.ESTIMATE_COMPLETE: {
+              sawOutcome = true;
               const sizeBytes = getEstimatedBytes(eventData);
               if (sizeBytes !== undefined) {
                 setEstimatedSizeBytes(sizeBytes);
@@ -121,10 +123,20 @@ const useEstimateSize = <TArg,>(
 
             case EstimateEventName.ESTIMATE_FAILED:
             case EstimateEventName.ERROR:
+              sawOutcome = true;
+              console.warn(
+                "Download size estimate failed:",
+                eventData.message ?? "no reason given"
+              );
               setStatus(EstimateStatus.ERROR);
               break;
           }
         });
+
+        // A stream that ends without saying how is a failure too.
+        if (!sawOutcome) {
+          setStatus(EstimateStatus.ERROR);
+        }
       } catch (error) {
         // Aborting the stream (cancel or superseding estimate) is not an error
         if (error instanceof DOMException && error.name === "AbortError") {
@@ -139,6 +151,7 @@ const useEstimateSize = <TArg,>(
   return {
     estimatedSizeBytes,
     isEstimating: status === EstimateStatus.ESTIMATING,
+    estimateFailed: status === EstimateStatus.ERROR,
     estimateSize,
     cancelEstimate,
   };
