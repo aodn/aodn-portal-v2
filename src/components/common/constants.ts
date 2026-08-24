@@ -1,13 +1,19 @@
 import dayjs from "dayjs";
 
 const dateDefault = {
+  // --- Wire formats: sent to / received from APIs. NOT for display. ---
   // Must use this format to do search, we care about the time
   DATE_TIME_FORMAT: "YYYY-MM-DDTHH:mm:ss[Z]",
   DATE_FORMAT: "YYYY-MM-DD",
-  DATE_YEAR_MONTH_FORMAT: "YYYY-MM",
-  DISPLAY_FORMAT: "DD/MM/YYYY",
-  // e.g. 05 Jan 2024, matching the download email
-  DISPLAY_FORMAT_LONG: "DD MMM YYYY",
+
+  // --- Display formats: everything the user reads. Go through formatDate()
+  // in @/utils/DateUtils rather than calling dayjs().format() directly. ---
+  // e.g. 05 Jan 2024 — unambiguous for an international audience, unlike
+  // DD/MM/YYYY which en-US readers parse as MM/DD/YYYY.
+  DISPLAY_FORMAT: "DD MMM YYYY",
+  // Metadata creation/revision dates only, which also show a time.
+  DISPLAY_FORMAT_WITH_TIME: "DD MMM YYYY HH:mm [GMT+0000]",
+
   min: new Date("01/01/1970"),
   max: new Date(),
   currentYear: dayjs(new Date()).year(),

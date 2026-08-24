@@ -17,8 +17,8 @@ import {
   updateStatus,
   updateUpdateFreq,
 } from "@/app/store/componentParamReducer";
-import dayjs from "dayjs";
-import { dateDefault, pageDefault, pageReferer } from "../common/constants";
+import { formatDateRange } from "@/utils/DateUtils";
+import { pageDefault, pageReferer } from "../common/constants";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { borderRadius, color } from "../../styles/constants";
 import { TrashIcon } from "../../assets/icons/search/trash";
@@ -71,18 +71,13 @@ const ActiveFiltersChips: FC = () => {
 
     // Date Range
     if (params.dateTimeFilterRange?.start || params.dateTimeFilterRange?.end) {
-      const start = params.dateTimeFilterRange.start
-        ? dayjs(params.dateTimeFilterRange.start).format(
-            dateDefault.DISPLAY_FORMAT
-          )
-        : "...";
-      const end = params.dateTimeFilterRange.end
-        ? dayjs(params.dateTimeFilterRange.end).format(
-            dateDefault.DISPLAY_FORMAT
-          )
-        : "...";
+      const range = formatDateRange(
+        params.dateTimeFilterRange.start,
+        params.dateTimeFilterRange.end,
+        { separator: " - ", fallback: "..." }
+      );
       chips.push({
-        label: `Date: ${start} - ${end}`,
+        label: `Date: ${range}`,
         onDelete: () => {
           dispatch(updateDateTimeFilterRange({}));
           triggerRedirectIfOnSearchPage();

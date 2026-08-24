@@ -51,7 +51,7 @@ import { boundingBoxInEpsg3857, isMapDrawModeActive } from "@/utils/MapUtils";
 import { checkEmptyArray } from "@/utils/Helpers";
 import AdminScreenContext from "../../../../admin/AdminScreenContext";
 import { HttpStatusCode } from "axios";
-import { dateToValue } from "@/utils/DateUtils";
+import { dateToValue, formatDate } from "@/utils/DateUtils";
 import { layernameRoughlyMatch } from "@/utils/GeoJsonUtils";
 import { AppDispatch } from "@/app/store/store";
 
@@ -502,7 +502,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             <CardContent key={index}>
               {value.time && (
                 <Typography component="div" variant="body3Small">
-                  Time: {value.time.toString()}
+                  Time: {formatDate(value.time)}
                 </Typography>
               )}
               {value.value && (

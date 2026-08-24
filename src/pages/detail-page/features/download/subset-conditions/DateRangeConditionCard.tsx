@@ -14,7 +14,7 @@ import { TimeRangeTooltipIcon } from "../../../../../assets/icons/map/tooltip_ti
 import { dateDefault } from "../../../../../components/common/constants";
 
 const formatOrEmpty = (d: Dayjs | null): string =>
-  d?.isValid() ? d.format("YYYY-MM-DD") : "";
+  d?.isValid() ? d.format(dateDefault.DATE_FORMAT) : "";
 
 const datePickerSx = {
   border: "none",
@@ -81,7 +81,7 @@ const DateRow: React.FC<DateRowProps> = ({
     <PlainDatePicker
       sx={datePickerSx}
       views={["year", "month", "day"]}
-      format={dateDefault.DISPLAY_FORMAT_LONG}
+      format={dateDefault.DISPLAY_FORMAT}
       value={dayjs(value)}
       minDate={minDate}
       maxDate={maxDate}

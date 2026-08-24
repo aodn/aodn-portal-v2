@@ -266,9 +266,9 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
 
       const extent = collection?.getExtent();
       if (extent) {
-        const [s, e] = extent.getOverallTemporal();
-        start = s === undefined ? start : dayjs(s, dateDefault.DISPLAY_FORMAT);
-        end = e === undefined ? end : dayjs(e, dateDefault.DISPLAY_FORMAT);
+        const [s, e] = extent.getOverallTemporalRange();
+        start = s ?? start;
+        end = e ?? end;
       }
     }
 

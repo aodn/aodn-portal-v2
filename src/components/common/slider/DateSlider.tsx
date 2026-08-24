@@ -8,7 +8,7 @@ import React, {
 import dayjs from "dayjs";
 import { Grid, Stack, Typography } from "@mui/material";
 import type { SxProps, Theme } from "@mui/material/styles";
-import { dateToValue, valueToDate } from "@/utils/DateUtils";
+import { dateToValue, formatDate, valueToDate } from "@/utils/DateUtils";
 import { dateDefault } from "../constants";
 import { portalTheme } from "../../../styles";
 import { padding } from "@/styles/constants";
@@ -207,7 +207,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
             <Typography sx={sliderCaptionSx}>
               Displaying{" "}
               {datePointStamp !== undefined
-                ? valueToDate(datePointStamp).format(dateDefault.DISPLAY_FORMAT)
+                ? formatDate(valueToDate(datePointStamp))
                 : ""}
             </Typography>
           </Stack>
@@ -230,10 +230,11 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
               },
             }}
             valueLabelDisplay="auto"
-            valueLabelFormat={(value: number) =>
-              valueToDate(value).format(dateDefault.DISPLAY_FORMAT)
-            }
+            valueLabelFormat={(value: number) => formatDate(valueToDate(value))}
             thumb={thumbType}
+            // The caption is nowrap + flexShrink 0, so the rail must be the
+            // part that gives way — otherwise a wide date pushes it off-screen.
+            sx={{ flex: 1, minWidth: 0 }}
           />
         </Stack>
       </Grid>
@@ -441,7 +442,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
               Start Date
             </Typography>
             <Typography sx={sliderCaptionSx}>
-              {valueToDate(minValue).format(dateDefault.DISPLAY_FORMAT)}
+              {formatDate(valueToDate(minValue))}
             </Typography>
           </Stack>
           <PlainSlider
@@ -460,9 +461,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
               },
             }}
             valueLabelDisplay="auto"
-            valueLabelFormat={(value: number) =>
-              valueToDate(value).format(dateDefault.DISPLAY_FORMAT)
-            }
+            valueLabelFormat={(value: number) => formatDate(valueToDate(value))}
             sx={{ flex: 1, minWidth: 0 }}
           />
           <Stack flexShrink={0} alignItems="flex-end">
@@ -475,7 +474,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
               On going
             </Typography>
             <Typography sx={sliderCaptionSx}>
-              {valueToDate(maxValue).format(dateDefault.DISPLAY_FORMAT)}
+              {formatDate(valueToDate(maxValue))}
             </Typography>
           </Stack>
         </Stack>

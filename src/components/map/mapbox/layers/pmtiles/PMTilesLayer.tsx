@@ -37,6 +37,7 @@ import {
   parquetKeyCandidates,
   probePmtilesMetadata,
 } from "./Common";
+import { formatDate } from "@/utils/DateUtils";
 import MapContext from "@/components/map/mapbox/MapContext";
 import { playwrightTestIds } from "@/components/common/constants";
 import {
@@ -260,9 +261,14 @@ export const buildPopupHtml = (
     .addText("Data Record Count: " + total);
 
   if (hasTime) {
+    // matchedKeys are ISO day keys from the tile data; format at the display boundary.
     const first = matchedKeys[0];
     const last = matchedKeys[matchedKeys.length - 1];
-    builder.addRange("Time Range", first ?? "N/A", last ?? "N/A");
+    builder.addRange(
+      "Time Range",
+      formatDate(first, undefined, "N/A"),
+      formatDate(last, undefined, "N/A")
+    );
   }
 
   return builder.getHtml();

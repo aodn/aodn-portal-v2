@@ -459,7 +459,7 @@ describe("PMTilesLayer - buildPopupHtml", () => {
     );
     expect(html).toContain("Data Records In This Area:");
     expect(html).toContain("Data Record Count: 12");
-    expect(html).toContain("Time Range: 2024-01-01 to 2024-03-02");
+    expect(html).toContain("Time Range: 01 Jan 2024 to 02 Mar 2024");
   });
 
   it("omits Time Range on timeless (has_time false) tiles", () => {
@@ -506,7 +506,7 @@ describe("PMTilesLayer - buildPopupHtml", () => {
       filterEnd
     );
     expect(html).toContain("Data Record Count: 5");
-    expect(html).toContain("Time Range: 2024-01-01 to 2024-01-01");
+    expect(html).toContain("Time Range: 01 Jan 2024 to 01 Jan 2024");
   });
 
   it("shows zero count and N/A range when the density cell has no records in range", () => {

@@ -41,7 +41,7 @@ import {
 import TimeRangeBarChart from "../common/charts/TimeRangeBarChart";
 import PlainDatePicker from "../common/datetime/PlainDatePicker";
 import PlainSlider from "../common/slider/PlainSlider";
-import { dateToValue, valueToDate } from "@/utils/DateUtils";
+import { dateToValue, formatDate, valueToDate } from "@/utils/DateUtils";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import theme from "../../styles/themeRC8";
 import { CalendarIcon } from "../../assets/icons/search/calendar";
@@ -494,7 +494,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                 onChange={handleSliderChange}
                 valueLabelDisplay="auto"
                 valueLabelFormat={(value: number) =>
-                  valueToDate(value).format(dateDefault.DISPLAY_FORMAT)
+                  formatDate(valueToDate(value))
                 }
               />
               <Box
@@ -505,10 +505,10 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                 }}
               >
                 <Typography padding={0} variant="body2Regular">
-                  {initialMinDate.format(dateDefault.DISPLAY_FORMAT)}
+                  {formatDate(initialMinDate)}
                 </Typography>
                 <Typography padding={0} variant="body2Regular">
-                  {initialMaxDate.format(dateDefault.DISPLAY_FORMAT)}
+                  {formatDate(initialMaxDate)}
                 </Typography>
               </Box>
             </Box>
