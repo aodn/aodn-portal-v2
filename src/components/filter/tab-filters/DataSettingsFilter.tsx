@@ -7,10 +7,10 @@ import {
   updateUpdateFreq,
 } from "@/app/store/componentParamReducer";
 import { useAppDispatch } from "@/app/store/hooks";
-import { TabFilterType } from "../Filters";
+import { TabFilterType } from "../FilterDefinition";
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
 import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
-import { DatasetFrequency, DatasetStatus } from "@/app/store/searchReducer";
+import { DatasetFrequency, DatasetStatus } from "@/app/store/datasetEnums";
 import { IndexDataType, ItemButton } from "../FilterDefinition";
 import { portalTheme } from "../../../styles";
 

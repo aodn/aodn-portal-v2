@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import EventEmitter from "events";
-import { AppDispatch, RootState } from "./store";
 import { fetchResultNoStore, jsonToOGCCollections } from "./searchReducer";
 import { OGCCollection } from "./OGCCollectionDefinitions";
 import {
@@ -18,6 +17,10 @@ interface BookmarkListState {
   items: Array<OGCCollection>;
   temporaryItem: OGCCollection | undefined;
   expandedItem: OGCCollection | undefined;
+}
+
+interface BookmarkListRootState {
+  bookmarkList: BookmarkListState;
 }
 
 // Bookmark button can use in multiple location for the same record, hence
@@ -143,7 +146,7 @@ export { on, off };
 export const initializeBookmarkList = createAsyncThunk<
   void,
   void,
-  { rejectValue: ErrorResponse; state: RootState; dispatch: AppDispatch }
+  { rejectValue: ErrorResponse; state: BookmarkListRootState }
 >("bookmarkList/initialize", async (_, thunkAPI: any) => {
   const { dispatch } = thunkAPI;
 
@@ -193,14 +196,18 @@ export const initializeBookmarkList = createAsyncThunk<
 });
 
 // Selectors
-export const getBookmarkList = (state: RootState) => state.bookmarkList;
-export const selectBookmarkItems = (state: RootState) =>
+export const getBookmarkList = (state: BookmarkListRootState) =>
+  state.bookmarkList;
+export const selectBookmarkItems = (state: BookmarkListRootState) =>
   state.bookmarkList.items;
-export const selectTemporaryItem = (state: RootState) =>
+export const selectTemporaryItem = (state: BookmarkListRootState) =>
   state.bookmarkList.temporaryItem;
-export const selectExpandedItem = (state: RootState) =>
+export const selectExpandedItem = (state: BookmarkListRootState) =>
   state.bookmarkList.expandedItem;
-export const checkIsBookmarked = (state: RootState, uuid: string) => {
+export const checkIsBookmarked = (
+  state: BookmarkListRootState,
+  uuid: string
+) => {
   return state.bookmarkList.items?.some(
     (item: OGCCollection) => item.id === uuid
   );

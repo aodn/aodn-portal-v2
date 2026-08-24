@@ -77,6 +77,8 @@ const playwrightTestIds = {
   DETAIL_MAP_POPUP: "map-popup",
 };
 
+const SIMPLE_FILTER_DEFAULT_HEIGHT = 40;
+
 const imosInfoDefault = {
   EMAIL: {
     RECIPIENT: "info@aodn.org.au",
@@ -95,4 +97,5 @@ export {
   contactRoles,
   imosInfoDefault,
   playwrightTestIds,
+  SIMPLE_FILTER_DEFAULT_HEIGHT,
 };

@@ -3,6 +3,11 @@ import axios, { AxiosError } from "axios";
 import axiosRetry, { isNetworkError, isRetryableError } from "axios-retry";
 import { ParameterState, Vocab } from "./componentParamReducer";
 import {
+  SearchControl,
+  SearchParameters,
+  SuggesterParameters,
+} from "./searchTypes";
+import {
   cqlDefaultFilters,
   DatasetGroup,
   IsNotNull,
@@ -46,35 +51,12 @@ import {
 import { Health } from "./systemDefinition";
 import { TileProductsResponse } from "./GriddedTileDefinitions";
 
-export enum DatasetFrequency {
-  REALTIME = "real-time",
-  DELAYED = "delayed",
-  OTHER = "other",
-  BOTH = "both",
-}
-
-export enum DatasetStatus {
-  ONGOING = "onGoing",
-  COMPLETED = "completed",
-}
-
-export type SuggesterParameters = {
-  input?: string;
-  filter?: string;
-};
-
-export type SearchParameters = {
-  text?: string;
-  filter?: string;
-  properties?: string;
-  sortby?: string;
-};
-// Control the behavior of search behavior not part of the query
-export type SearchControl = {
-  pagesize?: number;
-  searchafter?: Array<string>;
-  score?: number;
-};
+export { DatasetFrequency, DatasetStatus } from "./datasetEnums";
+export type {
+  SearchControl,
+  SearchParameters,
+  SuggesterParameters,
+} from "./searchTypes";
 
 type OGCSearchParameters = {
   q?: string;

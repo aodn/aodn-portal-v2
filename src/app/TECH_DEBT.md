@@ -4,29 +4,28 @@ Found during the 2026-07 restructure. Two things worth fixing, one PR:
 
 | #   | Problem                                                              | Fix                                                                        |
 | --- | -------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| 1   | 11 circular import cycles                                            | Move shared types/constants into a third file so imports go one way        |
+| 1   | ~~11 circular import cycles~~ (fixed)                                | Shared types/constants live in leaf files; imports go one way              |
 | 2   | `searchReducer.ts` is 860 lines, mixes axios client + thunks + state | Extract HTTP code into `src/services/api/`, keep only state in the reducer |
 
-## 1. The 11 cycles
+## 1. Circular imports (done)
 
-Found with `npx madge --circular --extensions ts,tsx src`:
+Broken by moving shared types/constants into leaf modules:
 
-- `componentParamReducer` ⇄ `searchReducer`
-- `bookmarkListReducer` ⇄ `store.ts`
-- `searchReducer` ⇄ `analytics/searchParamsEvent`
-- `searchReducer` ⇄ `components/common/cqlFilters`
-- `Filters` ⇄ each of the 4 `tab-filters/*` (4 cycles)
-- `ResultCards` ⇄ `GridResultCard` / `ListResultCard` (2 cycles)
-- `ResultListLayoutButton` ⇄ `IconSelect` ⇄ `ResultPanelSimpleFilter`
+- `datasetEnums.ts` / `searchTypes.ts` — enums and search param types
+- `FilterDefinition.tsx` — `TabFilterType` / `FilterValues`
+- `result/types.ts` — `ResultCardBasicType`
+- `common/constants.ts` — `SIMPLE_FILTER_DEFAULT_HEIGHT`
+- bookmark selectors typed against local slice state instead of `store.ts`
 
-While fixing, also repair the lint gate in the same PR so cycles cannot
-come back:
+Verify with `npx madge --circular --extensions ts,tsx src`.
+
+Optional follow-up so cycles cannot come back:
 
 1. Upgrade `eslint-plugin-import` to ^2.32.0
    (2.29 is silently broken with ESLint 9 — it reports nothing)
 2. Add to eslint settings:
    `"import/parsers": { "@typescript-eslint/parser": [".ts", ".tsx"] }`
-3. After all cycles are fixed, turn on `"import/no-cycle": "error"`
+3. Turn on `"import/no-cycle": "error"`
 
 ⚠️ Regenerate `yarn.lock` with yarn 4 (`corepack yarn install`), not the
 system yarn 1 — yarn 1 rewrites the whole lockfile.

@@ -4,7 +4,7 @@
  */
 import { bboxPolygon } from "@turf/turf";
 import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from "geojson";
-import { DatasetFrequency, DatasetStatus } from "./searchReducer";
+import { DatasetFrequency, DatasetStatus } from "./datasetEnums";
 import { MapDefaultConfig } from "@/components/map/mapbox/constants";
 import { SearchResultLayoutEnum } from "@/components/common/buttons/ResultListLayoutButton";
 import { SortResultEnum } from "@/components/common/buttons/ResultListSortButton";
