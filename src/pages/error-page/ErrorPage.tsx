@@ -3,7 +3,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import notFoundImage from "@/assets/images/no_matching_record.png";
 import { Box, Typography } from "@mui/material";
-import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { useDocumentTitle } from "@/seo/useDocumentTitle";
 import { useRobotsNoIndex } from "@/seo/useRobotsNoIndex";
 
 const ErrorPage: React.FC = () => {

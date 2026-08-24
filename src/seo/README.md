@@ -5,8 +5,9 @@ a crawler fetching a page gets an empty shell — so this folder adds what
 crawlers need, delivered two ways:
 
 - **With the app bundle** (wired in `vite.config.ts`): head tags, robots.txt,
-  a live canonical link and a noindex hook for pages crawlers must skip —
-  `headTags.ts`, `vitePlugins.ts`, `canonicalUrl.ts`, `useRobotsNoIndex.ts`
+  a live canonical link, per-page titles and a noindex hook for pages crawlers
+  must skip — `headTags.ts`, `vitePlugins.ts`, `canonicalUrl.ts`,
+  `useDocumentTitle.ts`, `useRobotsNoIndex.ts`
 - **Weekly to S3** (the [Publish SEO Artifacts workflow](../../.github/workflows/seo.yml)):
   `sitemap.xml` plus ~15k pre-rendered detail pages under
   `prerender/details/<uuid>/index.html` —

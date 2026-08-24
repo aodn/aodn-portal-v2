@@ -21,7 +21,7 @@ import {
   LayerName,
   LayerSwitcherLayer,
 } from "@/components/map/mapbox/controls/menu/MapLayerSwitcher";
-import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { useDocumentTitle } from "@/seo/useDocumentTitle";
 import { useRobotsNoIndex } from "@/seo/useRobotsNoIndex";
 
 interface DetailPageProviderProps {

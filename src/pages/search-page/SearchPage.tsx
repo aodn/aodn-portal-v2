@@ -68,7 +68,7 @@ import _ from "lodash";
 import useFetchData from "../../hooks/useFetchData";
 import { ProgressType } from "../../components/map/mapbox/MapContext";
 import AdminScreenContext from "../../components/admin/AdminScreenContext";
-import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { useDocumentTitle } from "@/seo/useDocumentTitle";
 
 const SearchPage = () => {
   useDocumentTitle("Search");

@@ -1,6 +1,5 @@
 import { useEffect } from "react";
-
-const SITE_NAME = "AODN Portal";
+import { SITE_NAME } from "./constants";
 
 /**
  * Sets "<title> | AODN Portal" as the document title while mounted and
