@@ -12,10 +12,6 @@ import {
   MapLayerResponse,
 } from "@/app/store/GeoserverDefinitions";
 import { MapEventEnum } from "../../../constants";
-import utc from "dayjs/plugin/utc";
-import { extend } from "dayjs";
-
-extend(utc);
 
 // 1. Use vi.hoisted to ensure this object exists before ANY imports
 const mocks = vi.hoisted(() => ({

@@ -2,7 +2,7 @@
  * Common filter for cql, avoid cql string repeat everywhere
  * @type {{}}
  */
-import dayjs from "dayjs";
+import dayjs from "@/utils/DayjsUtils";
 import { dateDefault } from "./constants";
 import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from "geojson";
 import * as wellknown from "wellknown";

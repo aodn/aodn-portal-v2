@@ -10,7 +10,7 @@ import default_thumbnail from "@/assets/images/default-thumbnail.png";
 import { bboxPolygon } from "@turf/turf";
 
 import * as turf from "@turf/turf";
-import dayjs from "dayjs";
+import dayjs from "@/utils/DayjsUtils";
 import { dateDefault } from "@/components/common/constants";
 import { IconWMS } from "@/components/icon/IconWMS";
 import { IconWFS } from "@/components/icon/IconWFS";

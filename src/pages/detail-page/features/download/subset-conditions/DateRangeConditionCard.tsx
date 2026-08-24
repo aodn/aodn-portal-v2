@@ -1,5 +1,5 @@
 import React from "react";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "@/utils/DayjsUtils";
 import { Box, Stack, Typography } from "@mui/material";
 import BaseConditionCard from "./BaseConditionCard";
 import {
@@ -7,11 +7,11 @@ import {
   DownloadConditionType,
 } from "../../../context/DownloadDefinitions";
 import PlainDatePicker from "../../../../../components/common/datetime/PlainDatePicker";
-import { DEFAULT_DATE_PICKER_SLOT } from "../../../../../components/common/datetime/datePickerSlots";
+import { DEFAULT_DATE_PICKER_SLOT } from "@/components/common/datetime/datePickerSlots";
 import { portalTheme } from "../../../../../styles";
-import { CalendarIcon } from "../../../../../assets/icons/search/calendar";
-import { TimeRangeTooltipIcon } from "../../../../../assets/icons/map/tooltip_time_range";
-import { dateDefault } from "../../../../../components/common/constants";
+import { CalendarIcon } from "@/assets/icons/search/calendar";
+import { TimeRangeTooltipIcon } from "@/assets/icons/map/tooltip_time_range";
+import { dateDefault } from "@/components/common/constants";
 
 const formatOrEmpty = (d: Dayjs | null): string =>
   d?.isValid() ? d.format("YYYY-MM-DD") : "";

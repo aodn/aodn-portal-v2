@@ -9,7 +9,9 @@ const prettier = require("eslint-plugin-prettier");
 const prettierConfig = require("eslint-config-prettier");
 
 module.exports = [
-  { ignores: ["playwright/.venv/**", "playwright/pages/js_scripts/**"] },
+  {
+    ignores: ["dist/**", "playwright/.venv/**", "playwright/pages/js_scripts/**"],
+  },
 
   js.configs.recommended,
 
@@ -84,6 +86,7 @@ module.exports = [
           json: "always",
         },
       ],
+      "import/no-cycle": "error",
     },
   },
 

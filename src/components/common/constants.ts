@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import dayjs from "@/utils/DayjsUtils";
 
 const dateDefault = {
   // Must use this format to do search, we care about the time

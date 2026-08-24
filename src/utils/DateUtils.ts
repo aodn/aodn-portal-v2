@@ -1,22 +1,6 @@
-// This file is only for date time related helper methods e.g comparing dates, convert timezone, etc.
-
 import dayjs, { Dayjs } from "@/utils/DayjsUtils";
 import { dateDefault } from "@/components/common/constants";
 
-/**
- * Converts a date string from ISO 8601 format to a more readable format.
- *
- * @param dateString A date string in ISO 8601 format (e.g., "2021-08-01T00:00:00.000Z")
- * @returns A string representing the date in a more readable format (e.g., "Sun Aug 01 2021 05:30:00 GMT+0530")
- *
- * @example
- * const isoDate = "2021-08-01T00:00:00.000Z";
- * const result = convertDateFormat(isoDate);
- * // result: "Sun Aug 01 2021 05:30:00 GMT+0530" (actual result may vary based on local timezone)
- *
- * @note The exact output format may vary depending on the local timezone of the system running the code.
- * @note This function assumes the input is a valid ISO 8601 date string. Invalid inputs may produce unexpected results.
- */
 export const convertDateFormat = (dateString: string): string => {
   const date = new Date(dateString);
   const convertedString = date.toString();
@@ -28,15 +12,13 @@ export const convertDateFormat = (dateString: string): string => {
   return dateTimeString.replace(/GMT\+\d{4}/g, "GMT+0000");
 };
 
-// Utility function to convert a date to a numeric value
 export const dateToValue = (date: Dayjs, endOfDay: boolean = false): number => {
   return endOfDay ? date.endOf("day").valueOf() : date.valueOf();
 };
 
-// Utility function to convert a numeric value back to a date
 export const valueToDate = (value: number): Dayjs => dayjs(value);
 
-/** Calendar day → YYYYMMDD integer (local calendar fields from dayjs). */
+/** Calendar day → YYYYMMDD integer. */
 export const dayjsToDayPeriod = (d: Dayjs): number =>
   d.year() * 10000 + (d.month() + 1) * 100 + d.date();
 
