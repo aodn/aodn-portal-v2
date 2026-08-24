@@ -179,7 +179,10 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
           backgroundColor: portalTheme.palette.primary6,
           borderRadius: "6px",
           display: "flex",
+          alignItems: "center",
           width: "100%",
+          height: portalTheme.spacing(6),
+          boxSizing: "border-box",
           mx: "8px",
           overflow: "visible",
           position: "relative",
@@ -193,8 +196,9 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
         container
         sx={{
           px: padding.medium,
-          py: padding.small,
+          py: 0,
           overflow: "visible",
+          alignItems: "center",
         }}
         size={12}
       >
@@ -402,11 +406,12 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
       container
       sx={{
         backgroundColor: portalTheme.palette.primary6,
-        borderRadius: "6px",
+        borderRadius: portalTheme.borderRadius.sm,
         display: "flex",
         width: "100%",
         mx: "8px",
         overflow: "visible",
+        height: "48px",
       }}
       data-testid={COMPONENT_ID}
     >
@@ -414,7 +419,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
         container
         sx={{
           px: padding.medium,
-          py: padding.small,
+          py: "2px",
           overflow: "visible",
         }}
         size={12}

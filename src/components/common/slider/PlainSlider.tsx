@@ -106,20 +106,26 @@ const StyledSlider = styled(Slider)<SliderProps>(({ theme, orientation }) => {
     },
   };
 
+  const title1Medium = portalTheme.typography.title1Medium;
+
   return {
     "& .MuiSlider-valueLabel": {
-      ...portalTheme.typography.body2Regular,
+      ...title1Medium,
       backgroundColor: portalTheme.palette.primary6,
+      // Spec blur; no matching token in RC8 theme
+      backdropFilter: "blur(2.5px)",
+      WebkitBackdropFilter: "blur(2.5px)",
       borderRadius: portalTheme.borderRadius.sm,
       border: `1px solid ${portalTheme.palette.text1}`,
-      // No 28px size token; MUI default spacing is 8px → 3.5 = 28px
-      height: theme.spacing(3.5),
+      height: "auto",
+      padding: portalTheme.spacing(0, 1),
       boxSizing: "border-box",
       overflow: "visible",
       whiteSpace: "nowrap",
       "&::before": {
         display: "none",
       },
+      "& .MuiSlider-valueLabelLabel": title1Medium,
       ...labelPositioning,
       opacity: 0, // Hide text by default
       ...labelPositioningMobile,
