@@ -51,7 +51,7 @@ import { boundingBoxInEpsg3857, isMapDrawModeActive } from "@/utils/MapUtils";
 import { checkEmptyArray } from "@/utils/Helpers";
 import AdminScreenContext from "../../../../admin/AdminScreenContext";
 import { HttpStatusCode } from "axios";
-import { dateToValue, formatDate } from "@/utils/DateUtils";
+import { dayjsToUnixMs, formatDate } from "@/utils/DateUtils";
 import { layernameRoughlyMatch } from "@/utils/GeoJsonUtils";
 import { AppDispatch } from "@/app/store/store";
 
@@ -196,7 +196,7 @@ const checkSupportDiscreteTimeSlider = (
           const result: Map<string, Array<number>> = new Map();
           result.set(
             layerName,
-            val["time"]?.map((v) => dateToValue(dayjs(v.toString())))
+            val["time"]?.map((v) => dayjsToUnixMs(dayjs(v.toString())))
           );
           setDiscreteTimeSliderValues?.(result);
         } else {

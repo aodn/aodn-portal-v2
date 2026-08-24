@@ -9,7 +9,7 @@ import dayjs, { Dayjs } from "@/utils/dayjs";
 import DateRangeFilter from "../DateRangeFilter";
 import { dateDefault } from "../../common/constants";
 import { updateDateTimeFilterRange } from "@/app/store/componentParamReducer";
-import { dateToValue } from "../../../utils/DateUtils";
+import { dayjsToUnixMs } from "../../../utils/DateUtils";
 import axios from "axios";
 import { responseIdTemporal, responseIdProvider } from "./canned";
 
@@ -20,8 +20,8 @@ const initialMaxDate: Dayjs = dayjs(dateDefault.max);
 const mockInitialState = {
   paramReducer: {
     dateTimeFilterRange: {
-      start: dateToValue(dayjs(dateDefault.min)),
-      end: dateToValue(dayjs(dateDefault.max)),
+      start: dayjsToUnixMs(dayjs(dateDefault.min)),
+      end: dayjsToUnixMs(dayjs(dateDefault.max)),
     },
   },
 };
@@ -48,8 +48,7 @@ vi.mock("../../../hooks/useBreakpoint", () => ({
 
 // Mock date utilities
 vi.mock("../../utils/DateUtils", () => ({
-  dateToValue: vi.fn((date: Dayjs) => date.valueOf()),
-  valueToDate: vi.fn((value: number) => dayjs(value)),
+  dayjsToUnixMs: vi.fn((date: Dayjs) => date.valueOf()),
 }));
 
 describe("DateRangeFilter", () => {
@@ -142,7 +141,7 @@ describe("DateRangeFilter", () => {
       }).then(() =>
         expect(store.dispatch).toHaveBeenCalledWith(
           updateDateTimeFilterRange({
-            start: dateToValue(newDate),
+            start: dayjsToUnixMs(newDate),
             end: mockInitialState.paramReducer.dateTimeFilterRange.end,
           })
         )
@@ -169,7 +168,7 @@ describe("DateRangeFilter", () => {
         expect(store.dispatch).toHaveBeenCalledWith(
           updateDateTimeFilterRange({
             start: mockInitialState.paramReducer.dateTimeFilterRange.start,
-            end: dateToValue(
+            end: dayjsToUnixMs(
               newDate
                 .set("hour", 23)
                 .set("minute", 59)
@@ -216,8 +215,8 @@ describe("DateRangeFilter", () => {
     const newState = {
       paramReducer: {
         dateTimeFilterRange: {
-          start: dateToValue(fiveYearsAgo),
-          end: dateToValue(dayjs()),
+          start: dayjsToUnixMs(fiveYearsAgo),
+          end: dayjsToUnixMs(dayjs()),
         },
       },
     };

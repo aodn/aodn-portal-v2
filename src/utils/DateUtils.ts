@@ -73,13 +73,12 @@ export const formatDateRange = (
 export const formatMetadataDate = (dateString: DateInput): string =>
   formatDate(dateString, dateDefault.DISPLAY_FORMAT_WITH_TIME);
 
-// Utility function to convert a date to a numeric value
-export const dateToValue = (date: Dayjs, endOfDay: boolean = false): number => {
+export const dayjsToUnixMs = (
+  date: Dayjs,
+  endOfDay: boolean = false
+): number => {
   return endOfDay ? date.endOf("day").valueOf() : date.valueOf();
 };
-
-// Utility function to convert a numeric value back to a date
-export const valueToDate = (value: number): Dayjs => dayjs(value);
 
 /** Calendar day → YYYYMMDD integer (local calendar fields from dayjs). */
 export const dayjsToDayPeriod = (d: Dayjs): number =>
@@ -89,7 +88,11 @@ export const dayjsToDayPeriod = (d: Dayjs): number =>
 export const dayjsToMonthPeriod = (d: Dayjs): number =>
   d.year() * 100 + (d.month() + 1);
 
-export const dayKeyToUtcValue = (key: string): number | undefined => {
+/**
+ * Strict "YYYY-MM-DD" day key → Unix ms at UTC midnight, or undefined if the
+ * key isn't a real calendar day. The key is read as UTC, not local time
+ */
+export const utcDayKeyToUnixMs = (key: string): number | undefined => {
   const parsed = dayjs.utc(key, dateDefault.DATE_FORMAT, true);
   return parsed.isValid() ? parsed.valueOf() : undefined;
 };

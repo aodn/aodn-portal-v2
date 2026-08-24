@@ -8,7 +8,7 @@ import React, {
 import dayjs from "@/utils/dayjs";
 import { Grid, Stack, Typography } from "@mui/material";
 import type { SxProps, Theme } from "@mui/material/styles";
-import { dateToValue, formatDate, valueToDate } from "@/utils/DateUtils";
+import { dayjsToUnixMs, formatDate } from "@/utils/DateUtils";
 import { dateDefault } from "../constants";
 import { portalTheme } from "../../../styles";
 import { padding } from "@/styles/constants";
@@ -206,9 +206,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
           <Stack flexShrink={0} alignItems="flex-start">
             <Typography sx={sliderCaptionSx}>
               Displaying{" "}
-              {datePointStamp !== undefined
-                ? formatDate(valueToDate(datePointStamp))
-                : ""}
+              {datePointStamp !== undefined ? formatDate(datePointStamp) : ""}
             </Typography>
           </Stack>
           <ConcentrationSlider
@@ -230,7 +228,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
               },
             }}
             valueLabelDisplay="auto"
-            valueLabelFormat={(value: number) => formatDate(valueToDate(value))}
+            valueLabelFormat={(value: number) => formatDate(value)}
             thumb={thumbType}
           />
         </Stack>
@@ -240,14 +238,17 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
 };
 
 /** Epoch ms for {@link dateDefault.min} (1 Jan 1970 local). Slider floor. */
-const SLIDER_MIN_FLOOR = dateToValue(dayjs(dateDefault.min));
+const SLIDER_MIN_FLOOR = dayjsToUnixMs(dayjs(dateDefault.min));
 
 /**
  * Parse a date string to slider epoch ms at **start of day**, never below
  * {@link SLIDER_MIN_FLOOR}. Used for the left thumb / rail min.
  */
 const dateStringToSliderMinValue = (date: string): number =>
-  Math.max(SLIDER_MIN_FLOOR, dateToValue(dayjs(date, dateDefault.DATE_FORMAT)));
+  Math.max(
+    SLIDER_MIN_FLOOR,
+    dayjsToUnixMs(dayjs(date, dateDefault.DATE_FORMAT))
+  );
 
 /**
  * Parse a date string to slider epoch ms at **end of day**. Used for the right
@@ -256,7 +257,7 @@ const dateStringToSliderMinValue = (date: string): number =>
  * min and max share the same calendar day).
  */
 const dateStringToSliderMaxValue = (date: string): number =>
-  dateToValue(dayjs(date, dateDefault.DATE_FORMAT), true);
+  dayjsToUnixMs(dayjs(date, dateDefault.DATE_FORMAT), true);
 
 /** Full-coverage thumb pair for the current rail bounds. */
 const fullCoverageRange = (minValue: number, maxValue: number): number[] => [
@@ -438,9 +439,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
             >
               Start Date
             </Typography>
-            <Typography sx={sliderCaptionSx}>
-              {formatDate(valueToDate(minValue))}
-            </Typography>
+            <Typography sx={sliderCaptionSx}>{formatDate(minValue)}</Typography>
           </Stack>
           <PlainSlider
             value={dateRangeStamp}
@@ -458,7 +457,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
               },
             }}
             valueLabelDisplay="auto"
-            valueLabelFormat={(value: number) => formatDate(valueToDate(value))}
+            valueLabelFormat={(value: number) => formatDate(value)}
             sx={{ flex: 1, minWidth: 0 }}
           />
           <Stack flexShrink={0} alignItems="flex-end">
@@ -470,9 +469,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
             >
               On going
             </Typography>
-            <Typography sx={sliderCaptionSx}>
-              {formatDate(valueToDate(maxValue))}
-            </Typography>
+            <Typography sx={sliderCaptionSx}>{formatDate(maxValue)}</Typography>
           </Stack>
         </Stack>
       </Grid>

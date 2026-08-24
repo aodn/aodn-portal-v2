@@ -41,7 +41,7 @@ import {
 import TimeRangeBarChart from "../common/charts/TimeRangeBarChart";
 import PlainDatePicker from "../common/datetime/PlainDatePicker";
 import PlainSlider from "../common/slider/PlainSlider";
-import { dateToValue, formatDate, valueToDate } from "@/utils/DateUtils";
+import { dayjsToUnixMs, formatDate } from "@/utils/DateUtils";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import theme from "../../styles/themeRC8";
 import { CalendarIcon } from "../../assets/icons/search/calendar";
@@ -86,8 +86,8 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
 
   // Local state for date-range-slider
   const [value, setValue] = useState<number[]>([
-    dateToValue(initialMinDate),
-    dateToValue(initialMaxDate),
+    dayjsToUnixMs(initialMinDate),
+    dayjsToUnixMs(initialMaxDate),
   ]);
 
   // Local state for radio group
@@ -103,8 +103,8 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
   );
 
   // Memoized derived dates
-  const minDate = useMemo(() => valueToDate(value[0]), [value]);
-  const maxDate = useMemo(() => valueToDate(value[1]), [value]);
+  const minDate = useMemo(() => dayjs(value[0]), [value]);
+  const maxDate = useMemo(() => dayjs(value[1]), [value]);
 
   // Helper to check if given star-end period falls in any of the radio group year-range options
   const determineSelectedOption = useCallback(
@@ -152,7 +152,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
         const years = Number(option);
         const today = dayjs();
         const startDate = today.subtract(years, "year");
-        const newValue = [dateToValue(startDate), dateToValue(today)];
+        const newValue = [dayjsToUnixMs(startDate), dayjsToUnixMs(today)];
 
         setValue(newValue);
         dispatch(
@@ -170,8 +170,8 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
     (_: Event, newValue: number | number[]): void => {
       if (!Array.isArray(newValue)) return;
       const [newStart, newEnd] = newValue;
-      const newMinDate = valueToDate(newStart);
-      const newMaxDate = valueToDate(newEnd);
+      const newMinDate = dayjs(newStart);
+      const newMaxDate = dayjs(newEnd);
 
       setValue(newValue);
       setSelectedOption(determineSelectedOption(newMinDate, newMaxDate));
@@ -193,8 +193,11 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
         .set("minute", 0)
         .set("second", 0);
 
-      if (localMinDate && dateToValue(localMinDate) < dateToValue(maxDate)) {
-        const newStart = dateToValue(localMinDate);
+      if (
+        localMinDate &&
+        dayjsToUnixMs(localMinDate) < dayjsToUnixMs(maxDate)
+      ) {
+        const newStart = dayjsToUnixMs(localMinDate);
         setValue([newStart, value[1]]);
         setSelectedOption(determineSelectedOption(localMinDate, maxDate));
         dispatch(
@@ -223,8 +226,11 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
         .set("second", 59)
         .set("millisecond", 0);
 
-      if (localMaxDate && dateToValue(localMaxDate) > dateToValue(minDate)) {
-        const newEnd = dateToValue(localMaxDate);
+      if (
+        localMaxDate &&
+        dayjsToUnixMs(localMaxDate) > dayjsToUnixMs(minDate)
+      ) {
+        const newEnd = dayjsToUnixMs(localMaxDate);
         setValue([value[0], newEnd]);
         setSelectedOption(determineSelectedOption(minDate, localMaxDate));
         dispatch(
@@ -318,21 +324,24 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
     // Avoid eslint error on set state in useEffect
     startTransition(() => {
       if (dateTimeFilterRange) {
-        const newMinDate = valueToDate(
-          dateTimeFilterRange.start ?? dateToValue(initialMinDate)
+        const newMinDate = dayjs(
+          dateTimeFilterRange.start ?? dayjsToUnixMs(initialMinDate)
         );
-        const newMaxDate = valueToDate(
-          dateTimeFilterRange.end ?? dateToValue(initialMaxDate)
+        const newMaxDate = dayjs(
+          dateTimeFilterRange.end ?? dayjsToUnixMs(initialMaxDate)
         );
 
         setValue([
-          dateTimeFilterRange.start ?? dateToValue(initialMinDate),
-          dateTimeFilterRange.end ?? dateToValue(initialMaxDate),
+          dateTimeFilterRange.start ?? dayjsToUnixMs(initialMinDate),
+          dateTimeFilterRange.end ?? dayjsToUnixMs(initialMaxDate),
         ]);
         setSelectedOption(determineSelectedOption(newMinDate, newMaxDate));
       } else {
         // Reset to initial state when dateTimeFilterRange is null or undefined
-        setValue([dateToValue(initialMinDate), dateToValue(initialMaxDate)]);
+        setValue([
+          dayjsToUnixMs(initialMinDate),
+          dayjsToUnixMs(initialMaxDate),
+        ]);
         setSelectedOption(DateRangeOptionValues.Custom);
       }
     });
@@ -418,7 +427,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                   format={dateDefault.DISPLAY_FORMAT}
                   value={minDate}
                   minDate={initialMinDate}
-                  maxDate={valueToDate(value[1])}
+                  maxDate={dayjs(value[1])}
                   onChange={(date) => handleMinDateChange(date as Dayjs)}
                   slots={{
                     openPickerIcon: CalendarIcon,
@@ -452,7 +461,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                   views={["year", "month", "day"]}
                   format={dateDefault.DISPLAY_FORMAT}
                   value={maxDate}
-                  minDate={valueToDate(value[0])}
+                  minDate={dayjs(value[0])}
                   maxDate={initialMaxDate}
                   onChange={(date) => handleMaxDateChange(date as Dayjs)}
                   slots={{
@@ -488,14 +497,12 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
             >
               <PlainSlider
                 value={value}
-                min={dateToValue(initialMinDate)}
-                max={dateToValue(initialMaxDate)}
+                min={dayjsToUnixMs(initialMinDate)}
+                max={dayjsToUnixMs(initialMaxDate)}
                 step={432000000} // 5 days in mils
                 onChange={handleSliderChange}
                 valueLabelDisplay="auto"
-                valueLabelFormat={(value: number) =>
-                  formatDate(valueToDate(value))
-                }
+                valueLabelFormat={(value: number) => formatDate(value)}
               />
               <Box
                 sx={{

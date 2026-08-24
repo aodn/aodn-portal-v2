@@ -52,7 +52,7 @@ import {
   DateSliderPoint,
   ThumbType,
 } from "@/components/common/slider/DateSlider";
-import { dateToValue } from "@/utils/DateUtils";
+import { dayjsToUnixMs } from "@/utils/DateUtils";
 import { GeoserverFieldsResponse } from "@/app/store/GeoserverDefinitions";
 import * as turf from "@turf/turf";
 import { createStaticLayers } from "@/components/map/mapbox/layers/StaticLayer";
@@ -192,7 +192,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     Map<string, Array<number>> | null | undefined
   >(undefined);
   const [datePointValue, setDatePointValue] = useState<number>(
-    dateToValue(dayjs(dateDefault.min))
+    dayjsToUnixMs(dayjs(dateDefault.min))
   );
   // Period coverage from the selected parquet's PMTiles `.metadata` sidecar
   const [pmtilesPeriodRange, setPmtilesPeriodRange] =

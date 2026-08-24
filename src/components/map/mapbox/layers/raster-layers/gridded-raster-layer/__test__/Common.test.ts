@@ -88,7 +88,7 @@ describe("buildGriddedTileUrl", () => {
 
   it("returns undefined rather than a URL carrying a literal {datetime}", () => {
     // No dayKey shape/calendar re-check here: only ever called with a value
-    // already validated by `dayKeyToUtcValue` during discovery, so this is
+    // already validated by `utcDayKeyToUnixMs` during discovery, so this is
     // just the "nothing selected yet" / missing-input guard.
     expect(buildGriddedTileUrl(VISUAL_TEMPLATE, undefined)).toBeUndefined();
     expect(buildGriddedTileUrl(VISUAL_TEMPLATE, "")).toBeUndefined();

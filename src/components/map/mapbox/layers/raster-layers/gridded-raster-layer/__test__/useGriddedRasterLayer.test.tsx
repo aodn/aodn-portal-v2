@@ -9,7 +9,7 @@ import {
   OGCCollection,
 } from "@/app/store/OGCCollectionDefinitions";
 import { TileProduct } from "@/app/store/GriddedTileDefinitions";
-import { dayKeyToUtcValue } from "@/utils/DateUtils";
+import { utcDayKeyToUnixMs } from "@/utils/DateUtils";
 import useGriddedRasterLayer from "../useGriddedRasterLayer";
 
 const wrapper = ({ children }: { children: ReactNode }) => (
@@ -65,7 +65,7 @@ describe("useGriddedRasterLayer", () => {
     expect(result.current.dateSliderKey).toBe("gridded-date-a:one");
     expect(
       result.current.dateSliderProps.formatLabel(
-        dayKeyToUtcValue("2024-01-05")!
+        utcDayKeyToUnixMs("2024-01-05")!
       )
     ).toBe("2024-01-05");
   });
@@ -110,7 +110,7 @@ describe("useGriddedRasterLayer", () => {
     act(() => {
       result.current.dateSliderProps.onDatePointChange(
         undefined,
-        dayKeyToUtcValue("2024-01-05")!
+        utcDayKeyToUnixMs("2024-01-05")!
       );
     });
     expect(result.current.layerProps.selectedDate).toBe("2024-01-05");

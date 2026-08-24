@@ -4,7 +4,7 @@ import { userEvent } from "@testing-library/user-event";
 import DateSliderRange, { DateSliderPoint } from "../DateSlider";
 import dayjs from "@/utils/dayjs";
 import { dateDefault } from "../../constants";
-import { dateToValue } from "@/utils/DateUtils";
+import { dayjsToUnixMs } from "@/utils/DateUtils";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -49,7 +49,7 @@ describe("DateSliderRange keyboard", () => {
 describe("DateSliderRange min floor", () => {
   it("defaults the min thumb to 1 Jan 1970 when dataset min is earlier", () => {
     const onDateRangeChange = vi.fn();
-    const floorValue = dateToValue(dayjs(dateDefault.min));
+    const floorValue = dayjsToUnixMs(dayjs(dateDefault.min));
 
     render(
       <DateSliderRange
@@ -72,7 +72,7 @@ describe("DateSliderRange min floor", () => {
   it("keeps the dataset min when it is on or after 1 Jan 1970", () => {
     const onDateRangeChange = vi.fn();
     const minDate = "1980-03-01";
-    const expected = dateToValue(dayjs(minDate, dateDefault.DATE_FORMAT));
+    const expected = dayjsToUnixMs(dayjs(minDate, dateDefault.DATE_FORMAT));
 
     render(
       <DateSliderRange
@@ -93,8 +93,11 @@ describe("DateSliderRange min floor", () => {
     const onDateRangeChange = vi.fn();
     const minDate = "2020-01-01";
     const maxDate = "2020-01-31";
-    const minValue = dateToValue(dayjs(minDate, dateDefault.DATE_FORMAT));
-    const maxValue = dateToValue(dayjs(maxDate, dateDefault.DATE_FORMAT), true);
+    const minValue = dayjsToUnixMs(dayjs(minDate, dateDefault.DATE_FORMAT));
+    const maxValue = dayjsToUnixMs(
+      dayjs(maxDate, dateDefault.DATE_FORMAT),
+      true
+    );
 
     render(
       <DateSliderRange
@@ -122,8 +125,8 @@ describe("DateSliderRange min floor", () => {
     // so both values equaled min and MUI stacked both dots on the left.
     const onDateRangeChange = vi.fn();
     const day = "1970-01-21";
-    const minValue = dateToValue(dayjs(day, dateDefault.DATE_FORMAT));
-    const maxValue = dateToValue(dayjs(day, dateDefault.DATE_FORMAT), true);
+    const minValue = dayjsToUnixMs(dayjs(day, dateDefault.DATE_FORMAT));
+    const maxValue = dayjsToUnixMs(dayjs(day, dateDefault.DATE_FORMAT), true);
 
     render(
       <DateSliderRange
