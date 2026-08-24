@@ -11,10 +11,8 @@ import { DEFAULT_DATE_PICKER_SLOT } from "../../../../../components/common/datet
 import { portalTheme } from "../../../../../styles";
 import { CalendarIcon } from "../../../../../assets/icons/search/calendar";
 import { TimeRangeTooltipIcon } from "../../../../../assets/icons/map/tooltip_time_range";
-import { dateDefault } from "../../../../../components/common/constants";
-
-const formatOrEmpty = (d: Dayjs | null): string =>
-  d?.isValid() ? d.format(dateDefault.DATE_FORMAT) : "";
+import { dateDefault } from "@/components/common/constants";
+import { formatDate } from "@/utils/DateUtils";
 
 const datePickerSx = {
   border: "none",
@@ -139,7 +137,7 @@ const DateRangeConditionCard: React.FC<DateRangeConditionCardProps> = ({
           maxDate={dayjs(end)}
           onChange={(next) => {
             if (next?.isValid() && !next.isAfter(dayjs(end))) {
-              onChange(formatOrEmpty(next), end);
+              onChange(formatDate(next, dateDefault.DATE_FORMAT), end);
             }
           }}
         />
@@ -151,7 +149,7 @@ const DateRangeConditionCard: React.FC<DateRangeConditionCardProps> = ({
           minDate={dayjs(start)}
           onChange={(next) => {
             if (next?.isValid() && !next.isBefore(dayjs(start))) {
-              onChange(start, formatOrEmpty(next));
+              onChange(start, formatDate(next, dateDefault.DATE_FORMAT));
             }
           }}
         />
