@@ -78,6 +78,28 @@ module.exports = [
       // console.log is debug noise; real problems should use warn/error
       "no-console": ["error", { allow: ["warn", "error"] }],
 
+      // Enforce the configured Day.js wrapper.
+      "no-restricted-imports": "off", // replaced by the TS version below
+      "@typescript-eslint/no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "dayjs",
+              message:
+                'Import dayjs from "@/utils/dayjs" instead, so the shared plugins are always applied.',
+              allowTypeImports: true,
+            },
+          ],
+          patterns: [
+            {
+              group: ["dayjs/plugin/*"],
+              message: "Import dayjs plugins only inside src/utils/dayjs.ts.",
+            },
+          ],
+        },
+      ],
+
       quotes: ["error", "double", { avoidEscape: true }],
 
       "import/extensions": [
@@ -112,6 +134,14 @@ module.exports = [
     ],
     rules: {
       "no-console": "off",
+    },
+  },
+
+  // The wrapper itself is the one place that must import the real dayjs.
+  {
+    files: ["src/utils/dayjs.ts"],
+    rules: {
+      "@typescript-eslint/no-restricted-imports": "off",
     },
   },
 ];
