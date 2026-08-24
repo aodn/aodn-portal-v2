@@ -1,4 +1,5 @@
 const js = require("@eslint/js");
+const { globalIgnores } = require("eslint/config");
 const tseslint = require("@typescript-eslint/eslint-plugin");
 const tsParser = require("@typescript-eslint/parser");
 const react = require("eslint-plugin-react");
@@ -9,7 +10,13 @@ const prettier = require("eslint-plugin-prettier");
 const prettierConfig = require("eslint-config-prettier");
 
 module.exports = [
-  { ignores: ["playwright/.venv/**", "playwright/pages/js_scripts/**"] },
+  globalIgnores([
+    "dist/**",
+    "coverage/**",
+    "html-reports/**",
+    "playwright/.venv/**",
+    "playwright/pages/js_scripts/**",
+  ]),
 
   js.configs.recommended,
 
