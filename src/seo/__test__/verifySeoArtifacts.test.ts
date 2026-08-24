@@ -37,6 +37,16 @@ describe("checkDetailPage", () => {
     );
   });
 
+  test("flags the full shell title the live site serves on a rewrite miss", () => {
+    const shell = template.replace(
+      "<title>AODN Portal</title>",
+      "<title>AODN Portal – Australian Ocean Data Network</title>"
+    );
+    expect(checkDetailPage(shell, "abc-123")).toContain(
+      "title is missing or still the generic site title"
+    );
+  });
+
   test("flags a canonical pointing at a different record", () => {
     const page = renderCrawlerPage(template, collection);
     expect(checkDetailPage(page, "other-uuid")).toContain(
