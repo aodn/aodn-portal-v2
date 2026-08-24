@@ -13,19 +13,11 @@ import { SearchResultLayoutEnum } from "../common/buttons/ResultListLayoutButton
 import useFetchData from "../../hooks/useFetchData";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import { GRID_CARD_HEIGHT, LIST_CARD_HEIGHT } from "./constants";
+import { ResultCardBasicType } from "./types";
 import { detailPageDefault, pageReferer } from "../common/constants";
 import ShowMoreDetailBtn from "../common/buttons/ShowMoreDetailBtn";
 
-export interface ResultCardBasicType {
-  content?: OGCCollection;
-  onClickCard?: (item: OGCCollection | undefined) => void;
-  onClickDetail?: (uuid: string, type?: OpenType) => void;
-  onClickDownload?: (uuid: string, type?: OpenType) => void;
-  onClickLinks?: (uuid: string, type?: OpenType) => void;
-  selectedUuid?: string;
-  sx?: SxProps;
-  isSimplified?: boolean;
-}
+export type { ResultCardBasicType } from "./types";
 
 interface ResultCardsListType extends ResultCardBasicType {
   count: number;

@@ -11,7 +11,7 @@ import {
 import { border, borderRadius, color, gap, padding } from "@/styles/constants";
 import OrganizationLogo from "../icon/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
-import { ResultCardBasicType } from "./ResultCards";
+import { ResultCardBasicType } from "./types";
 import { SHOW_RESULT_CARD_THUMBNAIL } from "./constants";
 import BookmarkButton from "../bookmark/BookmarkButton";
 import default_thumbnail from "@/assets/images/default-thumbnail.png";

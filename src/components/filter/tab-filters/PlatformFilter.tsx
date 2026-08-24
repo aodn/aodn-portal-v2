@@ -2,7 +2,7 @@ import { FC, useCallback } from "react";
 import { Box, Stack, SxProps, Typography } from "@mui/material";
 import { useAppDispatch } from "@/app/store/hooks";
 import { updatePlatform } from "@/app/store/componentParamReducer";
-import { TabFilterType } from "../Filters";
+import { TabFilterType } from "../FilterDefinition";
 import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
 import SatelliteIcon from "../../icon/platform/SatelliteIcon";

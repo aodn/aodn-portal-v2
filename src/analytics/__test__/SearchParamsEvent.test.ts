@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { trackSearchResultParameters } from "../searchParamsEvent";
 import { trackCustomEvent } from "../customEventTracker";
-import { SearchParameters } from "@/app/store/searchReducer";
+import { SearchParameters } from "@/app/store/searchTypes";
 
 // Mock external dependencies
 vi.mock("../customEventTracker");
