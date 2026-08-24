@@ -5,7 +5,9 @@ const dateDefault = {
   DATE_TIME_FORMAT: "YYYY-MM-DDTHH:mm:ss[Z]",
   DATE_FORMAT: "YYYY-MM-DD",
   DISPLAY_FORMAT: "DD MMM YYYY",
-  DISPLAY_FORMAT_WITH_TIME: "ddd DD MMM YYYY HH:mm:ss [GMT+0000]",
+  UTC_DATE_TIME_DISPLAY_FORMAT: "DD MMM YYYY HH:mm [UTC]",
+  // Metadata creation/revision dates only — see formatMetadataDate.
+  METADATA_DISPLAY_FORMAT: "ddd DD MMM YYYY HH:mm:ss [GMT+0000]",
 
   min: new Date("01/01/1970"),
   max: new Date(),

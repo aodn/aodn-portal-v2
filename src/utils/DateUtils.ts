@@ -31,6 +31,25 @@ export const formatDate = (
   return date.isValid() ? date.format(format) : fallback;
 };
 
+/**
+ * Renders a date *and* its time of day, in UTC.
+ *
+ * Use this wherever the time of day carries meaning — an observation instant,
+ * a WMS time-axis value — and formatDate() would silently throw it away.
+ *
+ * @example
+ * formatDateTime("2021-08-01T22:00:00.000Z"); // "01 Aug 2021 22:00 UTC"
+ */
+export const formatDateTime = (
+  value: DateInput,
+  format: string = dateDefault.UTC_DATE_TIME_DISPLAY_FORMAT,
+  fallback: string = ""
+): string => {
+  if (value === null || value === undefined || value === "") return fallback;
+  const date = dayjs.utc(value);
+  return date.isValid() ? date.format(format) : fallback;
+};
+
 interface FormatDateRangeOptions {
   format?: string;
   separator?: string;
@@ -54,7 +73,7 @@ export const formatDateRange = (
  * Converts a metadata creation/revision date from ISO 8601 format to a more
  * readable format. Scoped to GeoNetwork metadata dates on purpose — the
  * GMT+0000 label below is a workaround, so don't reuse this as a general
- * "date with time" formatter. Reach for formatDate() instead.
+ * "date with time" formatter. Reach for formatDateTime() instead.
  *
  * @param dateString A date string in ISO 8601 format (e.g., "2021-08-01T00:00:00.000Z")
  * @returns A string representing the date in a more readable format (e.g., "Sun 01 Aug 2021 05:30:00 GMT+0000")
@@ -71,7 +90,7 @@ export const formatDateRange = (
  *  the issue in geonetwork is resolved.
  */
 export const formatMetadataDate = (dateString: DateInput): string =>
-  formatDate(dateString, dateDefault.DISPLAY_FORMAT_WITH_TIME);
+  formatDate(dateString, dateDefault.METADATA_DISPLAY_FORMAT);
 
 export const dayjsToUnixMs = (
   date: Dayjs,

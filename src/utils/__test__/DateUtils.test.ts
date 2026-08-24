@@ -4,6 +4,7 @@ import {
   formatMetadataDate,
   utcDayKeyToUnixMs,
   formatDate,
+  formatDateTime,
   formatDateRange,
 } from "../DateUtils";
 import { dateDefault } from "@/components/common/constants";
@@ -36,6 +37,34 @@ describe("formatDate", () => {
     expect(formatDate("not-a-date")).toBe("");
     expect(formatDate(undefined, undefined, "N/A")).toBe("N/A");
     expect(formatDate("not-a-date", undefined, "N/A")).toBe("N/A");
+  });
+});
+
+describe("formatDateTime", () => {
+  it("keeps the time of day that formatDate drops", () => {
+    expect(formatDateTime("2021-08-01T03:30:00.000Z")).toBe(
+      "01 Aug 2021 03:30 UTC"
+    );
+    expect(formatDate("2021-08-01T03:30:00.000Z")).toBe("01 Aug 2021");
+  });
+
+  // The GeoServer popup feeds this raw UTC ISO strings from the WMS time axis.
+  // Rendering in local time would shift the *day* either side of midnight UTC.
+  it("renders in UTC regardless of the machine timezone", () => {
+    expect(formatDateTime("2021-08-01T22:00:00.000Z")).toBe(
+      "01 Aug 2021 22:00 UTC"
+    );
+    expect(formatDateTime("2021-08-01T01:00:00.000Z")).toBe(
+      "01 Aug 2021 01:00 UTC"
+    );
+  });
+
+  it("honours a format override and falls back on bad input", () => {
+    expect(formatDateTime("2021-08-01T03:30:00.000Z", "YYYY-MM-DD HH:mm")).toBe(
+      "2021-08-01 03:30"
+    );
+    expect(formatDateTime(null)).toBe("");
+    expect(formatDateTime("not-a-date", undefined, "N/A")).toBe("N/A");
   });
 });
 
