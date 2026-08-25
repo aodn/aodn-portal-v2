@@ -3,7 +3,7 @@ import dayjs, {
   DEFAULT_APP_TIMEZONE,
   getAppTimezone,
   setAppTimezone,
-} from "../dayjs";
+} from "../DayjsUtils";
 
 describe("configured dayjs", () => {
   it("supports UTC and timezone APIs", () => {

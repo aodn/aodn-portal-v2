@@ -8,7 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { Dayjs } from "@/utils/dayjs";
+import { Dayjs } from "@/utils/DayjsUtils";
 import {
   Box,
   Divider,

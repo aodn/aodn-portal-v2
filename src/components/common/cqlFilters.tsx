@@ -2,7 +2,7 @@
  * Common filter for cql, avoid cql string repeat everywhere
  * @type {{}}
  */
-import dayjs from "@/utils/dayjs";
+import dayjs from "@/utils/DayjsUtils";
 import {
   formatUtcDateTime,
   toUtcEndOfDay,

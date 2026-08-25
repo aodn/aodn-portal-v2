@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import DateSliderRange, { DateSliderPoint } from "../DateSlider";
-import dayjs from "@/utils/dayjs";
+import dayjs from "@/utils/DayjsUtils";
 import { dateDefault } from "../../constants";
 import { dayjsToUnixMs, toAppDayjs } from "@/utils/DateUtils";
 

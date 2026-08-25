@@ -1,4 +1,4 @@
-import dayjs from "@/utils/dayjs";
+import dayjs from "@/utils/DayjsUtils";
 import { vi } from "vitest";
 import type { Map } from "mapbox-gl";
 import {

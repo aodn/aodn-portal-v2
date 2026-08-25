@@ -13,7 +13,7 @@ import {
   unixMsToAppDayjs,
 } from "../DateUtils";
 import { dateDefault } from "@/components/common/constants";
-import dayjs, { DEFAULT_APP_TIMEZONE, setAppTimezone } from "../dayjs";
+import dayjs, { DEFAULT_APP_TIMEZONE, setAppTimezone } from "../DayjsUtils";
 
 describe("utcDayKeyToUnixMs", () => {
   it("maps a day key to UTC midnight", () => {

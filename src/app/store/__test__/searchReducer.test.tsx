@@ -3,7 +3,7 @@ import default_thumbnail from "@/assets/images/default-thumbnail.png";
 import { OGCCollection } from "../OGCCollectionDefinitions";
 import { DateTimeFilterRange, ParameterState } from "../componentParamReducer";
 import { createSearchParamFrom, SearchParameters } from "../searchReducer";
-import dayjs from "@/utils/dayjs";
+import dayjs from "@/utils/DayjsUtils";
 
 describe("Search Reducer Function Test", () => {
   it("Empty links return default thumbnail", () => {

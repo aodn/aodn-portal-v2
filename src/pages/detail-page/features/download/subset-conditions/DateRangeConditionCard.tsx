@@ -1,5 +1,5 @@
 import React from "react";
-import { Dayjs } from "@/utils/dayjs";
+import { Dayjs } from "@/utils/DayjsUtils";
 import { toAppDayjs, toUtcStartOfDay } from "@/utils/DateUtils";
 import { Box, Stack, Typography } from "@mui/material";
 import BaseConditionCard from "./BaseConditionCard";
