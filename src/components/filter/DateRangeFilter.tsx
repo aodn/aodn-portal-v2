@@ -81,7 +81,8 @@ interface DateRangeFilterProps {}
 const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
   const { isMobile, isTablet } = useBreakpoint();
   const dispatch = useAppDispatch();
-  const initialMaxDate = dateDefault.max;
+  // Snapshot per mount so a live `dateDefault.max` getter cannot retrigger effects.
+  const initialMaxDate = useMemo(() => dateDefault.max, []);
 
   // State from redux
   const dateTimeFilterRange = useAppSelector(
