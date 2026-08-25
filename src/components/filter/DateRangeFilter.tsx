@@ -39,7 +39,13 @@ import {
 import TimeRangeBarChart from "../common/charts/TimeRangeBarChart";
 import PlainDatePicker from "../common/datetime/PlainDatePicker";
 import PlainSlider from "../common/slider/PlainSlider";
-import { dateToValue, toAppDayjs, valueToDate } from "@/utils/DateUtils";
+import {
+  dateToValue,
+  toAppDayjs,
+  toUtcEndOfDay,
+  toUtcStartOfDay,
+  valueToDate,
+} from "@/utils/DateUtils";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import theme from "../../styles/themeRC8";
 import { CalendarIcon } from "../../assets/icons/search/calendar";
@@ -149,8 +155,11 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
         // Convert option to number for year calculation
         const years = Number(option);
         const today = toAppDayjs();
-        const startDate = today.subtract(years, "year");
-        const newValue = [dateToValue(startDate), dateToValue(today)];
+        const startDate = toUtcStartOfDay(today.subtract(years, "year"));
+        const newValue = [
+          dateToValue(startDate),
+          dateToValue(toUtcEndOfDay(today)),
+        ];
 
         setValue(newValue);
         dispatch(
@@ -185,11 +194,8 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
 
   const handleMinDateChange = useCallback(
     (newMinDate: Dayjs | null) => {
-      // For min date we always set to start of day time 00:00:00
-      const localMinDate = newMinDate
-        ?.set("hour", 0)
-        .set("minute", 0)
-        .set("second", 0);
+      // Date-only picker: the chosen calendar day at UTC 00:00:00, not host midnight.
+      const localMinDate = newMinDate ? toUtcStartOfDay(newMinDate) : null;
 
       if (localMinDate && dateToValue(localMinDate) < dateToValue(maxDate)) {
         const newStart = dateToValue(localMinDate);
@@ -214,12 +220,8 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
 
   const handleMaxDateChange = useCallback(
     (newMaxDate: Dayjs | null) => {
-      // For max date we always set to end of day time to 23:59:59
-      const localMaxDate = newMaxDate
-        ?.set("hour", 23)
-        .set("minute", 59)
-        .set("second", 59)
-        .set("millisecond", 0);
+      // Date-only picker: the chosen calendar day at UTC 23:59:59, not host local.
+      const localMaxDate = newMaxDate ? toUtcEndOfDay(newMaxDate) : null;
 
       if (localMaxDate && dateToValue(localMaxDate) > dateToValue(minDate)) {
         const newEnd = dateToValue(localMaxDate);

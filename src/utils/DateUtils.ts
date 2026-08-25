@@ -12,6 +12,14 @@ export const toAppDayjs = (
   return value === undefined ? dayjs.tz() : dayjs.tz(value);
 };
 
+/** Calendar Y-M-D of `date` as UTC midnight (date-only pickers). */
+export const toUtcStartOfDay = (date: Dayjs): Dayjs =>
+  dayjs.utc(date.format(dateDefault.DATE_FORMAT)).startOf("day");
+
+/** Calendar Y-M-D of `date` as UTC 23:59:59.999. */
+export const toUtcEndOfDay = (date: Dayjs): Dayjs =>
+  dayjs.utc(date.format(dateDefault.DATE_FORMAT)).endOf("day");
+
 /** CQL / WMS datetimes: UTC wall clock plus a literal Z. */
 export const formatUtcDateTime = (
   value: string | number | Date | Dayjs
