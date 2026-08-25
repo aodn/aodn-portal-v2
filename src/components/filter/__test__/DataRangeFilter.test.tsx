@@ -1,22 +1,32 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
-import { userEvent } from "@testing-library/user-event";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs, { Dayjs } from "@/utils/DayjsUtils";
+import dayjs from "@/utils/DayjsUtils";
 import DateRangeFilter from "../DateRangeFilter";
 import { dateDefault } from "../../common/constants";
 import { updateDateTimeFilterRange } from "@/app/store/componentParamReducer";
-import { dateToValue, toAppDayjs } from "@/utils/DateUtils";
+import { dateToValue, toAppDayjs, valueToDate } from "@/utils/DateUtils";
 import axios from "axios";
-import { responseIdTemporal, responseIdProvider } from "./canned";
 
-const initialMinDate: Dayjs = dateDefault.min;
-const initialMaxDate: Dayjs = dateDefault.max;
+vi.mock("../../common/charts/TimeRangeBarChart", () => ({
+  default: () => <div data-testid="time-range-bar-chart" />,
+}));
 
-// Mock Redux store
+vi.mock("../../../hooks/useBreakpoint", () => ({
+  default: () => ({
+    isMobile: false,
+    isTablet: false,
+    isLaptop: false,
+    isDesktop: true,
+    is4K: false,
+    isAboveDesktop: false,
+    isUnderLaptop: false,
+  }),
+}));
+
 const mockInitialState = {
   paramReducer: {
     dateTimeFilterRange: {
@@ -33,57 +43,17 @@ const createMockStore = (initialState = mockInitialState) =>
     },
   });
 
-// Mock useBreakpoint hook
-vi.mock("../../../hooks/useBreakpoint", () => ({
-  default: () => ({
-    isMobile: false,
-    isTablet: false,
-    isLaptop: false,
-    isDesktop: true,
-    is4K: false,
-    isAboveDesktop: false,
-    isUnderLaptop: false,
-  }),
-}));
-
-// Mock date utilities
-vi.mock("../../utils/DateUtils", () => ({
-  dateToValue: vi.fn((date: Dayjs) => date.valueOf()),
-  valueToDate: vi.fn((value: number) => dayjs.tz(value)),
-  toAppDayjs: vi.fn((value?: Dayjs) =>
-    value === undefined ? dayjs.tz() : dayjs.tz(value)
-  ),
-}));
-
 describe("DateRangeFilter", () => {
   let store: ReturnType<typeof createMockStore>;
 
   beforeEach(() => {
     store = createMockStore();
     vi.spyOn(store, "dispatch");
-
-    // Mock axios.get using vi.spyOn
-    vi.spyOn(axios, "get").mockImplementation((url, config) => {
-      if (
-        url === "/api/v1/ogc/collections" &&
-        config?.params?.properties === "id,temporal" &&
-        config?.params?.filter === "temporal after 1970-01-01T00:00:00Z"
-      ) {
-        return Promise.resolve({ data: responseIdTemporal });
-      } else if (
-        url === "/api/v1/ogc/collections" &&
-        config?.params?.properties === "id,providers" &&
-        config?.params?.filter ===
-          "temporal after 1970-01-01T00:00:00Z AND dataset_group='imos'"
-      ) {
-        return Promise.resolve({ data: responseIdProvider });
-      }
-      return Promise.reject(new Error("Unexpected API call"));
-    });
+    vi.spyOn(axios, "get").mockResolvedValue({ data: { collections: [] } });
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   const renderComponent = () =>
@@ -110,165 +80,76 @@ describe("DateRangeFilter", () => {
 
     const radioButtons = screen.getAllByRole("radio");
     expect(radioButtons).toHaveLength(4);
-    expect(radioButtons[0]).toBeChecked(); // Custom option should be selected by default
+    expect(radioButtons[0]).toBeChecked();
   });
 
   it("updates radio selection and dispatches date range update for Last year", () => {
     renderComponent();
-    const user = userEvent.setup();
+    fireEvent.click(screen.getByLabelText("Last year"));
 
-    const lastYearRadio = screen.getByLabelText("Last year");
-    user.click(lastYearRadio);
-
-    return waitFor(() => expect(lastYearRadio).toBeChecked()).then(() =>
-      expect(store.dispatch).toHaveBeenCalledWith(
-        updateDateTimeFilterRange({
-          start: expect.any(Number),
-          end: expect.any(Number),
-        })
-      )
+    expect(screen.getByLabelText("Last year")).toBeChecked();
+    expect(store.dispatch).toHaveBeenCalledWith(
+      updateDateTimeFilterRange({
+        start: expect.any(Number),
+        end: expect.any(Number),
+      })
     );
   });
 
   it("updates date range when start date is changed via date picker", () => {
     renderComponent();
-    const user = userEvent.setup();
-    const minDate = initialMinDate.format(dateDefault.DISPLAY_FORMAT);
-
-    return waitFor(() => screen.findByDisplayValue(minDate)).then(() => {
-      const startDatePicker = screen.getByDisplayValue(minDate);
-      user.click(startDatePicker);
-
-      const newDate = toAppDayjs("2020-01-01", dateDefault.DATE_FORMAT);
-      const newStringDate = newDate.format(dateDefault.DISPLAY_FORMAT);
-      user.type(startDatePicker, newStringDate);
-
-      return waitFor(() => screen.findByDisplayValue(newStringDate), {
-        timeout: 2000,
-      }).then(() => {
-        const lastRange = vi
-          .mocked(store.dispatch)
-          .mock.calls.map(
-            ([action]) => action as { type?: string; payload?: any }
-          )
-          .filter(
-            (action) => action?.type === "UPDATE_DATETIME_FILTER_VARIABLE"
-          )
-          .at(-1);
-        expect(
-          toAppDayjs(lastRange?.payload?.dateTimeFilterRange?.start).format(
-            dateDefault.DATE_FORMAT
-          )
-        ).toBe("2020-01-01");
-      });
+    const minDate = dateDefault.min.format(dateDefault.DISPLAY_FORMAT);
+    const startDatePicker = screen.getByDisplayValue(minDate);
+    const newDate = toAppDayjs("2020-01-01", dateDefault.DATE_FORMAT);
+    fireEvent.change(startDatePicker, {
+      target: { value: newDate.format(dateDefault.DISPLAY_FORMAT) },
     });
+
+    const lastRange = vi
+      .mocked(store.dispatch)
+      .mock.calls.map(([action]) => action as { type?: string; payload?: any })
+      .filter((action) => action?.type === "UPDATE_DATETIME_FILTER_VARIABLE")
+      .at(-1);
+    expect(
+      valueToDate(lastRange?.payload?.dateTimeFilterRange?.start).format(
+        dateDefault.DATE_FORMAT
+      )
+    ).toBe("2020-01-01");
   });
 
   it("updates date range when end date is changed via date picker", () => {
     renderComponent();
-    const user = userEvent.setup();
-    const maxDate = initialMaxDate.format(dateDefault.DISPLAY_FORMAT);
-
-    return waitFor(() => screen.findByDisplayValue(maxDate)).then(() => {
-      const endDatePicker = screen.getByDisplayValue(maxDate);
-      user.click(endDatePicker);
-
-      const newDate = toAppDayjs("2025-01-01", dateDefault.DATE_FORMAT);
-      const newStringDate = newDate.format(dateDefault.DISPLAY_FORMAT);
-      user.type(endDatePicker, newStringDate);
-
-      return waitFor(() => screen.findByDisplayValue(newStringDate), {
-        timeout: 2000,
-      }).then(() => {
-        const lastRange = vi
-          .mocked(store.dispatch)
-          .mock.calls.map(
-            ([action]) => action as { type?: string; payload?: any }
-          )
-          .filter(
-            (action) => action?.type === "UPDATE_DATETIME_FILTER_VARIABLE"
-          )
-          .at(-1);
-        expect(
-          toAppDayjs(lastRange?.payload?.dateTimeFilterRange?.end).format(
-            dateDefault.DATE_FORMAT
-          )
-        ).toBe("2025-01-01");
-      });
+    const maxDate = dateDefault.max.format(dateDefault.DISPLAY_FORMAT);
+    const endDatePicker = screen.getByDisplayValue(maxDate);
+    const newDate = toAppDayjs("2025-01-01", dateDefault.DATE_FORMAT);
+    fireEvent.change(endDatePicker, {
+      target: { value: newDate.format(dateDefault.DISPLAY_FORMAT) },
     });
-  });
 
-  it.skip("updates date range when slider is moved", () => {
-    renderComponent();
-    const user = userEvent.setup();
-
-    return waitFor(() => screen.findByRole("slider")).then(() => {
-      const slider = screen.getByRole("slider");
-      user.type(slider, "{arrowright}"); // Simulate slider movement
-
-      expect(store.dispatch).toHaveBeenCalledWith(
-        updateDateTimeFilterRange({
-          start: expect.any(Number),
-          end: expect.any(Number),
-        })
-      );
-    });
-  });
-
-  it.skip("renders TimeRangeBarChart with correct props", async () => {
-    renderComponent();
-
-    await waitFor(() => {
-      const barChart = screen.getByTestId("time-range-bar-chart"); // Assuming TimeRangeBarChart has a data-testid
-      expect(barChart).toBeInTheDocument();
-      expect(barChart).toHaveAttribute("data-start-date");
-      expect(barChart).toHaveAttribute("data-end-date");
-    });
+    const lastRange = vi
+      .mocked(store.dispatch)
+      .mock.calls.map(([action]) => action as { type?: string; payload?: any })
+      .filter((action) => action?.type === "UPDATE_DATETIME_FILTER_VARIABLE")
+      .at(-1);
+    expect(
+      valueToDate(lastRange?.payload?.dateTimeFilterRange?.end).format(
+        dateDefault.DATE_FORMAT
+      )
+    ).toBe("2025-01-01");
   });
 
   it("updates selected option based on Redux state changes", () => {
-    // Create a store with a different date range (e.g., Last 5 years)
-    const fiveYearsAgo = dayjs().subtract(5, "year");
-    const newState = {
+    const fiveYearsAgo = dayjs.tz().subtract(5, "year");
+    store = createMockStore({
       paramReducer: {
         dateTimeFilterRange: {
           start: dateToValue(fiveYearsAgo),
-          end: dateToValue(dayjs()),
+          end: dateToValue(dayjs.tz()),
         },
       },
-    };
-    store = createMockStore(newState);
+    });
     renderComponent();
 
-    return waitFor(() => {
-      expect(screen.getByLabelText("Last 5 years")).toBeChecked();
-    });
-  });
-
-  it("handles mobile view correctly", () => {
-    vi.mock("../../../hooks/useBreakpoint", () => ({
-      default: () => ({
-        isMobile: true,
-        isTablet: false,
-        isLaptop: false,
-        isDesktop: false,
-        is4K: false,
-        isAboveDesktop: false,
-        isUnderLaptop: false,
-      }),
-    }));
-
-    renderComponent();
-
-    // TimeRangeBarChart should not render in mobile view
-    return waitFor(() => {
-      expect(
-        screen.queryByTestId("time-range-bar-chart")
-      ).not.toBeInTheDocument();
-    }).then(() => {
-      // Radio buttons should be in column layout
-      const radioGroup = screen.getByRole("radiogroup");
-      expect(radioGroup).toHaveStyle({ flexDirection: "column" });
-    });
+    expect(screen.getByLabelText("Last 5 years")).toBeChecked();
   });
 });

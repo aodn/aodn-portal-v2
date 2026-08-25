@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import TimeRangeBarChart, { Bucket, DividedBy } from "../TimeRangeBarChart";
-import { OGCCollections } from "@/app/store/OGCCollectionDefinitions"; // Adjust path as needed
+import { OGCCollections } from "@/app/store/OGCCollectionDefinitions";
+import dayjs from "@/utils/DayjsUtils";
 
 // Helper to access private functions for testing
 // This assumes you add a test-only export at the bottom of TimeRangeBarChart.tsx
@@ -57,8 +58,8 @@ const mockTotalDataset: OGCCollections = Object.assign(new OGCCollections(), {
     },
   ],
 });
-const mockStartDate = new Date("2023-01-01T00:00:00Z");
-const mockEndDate = new Date("2023-01-03T00:00:00Z");
+const mockStartDate = dayjs.utc("2023-01-01T00:00:00Z");
+const mockEndDate = dayjs.utc("2023-01-03T00:00:00Z");
 
 describe("TimeRangeBarChart", () => {
   beforeEach(() => {
@@ -107,51 +108,51 @@ describe("TimeRangeBarChart", () => {
   // Test determineChartUnit
   it("determineChartUnit returns correct unit based on date range", () => {
     const { determineChartUnit } = getPrivateFunctions();
-    const start = new Date("2023-01-01");
-    const end = new Date("2023-01-10"); // 10 days
+    const start = dayjs.utc("2023-01-01");
+    const end = dayjs.utc("2023-01-10"); // 10 days
     expect(determineChartUnit(start, end)).toBe(DividedBy.day);
 
-    const endMonth = new Date("2023-12-01"); // ~11 months
+    const endMonth = dayjs.utc("2023-12-01"); // ~11 months
     expect(determineChartUnit(start, endMonth)).toBe(DividedBy.month);
 
-    let endYear = new Date("2031-01-01"); // 8 years
+    let endYear = dayjs.utc("2031-01-01"); // 8 years
     expect(determineChartUnit(start, endYear)).toBe(DividedBy.month);
 
-    endYear = new Date("2032-01-01"); // 9 years
+    endYear = dayjs.utc("2032-01-01"); // 9 years
     expect(determineChartUnit(start, endYear)).toBe(DividedBy.year);
   });
 
   // Test calculateDaysBetween
   it("calculateDaysBetween returns correct number of days", () => {
     const { calculateDaysBetween } = getPrivateFunctions();
-    const start = new Date("2023-01-01");
-    const end = new Date("2023-01-03");
+    const start = dayjs.utc("2023-01-01");
+    const end = dayjs.utc("2023-01-03");
     expect(calculateDaysBetween(start, end)).toBe(3); // Inclusive
   });
 
   // Test calculateMonthBetween
   it("calculateMonthBetween returns correct number of months", () => {
     const { calculateMonthBetween } = getPrivateFunctions();
-    const start = new Date("2023-01-01");
-    const end = new Date("2023-03-01");
+    const start = dayjs.utc("2023-01-01");
+    const end = dayjs.utc("2023-03-01");
     expect(calculateMonthBetween(start, end)).toBe(3); // Inclusive
   });
 
   // Test calculateYearBetween
   it("calculateYearBetween returns correct number of years", () => {
     const { calculateYearBetween } = getPrivateFunctions();
-    const start = new Date("2023-01-01");
-    const end = new Date("2025-01-01");
+    const start = dayjs.utc("2023-01-01");
+    const end = dayjs.utc("2025-01-01");
     expect(calculateYearBetween(start, end)).toBe(3); // Inclusive
   });
 
   // Test isIncludedInBucket
   it("isIncludedInBucket correctly determines if interval is in bucket", () => {
     const { isIncludedInBucket, MS_PER_DAY } = getPrivateFunctions();
-    const targetStart = new Date("2023-01-01").getTime();
-    const targetEnd = new Date("2023-01-02").getTime();
-    const bucketStart = new Date("2023-01-01").getTime();
-    const bucketEnd = new Date("2023-01-01T23:59:59").getTime();
+    const targetStart = dayjs.utc("2023-01-01").valueOf();
+    const targetEnd = dayjs.utc("2023-01-02").valueOf();
+    const bucketStart = dayjs.utc("2023-01-01").valueOf();
+    const bucketEnd = dayjs.utc("2023-01-01T23:59:59").valueOf();
 
     expect(
       isIncludedInBucket(targetStart, targetEnd, bucketStart, bucketEnd)

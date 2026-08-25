@@ -37,7 +37,7 @@ const StyledDatePicker = styled(DatePicker<Dayjs>)(() => ({
 }));
 
 const PlainDatePicker = (props: DatePickerProps<Dayjs>) => (
-  <StyledDatePicker timezone={getAppTimezone()} {...props} />
+  <StyledDatePicker {...props} timezone={getAppTimezone()} />
 );
 
 export default PlainDatePicker;

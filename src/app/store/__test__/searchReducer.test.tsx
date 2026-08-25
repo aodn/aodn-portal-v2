@@ -132,9 +132,51 @@ describe("Search Reducer Function Test", () => {
 
     const result = createSearchParamFrom(param);
 
-    // Verify both CO data and download link filters are included with OR
     expect(result.filter).toContain(
       "temporal DURING 2025-05-07T00:00:00Z/2025-05-07T23:59:59Z"
+    );
+  });
+
+  it("uses BEFORE the end date when only end is set", () => {
+    const param: ParameterState = {
+      dateTimeFilterRange: {
+        end: dayjs.utc("2014-07-29T00:00:00").valueOf(),
+      } as DateTimeFilterRange,
+    };
+
+    const result = createSearchParamFrom(param);
+
+    expect(result.filter).toContain("temporal BEFORE 2014-07-29T23:59:59Z");
+    expect(result.filter).not.toContain("temporal AFTER");
+    expect(result.filter).not.toContain("temporal DURING");
+  });
+
+  it("uses AFTER the start date when only start is set", () => {
+    const param: ParameterState = {
+      dateTimeFilterRange: {
+        start: dayjs.utc("1992-01-17T00:00:00").valueOf(),
+      } as DateTimeFilterRange,
+    };
+
+    const result = createSearchParamFrom(param);
+
+    expect(result.filter).toContain("temporal AFTER 1992-01-17T00:00:00Z");
+    expect(result.filter).not.toContain("temporal BEFORE");
+    expect(result.filter).not.toContain("temporal DURING");
+  });
+
+  it("expands an end epoch at UTC midnight to end of that calendar day", () => {
+    const param: ParameterState = {
+      dateTimeFilterRange: {
+        start: dayjs.utc("1992-01-17T00:00:00").valueOf(),
+        end: dayjs.utc("2014-07-29T00:00:00").valueOf(),
+      } as DateTimeFilterRange,
+    };
+
+    const result = createSearchParamFrom(param);
+
+    expect(result.filter).toContain(
+      "temporal DURING 1992-01-17T00:00:00Z/2014-07-29T23:59:59Z"
     );
   });
 });

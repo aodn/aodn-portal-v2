@@ -3,12 +3,15 @@ import { axisClasses, BarSeriesType, BarChart } from "@mui/x-charts";
 import { OGCCollections } from "@/app/store/OGCCollectionDefinitions";
 import { color } from "@/styles/constants";
 import { legendClasses } from "@mui/x-charts/ChartsLegend";
+import dayjs, { Dayjs } from "@/utils/DayjsUtils";
+import { dateDefault } from "@/components/common/constants";
+import { toUtcStartOfDay } from "@/utils/DateUtils";
 
 interface TimeRangeBarChartProps {
   imosDataIds: string[];
   totalDataset: OGCCollections;
-  selectedStartDate: Date;
-  selectedEndDate: Date;
+  selectedStartDate: Dayjs;
+  selectedEndDate: Dayjs;
 }
 
 export interface Bucket {
@@ -25,11 +28,10 @@ export enum DividedBy {
 }
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
-const MS_PER_MONTH = MS_PER_DAY * 30;
-const MS_PER_YEAR = MS_PER_DAY * 365;
 
-// below consts are private functions
-const determineChartUnit = (start: Date, end: Date) => {
+const utcDay = (d: Dayjs): Dayjs => toUtcStartOfDay(d);
+
+const determineChartUnit = (start: Dayjs, end: Dayjs) => {
   if (calculateDaysBetween(start, end) <= 100) {
     return DividedBy.day;
   }
@@ -39,24 +41,17 @@ const determineChartUnit = (start: Date, end: Date) => {
   return DividedBy.year;
 };
 
-// start date and end date are inclusive. So the result should be added by 1
-const calculateDaysBetween = (date1: Date, date2: Date) => {
-  return Math.floor((date2.getTime() - date1.getTime()) / MS_PER_DAY) + 1;
+const calculateDaysBetween = (date1: Dayjs, date2: Dayjs) =>
+  utcDay(date2).diff(utcDay(date1), "day") + 1;
+
+const calculateMonthBetween = (date1: Dayjs, date2: Dayjs) => {
+  const a = utcDay(date1);
+  const b = utcDay(date2);
+  return b.year() * 12 + b.month() - (a.year() * 12 + a.month()) + 1;
 };
 
-const calculateMonthBetween = (date1: Date, date2: Date) => {
-  return (
-    date2.getMonth() -
-    date1.getMonth() +
-    12 * (date2.getFullYear() - date1.getFullYear()) +
-    1
-  );
-};
-
-const calculateYearBetween = (date1: Date, date2: Date) => {
-  const value = date2.getFullYear() - date1.getFullYear();
-  return value + 1;
-};
+const calculateYearBetween = (date1: Dayjs, date2: Dayjs) =>
+  utcDay(date2).year() - utcDay(date1).year() + 1;
 
 /**
  * It belongs to a bucket if
@@ -80,53 +75,45 @@ const isIncludedInBucket = (
   (bucketStart <= targetEnd && targetEnd <= bucketEnd) ||
   (targetStart <= bucketStart && bucketEnd <= targetEnd);
 
+const addBucket = (
+  xValues: Date[],
+  buckets: Bucket[],
+  date: Dayjs,
+  unit: "day" | "month" | "year"
+) => {
+  xValues.push(date.toDate());
+  buckets.push({
+    start: date.valueOf(),
+    end: date.add(1, unit).valueOf(),
+    imosOnlyCount: 0,
+    total: 0,
+  });
+};
+
 const determineXWithBucketsBy = (
-  start: Date,
-  end: Date,
+  start: Dayjs,
+  end: Dayjs,
   imosDataIds: string[],
   totalDataset: OGCCollections,
   unit: DividedBy
 ) => {
   const xValues: Array<Date> = [];
   const buckets: Array<Bucket> = [];
+  const origin = utcDay(start);
   if (unit === DividedBy.day) {
     const days = calculateDaysBetween(start, end);
     for (let i = 0; i < days; i++) {
-      const date = new Date(start);
-      date.setDate(date.getDate() + i);
-      xValues.push(date);
-      buckets.push({
-        start: date.getTime(),
-        end: date.getTime() + MS_PER_DAY,
-        imosOnlyCount: 0,
-        total: 0,
-      });
+      addBucket(xValues, buckets, origin.add(i, "day"), "day");
     }
   } else if (unit === DividedBy.month) {
     const months = calculateMonthBetween(start, end);
     for (let i = 0; i < months; i++) {
-      const date = new Date(start);
-      date.setMonth(date.getMonth() + i);
-      xValues.push(date);
-      buckets.push({
-        start: date.getTime(),
-        end: date.getTime() + MS_PER_MONTH,
-        imosOnlyCount: 0,
-        total: 0,
-      });
+      addBucket(xValues, buckets, origin.add(i, "month"), "month");
     }
   } else if (unit === DividedBy.year) {
     const years = calculateYearBetween(start, end);
     for (let i = 0; i < years; i++) {
-      const date = new Date(start);
-      date.setFullYear(date.getFullYear() + i);
-      xValues.push(date);
-      buckets.push({
-        start: date.getTime(),
-        end: date.getTime() + MS_PER_YEAR,
-        imosOnlyCount: 0,
-        total: 0,
-      });
+      addBucket(xValues, buckets, origin.add(i, "year"), "year");
     }
   }
   const imosDataSet = new Set(imosDataIds);
@@ -137,11 +124,11 @@ const determineXWithBucketsBy = (
     const isImosOnly = collection.id ? imosDataSet.has(collection.id) : false;
 
     collection.extent?.temporal?.interval?.forEach((interval) => {
-      const start = interval[0] ? new Date(interval[0]).getTime() : null;
+      const start = interval[0] ? dayjs.utc(interval[0]).valueOf() : null;
       if (!start) return;
 
       const end = interval[1]
-        ? new Date(interval[1]).getTime()
+        ? dayjs.utc(interval[1]).valueOf()
         : defaultEndTime;
 
       // Since buckets are ordered chronologically, we can skip and break early
@@ -218,16 +205,14 @@ const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
   );
   const xAxisLabelFormatter = useCallback(
     (date: Date): string => {
+      const d = dayjs.utc(date);
       if (unit === DividedBy.day) {
-        return date.toLocaleDateString();
-      } else if (unit === DividedBy.month) {
-        // return mm/yyyy
-        return `${date.getMonth() + 1}/${date.getFullYear()}`;
-      } else if (unit === DividedBy.year) {
-        return date.getFullYear().toString();
-      } else {
-        return date.getFullYear().toString();
+        return d.format(dateDefault.DISPLAY_FORMAT);
       }
+      if (unit === DividedBy.month) {
+        return `${d.month() + 1}/${d.year()}`;
+      }
+      return d.year().toString();
     },
     [unit]
   );

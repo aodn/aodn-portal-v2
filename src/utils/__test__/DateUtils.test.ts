@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it } from "vitest";
 import {
+  convertDateFormat,
   dayKeyToUtcValue,
   formatUtcDateTime,
+  getAppMaxDate,
   toAppDayjs,
   toUtcEndOfDay,
   toUtcStartOfDay,
@@ -33,12 +35,28 @@ describe("dayKeyToUtcValue", () => {
   });
 });
 
+describe("convertDateFormat", () => {
+  it("renders an ISO instant as UTC, not host-local wall clock", () => {
+    expect(convertDateFormat("2021-08-01T00:00:00.000Z")).toBe(
+      "Sun Aug 01 2021 00:00:00 GMT+0000"
+    );
+  });
+});
+
 describe("formatUtcDateTime", () => {
   it("formats an epoch as UTC with a literal Z", () => {
     expect(formatUtcDateTime(0)).toBe("1970-01-01T00:00:00Z");
     expect(formatUtcDateTime(Date.UTC(2024, 5, 1, 15, 30, 45))).toBe(
       "2024-06-01T15:30:45Z"
     );
+  });
+});
+
+describe("getAppMaxDate", () => {
+  it("returns now in the app timezone", () => {
+    const now = getAppMaxDate();
+    expect(now.isValid()).toBe(true);
+    expect(Math.abs(now.valueOf() - Date.now())).toBeLessThan(1000);
   });
 });
 
@@ -51,6 +69,18 @@ describe("valueToDate / toAppDayjs", () => {
 
   it("parses a date-only string as midnight in the app timezone", () => {
     const d = toAppDayjs("2024-01-02", dateDefault.DATE_FORMAT);
+    expect(d.toISOString()).toBe("2024-01-02T00:00:00.000Z");
+  });
+
+  it("ignores format when value is missing", () => {
+    const d = toAppDayjs(undefined, dateDefault.DATE_FORMAT);
+    expect(d.isValid()).toBe(true);
+    expect(Math.abs(d.valueOf() - Date.now())).toBeLessThan(1000);
+  });
+
+  it("ignores format for non-string values", () => {
+    const epoch = Date.UTC(2024, 0, 2, 0, 0, 0);
+    const d = toAppDayjs(epoch, dateDefault.DATE_FORMAT);
     expect(d.toISOString()).toBe("2024-01-02T00:00:00.000Z");
   });
 });

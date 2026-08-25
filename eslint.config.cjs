@@ -80,6 +80,16 @@ module.exports = [
 
       quotes: ["error", "double", { avoidEscape: true }],
 
+      // dayjs() is host-local; app dates must use the configured timezone.
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "CallExpression[callee.name='dayjs']",
+          message:
+            "Do not call dayjs(). Use dayjs.tz(...) or toAppDayjs() (dayjs.utc(...) only for protocol UTC).",
+        },
+      ],
+
       "import/extensions": [
         "error",
         "never",

@@ -740,29 +740,19 @@ const createSearchParamFrom = (
     p.filter = appendFilter(p.filter, f(i.datasetStatus));
   }
 
-  if (
-    i.dateTimeFilterRange &&
-    (i.dateTimeFilterRange.start || i.dateTimeFilterRange.end)
-  ) {
-    if (i.dateTimeFilterRange.start && i.dateTimeFilterRange.end) {
-      const f = cqlDefaultFilters.get("BETWEEN_TIME_RANGE") as TemporalDuring;
-      p.filter = appendFilter(
-        p.filter,
-        f(i.dateTimeFilterRange.start, i.dateTimeFilterRange.end)
-      );
-    } else if (
-      i.dateTimeFilterRange.start === undefined &&
-      i.dateTimeFilterRange.end
-    ) {
-      const f = cqlDefaultFilters.get("BEFORE_TIME") as TemporalAfterOrBefore;
-      p.filter = appendFilter(p.filter, f(i.dateTimeFilterRange.end));
-    } else if (
-      i.dateTimeFilterRange.end === undefined &&
-      i.dateTimeFilterRange.start
-    ) {
-      const f = cqlDefaultFilters.get("AFTER_TIME") as TemporalAfterOrBefore;
-      p.filter = appendFilter(p.filter, f(i.dateTimeFilterRange.start));
-    }
+  const rangeStart = i.dateTimeFilterRange?.start;
+  const rangeEnd = i.dateTimeFilterRange?.end;
+  const hasStart = rangeStart !== undefined;
+  const hasEnd = rangeEnd !== undefined;
+  if (hasStart && hasEnd) {
+    const f = cqlDefaultFilters.get("BETWEEN_TIME_RANGE") as TemporalDuring;
+    p.filter = appendFilter(p.filter, f(rangeStart, rangeEnd));
+  } else if (hasEnd) {
+    const f = cqlDefaultFilters.get("BEFORE_TIME") as TemporalAfterOrBefore;
+    p.filter = appendFilter(p.filter, f(rangeEnd));
+  } else if (hasStart) {
+    const f = cqlDefaultFilters.get("AFTER_TIME") as TemporalAfterOrBefore;
+    p.filter = appendFilter(p.filter, f(rangeStart));
   }
 
   if (i.bbox) {

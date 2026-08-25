@@ -155,9 +155,9 @@ describe("DateSliderPoint keyboard", () => {
     const user = userEvent.setup();
     const onDatePointChange = vi.fn();
     const points = [
-      dayjs("2020-01-01").valueOf(),
-      dayjs("2020-01-15").valueOf(),
-      dayjs("2020-02-01").valueOf(),
+      dayjs.tz("2020-01-01").valueOf(),
+      dayjs.tz("2020-01-15").valueOf(),
+      dayjs.tz("2020-02-01").valueOf(),
     ];
 
     render(
@@ -221,12 +221,12 @@ describe("DateSliderPoint resync", () => {
   it("snaps to the new last mark when marks change, without notifying", () => {
     const onDatePointChange = vi.fn();
     const first = [
-      dayjs("2020-01-01").valueOf(),
-      dayjs("2020-01-15").valueOf(),
+      dayjs.tz("2020-01-01").valueOf(),
+      dayjs.tz("2020-01-15").valueOf(),
     ];
     const second = [
-      dayjs("2021-06-01").valueOf(),
-      dayjs("2021-06-02").valueOf(),
+      dayjs.tz("2021-06-01").valueOf(),
+      dayjs.tz("2021-06-02").valueOf(),
     ];
 
     const { rerender } = render(

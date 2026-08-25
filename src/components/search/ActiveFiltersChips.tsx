@@ -17,8 +17,8 @@ import {
   updateStatus,
   updateUpdateFreq,
 } from "@/app/store/componentParamReducer";
-import dayjs from "@/utils/DayjsUtils";
 import { dateDefault, pageDefault, pageReferer } from "../common/constants";
+import { valueToDate } from "@/utils/DateUtils";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
 import { borderRadius, color } from "@/styles/constants";
 import { TrashIcon } from "../../assets/icons/search/trash";
@@ -72,12 +72,12 @@ const ActiveFiltersChips: FC = () => {
     // Date Range
     if (params.dateTimeFilterRange?.start || params.dateTimeFilterRange?.end) {
       const start = params.dateTimeFilterRange.start
-        ? dayjs(params.dateTimeFilterRange.start).format(
+        ? valueToDate(params.dateTimeFilterRange.start).format(
             dateDefault.DISPLAY_FORMAT
           )
         : "...";
       const end = params.dateTimeFilterRange.end
-        ? dayjs(params.dateTimeFilterRange.end).format(
+        ? valueToDate(params.dateTimeFilterRange.end).format(
             dateDefault.DISPLAY_FORMAT
           )
         : "...";

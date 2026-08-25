@@ -6,10 +6,13 @@ export const toAppDayjs = (
   value?: string | number | Date | Dayjs,
   format?: string
 ): Dayjs => {
-  if (format) {
+  if (value === undefined) {
+    return dayjs.tz();
+  }
+  if (format && typeof value === "string") {
     return dayjs.tz(value, format, getAppTimezone());
   }
-  return value === undefined ? dayjs.tz() : dayjs.tz(value);
+  return dayjs.tz(value);
 };
 
 /** Calendar Y-M-D of `date` as UTC midnight (date-only pickers). */
@@ -18,22 +21,20 @@ export const toUtcStartOfDay = (date: Dayjs): Dayjs =>
 
 /** Calendar Y-M-D of `date` as UTC 23:59:59.999. */
 export const toUtcEndOfDay = (date: Dayjs): Dayjs =>
-  dayjs.utc(date.format(dateDefault.DATE_FORMAT)).endOf("day");
+  toUtcStartOfDay(date).hour(23).minute(59).second(59).millisecond(999);
 
 /** CQL / WMS datetimes: UTC wall clock plus a literal Z. */
 export const formatUtcDateTime = (
   value: string | number | Date | Dayjs
 ): string => dayjs.utc(value).format(dateDefault.DATE_TIME_FORMAT);
 
+/** ISO instant → `Sun Aug 01 2021 00:00:00 GMT+0000` in UTC. */
 export const convertDateFormat = (dateString: string): string => {
-  const date = new Date(dateString);
-  const convertedString = date.toString();
-  const index = convertedString.indexOf("(");
-  const dateTimeString = convertedString.substring(0, index).trim();
-
-  // TODO: hard code using GMT+0000 for now. Change the implementation after
-  //  the issue in geonetwork is resolved.
-  return dateTimeString.replace(/GMT\+\d{4}/g, "GMT+0000");
+  const parsed = dayjs.utc(dateString);
+  if (!parsed.isValid()) {
+    return dateString;
+  }
+  return parsed.format("ddd MMM DD YYYY HH:mm:ss [GMT+0000]");
 };
 
 export const dateToValue = (date: Dayjs, endOfDay: boolean = false): number => {
@@ -41,6 +42,9 @@ export const dateToValue = (date: Dayjs, endOfDay: boolean = false): number => {
 };
 
 export const valueToDate = (value: number): Dayjs => dayjs.tz(value);
+
+/** Live "now" in the app timezone (`dateDefault.max`). */
+export const getAppMaxDate = (): Dayjs => dateDefault.max;
 
 /** Calendar day → YYYYMMDD integer. */
 export const dayjsToDayPeriod = (d: Dayjs): number =>
