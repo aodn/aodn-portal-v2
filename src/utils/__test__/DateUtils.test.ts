@@ -3,6 +3,7 @@ import {
   convertDateFormat,
   dayKeyToUtcValue,
   formatUtcDateTime,
+  getAppMaxDate,
   toAppDayjs,
   toUtcEndOfDay,
   toUtcStartOfDay,
@@ -48,6 +49,14 @@ describe("formatUtcDateTime", () => {
     expect(formatUtcDateTime(Date.UTC(2024, 5, 1, 15, 30, 45))).toBe(
       "2024-06-01T15:30:45Z"
     );
+  });
+});
+
+describe("getAppMaxDate", () => {
+  it("returns now in the app timezone", () => {
+    const now = getAppMaxDate();
+    expect(now.isValid()).toBe(true);
+    expect(Math.abs(now.valueOf() - Date.now())).toBeLessThan(1000);
   });
 });
 

@@ -75,13 +75,13 @@ const dateRangeOptions: DateRangeOption[] = [
 ];
 
 const initialMinDate: Dayjs = dateDefault.min;
-const initialMaxDate: Dayjs = dateDefault.max;
 
 interface DateRangeFilterProps {}
 
 const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
   const { isMobile, isTablet } = useBreakpoint();
   const dispatch = useAppDispatch();
+  const initialMaxDate = dateDefault.max;
 
   // State from redux
   const dateTimeFilterRange = useAppSelector(
@@ -89,9 +89,9 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
   );
 
   // Local state for date-range-slider
-  const [value, setValue] = useState<number[]>([
+  const [value, setValue] = useState<number[]>(() => [
     dateToValue(toUtcStartOfDay(initialMinDate)),
-    dateToValue(toUtcEndOfDay(initialMaxDate)),
+    dateToValue(toUtcEndOfDay(dateDefault.max)),
   ]);
 
   // Local state for radio group
@@ -328,7 +328,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
         setSelectedOption(DateRangeOptionValues.Custom);
       }
     });
-  }, [dateTimeFilterRange, determineSelectedOption]);
+  }, [dateTimeFilterRange, determineSelectedOption, initialMaxDate]);
 
   useEffect(() => {
     // Find all collection

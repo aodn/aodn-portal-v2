@@ -51,7 +51,11 @@ import { boundingBoxInEpsg3857, isMapDrawModeActive } from "@/utils/MapUtils";
 import { checkEmptyArray } from "@/utils/Helpers";
 import AdminScreenContext from "../../../../admin/AdminScreenContext";
 import { HttpStatusCode } from "axios";
-import { dateToValue, formatUtcDateTime } from "@/utils/DateUtils";
+import {
+  dateToValue,
+  formatUtcDateTime,
+  getAppMaxDate,
+} from "@/utils/DateUtils";
 import { layernameRoughlyMatch } from "@/utils/GeoJsonUtils";
 import { AppDispatch } from "@/app/store/store";
 
@@ -196,7 +200,7 @@ const checkSupportDiscreteTimeSlider = (
           const result: Map<string, Array<number>> = new Map();
           result.set(
             layerName,
-            val["time"]?.map((v) => dateToValue(dayjs(v.toString())))
+            val["time"]?.map((v) => dateToValue(dayjs.utc(v.toString())))
           );
           setDiscreteTimeSliderValues?.(result);
         } else {
@@ -287,7 +291,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
 
     const end =
       config.urlParams.END_DATE === undefined
-        ? dateDefault.max
+        ? getAppMaxDate()
         : config.urlParams.END_DATE;
 
     const time =

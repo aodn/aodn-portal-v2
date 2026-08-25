@@ -52,7 +52,7 @@ import {
   DateSliderPoint,
   ThumbType,
 } from "@/components/common/slider/DateSlider";
-import { dateToValue, toAppDayjs } from "@/utils/DateUtils";
+import { dateToValue, getAppMaxDate, toAppDayjs } from "@/utils/DateUtils";
 import { GeoserverFieldsResponse } from "@/app/store/GeoserverDefinitions";
 import * as turf from "@turf/turf";
 import { createStaticLayers } from "@/components/map/mapbox/layers/StaticLayer";
@@ -262,7 +262,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       end = pmtilesDayjs.maxDate;
     } else {
       start = dateDefault.min;
-      end = dateDefault.max;
+      end = getAppMaxDate();
 
       const extent = collection?.getExtent();
       if (extent) {

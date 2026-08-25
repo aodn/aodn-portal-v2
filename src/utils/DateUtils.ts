@@ -40,6 +40,9 @@ export const dateToValue = (date: Dayjs, endOfDay: boolean = false): number => {
 
 export const valueToDate = (value: number): Dayjs => dayjs.tz(value);
 
+/** Live "now" in the app timezone (`dateDefault.max`). */
+export const getAppMaxDate = (): Dayjs => dateDefault.max;
+
 /** Calendar day → YYYYMMDD integer. */
 export const dayjsToDayPeriod = (d: Dayjs): number =>
   d.year() * 10000 + (d.month() + 1) * 100 + d.date();

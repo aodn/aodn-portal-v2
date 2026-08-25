@@ -9,8 +9,12 @@ const dateDefault = {
   // e.g. 05 Jan 2024, matching the download email
   DISPLAY_FORMAT_LONG: "DD MMM YYYY",
   min: dayjs.tz(0),
-  max: dayjs.tz(),
-  currentYear: dayjs.tz().year(),
+  get max() {
+    return dayjs.tz();
+  },
+  get currentYear() {
+    return dayjs.tz().year();
+  },
 };
 
 const pageDefault = {
