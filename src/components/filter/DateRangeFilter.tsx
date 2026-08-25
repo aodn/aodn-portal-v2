@@ -45,7 +45,7 @@ import {
   toAppDayjs,
   toUtcEndOfDay,
   toUtcStartOfDay,
-  valueToDate,
+  unixMsToAppDayjs,
 } from "@/utils/DateUtils";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import theme from "../../styles/themeRC8";
@@ -109,8 +109,8 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
   );
 
   // Memoized derived dates
-  const minDate = useMemo(() => valueToDate(value[0]), [value]);
-  const maxDate = useMemo(() => valueToDate(value[1]), [value]);
+  const minDate = useMemo(() => unixMsToAppDayjs(value[0]), [value]);
+  const maxDate = useMemo(() => unixMsToAppDayjs(value[1]), [value]);
 
   // Helper to check if given star-end period falls in any of the radio group year-range options
   const determineSelectedOption = useCallback(
@@ -178,10 +178,14 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
   const handleSliderChange = useCallback(
     (_: Event, newValue: number | number[]): void => {
       if (!Array.isArray(newValue)) return;
-      const newStart = dayjsToUnixMs(toUtcStartOfDay(valueToDate(newValue[0])));
-      const newEnd = dayjsToUnixMs(toUtcEndOfDay(valueToDate(newValue[1])));
-      const newMinDate = valueToDate(newStart);
-      const newMaxDate = valueToDate(newEnd);
+      const newStart = dayjsToUnixMs(
+        toUtcStartOfDay(unixMsToAppDayjs(newValue[0]))
+      );
+      const newEnd = dayjsToUnixMs(
+        toUtcEndOfDay(unixMsToAppDayjs(newValue[1]))
+      );
+      const newMinDate = unixMsToAppDayjs(newStart);
+      const newMaxDate = unixMsToAppDayjs(newEnd);
 
       setValue([newStart, newEnd]);
       setSelectedOption(determineSelectedOption(newMinDate, newMaxDate));
@@ -317,10 +321,12 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
       if (dateTimeFilterRange) {
         const fallbackMin = dayjsToUnixMs(toUtcStartOfDay(initialMinDate));
         const fallbackMax = dayjsToUnixMs(toUtcEndOfDay(initialMaxDate));
-        const newMinDate = valueToDate(
+        const newMinDate = unixMsToAppDayjs(
           dateTimeFilterRange.start ?? fallbackMin
         );
-        const newMaxDate = valueToDate(dateTimeFilterRange.end ?? fallbackMax);
+        const newMaxDate = unixMsToAppDayjs(
+          dateTimeFilterRange.end ?? fallbackMax
+        );
 
         setValue([
           dateTimeFilterRange.start ?? fallbackMin,
@@ -418,7 +424,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                   format={dateDefault.DISPLAY_FORMAT}
                   value={minDate}
                   minDate={initialMinDate}
-                  maxDate={valueToDate(value[1])}
+                  maxDate={unixMsToAppDayjs(value[1])}
                   onChange={(date) => handleMinDateChange(date as Dayjs)}
                   slots={{
                     openPickerIcon: CalendarIcon,
@@ -452,7 +458,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                   views={["year", "month", "day"]}
                   format={dateDefault.DISPLAY_FORMAT}
                   value={maxDate}
-                  minDate={valueToDate(value[0])}
+                  minDate={unixMsToAppDayjs(value[0])}
                   maxDate={initialMaxDate}
                   onChange={(date) => handleMaxDateChange(date as Dayjs)}
                   slots={{
@@ -494,7 +500,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                 onChange={handleSliderChange}
                 valueLabelDisplay="auto"
                 valueLabelFormat={(value: number) =>
-                  formatDate(valueToDate(value))
+                  formatDate(unixMsToAppDayjs(value))
                 }
               />
               <Box

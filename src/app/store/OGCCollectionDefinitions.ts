@@ -587,7 +587,6 @@ export class Spatial {
     return this.bounding_box;
   }
 
-  /** Raw temporal bounds — use this for anything that needs a date, not a label. */
   getOverallTemporalRange = (): [Dayjs | undefined, Dayjs | undefined] => {
     const period = this.temporal?.interval;
     return [

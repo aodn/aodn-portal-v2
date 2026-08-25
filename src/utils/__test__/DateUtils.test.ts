@@ -10,7 +10,7 @@ import {
   toUtcEndOfDay,
   toUtcStartOfDay,
   utcDayKeyToUnixMs,
-  valueToDate,
+  unixMsToAppDayjs,
 } from "../DateUtils";
 import { dateDefault } from "@/components/common/constants";
 import dayjs, { DEFAULT_APP_TIMEZONE, setAppTimezone } from "../dayjs";
@@ -84,7 +84,9 @@ describe("formatDate", () => {
     expect(formatDate("2021-08-01T00:00:00.000Z")).toBe("01 Aug 2021");
     expect(formatDate(new Date(Date.UTC(2021, 7, 1)))).toBe("01 Aug 2021");
     expect(formatDate(Date.UTC(2021, 7, 1))).toBe("01 Aug 2021");
-    expect(formatDate(valueToDate(Date.UTC(2021, 7, 1)))).toBe("01 Aug 2021");
+    expect(formatDate(unixMsToAppDayjs(Date.UTC(2021, 7, 1)))).toBe(
+      "01 Aug 2021"
+    );
   });
 
   it("falls back for nullish, empty or unparseable input", () => {
@@ -135,9 +137,9 @@ describe("getAppMaxDate", () => {
   });
 });
 
-describe("valueToDate / toAppDayjs", () => {
+describe("unixMsToAppDayjs / toAppDayjs", () => {
   it("reads epoch ms in the app timezone (UTC by default)", () => {
-    const d = valueToDate(Date.UTC(2024, 0, 2, 0, 0, 0));
+    const d = unixMsToAppDayjs(Date.UTC(2024, 0, 2, 0, 0, 0));
     expect(d.format("Z")).toBe("+00:00");
     expect(d.format(dateDefault.DATE_FORMAT)).toBe("2024-01-02");
   });

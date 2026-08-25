@@ -11,7 +11,7 @@ import {
   dayjsToUnixMs,
   formatDate,
   toAppDayjs,
-  valueToDate,
+  unixMsToAppDayjs,
 } from "@/utils/DateUtils";
 import { dateDefault } from "../constants";
 import { portalTheme } from "../../../styles";
@@ -211,7 +211,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
             <Typography sx={sliderCaptionSx}>
               Displaying{" "}
               {datePointStamp !== undefined
-                ? formatDate(valueToDate(datePointStamp))
+                ? formatDate(unixMsToAppDayjs(datePointStamp))
                 : ""}
             </Typography>
           </Stack>
@@ -234,9 +234,10 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
               },
             }}
             valueLabelDisplay="auto"
-            valueLabelFormat={(value: number) => formatDate(valueToDate(value))}
+            valueLabelFormat={(value: number) =>
+              formatDate(unixMsToAppDayjs(value))
+            }
             thumb={thumbType}
-            sx={{ flex: 1, minWidth: 0 }}
           />
         </Stack>
       </Grid>
@@ -447,7 +448,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
               Start Date
             </Typography>
             <Typography sx={sliderCaptionSx}>
-              {formatDate(valueToDate(minValue))}
+              {formatDate(unixMsToAppDayjs(minValue))}
             </Typography>
           </Stack>
           <PlainSlider
@@ -466,7 +467,9 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
               },
             }}
             valueLabelDisplay="auto"
-            valueLabelFormat={(value: number) => formatDate(valueToDate(value))}
+            valueLabelFormat={(value: number) =>
+              formatDate(unixMsToAppDayjs(value))
+            }
             sx={{ flex: 1, minWidth: 0 }}
           />
           <Stack flexShrink={0} alignItems="flex-end">
@@ -479,7 +482,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
               On going
             </Typography>
             <Typography sx={sliderCaptionSx}>
-              {formatDate(valueToDate(maxValue))}
+              {formatDate(unixMsToAppDayjs(maxValue))}
             </Typography>
           </Stack>
         </Stack>

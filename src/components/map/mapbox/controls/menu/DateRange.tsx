@@ -16,7 +16,7 @@ import { Box, IconButton } from "@mui/material";
 import { switcherIconButtonSx } from "./MenuControl";
 import MenuHintTooltip from "./MenuHintTooltip";
 import { dateDefault } from "../../../../common/constants";
-import { toAppDayjs, valueToDate } from "@/utils/DateUtils";
+import { toAppDayjs, unixMsToAppDayjs } from "@/utils/DateUtils";
 import { TimeRangeIcon } from "@/assets/icons/map/time_range";
 import DateSlider from "../../../../common/slider/DateSlider";
 import { TimeRangeTooltipIcon } from "@/assets/icons/map/tooltip_time_range";
@@ -68,8 +68,8 @@ const DateRange: React.FC<DateRangeControlProps> = ({
       dateRangeStamps: number | number[]
     ) => {
       const d = dateRangeStamps as number[];
-      const start = valueToDate(d[0]).format(dateDefault.DATE_FORMAT);
-      const end = valueToDate(d[1]).format(dateDefault.DATE_FORMAT);
+      const start = unixMsToAppDayjs(d[0]).format(dateDefault.DATE_FORMAT);
+      const end = unixMsToAppDayjs(d[1]).format(dateDefault.DATE_FORMAT);
 
       if (minDate === start && maxDate === end) {
         const prev = getAndSetDownloadConditions(

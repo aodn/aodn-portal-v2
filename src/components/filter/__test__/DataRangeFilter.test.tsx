@@ -8,7 +8,7 @@ import dayjs from "@/utils/dayjs";
 import DateRangeFilter from "../DateRangeFilter";
 import { dateDefault } from "../../common/constants";
 import { updateDateTimeFilterRange } from "@/app/store/componentParamReducer";
-import { dayjsToUnixMs, toAppDayjs, valueToDate } from "@/utils/DateUtils";
+import { dayjsToUnixMs, toAppDayjs, unixMsToAppDayjs } from "@/utils/DateUtils";
 import axios from "axios";
 
 vi.mock("../../common/charts/TimeRangeBarChart", () => ({
@@ -111,7 +111,7 @@ describe("DateRangeFilter", () => {
       .filter((action) => action?.type === "UPDATE_DATETIME_FILTER_VARIABLE")
       .at(-1);
     expect(
-      valueToDate(lastRange?.payload?.dateTimeFilterRange?.start).format(
+      unixMsToAppDayjs(lastRange?.payload?.dateTimeFilterRange?.start).format(
         dateDefault.DATE_FORMAT
       )
     ).toBe("2020-01-01");
@@ -132,7 +132,7 @@ describe("DateRangeFilter", () => {
       .filter((action) => action?.type === "UPDATE_DATETIME_FILTER_VARIABLE")
       .at(-1);
     expect(
-      valueToDate(lastRange?.payload?.dateTimeFilterRange?.end).format(
+      unixMsToAppDayjs(lastRange?.payload?.dateTimeFilterRange?.end).format(
         dateDefault.DATE_FORMAT
       )
     ).toBe("2025-01-01");

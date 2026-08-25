@@ -4,10 +4,7 @@ import { dateDefault } from "@/components/common/constants";
 export type DateInput = string | number | Date | Dayjs | null | undefined;
 
 /** Instant in the app timezone (`setAppTimezone` / UTC by default). */
-export const toAppDayjs = (
-  value?: string | number | Date | Dayjs,
-  format?: string
-): Dayjs => {
+export const toAppDayjs = (value?: DateInput, format?: string): Dayjs => {
   if (value === undefined) {
     return dayjs.tz();
   }
@@ -117,7 +114,8 @@ export const dayjsToUnixMs = (
   return endOfDay ? date.endOf("day").valueOf() : date.valueOf();
 };
 
-export const valueToDate = (value: number): Dayjs => dayjs.tz(value);
+/** Unix ms → Dayjs in the app timezone. Inverse of {@link dayjsToUnixMs}. */
+export const unixMsToAppDayjs = (value: number): Dayjs => dayjs.tz(value);
 
 /** Live "now" in the app timezone (`dateDefault.max`). */
 export const getAppMaxDate = (): Dayjs => dateDefault.max;

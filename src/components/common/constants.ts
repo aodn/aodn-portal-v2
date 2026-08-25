@@ -1,13 +1,12 @@
 import dayjs from "@/utils/dayjs";
 
 const dateDefault = {
-  // Wire formats — machine-readable, NOT for display. Do not repoint these.
-  DATE_TIME_FORMAT: "YYYY-MM-DDTHH:mm:ss[Z]", // CQL temporal filters
+  // Must use this format to do search, we care about the time
+  DATE_TIME_FORMAT: "YYYY-MM-DDTHH:mm:ss[Z]",
   DATE_FORMAT: "YYYY-MM-DD", // machine day keys, slider I/O
 
   // Display formats — every user-facing date goes through formatDate().
   DISPLAY_FORMAT: "DD MMM YYYY",
-  // Date + time, rendered in UTC — see formatDateTime().
   UTC_DATE_TIME_DISPLAY_FORMAT: "DD MMM YYYY HH:mm [UTC]",
   // Metadata Dates panel only, keeps the GeoNetwork GMT+0000 hack — see formatMetadataDate().
   METADATA_DISPLAY_FORMAT: "ddd DD MMM YYYY HH:mm:ss [GMT+0000]",
