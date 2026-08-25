@@ -174,6 +174,7 @@ const MapPopup: React.FC<MapPopupProps> = memo(
           const uuid = feature.properties?.uuid as string;
           getCollectionData(uuid).then((collection) => {
             if (collection) {
+              popup.remove();
               root.render(renderContentBox(collection, onPopupMouseLeave));
               // Set the popup's position and content, then add it to the map
               // subscribe to close event to clean up resource.
