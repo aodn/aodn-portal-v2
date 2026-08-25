@@ -12,7 +12,11 @@ import { dateDefault } from "@/components/common/constants";
 describe("formatDate", () => {
   it("accepts an ISO string, Date, epoch number or Dayjs", () => {
     const expected = "02 Jan 2024";
-    expect(formatDate("2024-01-02T00:00:00.000Z")).toBe(expected);
+    // Local-time rendering of a UTC instant is timezone-dependent — assert
+    // against the same conversion path rather than a hardcoded calendar day.
+    expect(formatDate("2024-01-02T00:00:00.000Z")).toBe(
+      dayjs("2024-01-02T00:00:00.000Z").format(dateDefault.DISPLAY_FORMAT)
+    );
     expect(formatDate(new Date(2024, 0, 2))).toBe(expected);
     expect(formatDate(dayjs("2024-01-02").valueOf())).toBe(expected);
     expect(formatDate(dayjs("2024-01-02"))).toBe(expected);
@@ -45,7 +49,9 @@ describe("formatDateTime", () => {
     expect(formatDateTime("2021-08-01T03:30:00.000Z")).toBe(
       "01 Aug 2021 03:30 UTC"
     );
-    expect(formatDate("2021-08-01T03:30:00.000Z")).toBe("01 Aug 2021");
+    expect(formatDate("2021-08-01T03:30:00.000Z")).toBe(
+      dayjs("2021-08-01T03:30:00.000Z").format(dateDefault.DISPLAY_FORMAT)
+    );
   });
 
   // The GeoServer popup feeds this raw UTC ISO strings from the WMS time axis.
