@@ -49,15 +49,11 @@ export const consumeSSEStream = async (
 
       buffer += decoder.decode(result.value, { stream: true });
 
-      let eventStart = 0;
-      while (eventStart < buffer.length) {
-        const eventEnd = buffer.indexOf("\n\n", eventStart);
-        if (eventEnd === -1) {
-          buffer = buffer.slice(eventStart);
-          break;
-        }
+      let eventEnd = buffer.indexOf("\n\n");
+      while (eventEnd !== -1) {
+        const eventText = buffer.slice(0, eventEnd);
+        buffer = buffer.slice(eventEnd + 2);
 
-        const eventText = buffer.slice(eventStart, eventEnd);
         if (eventText.trim()) {
           const parsed = parseSSEEventText(eventText);
           if (parsed) {
@@ -65,7 +61,7 @@ export const consumeSSEStream = async (
           }
         }
 
-        eventStart = eventEnd + 2;
+        eventEnd = buffer.indexOf("\n\n");
       }
     }
   } finally {

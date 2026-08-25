@@ -233,6 +233,14 @@ class ApiRouter:
     ) -> None:
         self.unroute(Routes.PMTILES_METADATA, handler_function)
 
+    def route_manage_info(self, handler_function: Callable) -> None:
+        self.route(Routes.MANAGE_INFO, handler_function)
+
+    def unroute_manage_info(
+        self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.MANAGE_INFO, handler_function)
+
     def route_static_geojson(self, handler_function: Callable) -> None:
         self.route(Routes.STATIC_GEOJSON, handler_function)
 

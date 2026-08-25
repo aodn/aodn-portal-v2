@@ -9,6 +9,7 @@ import {
   TileProductsResponse,
 } from "@/app/store/GriddedTileDefinitions";
 import { dayKeyToUtcValue } from "@/utils/DateUtils";
+import { LayerSelectable } from "@/components/map/mapbox/layers/Layers";
 
 /**
  * The placeholders a template must still carry. `{tileRow}`/`{tileCol}` are the
@@ -37,11 +38,11 @@ export const EMPTY_TILE_DATE_MARKS: TileDateMarks = {
   latest: undefined,
 };
 
-export interface GriddedRasterLayerControls {
+export interface GriddedRasterLayerControls extends LayerSelectable<string> {
   products: GriddedRasterProduct[];
 
-  selectedProductId: string;
-  onSelectProduct: (id: string) => void;
+  layerConfig: string;
+  onLayerChange: (id: string) => void;
   /** `YYYY-MM-DD`, round-tripped from the listing — never derived from a Date. */
   selectedDate?: string;
   /** A refetch failed while this layer was selected. */

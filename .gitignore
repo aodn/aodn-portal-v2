@@ -38,6 +38,7 @@ html-reports/
 *.env.prod
 package-lock.json
 tsconfig.node.tsbuildinfo
+.eslintcache
 
 .yarn/install-state.gz
 .last-run.json

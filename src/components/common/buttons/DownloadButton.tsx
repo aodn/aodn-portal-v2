@@ -19,6 +19,7 @@ interface DownloadButtonProps {
   isDownloading?: boolean;
   isEstimating?: boolean;
   estimatedSizeBytes?: number | null;
+  estimateFailed?: boolean;
   handleCancelDownload?: () => void;
   sx?: SxProps;
 }
@@ -26,7 +27,8 @@ interface DownloadButtonProps {
 const getTooltip = (
   isDownloading: boolean,
   isEstimating: boolean,
-  estimatedSizeBytes: number | null
+  estimatedSizeBytes: number | null,
+  estimateFailed: boolean
 ) =>
   isDownloading
     ? "Downloading data"
@@ -34,7 +36,9 @@ const getTooltip = (
       ? "Estimating download size..."
       : estimatedSizeBytes != null
         ? `Download data is approximately ${formatBytes(estimatedSizeBytes)}`
-        : "Download data";
+        : estimateFailed
+          ? "Download size could not be estimated, you can still download this data"
+          : "Download data";
 
 const renderButtonLabel = (
   isDownloading: boolean,
@@ -68,6 +72,7 @@ const DownloadButton: FC<DownloadButtonProps> = ({
   isDownloading = false,
   isEstimating = false,
   estimatedSizeBytes = null,
+  estimateFailed = false,
   handleCancelDownload = () => {},
   sx,
 }) => {
@@ -88,7 +93,12 @@ const DownloadButton: FC<DownloadButtonProps> = ({
       data-testid="download-button"
     >
       <Tooltip
-        title={getTooltip(isDownloading, isEstimating, estimatedSizeBytes)}
+        title={getTooltip(
+          isDownloading,
+          isEstimating,
+          estimatedSizeBytes,
+          estimateFailed
+        )}
         placement="top"
       >
         <Stack direction="row" alignItems="center" gap={1}>

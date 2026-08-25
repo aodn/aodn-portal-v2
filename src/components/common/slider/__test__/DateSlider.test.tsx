@@ -2,9 +2,9 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import DateSliderRange, { DateSliderPoint } from "../DateSlider";
-import dayjs from "dayjs";
+import dayjs from "@/utils/DayjsUtils";
 import { dateDefault } from "../../constants";
-import { dateToValue } from "@/utils/DateUtils";
+import { dateToValue, toAppDayjs } from "@/utils/DateUtils";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -49,7 +49,7 @@ describe("DateSliderRange keyboard", () => {
 describe("DateSliderRange min floor", () => {
   it("defaults the min thumb to 1 Jan 1970 when dataset min is earlier", () => {
     const onDateRangeChange = vi.fn();
-    const floorValue = dateToValue(dayjs(dateDefault.min));
+    const floorValue = dateToValue(dateDefault.min);
 
     render(
       <DateSliderRange
@@ -72,7 +72,7 @@ describe("DateSliderRange min floor", () => {
   it("keeps the dataset min when it is on or after 1 Jan 1970", () => {
     const onDateRangeChange = vi.fn();
     const minDate = "1980-03-01";
-    const expected = dateToValue(dayjs(minDate, dateDefault.DATE_FORMAT));
+    const expected = dateToValue(toAppDayjs(minDate, dateDefault.DATE_FORMAT));
 
     render(
       <DateSliderRange
@@ -93,8 +93,11 @@ describe("DateSliderRange min floor", () => {
     const onDateRangeChange = vi.fn();
     const minDate = "2020-01-01";
     const maxDate = "2020-01-31";
-    const minValue = dateToValue(dayjs(minDate, dateDefault.DATE_FORMAT));
-    const maxValue = dateToValue(dayjs(maxDate, dateDefault.DATE_FORMAT), true);
+    const minValue = dateToValue(toAppDayjs(minDate, dateDefault.DATE_FORMAT));
+    const maxValue = dateToValue(
+      toAppDayjs(maxDate, dateDefault.DATE_FORMAT),
+      true
+    );
 
     render(
       <DateSliderRange
@@ -122,8 +125,11 @@ describe("DateSliderRange min floor", () => {
     // so both values equaled min and MUI stacked both dots on the left.
     const onDateRangeChange = vi.fn();
     const day = "1970-01-21";
-    const minValue = dateToValue(dayjs(day, dateDefault.DATE_FORMAT));
-    const maxValue = dateToValue(dayjs(day, dateDefault.DATE_FORMAT), true);
+    const minValue = dateToValue(toAppDayjs(day, dateDefault.DATE_FORMAT));
+    const maxValue = dateToValue(
+      toAppDayjs(day, dateDefault.DATE_FORMAT),
+      true
+    );
 
     render(
       <DateSliderRange
@@ -149,9 +155,9 @@ describe("DateSliderPoint keyboard", () => {
     const user = userEvent.setup();
     const onDatePointChange = vi.fn();
     const points = [
-      dayjs("2020-01-01").valueOf(),
-      dayjs("2020-01-15").valueOf(),
-      dayjs("2020-02-01").valueOf(),
+      dayjs.tz("2020-01-01").valueOf(),
+      dayjs.tz("2020-01-15").valueOf(),
+      dayjs.tz("2020-02-01").valueOf(),
     ];
 
     render(
@@ -215,12 +221,12 @@ describe("DateSliderPoint resync", () => {
   it("snaps to the new last mark when marks change, without notifying", () => {
     const onDatePointChange = vi.fn();
     const first = [
-      dayjs("2020-01-01").valueOf(),
-      dayjs("2020-01-15").valueOf(),
+      dayjs.tz("2020-01-01").valueOf(),
+      dayjs.tz("2020-01-15").valueOf(),
     ];
     const second = [
-      dayjs("2021-06-01").valueOf(),
-      dayjs("2021-06-02").valueOf(),
+      dayjs.tz("2021-06-01").valueOf(),
+      dayjs.tz("2021-06-02").valueOf(),
     ];
 
     const { rerender } = render(
@@ -255,11 +261,25 @@ describe("DateSliderPoint display", () => {
   it("shows the selected date formatted as DD/MM/YYYY", () => {
     render(<DateSliderPoint valid_points={[...points]} />);
 
-    expect(screen.getByText("Displaying")).toBeInTheDocument();
-    // { selector: "p" } excludes the slider's own value-label tooltip, which
-    // renders the same formatted date in a sibling span.
     expect(
-      screen.getByText("02/01/2024", { selector: "p" })
+      screen.getByText("Displaying 02/01/2024", { selector: "p" })
     ).toBeInTheDocument();
+  });
+
+  it("applies sx overrides on the container", () => {
+    render(
+      <DateSliderPoint
+        valid_points={[...points]}
+        sx={{ mx: 0, borderRadius: 0, backgroundColor: "#fff" }}
+      />
+    );
+
+    const container = screen.getByTestId("dateslider-daterange-menu-button");
+    expect(container).toHaveStyle({
+      marginLeft: "0px",
+      marginRight: "0px",
+      borderRadius: "0px",
+      backgroundColor: "#fff",
+    });
   });
 });

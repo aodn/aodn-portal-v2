@@ -2,12 +2,16 @@
  * Common filter for cql, avoid cql string repeat everywhere
  * @type {{}}
  */
-import dayjs from "dayjs";
-import { dateDefault } from "./constants";
+import dayjs from "@/utils/DayjsUtils";
+import {
+  formatUtcDateTime,
+  toUtcEndOfDay,
+  toUtcStartOfDay,
+} from "@/utils/DateUtils";
 import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from "geojson";
 import * as wellknown from "wellknown";
 import { SelectedStaticArea, Vocab } from "@/app/store/componentParamReducer";
-import { DatasetFrequency, DatasetStatus } from "@/app/store/searchReducer";
+import { DatasetFrequency, DatasetStatus } from "@/app/store/datasetEnums";
 import { bbox } from "@turf/turf";
 
 // TODO: refactor this, naming like this is not ideal for readability,
@@ -67,11 +71,13 @@ const funcExcludeDatasetScope: ExcludeDatasetScope = (scope: string) =>
 const funcUpdateDatasetGroup: DatasetGroup = (name: string) =>
   `dataset_group='${name}'`;
 
+const utcInstant = (epoch: number) => dayjs.utc(epoch);
+
 const funcTemporalAfter: TemporalAfterOrBefore = (s: number) =>
-  `temporal AFTER ${dayjs(s).format(dateDefault["DATE_TIME_FORMAT"])}`;
+  `temporal AFTER ${formatUtcDateTime(toUtcStartOfDay(utcInstant(s)))}`;
 
 const funcTemporalBefore: TemporalAfterOrBefore = (s: number) =>
-  `temporal BEFORE ${dayjs(s).format(dateDefault["DATE_TIME_FORMAT"])}`;
+  `temporal BEFORE ${formatUtcDateTime(toUtcEndOfDay(utcInstant(s)))}`;
 
 const funcIntersectPolygon: PolygonOperation = (
   p: Feature<Polygon | MultiPolygon, GeoJsonProperties>
@@ -132,7 +138,7 @@ const funcPlatformFilter: PlatformFilter = (platforms: Array<string>) => {
  * @param e
  */
 const funcTemporalBetween: TemporalDuring = (s: number, e: number) =>
-  `temporal DURING ${dayjs(s).format(dateDefault["DATE_TIME_FORMAT"])}/${dayjs(e).format(dateDefault["DATE_TIME_FORMAT"])}`;
+  `temporal DURING ${formatUtcDateTime(toUtcStartOfDay(utcInstant(s)))}/${formatUtcDateTime(toUtcEndOfDay(utcInstant(e)))}`;
 
 /**
  * Keep all cql query here, otherwise it will be very hard to manage

@@ -1,42 +1,52 @@
-// This file is only for date time related helper methods e.g comparing dates, convert timezone, etc.
-
-import dayjs, { Dayjs } from "@/utils/DayjsUtils";
+import dayjs, { Dayjs, getAppTimezone } from "@/utils/DayjsUtils";
 import { dateDefault } from "@/components/common/constants";
 
-/**
- * Converts a date string from ISO 8601 format to a more readable format.
- *
- * @param dateString A date string in ISO 8601 format (e.g., "2021-08-01T00:00:00.000Z")
- * @returns A string representing the date in a more readable format (e.g., "Sun Aug 01 2021 05:30:00 GMT+0530")
- *
- * @example
- * const isoDate = "2021-08-01T00:00:00.000Z";
- * const result = convertDateFormat(isoDate);
- * // result: "Sun Aug 01 2021 05:30:00 GMT+0530" (actual result may vary based on local timezone)
- *
- * @note The exact output format may vary depending on the local timezone of the system running the code.
- * @note This function assumes the input is a valid ISO 8601 date string. Invalid inputs may produce unexpected results.
- */
-export const convertDateFormat = (dateString: string): string => {
-  const date = new Date(dateString);
-  const convertedString = date.toString();
-  const index = convertedString.indexOf("(");
-  const dateTimeString = convertedString.substring(0, index).trim();
-
-  // TODO: hard code using GMT+0000 for now. Change the implementation after
-  //  the issue in geonetwork is resolved.
-  return dateTimeString.replace(/GMT\+\d{4}/g, "GMT+0000");
+/** Instant in the app timezone (`setAppTimezone` / UTC by default). */
+export const toAppDayjs = (
+  value?: string | number | Date | Dayjs,
+  format?: string
+): Dayjs => {
+  if (value === undefined) {
+    return dayjs.tz();
+  }
+  if (format && typeof value === "string") {
+    return dayjs.tz(value, format, getAppTimezone());
+  }
+  return dayjs.tz(value);
 };
 
-// Utility function to convert a date to a numeric value
+/** Calendar Y-M-D of `date` as UTC midnight (date-only pickers). */
+export const toUtcStartOfDay = (date: Dayjs): Dayjs =>
+  dayjs.utc(date.format(dateDefault.DATE_FORMAT)).startOf("day");
+
+/** Calendar Y-M-D of `date` as UTC 23:59:59.999. */
+export const toUtcEndOfDay = (date: Dayjs): Dayjs =>
+  toUtcStartOfDay(date).hour(23).minute(59).second(59).millisecond(999);
+
+/** CQL / WMS datetimes: UTC wall clock plus a literal Z. */
+export const formatUtcDateTime = (
+  value: string | number | Date | Dayjs
+): string => dayjs.utc(value).format(dateDefault.DATE_TIME_FORMAT);
+
+/** ISO instant → `Sun Aug 01 2021 00:00:00 GMT+0000` in UTC. */
+export const convertDateFormat = (dateString: string): string => {
+  const parsed = dayjs.utc(dateString);
+  if (!parsed.isValid()) {
+    return dateString;
+  }
+  return parsed.format("ddd MMM DD YYYY HH:mm:ss [GMT+0000]");
+};
+
 export const dateToValue = (date: Dayjs, endOfDay: boolean = false): number => {
   return endOfDay ? date.endOf("day").valueOf() : date.valueOf();
 };
 
-// Utility function to convert a numeric value back to a date
-export const valueToDate = (value: number): Dayjs => dayjs(value);
+export const valueToDate = (value: number): Dayjs => dayjs.tz(value);
 
-/** Calendar day → YYYYMMDD integer (local calendar fields from dayjs). */
+/** Live "now" in the app timezone (`dateDefault.max`). */
+export const getAppMaxDate = (): Dayjs => dateDefault.max;
+
+/** Calendar day → YYYYMMDD integer. */
 export const dayjsToDayPeriod = (d: Dayjs): number =>
   d.year() * 10000 + (d.month() + 1) * 100 + d.date();
 

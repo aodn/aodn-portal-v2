@@ -1,7 +1,7 @@
 import { loadEnv, type ConfigEnv } from "vite";
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react-swc";
-import eslint from "vite-plugin-eslint";
+import eslint from "vite-plugin-eslint2";
 import path from "path";
 import fs from "fs";
 import { seoPlugins } from "./src/seo/vitePlugins";
@@ -12,6 +12,48 @@ export default ({ mode }: ConfigEnv) => {
 
   const apiPath = process.env.VITE_API_HOST?.replace(/\/$/, "");
   const port = Number(process.env.VITE_PORT);
+  // Playwright-local mocks /api; do not register a proxy with no target
+  // (Vite throws "Must set target or forward").
+  const apiProxy = apiPath
+    ? {
+        "/api/v1/ogc/collections": {
+          target: apiPath,
+          changeOrigin: true,
+        },
+        "/api/v1/ogc/tiles": {
+          target: apiPath,
+          changeOrigin: true,
+        },
+        "/api/v1/ogc/ext/autocomplete": {
+          target: apiPath,
+          changeOrigin: true,
+        },
+        "/api/v1/ogc/ext/static": {
+          target: apiPath,
+          changeOrigin: true,
+        },
+        "/api/v1/ogc/ext/parameter/vocabs": {
+          target: apiPath,
+          changeOrigin: true,
+        },
+        "/api/v1/ogc/ext/tiles": {
+          target: apiPath,
+          changeOrigin: true,
+        },
+        "/api/v1/ogc/processes": {
+          target: apiPath,
+          changeOrigin: true,
+        },
+        "/api/v1/ogc/jobs": {
+          target: apiPath,
+          changeOrigin: true,
+        },
+        "/api/v1/ogc/manage": {
+          target: apiPath,
+          changeOrigin: true,
+        },
+      }
+    : undefined;
 
   const inlineNewRelicPlugin = () => {
     // We need to inline the relic_script in the index.html, you can dynamic include based on env here
@@ -71,44 +113,7 @@ export default ({ mode }: ConfigEnv) => {
       watch: {
         usePolling: true,
       },
-      proxy: {
-        "/api/v1/ogc/collections": {
-          target: apiPath,
-          changeOrigin: true,
-        },
-        "/api/v1/ogc/tiles": {
-          target: apiPath,
-          changeOrigin: true,
-        },
-        "/api/v1/ogc/ext/autocomplete": {
-          target: apiPath,
-          changeOrigin: true,
-        },
-        "/api/v1/ogc/ext/static": {
-          target: apiPath,
-          changeOrigin: true,
-        },
-        "/api/v1/ogc/ext/parameter/vocabs": {
-          target: apiPath,
-          changeOrigin: true,
-        },
-        "/api/v1/ogc/ext/tiles": {
-          target: apiPath,
-          changeOrigin: true,
-        },
-        "/api/v1/ogc/processes": {
-          target: apiPath,
-          changeOrigin: true,
-        },
-        "/api/v1/ogc/jobs": {
-          target: apiPath,
-          changeOrigin: true,
-        },
-        "/api/v1/ogc/manage": {
-          target: apiPath,
-          changeOrigin: true,
-        },
-      },
+      proxy: apiProxy,
     },
     plugins: [
       react(),

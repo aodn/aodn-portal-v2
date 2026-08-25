@@ -352,6 +352,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
           }}
         >
           <IconButton
+            aria-label="Previous topics"
             onClick={() => handleScroll(-topicsPanelContainerWidth)}
             disabled={isLeftDisabled}
             sx={{
@@ -419,6 +420,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
           }}
         >
           <IconButton
+            aria-label="Next topics"
             onClick={() => handleScroll(topicsPanelContainerWidth)}
             disabled={isRightDisabled}
             sx={{

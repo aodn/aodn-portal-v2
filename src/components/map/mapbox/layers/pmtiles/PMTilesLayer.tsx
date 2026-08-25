@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 
-import { Dayjs } from "dayjs";
+import { Dayjs } from "@/utils/DayjsUtils";
 import {
   ExpressionSpecification,
   GeoJSONSource,
@@ -409,14 +409,82 @@ export const applyHexLayerStyle = (
   });
 };
 
+/** Restore the PMTiles source and layers after a Mapbox base-style change. */
+export const addPmtilesSourceAndLayers = (
+  map: Map,
+  sourceUrl: string,
+  visible: boolean
+): void => {
+  if (!map.getSource(SOURCE_ID)) {
+    map.addSource(SOURCE_ID, {
+      type: "vector",
+      url: sourceUrl,
+      promoteId: PROMOTE_ID_PROPERTY,
+    });
+  }
+
+  // Density paint from the start (feature-state expressions). Unset totals
+  // use the paint expression's unset branch until refreshDensity writes them.
+  const densityPaint = getFeatureStatePaintProperties();
+  PMTILE_LAYERS.forEach((layer) => {
+    if (!map.getLayer(layer.id)) {
+      addDataLayer(map, {
+        id: layer.id,
+        type: "fill",
+        source: SOURCE_ID,
+        "source-layer": layer.sourceLayer,
+        minzoom: layer.minzoom,
+        maxzoom: layer.maxzoom,
+        filter: buildDensityLayerFilter(),
+        layout: {
+          visibility: visible ? "visible" : "none",
+        },
+        paint: {
+          "fill-color": densityPaint["fill-color"],
+          "fill-opacity": densityPaint["fill-opacity"],
+          "fill-outline-color": densityPaint["fill-outline-color"],
+        },
+      });
+    }
+  });
+
+  if (!map.getSource(HOVER_SOURCE_ID)) {
+    map.addSource(HOVER_SOURCE_ID, {
+      type: "geojson",
+      data: EMPTY_FEATURE_COLLECTION,
+    });
+  }
+  if (!map.getLayer(HOVER_OUTLINE_LAYER_ID)) {
+    addDataLayer(map, {
+      id: HOVER_OUTLINE_LAYER_ID,
+      type: "line",
+      source: HOVER_SOURCE_ID,
+      layout: {
+        visibility: visible ? "visible" : "none",
+        "line-join": "round",
+        "line-cap": "round",
+      },
+      paint: {
+        "line-color": "rgba(255, 255, 255, 0.9)",
+        "line-width": 1.5,
+      },
+    });
+  }
+};
+
 /** Drop all feature-state for the PMTiles vector source (if present). */
 export const clearPmtilesFeatureState = (map: Map): void => {
   if (!map.getSource(SOURCE_ID)) return;
-  try {
-    // Clears every feature-state entry for this source (all source-layers)
-    map.removeFeatureState({ source: SOURCE_ID });
-  } catch {
-    // Source may already be gone or style unloaded
+  // Vector sources require sourceLayer, so clear each hex band explicitly
+  for (const layer of PMTILE_LAYERS) {
+    try {
+      map.removeFeatureState({
+        source: SOURCE_ID,
+        sourceLayer: layer.sourceLayer,
+      });
+    } catch {
+      // Source may already be gone or style unloaded
+    }
   }
 };
 
@@ -849,62 +917,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
 
     const addSourceAndLayers = () => {
       try {
-        if (!map.getSource(SOURCE_ID)) {
-          map.addSource(SOURCE_ID, {
-            type: "vector",
-            url: sourceUrl,
-            promoteId: PROMOTE_ID_PROPERTY,
-          });
-        }
-
-        // Density paint from the start (feature-state expressions). Unset totals
-        // use the paint expression's unset branch until refreshDensity writes them.
-        const densityPaint = getFeatureStatePaintProperties();
-        PMTILE_LAYERS.forEach((layer) => {
-          if (!map.getLayer(layer.id)) {
-            addDataLayer(map, {
-              id: layer.id,
-              type: "fill",
-              source: SOURCE_ID,
-              "source-layer": layer.sourceLayer,
-              minzoom: layer.minzoom,
-              maxzoom: layer.maxzoom,
-              filter: buildDensityLayerFilter(),
-              layout: {
-                // Visibility effect owns show/hide; avoid remounting source on toggle
-                visibility: "visible",
-              },
-              paint: {
-                "fill-color": densityPaint["fill-color"],
-                "fill-opacity": densityPaint["fill-opacity"],
-                "fill-outline-color": densityPaint["fill-outline-color"],
-              },
-            });
-          }
-        });
-
-        if (!map.getSource(HOVER_SOURCE_ID)) {
-          map.addSource(HOVER_SOURCE_ID, {
-            type: "geojson",
-            data: EMPTY_FEATURE_COLLECTION,
-          });
-        }
-        if (!map.getLayer(HOVER_OUTLINE_LAYER_ID)) {
-          addDataLayer(map, {
-            id: HOVER_OUTLINE_LAYER_ID,
-            type: "line",
-            source: HOVER_SOURCE_ID,
-            layout: {
-              visibility: "visible",
-              "line-join": "round",
-              "line-cap": "round",
-            },
-            paint: {
-              "line-color": "rgba(255, 255, 255, 0.9)",
-              "line-width": 1.5,
-            },
-          });
-        }
+        addPmtilesSourceAndLayers(map, sourceUrl, hoverCtxRef.current.visible);
       } catch {
         // Style may not be ready
       }

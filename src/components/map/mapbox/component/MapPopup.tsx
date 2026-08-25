@@ -36,7 +36,7 @@ interface PopupConfig {
 
 const defaultPopupConfig: PopupConfig = {
   popupWidth: 280,
-  popupHeight: 400,
+  popupHeight: 390,
 };
 
 const renderLoadingBox = ({ popupHeight, popupWidth }: PopupConfig) => (
@@ -174,6 +174,7 @@ const MapPopup: React.FC<MapPopupProps> = memo(
           const uuid = feature.properties?.uuid as string;
           getCollectionData(uuid).then((collection) => {
             if (collection) {
+              popup.remove();
               root.render(renderContentBox(collection, onPopupMouseLeave));
               // Set the popup's position and content, then add it to the map
               // subscribe to close event to clean up resource.
@@ -198,6 +199,11 @@ const MapPopup: React.FC<MapPopupProps> = memo(
         popup.remove();
       };
 
+      // Mapbox detaches the popup content from the DOM as soon as the popup is
+      // removed, but the React tree stays mounted. Any portaled child (e.g. the
+      // MUI tooltip on the title) would then lose its anchor.
+      const onPopupClose = () => root.render(null);
+
       // We do not need to show the MapPopup for small screen
       // without the event, the popup will not show but instance still
       // created, so when user enlarge the screen, this popup will work
@@ -207,6 +213,8 @@ const MapPopup: React.FC<MapPopupProps> = memo(
           popup.remove();
         }
       };
+
+      popup.on("close", onPopupClose);
 
       map?.on("mouseleave", layerId, onPointMouseLeave);
       map?.on("mouseenter", layerId, onPointMouseEnter);
@@ -226,7 +234,9 @@ const MapPopup: React.FC<MapPopupProps> = memo(
         map?.off("sourcedata", onSourceChange);
         map?.off("draw.modechange", onDrawInteractionChange);
         map?.off("draw.selectionchange", onDrawInteractionChange);
+        // Remove first so onPopupClose still unmounts the content, then detach
         popup?.remove();
+        popup?.off("close", onPopupClose);
         setTimeout(() => root?.unmount(), 500);
       };
     }, [getCollectionData, isUnderLaptop, layerId, map, renderContentBox]);

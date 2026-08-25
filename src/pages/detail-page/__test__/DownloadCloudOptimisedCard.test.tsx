@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "@/utils/DayjsUtils";
 import { Provider } from "react-redux";
 
 beforeAll(() => {
@@ -89,7 +90,10 @@ describe("DownloadCloudOptimisedCard", () => {
     return render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <LocalizationProvider
+            dateAdapter={AdapterDayjs}
+            dateLibInstance={dayjs}
+          >
             <DownloadCloudOptimisedCard
               collection={collection}
               downloadConditions={downloadConditions}
@@ -233,7 +237,10 @@ describe("DownloadCloudOptimisedCard", () => {
     render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <LocalizationProvider
+            dateAdapter={AdapterDayjs}
+            dateLibInstance={dayjs}
+          >
             <DownloadCloudOptimisedCard
               collection={createMockCollection(DatasetType.ZARR)}
               downloadConditions={[]}

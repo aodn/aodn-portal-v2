@@ -10,7 +10,7 @@ import default_thumbnail from "@/assets/images/default-thumbnail.png";
 import { bboxPolygon } from "@turf/turf";
 
 import * as turf from "@turf/turf";
-import dayjs from "dayjs";
+import dayjs from "@/utils/DayjsUtils";
 import { dateDefault } from "@/components/common/constants";
 import { IconWMS } from "@/components/icon/IconWMS";
 import { IconWFS } from "@/components/icon/IconWFS";
@@ -592,10 +592,10 @@ export class Spatial {
     let startDate: string | undefined = undefined;
     let endDate: string | undefined = undefined;
     if (period?.[0][0]) {
-      startDate = dayjs(period[0][0]).format(dateDefault.DISPLAY_FORMAT);
+      startDate = dayjs.tz(period[0][0]).format(dateDefault.DISPLAY_FORMAT);
     }
     if (period?.[0][1]) {
-      endDate = dayjs(period[0][1]).format(dateDefault.DISPLAY_FORMAT);
+      endDate = dayjs.tz(period[0][1]).format(dateDefault.DISPLAY_FORMAT);
     }
     return [startDate, endDate];
   };

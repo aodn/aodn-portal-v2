@@ -51,8 +51,13 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
   setSelectedCoKey,
 }) => {
   const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
-  const { isEstimating, estimateSize, cancelEstimate, estimatedSizeBytes } =
-    useEstimateSize(processCoEstimateSize, getCoEstimatedBytes);
+  const {
+    isEstimating,
+    estimateSize,
+    cancelEstimate,
+    estimatedSizeBytes,
+    estimateFailed,
+  } = useEstimateSize(processCoEstimateSize, getCoEstimatedBytes);
 
   // add datasetselection option
   const [selectedDataItem, setSelectedDataItem] = useState<
@@ -230,6 +235,7 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
           onDownload={onDownload}
           isEstimating={isEstimating}
           estimatedSizeBytes={estimatedSizeBytes}
+          estimateFailed={estimateFailed}
         />
       </Stack>
       <DownloadSubsetting

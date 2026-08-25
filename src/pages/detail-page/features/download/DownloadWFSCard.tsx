@@ -75,8 +75,13 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
     cancelDownload,
     isDownloading,
   } = useWFSDownload(() => setSnackbarOpen(true));
-  const { isEstimating, estimateSize, cancelEstimate, estimatedSizeBytes } =
-    useEstimateSize(processWFSEstimateSize);
+  const {
+    isEstimating,
+    estimateSize,
+    cancelEstimate,
+    estimatedSizeBytes,
+    estimateFailed,
+  } = useEstimateSize(processWFSEstimateSize);
   const dispatch = useAppDispatch();
   const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
   const [dataSelectOptions, setDataSelectOptions] = useState<SelectItem[]>([]);
@@ -254,6 +259,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
           isDownloading={isDownloading}
           isEstimating={isEstimating}
           estimatedSizeBytes={estimatedSizeBytes}
+          estimateFailed={estimateFailed}
           handleCancelDownload={handleCancelDownload}
         />
         {isDownloading &&

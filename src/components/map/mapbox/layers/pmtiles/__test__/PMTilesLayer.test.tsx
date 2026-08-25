@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import dayjs from "@/utils/DayjsUtils";
 import { vi } from "vitest";
 import type { Map } from "mapbox-gl";
 import {
@@ -20,6 +20,7 @@ import {
   countUnwrittenLoadedFeatures,
   getActivePmtilesLayers,
   clearInactivePmtilesFeatureState,
+  addPmtilesSourceAndLayers,
   PMTILE_LAYERS,
   FEATURE_STATE_TOTAL,
   DENSITY_TOTAL_CAP,
@@ -100,8 +101,8 @@ const sampleDateTree = {
 
 describe("PMTilesLayer - parsePeriodInt / periodNumberToDayjs", () => {
   it("parses day periods as integers (not unix ms)", () => {
-    // Regression: dayjs(20100815) is ~1970; period keys must stay as YYYYMMDD ints
-    expect(dayjs(20100815).format("YYYY-MM-DD")).toBe("1970-01-01");
+    // Regression: a YYYYMMDD int is unix ms (~1970), not a calendar day.
+    expect(dayjs.tz(20100815).format("YYYY-MM-DD")).toBe("1970-01-01");
     expect(parsePeriodInt(20100815)).toBe(20100815);
     expect(parsePeriodInt("20260304")).toBe(20260304);
     expect(periodNumberToDayjs(20100815)?.format("YYYY-MM-DD")).toBe(
@@ -119,7 +120,7 @@ describe("PMTilesLayer - parsePeriodInt / periodNumberToDayjs", () => {
   });
 
   it("dayjsToPeriodInt is always YYYYMMDD", () => {
-    expect(dayjsToPeriodInt(dayjs("2010-08-15"))).toBe(20100815);
+    expect(dayjsToPeriodInt(dayjs.tz("2010-08-15"))).toBe(20100815);
   });
 
   it("daysInMonth handles leap years", () => {
@@ -202,8 +203,8 @@ describe("PMTilesLayer - parsePMTilesMetadata", () => {
       hasTime: false as const,
     };
     const range = buildCountFilterRange(
-      dayjs("2020-01-01"),
-      dayjs("2024-12-31"),
+      dayjs.tz("2020-01-01"),
+      dayjs.tz("2024-12-31"),
       { bounds }
     );
     expect(range.empty).toBe(false);
@@ -217,8 +218,8 @@ describe("PMTilesLayer - parsePMTilesMetadata", () => {
           "01": { [TOTAL_KEY]: 99, [DAYS_KEY]: { "01": 99 } },
         },
       }),
-      dayjs("2020-01-01"),
-      dayjs("2024-12-31"),
+      dayjs.tz("2020-01-01"),
+      dayjs.tz("2024-12-31"),
       { range }
     );
     expect(total).toBe(99);
@@ -231,8 +232,8 @@ describe("PMTilesLayer - parsePMTilesMetadata", () => {
       hasTime: true as const,
     };
     const range = buildCountFilterRange(
-      dayjs("2020-01-01"),
-      dayjs("2024-12-31"),
+      dayjs.tz("2020-01-01"),
+      dayjs.tz("2024-12-31"),
       { bounds }
     );
     expect(range.empty).toBe(true);
@@ -279,8 +280,8 @@ describe("PMTilesLayer - clampPeriodsToMetadata / clampRangeToMetadata", () => {
 
   it("Dayjs clamp helper uses integer clamp under the hood", () => {
     const { start, end } = clampRangeToMetadata(
-      dayjs("2000-01-01"),
-      dayjs("2030-12-31"),
+      dayjs.tz("2000-01-01"),
+      dayjs.tz("2030-12-31"),
       metaRange(20100815, 20100901)
     );
     expect(start.format("YYYY-MM-DD")).toBe("2010-08-15");
@@ -289,8 +290,8 @@ describe("PMTilesLayer - clampPeriodsToMetadata / clampRangeToMetadata", () => {
 
   it("leaves the filter unchanged when metadata bounds are absent", () => {
     const { start, end } = clampRangeToMetadata(
-      dayjs("2020-01-01"),
-      dayjs("2020-01-31"),
+      dayjs.tz("2020-01-01"),
+      dayjs.tz("2020-01-31"),
       null
     );
     expect(start.format("YYYY-MM-DD")).toBe("2020-01-01");
@@ -334,8 +335,8 @@ describe("PMTilesLayer - parseCountsTree", () => {
 describe("PMTilesLayer - buildCountFilterRange", () => {
   it("builds day periods from Dayjs window", () => {
     const range = buildCountFilterRange(
-      dayjs("2024-01-10"),
-      dayjs("2024-01-20")
+      dayjs.tz("2024-01-10"),
+      dayjs.tz("2024-01-20")
     );
     expect(range.empty).toBe(false);
     expect(range.startPeriod).toBe(20240110);
@@ -344,8 +345,8 @@ describe("PMTilesLayer - buildCountFilterRange", () => {
 
   it("marks empty when start is after end", () => {
     const range = buildCountFilterRange(
-      dayjs("2024-06-01"),
-      dayjs("2024-01-01")
+      dayjs.tz("2024-06-01"),
+      dayjs.tz("2024-01-01")
     );
     expect(range.empty).toBe(true);
   });
@@ -374,8 +375,8 @@ describe("PMTilesLayer - buildCountFilterRange", () => {
   it("still empties when an explicit UI filter is entirely after metadata", () => {
     const bounds = metaRange(19700121, 19700121);
     const range = buildCountFilterRange(
-      dayjs("2000-01-01"),
-      dayjs("2020-01-01"),
+      dayjs.tz("2000-01-01"),
+      dayjs.tz("2020-01-01"),
       { bounds }
     );
     expect(range.empty).toBe(true);
@@ -393,8 +394,8 @@ describe("PMTilesLayer - buildCountFilterRange", () => {
 describe("PMTilesLayer - sumCountsTreeInRange (hierarchical all-grain)", () => {
   it("uses year.t for a fully covered year (fast path)", () => {
     const range = buildCountFilterRange(
-      dayjs("2012-01-01"),
-      dayjs("2012-12-31")
+      dayjs.tz("2012-01-01"),
+      dayjs.tz("2012-12-31")
     );
     const { total } = sumCountsTreeInRange(sampleDateTree, range);
     expect(total).toBe(20);
@@ -402,8 +403,8 @@ describe("PMTilesLayer - sumCountsTreeInRange (hierarchical all-grain)", () => {
 
   it("sums only in-range days for a partial month", () => {
     const range = buildCountFilterRange(
-      dayjs("2012-11-05"),
-      dayjs("2012-11-05")
+      dayjs.tz("2012-11-05"),
+      dayjs.tz("2012-11-05")
     );
     const { total, minPeriod, maxPeriod } = sumCountsTreeInRange(
       sampleDateTree,
@@ -417,8 +418,8 @@ describe("PMTilesLayer - sumCountsTreeInRange (hierarchical all-grain)", () => {
 
   it("mixes full years with partial edges", () => {
     const range = buildCountFilterRange(
-      dayjs("2012-01-01"),
-      dayjs("2014-07-01")
+      dayjs.tz("2012-01-01"),
+      dayjs.tz("2014-07-01")
     );
     const { total } = sumCountsTreeInRange(sampleDateTree, range);
     expect(total).toBe(22);
@@ -433,16 +434,16 @@ describe("PMTilesLayer - sumCountsTreeInRange (hierarchical all-grain)", () => {
       },
     };
     const range = buildCountFilterRange(
-      dayjs("2024-01-01"),
-      dayjs("2024-03-31")
+      dayjs.tz("2024-01-01"),
+      dayjs.tz("2024-03-31")
     );
     expect(sumCountsTreeInRange(tree, range).total).toBe(12);
   });
 });
 
 describe("PMTilesLayer - buildPopupHtml", () => {
-  const filterStart = dayjs("2024-01-01");
-  const filterEnd = dayjs("2024-12-31");
+  const filterStart = dayjs.tz("2024-01-01");
+  const filterEnd = dayjs.tz("2024-12-31");
 
   it("sums daily counts from the nested tree", () => {
     const html = buildPopupHtml(
@@ -463,8 +464,8 @@ describe("PMTilesLayer - buildPopupHtml", () => {
 
   it("omits Time Range on timeless (has_time false) tiles", () => {
     const range = buildCountFilterRange(
-      dayjs("2020-01-01"),
-      dayjs("2024-12-31"),
+      dayjs.tz("2020-01-01"),
+      dayjs.tz("2024-12-31"),
       {
         bounds: {
           minPeriod: 19700101,
@@ -480,8 +481,8 @@ describe("PMTilesLayer - buildPopupHtml", () => {
           "01": { [TOTAL_KEY]: 42, [DAYS_KEY]: { "01": 42 } },
         },
       }),
-      dayjs("2020-01-01"),
-      dayjs("2024-12-31"),
+      dayjs.tz("2020-01-01"),
+      dayjs.tz("2024-12-31"),
       range,
       false
     );
@@ -524,8 +525,8 @@ describe("PMTilesLayer - buildPopupHtml", () => {
   });
 
   it("for a full month, day tree sum matches month.t", () => {
-    const start = dayjs("2010-08-01");
-    const end = dayjs("2010-08-31");
+    const start = dayjs.tz("2010-08-01");
+    const end = dayjs.tz("2010-08-31");
     const dayHtml = buildPopupHtml(
       countsProps({
         "2010": {
@@ -543,8 +544,8 @@ describe("PMTilesLayer - buildPopupHtml", () => {
   });
 
   it("partial-month filters only count in-range days", () => {
-    const start = dayjs("2010-08-01");
-    const end = dayjs("2010-08-15");
+    const start = dayjs.tz("2010-08-01");
+    const end = dayjs.tz("2010-08-15");
     const dayHtml = buildPopupHtml(
       countsProps({
         "2010": {
@@ -648,8 +649,8 @@ describe("PMTilesLayer - clearInactivePmtilesFeatureState", () => {
 });
 
 describe("PMTilesLayer - sparse sum and feature-state", () => {
-  const start = dayjs("2024-01-01");
-  const end = dayjs("2024-03-31");
+  const start = dayjs.tz("2024-01-01");
+  const end = dayjs.tz("2024-03-31");
 
   it("sums only in-range days from the nested tree", () => {
     const { total, matchedKeys, minPeriod, maxPeriod } =
@@ -899,8 +900,8 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
 
     const { updated } = updateFeatureStateTotals(
       map,
-      dayjs("2024-01-01"),
-      dayjs("2024-03-31")
+      dayjs.tz("2024-01-01"),
+      dayjs.tz("2024-03-31")
     );
     expect(updated).toBe(3);
     expect(setFeatureState).toHaveBeenCalledWith(
@@ -967,8 +968,8 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
 
     const { updated } = updateFeatureStateTotals(
       map,
-      dayjs("2024-01-14"),
-      dayjs("2024-01-16")
+      dayjs.tz("2024-01-14"),
+      dayjs.tz("2024-01-16")
     );
     expect(updated).toBe(2);
     expect(setFeatureState).toHaveBeenCalledWith(
@@ -1029,14 +1030,14 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
 
     const session = createFeatureStateTotalsSession();
     const range = buildCountFilterRange(
-      dayjs("2024-01-01"),
-      dayjs("2024-03-31")
+      dayjs.tz("2024-01-01"),
+      dayjs.tz("2024-03-31")
     );
 
     const first = updateFeatureStateTotals(
       map,
-      dayjs("2024-01-01"),
-      dayjs("2024-03-31"),
+      dayjs.tz("2024-01-01"),
+      dayjs.tz("2024-03-31"),
       { range, session }
     );
     expect(first.updated).toBe(2);
@@ -1047,8 +1048,8 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     setFeatureState.mockClear();
     const second = updateFeatureStateTotals(
       map,
-      dayjs("2024-01-01"),
-      dayjs("2024-03-31"),
+      dayjs.tz("2024-01-01"),
+      dayjs.tz("2024-03-31"),
       { range, session }
     );
     expect(second.updated).toBe(0);
@@ -1068,8 +1069,8 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     });
     const third = updateFeatureStateTotals(
       map,
-      dayjs("2024-01-01"),
-      dayjs("2024-03-31"),
+      dayjs.tz("2024-01-01"),
+      dayjs.tz("2024-03-31"),
       { range, session }
     );
     expect(third.updated).toBe(1);
@@ -1200,8 +1201,8 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
 
     const { updated } = updateFeatureStateTotals(
       map,
-      dayjs("2024-01-01"),
-      dayjs("2024-03-31"),
+      dayjs.tz("2024-01-01"),
+      dayjs.tz("2024-03-31"),
       { layers: active }
     );
 
@@ -1261,6 +1262,42 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     expect(work).not.toHaveBeenCalled();
     await new Promise((r) => setTimeout(r, 40));
     expect(work).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("PMTilesLayer - base style restoration", () => {
+  it("restores PMTiles layers as hidden while another style is selected", () => {
+    const addLayer = vi.fn();
+    const map = {
+      getSource: vi.fn().mockReturnValue(undefined),
+      addSource: vi.fn(),
+      getLayer: vi.fn().mockReturnValue(undefined),
+      getStyle: vi.fn().mockReturnValue({ layers: [] }),
+      addLayer,
+    } as unknown as Map;
+
+    addPmtilesSourceAndLayers(map, "pmtiles://density", false);
+
+    const restoredLayers = addLayer.mock.calls.map(([layer]) => layer);
+    expect(restoredLayers).toHaveLength(PMTILE_LAYERS.length + 1);
+    expect(restoredLayers).toEqual(
+      expect.arrayContaining(
+        PMTILE_LAYERS.map((layer) =>
+          expect.objectContaining({
+            id: layer.id,
+            layout: expect.objectContaining({ visibility: "none" }),
+          })
+        )
+      )
+    );
+    expect(restoredLayers).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "pmtiles-hex-hover-outline",
+          layout: expect.objectContaining({ visibility: "none" }),
+        }),
+      ])
+    );
   });
 });
 

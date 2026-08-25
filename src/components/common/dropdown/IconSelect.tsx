@@ -20,7 +20,7 @@ import { IconProps } from "../../icon/types";
 import { mergeWithDefaults } from "@/utils/ObjectUtils";
 import { disableScroll, enableScroll } from "@/utils/ScrollUtils";
 import { portalTheme } from "../../../styles";
-import { SIMPLE_FILTER_DEFAULT_HEIGHT } from "../../filter/ResultPanelSimpleFilter";
+import { SIMPLE_FILTER_DEFAULT_HEIGHT } from "../constants";
 
 interface IconSelectColorConfig {
   defaultColor: string;

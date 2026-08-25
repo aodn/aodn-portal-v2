@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import dayjs from "@/utils/DayjsUtils";
 
 const dateDefault = {
   // Must use this format to do search, we care about the time
@@ -8,9 +8,13 @@ const dateDefault = {
   DISPLAY_FORMAT: "DD/MM/YYYY",
   // e.g. 05 Jan 2024, matching the download email
   DISPLAY_FORMAT_LONG: "DD MMM YYYY",
-  min: new Date("01/01/1970"),
-  max: new Date(),
-  currentYear: dayjs(new Date()).year(),
+  min: dayjs.tz(0),
+  get max() {
+    return dayjs.tz();
+  },
+  get currentYear() {
+    return dayjs.tz().year();
+  },
 };
 
 const pageDefault = {
@@ -78,6 +82,8 @@ const playwrightTestIds = {
   DETAIL_MAP_POPUP: "map-popup",
 };
 
+const SIMPLE_FILTER_DEFAULT_HEIGHT = 40;
+
 const imosInfoDefault = {
   EMAIL: {
     RECIPIENT: "info@aodn.org.au",
@@ -96,4 +102,5 @@ export {
   contactRoles,
   imosInfoDefault,
   playwrightTestIds,
+  SIMPLE_FILTER_DEFAULT_HEIGHT,
 };

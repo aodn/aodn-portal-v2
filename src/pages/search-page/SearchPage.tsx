@@ -68,8 +68,10 @@ import _ from "lodash";
 import useFetchData from "../../hooks/useFetchData";
 import { ProgressType } from "../../components/map/mapbox/MapContext";
 import AdminScreenContext from "../../components/admin/AdminScreenContext";
+import { useDocumentTitle } from "@/seo/useDocumentTitle";
 
 const SearchPage = () => {
+  useDocumentTitle("Search");
   const location = useLocation();
   const navigate = useNavigate();
   const { getMaxMapCentroids } = useContext(AdminScreenContext);
@@ -607,7 +609,10 @@ const SearchPage = () => {
         sx={{
           flex: isUnderLaptop ? 1 : "none",
           width: layout === SearchResultLayoutEnum.FULL_LIST ? "100%" : "auto",
-          height: layout === SearchResultLayoutEnum.FULL_MAP ? 0 : "auto",
+          height: layout === SearchResultLayoutEnum.FULL_MAP ? 0 : "100%",
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         <ResultSection

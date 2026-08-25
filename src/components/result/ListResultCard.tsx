@@ -20,7 +20,7 @@ import {
 import { Link as RouterLink } from "react-router-dom";
 import OrganizationLogo from "../icon/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
-import { ResultCardBasicType } from "./ResultCards";
+import { ResultCardBasicType } from "./types";
 import BookmarkButton from "../bookmark/BookmarkButton";
 import default_thumbnail from "@/assets/images/default-thumbnail.png";
 import {

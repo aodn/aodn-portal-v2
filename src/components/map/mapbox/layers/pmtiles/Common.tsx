@@ -1,6 +1,7 @@
-import dayjs, { Dayjs } from "dayjs";
+import { Dayjs } from "@/utils/DayjsUtils";
 import { ExpressionSpecification } from "mapbox-gl";
-import { dayjsToDayPeriod } from "@/utils/DateUtils";
+import { dateDefault } from "@/components/common/constants";
+import { dayjsToDayPeriod, getAppMaxDate, toAppDayjs } from "@/utils/DateUtils";
 
 /** One Mapbox fill band over a PMTiles `hex_z*` source-layer. */
 export type PmtilesHexLayerDef = {
@@ -240,8 +241,8 @@ export const daysInMonth = (year: number, month: number): number => {
 };
 
 const resolveRange = (start?: Dayjs, end?: Dayjs) => ({
-  start: start || dayjs(DEFAULT_RANGE_START),
-  end: end || dayjs(),
+  start: start || toAppDayjs(DEFAULT_RANGE_START, dateDefault.DATE_FORMAT),
+  end: end || getAppMaxDate(),
 });
 
 /** UI Dayjs → day period int (`YYYYMMDD`). */
@@ -283,8 +284,8 @@ export const periodNumberToDayjs = (value: unknown): Dayjs | undefined => {
   const d = period % 100;
   const mm = m < 10 ? `0${m}` : String(m);
   const dd = d < 10 ? `0${d}` : String(d);
-  const day = dayjs(`${y}-${mm}-${dd}`);
-  return day.isValid() ? day.startOf("day") : undefined;
+  const day = toAppDayjs(`${y}-${mm}-${dd}`, dateDefault.DATE_FORMAT);
+  return day.isValid() ? day : undefined;
 };
 
 /**

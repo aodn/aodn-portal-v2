@@ -41,6 +41,7 @@ class Routes:
     ESTIMATE_CO_DOWNLOAD = f'{PREFIX}/processes/estimateCOdownload/execution'
 
     STATIC_GEOJSON = f'{PREFIX}/ext/static/*.json'
+    MANAGE_INFO = f'{PREFIX}/manage/info'
 
     # S3 sidecar next to `{key}.pmtiles` — used to decide PMTiles support.
     PMTILES_METADATA = re.compile(

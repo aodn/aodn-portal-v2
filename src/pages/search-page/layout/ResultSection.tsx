@@ -18,6 +18,7 @@ import {
   SEARCH_PAGE_RESULT_SECTION_CONTAINER_MAX_WIDTH,
   SEARCH_PAGE_RESULT_SECTION_CONTAINER_MIN_WIDTH,
 } from "../constants";
+import MiniFooter from "@/app/layout/MiniFooter";
 
 interface ResultSectionProps
   extends
@@ -61,6 +62,7 @@ const ResultSection: FC<ResultSectionProps> = ({
               ? SEARCH_PAGE_RESULT_SECTION_CONTAINER_MIN_WIDTH
               : SEARCH_PAGE_RESULT_SECTION_CONTAINER_MAX_WIDTH,
         height: "100%",
+        minHeight: 0,
         display: "flex",
         flexDirection: "column",
         position: "relative",
@@ -95,7 +97,7 @@ const ResultSection: FC<ResultSectionProps> = ({
       <Box
         sx={{
           flex: 1,
-          height: "100%",
+          minHeight: 0,
           overflowY: "auto",
           pr: isUnderLaptop ? 0 : 1,
         }}
@@ -110,6 +112,7 @@ const ResultSection: FC<ResultSectionProps> = ({
           selectedUuids={selectedUuids}
         />
       </Box>
+      {showFullList && <MiniFooter />}
     </Box>
   );
 };

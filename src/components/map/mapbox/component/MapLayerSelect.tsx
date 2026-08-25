@@ -1,4 +1,5 @@
-import { FC, useMemo } from "react";
+import { FC, ReactNode, useMemo } from "react";
+import { createPortal } from "react-dom";
 import {
   Box,
   Divider,
@@ -7,12 +8,15 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { borderRadius, zIndex } from "@/styles/constants";
+import { borderRadius } from "@/styles/constants";
 import CommonSelect, {
   SelectItem,
 } from "../../../common/dropdown/CommonSelect";
 import { portalTheme } from "../../../../styles";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
+
+/** Host slot above the map. Layers still own options; this is only placement. */
+export const MAP_DATASET_SELECT_SLOT_ID = "map-dataset-select-slot";
 
 interface MapLayerSelectProps {
   layersOptions: SelectItem<string>[];
@@ -22,6 +26,17 @@ interface MapLayerSelectProps {
   loadingText?: string;
 }
 
+const selectProps = {
+  backgroundColor: "transparent",
+  border: "none",
+  boxShadow: "unset",
+  textAlign: "left",
+  "& .MuiSelect-select": {
+    textAlign: "left",
+    justifyContent: "flex-start",
+  },
+};
+
 const MapLayerSelect: FC<MapLayerSelectProps> = ({
   layersOptions,
   selectedLayer,
@@ -30,13 +45,7 @@ const MapLayerSelect: FC<MapLayerSelectProps> = ({
   loadingText = "Loading Layers...",
 }) => {
   const theme = useTheme();
-  const { isUnderLaptop, isLargeMobile } = useBreakpoint();
-
-  const selectProps = {
-    backgroundColor: "transparent",
-    border: "none",
-    boxShadow: "unset",
-  };
+  const { isLargeMobile } = useBreakpoint();
 
   const menuProps = useMemo(
     () => ({
@@ -49,6 +58,8 @@ const MapLayerSelect: FC<MapLayerSelectProps> = ({
           maxWidth: "80vw",
           "& .MuiMenuItem-root": {
             ...portalTheme.typography.body1Medium,
+            textAlign: "left",
+            justifyContent: "flex-start",
             whiteSpace: "normal",
             wordBreak: "break-word",
             "&.Mui-selected": {
@@ -61,17 +72,15 @@ const MapLayerSelect: FC<MapLayerSelectProps> = ({
     [theme]
   );
 
-  return (
+  if (!isLoading && layersOptions.length === 0) {
+    return null;
+  }
+
+  const content: ReactNode = (
     <Box
       id="geoserver-layer-select-container"
       sx={{
-        width: "auto",
-        maxWidth: "70%",
-        position: "absolute",
-        top: 0,
-        left: `${isUnderLaptop ? "0px" : "40px"}`,
-        zIndex: zIndex.MAP_BASE,
-        padding: "10px",
+        width: "100%",
       }}
     >
       {isLoading ? (
@@ -80,8 +89,8 @@ const MapLayerSelect: FC<MapLayerSelectProps> = ({
           sx={{
             backgroundColor: "#fff",
             border: "none",
-            borderRadius: borderRadius.small,
-            boxShadow: theme.shadows[5],
+            borderRadius: 0,
+            boxShadow: "none",
             alignContent: "center",
             alignItems: "center",
             p: "12px",
@@ -112,14 +121,14 @@ const MapLayerSelect: FC<MapLayerSelectProps> = ({
             }}
           />
         </Stack>
-      ) : layersOptions.length > 0 ? (
+      ) : (
         <Stack
           direction="row"
           sx={{
             backgroundColor: "#fff",
             border: "none",
-            borderRadius: borderRadius.small,
-            boxShadow: theme.shadows[5],
+            borderRadius: 0,
+            boxShadow: "none",
             alignContent: "center",
             alignItems: "center",
           }}
@@ -134,7 +143,7 @@ const MapLayerSelect: FC<MapLayerSelectProps> = ({
                   whiteSpace: "nowrap",
                 }}
               >
-                Map Layer
+                Dataset Selection
               </Typography>
               <Divider
                 orientation="vertical"
@@ -155,9 +164,12 @@ const MapLayerSelect: FC<MapLayerSelectProps> = ({
             dataTestId="layer-select-dropdown"
           />
         </Stack>
-      ) : null}
+      )}
     </Box>
   );
+
+  const slot = document.getElementById(MAP_DATASET_SELECT_SLOT_ID);
+  return slot ? createPortal(content, slot) : content;
 };
 
 export default MapLayerSelect;

@@ -59,7 +59,7 @@ describe("useGriddedRasterLayer", () => {
     );
 
     await waitFor(() => expect(result.current.hasProducts).toBe(true));
-    expect(result.current.layerProps.selectedProductId).toBe("a:one");
+    expect(result.current.layerProps.layerConfig).toBe("a:one");
     expect(result.current.layerProps.selectedDate).toBe("2024-01-05");
     expect(result.current.hasDates).toBe(true);
     expect(result.current.dateSliderKey).toBe("gridded-date-a:one");
@@ -117,11 +117,11 @@ describe("useGriddedRasterLayer", () => {
 
     // Switch to product two: its own latest day is different from the shared date.
     act(() => {
-      result.current.layerProps.onSelectProduct("b:two");
+      result.current.layerProps.onLayerChange("b:two");
     });
 
     await waitFor(() =>
-      expect(result.current.layerProps.selectedProductId).toBe("b:two")
+      expect(result.current.layerProps.layerConfig).toBe("b:two")
     );
     expect(result.current.layerProps.selectedDate).toBe("2024-01-20");
     // The remount key follows the product, forcing DateSliderPoint to reset.
@@ -169,15 +169,15 @@ describe("useGriddedRasterLayer", () => {
     );
 
     await waitFor(() => expect(result.current.hasProducts).toBe(true));
-    act(() => result.current.layerProps.onSelectProduct("b:two"));
+    act(() => result.current.layerProps.onLayerChange("b:two"));
     await waitFor(() =>
-      expect(result.current.layerProps.selectedProductId).toBe("b:two")
+      expect(result.current.layerProps.layerConfig).toBe("b:two")
     );
 
     act(() => result.current.layerProps.onRetry?.());
 
     await waitFor(() =>
-      expect(result.current.layerProps.selectedProductId).toBe("c:three")
+      expect(result.current.layerProps.layerConfig).toBe("c:three")
     );
     expect(result.current.layerProps.selectedDate).toBe("2024-03-01");
     expect(spy).toHaveBeenCalledTimes(2);

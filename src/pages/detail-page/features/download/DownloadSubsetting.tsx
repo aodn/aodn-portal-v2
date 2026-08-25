@@ -10,7 +10,8 @@ import {
   Typography,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import dayjs, { Dayjs } from "dayjs";
+import { Dayjs } from "@/utils/DayjsUtils";
+import { toAppDayjs } from "@/utils/DateUtils";
 import PlainAccordion from "../../../../components/common/accordion/PlainAccordion";
 import { portalTheme } from "../../../../styles";
 import {
@@ -43,8 +44,8 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
       const bounds = mapSubsettingCapabilities.timeRangeBounds;
       if (!bounds) return undefined;
 
-      const min = dayjs(bounds.min, dateDefault.DATE_FORMAT);
-      const max = dayjs(bounds.max, dateDefault.DATE_FORMAT);
+      const min = toAppDayjs(bounds.min, dateDefault.DATE_FORMAT);
+      const max = toAppDayjs(bounds.max, dateDefault.DATE_FORMAT);
       return min.isValid() && max.isValid() ? { min, max } : undefined;
     }, [mapSubsettingCapabilities.timeRangeBounds]);
   const supportCtx: ConditionSupportContext = useMemo(
