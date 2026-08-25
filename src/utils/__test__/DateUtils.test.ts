@@ -71,6 +71,18 @@ describe("valueToDate / toAppDayjs", () => {
     const d = toAppDayjs("2024-01-02", dateDefault.DATE_FORMAT);
     expect(d.toISOString()).toBe("2024-01-02T00:00:00.000Z");
   });
+
+  it("ignores format when value is missing", () => {
+    const d = toAppDayjs(undefined, dateDefault.DATE_FORMAT);
+    expect(d.isValid()).toBe(true);
+    expect(Math.abs(d.valueOf() - Date.now())).toBeLessThan(1000);
+  });
+
+  it("ignores format for non-string values", () => {
+    const epoch = Date.UTC(2024, 0, 2, 0, 0, 0);
+    const d = toAppDayjs(epoch, dateDefault.DATE_FORMAT);
+    expect(d.toISOString()).toBe("2024-01-02T00:00:00.000Z");
+  });
 });
 
 describe("toUtcStartOfDay / toUtcEndOfDay", () => {

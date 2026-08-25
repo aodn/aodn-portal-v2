@@ -6,10 +6,13 @@ export const toAppDayjs = (
   value?: string | number | Date | Dayjs,
   format?: string
 ): Dayjs => {
-  if (format) {
+  if (value === undefined) {
+    return dayjs.tz();
+  }
+  if (format && typeof value === "string") {
     return dayjs.tz(value, format, getAppTimezone());
   }
-  return value === undefined ? dayjs.tz() : dayjs.tz(value);
+  return dayjs.tz(value);
 };
 
 /** Calendar Y-M-D of `date` as UTC midnight (date-only pickers). */
