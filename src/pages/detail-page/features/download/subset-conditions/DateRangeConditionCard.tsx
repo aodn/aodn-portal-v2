@@ -82,7 +82,7 @@ const DateRow: React.FC<DateRowProps> = ({
     <PlainDatePicker
       sx={datePickerSx}
       views={["year", "month", "day"]}
-      format={dateDefault.DISPLAY_FORMAT_LONG}
+      format={dateDefault.DISPLAY_FORMAT}
       value={toAppDayjs(value, dateDefault.DATE_FORMAT)}
       minDate={minDate}
       maxDate={maxDate}

@@ -53,6 +53,7 @@ import AdminScreenContext from "../../../../admin/AdminScreenContext";
 import { HttpStatusCode } from "axios";
 import {
   dateToValue,
+  formatDate,
   formatUtcDateTime,
   getAppMaxDate,
 } from "@/utils/DateUtils";
@@ -506,7 +507,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             <CardContent key={index}>
               {value.time && (
                 <Typography component="div" variant="body3Small">
-                  Time: {value.time.toString()}
+                  Time: {formatDate(value.time)}
                 </Typography>
               )}
               {value.value && (

@@ -1,13 +1,14 @@
 import dayjs from "@/utils/DayjsUtils";
 
 const dateDefault = {
-  // Must use this format to do search, we care about the time
-  DATE_TIME_FORMAT: "YYYY-MM-DDTHH:mm:ss[Z]",
-  DATE_FORMAT: "YYYY-MM-DD",
-  DATE_YEAR_MONTH_FORMAT: "YYYY-MM",
-  DISPLAY_FORMAT: "DD/MM/YYYY",
-  // e.g. 05 Jan 2024, matching the download email
-  DISPLAY_FORMAT_LONG: "DD MMM YYYY",
+  // Wire formats — machine-readable, NOT for display. Do not repoint these.
+  DATE_TIME_FORMAT: "YYYY-MM-DDTHH:mm:ss[Z]", // CQL temporal filters
+  DATE_FORMAT: "YYYY-MM-DD", // machine day keys, slider I/O
+
+  // Display formats — every user-facing date goes through formatDate().
+  DISPLAY_FORMAT: "DD MMM YYYY",
+  // Metadata Dates panel: keeps the GeoNetwork time-of-day + GMT+0000 hack.
+  DISPLAY_FORMAT_WITH_TIME: "DD MMM YYYY HH:mm:ss [GMT+0000]",
   min: dayjs.tz(0),
   get max() {
     return dayjs.tz();

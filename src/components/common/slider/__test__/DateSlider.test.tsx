@@ -66,7 +66,7 @@ describe("DateSliderRange min floor", () => {
     expect(Number(startThumb.getAttribute("aria-valuenow"))).toBe(floorValue);
     expect(Number(startThumb.getAttribute("aria-valuemin"))).toBe(floorValue);
     // Bottom rail label shows the floored min (value labels may also render it)
-    expect(screen.getAllByText("01/01/1970").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("01 Jan 1970").length).toBeGreaterThan(0);
   });
 
   it("keeps the dataset min when it is on or after 1 Jan 1970", () => {
@@ -258,11 +258,11 @@ describe("DateSliderPoint resync", () => {
 describe("DateSliderPoint display", () => {
   const points = [Date.UTC(2024, 0, 1), Date.UTC(2024, 0, 2)];
 
-  it("shows the selected date formatted as DD/MM/YYYY", () => {
+  it("shows the selected date formatted as DD MMM YYYY", () => {
     render(<DateSliderPoint valid_points={[...points]} />);
 
     expect(
-      screen.getByText("Displaying 02/01/2024", { selector: "p" })
+      screen.getByText("Displaying 02 Jan 2024", { selector: "p" })
     ).toBeInTheDocument();
   });
 

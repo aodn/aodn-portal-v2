@@ -41,6 +41,7 @@ import PlainDatePicker from "../common/datetime/PlainDatePicker";
 import PlainSlider from "../common/slider/PlainSlider";
 import {
   dateToValue,
+  formatDate,
   toAppDayjs,
   toUtcEndOfDay,
   toUtcStartOfDay,
@@ -487,7 +488,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                 onChange={handleSliderChange}
                 valueLabelDisplay="auto"
                 valueLabelFormat={(value: number) =>
-                  valueToDate(value).format(dateDefault.DISPLAY_FORMAT)
+                  formatDate(valueToDate(value))
                 }
               />
               <Box
@@ -498,10 +499,10 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                 }}
               >
                 <Typography padding={0} variant="body2Regular">
-                  {initialMinDate.format(dateDefault.DISPLAY_FORMAT)}
+                  {formatDate(initialMinDate)}
                 </Typography>
                 <Typography padding={0} variant="body2Regular">
-                  {initialMaxDate.format(dateDefault.DISPLAY_FORMAT)}
+                  {formatDate(initialMaxDate)}
                 </Typography>
               </Box>
             </Box>

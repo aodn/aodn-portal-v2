@@ -2,6 +2,8 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   convertDateFormat,
   dayKeyToUtcValue,
+  formatDate,
+  formatDateRange,
   formatUtcDateTime,
   getAppMaxDate,
   toAppDayjs,
@@ -38,8 +40,47 @@ describe("dayKeyToUtcValue", () => {
 describe("convertDateFormat", () => {
   it("renders an ISO instant as UTC, not host-local wall clock", () => {
     expect(convertDateFormat("2021-08-01T00:00:00.000Z")).toBe(
-      "Sun Aug 01 2021 00:00:00 GMT+0000"
+      "01 Aug 2021 00:00:00 GMT+0000"
     );
+  });
+});
+
+describe("formatDate", () => {
+  it("formats an ISO string, a Date, an epoch number and a Dayjs the same way", () => {
+    expect(formatDate("2021-08-01T00:00:00.000Z")).toBe("01 Aug 2021");
+    expect(formatDate(new Date(Date.UTC(2021, 7, 1)))).toBe("01 Aug 2021");
+    expect(formatDate(Date.UTC(2021, 7, 1))).toBe("01 Aug 2021");
+    expect(formatDate(valueToDate(Date.UTC(2021, 7, 1)))).toBe("01 Aug 2021");
+  });
+
+  it("falls back for nullish, empty or unparseable input", () => {
+    expect(formatDate(null)).toBe("");
+    expect(formatDate(undefined)).toBe("");
+    expect(formatDate("")).toBe("");
+    expect(formatDate("not-a-date", undefined, "N/A")).toBe("N/A");
+  });
+
+  it("honours an explicit format override", () => {
+    expect(
+      formatDate("2021-08-01T00:00:00.000Z", dateDefault.DATE_FORMAT)
+    ).toBe("2021-08-01");
+  });
+});
+
+describe("formatDateRange", () => {
+  it("joins both ends with the default separator", () => {
+    expect(
+      formatDateRange("2021-01-01T00:00:00.000Z", "2021-12-31T00:00:00.000Z")
+    ).toBe("01 Jan 2021 to 31 Dec 2021");
+  });
+
+  it("supports a custom separator and independent fallback", () => {
+    expect(
+      formatDateRange(undefined, "2021-12-31T00:00:00.000Z", {
+        separator: " - ",
+        fallback: "...",
+      })
+    ).toBe("... - 31 Dec 2021");
   });
 });
 
