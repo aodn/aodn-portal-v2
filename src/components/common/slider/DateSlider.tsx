@@ -8,7 +8,7 @@ import React, {
 import { Grid, Stack, Typography } from "@mui/material";
 import type { SxProps, Theme } from "@mui/material/styles";
 import {
-  dateToValue,
+  dayjsToUnixMs,
   formatDate,
   toAppDayjs,
   valueToDate,
@@ -245,7 +245,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
 };
 
 /** Epoch ms for {@link dateDefault.min} (1 Jan 1970 UTC). Slider floor. */
-const SLIDER_MIN_FLOOR = dateToValue(dateDefault.min);
+const SLIDER_MIN_FLOOR = dayjsToUnixMs(dateDefault.min);
 
 /**
  * Parse a date string to slider epoch ms at **start of day**, never below
@@ -254,7 +254,7 @@ const SLIDER_MIN_FLOOR = dateToValue(dateDefault.min);
 const dateStringToSliderMinValue = (date: string): number =>
   Math.max(
     SLIDER_MIN_FLOOR,
-    dateToValue(toAppDayjs(date, dateDefault.DATE_FORMAT))
+    dayjsToUnixMs(toAppDayjs(date, dateDefault.DATE_FORMAT))
   );
 
 /**
@@ -264,7 +264,7 @@ const dateStringToSliderMinValue = (date: string): number =>
  * min and max share the same calendar day).
  */
 const dateStringToSliderMaxValue = (date: string): number =>
-  dateToValue(toAppDayjs(date, dateDefault.DATE_FORMAT), true);
+  dayjsToUnixMs(toAppDayjs(date, dateDefault.DATE_FORMAT), true);
 
 /** Full-coverage thumb pair for the current rail bounds. */
 const fullCoverageRange = (minValue: number, maxValue: number): number[] => [

@@ -11,7 +11,7 @@ import MetadataContactList from "../../../components/list/MetadataContactList";
 import MetadataIdentifierList from "../../../components/list/MetadataIdentifierList";
 import MetadataUrlList from "../../../components/list/MetadataUrlList";
 import MetadataDateList from "../../../components/list/MetadataDateList";
-import { convertDateFormat } from "../../../utils/DateUtils";
+import { formatMetadataDate } from "../../../utils/DateUtils";
 import { contactRoles } from "../../../components/common/constants";
 import { IKeyword } from "@/app/store/OGCCollectionDefinitions";
 
@@ -41,14 +41,12 @@ const AdditionalInfoPanel = () => {
 
     const metadataId = context.collection?.id ?? "";
 
-    const t = context.collection?.getRevision();
-    const revision = t ? convertDateFormat(t) : "";
+    const revision = formatMetadataDate(context.collection?.getRevision());
 
     // TODO: for the creation and revision, geonetwork still have a confusion about the time zone.
     //  currently just make all time zone to be UTC (hard coded).
     //  Should be resolved in the future when the geonetwork is clarified.
-    const c = context.collection?.getCreation();
-    const creation = c ? convertDateFormat(c) : "";
+    const creation = formatMetadataDate(context.collection?.getCreation());
 
     let categories: Array<string> = [];
     for (const theme of themes) {

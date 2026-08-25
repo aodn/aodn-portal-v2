@@ -7,8 +7,10 @@ const dateDefault = {
 
   // Display formats — every user-facing date goes through formatDate().
   DISPLAY_FORMAT: "DD MMM YYYY",
-  // Metadata Dates panel: keeps the GeoNetwork time-of-day + GMT+0000 hack.
-  DISPLAY_FORMAT_WITH_TIME: "DD MMM YYYY HH:mm:ss [GMT+0000]",
+  // Date + time, rendered in UTC — see formatDateTime().
+  UTC_DATE_TIME_DISPLAY_FORMAT: "DD MMM YYYY HH:mm [UTC]",
+  // Metadata Dates panel only, keeps the GeoNetwork GMT+0000 hack — see formatMetadataDate().
+  METADATA_DISPLAY_FORMAT: "ddd DD MMM YYYY HH:mm:ss [GMT+0000]",
   min: dayjs.tz(0),
   get max() {
     return dayjs.tz();

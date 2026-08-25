@@ -8,7 +8,7 @@ import dayjs from "@/utils/dayjs";
 import DateRangeFilter from "../DateRangeFilter";
 import { dateDefault } from "../../common/constants";
 import { updateDateTimeFilterRange } from "@/app/store/componentParamReducer";
-import { dateToValue, toAppDayjs, valueToDate } from "@/utils/DateUtils";
+import { dayjsToUnixMs, toAppDayjs, valueToDate } from "@/utils/DateUtils";
 import axios from "axios";
 
 vi.mock("../../common/charts/TimeRangeBarChart", () => ({
@@ -30,8 +30,8 @@ vi.mock("../../../hooks/useBreakpoint", () => ({
 const mockInitialState = {
   paramReducer: {
     dateTimeFilterRange: {
-      start: dateToValue(dateDefault.min),
-      end: dateToValue(dateDefault.max),
+      start: dayjsToUnixMs(dateDefault.min),
+      end: dayjsToUnixMs(dateDefault.max),
     },
   },
 };
@@ -143,8 +143,8 @@ describe("DateRangeFilter", () => {
     store = createMockStore({
       paramReducer: {
         dateTimeFilterRange: {
-          start: dateToValue(fiveYearsAgo),
-          end: dateToValue(dayjs.tz()),
+          start: dayjsToUnixMs(fiveYearsAgo),
+          end: dayjsToUnixMs(dayjs.tz()),
         },
       },
     });

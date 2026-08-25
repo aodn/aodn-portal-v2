@@ -4,7 +4,7 @@ import { userEvent } from "@testing-library/user-event";
 import DateSliderRange, { DateSliderPoint } from "../DateSlider";
 import dayjs from "@/utils/dayjs";
 import { dateDefault } from "../../constants";
-import { dateToValue, toAppDayjs } from "@/utils/DateUtils";
+import { dayjsToUnixMs, toAppDayjs } from "@/utils/DateUtils";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -49,7 +49,7 @@ describe("DateSliderRange keyboard", () => {
 describe("DateSliderRange min floor", () => {
   it("defaults the min thumb to 1 Jan 1970 when dataset min is earlier", () => {
     const onDateRangeChange = vi.fn();
-    const floorValue = dateToValue(dateDefault.min);
+    const floorValue = dayjsToUnixMs(dateDefault.min);
 
     render(
       <DateSliderRange
@@ -72,7 +72,9 @@ describe("DateSliderRange min floor", () => {
   it("keeps the dataset min when it is on or after 1 Jan 1970", () => {
     const onDateRangeChange = vi.fn();
     const minDate = "1980-03-01";
-    const expected = dateToValue(toAppDayjs(minDate, dateDefault.DATE_FORMAT));
+    const expected = dayjsToUnixMs(
+      toAppDayjs(minDate, dateDefault.DATE_FORMAT)
+    );
 
     render(
       <DateSliderRange
@@ -93,8 +95,10 @@ describe("DateSliderRange min floor", () => {
     const onDateRangeChange = vi.fn();
     const minDate = "2020-01-01";
     const maxDate = "2020-01-31";
-    const minValue = dateToValue(toAppDayjs(minDate, dateDefault.DATE_FORMAT));
-    const maxValue = dateToValue(
+    const minValue = dayjsToUnixMs(
+      toAppDayjs(minDate, dateDefault.DATE_FORMAT)
+    );
+    const maxValue = dayjsToUnixMs(
       toAppDayjs(maxDate, dateDefault.DATE_FORMAT),
       true
     );
@@ -125,8 +129,8 @@ describe("DateSliderRange min floor", () => {
     // so both values equaled min and MUI stacked both dots on the left.
     const onDateRangeChange = vi.fn();
     const day = "1970-01-21";
-    const minValue = dateToValue(toAppDayjs(day, dateDefault.DATE_FORMAT));
-    const maxValue = dateToValue(
+    const minValue = dayjsToUnixMs(toAppDayjs(day, dateDefault.DATE_FORMAT));
+    const maxValue = dayjsToUnixMs(
       toAppDayjs(day, dateDefault.DATE_FORMAT),
       true
     );

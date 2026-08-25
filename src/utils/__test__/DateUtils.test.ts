@@ -1,47 +1,81 @@
 import { afterEach, describe, expect, it } from "vitest";
 import {
-  convertDateFormat,
-  dayKeyToUtcValue,
   formatDate,
   formatDateRange,
+  formatDateTime,
+  formatMetadataDate,
   formatUtcDateTime,
   getAppMaxDate,
   toAppDayjs,
   toUtcEndOfDay,
   toUtcStartOfDay,
+  utcDayKeyToUnixMs,
   valueToDate,
 } from "../DateUtils";
 import { dateDefault } from "@/components/common/constants";
 import dayjs, { DEFAULT_APP_TIMEZONE, setAppTimezone } from "../dayjs";
 
-describe("dayKeyToUtcValue", () => {
+describe("utcDayKeyToUnixMs", () => {
   it("maps a day key to UTC midnight", () => {
-    const value = dayKeyToUtcValue("2024-01-02") as number;
+    const value = utcDayKeyToUnixMs("2024-01-02") as number;
     expect(new Date(value).toISOString()).toBe("2024-01-02T00:00:00.000Z");
   });
 
   it("rejects impossible dates, not just badly-shaped ones", () => {
-    expect(dayKeyToUtcValue("2024-02-31")).toBeUndefined();
-    expect(dayKeyToUtcValue("2023-02-29")).toBeUndefined();
-    expect(dayKeyToUtcValue("2024-13-01")).toBeUndefined();
-    expect(dayKeyToUtcValue("2024-00-10")).toBeUndefined();
-    expect(dayKeyToUtcValue("not-a-date")).toBeUndefined();
-    expect(dayKeyToUtcValue("2024-1-2")).toBeUndefined();
+    expect(utcDayKeyToUnixMs("2024-02-31")).toBeUndefined();
+    expect(utcDayKeyToUnixMs("2023-02-29")).toBeUndefined();
+    expect(utcDayKeyToUnixMs("2024-13-01")).toBeUndefined();
+    expect(utcDayKeyToUnixMs("2024-00-10")).toBeUndefined();
+    expect(utcDayKeyToUnixMs("not-a-date")).toBeUndefined();
+    expect(utcDayKeyToUnixMs("2024-1-2")).toBeUndefined();
     // A leap day is genuinely valid.
-    expect(dayKeyToUtcValue("2024-02-29")).toBeDefined();
+    expect(utcDayKeyToUnixMs("2024-02-29")).toBeDefined();
   });
 
   it("rejects a shape carrying time or timezone info", () => {
-    expect(dayKeyToUtcValue("2024-01-02T00:00:00Z")).toBeUndefined();
-    expect(dayKeyToUtcValue("2024-01-02 ")).toBeUndefined();
+    expect(utcDayKeyToUnixMs("2024-01-02T00:00:00Z")).toBeUndefined();
+    expect(utcDayKeyToUnixMs("2024-01-02 ")).toBeUndefined();
   });
 });
 
-describe("convertDateFormat", () => {
-  it("renders an ISO instant as UTC, not host-local wall clock", () => {
-    expect(convertDateFormat("2021-08-01T00:00:00.000Z")).toBe(
-      "01 Aug 2021 00:00:00 GMT+0000"
+describe("formatDateTime", () => {
+  it("keeps the time of day that formatDate drops", () => {
+    expect(formatDateTime("2021-08-01T03:30:00.000Z")).toBe(
+      "01 Aug 2021 03:30 UTC"
     );
+    expect(formatDate("2021-08-01T03:30:00.000Z")).toBe("01 Aug 2021");
+  });
+
+  // The GeoServer popup feeds this raw UTC ISO strings from the WMS time axis.
+  // Rendering in local time would shift the *day* either side of midnight UTC.
+  it("renders in UTC regardless of the machine timezone", () => {
+    expect(formatDateTime("2021-08-01T22:00:00.000Z")).toBe(
+      "01 Aug 2021 22:00 UTC"
+    );
+    expect(formatDateTime("2021-08-01T01:00:00.000Z")).toBe(
+      "01 Aug 2021 01:00 UTC"
+    );
+  });
+
+  it("honours a format override and falls back on bad input", () => {
+    expect(formatDateTime("2021-08-01T03:30:00.000Z", "YYYY-MM-DD HH:mm")).toBe(
+      "2021-08-01 03:30"
+    );
+    expect(formatDateTime(null)).toBe("");
+    expect(formatDateTime("not-a-date", undefined, "N/A")).toBe("N/A");
+  });
+});
+
+describe("formatMetadataDate", () => {
+  it("renders a metadata date with its time, forced to UTC and labelled GMT+0000", () => {
+    expect(formatMetadataDate("2021-08-01T00:00:00.000Z")).toBe(
+      "Sun 01 Aug 2021 00:00:00 GMT+0000"
+    );
+  });
+
+  it("returns empty for nullish or unparseable input", () => {
+    expect(formatMetadataDate(undefined)).toBe("");
+    expect(formatMetadataDate("not-a-date")).toBe("");
   });
 });
 

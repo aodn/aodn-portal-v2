@@ -40,7 +40,7 @@ import TimeRangeBarChart from "../common/charts/TimeRangeBarChart";
 import PlainDatePicker from "../common/datetime/PlainDatePicker";
 import PlainSlider from "../common/slider/PlainSlider";
 import {
-  dateToValue,
+  dayjsToUnixMs,
   formatDate,
   toAppDayjs,
   toUtcEndOfDay,
@@ -92,8 +92,8 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
 
   // Local state for date-range-slider
   const [value, setValue] = useState<number[]>(() => [
-    dateToValue(toUtcStartOfDay(initialMinDate)),
-    dateToValue(toUtcEndOfDay(dateDefault.max)),
+    dayjsToUnixMs(toUtcStartOfDay(initialMinDate)),
+    dayjsToUnixMs(toUtcEndOfDay(dateDefault.max)),
   ]);
 
   // Local state for radio group
@@ -159,8 +159,8 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
         const today = toAppDayjs();
         const startDate = toUtcStartOfDay(today.subtract(years, "year"));
         const newValue = [
-          dateToValue(startDate),
-          dateToValue(toUtcEndOfDay(today)),
+          dayjsToUnixMs(startDate),
+          dayjsToUnixMs(toUtcEndOfDay(today)),
         ];
 
         setValue(newValue);
@@ -178,8 +178,8 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
   const handleSliderChange = useCallback(
     (_: Event, newValue: number | number[]): void => {
       if (!Array.isArray(newValue)) return;
-      const newStart = dateToValue(toUtcStartOfDay(valueToDate(newValue[0])));
-      const newEnd = dateToValue(toUtcEndOfDay(valueToDate(newValue[1])));
+      const newStart = dayjsToUnixMs(toUtcStartOfDay(valueToDate(newValue[0])));
+      const newEnd = dayjsToUnixMs(toUtcEndOfDay(valueToDate(newValue[1])));
       const newMinDate = valueToDate(newStart);
       const newMaxDate = valueToDate(newEnd);
 
@@ -200,8 +200,11 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
       // Date-only picker: the chosen calendar day at UTC 00:00:00, not host midnight.
       const localMinDate = newMinDate ? toUtcStartOfDay(newMinDate) : null;
 
-      if (localMinDate && dateToValue(localMinDate) < dateToValue(maxDate)) {
-        const newStart = dateToValue(localMinDate);
+      if (
+        localMinDate &&
+        dayjsToUnixMs(localMinDate) < dayjsToUnixMs(maxDate)
+      ) {
+        const newStart = dayjsToUnixMs(localMinDate);
         setValue([newStart, value[1]]);
         setSelectedOption(determineSelectedOption(localMinDate, maxDate));
         dispatch(
@@ -220,8 +223,11 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
       // Date-only picker: the chosen calendar day at UTC 23:59:59, not host local.
       const localMaxDate = newMaxDate ? toUtcEndOfDay(newMaxDate) : null;
 
-      if (localMaxDate && dateToValue(localMaxDate) > dateToValue(minDate)) {
-        const newEnd = dateToValue(localMaxDate);
+      if (
+        localMaxDate &&
+        dayjsToUnixMs(localMaxDate) > dayjsToUnixMs(minDate)
+      ) {
+        const newEnd = dayjsToUnixMs(localMaxDate);
         setValue([value[0], newEnd]);
         setSelectedOption(determineSelectedOption(minDate, localMaxDate));
         dispatch(
@@ -309,8 +315,8 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
     // Avoid eslint error on set state in useEffect
     startTransition(() => {
       if (dateTimeFilterRange) {
-        const fallbackMin = dateToValue(toUtcStartOfDay(initialMinDate));
-        const fallbackMax = dateToValue(toUtcEndOfDay(initialMaxDate));
+        const fallbackMin = dayjsToUnixMs(toUtcStartOfDay(initialMinDate));
+        const fallbackMax = dayjsToUnixMs(toUtcEndOfDay(initialMaxDate));
         const newMinDate = valueToDate(
           dateTimeFilterRange.start ?? fallbackMin
         );
@@ -324,8 +330,8 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
       } else {
         // Reset to initial state when dateTimeFilterRange is null or undefined
         setValue([
-          dateToValue(toUtcStartOfDay(initialMinDate)),
-          dateToValue(toUtcEndOfDay(initialMaxDate)),
+          dayjsToUnixMs(toUtcStartOfDay(initialMinDate)),
+          dayjsToUnixMs(toUtcEndOfDay(initialMaxDate)),
         ]);
         setSelectedOption(DateRangeOptionValues.Custom);
       }
@@ -482,8 +488,8 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
             >
               <PlainSlider
                 value={value}
-                min={dateToValue(toUtcStartOfDay(initialMinDate))}
-                max={dateToValue(toUtcEndOfDay(initialMaxDate))}
+                min={dayjsToUnixMs(toUtcStartOfDay(initialMinDate))}
+                max={dayjsToUnixMs(toUtcEndOfDay(initialMaxDate))}
                 step={432000000} // 5 days in mils
                 onChange={handleSliderChange}
                 valueLabelDisplay="auto"

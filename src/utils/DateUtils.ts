@@ -76,16 +76,44 @@ export const formatUtcDateTime = (
   value: string | number | Date | Dayjs
 ): string => dayjs.utc(value).format(dateDefault.DATE_TIME_FORMAT);
 
-/** ISO instant → `01 Aug 2021 00:00:00 GMT+0000` in UTC. */
-export const convertDateFormat = (dateString: string): string => {
-  const parsed = dayjs.utc(dateString);
-  if (!parsed.isValid()) {
-    return dateString;
-  }
-  return parsed.format(dateDefault.DISPLAY_FORMAT_WITH_TIME);
+/**
+ * Renders a date *and* its time of day, in UTC.
+ *
+ * Use this wherever the time of day carries meaning — an observation instant,
+ * a WMS time-axis value — and formatDate() would silently throw it away.
+ *
+ * @example
+ * formatDateTime("2021-08-01T22:00:00.000Z"); // "01 Aug 2021 22:00 UTC"
+ */
+export const formatDateTime = (
+  value: DateInput,
+  format: string = dateDefault.UTC_DATE_TIME_DISPLAY_FORMAT,
+  fallback: string = ""
+): string => {
+  if (value === null || value === undefined || value === "") return fallback;
+  const date = dayjs.utc(value);
+  return date.isValid() ? date.format(format) : fallback;
 };
 
-export const dateToValue = (date: Dayjs, endOfDay: boolean = false): number => {
+/**
+ * Renders a metadata creation/revision date with its time, forced to UTC and
+ * labelled GMT+0000. Scoped to GeoNetwork metadata dates on purpose — don't
+ * reuse this as a general "date with time" formatter, reach for
+ * formatDateTime() instead.
+ *
+ * TODO: hard code using GMT+0000 for now. Change the implementation after
+ *  the timezone issue in GeoNetwork is resolved.
+ *
+ * @example
+ * formatMetadataDate("2021-08-01T00:00:00.000Z"); // "Sun 01 Aug 2021 00:00:00 GMT+0000"
+ */
+export const formatMetadataDate = (dateString: DateInput): string =>
+  formatDateTime(dateString, dateDefault.METADATA_DISPLAY_FORMAT);
+
+export const dayjsToUnixMs = (
+  date: Dayjs,
+  endOfDay: boolean = false
+): number => {
   return endOfDay ? date.endOf("day").valueOf() : date.valueOf();
 };
 
@@ -102,7 +130,11 @@ export const dayjsToDayPeriod = (d: Dayjs): number =>
 export const dayjsToMonthPeriod = (d: Dayjs): number =>
   d.year() * 100 + (d.month() + 1);
 
-export const dayKeyToUtcValue = (key: string): number | undefined => {
+/**
+ * Strict "YYYY-MM-DD" day key → Unix ms at UTC midnight, or undefined if the
+ * key isn't a real calendar day. The key is read as UTC, not local time.
+ */
+export const utcDayKeyToUnixMs = (key: string): number | undefined => {
   const parsed = dayjs.utc(key, dateDefault.DATE_FORMAT, true);
   return parsed.isValid() ? parsed.valueOf() : undefined;
 };
