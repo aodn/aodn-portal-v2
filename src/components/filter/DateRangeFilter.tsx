@@ -205,18 +205,12 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
         dispatch(
           updateDateTimeFilterRange({
             start: newStart,
-            end: dateTimeFilterRange?.end,
+            end: value[1],
           })
         );
       }
     },
-    [
-      dateTimeFilterRange?.end,
-      determineSelectedOption,
-      dispatch,
-      maxDate,
-      value,
-    ]
+    [determineSelectedOption, dispatch, maxDate, value]
   );
 
   const handleMaxDateChange = useCallback(
@@ -230,19 +224,13 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
         setSelectedOption(determineSelectedOption(minDate, localMaxDate));
         dispatch(
           updateDateTimeFilterRange({
-            start: dateTimeFilterRange?.start,
+            start: value[0],
             end: newEnd,
           })
         );
       }
     },
-    [
-      dateTimeFilterRange?.start,
-      determineSelectedOption,
-      dispatch,
-      minDate,
-      value,
-    ]
+    [determineSelectedOption, dispatch, minDate, value]
   );
 
   const renderFilterBy = useCallback(
