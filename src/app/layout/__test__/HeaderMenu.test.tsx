@@ -4,19 +4,27 @@ import { openInNewTab } from "@/utils/LinkUtils";
 import HeaderMenu, { HeaderMenuStyle } from "../HeaderMenu";
 import { userEvent } from "@testing-library/user-event";
 import { pageDefault } from "@/components/common/constants";
+import { MemoryRouter, useLocation } from "react-router-dom";
 
 vi.mock("@/utils/LinkUtils", () => ({
   openInNewTab: vi.fn(),
 }));
 
 describe("HeaderMenu", () => {
+  const renderHeaderMenu = (menuStyle: HeaderMenuStyle) =>
+    render(
+      <MemoryRouter>
+        <HeaderMenu menuStyle={menuStyle} />
+      </MemoryRouter>
+    );
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   describe("DROPDOWN_MENU style", () => {
     it("renders dropdown menu when DROPDOWN_MENU style is provided", () => {
-      render(<HeaderMenu menuStyle={HeaderMenuStyle.DROPDOWN_MENU} />);
+      renderHeaderMenu(HeaderMenuStyle.DROPDOWN_MENU);
 
       // Should have two dropdown menus (About Us, Resources)
       expect(screen.getByText("About Us")).toBeInTheDocument();
@@ -25,7 +33,7 @@ describe("HeaderMenu", () => {
 
     it("calls openInNewTab when an About Us item is clicked", () => {
       const user = userEvent.setup();
-      render(<HeaderMenu menuStyle={HeaderMenuStyle.DROPDOWN_MENU} />);
+      renderHeaderMenu(HeaderMenuStyle.DROPDOWN_MENU);
 
       // Find and click the "About Us" button to open dropdown
       const aboutUsButton = screen.getByText("About Us");
@@ -52,7 +60,7 @@ describe("HeaderMenu", () => {
 
   it("menu with no items is not expandable and calls handler on click", () => {
     const user = userEvent.setup();
-    render(<HeaderMenu menuStyle={HeaderMenuStyle.ACCORDION_MENU} />);
+    renderHeaderMenu(HeaderMenuStyle.ACCORDION_MENU);
 
     // "IMOS Home" has no sub-items — clicking it should navigate, not expand
     user.click(screen.getByText("IMOS Home"));
@@ -73,7 +81,7 @@ describe("HeaderMenu", () => {
 
   it("menu with items shows expand icon and does not call handler on click", () => {
     const user = userEvent.setup();
-    render(<HeaderMenu menuStyle={HeaderMenuStyle.ACCORDION_MENU} />);
+    renderHeaderMenu(HeaderMenuStyle.ACCORDION_MENU);
 
     // "About Us" has sub-items — clicking expands it, does not navigate
     user.click(screen.getByText("About Us"));
@@ -93,15 +101,16 @@ describe("HeaderMenu", () => {
   });
 
   it("renders accordion menu correctly", () => {
-    render(<HeaderMenu menuStyle={HeaderMenuStyle.ACCORDION_MENU} />);
+    renderHeaderMenu(HeaderMenuStyle.ACCORDION_MENU);
 
-    // Should have four accordion menus
+    // Should have five accordion menus
     const accordions = screen.getAllByTestId("accordion-menu");
-    expect(accordions).toHaveLength(4);
+    expect(accordions).toHaveLength(5);
 
     // Should render menu summaries (About Us, Resources)
     // Here we trust MUI Accordion so no need to test the expand of accordion
     expect(screen.getByText("IMOS Home")).toBeInTheDocument();
+    expect(screen.getByText("Downloads")).toBeInTheDocument();
     expect(screen.getByText("About Us")).toBeInTheDocument();
     expect(screen.getByText("Subscribe")).toBeInTheDocument();
     expect(screen.getByText("Resources")).toBeInTheDocument();
@@ -109,13 +118,34 @@ describe("HeaderMenu", () => {
 
   it("calls openInNewTab with the newsletter URL when Subscribe is clicked", () => {
     const user = userEvent.setup();
-    render(<HeaderMenu menuStyle={HeaderMenuStyle.ACCORDION_MENU} />);
+    renderHeaderMenu(HeaderMenuStyle.ACCORDION_MENU);
 
     user.click(screen.getByText("Subscribe"));
 
     return waitFor(() =>
       expect(openInNewTab).toHaveBeenCalledWith(
         `${pageDefault.url.IMOS}/news/marine-matters-newsletter`
+      )
+    );
+  });
+
+  it("navigates to the downloads page", async () => {
+    const Location = () => (
+      <span data-testid="location">{useLocation().pathname}</span>
+    );
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <HeaderMenu menuStyle={HeaderMenuStyle.DROPDOWN_MENU} />
+        <Location />
+      </MemoryRouter>
+    );
+
+    await user.click(screen.getByText("Downloads"));
+
+    await waitFor(() =>
+      expect(screen.getByTestId("location")).toHaveTextContent(
+        pageDefault.downloads
       )
     );
   });

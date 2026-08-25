@@ -20,6 +20,7 @@ import {
 import {
   DatasetDownloadRequest,
   DownloadConditionType,
+  getValidEstimatedSizeBytes,
 } from "../pages/detail-page/context/DownloadDefinitions";
 import { processDatasetDownload } from "@/app/store/searchReducer";
 import { trackCustomEvent } from "../analytics/customEventTracker";
@@ -27,6 +28,11 @@ import { AnalyticsEvent } from "../analytics/analyticsEvents";
 import { calculateBboxes } from "../analytics/downloadCODataEvent";
 import { MultiPolygon } from "geojson";
 import { pageDefault } from "../components/common/constants";
+import {
+  DownloadExecutionResponse,
+  getSubmittedDownloadJobID,
+} from "@/app/store/DownloadStatusDefinitions";
+import { addTrackedDownloadId } from "@/utils/DownloadStorageUtils";
 
 // ================== CONSTANTS ==================
 const STATUS_CODES = {
@@ -46,7 +52,8 @@ const TIMEOUT_LIMIT = 8000;
 
 export const useDownloadDialog = (
   isOpen: boolean,
-  setIsOpen: (isOpen: boolean) => void
+  setIsOpen: (isOpen: boolean) => void,
+  estimatedSizeBytes?: number | null
 ) => {
   // ================== DEPENDENCIES & CONTEXT ==================
   const { uuid } = useParams<{ uuid: string }>();
@@ -57,6 +64,7 @@ export const useDownloadDialog = (
   const [activeStep, setActiveStep] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [createdJobID, setCreatedJobID] = useState<string | undefined>();
   const [processingStatus, setProcessingStatus] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [dataUsage, setDataUsage] = useState<DataUsageInformation>({
@@ -132,6 +140,7 @@ export const useDownloadDialog = (
       setActiveStep(0);
       setProcessingStatus("");
       setIsSuccess(false);
+      setCreatedJobID(undefined);
       setIsProcessing(false);
 
       // Load saved data from localStorage
@@ -203,6 +212,7 @@ export const useDownloadDialog = (
   // ================== DIALOG MANAGEMENT ==================
   const handleIsClose = useCallback(() => {
     setIsSuccess(false);
+    setCreatedJobID(undefined);
     setProcessingStatus("");
     setActiveStep(0);
     setEmail("");
@@ -317,6 +327,8 @@ export const useDownloadDialog = (
       // Get latest values from ref
       const { dataUsage, dateRange, format, multiPolygon, key } =
         latestValuesRef.current;
+      const validEstimatedSizeBytes =
+        getValidEstimatedSizeBytes(estimatedSizeBytes);
 
       const request: DatasetDownloadRequest = {
         inputs: {
@@ -332,6 +344,9 @@ export const useDownloadDialog = (
           full_metadata_link: `${window.location.origin}${pageDefault.details}/${uuid}`,
           suggested_citation:
             collection?.getCitation()?.suggestedCitation || "",
+          ...(validEstimatedSizeBytes !== undefined && {
+            estimated_size_bytes: validEstimatedSizeBytes,
+          }),
         },
         outputs: {},
         subscriber: {
@@ -343,24 +358,22 @@ export const useDownloadDialog = (
 
       dispatch(processDatasetDownload(request))
         .unwrap()
-        .then((response: { status: { message: string } }) => {
-          if (response?.status?.message) {
-            const statusCode = response.status.message;
-            setProcessingStatus(statusCode);
+        .then((response: DownloadExecutionResponse) => {
+          const statusCode = response?.status?.message;
+          const jobID = getSubmittedDownloadJobID(response);
 
-            // Only 2xx status codes are considered successful
-            if (/^2\d{2}$/.test(statusCode)) {
-              setIsSuccess(true);
-              // Clear saved data after successful submission
-              try {
-                // localStorage.removeItem("download_dialog_email");
-                // localStorage.removeItem("download_dialog_dataUsage");
-              } catch (error) {
-                console.warn("Error clearing saved data:", error);
-              }
-            }
+          if (jobID) {
+            addTrackedDownloadId(jobID);
+            setCreatedJobID(jobID);
+            setProcessingStatus(statusCode);
+            setIsSuccess(true);
+          } else if (statusCode) {
+            setProcessingStatus(
+              statusCode === STATUS_CODES.SUCCESS
+                ? STATUS_CODES.SERVER_ERROR
+                : statusCode
+            );
           } else {
-            console.log("Internal server error.");
             setProcessingStatus(STATUS_CODES.SERVER_ERROR);
           }
           setIsProcessing(false);
@@ -377,7 +390,7 @@ export const useDownloadDialog = (
           }
         );
     },
-    [uuid, dispatch, collection]
+    [uuid, dispatch, collection, estimatedSizeBytes]
   );
 
   // ================== FORM SUBMISSION HANDLERS ==================
@@ -508,6 +521,7 @@ export const useDownloadDialog = (
     activeStep,
     isProcessing,
     isSuccess,
+    createdJobID,
     processingStatus,
     email,
     emailError,

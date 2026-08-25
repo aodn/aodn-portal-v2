@@ -11,6 +11,7 @@ import DegradedPage from "../pages/error-page/DegradedPage";
 import { syncCanonicalUrl } from "@/seo/canonicalUrl";
 import Layout from "./layout/Layout";
 import React from "react";
+import DownloadsPage from "@/pages/downloads-page/DownloadsPage";
 
 // Helper to conditionally wrap a page with HealthChecker based on the mode
 const wrapWithHealthChecker = (node: React.ReactNode) =>
@@ -58,6 +59,14 @@ const router = createBrowserRouter([
         element: (
           <ErrorBoundary>
             {wrapWithHealthChecker(<DetailsPage />)}
+          </ErrorBoundary>
+        ),
+      },
+      {
+        path: pageDefault.downloads,
+        element: (
+          <ErrorBoundary>
+            {wrapWithHealthChecker(<DownloadsPage />)}
           </ErrorBoundary>
         ),
       },

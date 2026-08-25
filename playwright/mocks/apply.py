@@ -13,6 +13,7 @@ from mocks.api.collections import (
     handle_collections_popup_api,
 )
 from mocks.api.download_dialog import handle_download_dialog_success
+from mocks.api.download_status import handle_download_status_success
 from mocks.api.download_wfs import (
     handle_download_wfs,
     handle_estimate_co_download,
@@ -74,6 +75,7 @@ def apply_mock(page: Page) -> None:
     api_router.route_wfs_layers(handle_wfs_layers_api)
 
     api_router.route_download_dialog(handle_download_dialog_success)
+    api_router.route_download_status(handle_download_status_success)
     api_router.route_download_wfs(handle_download_wfs)
     api_router.route_estimate_wfs_download(handle_estimate_wfs_download)
     api_router.route_estimate_co_download(handle_estimate_co_download)

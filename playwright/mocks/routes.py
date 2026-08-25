@@ -35,6 +35,7 @@ class Routes:
     WFS_FIELD_VALUE = '*/**/items/wfs_field_value?*'
 
     DOWNLOAD_DIALOG = f'{PREFIX}/processes/download/execution'
+    DOWNLOAD_STATUS = f'{PREFIX}/jobs/*'
     DOWNLOAD_WFS = f'{PREFIX}/processes/downloadWfs/execution'
     ESTIMATE_WFS_DOWNLOAD = f'{PREFIX}/processes/estimateWfsDownload/execution'
     ESTIMATE_CO_DOWNLOAD = f'{PREFIX}/processes/estimateCOdownload/execution'

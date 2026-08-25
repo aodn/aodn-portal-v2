@@ -25,6 +25,7 @@ import {
 import { openInNewTab } from "@/utils/LinkUtils";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { pageDefault } from "@/components/common/constants";
+import { useNavigate } from "react-router-dom";
 
 export enum HeaderMenuStyle {
   DROPDOWN_MENU = "DROPDOWN",
@@ -79,8 +80,16 @@ const DisclaimerDialog: FC<{ open: boolean; onClose: () => void }> = ({
 
 const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const navigate = useNavigate();
   const HEADER_MENUS: Menu[] = useMemo(
     () => [
+      {
+        menu: {
+          name: "Downloads",
+          handler: () => navigate(pageDefault.downloads),
+        },
+        items: [],
+      },
       {
         menu: {
           name: "IMOS Home",
@@ -145,7 +154,7 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
         ],
       },
     ],
-    []
+    [navigate]
   );
 
   const renderHeaderDropdownMenu = useCallback(() => {

@@ -100,6 +100,10 @@ export default ({ mode }: ConfigEnv) => {
           target: apiPath,
           changeOrigin: true,
         },
+        "/api/v1/ogc/jobs": {
+          target: apiPath,
+          changeOrigin: true,
+        },
         "/api/v1/ogc/manage": {
           target: apiPath,
           changeOrigin: true,

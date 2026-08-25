@@ -7,7 +7,9 @@ import {
   Typography,
   useTheme,
   Divider,
+  Button,
 } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
 import SubsetConditions from "../subset-conditions/SubsetConditions";
 import LicenseStep from "./LicenseStep";
 import { useDownloadDialog } from "@/hooks/useDownloadDialog";
@@ -23,10 +25,12 @@ import {
 } from "../../../context/DownloadDefinitions";
 import { disableScroll, enableScroll } from "@/utils/ScrollUtils";
 import { useDetailPageContext } from "../../../context/detail-page-context";
+import { pageDefault } from "@/components/common/constants";
 
 interface DownloadDialogProps extends DownloadCondition {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  estimatedSizeBytes?: number | null;
 }
 
 interface Step {
@@ -42,6 +46,7 @@ const steps: Step[] = [
 const DownloadDialog = ({
   isOpen,
   setIsOpen,
+  estimatedSizeBytes,
   downloadConditions,
   getAndSetDownloadConditions,
   removeDownloadCondition,
@@ -58,6 +63,7 @@ const DownloadDialog = ({
     activeStep,
     isProcessing,
     isSuccess,
+    createdJobID,
     processingStatus,
     email,
     emailError,
@@ -74,7 +80,7 @@ const DownloadDialog = ({
     getStepperButtonTitle,
     setEmail,
     setEmailError,
-  } = useDownloadDialog(isOpen, setIsOpen);
+  } = useDownloadDialog(isOpen, setIsOpen, estimatedSizeBytes);
 
   // Disable background scroll when dialog is open
   useEffect(() => {
@@ -260,11 +266,16 @@ const DownloadDialog = ({
           flexShrink: 0,
         }}
       >
+        {isSuccess && createdJobID ? (
+          <Button component={RouterLink} to={pageDefault.downloads}>
+            View download status
+          </Button>
+        ) : null}
         <StepperButton
           title={getStepperButtonTitle()}
           statusText={getDisplayText()}
           onClick={handleStepperButtonClick}
-          disabled={isProcessing || !!emailError}
+          disabled={isProcessing || !!emailError || isSuccess}
           status={getButtonStatus()}
         />
       </DialogActions>

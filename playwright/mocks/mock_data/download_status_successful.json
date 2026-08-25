@@ -1,0 +1,15 @@
+{
+  "processID": "download-dataset",
+  "type": "process",
+  "jobID": "f358dc2f-e211-4bf1-95c4-c513ef57c2b6",
+  "status": "successful",
+  "message": "Download job completed successfully",
+  "collection": "Test Ocean Data Collection",
+  "dataSelection": "imos-data/dataset.zarr",
+  "format": "netcdf",
+  "metadataUrl": "http://localhost:5173/details/b299cdcd-3dee-48aa-abdd-e0fcdbb9cadc",
+  "created": "2026-08-24T01:00:00.000+00:00",
+  "started": "2026-08-24T01:00:10.000+00:00",
+  "finished": "2026-08-24T01:01:00.000+00:00",
+  "updated": "2026-08-24T01:01:01.000+00:00"
+}

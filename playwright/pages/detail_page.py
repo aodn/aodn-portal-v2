@@ -44,6 +44,9 @@ class DetailPage(BasePage):
             'download-email-input'
         ).locator('input')
         self.dialog_button = self.page.get_by_test_id('dialog-button')
+        self.view_download_status_link = self.page.get_by_role(
+            'link', name='View download status'
+        )
 
         # download condition boxes
         self.bbox_condition_box = self.page.get_by_test_id('bbox-condition-box')

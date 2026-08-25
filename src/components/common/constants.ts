@@ -18,6 +18,7 @@ const pageDefault = {
   degraded: "/degraded",
   search: "/search",
   details: "/details",
+  downloads: "/downloads",
   landing: "/",
   url: {
     IMOS: "https://imos.org.au",
