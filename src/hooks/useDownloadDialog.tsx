@@ -27,6 +27,12 @@ import { AnalyticsEvent } from "../analytics/analyticsEvents";
 import { calculateBboxes } from "../analytics/downloadCODataEvent";
 import { MultiPolygon } from "geojson";
 import { pageDefault } from "../components/common/constants";
+import {
+  formatUtcDateTime,
+  toAppDayjs,
+  toUtcEndOfDay,
+  toUtcStartOfDay,
+} from "@/utils/DateUtils";
 
 // ================== CONSTANTS ==================
 const STATUS_CODES = {
@@ -323,8 +329,14 @@ export const useDownloadDialog = (
           uuid: uuid,
           key: key,
           recipient: normalizedEmail,
-          start_date: dateRange.start,
-          end_date: dateRange.end,
+          start_date:
+            dateRange.start === "non-specified"
+              ? dateRange.start
+              : formatUtcDateTime(toUtcStartOfDay(toAppDayjs(dateRange.start))),
+          end_date:
+            dateRange.end === "non-specified"
+              ? dateRange.end
+              : formatUtcDateTime(toUtcEndOfDay(toAppDayjs(dateRange.end))),
           multi_polygon: multiPolygon,
           output_format: format,
           data_usage: dataUsage,
