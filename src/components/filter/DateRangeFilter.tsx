@@ -90,8 +90,8 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
 
   // Local state for date-range-slider
   const [value, setValue] = useState<number[]>([
-    dateToValue(initialMinDate),
-    dateToValue(initialMaxDate),
+    dateToValue(toUtcStartOfDay(initialMinDate)),
+    dateToValue(toUtcEndOfDay(initialMaxDate)),
   ]);
 
   // Local state for radio group
@@ -176,11 +176,12 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
   const handleSliderChange = useCallback(
     (_: Event, newValue: number | number[]): void => {
       if (!Array.isArray(newValue)) return;
-      const [newStart, newEnd] = newValue;
+      const newStart = dateToValue(toUtcStartOfDay(valueToDate(newValue[0])));
+      const newEnd = dateToValue(toUtcEndOfDay(valueToDate(newValue[1])));
       const newMinDate = valueToDate(newStart);
       const newMaxDate = valueToDate(newEnd);
 
-      setValue(newValue);
+      setValue([newStart, newEnd]);
       setSelectedOption(determineSelectedOption(newMinDate, newMaxDate));
       dispatch(
         updateDateTimeFilterRange({
@@ -318,21 +319,24 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
     // Avoid eslint error on set state in useEffect
     startTransition(() => {
       if (dateTimeFilterRange) {
+        const fallbackMin = dateToValue(toUtcStartOfDay(initialMinDate));
+        const fallbackMax = dateToValue(toUtcEndOfDay(initialMaxDate));
         const newMinDate = valueToDate(
-          dateTimeFilterRange.start ?? dateToValue(initialMinDate)
+          dateTimeFilterRange.start ?? fallbackMin
         );
-        const newMaxDate = valueToDate(
-          dateTimeFilterRange.end ?? dateToValue(initialMaxDate)
-        );
+        const newMaxDate = valueToDate(dateTimeFilterRange.end ?? fallbackMax);
 
         setValue([
-          dateTimeFilterRange.start ?? dateToValue(initialMinDate),
-          dateTimeFilterRange.end ?? dateToValue(initialMaxDate),
+          dateTimeFilterRange.start ?? fallbackMin,
+          dateTimeFilterRange.end ?? fallbackMax,
         ]);
         setSelectedOption(determineSelectedOption(newMinDate, newMaxDate));
       } else {
         // Reset to initial state when dateTimeFilterRange is null or undefined
-        setValue([dateToValue(initialMinDate), dateToValue(initialMaxDate)]);
+        setValue([
+          dateToValue(toUtcStartOfDay(initialMinDate)),
+          dateToValue(toUtcEndOfDay(initialMaxDate)),
+        ]);
         setSelectedOption(DateRangeOptionValues.Custom);
       }
     });
@@ -488,8 +492,8 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
             >
               <PlainSlider
                 value={value}
-                min={dateToValue(initialMinDate)}
-                max={dateToValue(initialMaxDate)}
+                min={dateToValue(toUtcStartOfDay(initialMinDate))}
+                max={dateToValue(toUtcEndOfDay(initialMaxDate))}
                 step={432000000} // 5 days in mils
                 onChange={handleSliderChange}
                 valueLabelDisplay="auto"

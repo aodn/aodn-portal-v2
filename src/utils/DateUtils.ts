@@ -18,7 +18,7 @@ export const toUtcStartOfDay = (date: Dayjs): Dayjs =>
 
 /** Calendar Y-M-D of `date` as UTC 23:59:59.999. */
 export const toUtcEndOfDay = (date: Dayjs): Dayjs =>
-  dayjs.utc(date.format(dateDefault.DATE_FORMAT)).endOf("day");
+  toUtcStartOfDay(date).hour(23).minute(59).second(59).millisecond(999);
 
 /** CQL / WMS datetimes: UTC wall clock plus a literal Z. */
 export const formatUtcDateTime = (
