@@ -1,4 +1,4 @@
-import dayjs from "@/utils/DayjsUtils";
+import dayjs from "@/utils/dayjs";
 
 const dateDefault = {
   // Wire formats — machine-readable, NOT for display. Do not repoint these.

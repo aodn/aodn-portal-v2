@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 
-import { Dayjs } from "@/utils/DayjsUtils";
+import { Dayjs } from "@/utils/dayjs";
 import { formatDate } from "@/utils/DateUtils";
 import {
   ExpressionSpecification,

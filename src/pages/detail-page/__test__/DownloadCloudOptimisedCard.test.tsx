@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs from "@/utils/DayjsUtils";
+import dayjs from "@/utils/dayjs";
 import { Provider } from "react-redux";
 
 beforeAll(() => {

@@ -1,4 +1,4 @@
-import { Dayjs } from "@/utils/DayjsUtils";
+import { Dayjs } from "@/utils/dayjs";
 import { ExpressionSpecification } from "mapbox-gl";
 import { dateDefault } from "@/components/common/constants";
 import { dayjsToDayPeriod, getAppMaxDate, toAppDayjs } from "@/utils/DateUtils";

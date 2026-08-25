@@ -1,6 +1,6 @@
 import { styled } from "@mui/material";
 import { DatePicker, DatePickerProps } from "@mui/x-date-pickers";
-import { Dayjs, getAppTimezone } from "@/utils/DayjsUtils";
+import { Dayjs, getAppTimezone } from "@/utils/dayjs";
 import {
   border,
   borderRadius,

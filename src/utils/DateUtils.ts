@@ -1,4 +1,4 @@
-import dayjs, { Dayjs, getAppTimezone } from "@/utils/DayjsUtils";
+import dayjs, { Dayjs, getAppTimezone } from "@/utils/dayjs";
 import { dateDefault } from "@/components/common/constants";
 
 export type DateInput = string | number | Date | Dayjs | null | undefined;

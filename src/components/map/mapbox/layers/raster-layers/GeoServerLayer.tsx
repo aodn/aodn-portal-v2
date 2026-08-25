@@ -41,7 +41,7 @@ import {
 } from "@/app/store/searchReducer";
 import { CardContent, Typography } from "@mui/material";
 import { createRoot, Root } from "react-dom/client";
-import dayjs, { Dayjs } from "@/utils/DayjsUtils";
+import dayjs, { Dayjs } from "@/utils/dayjs";
 import { dateDefault, playwrightTestIds } from "../../../../common/constants";
 import MapLayerSelect from "../../component/MapLayerSelect";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";

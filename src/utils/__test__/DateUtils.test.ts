@@ -12,7 +12,7 @@ import {
   valueToDate,
 } from "../DateUtils";
 import { dateDefault } from "@/components/common/constants";
-import dayjs, { DEFAULT_APP_TIMEZONE, setAppTimezone } from "../DayjsUtils";
+import dayjs, { DEFAULT_APP_TIMEZONE, setAppTimezone } from "../dayjs";
 
 describe("dayKeyToUtcValue", () => {
   it("maps a day key to UTC midnight", () => {

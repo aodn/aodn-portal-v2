@@ -3,7 +3,7 @@ import { axisClasses, BarSeriesType, BarChart } from "@mui/x-charts";
 import { OGCCollections } from "@/app/store/OGCCollectionDefinitions";
 import { color } from "@/styles/constants";
 import { legendClasses } from "@mui/x-charts/ChartsLegend";
-import dayjs, { Dayjs } from "@/utils/DayjsUtils";
+import dayjs, { Dayjs } from "@/utils/dayjs";
 import { dateDefault } from "@/components/common/constants";
 import { toUtcStartOfDay } from "@/utils/DateUtils";
 
