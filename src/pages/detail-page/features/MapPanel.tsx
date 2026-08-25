@@ -19,7 +19,7 @@ import { LngLatBounds, MapEvent } from "mapbox-gl";
 import BaseMapSwitcher from "../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
 import MenuControl from "../../../components/map/mapbox/controls/menu/MenuControl";
 import DateRange from "../../../components/map/mapbox/controls/menu/DateRange";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "@/utils/DayjsUtils";
 import {
   BBoxCondition,
   DateRangeCondition,
@@ -52,7 +52,7 @@ import {
   DateSliderPoint,
   ThumbType,
 } from "@/components/common/slider/DateSlider";
-import { dateToValue } from "@/utils/DateUtils";
+import { dateToValue, toAppDayjs } from "@/utils/DateUtils";
 import { GeoserverFieldsResponse } from "@/app/store/GeoserverDefinitions";
 import * as turf from "@turf/turf";
 import { createStaticLayers } from "@/components/map/mapbox/layers/StaticLayer";
@@ -192,7 +192,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     Map<string, Array<number>> | null | undefined
   >(undefined);
   const [datePointValue, setDatePointValue] = useState<number>(
-    dateToValue(dayjs(dateDefault.min))
+    dateToValue(dateDefault.min)
   );
   // Period coverage from the selected parquet's PMTiles `.metadata` sidecar
   const [pmtilesPeriodRange, setPmtilesPeriodRange] =
@@ -261,14 +261,15 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       start = pmtilesDayjs.minDate;
       end = pmtilesDayjs.maxDate;
     } else {
-      start = dayjs(dateDefault.min);
-      end = dayjs(dateDefault.max);
+      start = dateDefault.min;
+      end = dateDefault.max;
 
       const extent = collection?.getExtent();
       if (extent) {
         const [s, e] = extent.getOverallTemporal();
-        start = s === undefined ? start : dayjs(s, dateDefault.DISPLAY_FORMAT);
-        end = e === undefined ? end : dayjs(e, dateDefault.DISPLAY_FORMAT);
+        start =
+          s === undefined ? start : toAppDayjs(s, dateDefault.DISPLAY_FORMAT);
+        end = e === undefined ? end : toAppDayjs(e, dateDefault.DISPLAY_FORMAT);
       }
     }
 
@@ -316,11 +317,14 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       return [undefined, undefined];
     }
     const dateRangeCondition = dateRangeConditionGeneric as DateRangeCondition;
-    const conditionStart = dayjs(
+    const conditionStart = toAppDayjs(
       dateRangeCondition.start,
       dateDefault.DATE_FORMAT
     );
-    const conditionEnd = dayjs(dateRangeCondition.end, dateDefault.DATE_FORMAT);
+    const conditionEnd = toAppDayjs(
+      dateRangeCondition.end,
+      dateDefault.DATE_FORMAT
+    );
     return [conditionStart, conditionEnd];
   }, [downloadConditions, isSubsettingSupported]);
 

@@ -8,7 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import dayjs, { Dayjs } from "dayjs";
+import { Dayjs } from "@/utils/DayjsUtils";
 import {
   Box,
   Divider,
@@ -19,8 +19,6 @@ import {
   RadioGroup,
   Typography,
 } from "@mui/material";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { color, padding } from "@/styles/constants";
 import { dateDefault } from "../common/constants";
 import { updateDateTimeFilterRange } from "@/app/store/componentParamReducer";
@@ -41,7 +39,13 @@ import {
 import TimeRangeBarChart from "../common/charts/TimeRangeBarChart";
 import PlainDatePicker from "../common/datetime/PlainDatePicker";
 import PlainSlider from "../common/slider/PlainSlider";
-import { dateToValue, valueToDate } from "@/utils/DateUtils";
+import {
+  dateToValue,
+  toAppDayjs,
+  toUtcEndOfDay,
+  toUtcStartOfDay,
+  valueToDate,
+} from "@/utils/DateUtils";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import theme from "../../styles/themeRC8";
 import { CalendarIcon } from "../../assets/icons/search/calendar";
@@ -70,8 +74,8 @@ const dateRangeOptions: DateRangeOption[] = [
   { label: "Last 10 years", value: DateRangeOptionValues.LastTenYears },
 ];
 
-const initialMinDate: Dayjs = dayjs(dateDefault.min);
-const initialMaxDate: Dayjs = dayjs(dateDefault.max);
+const initialMinDate: Dayjs = dateDefault.min;
+const initialMaxDate: Dayjs = dateDefault.max;
 
 interface DateRangeFilterProps {}
 
@@ -110,7 +114,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
   const determineSelectedOption = useCallback(
     (startDate: Dayjs, endDate: Dayjs): DateRangeOptionValues => {
       // Only consider predefined ranges if the end date is today
-      const today = dayjs();
+      const today = toAppDayjs();
       const isEndDateToday = endDate
         .startOf("day")
         .isSame(today.startOf("day"));
@@ -150,9 +154,12 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
       if (option !== DateRangeOptionValues.Custom) {
         // Convert option to number for year calculation
         const years = Number(option);
-        const today = dayjs();
-        const startDate = today.subtract(years, "year");
-        const newValue = [dateToValue(startDate), dateToValue(today)];
+        const today = toAppDayjs();
+        const startDate = toUtcStartOfDay(today.subtract(years, "year"));
+        const newValue = [
+          dateToValue(startDate),
+          dateToValue(toUtcEndOfDay(today)),
+        ];
 
         setValue(newValue);
         dispatch(
@@ -187,11 +194,8 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
 
   const handleMinDateChange = useCallback(
     (newMinDate: Dayjs | null) => {
-      // For min date we always set to start of day time 00:00:00
-      const localMinDate = newMinDate
-        ?.set("hour", 0)
-        .set("minute", 0)
-        .set("second", 0);
+      // Date-only picker: the chosen calendar day at UTC 00:00:00, not host midnight.
+      const localMinDate = newMinDate ? toUtcStartOfDay(newMinDate) : null;
 
       if (localMinDate && dateToValue(localMinDate) < dateToValue(maxDate)) {
         const newStart = dateToValue(localMinDate);
@@ -216,12 +220,8 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
 
   const handleMaxDateChange = useCallback(
     (newMaxDate: Dayjs | null) => {
-      // For max date we always set to end of day time to 23:59:59
-      const localMaxDate = newMaxDate
-        ?.set("hour", 23)
-        .set("minute", 59)
-        .set("second", 59)
-        .set("millisecond", 0);
+      // Date-only picker: the chosen calendar day at UTC 23:59:59, not host local.
+      const localMaxDate = newMaxDate ? toUtcEndOfDay(newMaxDate) : null;
 
       if (localMaxDate && dateToValue(localMaxDate) > dateToValue(minDate)) {
         const newEnd = dateToValue(localMaxDate);
@@ -367,7 +367,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
   }, [dispatch]);
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <>
       {/*
         Grid v2: only the *container* should force full width.
         Column items must rely on `size` — width:100% on them stacks the layout.
@@ -526,7 +526,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
           return funcIntersectPolygon(value[0], value[1]);
         }}
       />
-    </LocalizationProvider>
+    </>
   );
 });
 

@@ -5,10 +5,9 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import dayjs from "dayjs";
 import { Grid, Stack, Typography } from "@mui/material";
 import type { SxProps, Theme } from "@mui/material/styles";
-import { dateToValue, valueToDate } from "@/utils/DateUtils";
+import { dateToValue, toAppDayjs, valueToDate } from "@/utils/DateUtils";
 import { dateDefault } from "../constants";
 import { portalTheme } from "../../../styles";
 import { padding } from "@/styles/constants";
@@ -241,15 +240,18 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
   );
 };
 
-/** Epoch ms for {@link dateDefault.min} (1 Jan 1970 local). Slider floor. */
-const SLIDER_MIN_FLOOR = dateToValue(dayjs(dateDefault.min));
+/** Epoch ms for {@link dateDefault.min} (1 Jan 1970 UTC). Slider floor. */
+const SLIDER_MIN_FLOOR = dateToValue(dateDefault.min);
 
 /**
  * Parse a date string to slider epoch ms at **start of day**, never below
  * {@link SLIDER_MIN_FLOOR}. Used for the left thumb / rail min.
  */
 const dateStringToSliderMinValue = (date: string): number =>
-  Math.max(SLIDER_MIN_FLOOR, dateToValue(dayjs(date, dateDefault.DATE_FORMAT)));
+  Math.max(
+    SLIDER_MIN_FLOOR,
+    dateToValue(toAppDayjs(date, dateDefault.DATE_FORMAT))
+  );
 
 /**
  * Parse a date string to slider epoch ms at **end of day**. Used for the right
@@ -258,7 +260,7 @@ const dateStringToSliderMinValue = (date: string): number =>
  * min and max share the same calendar day).
  */
 const dateStringToSliderMaxValue = (date: string): number =>
-  dateToValue(dayjs(date, dateDefault.DATE_FORMAT), true);
+  dateToValue(toAppDayjs(date, dateDefault.DATE_FORMAT), true);
 
 /** Full-coverage thumb pair for the current rail bounds. */
 const fullCoverageRange = (minValue: number, maxValue: number): number[] => [

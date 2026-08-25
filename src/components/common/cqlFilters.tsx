@@ -2,8 +2,7 @@
  * Common filter for cql, avoid cql string repeat everywhere
  * @type {{}}
  */
-import dayjs from "dayjs";
-import { dateDefault } from "./constants";
+import { formatUtcDateTime } from "@/utils/DateUtils";
 import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from "geojson";
 import * as wellknown from "wellknown";
 import { SelectedStaticArea, Vocab } from "@/app/store/componentParamReducer";
@@ -68,10 +67,10 @@ const funcUpdateDatasetGroup: DatasetGroup = (name: string) =>
   `dataset_group='${name}'`;
 
 const funcTemporalAfter: TemporalAfterOrBefore = (s: number) =>
-  `temporal AFTER ${dayjs(s).format(dateDefault["DATE_TIME_FORMAT"])}`;
+  `temporal AFTER ${formatUtcDateTime(s)}`;
 
 const funcTemporalBefore: TemporalAfterOrBefore = (s: number) =>
-  `temporal BEFORE ${dayjs(s).format(dateDefault["DATE_TIME_FORMAT"])}`;
+  `temporal BEFORE ${formatUtcDateTime(s)}`;
 
 const funcIntersectPolygon: PolygonOperation = (
   p: Feature<Polygon | MultiPolygon, GeoJsonProperties>
@@ -132,7 +131,7 @@ const funcPlatformFilter: PlatformFilter = (platforms: Array<string>) => {
  * @param e
  */
 const funcTemporalBetween: TemporalDuring = (s: number, e: number) =>
-  `temporal DURING ${dayjs(s).format(dateDefault["DATE_TIME_FORMAT"])}/${dayjs(e).format(dateDefault["DATE_TIME_FORMAT"])}`;
+  `temporal DURING ${formatUtcDateTime(s)}/${formatUtcDateTime(e)}`;
 
 /**
  * Keep all cql query here, otherwise it will be very hard to manage

@@ -17,10 +17,10 @@ import {
   updateStatus,
   updateUpdateFreq,
 } from "@/app/store/componentParamReducer";
-import dayjs from "dayjs";
+import dayjs from "@/utils/DayjsUtils";
 import { dateDefault, pageDefault, pageReferer } from "../common/constants";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
-import { borderRadius, color } from "../../styles/constants";
+import { borderRadius, color } from "@/styles/constants";
 import { TrashIcon } from "../../assets/icons/search/trash";
 import {
   BoundaryName,

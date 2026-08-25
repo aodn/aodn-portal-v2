@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import dayjs from "@/utils/DayjsUtils";
 
 const dateDefault = {
   // Must use this format to do search, we care about the time
@@ -8,9 +8,9 @@ const dateDefault = {
   DISPLAY_FORMAT: "DD/MM/YYYY",
   // e.g. 05 Jan 2024, matching the download email
   DISPLAY_FORMAT_LONG: "DD MMM YYYY",
-  min: new Date("01/01/1970"),
-  max: new Date(),
-  currentYear: dayjs(new Date()).year(),
+  min: dayjs.tz(0),
+  max: dayjs.tz(),
+  currentYear: dayjs.tz().year(),
 };
 
 const pageDefault = {
