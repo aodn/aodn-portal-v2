@@ -474,8 +474,8 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                 <TimeRangeBarChart
                   imosDataIds={imosDataIds}
                   totalDataset={totalDataset}
-                  selectedStartDate={minDate.toDate()}
-                  selectedEndDate={maxDate.toDate()}
+                  selectedStartDate={minDate}
+                  selectedEndDate={maxDate}
                 />
               </Box>
             )}

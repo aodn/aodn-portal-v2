@@ -1,5 +1,6 @@
 import React from "react";
-import dayjs, { Dayjs } from "@/utils/DayjsUtils";
+import { Dayjs } from "@/utils/DayjsUtils";
+import { toAppDayjs, toUtcStartOfDay } from "@/utils/DateUtils";
 import { Box, Stack, Typography } from "@mui/material";
 import BaseConditionCard from "./BaseConditionCard";
 import {
@@ -14,7 +15,7 @@ import { TimeRangeTooltipIcon } from "@/assets/icons/map/tooltip_time_range";
 import { dateDefault } from "@/components/common/constants";
 
 const formatOrEmpty = (d: Dayjs | null): string =>
-  d?.isValid() ? d.format("YYYY-MM-DD") : "";
+  d?.isValid() ? toUtcStartOfDay(d).format(dateDefault.DATE_FORMAT) : "";
 
 const datePickerSx = {
   border: "none",
@@ -82,7 +83,7 @@ const DateRow: React.FC<DateRowProps> = ({
       sx={datePickerSx}
       views={["year", "month", "day"]}
       format={dateDefault.DISPLAY_FORMAT_LONG}
-      value={dayjs.tz(value)}
+      value={toAppDayjs(value, dateDefault.DATE_FORMAT)}
       minDate={minDate}
       maxDate={maxDate}
       onChange={(date) => onChange(date as Dayjs | null)}
@@ -136,9 +137,13 @@ const DateRangeConditionCard: React.FC<DateRangeConditionCardProps> = ({
           value={start}
           disabled={disable || readOnly}
           minDate={minDate}
-          maxDate={dayjs(end)}
+          maxDate={toAppDayjs(end, dateDefault.DATE_FORMAT)}
           onChange={(next) => {
-            if (next?.isValid() && !next.isAfter(dayjs(end))) {
+            const endDay = toAppDayjs(end, dateDefault.DATE_FORMAT);
+            if (
+              next?.isValid() &&
+              !toUtcStartOfDay(next).isAfter(endDay, "day")
+            ) {
               onChange(formatOrEmpty(next), end);
             }
           }}
@@ -148,9 +153,13 @@ const DateRangeConditionCard: React.FC<DateRangeConditionCardProps> = ({
           value={end}
           disabled={disable || readOnly}
           maxDate={maxDate}
-          minDate={dayjs(start)}
+          minDate={toAppDayjs(start, dateDefault.DATE_FORMAT)}
           onChange={(next) => {
-            if (next?.isValid() && !next.isBefore(dayjs(start))) {
+            const startDay = toAppDayjs(start, dateDefault.DATE_FORMAT);
+            if (
+              next?.isValid() &&
+              !toUtcStartOfDay(next).isBefore(startDay, "day")
+            ) {
               onChange(start, formatOrEmpty(next));
             }
           }}

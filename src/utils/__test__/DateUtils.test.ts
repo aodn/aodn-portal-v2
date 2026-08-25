@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import {
+  convertDateFormat,
   dayKeyToUtcValue,
   formatUtcDateTime,
   toAppDayjs,
@@ -30,6 +31,14 @@ describe("dayKeyToUtcValue", () => {
   it("rejects a shape carrying time or timezone info", () => {
     expect(dayKeyToUtcValue("2024-01-02T00:00:00Z")).toBeUndefined();
     expect(dayKeyToUtcValue("2024-01-02 ")).toBeUndefined();
+  });
+});
+
+describe("convertDateFormat", () => {
+  it("renders an ISO instant as UTC, not host-local wall clock", () => {
+    expect(convertDateFormat("2021-08-01T00:00:00.000Z")).toBe(
+      "Sun Aug 01 2021 00:00:00 GMT+0000"
+    );
   });
 });
 
