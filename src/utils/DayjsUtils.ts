@@ -13,7 +13,7 @@ let appTimezone = DEFAULT_APP_TIMEZONE;
 
 export const getAppTimezone = (): string => appTimezone;
 
-/** Default zone for `dayjs.tz()` / `.tz()`. `dayjs()` stays host-local. */
+/** Default zone for `dayjs.tz()`. Host-local `dayjs()` is banned by ESLint. */
 export const setAppTimezone = (timezoneName: string): void => {
   dayjs.tz.setDefault(timezoneName);
   appTimezone = timezoneName;

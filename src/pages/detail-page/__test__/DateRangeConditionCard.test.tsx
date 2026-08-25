@@ -20,7 +20,7 @@ vi.mock("../../../components/common/datetime/PlainDatePicker", () => ({
       value={value?.format?.("YYYY-MM-DD") ?? ""}
       disabled={disabled}
       onChange={(e) =>
-        onChange(e.target.value === "" ? null : dayjs(e.target.value))
+        onChange(e.target.value === "" ? null : dayjs.tz(e.target.value))
       }
     />
   ),
@@ -149,8 +149,8 @@ describe("DateRangeConditionCard", () => {
         <DateRangeConditionCard
           dateRangeCondition={buildCondition(RANGE_START, RANGE_END)}
           onChange={onChange}
-          minDate={dayjs(DATASET_MIN)}
-          maxDate={dayjs(DATASET_MAX)}
+          minDate={dayjs.tz(DATASET_MIN)}
+          maxDate={dayjs.tz(DATASET_MAX)}
         />
       );
 
@@ -163,8 +163,8 @@ describe("DateRangeConditionCard", () => {
         <DateRangeConditionCard
           dateRangeCondition={buildCondition(RANGE_START, RANGE_END)}
           onChange={onChange}
-          minDate={dayjs(DATASET_MIN)}
-          maxDate={dayjs(DATASET_MAX)}
+          minDate={dayjs.tz(DATASET_MIN)}
+          maxDate={dayjs.tz(DATASET_MAX)}
         />
       );
 
