@@ -34,6 +34,12 @@ import {
   WFSDownloadRequest,
 } from "@/pages/detail-page/context/DownloadDefinitions";
 import {
+  formatUtcDateTime,
+  toAppDayjs,
+  toUtcEndOfDay,
+  toUtcStartOfDay,
+} from "@/utils/DateUtils";
+import {
   getDateConditionFrom,
   getFormatFrom,
   getKeyFrom,
@@ -313,6 +319,15 @@ export interface DatasetMetadataItem {
 
 export type DatasetMetadata = Record<string, DatasetMetadataItem>;
 
+const toIsoDateOrUnspecified = (value: string, endOfDay = false): string =>
+  value === "non-specified"
+    ? value
+    : formatUtcDateTime(
+        endOfDay
+          ? toUtcEndOfDay(toAppDayjs(value))
+          : toUtcStartOfDay(toAppDayjs(value))
+      );
+
 const fetchDatasetMetadataByUuid = createAsyncThunk<
   DatasetMetadata,
   string,
@@ -359,8 +374,8 @@ const processWFSDownload = createAsyncThunk<
       const requestBody = {
         inputs: {
           uuid: request.uuid,
-          start_date: dateRange.start,
-          end_date: dateRange.end,
+          start_date: toIsoDateOrUnspecified(dateRange.start),
+          end_date: toIsoDateOrUnspecified(dateRange.end, true),
           multi_polygon: multiPolygon,
           layer_name: request.layerName,
           output_format: format,
@@ -410,8 +425,8 @@ const processWFSEstimateSize = createAsyncThunk<
         inputs: {
           uuid: request.uuid,
           layer_name: request.layerName,
-          start_date: dateRange.start,
-          end_date: dateRange.end,
+          start_date: toIsoDateOrUnspecified(dateRange.start),
+          end_date: toIsoDateOrUnspecified(dateRange.end, true),
           output_format: format,
           multi_polygon: multiPolygon,
         },
@@ -458,8 +473,8 @@ const processCoEstimateSize = createAsyncThunk<
         inputs: {
           uuid: request.uuid,
           key,
-          start_date: dateRange.start,
-          end_date: dateRange.end,
+          start_date: toIsoDateOrUnspecified(dateRange.start),
+          end_date: toIsoDateOrUnspecified(dateRange.end, true),
           output_format: format,
           multi_polygon: multiPolygon,
         },

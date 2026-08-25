@@ -42,8 +42,8 @@ describe("searchReducer async thunks", () => {
       expect.objectContaining({
         inputs: {
           uuid: "test-uuid",
-          start_date: "2020-01-01",
-          end_date: "2020-01-02",
+          start_date: "2020-01-01T00:00:00Z",
+          end_date: "2020-01-02T23:59:59Z",
           multi_polygon: "non-specified",
           layer_name: "test-layer",
           output_format: "CSV",
@@ -88,8 +88,8 @@ describe("searchReducer async thunks", () => {
         inputs: {
           uuid: "test-uuid",
           layer_name: "test-layer",
-          start_date: "2020-01-01",
-          end_date: "2020-01-02",
+          start_date: "2020-01-01T00:00:00Z",
+          end_date: "2020-01-02T23:59:59Z",
           output_format: "CSV",
           multi_polygon: "non-specified",
         },
