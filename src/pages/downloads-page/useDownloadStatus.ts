@@ -9,6 +9,7 @@ import {
   getTrackedDownloadIds,
   removeTrackedDownloadId,
 } from "@/utils/DownloadStorageUtils";
+import { toAppDayjs } from "@/utils/DateUtils";
 import { fetchDownloadStatus } from "./api";
 
 const POLLING_INTERVAL_MS = 5 * 60_000;
@@ -83,7 +84,7 @@ const useDownloadStatus = () => {
                 finished: statusInfo.finished ?? download.finished,
                 updated: statusInfo.updated ?? download.updated,
                 progress: statusInfo.progress ?? download.progress,
-                lastCheckedAt: new Date().toISOString(),
+                lastCheckedAt: toAppDayjs().toISOString(),
                 pollingError: undefined,
                 lookupState: "available",
               }
@@ -103,7 +104,7 @@ const useDownloadStatus = () => {
         return;
       }
 
-      const checkedAt = new Date().toISOString();
+      const checkedAt = toAppDayjs().toISOString();
       if (axios.isAxiosError(error) && error.response?.status === 404) {
         retryCountsRef.current.delete(jobID);
         setDownloads((current) =>
