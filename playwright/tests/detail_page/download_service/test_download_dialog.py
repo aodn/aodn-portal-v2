@@ -7,7 +7,6 @@ from mocks.api_router import ApiRouter
 from pages.detail_page import DetailPage
 from pages.downloads_page import DownloadsPage
 
-
 DOWNLOAD_JOB_ID = 'f358dc2f-e211-4bf1-95c4-c513ef57c2b6'
 
 
