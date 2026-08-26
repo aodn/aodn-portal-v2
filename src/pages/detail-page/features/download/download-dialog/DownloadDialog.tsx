@@ -26,6 +26,7 @@ import {
 import { disableScroll, enableScroll } from "@/utils/ScrollUtils";
 import { useDetailPageContext } from "../../../context/detail-page-context";
 import { pageDefault } from "@/components/common/constants";
+import { isDownloadStatusTrackingEnabled } from "@/utils/downloadFeatureFlags";
 
 interface DownloadDialogProps extends DownloadCondition {
   isOpen: boolean;
@@ -266,7 +267,7 @@ const DownloadDialog = ({
           flexShrink: 0,
         }}
       >
-        {isSuccess && createdJobID ? (
+        {isDownloadStatusTrackingEnabled && isSuccess && createdJobID ? (
           <Button component={RouterLink} to={pageDefault.downloads}>
             View download status
           </Button>

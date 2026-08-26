@@ -26,6 +26,7 @@ import { openInNewTab } from "@/utils/LinkUtils";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { pageDefault } from "@/components/common/constants";
 import { useNavigate } from "react-router-dom";
+import { isDownloadStatusTrackingEnabled } from "@/utils/downloadFeatureFlags";
 
 export enum HeaderMenuStyle {
   DROPDOWN_MENU = "DROPDOWN",
@@ -83,13 +84,17 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
   const navigate = useNavigate();
   const HEADER_MENUS: Menu[] = useMemo(
     () => [
-      {
-        menu: {
-          name: "Downloads",
-          handler: () => navigate(pageDefault.downloads),
-        },
-        items: [],
-      },
+      ...(isDownloadStatusTrackingEnabled
+        ? [
+            {
+              menu: {
+                name: "Downloads",
+                handler: () => navigate(pageDefault.downloads),
+              },
+              items: [],
+            },
+          ]
+        : []),
       {
         menu: {
           name: "IMOS Home",
