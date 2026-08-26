@@ -1,4 +1,3 @@
-import dayjs from "dayjs";
 import { ReactNode } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import ListAltOutlinedIcon from "@mui/icons-material/ListAltOutlined";
@@ -29,6 +28,7 @@ import {
 } from "@/app/store/DownloadStatusDefinitions";
 import { portalTheme } from "@/styles";
 import useBreakpoint from "@/hooks/useBreakpoint";
+import { toAppDayjs } from "@/utils/DateUtils";
 import useDownloadStatus from "./useDownloadStatus";
 
 const EMPTY_VALUE = "—";
@@ -40,7 +40,7 @@ interface DateCellProps {
 const DateCell = ({ value }: DateCellProps) => {
   if (!value) return <>{EMPTY_VALUE}</>;
 
-  const date = dayjs(value);
+  const date = toAppDayjs(value);
   if (!date.isValid()) return <>{EMPTY_VALUE}</>;
 
   return (
@@ -107,8 +107,8 @@ const CollectionCell = ({
 const formatDuration = (started?: string, finished?: string): string => {
   if (!started || !finished) return EMPTY_VALUE;
 
-  const startedAt = dayjs(started);
-  const finishedAt = dayjs(finished);
+  const startedAt = toAppDayjs(started);
+  const finishedAt = toAppDayjs(finished);
   if (!startedAt.isValid() || !finishedAt.isValid()) return EMPTY_VALUE;
 
   const totalSeconds = finishedAt.diff(startedAt, "second");

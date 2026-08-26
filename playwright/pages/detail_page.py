@@ -1,7 +1,7 @@
 from urllib.parse import unquote_plus
 
 import pytest
-from playwright.sync_api import Locator, Page, TimeoutError
+from playwright.sync_api import Locator, Page, TimeoutError, expect
 
 from config import settings
 from mocks.routes import Routes
@@ -61,7 +61,8 @@ class DetailPage(BasePage):
     def load(self, uuid: str) -> None:
         """Load the detail page for the given uuid"""
         url = f'{settings.baseURL}/details/{uuid}'
-        self.page.goto(url, wait_until='load')
+        self.page.goto(url, wait_until='domcontentloaded')
+        expect(self.page_title).to_be_visible()
 
     def is_mobile_viewport(self) -> bool:
         """Return True when the current viewport falls under the mobile breakpoint."""
