@@ -8,7 +8,7 @@ import {
   TileProduct,
   TileProductsResponse,
 } from "@/app/store/GriddedTileDefinitions";
-import { utcDayKeyToUnixMs } from "@/utils/DateUtils";
+import { utcDayKeyToUnixMs, utcIsoToDayKey } from "@/utils/DateUtils";
 import { LayerSelectable } from "@/components/map/mapbox/layers/Layers";
 
 /**
@@ -43,7 +43,7 @@ export interface GriddedRasterLayerControls extends LayerSelectable<string> {
 
   layerConfig: string;
   onLayerChange: (id: string) => void;
-  /** `YYYY-MM-DD`, round-tripped from the listing — never derived from a Date. */
+  /** Full UTC datetime, round-tripped verbatim from the listing — never derived from a Date. */
   selectedDate?: string;
   /** A refetch failed while this layer was selected. */
   error?: boolean;
@@ -62,8 +62,11 @@ export const buildTileDateMarks = (dates?: string[]): TileDateMarks => {
   const byValue = new Map<number, string>();
   dates.forEach((date) => {
     if (typeof date !== "string") return;
-    const value = utcDayKeyToUnixMs(date);
-    // De-duplicates: the same day key maps to the same value.
+    // Extract the day key from the full UTC datetime, then convert that to a Unix timestamp in ms for the slider value, the utc full time string kept.
+    const dayKey = utcIsoToDayKey(date);
+    if (dayKey === undefined) return;
+    const value = utcDayKeyToUnixMs(dayKey);
+    // De-duplicates by day: the first datetime seen for that day wins.
     if (value !== undefined && !byValue.has(value)) byValue.set(value, date);
   });
 
@@ -121,6 +124,10 @@ export const toGriddedRasterProducts = (
       return;
     }
 
+    // available_dates are full UTC datetimes ("2024-01-01T00:00:00Z"). Kept
+    // verbatim: the tile request must echo the same string back, so only
+    // buildTileDateMarks derives a day from each one, for sorting/dedup and
+    // the slider.
     const marks = buildTileDateMarks(product.available_dates);
     if (marks.dates.length === 0) return;
 
@@ -140,9 +147,9 @@ export const toSelectItems = (
   products.map((product) => ({ value: product.id, label: product.label }));
 
 /**
- * Substitutes the day into a tile template and translates the backend's OGC
- * placeholder names into the ones Mapbox recognises — pure string replacement,
- * nothing else.
+ * Substitutes the datetime into a tile template and translates the backend's
+ * OGC placeholder names into the ones Mapbox recognises — pure string
+ * replacement, nothing else.
  *
  * Deliberately NOT `new URL()`, `URLSearchParams` or `formatToUrl`: any of them
  * would turn `variable=ucur%2Bvcur` into `ucur+vcur` (which decodes to a space
@@ -158,13 +165,13 @@ export const toSelectItems = (
  */
 export const buildGriddedTileUrl = (
   template?: string,
-  dayKey?: string
+  datetime?: string
 ): string | undefined => {
   if (!template) return undefined;
-  if (!dayKey) return undefined;
+  if (!datetime) return undefined;
   return template
     .split("{datetime}")
-    .join(dayKey)
+    .join(datetime)
     .split("{tileRow}")
     .join("{y}")
     .split("{tileCol}")

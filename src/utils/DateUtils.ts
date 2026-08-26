@@ -136,3 +136,13 @@ export const utcDayKeyToUnixMs = (key: string): number | undefined => {
   const parsed = dayjs.utc(key, dateDefault.DATE_FORMAT, true);
   return parsed.isValid() ? parsed.valueOf() : undefined;
 };
+
+/**
+ * Strict full UTC datetime ("YYYY-MM-DDTHH:mm:ssZ") → its calendar day key
+ * ("YYYY-MM-DD"), or undefined if it isn't a real calendar day or doesn't
+ * match that exact shape.
+ */
+export const utcIsoToDayKey = (value: string): string | undefined => {
+  const parsed = dayjs.utc(value, "YYYY-MM-DDTHH:mm:ss[Z]", true);
+  return parsed.isValid() ? parsed.format(dateDefault.DATE_FORMAT) : undefined;
+};

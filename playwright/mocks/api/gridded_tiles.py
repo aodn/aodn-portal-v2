@@ -20,9 +20,17 @@ UNSUPPORTED_UUID = '19da2ce7-138f-4427-89de-a50c724f5f54'
 # invisible with fully disjoint date lists — see
 # test_switching_product_does_not_retain_a_shared_non_latest_date.
 PRODUCT_ONE_ID = 'satellite_net_primary_productivity_gsm_1day_aqua:chl_oc3'
-PRODUCT_ONE_DATES = ['2024-01-01', '2024-01-05', '2024-01-09']
+PRODUCT_ONE_DATES = [
+    '2024-01-01T00:00:00Z',
+    '2024-01-05T00:00:00Z',
+    '2024-01-09T00:00:00Z',
+]
 PRODUCT_TWO_ID = 'model_currents:ucur+vcur'
-PRODUCT_TWO_DATES = ['2023-06-02', '2024-01-05', '2024-03-01']
+PRODUCT_TWO_DATES = [
+    '2023-06-02T00:00:00Z',
+    '2024-01-05T00:00:00Z',
+    '2024-03-01T00:00:00Z',
+]
 DATA_ONLY_PRODUCT_ID = 'model_temperature:temp'
 
 
@@ -72,7 +80,7 @@ def _products_payload(uuid: str) -> dict:
                 'id': DATA_ONLY_PRODUCT_ID,
                 'variable': 'TEMP',
                 'tile_types': ['data'],
-                'available_dates': ['2024-01-01'],
+                'available_dates': ['2024-01-01T00:00:00Z'],
                 'data_tile_url_template': _tile_template(
                     uuid, 'model_temperature', 'temp'
                 ),
