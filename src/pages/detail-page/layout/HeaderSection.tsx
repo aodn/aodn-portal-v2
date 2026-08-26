@@ -330,13 +330,16 @@ const HeaderSection = () => {
                 sm: 10,
               }}
             >
-              {/* The collection title is the page's single h1 (SEO);
-                  component only changes the tag, not the styling. No
-                  aria-label here — it would override the title as the
-                  heading's accessible name */}
+              {/* The collection title is the page's h1 (SEO); component only
+                  changes the tag, not the styling. No aria-label here — it
+                  would override the title as the heading's accessible name.
+                  Carries a test id because it is not the only h1 on the page:
+                  MarkdownRenderer also emits one per `#` in a description, so
+                  selecting this by heading level is ambiguous */}
               <Typography
                 variant="heading3"
                 component="h1"
+                data-testid={DataTestId.HeaderSection.PageTitle}
                 color={portalTheme.palette.text2}
                 sx={{
                   p: 0,

@@ -53,6 +53,7 @@ export const ComponentId = {
 export const DataTestId = {
   HeaderSection: {
     ReturnButton: "return-button",
+    PageTitle: "detail-page-title",
   },
   MapLayerSwitcher: {
     RadioGroup: "layer-style-menu-items",

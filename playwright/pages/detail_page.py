@@ -25,7 +25,7 @@ class DetailPage(BasePage):
 
         # -- Page locators --
 
-        self.page_title = self.page.get_by_role('heading', level=1)
+        self.page_title = self.page.get_by_test_id('detail-page-title')
         self.return_button = self.page.get_by_test_id('return-button')
         self.share_button = self.page.get_by_test_id('share-button')
         self.copy_link = self.page.get_by_test_id('copy-link')

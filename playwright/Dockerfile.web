@@ -17,5 +17,5 @@ RUN \
 # Expose the port the app runs on
 EXPOSE 5173
 
-# Build the application once, then serve the production bundle to Playwright.
-CMD ["sh", "-c", "yarn vitest run && yarn vite build --mode playwright-local && yarn vite preview --host 0.0.0.0 --port 5173 --strictPort"]
+# Command to run the application
+CMD ["yarn", "playwright-local", "--host", "0.0.0.0"]
