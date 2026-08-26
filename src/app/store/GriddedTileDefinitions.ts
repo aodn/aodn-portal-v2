@@ -5,6 +5,7 @@ export interface TileProduct {
   id: string;
   variable?: string | string[];
   tile_types?: TileType[];
+  // Full UTC datetimes, e.g. "2024-01-01T00:00:00Z"
   available_dates?: string[];
   full_date_range?: { start?: string; end?: string };
   // Present only when tile_types includes "visual".
@@ -22,6 +23,6 @@ export interface GriddedRasterProduct {
   id: string;
   label: string;
   template: string;
-  // Ascending, de-duplicated, non-empty.
+  // Full UTC datetimes, e.g. "2024-01-01T00:00:00Z", ascending, de-duplicated by calendar day, non-empty.
   dates: string[];
 }

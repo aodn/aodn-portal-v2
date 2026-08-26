@@ -31,7 +31,7 @@ const visualProduct = (overrides: Partial<TileProduct> = {}): TileProduct => ({
   id: "model_sea_level_anomaly_gridded_realtime:gsla",
   variable: "GSLA",
   tile_types: ["visual", "data"],
-  available_dates: ["2024-01-01", "2024-01-02"],
+  available_dates: ["2024-01-01T00:00:00Z", "2024-01-02T00:00:00Z"],
   visual_tile_url_template: VISUAL_TEMPLATE,
   ...overrides,
 });
@@ -87,9 +87,9 @@ describe("buildGriddedTileUrl", () => {
   });
 
   it("returns undefined rather than a URL carrying a literal {datetime}", () => {
-    // No dayKey shape/calendar re-check here: only ever called with a value
-    // already validated by `utcDayKeyToUnixMs` during discovery, so this is
-    // just the "nothing selected yet" / missing-input guard.
+    // No shape/calendar re-check here: only ever called with a value already
+    // validated by `utcIsoToDayKey` during discovery, so this is just the
+    // "nothing selected yet" / missing-input guard.
     expect(buildGriddedTileUrl(VISUAL_TEMPLATE, undefined)).toBeUndefined();
     expect(buildGriddedTileUrl(VISUAL_TEMPLATE, "")).toBeUndefined();
     expect(buildGriddedTileUrl(undefined, "2024-01-02")).toBeUndefined();
@@ -100,17 +100,21 @@ describe("buildGriddedTileUrl", () => {
 describe("buildTileDateMarks", () => {
   it("sorts, de-duplicates and drops impossible days", () => {
     const marks = buildTileDateMarks([
-      "2024-01-03",
-      "2024-01-01",
-      "2024-01-03",
-      "2024-02-31",
+      "2024-01-03T00:00:00Z",
+      "2024-01-01T00:00:00Z",
+      "2024-01-03T00:00:00Z",
+      "2024-02-31T00:00:00Z",
       "garbage",
-      "2024-01-02",
+      "2024-01-02T00:00:00Z",
     ]);
-    expect(marks.dates).toEqual(["2024-01-01", "2024-01-02", "2024-01-03"]);
+    expect(marks.dates).toEqual([
+      "2024-01-01T00:00:00Z",
+      "2024-01-02T00:00:00Z",
+      "2024-01-03T00:00:00Z",
+    ]);
     expect(marks.values).toEqual([...marks.values].sort((a, b) => a - b));
     expect(marks.values).toHaveLength(3);
-    expect(marks.latest).toBe("2024-01-03");
+    expect(marks.latest).toBe("2024-01-03T00:00:00Z");
   });
 
   it("returns an empty, non-throwing result for empty or missing input", () => {
@@ -137,10 +141,13 @@ describe("buildTileDateMarks", () => {
         process.env.TZ = originalTz;
       });
 
-      it("recovers the original day key and lands on UTC midnight", () => {
-        const marks = buildTileDateMarks(["2024-01-01", "2024-01-02"]);
+      it("recovers the original datetime and lands on UTC midnight", () => {
+        const marks = buildTileDateMarks([
+          "2024-01-01T00:00:00Z",
+          "2024-01-02T00:00:00Z",
+        ]);
         const last = marks.values[marks.values.length - 1];
-        expect(marks.byValue.get(last)).toBe("2024-01-02");
+        expect(marks.byValue.get(last)).toBe("2024-01-02T00:00:00Z");
         expect(new Date(last).toISOString()).toMatch(/^2024-01-02/);
       });
     }
@@ -234,7 +241,9 @@ describe("toGriddedRasterProducts", () => {
     ).toEqual([]);
     expect(
       toGriddedRasterProducts({
-        products: [visualProduct({ available_dates: ["2024-02-31"] })],
+        products: [
+          visualProduct({ available_dates: ["2024-02-31T00:00:00Z"] }),
+        ],
       })
     ).toEqual([]);
   });
@@ -270,13 +279,20 @@ describe("toGriddedRasterProducts", () => {
     const [product] = toGriddedRasterProducts({
       products: [
         visualProduct({
-          available_dates: ["2024-01-02", "2024-01-01", "2024-01-02"],
+          available_dates: [
+            "2024-01-02T00:00:00Z",
+            "2024-01-01T00:00:00Z",
+            "2024-01-02T00:00:00Z",
+          ],
           visual_tile_url_template: TWO_VARIABLE_TEMPLATE,
           variable: ["UCUR", "VCUR"],
         }),
       ],
     });
-    expect(product.dates).toEqual(["2024-01-01", "2024-01-02"]);
+    expect(product.dates).toEqual([
+      "2024-01-01T00:00:00Z",
+      "2024-01-02T00:00:00Z",
+    ]);
     expect(product.template).toBe(TWO_VARIABLE_TEMPLATE);
     expect(product.label).toContain("UCUR + VCUR");
   });

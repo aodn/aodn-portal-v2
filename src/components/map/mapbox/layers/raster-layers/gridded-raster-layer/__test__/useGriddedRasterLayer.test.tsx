@@ -24,7 +24,8 @@ const productPayload = (id: string, dates: string[]): TileProduct => ({
   id,
   variable: "GSLA",
   tile_types: ["visual"],
-  available_dates: dates,
+  // The listing sends full UTC datetimes, not bare day keys.
+  available_dates: dates.map((date) => `${date}T00:00:00Z`),
   visual_tile_url_template: TEMPLATE,
 });
 
@@ -60,14 +61,14 @@ describe("useGriddedRasterLayer", () => {
 
     await waitFor(() => expect(result.current.hasProducts).toBe(true));
     expect(result.current.layerProps.layerConfig).toBe("a:one");
-    expect(result.current.layerProps.selectedDate).toBe("2024-01-05");
+    expect(result.current.layerProps.selectedDate).toBe("2024-01-05T00:00:00Z");
     expect(result.current.hasDates).toBe(true);
     expect(result.current.dateSliderKey).toBe("gridded-date-a:one");
     expect(
       result.current.dateSliderProps.formatLabel(
         utcDayKeyToUnixMs("2024-01-05")!
       )
-    ).toBe("2024-01-05");
+    ).toBe("2024-01-05T00:00:00Z");
   });
 
   it("is false for hasProducts/hasDates before the fetch resolves and for a non-zarr collection", async () => {
@@ -103,7 +104,7 @@ describe("useGriddedRasterLayer", () => {
     );
 
     await waitFor(() => expect(result.current.hasProducts).toBe(true));
-    expect(result.current.layerProps.selectedDate).toBe("2024-01-09");
+    expect(result.current.layerProps.selectedDate).toBe("2024-01-09T00:00:00Z");
     expect(result.current.dateSliderKey).toBe("gridded-date-a:one");
 
     // Move product one's day to the one shared with product two.
@@ -113,7 +114,7 @@ describe("useGriddedRasterLayer", () => {
         utcDayKeyToUnixMs("2024-01-05")!
       );
     });
-    expect(result.current.layerProps.selectedDate).toBe("2024-01-05");
+    expect(result.current.layerProps.selectedDate).toBe("2024-01-05T00:00:00Z");
 
     // Switch to product two: its own latest day is different from the shared date.
     act(() => {
@@ -123,7 +124,7 @@ describe("useGriddedRasterLayer", () => {
     await waitFor(() =>
       expect(result.current.layerProps.layerConfig).toBe("b:two")
     );
-    expect(result.current.layerProps.selectedDate).toBe("2024-01-20");
+    expect(result.current.layerProps.selectedDate).toBe("2024-01-20T00:00:00Z");
     // The remount key follows the product, forcing DateSliderPoint to reset.
     expect(result.current.dateSliderKey).toBe("gridded-date-b:two");
   });
@@ -179,7 +180,7 @@ describe("useGriddedRasterLayer", () => {
     await waitFor(() =>
       expect(result.current.layerProps.layerConfig).toBe("c:three")
     );
-    expect(result.current.layerProps.selectedDate).toBe("2024-03-01");
+    expect(result.current.layerProps.selectedDate).toBe("2024-03-01T00:00:00Z");
     expect(spy).toHaveBeenCalledTimes(2);
   });
 });
