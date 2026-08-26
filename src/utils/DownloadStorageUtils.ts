@@ -30,20 +30,21 @@ export const getTrackedDownloadIds = (): string[] => {
   }
 };
 
-const saveTrackedDownloadIds = (jobIDs: string[]): void => {
+const saveTrackedDownloadIds = (jobIDs: string[]): boolean => {
   try {
     localStorage.setItem(TRACKED_DOWNLOAD_IDS_KEY, JSON.stringify(jobIDs));
+    return true;
   } catch {
-    // Tracking is helpful but must not make a successful submission fail.
+    // Download submission should still succeed when browser storage is unavailable.
+    return false;
   }
 };
 
-export const addTrackedDownloadId = (jobID: string): void => {
+export const addTrackedDownloadId = (jobID: string): boolean =>
   saveTrackedDownloadIds([
     jobID,
     ...getTrackedDownloadIds().filter((storedID) => storedID !== jobID),
   ]);
-};
 
 export const removeTrackedDownloadId = (jobID: string): void => {
   saveTrackedDownloadIds(

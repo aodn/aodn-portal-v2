@@ -69,6 +69,20 @@ describe("DownloadStatusDefinitions", () => {
     ).toBe(false);
   });
 
+  it.each(["created", "started", "finished", "updated"] as const)(
+    "rejects a malformed optional %s date",
+    (field) => {
+      expect(
+        isDownloadStatusInfo({
+          type: "process",
+          jobID: "job-1",
+          status: "running",
+          [field]: 1,
+        })
+      ).toBe(false);
+    }
+  );
+
   it("accepts older jobs without process ID or message", () => {
     expect(
       isDownloadStatusInfo({

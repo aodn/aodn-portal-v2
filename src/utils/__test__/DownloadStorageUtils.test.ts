@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   addTrackedDownloadId,
   getTrackedDownloadIds,
@@ -8,11 +8,12 @@ import {
 
 describe("DownloadStorageUtils", () => {
   beforeEach(() => localStorage.clear());
+  afterEach(() => vi.restoreAllMocks());
 
   it("stores only deduplicated job IDs with the newest first", () => {
-    addTrackedDownloadId("job-1");
-    addTrackedDownloadId("job-2");
-    addTrackedDownloadId("job-1");
+    expect(addTrackedDownloadId("job-1")).toBe(true);
+    expect(addTrackedDownloadId("job-2")).toBe(true);
+    expect(addTrackedDownloadId("job-1")).toBe(true);
 
     expect(getTrackedDownloadIds()).toEqual(["job-1", "job-2"]);
     expect(
@@ -31,5 +32,13 @@ describe("DownloadStorageUtils", () => {
     removeTrackedDownloadId("job-1");
 
     expect(getTrackedDownloadIds()).toEqual(["job-2"]);
+  });
+
+  it("reports when browser storage is unavailable", () => {
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new DOMException("Storage unavailable", "SecurityError");
+    });
+
+    expect(addTrackedDownloadId("job-1")).toBe(false);
   });
 });

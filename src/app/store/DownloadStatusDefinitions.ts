@@ -94,6 +94,14 @@ export const isDownloadStatusInfo = (
       typeof statusInfo.format === "string") &&
     (statusInfo.metadataUrl === undefined ||
       typeof statusInfo.metadataUrl === "string") &&
+    (statusInfo.created === undefined ||
+      typeof statusInfo.created === "string") &&
+    (statusInfo.started === undefined ||
+      typeof statusInfo.started === "string") &&
+    (statusInfo.finished === undefined ||
+      typeof statusInfo.finished === "string") &&
+    (statusInfo.updated === undefined ||
+      typeof statusInfo.updated === "string") &&
     (statusInfo.progress === undefined ||
       typeof statusInfo.progress === "number")
   );

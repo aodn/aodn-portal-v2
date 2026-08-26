@@ -1,5 +1,6 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { TRACKED_DOWNLOAD_IDS_KEY } from "@/utils/DownloadStorageUtils";
 import { useDownloadDialog } from "../useDownloadDialog";
 
 const { mockDispatch, mockProcessDatasetDownload } = vi.hoisted(() => ({
@@ -61,6 +62,8 @@ describe("useDownloadDialog", () => {
     });
   });
 
+  afterEach(() => vi.restoreAllMocks());
+
   it("sends the available estimated size with the download request", async () => {
     const { result } = renderHook(() =>
       useDownloadDialog(true, vi.fn(), 987654)
@@ -84,5 +87,34 @@ describe("useDownloadDialog", () => {
         }),
       })
     );
+    await waitFor(() =>
+      expect(result.current.createdJobID).toBe(
+        "123e4567-e89b-12d3-a456-426614174000"
+      )
+    );
+  });
+
+  it("does not expose an untracked job when browser storage is unavailable", async () => {
+    const originalSetItem = Storage.prototype.setItem;
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(function (
+      this: Storage,
+      key: string,
+      value: string
+    ) {
+      if (key === TRACKED_DOWNLOAD_IDS_KEY) {
+        throw new DOMException("Storage unavailable", "SecurityError");
+      }
+      originalSetItem.call(this, key, value);
+    });
+    const { result } = renderHook(() =>
+      useDownloadDialog(true, vi.fn(), 987654)
+    );
+
+    act(() => result.current.setEmail("user@example.com"));
+    act(() => result.current.handleStepperButtonClick());
+    act(() => result.current.handleStepperButtonClick());
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.createdJobID).toBeUndefined();
   });
 });

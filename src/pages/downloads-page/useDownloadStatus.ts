@@ -72,7 +72,7 @@ const useDownloadStatus = () => {
             ? {
                 ...download,
                 status: statusInfo.status,
-                message: statusInfo.message ?? download.message,
+                message: statusInfo.message,
                 collection: statusInfo.collection ?? download.collection,
                 dataSelection:
                   statusInfo.dataSelection ?? download.dataSelection,
@@ -175,6 +175,7 @@ const useDownloadStatus = () => {
             ? {
                 ...download,
                 lookupState: "checking",
+                message: undefined,
                 pollingError: undefined,
               }
             : download

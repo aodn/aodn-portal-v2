@@ -61,6 +61,7 @@ describe("useDownloadStatus", () => {
       .mockResolvedValueOnce(statusResponse("running"))
       .mockResolvedValueOnce(
         statusResponse("successful", {
+          message: undefined,
           collection: "Test Ocean Data Collection",
           dataSelection: "imos-data/dataset.zarr",
           format: "netcdf",
@@ -97,6 +98,7 @@ describe("useDownloadStatus", () => {
       })
     );
     expect(mockFetchDownloadStatus).toHaveBeenCalledTimes(3);
+    expect(result.current.downloads[0].message).toBeUndefined();
     expect(vi.getTimerCount()).toBe(0);
   });
 
@@ -183,6 +185,21 @@ describe("useDownloadStatus", () => {
 
     expect(result.current.downloads[0].status).toBe("running");
     expect(result.current.downloads[0].lookupState).toBe("checking");
+  });
+
+  it("clears the previous status message when a manual retry starts", async () => {
+    mockFetchDownloadStatus
+      .mockResolvedValueOnce(statusResponse("running"))
+      .mockImplementationOnce(() => new Promise(() => {}));
+
+    const { result, unmount } = renderHook(() => useDownloadStatus());
+    await flushPromises();
+    expect(result.current.downloads[0].message).toBe("Download job is running");
+
+    act(() => result.current.retryDownload(JOB_ID));
+
+    expect(result.current.downloads[0].message).toBeUndefined();
+    unmount();
   });
 
   it("aborts an active request and clears polling when unmounted", () => {

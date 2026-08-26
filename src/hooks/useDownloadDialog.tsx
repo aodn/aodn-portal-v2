@@ -375,8 +375,8 @@ export const useDownloadDialog = (
           const jobID = getSubmittedDownloadJobID(response);
 
           if (jobID) {
-            addTrackedDownloadId(jobID);
-            setCreatedJobID(jobID);
+            const isTracked = addTrackedDownloadId(jobID);
+            setCreatedJobID(isTracked ? jobID : undefined);
             setProcessingStatus(statusCode);
             setIsSuccess(true);
           } else if (statusCode) {
