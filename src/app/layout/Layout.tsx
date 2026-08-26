@@ -1,9 +1,4 @@
-import { useEffect } from "react";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-// TODO: Temp works but need to check user locale on date time format
-import "dayjs/locale/en-gb";
-import dayjs from "@/utils/DayjsUtils";
+import { Fragment, useEffect } from "react";
 import { Box } from "@mui/material";
 import Header from "./Header";
 import Footer from "./Footer";
@@ -36,11 +31,7 @@ const Layout = () => {
   }, [isSearchPage]);
 
   return (
-    <LocalizationProvider
-      dateAdapter={AdapterDayjs}
-      adapterLocale={"en-gb"}
-      dateLibInstance={dayjs}
-    >
+    <Fragment>
       <ScrollToTop />
       <Box
         sx={{
@@ -70,7 +61,7 @@ const Layout = () => {
           <Footer />
         </Box>
       </Box>
-    </LocalizationProvider>
+    </Fragment>
   );
 };
 
