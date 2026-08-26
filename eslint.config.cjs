@@ -90,6 +90,29 @@ module.exports = [
         },
       ],
 
+      // Enforce the configured Day.js wrapper.
+      "no-restricted-imports": "off", // replaced by the TS version below
+      "@typescript-eslint/no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "dayjs",
+              message:
+                'Import dayjs from "@/utils/DayjsUtils" instead, so the shared plugins are always applied.',
+              allowTypeImports: true,
+            },
+          ],
+          patterns: [
+            {
+              group: ["dayjs/plugin/*"],
+              message:
+                "Import dayjs plugins only inside src/utils/DayjsUtils.ts.",
+            },
+          ],
+        },
+      ],
+
       "import/extensions": [
         "error",
         "never",
@@ -122,6 +145,22 @@ module.exports = [
     ],
     rules: {
       "no-console": "off",
+    },
+  },
+
+  // The wrapper itself is the one place that must import the real dayjs.
+  {
+    files: ["src/utils/DayjsUtils.ts"],
+    rules: {
+      "@typescript-eslint/no-restricted-imports": "off",
+    },
+  },
+
+  // Its test exercises the bare dayjs() parsing API the wrapper re-exports.
+  {
+    files: ["src/utils/__test__/DayjsUtils.test.ts"],
+    rules: {
+      "no-restricted-syntax": "off",
     },
   },
 ];

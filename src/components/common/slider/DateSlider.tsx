@@ -7,7 +7,12 @@ import React, {
 } from "react";
 import { Grid, Stack, Typography } from "@mui/material";
 import type { SxProps, Theme } from "@mui/material/styles";
-import { dateToValue, toAppDayjs, valueToDate } from "@/utils/DateUtils";
+import {
+  dayjsToUnixMs,
+  formatDate,
+  toAppDayjs,
+  unixMsToAppDayjs,
+} from "@/utils/DateUtils";
 import { dateDefault } from "../constants";
 import { portalTheme } from "../../../styles";
 import { padding } from "@/styles/constants";
@@ -206,7 +211,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
             <Typography sx={sliderCaptionSx}>
               Displaying{" "}
               {datePointStamp !== undefined
-                ? valueToDate(datePointStamp).format(dateDefault.DISPLAY_FORMAT)
+                ? formatDate(unixMsToAppDayjs(datePointStamp))
                 : ""}
             </Typography>
           </Stack>
@@ -230,7 +235,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
             }}
             valueLabelDisplay="auto"
             valueLabelFormat={(value: number) =>
-              valueToDate(value).format(dateDefault.DISPLAY_FORMAT)
+              formatDate(unixMsToAppDayjs(value))
             }
             thumb={thumbType}
           />
@@ -241,7 +246,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
 };
 
 /** Epoch ms for {@link dateDefault.min} (1 Jan 1970 UTC). Slider floor. */
-const SLIDER_MIN_FLOOR = dateToValue(dateDefault.min);
+const SLIDER_MIN_FLOOR = dayjsToUnixMs(dateDefault.min);
 
 /**
  * Parse a date string to slider epoch ms at **start of day**, never below
@@ -250,7 +255,7 @@ const SLIDER_MIN_FLOOR = dateToValue(dateDefault.min);
 const dateStringToSliderMinValue = (date: string): number =>
   Math.max(
     SLIDER_MIN_FLOOR,
-    dateToValue(toAppDayjs(date, dateDefault.DATE_FORMAT))
+    dayjsToUnixMs(toAppDayjs(date, dateDefault.DATE_FORMAT))
   );
 
 /**
@@ -260,7 +265,7 @@ const dateStringToSliderMinValue = (date: string): number =>
  * min and max share the same calendar day).
  */
 const dateStringToSliderMaxValue = (date: string): number =>
-  dateToValue(toAppDayjs(date, dateDefault.DATE_FORMAT), true);
+  dayjsToUnixMs(toAppDayjs(date, dateDefault.DATE_FORMAT), true);
 
 /** Full-coverage thumb pair for the current rail bounds. */
 const fullCoverageRange = (minValue: number, maxValue: number): number[] => [
@@ -443,7 +448,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
               Start Date
             </Typography>
             <Typography sx={sliderCaptionSx}>
-              {valueToDate(minValue).format(dateDefault.DISPLAY_FORMAT)}
+              {formatDate(unixMsToAppDayjs(minValue))}
             </Typography>
           </Stack>
           <PlainSlider
@@ -463,7 +468,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
             }}
             valueLabelDisplay="auto"
             valueLabelFormat={(value: number) =>
-              valueToDate(value).format(dateDefault.DISPLAY_FORMAT)
+              formatDate(unixMsToAppDayjs(value))
             }
             sx={{ flex: 1, minWidth: 0 }}
           />
@@ -477,7 +482,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
               On going
             </Typography>
             <Typography sx={sliderCaptionSx}>
-              {valueToDate(maxValue).format(dateDefault.DISPLAY_FORMAT)}
+              {formatDate(unixMsToAppDayjs(maxValue))}
             </Typography>
           </Stack>
         </Stack>

@@ -9,6 +9,7 @@ import {
 } from "react";
 
 import { Dayjs } from "@/utils/DayjsUtils";
+import { formatDate } from "@/utils/DateUtils";
 import {
   ExpressionSpecification,
   GeoJSONSource,
@@ -262,7 +263,11 @@ export const buildPopupHtml = (
   if (hasTime) {
     const first = matchedKeys[0];
     const last = matchedKeys[matchedKeys.length - 1];
-    builder.addRange("Time Range", first ?? "N/A", last ?? "N/A");
+    builder.addRange(
+      "Time Range",
+      formatDate(first, undefined, "N/A"),
+      formatDate(last, undefined, "N/A")
+    );
   }
 
   return builder.getHtml();

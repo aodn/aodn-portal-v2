@@ -52,7 +52,8 @@ import { checkEmptyArray } from "@/utils/Helpers";
 import AdminScreenContext from "../../../../admin/AdminScreenContext";
 import { HttpStatusCode } from "axios";
 import {
-  dateToValue,
+  dayjsToUnixMs,
+  formatDateTime,
   formatUtcDateTime,
   getAppMaxDate,
 } from "@/utils/DateUtils";
@@ -200,7 +201,7 @@ const checkSupportDiscreteTimeSlider = (
           const result: Map<string, Array<number>> = new Map();
           result.set(
             layerName,
-            val["time"]?.map((v) => dateToValue(dayjs.utc(v.toString())))
+            val["time"]?.map((v) => dayjsToUnixMs(dayjs.utc(v.toString())))
           );
           setDiscreteTimeSliderValues?.(result);
         } else {
@@ -506,7 +507,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             <CardContent key={index}>
               {value.time && (
                 <Typography component="div" variant="body3Small">
-                  Time: {value.time.toString()}
+                  Time: {formatDateTime(value.time)}
                 </Typography>
               )}
               {value.value && (

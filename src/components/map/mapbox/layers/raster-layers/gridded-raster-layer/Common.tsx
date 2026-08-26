@@ -8,7 +8,7 @@ import {
   TileProduct,
   TileProductsResponse,
 } from "@/app/store/GriddedTileDefinitions";
-import { dayKeyToUtcValue } from "@/utils/DateUtils";
+import { utcDayKeyToUnixMs } from "@/utils/DateUtils";
 import { LayerSelectable } from "@/components/map/mapbox/layers/Layers";
 
 /**
@@ -62,7 +62,7 @@ export const buildTileDateMarks = (dates?: string[]): TileDateMarks => {
   const byValue = new Map<number, string>();
   dates.forEach((date) => {
     if (typeof date !== "string") return;
-    const value = dayKeyToUtcValue(date);
+    const value = utcDayKeyToUnixMs(date);
     // De-duplicates: the same day key maps to the same value.
     if (value !== undefined && !byValue.has(value)) byValue.set(value, date);
   });

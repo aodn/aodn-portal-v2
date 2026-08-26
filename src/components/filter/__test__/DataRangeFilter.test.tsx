@@ -8,7 +8,7 @@ import dayjs from "@/utils/DayjsUtils";
 import DateRangeFilter from "../DateRangeFilter";
 import { dateDefault } from "../../common/constants";
 import { updateDateTimeFilterRange } from "@/app/store/componentParamReducer";
-import { dateToValue, toAppDayjs, valueToDate } from "@/utils/DateUtils";
+import { dayjsToUnixMs, toAppDayjs, unixMsToAppDayjs } from "@/utils/DateUtils";
 import axios from "axios";
 
 vi.mock("../../common/charts/TimeRangeBarChart", () => ({
@@ -30,8 +30,8 @@ vi.mock("../../../hooks/useBreakpoint", () => ({
 const mockInitialState = {
   paramReducer: {
     dateTimeFilterRange: {
-      start: dateToValue(dateDefault.min),
-      end: dateToValue(dateDefault.max),
+      start: dayjsToUnixMs(dateDefault.min),
+      end: dayjsToUnixMs(dateDefault.max),
     },
   },
 };
@@ -111,7 +111,7 @@ describe("DateRangeFilter", () => {
       .filter((action) => action?.type === "UPDATE_DATETIME_FILTER_VARIABLE")
       .at(-1);
     expect(
-      valueToDate(lastRange?.payload?.dateTimeFilterRange?.start).format(
+      unixMsToAppDayjs(lastRange?.payload?.dateTimeFilterRange?.start).format(
         dateDefault.DATE_FORMAT
       )
     ).toBe("2020-01-01");
@@ -132,7 +132,7 @@ describe("DateRangeFilter", () => {
       .filter((action) => action?.type === "UPDATE_DATETIME_FILTER_VARIABLE")
       .at(-1);
     expect(
-      valueToDate(lastRange?.payload?.dateTimeFilterRange?.end).format(
+      unixMsToAppDayjs(lastRange?.payload?.dateTimeFilterRange?.end).format(
         dateDefault.DATE_FORMAT
       )
     ).toBe("2025-01-01");
@@ -143,8 +143,8 @@ describe("DateRangeFilter", () => {
     store = createMockStore({
       paramReducer: {
         dateTimeFilterRange: {
-          start: dateToValue(fiveYearsAgo),
-          end: dateToValue(dayjs.tz()),
+          start: dayjsToUnixMs(fiveYearsAgo),
+          end: dayjsToUnixMs(dayjs.tz()),
         },
       },
     });

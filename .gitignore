@@ -45,3 +45,4 @@ tsconfig.node.tsbuildinfo
 
 CLAUDE.md
 .claude
+.agents
