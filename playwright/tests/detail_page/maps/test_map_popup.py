@@ -71,6 +71,8 @@ def test_map_popup_from_feature(
 
     detail_page.detail_map.wait_for_map_loading()
     detail_page.detail_map.wait_for_map_idle()
+    geoserver_layer_id = detail_page.detail_map.get_Geo_Server_Layer_id()
+    detail_page.detail_map.wait_until_map_layer_visible(geoserver_layer_id)
     detail_page.detail_map.hover_map()
     detail_page.detail_map.click_map()
 

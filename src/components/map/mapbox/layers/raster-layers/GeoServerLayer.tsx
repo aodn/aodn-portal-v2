@@ -757,6 +757,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       <TestHelper
         id={map?.getContainer().id || ""}
         getGeoServerTileLayer={() => titleLayerId}
+        isGeoServerVisible={() => visible}
       />
     </>
   );
