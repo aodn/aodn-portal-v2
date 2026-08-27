@@ -18,10 +18,9 @@ export const buildJsonLd = (
   description: collection.description?.slice(0, 5000),
   url: detailsUrl(collection.id),
   identifier: collection.id,
-  // TODO both stay undefined until ogcapi-java allows creation,revision in the
-  // properties filter — then add them to SEO_PROPERTIES (fetchCollections.ts)
-  datePublished: collection.properties?.creation?.slice(0, 10),
-  dateModified: collection.properties?.revision?.slice(0, 10),
+  // date only: the metadata timestamps carry no timezone
+  datePublished: collection.getCreation()?.slice(0, 10),
+  dateModified: collection.getRevision()?.slice(0, 10),
   keywords: toKeywords(collection.getThemes()),
   // providers is on the API payload but not modelled on OGCCollection
   creator: toCreators(
@@ -29,6 +28,8 @@ export const buildJsonLd = (
   ),
   spatialCoverage: toSpatialCoverage(collection.getBBox()),
   temporalCoverage: toTemporalCoverage(collection.extent?.temporal?.interval),
+  license: collection.getLicense(),
+  citation: collection.getCitation()?.suggestedCitation,
 });
 
 // schema.org GeoShape box is "south west north east"; OGC bbox is [west, south, east, north]

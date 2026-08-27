@@ -31,6 +31,36 @@ describe("checkDetailPage", () => {
     expect(checkDetailPage(page, "abc-123")).toEqual([]);
   });
 
+  test("passes a dated record whose visible date matches the JSON-LD", () => {
+    const dated = Object.assign(new OGCCollection(), {
+      id: "abc-123",
+      title: "Sea Surface Temperature",
+      description: "Gridded SST records.",
+      properties: { revision: "2026-08-12T15:24:43" },
+    });
+
+    expect(
+      checkDetailPage(renderCrawlerPage(template, dated), "abc-123")
+    ).toEqual([]);
+  });
+
+  test("flags a page whose visible date no longer matches the JSON-LD", () => {
+    const dated = Object.assign(new OGCCollection(), {
+      id: "abc-123",
+      title: "Sea Surface Temperature",
+      description: "Gridded SST records.",
+      properties: { revision: "2026-08-12T15:24:43" },
+    });
+    const page = renderCrawlerPage(template, dated).replace(
+      "<p>Updated: 2026-08-12</p>",
+      ""
+    );
+
+    expect(checkDetailPage(page, "abc-123")).toContain(
+      "visible date does not match the JSON-LD dates"
+    );
+  });
+
   test("flags a page that kept the generic site title", () => {
     expect(checkDetailPage(template, "abc-123")).toContain(
       "title is missing or still the generic site title"

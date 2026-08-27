@@ -20,6 +20,8 @@ const collection = toCollection({
     ],
     creation: "2017-04-27T00:00:00",
     revision: "2026-08-12T15:24:43",
+    license: "Creative Commons Attribution 4.0 International License",
+    citation: { suggestedCitation: "IMOS (2017). Sea Surface Temperature." },
   },
   providers: [{ name: "IMOS" }, { name: "IMOS" }, { name: "CSIRO" }],
 });
@@ -49,6 +51,8 @@ describe("buildJsonLd", () => {
       },
       // open-ended interval keeps ".." for the missing end
       temporalCoverage: "2010-01-01T00:00:00Z/..",
+      license: "Creative Commons Attribution 4.0 International License",
+      citation: "IMOS (2017). Sea Surface Temperature.",
     });
   });
 
@@ -68,6 +72,8 @@ describe("buildJsonLd", () => {
     expect(serialized).not.toContain("temporalCoverage");
     expect(serialized).not.toContain("datePublished");
     expect(serialized).not.toContain("dateModified");
+    expect(serialized).not.toContain("license");
+    expect(serialized).not.toContain("citation");
     expect(serialized).not.toContain("null");
   });
 

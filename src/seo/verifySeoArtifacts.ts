@@ -80,9 +80,21 @@ export const checkDetailPage = (html: string, uuid: string): string[] => {
       if (dataset.url !== detailsUrl(uuid)) {
         problems.push("JSON-LD url does not match the record");
       }
+      // Google's rule: the visible date must match the structured data
+      const visibleDate = dataset.dateModified
+        ? `<p>Updated: ${dataset.dateModified}</p>`
+        : dataset.datePublished
+          ? `<p>Published: ${dataset.datePublished}</p>`
+          : null;
+      if (visibleDate && !html.includes(visibleDate)) {
+        problems.push("visible date does not match the JSON-LD dates");
+      }
     } catch {
       problems.push("Dataset JSON-LD is not valid JSON");
     }
+  }
+  if (!/<h1>[^<]/.test(html)) {
+    problems.push("body is missing the visible record content (h1)");
   }
   if (!html.includes('<div id="root"')) {
     problems.push("page no longer boots the app shell");
