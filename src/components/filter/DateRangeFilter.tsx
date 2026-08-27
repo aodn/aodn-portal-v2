@@ -345,11 +345,12 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
   }, [dateTimeFilterRange, determineSelectedOption, initialMaxDate]);
 
   useEffect(() => {
-    // Find all collection
+    // Find all collection, with simple sort by id, query run faster then the default sort
     dispatch(
       fetchResultNoStore({
         properties: "id,temporal",
         filter: `${cqlDefaultFilters.get("ALL_TIME_RANGE")}`,
+        sortby: "id",
       })
     )
       .unwrap()
@@ -359,6 +360,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
           fetchResultNoStore({
             properties: "id,providers",
             filter: `${cqlDefaultFilters.get("ALL_TIME_RANGE")} AND ${(cqlDefaultFilters.get("DATASET_GROUP") as DatasetGroup)("imos")}`,
+            sortby: "id",
           })
         )
           .unwrap()
