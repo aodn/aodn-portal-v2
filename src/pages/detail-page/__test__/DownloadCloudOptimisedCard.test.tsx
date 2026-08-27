@@ -2,9 +2,7 @@ import { describe, it, expect, vi, beforeEach, beforeAll } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs from "@/utils/DayjsUtils";
+import { AppLocalizationProvider } from "@/app/providers/AppLocalizationProvider";
 import { Provider } from "react-redux";
 
 beforeAll(() => {
@@ -90,10 +88,7 @@ describe("DownloadCloudOptimisedCard", () => {
     return render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
-          <LocalizationProvider
-            dateAdapter={AdapterDayjs}
-            dateLibInstance={dayjs}
-          >
+          <AppLocalizationProvider>
             <DownloadCloudOptimisedCard
               collection={collection}
               downloadConditions={downloadConditions}
@@ -102,7 +97,7 @@ describe("DownloadCloudOptimisedCard", () => {
               selectedCoKey={selectedCoKey}
               setSelectedCoKey={setSelectedCoKey}
             />
-          </LocalizationProvider>
+          </AppLocalizationProvider>
         </ThemeProvider>
       </Provider>
     );
@@ -237,17 +232,14 @@ describe("DownloadCloudOptimisedCard", () => {
     render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
-          <LocalizationProvider
-            dateAdapter={AdapterDayjs}
-            dateLibInstance={dayjs}
-          >
+          <AppLocalizationProvider>
             <DownloadCloudOptimisedCard
               collection={createMockCollection(DatasetType.ZARR)}
               downloadConditions={[]}
               getAndSetDownloadConditions={mockGetAndSetDownloadConditions}
               removeDownloadCondition={mockRemoveDownloadCondition}
             />
-          </LocalizationProvider>
+          </AppLocalizationProvider>
         </ThemeProvider>
       </Provider>
     );

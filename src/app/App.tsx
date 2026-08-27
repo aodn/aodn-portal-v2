@@ -8,19 +8,25 @@ import Scrollbar from "@/components/common/scroll/ScrollBar";
 import GlobalLoader from "@/components/loading/GlobalLoader";
 import AdminScreen from "@/components/admin/AdminScreen";
 import { ClipboardProvider } from "@/app/providers/ClipboardProvider";
+import { AppLocalizationProvider } from "@/app/providers/AppLocalizationProvider";
 
 const app = () => {
   return (
     <ThemeProvider theme={AppTheme}>
       <CssBaseline />
-      <Scrollbar />
-      <GlobalLoader>
-        <ClipboardProvider>
-          <AdminScreen>
-            <RouterProvider router={AppRouter} fallbackElement={<Fallback />} />
-          </AdminScreen>
-        </ClipboardProvider>
-      </GlobalLoader>
+      <AppLocalizationProvider>
+        <Scrollbar />
+        <GlobalLoader>
+          <ClipboardProvider>
+            <AdminScreen>
+              <RouterProvider
+                router={AppRouter}
+                fallbackElement={<Fallback />}
+              />
+            </AdminScreen>
+          </ClipboardProvider>
+        </GlobalLoader>
+      </AppLocalizationProvider>
     </ThemeProvider>
   );
 };

@@ -2,8 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { AppLocalizationProvider } from "@/app/providers/AppLocalizationProvider";
 import dayjs from "@/utils/DayjsUtils";
 import DateRangeFilter from "../DateRangeFilter";
 import { dateDefault } from "../../common/constants";
@@ -59,12 +58,9 @@ describe("DateRangeFilter", () => {
   const renderComponent = () =>
     render(
       <Provider store={store}>
-        <LocalizationProvider
-          dateAdapter={AdapterDayjs}
-          dateLibInstance={dayjs}
-        >
+        <AppLocalizationProvider>
           <DateRangeFilter />
-        </LocalizationProvider>
+        </AppLocalizationProvider>
       </Provider>
     );
 
