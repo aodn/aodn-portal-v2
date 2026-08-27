@@ -21,6 +21,9 @@ import {
 import DownloadButton from "../../../../components/common/buttons/DownloadButton";
 import DownloadSubsetting from "./DownloadSubsetting";
 import DownloadSelect from "./DownloadSelect";
+import DownloadSizeWarning, {
+  hasDownloadSizeWarning,
+} from "./DownloadSizeWarning";
 import useEstimateSize from "../../../../hooks/useEstimateSize";
 import { processCoEstimateSize } from "@/app/store/searchReducer";
 
@@ -58,6 +61,14 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
     estimatedSizeBytes,
     estimateFailed,
   } = useEstimateSize(processCoEstimateSize, getCoEstimatedBytes);
+
+  // Only one advisory shows at a time: a size warning replaces the subsetting
+  // info message rather than sitting alongside it
+  const showSizeWarning = hasDownloadSizeWarning({
+    isEstimating,
+    estimatedSizeBytes,
+    estimateFailed,
+  });
 
   // add datasetselection option
   const [selectedDataItem, setSelectedDataItem] = useState<
@@ -237,11 +248,17 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
           estimatedSizeBytes={estimatedSizeBytes}
           estimateFailed={estimateFailed}
         />
+        <DownloadSizeWarning
+          isEstimating={isEstimating}
+          estimatedSizeBytes={estimatedSizeBytes}
+          estimateFailed={estimateFailed}
+        />
       </Stack>
       <DownloadSubsetting
         downloadConditions={downloadConditions}
         getAndSetDownloadConditions={getAndSetDownloadConditions}
         removeDownloadCondition={removeDownloadCondition}
+        hideInfoMessage={showSizeWarning}
       />
       <DownloadDialog
         isOpen={downloadDialogOpen}

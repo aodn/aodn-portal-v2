@@ -22,6 +22,9 @@ import InfoMessage from "./InfoMessage";
 import DownloadButton from "../../../../components/common/buttons/DownloadButton";
 import DownloadSubsetting from "./DownloadSubsetting";
 import DownloadSelect from "./DownloadSelect";
+import DownloadSizeWarning, {
+  hasDownloadSizeWarning,
+} from "./DownloadSizeWarning";
 import { trackCustomEvent } from "@/analytics/customEventTracker";
 import { AnalyticsEvent } from "@/analytics/analyticsEvents";
 import {
@@ -82,6 +85,14 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
     estimatedSizeBytes,
     estimateFailed,
   } = useEstimateSize(processWFSEstimateSize);
+
+  // Only one advisory shows at a time: a size warning replaces the subsetting
+  // info message rather than sitting alongside it
+  const showSizeWarning = hasDownloadSizeWarning({
+    isEstimating,
+    estimatedSizeBytes,
+    estimateFailed,
+  });
   const dispatch = useAppDispatch();
   const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
   const [dataSelectOptions, setDataSelectOptions] = useState<SelectItem[]>([]);
@@ -262,6 +273,13 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
           estimateFailed={estimateFailed}
           handleCancelDownload={handleCancelDownload}
         />
+        {!isDownloading && (
+          <DownloadSizeWarning
+            isEstimating={isEstimating}
+            estimatedSizeBytes={estimatedSizeBytes}
+            estimateFailed={estimateFailed}
+          />
+        )}
         {isDownloading &&
           renderProgressMessage(formatBytes(downloadedBytes), progressMessage)}
       </Stack>
@@ -269,7 +287,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
         downloadConditions={downloadConditions}
         getAndSetDownloadConditions={getAndSetDownloadConditions}
         removeDownloadCondition={removeDownloadCondition}
-        hideInfoMessage={isDownloading}
+        hideInfoMessage={isDownloading || showSizeWarning}
         disable={isDownloading}
         sx={{ px: "16px" }}
       />
