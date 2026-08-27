@@ -174,6 +174,32 @@ describe("renderCrawlerPage", () => {
     expect(html).toContain('<nav aria-label="Related records">');
   });
 
+  test("removes the New Relic tracking script", () => {
+    const templateWithNewRelic = TEMPLATE.replace(
+      "</head>",
+      "<!-- Tracking code - the comment below initializes monitoring - DO NOT DELETE -->" +
+        "<script>window.NREUM || (NREUM = {});</script></head>"
+    );
+
+    const html = renderCrawlerPage(templateWithNewRelic, collection);
+
+    expect(html).not.toContain("NREUM");
+    expect(html).toContain('<div id="root">');
+  });
+
+  test("removes the Google Analytics scripts", () => {
+    const templateWithAnalytics = TEMPLATE.replace(
+      "</head>",
+      '<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXX"></script>' +
+        "<script>window.dataLayer = [];</script></head>"
+    );
+
+    const html = renderCrawlerPage(templateWithAnalytics, collection);
+
+    expect(html).not.toContain("googletagmanager");
+    expect(html).not.toContain("dataLayer");
+  });
+
   test("escapes HTML in the title and meta description", () => {
     const html = renderCrawlerPage(
       TEMPLATE,

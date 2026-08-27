@@ -90,6 +90,13 @@ export const renderCrawlerPage = (
       .replace(/\s*<meta name="description"[^>]*\/?>/, "")
       .replace(/\s*<meta (?:property="og:|name="twitter:)[^>]*\/?>/g, "")
       .replace("</head>", `${headTags}\n  </head>`)
+      // New Relic is ~97% of the shell and useless on a crawler-only page
+      .replace(/\s*<!-- Tracking code -.*?<\/script>/s, "")
+      // Google Analytics: crawler-only pages have no visitors worth counting
+      .replace(
+        /\s*<script async src="https:\/\/www\.googletagmanager\.com\/gtag\/js[^"]*"><\/script>\s*<script>.*?<\/script>/s,
+        ""
+      )
       .replace(
         '<div id="root"></div>',
         `<div id="root">${renderBody(collection, related)}</div>`
