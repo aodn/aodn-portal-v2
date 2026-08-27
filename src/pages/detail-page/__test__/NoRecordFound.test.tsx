@@ -75,7 +75,7 @@ describe("No Record Found", () => {
           "There is no matching record. Please return to the search page."
         )
       ).toBeInTheDocument();
-    }).then(() => {
+
       // Verify return button is rendered
       expect(
         screen.getByTestId(DataTestId.HeaderSection.ReturnButton)
