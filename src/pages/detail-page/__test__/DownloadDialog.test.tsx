@@ -5,6 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import DownloadDialog from "../features/download/download-dialog/DownloadDialog";
 import { BBoxCondition } from "../context/DownloadDefinitions";
+import { useDownloadDialog } from "@/hooks/useDownloadDialog";
 
 // Mock the custom hook
 const mockUseDownloadDialog = {
@@ -12,7 +13,9 @@ const mockUseDownloadDialog = {
   activeStep: 0,
   isProcessing: false,
   isSuccess: false,
+  createdJobID: undefined as string | undefined,
   processingStatus: "",
+  emailError: "",
   email: "",
   dataUsage: { purposes: [], sectors: [], allow_contact: null },
   snackbar: { open: false, message: "", severity: "error" as const },
@@ -127,6 +130,20 @@ describe("DownloadDialog", () => {
     expect(screen.getByText("Dataset Download")).toBeInTheDocument();
   });
 
+  it("passes the estimated size to the download request hook", () => {
+    render(
+      <TestWrapper>
+        <DownloadDialog {...mockProps} estimatedSizeBytes={987654} />
+      </TestWrapper>
+    );
+
+    expect(vi.mocked(useDownloadDialog)).toHaveBeenCalledWith(
+      true,
+      mockProps.setIsOpen,
+      987654
+    );
+  });
+
   it("should not render dialog when closed", () => {
     render(
       <TestWrapper>
@@ -218,6 +235,25 @@ describe("DownloadDialog", () => {
 
     // Reset state
     mockUseDownloadDialog.isProcessing = false;
+  });
+
+  it("links to download status and prevents resubmission after success", () => {
+    mockUseDownloadDialog.isSuccess = true;
+    mockUseDownloadDialog.createdJobID = "job-1";
+
+    render(
+      <TestWrapper>
+        <DownloadDialog {...mockProps} />
+      </TestWrapper>
+    );
+
+    expect(
+      screen.getByRole("link", { name: "View download status" })
+    ).toHaveAttribute("href", "/downloads");
+    expect(screen.getByTestId("stepper-button")).toBeDisabled();
+
+    mockUseDownloadDialog.isSuccess = false;
+    mockUseDownloadDialog.createdJobID = undefined;
   });
 
   it("should display data selection when hasDownloadConditions is true", () => {

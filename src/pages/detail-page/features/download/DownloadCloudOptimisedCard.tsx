@@ -246,6 +246,7 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
       <DownloadDialog
         isOpen={downloadDialogOpen}
         setIsOpen={setDownloadDialogOpen}
+        estimatedSizeBytes={estimatedSizeBytes}
         downloadConditions={downloadConditions}
         getAndSetDownloadConditions={getAndSetDownloadConditions}
         removeDownloadCondition={removeDownloadCondition}

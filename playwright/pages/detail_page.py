@@ -1,7 +1,7 @@
 from urllib.parse import unquote_plus
 
 import pytest
-from playwright.sync_api import Locator, Page, TimeoutError
+from playwright.sync_api import Locator, Page, TimeoutError, expect
 
 from config import settings
 from mocks.routes import Routes
@@ -25,7 +25,7 @@ class DetailPage(BasePage):
 
         # -- Page locators --
 
-        self.page_title = self.page.get_by_role('heading', level=1)
+        self.page_title = self.page.get_by_test_id('detail-page-title')
         self.return_button = self.page.get_by_test_id('return-button')
         self.share_button = self.page.get_by_test_id('share-button')
         self.copy_link = self.page.get_by_test_id('copy-link')
@@ -44,6 +44,9 @@ class DetailPage(BasePage):
             'download-email-input'
         ).locator('input')
         self.dialog_button = self.page.get_by_test_id('dialog-button')
+        self.view_download_status_link = self.page.get_by_role(
+            'link', name='View download status'
+        )
 
         # download condition boxes
         self.bbox_condition_box = self.page.get_by_test_id('bbox-condition-box')
@@ -58,7 +61,8 @@ class DetailPage(BasePage):
     def load(self, uuid: str) -> None:
         """Load the detail page for the given uuid"""
         url = f'{settings.baseURL}/details/{uuid}'
-        self.page.goto(url, wait_until='load')
+        self.page.goto(url, wait_until='domcontentloaded')
+        expect(self.page_title).to_be_visible()
 
     def is_mobile_viewport(self) -> bool:
         """Return True when the current viewport falls under the mobile breakpoint."""

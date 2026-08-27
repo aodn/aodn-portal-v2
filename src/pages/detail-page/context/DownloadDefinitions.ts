@@ -62,6 +62,7 @@ export interface DatasetDownloadRequest {
     collection_title?: string;
     full_metadata_link?: string;
     suggested_citation?: string;
+    estimated_size_bytes?: number;
   };
   outputs: object;
   subscriber: {
@@ -70,6 +71,16 @@ export interface DatasetDownloadRequest {
     failedUri: string;
   };
 }
+
+export const getValidEstimatedSizeBytes = (
+  estimatedSizeBytes?: number | null
+): number | undefined =>
+  Number.isInteger(estimatedSizeBytes) &&
+  estimatedSizeBytes !== undefined &&
+  estimatedSizeBytes !== null &&
+  estimatedSizeBytes >= 0
+    ? estimatedSizeBytes
+    : undefined;
 
 export class DateRangeCondition
   implements IDownloadCondition, IDownloadConditionCallback

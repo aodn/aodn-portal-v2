@@ -193,6 +193,14 @@ class ApiRouter:
     ) -> None:
         self.unroute(Routes.DOWNLOAD_DIALOG, handler_function)
 
+    def route_download_status(self, handler_function: Callable) -> None:
+        self.route(Routes.DOWNLOAD_STATUS, handler_function)
+
+    def unroute_download_status(
+        self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.DOWNLOAD_STATUS, handler_function)
+
     def route_download_wfs(self, handler_function: Callable) -> None:
         self.route(Routes.DOWNLOAD_WFS, handler_function)
 

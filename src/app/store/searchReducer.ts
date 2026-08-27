@@ -56,6 +56,7 @@ import {
 } from "./GeoserverDefinitions";
 import { Health } from "./systemDefinition";
 import { TileProductsResponse } from "./GriddedTileDefinitions";
+import { DownloadExecutionResponse } from "./DownloadStatusDefinitions";
 
 export { DatasetFrequency, DatasetStatus } from "./datasetEnums";
 export type {
@@ -340,21 +341,19 @@ const fetchDatasetMetadataByUuid = createAsyncThunk<
 );
 
 const processDatasetDownload = createAsyncThunk<
-  any,
+  DownloadExecutionResponse,
   DatasetDownloadRequest,
   { rejectValue: ErrorResponse }
 >(
   "download/downloadDataset",
   async (request: DatasetDownloadRequest, thunkAPI: any) => {
-    try {
-      const response = await ogcAxiosWithRetry.post(
+    return ogcAxiosWithRetry
+      .post<DownloadExecutionResponse>(
         "/ogc/processes/download/execution",
         request
-      );
-      return response.data;
-    } catch (error) {
-      errorHandling(thunkAPI);
-    }
+      )
+      .then((response) => response.data)
+      .catch(errorHandling(thunkAPI));
   }
 );
 

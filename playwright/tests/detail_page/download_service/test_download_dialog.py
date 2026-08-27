@@ -5,6 +5,9 @@ from playwright.sync_api import Page, expect
 
 from mocks.api_router import ApiRouter
 from pages.detail_page import DetailPage
+from pages.downloads_page import DownloadsPage
+
+DOWNLOAD_JOB_ID = 'f358dc2f-e211-4bf1-95c4-c513ef57c2b6'
 
 
 @pytest.mark.parametrize(
@@ -46,6 +49,27 @@ def test_download_dialog_success(
     # Step 2: confirm request and expect success feedback
     detail_page.dialog_button.click()
     expect(detail_page.dialog_button).to_contain_text(success_button_text)
+
+    detail_page.view_download_status_link.click()
+    downloads_page = DownloadsPage(responsive_page)
+    expect(downloads_page.heading).to_be_visible()
+    expect(downloads_page.status_table).to_contain_text(DOWNLOAD_JOB_ID)
+    expect(downloads_page.status_table).to_contain_text('50s')
+    expect(downloads_page.status_table).to_contain_text('Completed')
+    expect(downloads_page.status_table).to_contain_text(
+        'Test Ocean Data Collection'
+    )
+    expect(downloads_page.status_table).to_contain_text(
+        'imos-data/dataset.zarr'
+    )
+    expect(downloads_page.status_table).to_contain_text('NETCDF')
+
+    responsive_page.set_viewport_size({'width': 1024, 'height': 800})
+    expect(downloads_page.status_cards).to_have_count(1)
+
+    responsive_page.set_viewport_size({'width': 1440, 'height': 900})
+    expect(downloads_page.status_cards).to_have_count(0)
+    expect(downloads_page.desktop_status_table).to_be_visible()
 
 
 @pytest.mark.parametrize(
