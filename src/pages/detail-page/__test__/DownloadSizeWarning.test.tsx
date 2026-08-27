@@ -80,10 +80,10 @@ describe("DownloadSizeWarning", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("should warn at the very large threshold", () => {
+  it("should warn at the extra large threshold", () => {
     renderWarning({ estimatedSizeBytes: EXTRA_LARGE_DOWNLOAD_BYTES });
 
-    expectWarningLevel("very-large");
+    expectWarningLevel("extra-large");
   });
 
   it("should warn when the estimate failed", () => {
@@ -95,7 +95,7 @@ describe("DownloadSizeWarning", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("should offer a data access link only for a very large download", () => {
+  it("should offer a data access link only for a extra large download", () => {
     renderWarning({ estimatedSizeBytes: EXTRA_LARGE_DOWNLOAD_BYTES });
 
     expect(screen.getByTestId(DATA_ACCESS_LINK_TEST_ID)).toBeInTheDocument();
@@ -121,7 +121,7 @@ describe("DownloadSizeWarning", () => {
     const { rerenderWith } = renderWarning({
       estimatedSizeBytes: EXTRA_LARGE_DOWNLOAD_BYTES,
     });
-    expectWarningLevel("very-large");
+    expectWarningLevel("extra-large");
 
     // The card resets the size and flips to estimating on every re-estimate
     rerenderWith({ isEstimating: true, estimatedSizeBytes: null });
@@ -133,7 +133,7 @@ describe("DownloadSizeWarning", () => {
     const { rerenderWith } = renderWarning({
       estimatedSizeBytes: EXTRA_LARGE_DOWNLOAD_BYTES,
     });
-    expectWarningLevel("very-large");
+    expectWarningLevel("extra-large");
 
     rerenderWith({ estimatedSizeBytes: LARGE_DOWNLOAD_BYTES });
 
@@ -147,7 +147,7 @@ describe("DownloadSizeWarning", () => {
     const { rerenderWith } = renderWarning({
       estimatedSizeBytes: EXTRA_LARGE_DOWNLOAD_BYTES,
     });
-    expectWarningLevel("very-large");
+    expectWarningLevel("extra-large");
 
     rerenderWith({ estimatedSizeBytes: LARGE_DOWNLOAD_BYTES - 1 });
 
@@ -156,7 +156,7 @@ describe("DownloadSizeWarning", () => {
 });
 
 describe("hasDownloadSizeWarning", () => {
-  it("should report a warning for large, very large, and failed estimates", () => {
+  it("should report a warning for large, extra large, and failed estimates", () => {
     expect(
       hasDownloadSizeWarning({ estimatedSizeBytes: LARGE_DOWNLOAD_BYTES })
     ).toBe(true);
@@ -181,7 +181,7 @@ describe("hasDownloadSizeWarning", () => {
 });
 
 describe("isDownloadBlocked", () => {
-  it("should block only at or above the very large threshold", () => {
+  it("should block only at or above the extra large threshold", () => {
     expect(
       isDownloadBlocked({ estimatedSizeBytes: EXTRA_LARGE_DOWNLOAD_BYTES })
     ).toBe(true);

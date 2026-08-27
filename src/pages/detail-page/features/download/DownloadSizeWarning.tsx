@@ -48,7 +48,7 @@ interface DownloadSizeWarningProps extends DownloadSizeWarningInput {
 /**
  * Maps the current download-size estimate onto a warning level.
  *
- * Only VERY_LARGE blocks the download; LARGE and ESTIMATE_FAILED are advisory
+ * Only EXTRA_LARGE blocks the download; LARGE and ESTIMATE_FAILED are advisory
  * and leave the Download button enabled.
  */
 const getDownloadSizeWarningLevel = ({
@@ -111,7 +111,7 @@ const renderWarningMessage = (
 
 /**
  * Warning shown under the Download button when the estimated size is large,
- * very large, or could not be estimated at all. Renders nothing when the
+ * extra large, or could not be estimated at all. Renders nothing when the
  * estimate succeeded and is small enough.
  */
 const DownloadSizeWarning: FC<DownloadSizeWarningProps> = ({
