@@ -24,6 +24,7 @@ import DownloadSubsetting from "./DownloadSubsetting";
 import DownloadSelect from "./DownloadSelect";
 import DownloadSizeWarning, {
   hasDownloadSizeWarning,
+  isDownloadBlocked,
 } from "./DownloadSizeWarning";
 import { trackCustomEvent } from "@/analytics/customEventTracker";
 import { AnalyticsEvent } from "@/analytics/analyticsEvents";
@@ -86,13 +87,14 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
     estimateFailed,
   } = useEstimateSize(processWFSEstimateSize);
 
-  // Only one advisory shows at a time: a size warning replaces the subsetting
-  // info message rather than sitting alongside it
-  const showSizeWarning = hasDownloadSizeWarning({
+  const estimateState = {
     isEstimating,
     estimatedSizeBytes,
     estimateFailed,
-  });
+  };
+
+  const showSizeWarning = hasDownloadSizeWarning(estimateState);
+  const downloadBlocked = isDownloadBlocked(estimateState);
   const dispatch = useAppDispatch();
   const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
   const [dataSelectOptions, setDataSelectOptions] = useState<SelectItem[]>([]);
@@ -271,6 +273,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
           isEstimating={isEstimating}
           estimatedSizeBytes={estimatedSizeBytes}
           estimateFailed={estimateFailed}
+          disabled={downloadBlocked}
           handleCancelDownload={handleCancelDownload}
         />
         {!isDownloading && (

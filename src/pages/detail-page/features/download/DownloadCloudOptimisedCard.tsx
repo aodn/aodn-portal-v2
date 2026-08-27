@@ -23,6 +23,7 @@ import DownloadSubsetting from "./DownloadSubsetting";
 import DownloadSelect from "./DownloadSelect";
 import DownloadSizeWarning, {
   hasDownloadSizeWarning,
+  isDownloadBlocked,
 } from "./DownloadSizeWarning";
 import useEstimateSize from "../../../../hooks/useEstimateSize";
 import { processCoEstimateSize } from "@/app/store/searchReducer";
@@ -62,13 +63,14 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
     estimateFailed,
   } = useEstimateSize(processCoEstimateSize, getCoEstimatedBytes);
 
-  // Only one advisory shows at a time: a size warning replaces the subsetting
-  // info message rather than sitting alongside it
-  const showSizeWarning = hasDownloadSizeWarning({
+  const estimateState = {
     isEstimating,
     estimatedSizeBytes,
     estimateFailed,
-  });
+  };
+
+  const showSizeWarning = hasDownloadSizeWarning(estimateState);
+  const downloadBlocked = isDownloadBlocked(estimateState);
 
   // add datasetselection option
   const [selectedDataItem, setSelectedDataItem] = useState<
@@ -247,6 +249,7 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
           isEstimating={isEstimating}
           estimatedSizeBytes={estimatedSizeBytes}
           estimateFailed={estimateFailed}
+          disabled={downloadBlocked}
         />
         <DownloadSizeWarning
           isEstimating={isEstimating}

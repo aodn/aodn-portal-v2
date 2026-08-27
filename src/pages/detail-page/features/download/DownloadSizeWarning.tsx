@@ -1,31 +1,36 @@
-import { FC } from "react";
-import { Box, SxProps } from "@mui/material";
+import { FC, ReactNode, useCallback } from "react";
+import { Box, Link, SxProps } from "@mui/material";
+import { useParams } from "react-router-dom";
 import InfoMessage from "./InfoMessage";
+import { LARGE_DOWNLOAD_BYTES, EXTRA_LARGE_DOWNLOAD_BYTES } from "./constants";
+import useTabNavigation from "@/hooks/useTabNavigation";
+import { detailPageDefault, pageReferer } from "@/components/common/constants";
 import { portalTheme } from "@/styles";
-
-// Thresholds are binary (GiB / TiB) so they line up with formatBytes, which
-// formats using base 1024 — a download the user sees as "10.5 GB" must not
-// fall below the "10 GB" threshold.
-const LARGE_DOWNLOAD_BYTES = 10 * 1024 ** 3;
-const VERY_LARGE_DOWNLOAD_BYTES = 1024 ** 4;
 
 enum DownloadSizeWarningLevel {
   NONE = "none",
   LARGE = "large",
-  VERY_LARGE = "very-large",
+  EXTRA_LARGE = "very-large",
   ESTIMATE_FAILED = "estimate-failed",
 }
 
-// First-pass wording agreed with the team; expected to change once the
-// designer and stakeholders review it
+type ActiveWarningLevel = Exclude<
+  DownloadSizeWarningLevel,
+  DownloadSizeWarningLevel.NONE
+>;
+
+const WARNING_ICON_COLOURS: Record<ActiveWarningLevel, string> = {
+  [DownloadSizeWarningLevel.LARGE]: portalTheme.palette.warning.main,
+  [DownloadSizeWarningLevel.ESTIMATE_FAILED]: portalTheme.palette.warning.main,
+  [DownloadSizeWarningLevel.EXTRA_LARGE]: portalTheme.palette.error.main,
+};
+
 const WARNING_MESSAGES: Record<
-  Exclude<DownloadSizeWarningLevel, DownloadSizeWarningLevel.NONE>,
+  Exclude<ActiveWarningLevel, DownloadSizeWarningLevel.EXTRA_LARGE>,
   string
 > = {
   [DownloadSizeWarningLevel.LARGE]:
     "The estimated download size is over 10 GB — please subset your selection to reduce it.",
-  [DownloadSizeWarningLevel.VERY_LARGE]:
-    "The estimated download size is over 1 TB — please subset your selection to keep it under 10 GB.",
   [DownloadSizeWarningLevel.ESTIMATE_FAILED]:
     "The download size could not be estimated — please subset your selection.",
 };
@@ -41,10 +46,10 @@ interface DownloadSizeWarningProps extends DownloadSizeWarningInput {
 }
 
 /**
- * Maps the current download-size estimate onto an advisory warning level.
+ * Maps the current download-size estimate onto a warning level.
  *
- * Every level is advisory only — the Download button stays enabled in all
- * cases, including a failed estimate.
+ * Only VERY_LARGE blocks the download; LARGE and ESTIMATE_FAILED are advisory
+ * and leave the Download button enabled.
  */
 const getDownloadSizeWarningLevel = ({
   isEstimating = false,
@@ -62,8 +67,8 @@ const getDownloadSizeWarningLevel = ({
   if (estimatedSizeBytes == null) {
     return DownloadSizeWarningLevel.NONE;
   }
-  if (estimatedSizeBytes >= VERY_LARGE_DOWNLOAD_BYTES) {
-    return DownloadSizeWarningLevel.VERY_LARGE;
+  if (estimatedSizeBytes >= EXTRA_LARGE_DOWNLOAD_BYTES) {
+    return DownloadSizeWarningLevel.EXTRA_LARGE;
   }
   if (estimatedSizeBytes >= LARGE_DOWNLOAD_BYTES) {
     return DownloadSizeWarningLevel.LARGE;
@@ -71,17 +76,43 @@ const getDownloadSizeWarningLevel = ({
   return DownloadSizeWarningLevel.NONE;
 };
 
-/**
- * Whether any advisory warning applies. Used by the cards to suppress the
- * subsetting info message so only one advisory shows at a time.
- */
 const hasDownloadSizeWarning = (input: DownloadSizeWarningInput): boolean =>
   getDownloadSizeWarningLevel(input) !== DownloadSizeWarningLevel.NONE;
 
+const isDownloadBlocked = (input: DownloadSizeWarningInput): boolean =>
+  getDownloadSizeWarningLevel(input) === DownloadSizeWarningLevel.EXTRA_LARGE;
+
+const renderWarningMessage = (
+  level: ActiveWarningLevel,
+  onShowDataAccess: () => void
+): ReactNode => {
+  if (level !== DownloadSizeWarningLevel.EXTRA_LARGE) {
+    return WARNING_MESSAGES[level];
+  }
+  return (
+    <>
+      Download is unavailable because the selected dataset is too large (greater
+      than 1TB). Please refine your selection to reduce the dataset size, or use
+      one of the alternative data access methods available{" "}
+      <Link
+        component="button"
+        type="button"
+        onClick={onShowDataAccess}
+        data-testid="download-size-warning-data-access-link"
+        // Keep the button flowing inline with the surrounding sentence
+        sx={{ font: "inherit", verticalAlign: "baseline" }}
+      >
+        here
+      </Link>
+      .
+    </>
+  );
+};
+
 /**
- * Advisory warning shown under the Download button when the estimated size is
- * large, very large, or could not be estimated at all. Renders nothing when
- * the estimate succeeded and is small enough.
+ * Warning shown under the Download button when the estimated size is large,
+ * very large, or could not be estimated at all. Renders nothing when the
+ * estimate succeeded and is small enough.
  */
 const DownloadSizeWarning: FC<DownloadSizeWarningProps> = ({
   isEstimating = false,
@@ -89,6 +120,18 @@ const DownloadSizeWarning: FC<DownloadSizeWarningProps> = ({
   estimateFailed = false,
   sx,
 }) => {
+  const { uuid } = useParams();
+  const tabNavigation = useTabNavigation();
+
+  const onShowDataAccess = useCallback(() => {
+    if (!uuid) return;
+    tabNavigation(
+      uuid,
+      detailPageDefault.DATA_ACCESS,
+      pageReferer.DETAIL_PAGE_REFERER
+    );
+  }, [tabNavigation, uuid]);
+
   const level = getDownloadSizeWarningLevel({
     isEstimating,
     estimatedSizeBytes,
@@ -106,8 +149,8 @@ const DownloadSizeWarning: FC<DownloadSizeWarningProps> = ({
       sx={{ width: "100%", ...sx }}
     >
       <InfoMessage
-        infoText={WARNING_MESSAGES[level]}
-        iconColor={portalTheme.palette.warning.main}
+        infoText={renderWarningMessage(level, onShowDataAccess)}
+        iconColor={WARNING_ICON_COLOURS[level]}
       />
     </Box>
   );
@@ -116,9 +159,8 @@ const DownloadSizeWarning: FC<DownloadSizeWarningProps> = ({
 export default DownloadSizeWarning;
 export {
   DownloadSizeWarningLevel,
-  LARGE_DOWNLOAD_BYTES,
-  VERY_LARGE_DOWNLOAD_BYTES,
   getDownloadSizeWarningLevel,
   hasDownloadSizeWarning,
+  isDownloadBlocked,
 };
 export type { DownloadSizeWarningInput };

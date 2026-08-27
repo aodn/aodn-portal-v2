@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { AppLocalizationProvider } from "@/app/providers/AppLocalizationProvider";
 import { Provider } from "react-redux";
+import { MemoryRouter } from "react-router-dom";
 
 beforeAll(() => {
   window.scrollTo = vi.fn();
@@ -87,18 +88,20 @@ describe("DownloadCloudOptimisedCard", () => {
   ) => {
     return render(
       <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <AppLocalizationProvider>
-            <DownloadCloudOptimisedCard
-              collection={collection}
-              downloadConditions={downloadConditions}
-              getAndSetDownloadConditions={mockGetAndSetDownloadConditions}
-              removeDownloadCondition={mockRemoveDownloadCondition}
-              selectedCoKey={selectedCoKey}
-              setSelectedCoKey={setSelectedCoKey}
-            />
-          </AppLocalizationProvider>
-        </ThemeProvider>
+        <MemoryRouter initialEntries={["/details/test-uuid"]}>
+          <ThemeProvider theme={theme}>
+            <AppLocalizationProvider>
+              <DownloadCloudOptimisedCard
+                collection={collection}
+                downloadConditions={downloadConditions}
+                getAndSetDownloadConditions={mockGetAndSetDownloadConditions}
+                removeDownloadCondition={mockRemoveDownloadCondition}
+                selectedCoKey={selectedCoKey}
+                setSelectedCoKey={setSelectedCoKey}
+              />
+            </AppLocalizationProvider>
+          </ThemeProvider>
+        </MemoryRouter>
       </Provider>
     );
   };
@@ -231,16 +234,18 @@ describe("DownloadCloudOptimisedCard", () => {
 
     render(
       <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <AppLocalizationProvider>
-            <DownloadCloudOptimisedCard
-              collection={createMockCollection(DatasetType.ZARR)}
-              downloadConditions={[]}
-              getAndSetDownloadConditions={mockGetAndSetDownloadConditions}
-              removeDownloadCondition={mockRemoveDownloadCondition}
-            />
-          </AppLocalizationProvider>
-        </ThemeProvider>
+        <MemoryRouter initialEntries={["/details/test-uuid"]}>
+          <ThemeProvider theme={theme}>
+            <AppLocalizationProvider>
+              <DownloadCloudOptimisedCard
+                collection={createMockCollection(DatasetType.ZARR)}
+                downloadConditions={[]}
+                getAndSetDownloadConditions={mockGetAndSetDownloadConditions}
+                removeDownloadCondition={mockRemoveDownloadCondition}
+              />
+            </AppLocalizationProvider>
+          </ThemeProvider>
+        </MemoryRouter>
       </Provider>
     );
 

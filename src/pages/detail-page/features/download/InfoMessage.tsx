@@ -1,10 +1,10 @@
 import { Box, SxProps, Typography } from "@mui/material";
 import { InformationIcon } from "../../../../assets/icons/download/information";
 import { portalTheme } from "../../../../styles";
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 
 interface InfoMessageProps {
-  infoText: string;
+  infoText: ReactNode;
   iconColor?: string;
   sx?: SxProps;
 }
