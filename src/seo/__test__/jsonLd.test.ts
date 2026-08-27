@@ -22,8 +22,8 @@ const collection = toCollection({
     revision: "2026-08-12T15:24:43",
     license: "Creative Commons Attribution 4.0 International License",
     citation: { suggestedCitation: "IMOS (2017). Sea Surface Temperature." },
+    dataset_provider: "IMOS",
   },
-  providers: [{ name: "IMOS" }, { name: "IMOS" }, { name: "CSIRO" }],
 });
 
 describe("buildJsonLd", () => {
@@ -39,11 +39,7 @@ describe("buildJsonLd", () => {
       datePublished: "2017-04-27",
       dateModified: "2026-08-12",
       keywords: ["Oceans | Ocean Temperature", "Oceans"],
-      // duplicate provider names are collapsed
-      creator: [
-        { "@type": "Organization", name: "IMOS" },
-        { "@type": "Organization", name: "CSIRO" },
-      ],
+      creator: { "@type": "Organization", name: "IMOS" },
       // schema.org GeoShape box is "south west north east"
       spatialCoverage: {
         "@type": "Place",
@@ -61,7 +57,7 @@ describe("buildJsonLd", () => {
       toCollection({
         id: "abc-123",
         title: "Bare record",
-        description: "No extent, themes or providers.",
+        description: "No extent or themes.",
       })
     );
 

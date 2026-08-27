@@ -13,7 +13,7 @@ export type { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 
 // Fields the bulk collections endpoint returns for the SEO artifacts
 export const SEO_PROPERTIES =
-  "id,title,description,bbox,temporal,themes,providers,creation,revision,citation,license";
+  "id,title,description,bbox,temporal,themes,creation,revision,citation,license,dataset_provider";
 
 // fetchResultNoStore returns one page; walk search_after until we have them all
 const API_URL = `${OGC_API_BASE}/api/v1/ogc/collections`;
@@ -57,6 +57,10 @@ const withOgcHost = async <T>(run: () => Promise<T>): Promise<T> => {
 export const fetchCollections = async (
   properties = SEO_PROPERTIES
 ): Promise<OGCCollection[]> => {
+  // Name the default rather than letting a missing config pass unnoticed
+  if (!import.meta.env?.VITE_API_HOST) {
+    console.warn(`VITE_API_HOST is not set; falling back to ${OGC_API_BASE}`);
+  }
   console.log(`Fetching ${properties} from ${API_URL}`);
 
   return withOgcHost(async () => {

@@ -452,6 +452,8 @@ export class OGCCollection {
   getLicense = (): string | undefined => this.propValue?.license;
   getCreation = (): string | undefined => this.propValue?.creation;
   getRevision = (): string | undefined => this.propValue?.revision;
+  getDatasetProvider = (): string | undefined =>
+    this.propValue?.dataset_provider;
   getMetadataUrl = (): string | undefined =>
     this.links?.filter(
       (link) =>
@@ -557,6 +559,7 @@ export class SummariesProperties {
   readonly dataset_group?: Array<string>;
   readonly scope?: Record<string, string>;
   readonly parameter_vocabs?: Array<string>;
+  readonly dataset_provider?: string;
 }
 
 export class Spatial {

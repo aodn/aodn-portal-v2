@@ -22,7 +22,6 @@ const collection = toCollection({
       { concepts: [{ id: "Oceans | Ocean Temperature" }, { id: "Oceans" }] },
     ],
   },
-  providers: [{ name: "IMOS" }, { name: "IMOS" }, { name: "CSIRO" }],
 });
 
 const extractJsonLd = (html: string) => {
@@ -80,8 +79,8 @@ describe("renderCrawlerPage", () => {
         citation: {
           suggestedCitation: "IMOS (2017). Sea Surface Temperature.",
         },
+        dataset_provider: "IMOS",
       },
-      providers: [{ name: "IMOS" }],
     });
 
     const html = renderCrawlerPage(TEMPLATE, full, [
@@ -109,7 +108,7 @@ describe("renderCrawlerPage", () => {
       datePublished: "2017-04-27",
       dateModified: "2026-08-12",
       keywords: ["Oceans"],
-      creator: [{ "@type": "Organization", name: "IMOS" }],
+      creator: { "@type": "Organization", name: "IMOS" },
       spatialCoverage: {
         "@type": "Place",
         geo: { "@type": "GeoShape", box: "-45 110 -10 155" },

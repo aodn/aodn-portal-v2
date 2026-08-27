@@ -44,6 +44,18 @@ export const checkSitemap = (xml: string, minUrls = MIN_PAGES) => {
   return { urls, problems };
 };
 
+// The date line the body should carry, derived from the JSON-LD so the two
+// are checked against each other — Google wants them to match
+const expectedDateLine = (dataset: {
+  dateModified?: string;
+  datePublished?: string;
+}) => {
+  if (dataset.dateModified) return `<p>Updated: ${dataset.dateModified}</p>`;
+  if (dataset.datePublished)
+    return `<p>Published: ${dataset.datePublished}</p>`;
+  return null;
+};
+
 export const checkDetailPage = (html: string, uuid: string): string[] => {
   const problems: string[] = [];
   const title = html.match(/<title>(.*?)<\/title>/s)?.[1];
@@ -80,13 +92,8 @@ export const checkDetailPage = (html: string, uuid: string): string[] => {
       if (dataset.url !== detailsUrl(uuid)) {
         problems.push("JSON-LD url does not match the record");
       }
-      // Google's rule: the visible date must match the structured data
-      const visibleDate = dataset.dateModified
-        ? `<p>Updated: ${dataset.dateModified}</p>`
-        : dataset.datePublished
-          ? `<p>Published: ${dataset.datePublished}</p>`
-          : null;
-      if (visibleDate && !html.includes(visibleDate)) {
+      const dateLine = expectedDateLine(dataset);
+      if (dateLine && !html.includes(dateLine)) {
         problems.push("visible date does not match the JSON-LD dates");
       }
     } catch {

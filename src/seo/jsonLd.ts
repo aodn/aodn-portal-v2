@@ -22,10 +22,9 @@ export const buildJsonLd = (
   datePublished: collection.getCreation()?.slice(0, 10),
   dateModified: collection.getRevision()?.slice(0, 10),
   keywords: toKeywords(collection.getThemes()),
-  // providers is on the API payload but not modelled on OGCCollection
-  creator: toCreators(
-    (collection as { providers?: { name?: string }[] }).providers
-  ),
+  // TODO IMOS records only; every record has one in contacts, which the bulk
+  // endpoint does not return
+  creator: toCreator(collection.getDatasetProvider()),
   spatialCoverage: toSpatialCoverage(collection.getBBox()),
   temporalCoverage: toTemporalCoverage(collection.extent?.temporal?.interval),
   license: collection.getLicense(),
@@ -52,6 +51,9 @@ const toTemporalCoverage = (
   return `${interval[0] ?? ".."}/${interval[1] ?? ".."}`;
 };
 
+const toCreator = (organisation?: string): Dataset["creator"] =>
+  organisation ? { "@type": "Organization", name: organisation } : undefined;
+
 const toKeywords = (
   themes?: { concepts: { id: string }[] }[]
 ): Dataset["keywords"] => {
@@ -59,14 +61,4 @@ const toKeywords = (
     .flatMap((theme) => theme.concepts?.map((concept) => concept.id) ?? [])
     .filter(Boolean);
   return keywords.length ? keywords : undefined;
-};
-
-const toCreators = (providers?: { name?: string }[]): Dataset["creator"] => {
-  const names = (providers ?? [])
-    .map((provider) => provider.name)
-    .filter(Boolean);
-  const unique = [...new Set(names)];
-  return unique.length
-    ? unique.map((name) => ({ "@type": "Organization", name }))
-    : undefined;
 };
