@@ -10,7 +10,7 @@ import { portalTheme } from "@/styles";
 enum DownloadSizeWarningLevel {
   NONE = "none",
   LARGE = "large",
-  EXTRA_LARGE = "very-large",
+  EXTRA_LARGE = "extra-large",
   ESTIMATE_FAILED = "estimate-failed",
 }
 
