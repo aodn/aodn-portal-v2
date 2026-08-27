@@ -4,9 +4,10 @@ export const BASE_URL = "https://portal-beta.aodn.org.au";
 
 export const SITE_NAME = "AODN Portal";
 
-// Where the build steps fetch records from. The portal domain, not
-// ogcapi-production, whose WAF 403s GitHub Actions runners. No trailing slash.
-export const OGC_API_BASE = "https://portal.production.aodn.org.au";
+// Where the build steps fetch from; VITE_API_HOST (shell or .env) overrides it.
+export const OGC_API_BASE = (
+  import.meta.env?.VITE_API_HOST || "https://portal.production.aodn.org.au"
+).replace(/\/$/, "");
 
 // og:image for social link previews, on every page. 1200x630 per the Open
 // Graph recommendation — the raw logos are under the 200x200 minimum and
