@@ -7,6 +7,7 @@ import {
   formatUtcDateTime,
   getAppMaxDate,
   toAppDayjs,
+  toUtcDayjs,
   toUtcEndOfDay,
   toUtcStartOfDay,
   utcDayKeyToUnixMs,
@@ -182,5 +183,29 @@ describe("toUtcStartOfDay / toUtcEndOfDay", () => {
     expect(formatUtcDateTime(toUtcEndOfDay(picked))).toBe(
       "1970-01-08T23:59:59Z"
     );
+  });
+});
+
+describe("toUtcDayjs", () => {
+  afterEach(() => {
+    setAppTimezone(DEFAULT_APP_TIMEZONE);
+  });
+
+  it("parses a day key as UTC, whatever the app timezone is", () => {
+    setAppTimezone("Pacific/Auckland");
+    const d = toUtcDayjs("1970-01-08", dateDefault.DATE_FORMAT);
+    expect(d.toISOString()).toBe("1970-01-08T00:00:00.000Z");
+    // toAppDayjs would have anchored the same key to Auckland midnight.
+    expect(
+      toAppDayjs("1970-01-08", dateDefault.DATE_FORMAT).toISOString()
+    ).not.toBe(d.toISOString());
+  });
+
+  it("honours the offset on an instant, and defaults to now", () => {
+    setAppTimezone("Pacific/Auckland");
+    expect(toUtcDayjs("2024-05-31T15:20:00Z").toISOString()).toBe(
+      "2024-05-31T15:20:00.000Z"
+    );
+    expect(Math.abs(toUtcDayjs().valueOf() - Date.now())).toBeLessThan(1000);
   });
 });

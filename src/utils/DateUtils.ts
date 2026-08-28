@@ -124,6 +124,15 @@ export const getAppMaxDate = (): Dayjs => dateDefault.max;
 export const dayjsToDayPeriod = (d: Dayjs): number =>
   d.year() * 10000 + (d.month() + 1) * 100 + d.date();
 
+/**
+ * Instant in UTC, whatever the app timezone is set to
+ */
+export const toUtcDayjs = (value?: DateInput, format?: string): Dayjs => {
+  if (value === undefined) return dayjs.utc();
+  if (format && typeof value === "string") return dayjs.utc(value, format);
+  return dayjs.utc(value);
+};
+
 /** Calendar month → YYYYMM integer. */
 export const dayjsToMonthPeriod = (d: Dayjs): number =>
   d.year() * 100 + (d.month() + 1);
