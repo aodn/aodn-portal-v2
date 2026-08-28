@@ -4,9 +4,17 @@
  */
 
 import { seoDistDir } from "./cli";
+import { OGC_API_BASE } from "./constants";
 import { fetchCollections } from "./fetchCollections";
 import { prerenderDetailPages } from "./prerender";
 import { generateSitemap } from "./sitemap";
+
+// There is no default API host — refuse to run rather than guess an environment
+if (!OGC_API_BASE) {
+  throw new Error(
+    "VITE_API_HOST is not set. Set it in the shell or .env (seo.yml passes the matrix site)."
+  );
+}
 
 const outDir = seoDistDir();
 

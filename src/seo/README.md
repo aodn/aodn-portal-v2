@@ -12,7 +12,9 @@ crawlers need, delivered two ways:
   `sitemap.xml` plus ~15k pre-rendered detail pages under
   `prerender/details/<uuid>/index.html` —
   `fetchCollections.ts` feeds `sitemap.ts` and `prerender.ts` (which embeds
-  `jsonLd.ts`); `fetchCollections.ts` is the only module importing app-store code
+  `jsonLd.ts`, plus a static body of title, abstract and `relatedRecords.ts`
+  links so pages link to each other — crawlers only discover pages through
+  `<a href>`); `fetchCollections.ts` is the only module importing app-store code
 
 A CloudFront function (in the appdeploy repo) rewrites crawler requests for
 `/details/<uuid>` to the pre-rendered pages; real users always get the latest

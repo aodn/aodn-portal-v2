@@ -3,6 +3,8 @@
  * with real title, description, canonical and Dataset JSON-LD in the head —
  * see README.md. CloudFront rewrites crawler requests for /details/<uuid>
  * to these pages; real users always get the live SPA shell.
+ * The complete expected page is pinned by the contract test in
+ * __test__/prerender.test.ts ("renders the complete crawler page …").
  * Standalone (needs a prior build): npx vite-node src/seo/prerender.ts
  */
 
@@ -11,6 +13,7 @@ import path from "path";
 import type { OGCCollection } from "./fetchCollections";
 import { fetchCollections } from "./fetchCollections";
 import { buildJsonLd } from "./jsonLd";
+import { buildRelatedLinks, RelatedLink } from "./relatedRecords";
 import { isSeoCli, runCli, seoDistDir } from "./cli";
 import {
   detailsUrl,
@@ -21,12 +24,45 @@ import {
   SITE_NAME,
 } from "./constants";
 
+// A visible, labelled date matching the JSON-LD dates — Google's best practice
+// for controlling the date shown next to search results
+const renderDateLine = (collection: OGCCollection) => {
+  const revision = collection.getRevision();
+  const creation = collection.getCreation();
+  if (revision)
+    return `<p>Updated: ${escapeEntities(revision.slice(0, 10))}</p>`;
+  if (creation)
+    return `<p>Published: ${escapeEntities(creation.slice(0, 10))}</p>`;
+  return "";
+};
+
+// Static body for crawlers: title, date, abstract and related-record links —
+// crawlers only follow <a href>. The SPA replaces it on mount.
+const renderBody = (collection: OGCCollection, related: RelatedLink[]) => {
+  const relatedItems = related
+    .map(
+      (link) =>
+        `<li><a href="/details/${link.id}">${escapeEntities(link.title)}</a></li>`
+    )
+    .join("");
+  const relatedNav = relatedItems
+    ? `<nav aria-label="Related records"><h2>Related records</h2><ul>${relatedItems}</ul></nav>`
+    : "";
+  return `<main>
+    <h1>${escapeEntities(collection.title ?? "")}</h1>
+    ${renderDateLine(collection)}
+    <p>${escapeEntities(collection.description ?? "")}</p>
+    ${relatedNav}
+  </main>`;
+};
+
 // Renders what crawlers read for one record — in Google terms: the title link,
 // snippet, canonical and Dataset structured data, plus Open Graph / Twitter
-// social preview tags. The body stays empty; Google's crawler renders it with JS.
+// social preview tags, and a static body (see renderBody).
 export const renderCrawlerPage = (
   template: string,
-  collection: OGCCollection
+  collection: OGCCollection,
+  related: RelatedLink[] = []
 ) => {
   const title = escapeEntities(collection.title ?? "");
   const description = escapeEntities(
@@ -54,6 +90,17 @@ export const renderCrawlerPage = (
       .replace(/\s*<meta name="description"[^>]*\/?>/, "")
       .replace(/\s*<meta (?:property="og:|name="twitter:)[^>]*\/?>/g, "")
       .replace("</head>", `${headTags}\n  </head>`)
+      // New Relic is ~97% of the shell and useless on a crawler-only page
+      .replace(/\s*<!-- Tracking code -.*?<\/script>/s, "")
+      // Google Analytics: crawler-only pages have no visitors worth counting
+      .replace(
+        /\s*<script async src="https:\/\/www\.googletagmanager\.com\/gtag\/js[^"]*"><\/script>\s*<script>.*?<\/script>/s,
+        ""
+      )
+      .replace(
+        '<div id="root"></div>',
+        `<div id="root">${renderBody(collection, related)}</div>`
+      )
   );
 };
 
@@ -73,6 +120,8 @@ export const prerenderDetailPages = async (
 
   const pages = collections.filter(hasSeoFields);
   const skipped = collections.length - pages.length;
+  // Built over pages only, so related links never point at a skipped record
+  const related = buildRelatedLinks(pages);
   // Bound concurrency so ~15k writes do not hit EMFILE
   const WRITE_CONCURRENCY = 64;
   for (let i = 0; i < pages.length; i += WRITE_CONCURRENCY) {
@@ -82,7 +131,7 @@ export const prerenderDetailPages = async (
         await mkdir(pageDir, { recursive: true });
         await writeFile(
           path.join(pageDir, "index.html"),
-          renderCrawlerPage(template, collection)
+          renderCrawlerPage(template, collection, related.get(collection.id))
         );
       })
     );
