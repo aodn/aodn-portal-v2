@@ -3,6 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import DownloadSizeWarning, {
+  DownloadSizeWarningLevel,
   hasDownloadSizeWarning,
   isDownloadBlocked,
 } from "../features/download/DownloadSizeWarning";
@@ -17,7 +18,7 @@ const TEST_UUID = "test-uuid";
 
 // Assertions target the data-warning-level attribute rather than the message
 // copy, which is a first-pass wording still to be reviewed by the designer
-const expectWarningLevel = (level: string) =>
+const expectWarningLevel = (level: DownloadSizeWarningLevel) =>
   expect(screen.getByTestId(WARNING_TEST_ID)).toHaveAttribute(
     "data-warning-level",
     level
@@ -74,7 +75,7 @@ describe("DownloadSizeWarning", () => {
   it("should warn at the large threshold", () => {
     renderWarning({ estimatedSizeBytes: LARGE_DOWNLOAD_BYTES });
 
-    expectWarningLevel("large");
+    expectWarningLevel(DownloadSizeWarningLevel.LARGE);
     expect(
       screen.queryByTestId(DATA_ACCESS_LINK_TEST_ID)
     ).not.toBeInTheDocument();
@@ -83,13 +84,13 @@ describe("DownloadSizeWarning", () => {
   it("should warn at the extra large threshold", () => {
     renderWarning({ estimatedSizeBytes: EXTRA_LARGE_DOWNLOAD_BYTES });
 
-    expectWarningLevel("extra-large");
+    expectWarningLevel(DownloadSizeWarningLevel.EXTRA_LARGE);
   });
 
   it("should warn when the estimate failed", () => {
     renderWarning({ estimateFailed: true });
 
-    expectWarningLevel("estimate-failed");
+    expectWarningLevel(DownloadSizeWarningLevel.ESTIMATE_FAILED);
     expect(
       screen.queryByTestId(DATA_ACCESS_LINK_TEST_ID)
     ).not.toBeInTheDocument();
@@ -121,7 +122,7 @@ describe("DownloadSizeWarning", () => {
     const { rerenderWith } = renderWarning({
       estimatedSizeBytes: EXTRA_LARGE_DOWNLOAD_BYTES,
     });
-    expectWarningLevel("extra-large");
+    expectWarningLevel(DownloadSizeWarningLevel.EXTRA_LARGE);
 
     // The card resets the size and flips to estimating on every re-estimate
     rerenderWith({ isEstimating: true, estimatedSizeBytes: null });
@@ -133,11 +134,11 @@ describe("DownloadSizeWarning", () => {
     const { rerenderWith } = renderWarning({
       estimatedSizeBytes: EXTRA_LARGE_DOWNLOAD_BYTES,
     });
-    expectWarningLevel("extra-large");
+    expectWarningLevel(DownloadSizeWarningLevel.EXTRA_LARGE);
 
     rerenderWith({ estimatedSizeBytes: LARGE_DOWNLOAD_BYTES });
 
-    expectWarningLevel("large");
+    expectWarningLevel(DownloadSizeWarningLevel.LARGE);
     expect(
       screen.queryByTestId(DATA_ACCESS_LINK_TEST_ID)
     ).not.toBeInTheDocument();
@@ -147,7 +148,7 @@ describe("DownloadSizeWarning", () => {
     const { rerenderWith } = renderWarning({
       estimatedSizeBytes: EXTRA_LARGE_DOWNLOAD_BYTES,
     });
-    expectWarningLevel("extra-large");
+    expectWarningLevel(DownloadSizeWarningLevel.EXTRA_LARGE);
 
     rerenderWith({ estimatedSizeBytes: LARGE_DOWNLOAD_BYTES - 1 });
 

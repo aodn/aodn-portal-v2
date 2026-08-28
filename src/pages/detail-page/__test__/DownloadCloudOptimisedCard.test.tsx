@@ -29,14 +29,38 @@ vi.mock("../features/download/DownloadSelect", () => ({
   ),
 }));
 
+vi.mock("@/hooks/useEstimateSize", async (importOriginal) => {
+  const actual = (await importOriginal()) as any;
+  return { ...actual, default: vi.fn() };
+});
+
 import DownloadCloudOptimisedCard from "../features/download/DownloadCloudOptimisedCard";
 import {
   DatasetType,
   OGCCollection,
 } from "@/app/store/OGCCollectionDefinitions";
 import store from "@/app/store/store";
+import useEstimateSize from "@/hooks/useEstimateSize";
+import {
+  LARGE_DOWNLOAD_BYTES,
+  EXTRA_LARGE_DOWNLOAD_BYTES,
+} from "../features/download/constants";
+import { DownloadSizeWarningLevel } from "../features/download/DownloadSizeWarning";
 
 const theme = createTheme();
+
+const WARNING_TEST_ID = "download-size-warning";
+const DOWNLOAD_BUTTON_TEST_ID = "download-button";
+const SUBSETTING_INFO_TEXT =
+  "To download data directly please use the selections below, or utilise the map tools to make your selection.";
+
+// Assertions target data-warning-level rather than the message copy, which is a
+// first-pass wording still to be reviewed by the designer
+const expectWarningLevel = (level: DownloadSizeWarningLevel) =>
+  expect(screen.getByTestId(WARNING_TEST_ID)).toHaveAttribute(
+    "data-warning-level",
+    level
+  );
 
 const createMockCollection = (datasetType: DatasetType): OGCCollection => {
   return {
@@ -76,6 +100,18 @@ describe("DownloadCloudOptimisedCard", () => {
   const mockRemoveDownloadCondition = vi.fn();
   const mockSetSelectedCoKey = vi.fn();
 
+  // Kept stable across renders: both sit in the card's estimate effect
+  // dependency array, so fresh mocks each render would re-estimate endlessly
+  const mockEstimateSize = vi.fn();
+  const mockCancelEstimate = vi.fn();
+
+  // Mutated per test to drive the estimate state the card reacts to
+  let estimateState: {
+    isEstimating: boolean;
+    estimatedSizeBytes: number | null;
+    estimateFailed: boolean;
+  };
+
   const getDataSelect = () => {
     return screen.getByTestId("select-data-selection") as HTMLSelectElement;
   };
@@ -108,6 +144,21 @@ describe("DownloadCloudOptimisedCard", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+
+    estimateState = {
+      isEstimating: false,
+      estimatedSizeBytes: null,
+      estimateFailed: false,
+    };
+
+    vi.mocked(useEstimateSize).mockImplementation(
+      () =>
+        ({
+          ...estimateState,
+          estimateSize: mockEstimateSize,
+          cancelEstimate: mockCancelEstimate,
+        }) as any
+    );
   });
 
   it("should render with format selection and data selection dropdowns", () => {
@@ -261,6 +312,103 @@ describe("DownloadCloudOptimisedCard", () => {
 
     await waitFor(() => {
       expect(getDataSelect().value).toBe("test-parquet.parquet");
+    });
+  });
+
+  describe("download size warning", () => {
+    it("should show no warning and keep the download enabled for a small estimate", async () => {
+      estimateState.estimatedSizeBytes = 1024;
+
+      renderComponent();
+
+      await waitFor(() => {
+        expect(screen.getByTestId(DOWNLOAD_BUTTON_TEST_ID)).toBeEnabled();
+      });
+      expect(screen.queryByTestId(WARNING_TEST_ID)).not.toBeInTheDocument();
+    });
+
+    it("should show no warning while an estimate is in flight", async () => {
+      estimateState.isEstimating = true;
+
+      renderComponent();
+
+      await waitFor(() => {
+        expect(screen.getByTestId(DOWNLOAD_BUTTON_TEST_ID)).toBeEnabled();
+      });
+      expect(screen.queryByTestId(WARNING_TEST_ID)).not.toBeInTheDocument();
+    });
+
+    it("should warn but keep the download enabled at the large threshold", async () => {
+      estimateState.estimatedSizeBytes = LARGE_DOWNLOAD_BYTES;
+
+      renderComponent();
+
+      await waitFor(() => expectWarningLevel(DownloadSizeWarningLevel.LARGE));
+      expect(screen.getByTestId(DOWNLOAD_BUTTON_TEST_ID)).toBeEnabled();
+    });
+
+    it("should warn and disable the download at the extra large threshold", async () => {
+      estimateState.estimatedSizeBytes = EXTRA_LARGE_DOWNLOAD_BYTES;
+
+      renderComponent();
+
+      await waitFor(() =>
+        expectWarningLevel(DownloadSizeWarningLevel.EXTRA_LARGE)
+      );
+      expect(screen.getByTestId(DOWNLOAD_BUTTON_TEST_ID)).toBeDisabled();
+    });
+
+    it("should warn but keep the download enabled when the estimate failed", async () => {
+      estimateState.estimateFailed = true;
+
+      renderComponent();
+
+      await waitFor(() =>
+        expectWarningLevel(DownloadSizeWarningLevel.ESTIMATE_FAILED)
+      );
+      expect(screen.getByTestId(DOWNLOAD_BUTTON_TEST_ID)).toBeEnabled();
+    });
+
+    it("should hide the subsetting info message while a size warning is showing", async () => {
+      estimateState.estimatedSizeBytes = LARGE_DOWNLOAD_BYTES;
+
+      renderComponent();
+
+      await waitFor(() => expectWarningLevel(DownloadSizeWarningLevel.LARGE));
+      expect(screen.queryByText(SUBSETTING_INFO_TEXT)).not.toBeInTheDocument();
+    });
+
+    it("should keep the subsetting info message when there is no size warning", async () => {
+      estimateState.estimatedSizeBytes = 1024;
+
+      renderComponent();
+
+      expect(await screen.findByText(SUBSETTING_INFO_TEXT)).toBeInTheDocument();
+    });
+
+    it("should open the download dialog when the estimate is not blocking", () => {
+      estimateState.estimatedSizeBytes = LARGE_DOWNLOAD_BYTES;
+
+      renderComponent();
+
+      userEvent.click(screen.getByTestId(DOWNLOAD_BUTTON_TEST_ID));
+
+      return waitFor(() => screen.findByTestId("download-dialog"));
+    });
+
+    it("should not open the download dialog when the download is blocked", () => {
+      estimateState.estimatedSizeBytes = EXTRA_LARGE_DOWNLOAD_BYTES;
+
+      // pointerEventsCheck is skipped because the disabled button intentionally
+      // keeps `pointer-events: auto` so its tooltip stays hoverable
+      const user = userEvent.setup({ pointerEventsCheck: 0 });
+      renderComponent();
+
+      user.click(screen.getByTestId(DOWNLOAD_BUTTON_TEST_ID));
+
+      return waitFor(() => {
+        expect(screen.queryByTestId("download-dialog")).not.toBeInTheDocument();
+      });
     });
   });
 });
