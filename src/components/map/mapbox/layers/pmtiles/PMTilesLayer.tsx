@@ -166,7 +166,7 @@ export const buildDensityInterpolateStops = <T extends string | number>(
 };
 /**
  * Zoom bands for hex density fills. Mapbox ranges are half-open:
- * layer is active when `minzoom ≤ zoom < maxzoom` (same as hover gating).
+ * layer is active when `minzoom ≤ zoom < maxzoom` (same as click/hover gating).
  */
 const PMTILE_LAYERS: readonly PmtilesHexLayerDef[] = [
   { id: "pmtiles-hex-z0", sourceLayer: "hex_z0", minzoom: 0, maxzoom: 2 },
@@ -796,8 +796,8 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   );
 
   /**
-   * Latest values for map event handlers (hover). Updated in an effect — not
-   * during render — so react-hooks/refs stays clean.
+   * Latest values for map event handlers (click/hover). Updated in an effect —
+   * not during render — so react-hooks/refs stays clean.
    */
   const hoverCtxRef = useRef({
     filterStartDate,
@@ -1074,11 +1074,13 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     };
   }, [map, formSourceUrl, filterStartDate, filterEndDate, periodBounds]);
 
-  // Hover popup + outline
+  // Click popup + hover outline
   useEffect(() => {
     if (!map) return;
 
     let hoveredId: string | number | undefined;
+    let selectedId: string | number | undefined;
+    let selectedGeometry: Geometry | undefined;
 
     const setHoverOutline = (geometry?: Geometry) => {
       const source = map.getSource<GeoJSONSource>(HOVER_SOURCE_ID);
@@ -1092,35 +1094,39 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       );
     };
 
-    const clearHover = () => {
+    const restoreOutline = () => {
+      setHoverOutline(selectedGeometry);
+    };
+
+    const clearInteraction = () => {
       map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
       hoveredId = undefined;
+      selectedId = undefined;
+      selectedGeometry = undefined;
       setHoverOutline(undefined);
       removePopup();
     };
 
-    const onHexHover = (
+    const hexTotal = (
       layer: (typeof PMTILE_LAYERS)[number],
       e: MapMouseEvent
-    ) => {
-      // While drawing bbox/polygon, skip hover popup/outline so draw clicks win
-      if (isMapDrawModeActive(map)) {
-        clearHover();
-        return;
-      }
-
+    ): {
+      feature: NonNullable<MapMouseEvent["features"]>[number] | undefined;
+      total: number;
+    } => {
       const ctx = hoverCtxRef.current;
       if (!ctx.visible || !ctx.densityReady) {
-        clearHover();
-        return;
+        return { feature: undefined, total: 0 };
       }
       const zoom = map.getZoom();
-      if (zoom < layer.minzoom || zoom >= layer.maxzoom) return;
-
+      if (zoom < layer.minzoom || zoom >= layer.maxzoom) {
+        return { feature: undefined, total: 0 };
+      }
       const feature = e.features?.[0];
-      if (!feature) return;
-
-      const { total: hoverTotal } = sumSparseCountFromProperties(
+      if (!feature) {
+        return { feature: undefined, total: 0 };
+      }
+      const { total } = sumSparseCountFromProperties(
         (feature.properties ?? {}) as Record<string, unknown>,
         ctx.filterStartDate,
         ctx.filterEndDate,
@@ -1129,35 +1135,67 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
           collectMatchedKeys: false,
         }
       );
-      if (hoverTotal <= 0) {
-        clearHover();
+      return { feature, total };
+    };
+
+    const onHexHover = (
+      layer: (typeof PMTILE_LAYERS)[number],
+      e: MapMouseEvent
+    ) => {
+      if (isMapDrawModeActive(map)) {
+        clearInteraction();
+        return;
+      }
+
+      const { feature, total } = hexTotal(layer, e);
+      if (!feature || total <= 0) {
+        map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
+        hoveredId = undefined;
+        restoreOutline();
         return;
       }
 
       map.getCanvas().classList.add(CURSOR_POINTER_CLASS);
-
-      if (!popupRef.current) {
-        popupRef.current = new Popup({
-          ...MapDefaultConfig.DEFAULT_POPUP,
-          closeButton: false,
-        });
-        hoveredId = undefined;
-      }
-
-      if (feature.id === undefined || feature.id !== hoveredId) {
-        hoveredId = feature.id;
-        popupRef.current.setHTML(
-          buildPopupHtml(
-            feature.properties ?? {},
-            ctx.filterStartDate,
-            ctx.filterEndDate,
-            ctx.countFilterRange,
-            ctx.hasTime
-          )
-        );
+      if (feature.id === undefined || feature.id === hoveredId) return;
+      hoveredId = feature.id;
+      if (feature.id !== selectedId) {
         setHoverOutline(feature.geometry);
       }
+    };
 
+    const onHexClick = (
+      layer: (typeof PMTILE_LAYERS)[number],
+      e: MapMouseEvent
+    ) => {
+      // While drawing bbox/polygon, skip popup/outline so draw clicks win
+      if (isMapDrawModeActive(map)) {
+        clearInteraction();
+        return;
+      }
+
+      const { feature, total } = hexTotal(layer, e);
+      if (!feature || total <= 0) {
+        clearInteraction();
+        return;
+      }
+
+      const ctx = hoverCtxRef.current;
+      selectedId = feature.id;
+      selectedGeometry = feature.geometry;
+      setHoverOutline(feature.geometry);
+
+      if (!popupRef.current) {
+        popupRef.current = new Popup(MapDefaultConfig.DEFAULT_POPUP);
+      }
+      popupRef.current.setHTML(
+        buildPopupHtml(
+          feature.properties ?? {},
+          ctx.filterStartDate,
+          ctx.filterEndDate,
+          ctx.countFilterRange,
+          ctx.hasTime
+        )
+      );
       popupRef.current.setLngLat(e.lngLat);
       if (!popupRef.current.isOpen()) {
         popupRef.current.addTo(map);
@@ -1170,44 +1208,48 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     };
 
     const onHexLeave = () => {
-      clearHover();
+      map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
+      hoveredId = undefined;
+      restoreOutline();
     };
 
     const onZoom = () => {
-      clearHover();
+      clearInteraction();
     };
 
-    // Drop open hover when drawing/editing starts or a feature is selected.
-    // mousemove re-enables hover once draw interaction is idle again.
+    // Drop open popup when drawing/editing starts or a feature is selected.
     const onDrawInteractionChange = () => {
       if (isMapDrawModeActive(map)) {
-        clearHover();
+        clearInteraction();
       }
     };
 
-    const hoverHandlers = PMTILE_LAYERS.map((layer) => ({
+    const layerHandlers = PMTILE_LAYERS.map((layer) => ({
       layerId: layer.id,
       onMouseMove: (e: MapMouseEvent) => onHexHover(layer, e),
+      onClick: (e: MapMouseEvent) => onHexClick(layer, e),
     }));
 
-    hoverHandlers.forEach(({ layerId, onMouseMove }) => {
+    layerHandlers.forEach(({ layerId, onMouseMove, onClick }) => {
       map.on("mousemove", layerId, onMouseMove);
       map.on("mouseleave", layerId, onHexLeave);
+      map.on("click", layerId, onClick);
     });
     map.on("zoom", onZoom);
     map.on("draw.modechange", onDrawInteractionChange);
     map.on("draw.selectionchange", onDrawInteractionChange);
 
     return () => {
-      hoverHandlers.forEach(({ layerId, onMouseMove }) => {
+      layerHandlers.forEach(({ layerId, onMouseMove, onClick }) => {
         map.off("mousemove", layerId, onMouseMove);
         map.off("mouseleave", layerId, onHexLeave);
+        map.off("click", layerId, onClick);
       });
       map.off("zoom", onZoom);
       map.off("draw.modechange", onDrawInteractionChange);
       map.off("draw.selectionchange", onDrawInteractionChange);
       try {
-        clearHover();
+        clearInteraction();
       } catch {
         // Map may already be torn down
       }

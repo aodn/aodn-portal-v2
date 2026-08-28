@@ -56,7 +56,7 @@ export const DAYS_KEY = "d";
 /**
  * Top density total used by paint interpolate and by the feature-state early-stop.
  * Totals at or above this value all paint the same; full accuracy is only needed
- * for the hover popup (which does not use this cap).
+ * for the click popup (which does not use this cap).
  */
 export const DENSITY_TOTAL_CAP = 10000;
 
