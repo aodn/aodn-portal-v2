@@ -57,10 +57,6 @@ const withOgcHost = async <T>(run: () => Promise<T>): Promise<T> => {
 export const fetchCollections = async (
   properties = SEO_PROPERTIES
 ): Promise<OGCCollection[]> => {
-  // Name the default rather than letting a missing config pass unnoticed
-  if (!import.meta.env?.VITE_API_HOST) {
-    console.warn(`VITE_API_HOST is not set; falling back to ${OGC_API_BASE}`);
-  }
   console.log(`Fetching ${properties} from ${API_URL}`);
 
   return withOgcHost(async () => {

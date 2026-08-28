@@ -4,10 +4,11 @@ export const BASE_URL = "https://portal-beta.aodn.org.au";
 
 export const SITE_NAME = "AODN Portal";
 
-// Where the build steps fetch from; VITE_API_HOST (shell or .env) overrides it.
-export const OGC_API_BASE = (
-  import.meta.env?.VITE_API_HOST || "https://portal.production.aodn.org.au"
-).replace(/\/$/, "");
+// Where the build steps fetch from; set VITE_API_HOST — no default on purpose
+export const OGC_API_BASE = (import.meta.env?.VITE_API_HOST ?? "").replace(
+  /\/$/,
+  ""
+);
 
 // og:image for social link previews, on every page. 1200x630 per the Open
 // Graph recommendation — the raw logos are under the 200x200 minimum and

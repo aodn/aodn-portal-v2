@@ -60,6 +60,9 @@ jobs:
           echo "Template from ${{ matrix.site }} references $(grep -o '/assets/index-[^"]*' dist/index.html | head -1)"
 
       - name: Generate sitemap.xml and pre-rendered detail pages
+        env:
+          # Each site's CloudFront proxies /api to its own environment's backend
+          VITE_API_HOST: ${{ matrix.site }}
         run: |
           # seo:artifacts runs under vite-node so it can reuse fetchResultNoStore
           yarn seo:artifacts
