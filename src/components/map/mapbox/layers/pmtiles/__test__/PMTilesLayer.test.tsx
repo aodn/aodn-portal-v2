@@ -1,5 +1,10 @@
-import dayjs from "@/utils/DayjsUtils";
-import { vi } from "vitest";
+import dayjs, {
+  DEFAULT_APP_TIMEZONE,
+  setAppTimezone,
+} from "@/utils/DayjsUtils";
+import { afterEach, vi } from "vitest";
+import { toAppDayjs } from "@/utils/DateUtils";
+import { dateDefault } from "@/components/common/constants";
 import type { Map } from "mapbox-gl";
 import {
   buildPopupHtml,
@@ -1383,5 +1388,96 @@ describe("PMTilesLayer - URL helpers and metadata probe", () => {
       result ? buildPmtilesSourceUrl(collectionId, result.key) : undefined
     ).toBeUndefined();
     vi.unstubAllGlobals();
+  });
+});
+
+describe("PMTilesLayer - UTC day edges (issue 9059)", () => {
+  afterEach(() => {
+    setAppTimezone(DEFAULT_APP_TIMEZONE);
+  });
+
+  /** What MapPanel builds from a stored DateRangeCondition: a day label. */
+  const pickedDay = (day: string) => toAppDayjs(day, dateDefault.DATE_FORMAT);
+
+  it("resolves a tile key to UTC midnight, not app-timezone midnight", () => {
+    setAppTimezone("Australia/Sydney");
+    // Sydney midnight is 2024-05-30T14:00Z — the wrong UTC day to hand on to
+    // the other time-aware components (WMS, subsetting).
+    expect(periodNumberToDayjs(20240531)?.toISOString()).toBe(
+      "2024-05-31T00:00:00.000Z"
+    );
+  });
+
+  it("gives the slider UTC-midnight metadata bounds", () => {
+    setAppTimezone("Australia/Sydney");
+    const bounds = metadataRangeToDayjs(metaRange(20240531, 20240602));
+    expect(bounds?.minDate.toISOString()).toBe("2024-05-31T00:00:00.000Z");
+    expect(bounds?.maxDate.toISOString()).toBe("2024-06-02T00:00:00.000Z");
+  });
+
+  it("clamps to UTC-midnight edges, on the days the metadata covers", () => {
+    setAppTimezone("Australia/Sydney");
+    const { start, end } = clampRangeToMetadata(
+      pickedDay("2024-01-01"),
+      pickedDay("2024-12-31"),
+      metaRange(20240531, 20240602)
+    );
+    expect(start.toISOString()).toBe("2024-05-31T00:00:00.000Z");
+    expect(end.toISOString()).toBe("2024-06-02T00:00:00.000Z");
+  });
+
+  it("day-aligns the empty clamp to UTC too", () => {
+    setAppTimezone("Australia/Sydney");
+    const { start, end } = clampRangeToMetadata(
+      pickedDay("2024-05-31"),
+      pickedDay("2024-06-02"),
+      metaRange(20200101, 20201231)
+    );
+    expect(start.toISOString()).toBe("2024-05-31T00:00:00.000Z");
+    expect(end.isBefore(start)).toBe(true);
+  });
+
+  // Defaulted ends must land on the UTC calendar day, not the display one:
+  // east of UTC the app clock is already on tomorrow for part of each day.
+  it.each(["UTC", "Australia/Sydney", "Pacific/Honolulu"])(
+    "defaults the open end to the UTC day in %s",
+    (timezone) => {
+      setAppTimezone(timezone);
+      const today = Number(dayjs.utc().format("YYYYMMDD"));
+      expect(
+        buildCountFilterRange(pickedDay("2024-05-31"), undefined).endPeriod
+      ).toBe(today);
+    }
+  );
+
+  // The picked day is a label, so it must bucket the same way in every
+  // display timezone — this is the invariant dayjsToPeriodInt has to hold.
+  it.each(["UTC", "Australia/Sydney", "Pacific/Honolulu"])(
+    "keeps both filter-window edges on the picked days in %s",
+    (timezone) => {
+      setAppTimezone(timezone);
+      const range = buildCountFilterRange(
+        pickedDay("2024-05-31"),
+        pickedDay("2024-06-02")
+      );
+      expect(range.empty).toBe(false);
+      expect(range.startPeriod).toBe(20240531);
+      expect(range.endPeriod).toBe(20240602);
+    }
+  );
+
+  it("counts the boundary day of a single-day window", () => {
+    setAppTimezone("Australia/Sydney");
+    const { total } = sumSparseCountFromProperties(
+      countsProps({
+        "2024": {
+          [TOTAL_KEY]: 7,
+          "05": { [TOTAL_KEY]: 7, [DAYS_KEY]: { "31": 7 } },
+        },
+      }),
+      pickedDay("2024-05-31"),
+      pickedDay("2024-05-31")
+    );
+    expect(total).toBe(7);
   });
 });

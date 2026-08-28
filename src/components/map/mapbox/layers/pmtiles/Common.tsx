@@ -1,7 +1,11 @@
 import { Dayjs } from "@/utils/DayjsUtils";
 import { ExpressionSpecification } from "mapbox-gl";
 import { dateDefault } from "@/components/common/constants";
-import { dayjsToDayPeriod, getAppMaxDate, toAppDayjs } from "@/utils/DateUtils";
+import {
+  dayjsToDayPeriod,
+  toUtcDayjs,
+  toUtcStartOfDay,
+} from "@/utils/DateUtils";
 
 /** One Mapbox fill band over a PMTiles `hex_z*` source-layer. */
 export type PmtilesHexLayerDef = {
@@ -240,12 +244,24 @@ export const daysInMonth = (year: number, month: number): number => {
   return (isLeapYear(year) ? DAYS_IN_MONTH_LEAP : DAYS_IN_MONTH_COMMON)[month]!;
 };
 
+/**
+ * Open ends of the filter window, as UTC instants. Every PMTiles period is a
+ * UTC calendar day, so the defaults must be too — an app timezone east of UTC
+ * would otherwise make "now" a day ahead of the newest tile key.
+ */
 const resolveRange = (start?: Dayjs, end?: Dayjs) => ({
-  start: start || toAppDayjs(DEFAULT_RANGE_START, dateDefault.DATE_FORMAT),
-  end: end || getAppMaxDate(),
+  start: start || toUtcDayjs(DEFAULT_RANGE_START, dateDefault.DATE_FORMAT),
+  end: end || toUtcDayjs(),
 });
 
-/** UI Dayjs → day period int (`YYYYMMDD`). */
+/**
+ * UI Dayjs → day period int (`YYYYMMDD`).
+ *
+ * Reads the Dayjs's own calendar day, which is the right reading here: callers
+ * pass a date the user picked, and a picked date is a day label rather than an
+ * instant. That label is the UTC day the tile keys are generated against, so it
+ * must survive unshifted — never re-anchor the instant to another zone first.
+ */
 export const dayjsToPeriodInt = (d: Dayjs): PeriodInt => dayjsToDayPeriod(d);
 
 /**
@@ -275,6 +291,10 @@ export const parsePeriodInt = (value: unknown): PeriodInt | undefined => {
 /**
  * Convert a day period int (or raw sidecar value) to Dayjs for UI edges only.
  * Never call `dayjs(periodNumber)` — dayjs treats numbers as unix ms (→ 1970).
+ *
+ * The result is UTC midnight of that calendar day, so it round-trips through
+ * {@link dayjsToPeriodInt} and lines up with the other time-aware components
+ * (WMS, subsetting) that also speak UTC.
  */
 export const periodNumberToDayjs = (value: unknown): Dayjs | undefined => {
   const period = parsePeriodInt(value);
@@ -284,7 +304,7 @@ export const periodNumberToDayjs = (value: unknown): Dayjs | undefined => {
   const d = period % 100;
   const mm = m < 10 ? `0${m}` : String(m);
   const dd = d < 10 ? `0${d}` : String(d);
-  const day = toAppDayjs(`${y}-${mm}-${dd}`, dateDefault.DATE_FORMAT);
+  const day = toUtcDayjs(`${y}-${mm}-${dd}`, dateDefault.DATE_FORMAT);
   return day.isValid() ? day : undefined;
 };
 
@@ -338,8 +358,9 @@ export const clampRangeToMetadata = (
   }
 
   const { start: s0, end: e0 } = resolveRange(start, end);
-  const startPeriod = dayjsToPeriodInt(s0.startOf("day"));
-  const endPeriod = dayjsToPeriodInt(e0.startOf("day"));
+  const startDay = toUtcStartOfDay(s0);
+  const startPeriod = dayjsToPeriodInt(startDay);
+  const endPeriod = dayjsToPeriodInt(toUtcStartOfDay(e0));
 
   if (startPeriod > endPeriod) {
     return { start: s0, end: e0 };
@@ -347,8 +368,7 @@ export const clampRangeToMetadata = (
 
   const clamped = clampPeriodsToMetadata(startPeriod, endPeriod, bounds);
   if (clamped.empty) {
-    const emptyEnd = s0.startOf("day").subtract(1, "day");
-    return { start: s0.startOf("day"), end: emptyEnd };
+    return { start: startDay, end: startDay.subtract(1, "day") };
   }
 
   const minD = periodNumberToDayjs(clamped.startPeriod);
