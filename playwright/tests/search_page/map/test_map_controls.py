@@ -132,7 +132,7 @@ def test_map_buttons(desktop_page: Page, data_title: str) -> None:
         detail_page.detail_map.daterange_show_hide_menu_button
     ).to_be_visible()
     expect(detail_page.detail_map.draw_rect_menu_button).to_be_visible()
-    expect(detail_page.detail_map.delete_button).to_be_visible()
+    expect(detail_page.detail_map.reset_selections_button).to_be_visible()
 
     # Data Density is default once the `.metadata` probe succeeds; map idle
     # can close the layer menu before GeoServer is clickable.

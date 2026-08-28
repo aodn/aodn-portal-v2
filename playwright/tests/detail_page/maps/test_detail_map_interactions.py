@@ -81,7 +81,7 @@ def test_drawing_shape_adds_download_filter(
     # Remove the drawn shape
     detail_page.detail_map.hover_map()
     detail_page.detail_map.click_map()
-    detail_page.detail_map.delete_button.click()
+    detail_page.detail_map.reset_selections_button.click()
     expect(detail_page.bbox_condition_box.first).not_to_be_visible()
 
 
