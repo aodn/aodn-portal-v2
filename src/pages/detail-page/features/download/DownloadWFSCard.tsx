@@ -22,6 +22,10 @@ import InfoMessage from "./InfoMessage";
 import DownloadButton from "../../../../components/common/buttons/DownloadButton";
 import DownloadSubsetting from "./DownloadSubsetting";
 import DownloadSelect from "./DownloadSelect";
+import DownloadSizeWarning, {
+  hasDownloadSizeWarning,
+  isDownloadBlocked,
+} from "./DownloadSizeWarning";
 import { trackCustomEvent } from "@/analytics/customEventTracker";
 import { AnalyticsEvent } from "@/analytics/analyticsEvents";
 import {
@@ -82,6 +86,15 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
     estimatedSizeBytes,
     estimateFailed,
   } = useEstimateSize(processWFSEstimateSize);
+
+  const estimateState = {
+    isEstimating,
+    estimatedSizeBytes,
+    estimateFailed,
+  };
+
+  const showSizeWarning = hasDownloadSizeWarning(estimateState);
+  const downloadBlocked = isDownloadBlocked(estimateState);
   const dispatch = useAppDispatch();
   const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
   const [dataSelectOptions, setDataSelectOptions] = useState<SelectItem[]>([]);
@@ -260,8 +273,16 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
           isEstimating={isEstimating}
           estimatedSizeBytes={estimatedSizeBytes}
           estimateFailed={estimateFailed}
+          disabled={downloadBlocked}
           handleCancelDownload={handleCancelDownload}
         />
+        {!isDownloading && (
+          <DownloadSizeWarning
+            isEstimating={isEstimating}
+            estimatedSizeBytes={estimatedSizeBytes}
+            estimateFailed={estimateFailed}
+          />
+        )}
         {isDownloading &&
           renderProgressMessage(formatBytes(downloadedBytes), progressMessage)}
       </Stack>
@@ -269,7 +290,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
         downloadConditions={downloadConditions}
         getAndSetDownloadConditions={getAndSetDownloadConditions}
         removeDownloadCondition={removeDownloadCondition}
-        hideInfoMessage={isDownloading}
+        hideInfoMessage={isDownloading || showSizeWarning}
         disable={isDownloading}
         sx={{ px: "16px" }}
       />

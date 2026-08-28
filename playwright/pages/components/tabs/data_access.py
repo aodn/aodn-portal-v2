@@ -6,7 +6,7 @@ from pages.base_page import BasePage
 class DataAccessTab(BasePage):
     TAB_NAME = 'Data Access'
     DATA = 'Data'
-    DOCUMENT = 'Document'
+    DOCUMENT = 'Documents'
     CODE_TUTORIALS = 'Code Tutorials'
     OTHER = 'Other'
 

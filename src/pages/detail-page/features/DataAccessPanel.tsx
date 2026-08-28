@@ -185,11 +185,11 @@ const DataAccessPanel: FC<DataAccessPanelProps> = ({ mode, type }) => {
         ),
       },
       {
-        title: "Document",
+        title: "Documents",
         component: (props: Record<string, any>) => (
           <DocumentList
             {...props}
-            title={"Document"}
+            title={"Documents"}
             documentLinks={collection?.getDocumentLinks()}
           />
         ),
