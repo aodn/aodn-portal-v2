@@ -18,7 +18,6 @@ import { ControlProps } from "./Definition";
 import { BboxSelectionIcon } from "@/assets/icons/map/bbox_selection";
 import { switcherIconButtonSx } from "./MenuControl";
 import MenuHintTooltip from "./MenuHintTooltip";
-import DeleteIcon from "@mui/icons-material/Delete";
 import { BboxTooltipIcon } from "@/assets/icons/map/tooltip_bbox";
 import MenuTooltip from "./MenuTooltip";
 import { PolygonSelectionTooltipIcon } from "@/assets/icons/map/tooltip_polygon_selection";
@@ -38,7 +37,6 @@ interface DrawControlProps extends ControlProps {
 
 const MENU_ID = "draw-rect-menu-button";
 const POLYGON_MENU_ID = "draw-polygon-menu-button";
-const TRASH_ID = "draw-rect-trash-button";
 const DRAW_RECTANGLE_MODE = "draw_rectangle";
 const DRAW_POLYGON_MODE = "draw_polygon";
 type SelectionTool = "bbox" | "polygon";
@@ -173,7 +171,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
     [anchorRef]
   );
 
-  const handleTrashClick = useCallback(() => {
+  const deleteSelectedOrAllFeatures = useCallback(() => {
     if (!hasFeatures) return;
 
     // Get all selected features and delete them
@@ -214,12 +212,12 @@ const DrawRect: React.FC<DrawControlProps> = ({
       if (isEditableTarget(event.target)) return;
 
       event.preventDefault();
-      handleTrashClick();
+      deleteSelectedOrAllFeatures();
     };
 
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [hasFeatures, handleTrashClick]);
+  }, [hasFeatures, deleteSelectedOrAllFeatures]);
 
   useEffect(() => {
     if (isDrawingMode) {
@@ -449,27 +447,6 @@ const DrawRect: React.FC<DrawControlProps> = ({
         onClose={handleClosePolygonTooltip}
         hideIconOnSmallScreen
       />
-
-      <MenuHintTooltip hint="Clear Area Selection" disable={!hasFeatures}>
-        <IconButton
-          aria-label="Delete"
-          id={TRASH_ID}
-          data-testid={TRASH_ID}
-          onClick={handleTrashClick}
-          disabled={!hasFeatures}
-          sx={{
-            ...switcherIconButtonSx(false),
-            opacity: hasFeatures ? 1 : 0.5,
-            cursor: hasFeatures ? "pointer" : "not-allowed",
-            "&.MuiIconButton-root": { border: "0px solid transparent" },
-            "&.Mui-disabled": {
-              border: "0px solid transparent",
-            },
-          }}
-        >
-          <DeleteIcon />
-        </IconButton>
-      </MenuHintTooltip>
     </Box>
   );
 };
