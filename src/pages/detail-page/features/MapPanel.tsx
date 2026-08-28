@@ -19,12 +19,14 @@ import { LngLatBounds, MapEvent } from "mapbox-gl";
 import BaseMapSwitcher from "../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
 import MenuControl from "../../../components/map/mapbox/controls/menu/MenuControl";
 import DateRange from "../../../components/map/mapbox/controls/menu/DateRange";
+import ResetSelections from "../../../components/map/mapbox/controls/menu/ResetSelections";
 import dayjs, { Dayjs } from "@/utils/DayjsUtils";
 import {
   BBoxCondition,
   DateRangeCondition,
   DownloadConditionType,
   DownloadServiceType,
+  IDownloadConditionCallback,
   PolygonCondition,
   SubsettingType,
 } from "../context/DownloadDefinitions";
@@ -73,6 +75,12 @@ import useGriddedRasterLayer from "@/components/map/mapbox/layers/raster-layers/
 import { portalTheme } from "@/styles";
 
 const mapContainerId = "map-detail-container-id";
+
+const RESETTABLE_TYPES = [
+  DownloadConditionType.BBOX,
+  DownloadConditionType.POLYGON,
+  DownloadConditionType.DATE_RANGE,
+];
 
 // Exported for unit tests
 export const buildMapLayerConfig = (
@@ -164,6 +172,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     collection,
     downloadConditions,
     getAndSetDownloadConditions,
+    clearDownloadConditions,
     lastSelectedMapLayer,
     setLastSelectedMapLayer,
     selectedWmsLayer,
@@ -596,6 +605,18 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     [getAndSetDownloadConditions]
   );
 
+  const hasResettableSelections = useMemo(
+    () => downloadConditions.some((c) => RESETTABLE_TYPES.includes(c.type)),
+    [downloadConditions]
+  );
+
+  const handleResetSelections = useCallback(() => {
+    downloadConditions
+      .filter((c) => RESETTABLE_TYPES.includes(c.type))
+      .forEach((c) => (c as IDownloadConditionCallback).removeCallback?.());
+    clearDownloadConditions(RESETTABLE_TYPES);
+  }, [downloadConditions, clearDownloadConditions]);
+
   if (!collection) return null;
 
   return (
@@ -690,6 +711,18 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
                     <DrawRect
                       onChangeFeatures={handleFeaturesChange}
                       features={drawFeatures}
+                    />
+                  }
+                />
+                <MenuControl
+                  visible={
+                    isSubsettingSupported(SubsettingType.TimeSlider) ||
+                    isSubsettingSupported(SubsettingType.DrawRect)
+                  }
+                  menu={
+                    <ResetSelections
+                      disabled={!hasResettableSelections}
+                      onReset={handleResetSelections}
                     />
                   }
                 />
