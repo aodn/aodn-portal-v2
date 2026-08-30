@@ -56,7 +56,7 @@ const SOURCE_ID = "pmtiles-source-id";
 const HOVER_SOURCE_ID = "pmtiles-hover-source-id";
 const HOVER_OUTLINE_LAYER_ID = "pmtiles-hex-hover-outline";
 /** Stable id for Playwright visibility checks (zoom-band fill layers share one source). */
-export const PMTILES_TEST_LAYER_ID = "pmtiles-hex-z0";
+const PMTILES_TEST_LAYER_ID = "pmtiles-hex-z0";
 const CURSOR_POINTER_CLASS = "map-cursor-pointer";
 /** H3 cell id property; promoted to feature id so feature-state can target hexes. */
 const PROMOTE_ID_PROPERTY = "h";
@@ -72,6 +72,25 @@ const FEATURE_STATE_DEBOUNCE_MS = 120;
 
 /** Feature-state key written by sparse JS sums for density paint/filter. */
 const FEATURE_STATE_TOTAL = "total";
+
+/**
+ * Tracks which features already received feature-state for the current filter
+ * generation so tile loads only process new hexes.
+ */
+type FeatureStateTotalsSession = {
+  /** Features already written: `${sourceLayer}\\0${id}` */
+  written: Set<string>;
+};
+
+/** Latest filter/visibility values read by hex click and hover handlers. */
+type PmtilesHexHoverCtx = {
+  filterStartDate?: Dayjs;
+  filterEndDate?: Dayjs;
+  countFilterRange?: CountFilterRange;
+  hasTime: boolean;
+  densityReady: boolean;
+  visible: boolean;
+};
 
 /**
  * Density fill-color stops as a fraction of {@link DENSITY_TOTAL_CAP}.
@@ -107,7 +126,7 @@ const DENSITY_OPACITY_STOPS: ReadonlyArray<{
  * Flatten ratio-based stops into Mapbox `interpolate` input/output pairs,
  * dropping any non-increasing values after rounding so the expression stays valid.
  */
-export const buildDensityInterpolateStops = <T extends string | number>(
+const buildDensityInterpolateStops = <T extends string | number>(
   stops: ReadonlyArray<{ ratio: number; value: T }>,
   cap: number = DENSITY_TOTAL_CAP
 ): Array<number | T> => {
@@ -140,7 +159,7 @@ const PMTILE_LAYERS: readonly PmtilesHexLayerDef[] = [
  * Usually 0–1 layer. Overzoom past the last `maxzoom` clamps to the top band;
  * underzoom below the first `minzoom` clamps to the bottom band.
  */
-export const getActivePmtilesLayers = (zoom: number): PmtilesHexLayerDef[] => {
+const getActivePmtilesLayers = (zoom: number): PmtilesHexLayerDef[] => {
   const matched = PMTILE_LAYERS.filter(
     (layer) => zoom >= layer.minzoom && zoom < layer.maxzoom
   );
@@ -201,7 +220,7 @@ interface PMTilesHexLayerProps extends LayerBasicType, LayerSelectable<string> {
  * omits the Time Range line so the synthetic sentinel is not shown as a
  * real observation date.
  */
-export const buildPopupHtml = (
+const buildPopupHtml = (
   properties: Record<string, unknown>,
   filterStartDate?: Dayjs,
   filterEndDate?: Dayjs,
@@ -232,7 +251,7 @@ export const buildPopupHtml = (
 };
 
 /** Density input: sparse total written via setFeatureState (0 when unset). */
-export const buildFeatureStateTotalExpression = (): ExpressionSpecification =>
+const buildFeatureStateTotalExpression = (): ExpressionSpecification =>
   [
     "coalesce",
     ["feature-state", FEATURE_STATE_TOTAL],
@@ -243,22 +262,20 @@ export const buildFeatureStateTotalExpression = (): ExpressionSpecification =>
  * True when feature-state total has been written. Unset state is `null` and must
  * not be treated like a real zero count (new tiles would vanish mid-load).
  */
-export const buildFeatureStateTotalIsSetExpression =
-  (): ExpressionSpecification =>
-    [
-      "!=",
-      ["feature-state", FEATURE_STATE_TOTAL],
-      null,
-    ] as ExpressionSpecification;
+const buildFeatureStateTotalIsSetExpression = (): ExpressionSpecification =>
+  [
+    "!=",
+    ["feature-state", FEATURE_STATE_TOTAL],
+    null,
+  ] as ExpressionSpecification;
 
 /**
  * True when the sparse total is strictly greater than zero.
  * Used so zero-count hexes (common after a narrow time-slider window) paint
  * fully transparent — including outline — rather than leaving a faint border.
  */
-export const buildFeatureStateHasCountExpression =
-  (): ExpressionSpecification =>
-    [">", buildFeatureStateTotalExpression(), 0] as ExpressionSpecification;
+const buildFeatureStateHasCountExpression = (): ExpressionSpecification =>
+  [">", buildFeatureStateTotalExpression(), 0] as ExpressionSpecification;
 
 /**
  * Layer filter for density mode.
@@ -267,26 +284,26 @@ export const buildFeatureStateHasCountExpression =
  * in paint/layout. Zero-count hexes are hidden via transparent paint instead.
  * Presence filter keeps only real hex features.
  */
-export const buildDensityLayerFilter = (): ExpressionSpecification =>
+const buildDensityLayerFilter = (): ExpressionSpecification =>
   ["has", PROMOTE_ID_PROPERTY] as ExpressionSpecification;
 
 /** Phase A: any hex feature is present (tiles only contain cells with data). */
-export const buildPresenceFilter = (): ExpressionSpecification =>
+const buildPresenceFilter = (): ExpressionSpecification =>
   ["has", PROMOTE_ID_PROPERTY] as ExpressionSpecification;
 
-export const PLACEHOLDER_FILL_COLOR = "#475569";
-export const PLACEHOLDER_FILL_OPACITY = 0.4;
+const PLACEHOLDER_FILL_COLOR = "#475569";
+const PLACEHOLDER_FILL_OPACITY = 0.4;
 /** Fully opaque white border (no alpha) so edges stay clear on the basemap. */
-export const PLACEHOLDER_OUTLINE_COLOR = "#FFFFFF";
+const PLACEHOLDER_OUTLINE_COLOR = "#FFFFFF";
 /** Fully opaque white border for hexes with a non-zero density total. */
-export const DENSITY_OUTLINE_COLOR = "#FFFFFF";
+const DENSITY_OUTLINE_COLOR = "#FFFFFF";
 /** Fully transparent fill/outline when a hex has no records in the filter window. */
-export const ZERO_COUNT_FILL_COLOR = "rgba(0, 0, 0, 0)";
-export const ZERO_COUNT_OUTLINE_COLOR = "rgba(0, 0, 0, 0)";
-export const ZERO_COUNT_FILL_OPACITY = 0;
+const ZERO_COUNT_FILL_COLOR = "rgba(0, 0, 0, 0)";
+const ZERO_COUNT_OUTLINE_COLOR = "rgba(0, 0, 0, 0)";
+const ZERO_COUNT_FILL_OPACITY = 0;
 
 /** Neutral style while feature-state totals are computed in the background. */
-export const getPlaceholderPaintProperties = (): HexFillPaint => ({
+const getPlaceholderPaintProperties = (): HexFillPaint => ({
   "fill-color": PLACEHOLDER_FILL_COLOR,
   "fill-opacity": PLACEHOLDER_FILL_OPACITY,
   "fill-outline-color": PLACEHOLDER_OUTLINE_COLOR,
@@ -303,7 +320,7 @@ export const getPlaceholderPaintProperties = (): HexFillPaint => ({
  * Color and opacity breakpoints scale with {@link DENSITY_TOTAL_CAP} via
  * {@link DENSITY_COLOR_STOPS} / {@link DENSITY_OPACITY_STOPS}.
  */
-export const getFeatureStatePaintProperties = (
+const getFeatureStatePaintProperties = (
   cap: number = DENSITY_TOTAL_CAP
 ): HexFillPaint => {
   const totalIsSet = buildFeatureStateTotalIsSetExpression();
@@ -351,7 +368,7 @@ export const getFeatureStatePaintProperties = (
 };
 
 /** Apply fill filter + paint to every PMTiles hex zoom band that exists. */
-export const applyHexLayerStyle = (
+const applyHexLayerStyle = (
   map: Map,
   filter: ExpressionSpecification | null,
   paint: HexFillPaint
@@ -373,7 +390,7 @@ export const applyHexLayerStyle = (
 };
 
 /** Restore the PMTiles source and layers after a Mapbox base-style change. */
-export const addPmtilesSourceAndLayers = (
+const addPmtilesSourceAndLayers = (
   map: Map,
   sourceUrl: string,
   visible: boolean
@@ -436,7 +453,7 @@ export const addPmtilesSourceAndLayers = (
 };
 
 /** Drop all feature-state for the PMTiles vector source (if present). */
-export const clearPmtilesFeatureState = (map: Map): void => {
+const clearPmtilesFeatureState = (map: Map): void => {
   if (!map.getSource(SOURCE_ID)) return;
   // Vector sources require sourceLayer, so clear each hex band explicitly
   for (const layer of PMTILE_LAYERS) {
@@ -451,21 +468,11 @@ export const clearPmtilesFeatureState = (map: Map): void => {
   }
 };
 
-/**
- * Tracks which features already received feature-state for the current filter
- * generation so tile loads only process new hexes.
- */
-export type FeatureStateTotalsSession = {
-  /** Features already written: `${sourceLayer}\\0${id}` */
-  written: Set<string>;
-};
+const createFeatureStateTotalsSession = (): FeatureStateTotalsSession => ({
+  written: new Set(),
+});
 
-export const createFeatureStateTotalsSession =
-  (): FeatureStateTotalsSession => ({
-    written: new Set(),
-  });
-
-export const featureStateSessionKey = (
+const featureStateSessionKey = (
   sourceLayer: string,
   id: string | number
 ): string => `${sourceLayer}\0${String(id)}`;
@@ -476,7 +483,7 @@ export const featureStateSessionKey = (
  * Falling back to a different type than promoteId leaves hexes stuck in
  * placeholder style while the session thinks they were written.
  */
-export const resolvePmtilesFeatureId = (feature: {
+const resolvePmtilesFeatureId = (feature: {
   id?: string | number | null;
   properties?: Record<string, unknown> | null;
 }): string | number | undefined => {
@@ -498,7 +505,7 @@ export const resolvePmtilesFeatureId = (feature: {
  * How many loaded hexes still need feature-state for this session.
  * Used to detect half-painted density (teal cells + empty outlined cells).
  */
-export const countUnwrittenLoadedFeatures = (
+const countUnwrittenLoadedFeatures = (
   map: Map,
   session: FeatureStateTotalsSession,
   layers: readonly PmtilesHexLayerDef[] = PMTILE_LAYERS
@@ -562,7 +569,7 @@ export type UpdateFeatureStateTotalsResult = {
  * Pass `layers` (e.g. from {@link getActivePmtilesLayers}) to skip bands
  * that are not visible at the current zoom.
  */
-export const updateFeatureStateTotals = (
+const updateFeatureStateTotals = (
   map: Map,
   filterStartDate?: Dayjs,
   filterEndDate?: Dayjs,
@@ -641,7 +648,7 @@ export const updateFeatureStateTotals = (
  * Schedule work after the browser is idle (or on the next macrotask).
  * Returns a cancel function so stale density updates can be dropped.
  */
-export const scheduleDeferredWork = (work: () => void): (() => void) => {
+const scheduleDeferredWork = (work: () => void): (() => void) => {
   let cancelled = false;
   const run = () => {
     if (!cancelled) work();
@@ -680,7 +687,7 @@ export const scheduleDeferredWork = (work: () => void): (() => void) => {
   };
 };
 
-export const scheduleDebouncedWork = (
+const scheduleDebouncedWork = (
   work: () => void,
   delayMs: number = FEATURE_STATE_DEBOUNCE_MS
 ): (() => void) => {
@@ -692,16 +699,6 @@ export const scheduleDebouncedWork = (
     cancelled = true;
     clearTimeout(timeoutId);
   };
-};
-
-/** Latest filter/visibility values read by hex click and hover handlers. */
-type PmtilesHexHoverCtx = {
-  filterStartDate?: Dayjs;
-  filterEndDate?: Dayjs;
-  countFilterRange?: CountFilterRange;
-  hasTime: boolean;
-  densityReady: boolean;
-  visible: boolean;
 };
 
 /**
@@ -1294,7 +1291,35 @@ export {
   DENSITY_COLOR_STOPS,
   DENSITY_OPACITY_STOPS,
   PMTILE_LAYERS,
+  PMTILES_TEST_LAYER_ID,
+  ZERO_COUNT_FILL_OPACITY,
+  ZERO_COUNT_OUTLINE_COLOR,
+  ZERO_COUNT_FILL_COLOR,
+  DENSITY_OUTLINE_COLOR,
+  PLACEHOLDER_OUTLINE_COLOR,
+  PLACEHOLDER_FILL_OPACITY,
+  PLACEHOLDER_FILL_COLOR,
   attachPmtilesHexInteraction,
+  addPmtilesSourceAndLayers,
+  buildPresenceFilter,
+  scheduleDebouncedWork,
+  scheduleDeferredWork,
+  updateFeatureStateTotals,
+  countUnwrittenLoadedFeatures,
+  resolvePmtilesFeatureId,
+  featureStateSessionKey,
+  createFeatureStateTotalsSession,
+  buildDensityInterpolateStops,
+  clearPmtilesFeatureState,
+  applyHexLayerStyle,
+  getFeatureStatePaintProperties,
+  getPlaceholderPaintProperties,
+  getActivePmtilesLayers,
+  buildDensityLayerFilter,
+  buildFeatureStateHasCountExpression,
+  buildFeatureStateTotalIsSetExpression,
+  buildFeatureStateTotalExpression,
+  buildPopupHtml,
 };
 
-export type { PmtilesHexHoverCtx };
+export type { PmtilesHexHoverCtx, FeatureStateTotalsSession };
