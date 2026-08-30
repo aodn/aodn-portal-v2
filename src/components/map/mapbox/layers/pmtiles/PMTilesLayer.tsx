@@ -708,7 +708,7 @@ type PmtilesHexHoverCtx = {
  * Click opens the count popup; hover only updates the pointer and outline.
  * Zoom and Mapbox Draw interaction clear the open popup.
  */
-export const attachPmtilesHexInteraction = (
+const attachPmtilesHexInteraction = (
   map: Map,
   hoverCtxRef: { current: PmtilesHexHoverCtx },
   popupRef: { current: Popup | null },
@@ -1294,6 +1294,7 @@ export {
   DENSITY_COLOR_STOPS,
   DENSITY_OPACITY_STOPS,
   PMTILE_LAYERS,
+  attachPmtilesHexInteraction,
 };
 
 export type { PmtilesHexHoverCtx };
