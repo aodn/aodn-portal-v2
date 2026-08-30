@@ -177,10 +177,7 @@ const getActivePmtilesLayers = (zoom: number): PmtilesHexLayerDef[] => {
  * Used on filter-window reset so inactive bands do not keep stale totals
  * (active band is overwritten in place to avoid a density flash).
  */
-export const clearInactivePmtilesFeatureState = (
-  map: Map,
-  zoom: number
-): void => {
+const clearInactivePmtilesFeatureState = (map: Map, zoom: number): void => {
   if (!map.getSource(SOURCE_ID)) return;
   const activeSourceLayers = new Set(
     getActivePmtilesLayers(zoom).map((layer) => layer.sourceLayer)
@@ -539,7 +536,7 @@ const countUnwrittenLoadedFeatures = (
   return unwritten;
 };
 
-export type UpdateFeatureStateTotalsOptions = {
+type UpdateFeatureStateTotalsOptions = {
   /** Precomputed range (required for hot path; built if omitted). */
   range?: CountFilterRange;
   /**
@@ -554,7 +551,7 @@ export type UpdateFeatureStateTotalsOptions = {
   layers?: readonly PmtilesHexLayerDef[];
 };
 
-export type UpdateFeatureStateTotalsResult = {
+type UpdateFeatureStateTotalsResult = {
   /** Features written in this call (not cumulative). */
   updated: number;
   /** Features seen in querySourceFeatures (including already-written). */
@@ -1291,13 +1288,9 @@ export {
   DENSITY_COLOR_STOPS,
   DENSITY_OPACITY_STOPS,
   PMTILE_LAYERS,
-  PMTILES_TEST_LAYER_ID,
   ZERO_COUNT_FILL_OPACITY,
   ZERO_COUNT_OUTLINE_COLOR,
   ZERO_COUNT_FILL_COLOR,
-  DENSITY_OUTLINE_COLOR,
-  PLACEHOLDER_OUTLINE_COLOR,
-  PLACEHOLDER_FILL_OPACITY,
   PLACEHOLDER_FILL_COLOR,
   attachPmtilesHexInteraction,
   addPmtilesSourceAndLayers,
@@ -1310,11 +1303,11 @@ export {
   featureStateSessionKey,
   createFeatureStateTotalsSession,
   buildDensityInterpolateStops,
-  clearPmtilesFeatureState,
   applyHexLayerStyle,
   getFeatureStatePaintProperties,
   getPlaceholderPaintProperties,
   getActivePmtilesLayers,
+  clearInactivePmtilesFeatureState,
   buildDensityLayerFilter,
   buildFeatureStateHasCountExpression,
   buildFeatureStateTotalIsSetExpression,
@@ -1322,4 +1315,4 @@ export {
   buildPopupHtml,
 };
 
-export type { PmtilesHexHoverCtx, FeatureStateTotalsSession };
+export type { PmtilesHexHoverCtx };
