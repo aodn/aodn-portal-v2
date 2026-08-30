@@ -28,14 +28,13 @@ import {
   addPmtilesSourceAndLayers,
   PMTILE_LAYERS,
   FEATURE_STATE_TOTAL,
-  DENSITY_TOTAL_CAP,
-  DENSITY_COLOR_STOPS,
-  DENSITY_OPACITY_STOPS,
   buildDensityInterpolateStops,
   PLACEHOLDER_FILL_COLOR,
   ZERO_COUNT_FILL_COLOR,
   ZERO_COUNT_FILL_OPACITY,
   ZERO_COUNT_OUTLINE_COLOR,
+  DENSITY_COLOR_STOPS,
+  DENSITY_OPACITY_STOPS,
 } from "../PMTilesLayer";
 import {
   COUNTS_PROPERTY,
@@ -62,6 +61,7 @@ import {
   buildPmtilesMetadataUrl,
   parquetKeyCandidates,
   probePmtilesMetadata,
+  DENSITY_TOTAL_CAP,
 } from "../Common";
 
 /** Test helper: parsePeriodInt that throws if parse fails. */
