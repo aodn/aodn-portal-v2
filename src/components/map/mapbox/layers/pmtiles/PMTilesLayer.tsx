@@ -52,48 +52,6 @@ import { TestHelper } from "@/components/common/test/helper";
 import { addDataLayer } from "@/components/map/mapbox/layerOrder";
 import { isMapDrawModeActive } from "@/utils/MapUtils";
 
-// Re-export pure helpers so existing imports from PMTilesLayer keep working
-// (e.g. MapPanel: metadataRangeToDayjs, PMTilesMetadata).
-export type {
-  CountFilterRange,
-  CountsTree,
-  PeriodInt,
-  SumSparseCountOptions,
-  SumSparseCountResult,
-  SumTreeResult,
-} from "./Common";
-export type { PMTilesMetadata, PMTilesMetadataRange } from "./Common";
-export {
-  COUNTS_PROPERTY,
-  DAYS_KEY,
-  DEFAULT_RANGE_START,
-  DENSITY_TOTAL_CAP,
-  TOTAL_KEY,
-  buildCountFilterRange,
-  buildCountFilterRangeFromPeriods,
-  clampPeriodsToMetadata,
-  clampRangeToMetadata,
-  clearCountsTreeCache,
-  coerceCountValue,
-  coercePeriodDigits,
-  dayjsToPeriodInt,
-  daysInMonth,
-  densityStopValue,
-  formatPeriodInt,
-  metadataRangeToDayjs,
-  parseCountsTree,
-  parsePMTilesMetadata,
-  parsePeriodInt,
-  periodNumberToDayjs,
-  probePmtilesMetadata,
-  parquetKeyCandidates,
-  buildPmtilesSourceUrl,
-  buildPmtilesMetadataUrl,
-  sumCountsTreeDensityTotal,
-  sumCountsTreeInRange,
-  sumSparseCountFromProperties,
-} from "./Common";
-
 const SOURCE_ID = "pmtiles-source-id";
 const HOVER_SOURCE_ID = "pmtiles-hover-source-id";
 const HOVER_OUTLINE_LAYER_ID = "pmtiles-hex-hover-outline";
@@ -735,6 +693,203 @@ export const scheduleDebouncedWork = (
     clearTimeout(timeoutId);
   };
 };
+
+/** Latest filter/visibility values read by hex click and hover handlers. */
+type PmtilesHexHoverCtx = {
+  filterStartDate?: Dayjs;
+  filterEndDate?: Dayjs;
+  countFilterRange?: CountFilterRange;
+  hasTime: boolean;
+  densityReady: boolean;
+  visible: boolean;
+};
+
+/**
+ * Click opens the count popup; hover only updates the pointer and outline.
+ * Zoom and Mapbox Draw interaction clear the open popup.
+ */
+export const attachPmtilesHexInteraction = (
+  map: Map,
+  hoverCtxRef: { current: PmtilesHexHoverCtx },
+  popupRef: { current: Popup | null },
+  removePopup: () => void
+): (() => void) => {
+  let hoveredId: string | number | undefined;
+  let selectedId: string | number | undefined;
+  let selectedGeometry: Geometry | undefined;
+
+  const setHoverOutline = (geometry?: Geometry) => {
+    const source = map.getSource<GeoJSONSource>(HOVER_SOURCE_ID);
+    source?.setData(
+      geometry
+        ? {
+            type: "FeatureCollection",
+            features: [{ type: "Feature", geometry, properties: {} }],
+          }
+        : EMPTY_FEATURE_COLLECTION
+    );
+  };
+
+  const restoreOutline = () => {
+    setHoverOutline(selectedGeometry);
+  };
+
+  const clearInteraction = () => {
+    map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
+    hoveredId = undefined;
+    selectedId = undefined;
+    selectedGeometry = undefined;
+    setHoverOutline(undefined);
+    removePopup();
+  };
+
+  const hexTotal = (
+    layer: (typeof PMTILE_LAYERS)[number],
+    e: MapMouseEvent
+  ): {
+    feature: NonNullable<MapMouseEvent["features"]>[number] | undefined;
+    total: number;
+  } => {
+    const ctx = hoverCtxRef.current;
+    if (!ctx.visible || !ctx.densityReady) {
+      return { feature: undefined, total: 0 };
+    }
+    const zoom = map.getZoom();
+    if (zoom < layer.minzoom || zoom >= layer.maxzoom) {
+      return { feature: undefined, total: 0 };
+    }
+    const feature = e.features?.[0];
+    if (!feature) {
+      return { feature: undefined, total: 0 };
+    }
+    const { total } = sumSparseCountFromProperties(
+      (feature.properties ?? {}) as Record<string, unknown>,
+      ctx.filterStartDate,
+      ctx.filterEndDate,
+      {
+        range: ctx.countFilterRange,
+        collectMatchedKeys: false,
+      }
+    );
+    return { feature, total };
+  };
+
+  const onHexHover = (
+    layer: (typeof PMTILE_LAYERS)[number],
+    e: MapMouseEvent
+  ) => {
+    if (isMapDrawModeActive(map)) {
+      clearInteraction();
+      return;
+    }
+
+    const { feature, total } = hexTotal(layer, e);
+    if (!feature || total <= 0) {
+      map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
+      hoveredId = undefined;
+      restoreOutline();
+      return;
+    }
+
+    map.getCanvas().classList.add(CURSOR_POINTER_CLASS);
+    if (feature.id === undefined || feature.id === hoveredId) return;
+    hoveredId = feature.id;
+    if (feature.id !== selectedId) {
+      setHoverOutline(feature.geometry);
+    }
+  };
+
+  const onHexClick = (
+    layer: (typeof PMTILE_LAYERS)[number],
+    e: MapMouseEvent
+  ) => {
+    if (isMapDrawModeActive(map)) {
+      clearInteraction();
+      return;
+    }
+
+    const { feature, total } = hexTotal(layer, e);
+    if (!feature || total <= 0) {
+      clearInteraction();
+      return;
+    }
+
+    const ctx = hoverCtxRef.current;
+    selectedId = feature.id;
+    selectedGeometry = feature.geometry;
+    setHoverOutline(feature.geometry);
+
+    if (!popupRef.current) {
+      popupRef.current = new Popup(MapDefaultConfig.DEFAULT_POPUP);
+    }
+    popupRef.current.setHTML(
+      buildPopupHtml(
+        feature.properties ?? {},
+        ctx.filterStartDate,
+        ctx.filterEndDate,
+        ctx.countFilterRange,
+        ctx.hasTime
+      )
+    );
+    popupRef.current.setLngLat(e.lngLat);
+    if (!popupRef.current.isOpen()) {
+      popupRef.current.addTo(map);
+    }
+
+    const popupElement = popupRef.current.getElement();
+    if (popupElement) {
+      popupElement.dataset.testid = playwrightTestIds.DETAIL_MAP_POPUP;
+    }
+  };
+
+  const onHexLeave = () => {
+    map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
+    hoveredId = undefined;
+    restoreOutline();
+  };
+
+  const onZoom = () => {
+    clearInteraction();
+  };
+
+  const onDrawInteractionChange = () => {
+    if (isMapDrawModeActive(map)) {
+      clearInteraction();
+    }
+  };
+
+  const layerHandlers = PMTILE_LAYERS.map((layer) => ({
+    layerId: layer.id,
+    onMouseMove: (e: MapMouseEvent) => onHexHover(layer, e),
+    onClick: (e: MapMouseEvent) => onHexClick(layer, e),
+  }));
+
+  layerHandlers.forEach(({ layerId, onMouseMove, onClick }) => {
+    map.on("mousemove", layerId, onMouseMove);
+    map.on("mouseleave", layerId, onHexLeave);
+    map.on("click", layerId, onClick);
+  });
+  map.on("zoom", onZoom);
+  map.on("draw.modechange", onDrawInteractionChange);
+  map.on("draw.selectionchange", onDrawInteractionChange);
+
+  return () => {
+    layerHandlers.forEach(({ layerId, onMouseMove, onClick }) => {
+      map.off("mousemove", layerId, onMouseMove);
+      map.off("mouseleave", layerId, onHexLeave);
+      map.off("click", layerId, onClick);
+    });
+    map.off("zoom", onZoom);
+    map.off("draw.modechange", onDrawInteractionChange);
+    map.off("draw.selectionchange", onDrawInteractionChange);
+    try {
+      clearInteraction();
+    } catch {
+      // Map may already be torn down
+    }
+  };
+};
+
 const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   collection,
   layerConfig,
@@ -1077,183 +1232,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   // Click popup + hover outline
   useEffect(() => {
     if (!map) return;
-
-    let hoveredId: string | number | undefined;
-    let selectedId: string | number | undefined;
-    let selectedGeometry: Geometry | undefined;
-
-    const setHoverOutline = (geometry?: Geometry) => {
-      const source = map.getSource<GeoJSONSource>(HOVER_SOURCE_ID);
-      source?.setData(
-        geometry
-          ? {
-              type: "FeatureCollection",
-              features: [{ type: "Feature", geometry, properties: {} }],
-            }
-          : EMPTY_FEATURE_COLLECTION
-      );
-    };
-
-    const restoreOutline = () => {
-      setHoverOutline(selectedGeometry);
-    };
-
-    const clearInteraction = () => {
-      map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
-      hoveredId = undefined;
-      selectedId = undefined;
-      selectedGeometry = undefined;
-      setHoverOutline(undefined);
-      removePopup();
-    };
-
-    const hexTotal = (
-      layer: (typeof PMTILE_LAYERS)[number],
-      e: MapMouseEvent
-    ): {
-      feature: NonNullable<MapMouseEvent["features"]>[number] | undefined;
-      total: number;
-    } => {
-      const ctx = hoverCtxRef.current;
-      if (!ctx.visible || !ctx.densityReady) {
-        return { feature: undefined, total: 0 };
-      }
-      const zoom = map.getZoom();
-      if (zoom < layer.minzoom || zoom >= layer.maxzoom) {
-        return { feature: undefined, total: 0 };
-      }
-      const feature = e.features?.[0];
-      if (!feature) {
-        return { feature: undefined, total: 0 };
-      }
-      const { total } = sumSparseCountFromProperties(
-        (feature.properties ?? {}) as Record<string, unknown>,
-        ctx.filterStartDate,
-        ctx.filterEndDate,
-        {
-          range: ctx.countFilterRange,
-          collectMatchedKeys: false,
-        }
-      );
-      return { feature, total };
-    };
-
-    const onHexHover = (
-      layer: (typeof PMTILE_LAYERS)[number],
-      e: MapMouseEvent
-    ) => {
-      if (isMapDrawModeActive(map)) {
-        clearInteraction();
-        return;
-      }
-
-      const { feature, total } = hexTotal(layer, e);
-      if (!feature || total <= 0) {
-        map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
-        hoveredId = undefined;
-        restoreOutline();
-        return;
-      }
-
-      map.getCanvas().classList.add(CURSOR_POINTER_CLASS);
-      if (feature.id === undefined || feature.id === hoveredId) return;
-      hoveredId = feature.id;
-      if (feature.id !== selectedId) {
-        setHoverOutline(feature.geometry);
-      }
-    };
-
-    const onHexClick = (
-      layer: (typeof PMTILE_LAYERS)[number],
-      e: MapMouseEvent
-    ) => {
-      // While drawing bbox/polygon, skip popup/outline so draw clicks win
-      if (isMapDrawModeActive(map)) {
-        clearInteraction();
-        return;
-      }
-
-      const { feature, total } = hexTotal(layer, e);
-      if (!feature || total <= 0) {
-        clearInteraction();
-        return;
-      }
-
-      const ctx = hoverCtxRef.current;
-      selectedId = feature.id;
-      selectedGeometry = feature.geometry;
-      setHoverOutline(feature.geometry);
-
-      if (!popupRef.current) {
-        popupRef.current = new Popup(MapDefaultConfig.DEFAULT_POPUP);
-      }
-      popupRef.current.setHTML(
-        buildPopupHtml(
-          feature.properties ?? {},
-          ctx.filterStartDate,
-          ctx.filterEndDate,
-          ctx.countFilterRange,
-          ctx.hasTime
-        )
-      );
-      popupRef.current.setLngLat(e.lngLat);
-      if (!popupRef.current.isOpen()) {
-        popupRef.current.addTo(map);
-      }
-
-      const popupElement = popupRef.current.getElement();
-      if (popupElement) {
-        popupElement.dataset.testid = playwrightTestIds.DETAIL_MAP_POPUP;
-      }
-    };
-
-    const onHexLeave = () => {
-      map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
-      hoveredId = undefined;
-      restoreOutline();
-    };
-
-    const onZoom = () => {
-      clearInteraction();
-    };
-
-    // Drop open popup when drawing/editing starts or a feature is selected.
-    const onDrawInteractionChange = () => {
-      if (isMapDrawModeActive(map)) {
-        clearInteraction();
-      }
-    };
-
-    const layerHandlers = PMTILE_LAYERS.map((layer) => ({
-      layerId: layer.id,
-      onMouseMove: (e: MapMouseEvent) => onHexHover(layer, e),
-      onClick: (e: MapMouseEvent) => onHexClick(layer, e),
-    }));
-
-    layerHandlers.forEach(({ layerId, onMouseMove, onClick }) => {
-      map.on("mousemove", layerId, onMouseMove);
-      map.on("mouseleave", layerId, onHexLeave);
-      map.on("click", layerId, onClick);
-    });
-    map.on("zoom", onZoom);
-    map.on("draw.modechange", onDrawInteractionChange);
-    map.on("draw.selectionchange", onDrawInteractionChange);
-
-    return () => {
-      layerHandlers.forEach(({ layerId, onMouseMove, onClick }) => {
-        map.off("mousemove", layerId, onMouseMove);
-        map.off("mouseleave", layerId, onHexLeave);
-        map.off("click", layerId, onClick);
-      });
-      map.off("zoom", onZoom);
-      map.off("draw.modechange", onDrawInteractionChange);
-      map.off("draw.selectionchange", onDrawInteractionChange);
-      try {
-        clearInteraction();
-      } catch {
-        // Map may already be torn down
-      }
-    };
+    return attachPmtilesHexInteraction(map, hoverCtxRef, popupRef, removePopup);
   }, [map, removePopup]);
 
   // Visibility
@@ -1316,3 +1295,5 @@ export {
   DENSITY_OPACITY_STOPS,
   PMTILE_LAYERS,
 };
+
+export type { PmtilesHexHoverCtx };
