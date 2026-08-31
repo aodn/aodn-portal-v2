@@ -23,6 +23,7 @@ export interface DetailPageContextType {
     conditions: IDownloadCondition[]
   ) => IDownloadCondition[];
   removeDownloadCondition: (condition: IDownloadCondition) => void;
+  clearDownloadConditions: (types: DownloadConditionType[]) => void;
   selectedWmsLayer: string;
   setSelectedWmsLayer: Dispatch<SetStateAction<string>>;
   selectedCoKey: string;
@@ -49,6 +50,7 @@ const DetailPageContextDefault: DetailPageContextType = {
   downloadConditions: [],
   getAndSetDownloadConditions: () => [],
   removeDownloadCondition: () => {},
+  clearDownloadConditions: () => {},
   selectedWmsLayer: "",
   setSelectedWmsLayer: () => {},
   selectedCoKey: "",

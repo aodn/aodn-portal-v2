@@ -3,15 +3,20 @@ import {
   getFormatFrom,
   getMultiPolygonFrom,
   getKeyFrom,
+  hasResettableDownloadConditions,
+  resetDownloadConditions,
 } from "../DownloadConditionUtils";
 import {
   BBoxCondition,
   DateRangeCondition,
+  DownloadConditionType,
   FormatCondition,
   KeyCondition,
+  PolygonCondition,
   IDownloadCondition,
 } from "../../pages/detail-page/context/DownloadDefinitions";
 import { MultiPolygon } from "geojson";
+import { vi } from "vitest";
 
 describe("DownloadConditionUtils", () => {
   describe("getDateConditionFrom", () => {
@@ -136,6 +141,95 @@ describe("DownloadConditionUtils", () => {
       ];
       const result = getKeyFrom(conditions);
       expect(result).toBe("dataset1.zarr,dataset2.parquet");
+    });
+  });
+
+  describe("resetDownloadConditions", () => {
+    // This is the actual logic behind the map's "Reset Selections" button
+    // (MapPanel.handleResetSelections) — it must clear bbox, polygon, and
+    // date range together, in one call, while leaving format/key untouched.
+    it("clears bbox, polygon, and date range together, leaves format/key alone", () => {
+      const bboxRemove = vi.fn();
+      const polygonRemove = vi.fn();
+      const dateRangeRemove = vi.fn();
+      const formatRemove = vi.fn();
+      const keyRemove = vi.fn();
+
+      const conditions: IDownloadCondition[] = [
+        new BBoxCondition("bbox1", [100, -40, 150, -10], bboxRemove),
+        new PolygonCondition(
+          "polygon1",
+          [
+            [100, -40],
+            [101, -40],
+            [101, -39],
+          ],
+          polygonRemove
+        ),
+        new DateRangeCondition(
+          "date1",
+          "2024-01-01",
+          "2024-12-31",
+          dateRangeRemove
+        ),
+        new FormatCondition("format1", "csv", formatRemove),
+        new KeyCondition("key1", "dataset1.zarr", keyRemove),
+      ];
+
+      const clearDownloadConditions = vi.fn();
+      resetDownloadConditions(conditions, clearDownloadConditions);
+
+      expect(bboxRemove).toHaveBeenCalledTimes(1);
+      expect(polygonRemove).toHaveBeenCalledTimes(1);
+      expect(dateRangeRemove).toHaveBeenCalledTimes(1);
+      expect(formatRemove).not.toHaveBeenCalled();
+      expect(keyRemove).not.toHaveBeenCalled();
+
+      expect(clearDownloadConditions).toHaveBeenCalledTimes(1);
+      expect(clearDownloadConditions).toHaveBeenCalledWith([
+        DownloadConditionType.BBOX,
+        DownloadConditionType.POLYGON,
+        DownloadConditionType.DATE_RANGE,
+      ]);
+    });
+
+    it("does nothing when there is nothing resettable", () => {
+      const conditions: IDownloadCondition[] = [
+        new FormatCondition("format1", "csv"),
+        new KeyCondition("key1", "dataset1.zarr"),
+      ];
+
+      const clearDownloadConditions = vi.fn();
+      resetDownloadConditions(conditions, clearDownloadConditions);
+
+      expect(clearDownloadConditions).toHaveBeenCalledWith([
+        DownloadConditionType.BBOX,
+        DownloadConditionType.POLYGON,
+        DownloadConditionType.DATE_RANGE,
+      ]);
+    });
+  });
+
+  describe("hasResettableDownloadConditions", () => {
+    it("is true when any of bbox/polygon/date range is present", () => {
+      expect(
+        hasResettableDownloadConditions([
+          new DateRangeCondition("date1", "2024-01-01", "2024-12-31"),
+        ])
+      ).toBe(true);
+    });
+
+    it("is false when only format/key are present", () => {
+      expect(
+        hasResettableDownloadConditions([
+          new FormatCondition("format1", "csv"),
+          new KeyCondition("key1", "dataset1.zarr"),
+        ])
+      ).toBe(false);
+    });
+
+    it("is false for an empty list", () => {
+      expect(hasResettableDownloadConditions([])).toBe(false);
     });
   });
 });

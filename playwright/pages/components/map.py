@@ -49,7 +49,7 @@ class Map(BasePage):
         self.draw_rect_menu_button = page.get_by_test_id(
             'draw-rect-menu-button'
         )
-        self.delete_button = self.get_button('Delete')
+        self.reset_selections_button = self.get_button('Reset Selections')
         self.date_slider = page.get_by_test_id(
             'dateslider-daterange-menu-button'
         )

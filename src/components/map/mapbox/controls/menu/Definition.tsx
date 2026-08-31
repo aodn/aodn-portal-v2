@@ -44,6 +44,9 @@ export interface MenuControlType {
   sx?: SxProps<Theme>;
   visible?: boolean;
   className?: string;
+  // When used as a MenuControlGroup child, opt out of being folded into the
+  // group's shared box — see MenuControlGroup.tsx.
+  standalone?: boolean;
 }
 
 export interface MenuClickedEvent {

@@ -64,6 +64,14 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
       {containerNode &&
         Children.toArray(children).map((child, index) => {
           if (isValidElement(child)) {
+            // A `standalone` child (e.g. ResetSelections) mounts in the same
+            // commit batch as the rest of the group — so it reliably lands
+            // after the group in the map's control corner — but keeps its
+            // own styling/positioning instead of being folded into the
+            // shared box (no parentRef re-parenting, no childStyles).
+            if ((child.props as { standalone?: boolean }).standalone) {
+              return cloneElement<any>(child, { key: child.key || index });
+            }
             return cloneElement<any>(child, {
               key: child.key || index,
               className: className,

@@ -47,6 +47,7 @@ import MenuControlGroup from "../map/mapbox/controls/menu/MenuControlGroup";
 import BaseMapSwitcher from "../map/mapbox/controls/menu/BaseMapSwitcher";
 import MenuControl from "../map/mapbox/controls/menu/MenuControl";
 import DrawRect from "../map/mapbox/controls/menu/DrawRect";
+import ResetSelections from "../map/mapbox/controls/menu/ResetSelections";
 import {
   cssFontFamilyToMapboxTextFont,
   fitToBound,
@@ -471,6 +472,11 @@ const LocationFilter: FC<LocationFilterProps> = () => {
     [dispatch]
   );
 
+  const handleClearDrawFeatures = useCallback(() => {
+    setDrawFeatures([]);
+    dispatch(updateFilterPolygon(undefined));
+  }, [dispatch]);
+
   const staticAreaHighlightCollection = useMemo(():
     | FeatureCollection<Polygon | MultiPolygon>
     | undefined => {
@@ -713,6 +719,17 @@ const LocationFilter: FC<LocationFilterProps> = () => {
                       <DrawRect
                         features={drawFeatures}
                         onChangeFeatures={handleFeaturesChange}
+                      />
+                    }
+                  />
+                  <MenuControl
+                    standalone
+                    sx={{ backgroundColor: "transparent", boxShadow: "none" }}
+                    menu={
+                      <ResetSelections
+                        disabled={drawFeatures.length === 0}
+                        onReset={handleClearDrawFeatures}
+                        hint="Reset Area Selection"
                       />
                     }
                   />

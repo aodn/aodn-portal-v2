@@ -19,6 +19,7 @@ import { LngLatBounds, MapEvent } from "mapbox-gl";
 import BaseMapSwitcher from "../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
 import MenuControl from "../../../components/map/mapbox/controls/menu/MenuControl";
 import DateRange from "../../../components/map/mapbox/controls/menu/DateRange";
+import ResetSelections from "../../../components/map/mapbox/controls/menu/ResetSelections";
 import dayjs, { Dayjs } from "@/utils/DayjsUtils";
 import {
   BBoxCondition,
@@ -29,6 +30,10 @@ import {
   SubsettingType,
 } from "../context/DownloadDefinitions";
 import { isValidPolygonFeature } from "@/utils/GeoJsonUtils";
+import {
+  hasResettableDownloadConditions,
+  resetDownloadConditions,
+} from "@/utils/DownloadConditionUtils";
 import { dateDefault } from "@/components/common/constants";
 import { Feature, MultiPolygon, Polygon } from "geojson";
 import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
@@ -164,6 +169,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     collection,
     downloadConditions,
     getAndSetDownloadConditions,
+    clearDownloadConditions,
     lastSelectedMapLayer,
     setLastSelectedMapLayer,
     selectedWmsLayer,
@@ -596,6 +602,15 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     [getAndSetDownloadConditions]
   );
 
+  const hasResettableSelections = useMemo(
+    () => hasResettableDownloadConditions(downloadConditions),
+    [downloadConditions]
+  );
+
+  const handleResetSelections = useCallback(() => {
+    resetDownloadConditions(downloadConditions, clearDownloadConditions);
+  }, [downloadConditions, clearDownloadConditions]);
+
   if (!collection) return null;
 
   return (
@@ -690,6 +705,24 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
                     <DrawRect
                       onChangeFeatures={handleFeaturesChange}
                       features={drawFeatures}
+                    />
+                  }
+                />
+                <MenuControl
+                  standalone
+                  visible={
+                    isSubsettingSupported(SubsettingType.TimeSlider) ||
+                    isSubsettingSupported(SubsettingType.DrawRect)
+                  }
+                  sx={{
+                    backgroundColor: "transparent",
+                    boxShadow: "none",
+                    paddingTop: "2px",
+                  }}
+                  menu={
+                    <ResetSelections
+                      disabled={!hasResettableSelections}
+                      onReset={handleResetSelections}
                     />
                   }
                 />

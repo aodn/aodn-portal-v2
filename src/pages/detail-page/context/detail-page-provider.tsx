@@ -79,6 +79,14 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
     []
   );
 
+  const clearDownloadConditions = useCallback(
+    (types: DownloadConditionType[]) =>
+      _setDownloadConditions((prev) =>
+        prev.filter((c) => !types.includes(c.type))
+      ),
+    []
+  );
+
   useEffect(() => {
     if (!uuid) return;
     let cancelled = false;
@@ -139,6 +147,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         downloadConditions,
         getAndSetDownloadConditions,
         removeDownloadCondition,
+        clearDownloadConditions,
         selectedWmsLayer,
         setSelectedWmsLayer,
         selectedCoKey,
