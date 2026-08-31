@@ -1,21 +1,12 @@
-import {
-  Dispatch,
-  FC,
-  SetStateAction,
-  startTransition,
-  useEffect,
-  useState,
-} from "react";
+import { FC, startTransition, useEffect, useState } from "react";
 import { Box, SxProps } from "@mui/material";
-import { Vocab } from "@/app/store/componentParamReducer";
 import { useAppSelector } from "@/app/store/hooks";
 import TabsPanelContainer, { Tab } from "../common/tab/TabsPanelContainer";
 import ThemeFilter from "./tab-filters/ThemeFilter";
 import PlatformFilter from "./tab-filters/PlatformFilter";
 import OrganisationFilter from "./tab-filters/OrganisationFilter";
 import DataSettingsFilter from "./tab-filters/DataSettingsFilter";
-import { DatasetFrequency, DatasetStatus } from "@/app/store/searchReducer";
-import { IndexDataType } from "./FilterDefinition";
+import { FilterValues, IndexDataType } from "./FilterDefinition";
 import { portalTheme } from "../../styles";
 
 enum FiltersTabs {
@@ -25,31 +16,13 @@ enum FiltersTabs {
   DataSettings = "data-settings",
 }
 
-// The type of each item in Filters should consistent with ParameterState
-// TODO: For now all the button groups below are multi selection, need to keep consistent with ogcapi
-interface Filters {
-  parameterVocabs?: Array<Vocab>;
-  platform?: Array<string>;
-  organisation?: Array<string>;
-  dataDeliveryFrequency?: Array<DatasetFrequency> | undefined;
-  dataDeliveryMode?: Array<string>;
-  dataStatus?: Array<DatasetStatus> | undefined;
-  dataIndexedType?: Array<IndexDataType>;
-  excludeDocument?: Array<string>;
-  dataService?: Array<string>;
-}
-
-export interface TabFilterType {
-  filters: Filters;
-  setFilters: Dispatch<SetStateAction<Filters>>;
-}
 interface FiltersProps {
   sx?: SxProps;
 }
 
 const TAB_MAX_HEIGHT = 300;
 
-const checkBadge = (filters: Filters, tabName: FiltersTabs): boolean => {
+const checkBadge = (filters: FilterValues, tabName: FiltersTabs): boolean => {
   switch (tabName) {
     case FiltersTabs.Parameters:
       return !!filters.parameterVocabs?.length;
@@ -86,7 +59,7 @@ const FiltersFC: FC<FiltersProps> = ({ sx }) => {
     datasetStatus,
   } = useAppSelector((state) => state.paramReducer);
 
-  const [filters, setFilters] = useState<Filters>({});
+  const [filters, setFilters] = useState<FilterValues>({});
   // Do not use useMemo here due to change in filters items not filters
   const TABS: Tab[] = [
     {

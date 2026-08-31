@@ -3,10 +3,12 @@ import {
   processWFSDownload,
   processWFSEstimateSize,
   fetchGriddedTileProducts,
+  processDatasetDownload,
   ogcAxiosWithRetry,
 } from "../searchReducer";
 import {
   WFSDownloadRequest,
+  DatasetDownloadRequest,
   DateRangeCondition,
   FormatCondition,
 } from "@/pages/detail-page/context/DownloadDefinitions";
@@ -15,6 +17,47 @@ import { configureStore } from "@reduxjs/toolkit";
 describe("searchReducer async thunks", () => {
   afterEach(() => {
     vi.restoreAllMocks();
+  });
+
+  it("processDatasetDownload preserves the request and returns jobID", async () => {
+    const request: DatasetDownloadRequest = {
+      inputs: {
+        uuid: "collection-id",
+        key: "dataset.zarr",
+        recipient: "user@example.com",
+        start_date: "2026-01-01",
+        end_date: "2026-01-31",
+        multi_polygon: "non-specified",
+        output_format: "netcdf",
+        collection_title: "Collection title",
+        full_metadata_link: "https://example.com/details/collection-id",
+        suggested_citation: "Citation",
+        estimated_size_bytes: 987654,
+      },
+      outputs: {},
+      subscriber: {
+        successUri: "place_holder",
+        inProgressUri: "place_holder",
+        failedUri: "place_holder",
+      },
+    };
+    const response = {
+      message: { message: "Job submitted" },
+      status: { message: "200" },
+      jobID: "123e4567-e89b-12d3-a456-426614174000",
+    };
+    const spy = vi
+      .spyOn(ogcAxiosWithRetry, "post")
+      .mockResolvedValue({ data: response } as any);
+    const store = configureStore({ reducer: (state = {}) => state });
+
+    const result = await store.dispatch(processDatasetDownload(request) as any);
+
+    expect(spy).toHaveBeenCalledWith(
+      "/ogc/processes/download/execution",
+      request
+    );
+    expect(result.payload).toEqual(response);
   });
 
   it("processWFSDownload sends correct request body", async () => {
@@ -42,8 +85,8 @@ describe("searchReducer async thunks", () => {
       expect.objectContaining({
         inputs: {
           uuid: "test-uuid",
-          start_date: "2020-01-01",
-          end_date: "2020-01-02",
+          start_date: "2020-01-01T00:00:00Z",
+          end_date: "2020-01-02T23:59:59Z",
           multi_polygon: "non-specified",
           layer_name: "test-layer",
           output_format: "CSV",
@@ -88,8 +131,8 @@ describe("searchReducer async thunks", () => {
         inputs: {
           uuid: "test-uuid",
           layer_name: "test-layer",
-          start_date: "2020-01-01",
-          end_date: "2020-01-02",
+          start_date: "2020-01-01T00:00:00Z",
+          end_date: "2020-01-02T23:59:59Z",
           output_format: "CSV",
           multi_polygon: "non-specified",
         },

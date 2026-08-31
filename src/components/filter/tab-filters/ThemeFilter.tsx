@@ -8,7 +8,7 @@ import { useAppDispatch } from "@/app/store/hooks";
 import { fetchParameterVocabsWithStore } from "@/app/store/searchReducer";
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
 import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
-import { TabFilterType } from "../Filters";
+import { TabFilterType } from "../FilterDefinition";
 import { portalTheme } from "../../../styles";
 
 interface ThemeFilterProps extends TabFilterType {

@@ -4,3 +4,5 @@
 # blocked page can never be de-indexed because Google can't fetch the noindex tag.
 User-agent: *
 Allow: /
+# Internal storage for the crawler pages served at /details/<uuid>
+Disallow: /prerender/

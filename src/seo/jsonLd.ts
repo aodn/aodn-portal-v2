@@ -18,17 +18,17 @@ export const buildJsonLd = (
   description: collection.description?.slice(0, 5000),
   url: detailsUrl(collection.id),
   identifier: collection.id,
-  // TODO both stay undefined until ogcapi-java allows creation,revision in the
-  // properties filter — then add them to SEO_PROPERTIES (fetchCollections.ts)
-  datePublished: collection.properties?.creation?.slice(0, 10),
-  dateModified: collection.properties?.revision?.slice(0, 10),
+  // date only: the metadata timestamps carry no timezone
+  datePublished: collection.getCreation()?.slice(0, 10),
+  dateModified: collection.getRevision()?.slice(0, 10),
   keywords: toKeywords(collection.getThemes()),
-  // providers is on the API payload but not modelled on OGCCollection
-  creator: toCreators(
-    (collection as { providers?: { name?: string }[] }).providers
-  ),
+  // TODO IMOS records only; every record has one in contacts, which the bulk
+  // endpoint does not return
+  creator: toCreator(collection.getDatasetProvider()),
   spatialCoverage: toSpatialCoverage(collection.getBBox()),
   temporalCoverage: toTemporalCoverage(collection.extent?.temporal?.interval),
+  license: collection.getLicense(),
+  citation: collection.getCitation()?.suggestedCitation,
 });
 
 // schema.org GeoShape box is "south west north east"; OGC bbox is [west, south, east, north]
@@ -51,6 +51,9 @@ const toTemporalCoverage = (
   return `${interval[0] ?? ".."}/${interval[1] ?? ".."}`;
 };
 
+const toCreator = (organisation?: string): Dataset["creator"] =>
+  organisation ? { "@type": "Organization", name: organisation } : undefined;
+
 const toKeywords = (
   themes?: { concepts: { id: string }[] }[]
 ): Dataset["keywords"] => {
@@ -58,14 +61,4 @@ const toKeywords = (
     .flatMap((theme) => theme.concepts?.map((concept) => concept.id) ?? [])
     .filter(Boolean);
   return keywords.length ? keywords : undefined;
-};
-
-const toCreators = (providers?: { name?: string }[]): Dataset["creator"] => {
-  const names = (providers ?? [])
-    .map((provider) => provider.name)
-    .filter(Boolean);
-  const unique = [...new Set(names)];
-  return unique.length
-    ? unique.map((name) => ({ "@type": "Organization", name }))
-    : undefined;
 };

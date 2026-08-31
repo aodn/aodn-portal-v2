@@ -1,4 +1,5 @@
 const js = require("@eslint/js");
+const { globalIgnores } = require("eslint/config");
 const tseslint = require("@typescript-eslint/eslint-plugin");
 const tsParser = require("@typescript-eslint/parser");
 const react = require("eslint-plugin-react");
@@ -9,7 +10,13 @@ const prettier = require("eslint-plugin-prettier");
 const prettierConfig = require("eslint-config-prettier");
 
 module.exports = [
-  { ignores: ["playwright/.venv/**"] },
+  globalIgnores([
+    "dist/**",
+    "coverage/**",
+    "html-reports/**",
+    "playwright/.venv/**",
+    "playwright/pages/js_scripts/**",
+  ]),
 
   js.configs.recommended,
 
@@ -60,15 +67,51 @@ module.exports = [
       ...prettierConfig.rules,
 
       "react/react-in-jsx-scope": "off",
-      "no-unused-vars": "off",
+      "no-unused-vars": "off", // replaced by the TS version below
       "@typescript-eslint/no-empty-interface": "off",
       "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-expressions": "off",
       "@typescript-eslint/no-empty-object-type": "off",
-      "no-undef": "off",
+      "no-undef": "off", // tsc already checks this
+
+      // console.log is debug noise; real problems should use warn/error
+      "no-console": ["error", { allow: ["warn", "error"] }],
 
       quotes: ["error", "double", { avoidEscape: true }],
+
+      // dayjs() is host-local; app dates must use the configured timezone.
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "CallExpression[callee.name='dayjs']",
+          message:
+            "Do not call dayjs(). Use dayjs.tz(...) or toAppDayjs() (dayjs.utc(...) only for protocol UTC).",
+        },
+      ],
+
+      // Enforce the configured Day.js wrapper.
+      "no-restricted-imports": "off", // replaced by the TS version below
+      "@typescript-eslint/no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "dayjs",
+              message:
+                'Import dayjs from "@/utils/DayjsUtils" instead, so the shared plugins are always applied.',
+              allowTypeImports: true,
+            },
+          ],
+          patterns: [
+            {
+              group: ["dayjs/plugin/*"],
+              message:
+                "Import dayjs plugins only inside src/utils/DayjsUtils.ts.",
+            },
+          ],
+        },
+      ],
 
       "import/extensions": [
         "error",
@@ -81,6 +124,43 @@ module.exports = [
           json: "always",
         },
       ],
+    },
+  },
+
+  // seo/ = CLI scripts, console output is their UI
+  {
+    files: ["src/seo/**"],
+    rules: {
+      "no-console": "off",
+    },
+  },
+
+  // tests and mocks don't ship to users
+  {
+    files: [
+      "**/__test__/**",
+      "**/__mocks__/**",
+      "**/*.test.{ts,tsx}",
+      "src/setupTests.ts",
+    ],
+    rules: {
+      "no-console": "off",
+    },
+  },
+
+  // The wrapper itself is the one place that must import the real dayjs.
+  {
+    files: ["src/utils/DayjsUtils.ts"],
+    rules: {
+      "@typescript-eslint/no-restricted-imports": "off",
+    },
+  },
+
+  // Its test exercises the bare dayjs() parsing API the wrapper re-exports.
+  {
+    files: ["src/utils/__test__/DayjsUtils.test.ts"],
+    rules: {
+      "no-restricted-syntax": "off",
     },
   },
 ];

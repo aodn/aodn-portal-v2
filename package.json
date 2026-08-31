@@ -10,6 +10,7 @@
     "staging": "bash generateEnv.sh staging && tsc && vitest run && vite build --mode staging",
     "prod": "bash generateEnv.sh prod && tsc && vitest run && vite build --mode prod",
     "build": "tsc && vite build",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.node.json --noEmit",
     "seo:artifacts": "vite-node src/seo/buildSeoArtifacts.ts",
     "seo:gsc": "tsx src/seo/searchConsole.ts",
     "seo:verify": "tsx src/seo/verifySeoArtifacts.ts",
@@ -19,8 +20,8 @@
     "test": "vitest",
     "test:debug": "vitest --run --reporter=verbose --watch=false",
     "playwright": "docker compose -f playwright/docker-compose.yml up --abort-on-container-exit --exit-code-from tests",
-    "playwright-local": "bash generateEnv.sh dev && vitest run && vite --mode playwright-local --host 0.0.0.0",
-    "playwright:no-vitest": "bash generateEnv.sh dev && vite --mode playwright-local --host 0.0.0.0",
+    "playwright-local": "vitest run && vite --mode playwright-local --host 0.0.0.0",
+    "playwright:no-vitest": "vite --mode playwright-local --host 0.0.0.0",
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
@@ -41,7 +42,7 @@
     "@turf/turf": "7.0.0",
     "axios": "1.15.2",
     "axios-retry": "4.5.0",
-    "dayjs": "1.11.13",
+    "dayjs": "1.11.23",
     "dompurify": "3.4.0",
     "events": "3.3.0",
     "geojson": "0.5.0",
@@ -71,8 +72,8 @@
     "@emotion/react": "11.14.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.5.0",
-    "@testing-library/react": "^14.3.1",
-    "@testing-library/user-event": "^14.5.2",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.5",
     "@types/dompurify": "^3.2.0",
     "@types/gtag.js": "^0.0.20",
     "@types/he": "^1",
@@ -115,7 +116,7 @@
     "typescript": "^5.4.2",
     "vite": "^7.3.5",
     "vite-node": "3.2.4",
-    "vite-plugin-eslint": "^1.8.1",
+    "vite-plugin-eslint2": "^5.3.0",
     "vitest": "^3.2.6"
   },
   "lint-staged": {

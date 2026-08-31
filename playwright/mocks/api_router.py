@@ -193,6 +193,14 @@ class ApiRouter:
     ) -> None:
         self.unroute(Routes.DOWNLOAD_DIALOG, handler_function)
 
+    def route_download_status(self, handler_function: Callable) -> None:
+        self.route(Routes.DOWNLOAD_STATUS, handler_function)
+
+    def unroute_download_status(
+        self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.DOWNLOAD_STATUS, handler_function)
+
     def route_download_wfs(self, handler_function: Callable) -> None:
         self.route(Routes.DOWNLOAD_WFS, handler_function)
 
@@ -224,6 +232,14 @@ class ApiRouter:
         self, handler_function: Optional[Callable] = None
     ) -> None:
         self.unroute(Routes.PMTILES_METADATA, handler_function)
+
+    def route_manage_info(self, handler_function: Callable) -> None:
+        self.route(Routes.MANAGE_INFO, handler_function)
+
+    def unroute_manage_info(
+        self, handler_function: Optional[Callable] = None
+    ) -> None:
+        self.unroute(Routes.MANAGE_INFO, handler_function)
 
     def route_static_geojson(self, handler_function: Callable) -> None:
         self.route(Routes.STATIC_GEOJSON, handler_function)

@@ -16,7 +16,7 @@ from pages.detail_page import DetailPage
             'Integrated Marine Observing System (IMOS)',
             '1fba3a57-35f4-461b-8a0e-551af229714e',
             'https://metadata.imas.utas.edu.au/geonetwork/srv/eng/catalog.search',
-            'CREATION: Thu Jul 09 2020 15:40:31 GMT+0000',
+            'CREATION: Thu 09 Jul 2020 15:40:31 GMT+0000',
         ),
     ],
 )
@@ -97,7 +97,7 @@ def test_additional_information_sections_in_desktop(
             'Integrated Marine Observing System (IMOS)',
             '1fba3a57-35f4-461b-8a0e-551af229714e',
             'https://metadata.imas.utas.edu.au/geonetwork/srv/eng/catalog.search',
-            'CREATION: Thu Jul 09 2020 15:40:31 GMT+0000',
+            'CREATION: Thu 09 Jul 2020 15:40:31 GMT+0000',
         ),
     ],
 )

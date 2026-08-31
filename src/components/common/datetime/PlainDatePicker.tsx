@@ -1,5 +1,6 @@
 import { styled } from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers";
+import { DatePicker, DatePickerProps } from "@mui/x-date-pickers";
+import { Dayjs, getAppTimezone } from "@/utils/DayjsUtils";
 import {
   border,
   borderRadius,
@@ -9,9 +10,9 @@ import {
   fontSize,
   fontWeight,
   padding,
-} from "../../../styles/constants";
+} from "@/styles/constants";
 
-const PlainDatePicker = styled(DatePicker)(() => ({
+const StyledDatePicker = styled(DatePicker<Dayjs>)(() => ({
   border: `${border.sm} ${color.blue.darkSemiTransparent}`,
   borderRadius: borderRadius.small,
   backgroundColor: "#fff",
@@ -34,5 +35,9 @@ const PlainDatePicker = styled(DatePicker)(() => ({
     margin: 0,
   },
 }));
+
+const PlainDatePicker = (props: DatePickerProps<Dayjs>) => (
+  <StyledDatePicker {...props} timezone={getAppTimezone()} />
+);
 
 export default PlainDatePicker;

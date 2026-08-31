@@ -12,10 +12,6 @@ import {
   MapLayerResponse,
 } from "@/app/store/GeoserverDefinitions";
 import { MapEventEnum } from "../../../constants";
-import utc from "dayjs/plugin/utc";
-import { extend } from "dayjs";
-
-extend(utc);
 
 // 1. Use vi.hoisted to ensure this object exists before ANY imports
 const mocks = vi.hoisted(() => ({
@@ -135,10 +131,12 @@ describe("GeoServerLayer", () => {
 
     const onWMSAvailabilityChange = vi.fn();
     const onLayerChange = vi.fn();
+    const setDiscreteTimeSliderValues = vi.fn();
 
     renderComponent({
       onWMSAvailabilityChange,
       onLayerChange,
+      setDiscreteTimeSliderValues,
     });
 
     await waitFor(() => {
@@ -148,6 +146,7 @@ describe("GeoServerLayer", () => {
       );
       expect(onWMSAvailabilityChange).toHaveBeenCalledWith(true);
       expect(onLayerChange).toHaveBeenCalledWith("test_layer");
+      expect(setDiscreteTimeSliderValues).toHaveBeenCalledWith(null);
     });
 
     await waitFor(() => {

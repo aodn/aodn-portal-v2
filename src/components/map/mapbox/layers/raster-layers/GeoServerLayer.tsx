@@ -41,7 +41,7 @@ import {
 } from "@/app/store/searchReducer";
 import { CardContent, Typography } from "@mui/material";
 import { createRoot, Root } from "react-dom/client";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "@/utils/DayjsUtils";
 import { dateDefault, playwrightTestIds } from "../../../../common/constants";
 import MapLayerSelect from "../../component/MapLayerSelect";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
@@ -51,7 +51,12 @@ import { boundingBoxInEpsg3857, isMapDrawModeActive } from "@/utils/MapUtils";
 import { checkEmptyArray } from "@/utils/Helpers";
 import AdminScreenContext from "../../../../admin/AdminScreenContext";
 import { HttpStatusCode } from "axios";
-import { dateToValue } from "@/utils/DateUtils";
+import {
+  dayjsToUnixMs,
+  formatDateTime,
+  formatUtcDateTime,
+  getAppMaxDate,
+} from "@/utils/DateUtils";
 import { layernameRoughlyMatch } from "@/utils/GeoJsonUtils";
 import { AppDispatch } from "@/app/store/store";
 
@@ -179,9 +184,9 @@ const checkSupportDiscreteTimeSlider = (
   dispatch: AppDispatch,
   id: string,
   layerName: string,
-  setDiscreteTimeSliderValues?: Dispatch<
-    SetStateAction<Map<string, Array<number>> | undefined>
-  >
+  setDiscreteTimeSliderValues?: (
+    value: Map<string, Array<number>> | null
+  ) => void
 ) => {
   if (id && layerName) {
     const request: MapFeatureRequest = {
@@ -196,17 +201,18 @@ const checkSupportDiscreteTimeSlider = (
           const result: Map<string, Array<number>> = new Map();
           result.set(
             layerName,
-            val["time"]?.map((v) => dateToValue(dayjs(v.toString())))
+            val["time"]?.map((v) => dayjsToUnixMs(dayjs.utc(v.toString())))
           );
           setDiscreteTimeSliderValues?.(result);
         } else {
-          setDiscreteTimeSliderValues?.(undefined);
+          // Resolved: layer does not use a discrete (single) time axis.
+          setDiscreteTimeSliderValues?.(null);
         }
       })
       .catch(() => {
         // Some dataset do not support this function call, in this case
         // assume it didn't support discrete time slider
-        setDiscreteTimeSliderValues?.(undefined);
+        setDiscreteTimeSliderValues?.(null);
       });
   }
 };
@@ -232,6 +238,9 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   const popupRootRef = useRef<Root | null>();
   const [wmsLayers, setWmsLayers] = useState<SelectItem[]>([]);
   const [selectedWmsLayer, setSelectedWmsLayer] = useState<string>(""); // Only handle single wms layer for now. Could be extended to multi-layer in multi-select in future
+  const [resolvedTimeMode, setResolvedTimeMode] = useState<
+    Dimension | undefined
+  >(undefined);
 
   const [isFetchingWmsLayers, setIsFetchingWmsLayers] = useState(
     collection ? (getWmsLayerNames(collection)?.length || 0) > 0 : true
@@ -268,39 +277,49 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
   ]);
 
   const tileUrl = useMemo(() => {
+    const layerName = config.urlParams.LAYERS?.join(",") || "";
+    const timeMode = config.urlParams.MODE ?? resolvedTimeMode;
+    // Wait until single-vs-range time is known. ncWMS layers reject a
+    // datetime range, so a default 1970/now request would 500.
+    if (!config.uuid || !layerName || timeMode === undefined) {
+      return [];
+    }
+
     const start =
       config.urlParams.START_DATE === undefined
-        ? dayjs(dateDefault.min)
+        ? dateDefault.min
         : config.urlParams.START_DATE;
 
     const end =
       config.urlParams.END_DATE === undefined
-        ? dayjs(dateDefault.max)
+        ? getAppMaxDate()
         : config.urlParams.END_DATE;
 
     const time =
       config.urlParams.TIME === undefined ||
-      config?.urlParams.TIME.isSame(dayjs(dateDefault.min))
+      config?.urlParams.TIME.isSame(dateDefault.min)
         ? undefined
         : config.urlParams.TIME;
 
-    const datetime =
-      config?.urlParams?.MODE === Dimension.SINGLE
-        ? `${time?.toISOString()}` // Must ISO format, any slight diff in format will cause internal server error
-        : `${start.format(dateDefault.DATE_TIME_FORMAT)}/${end.format(dateDefault.DATE_TIME_FORMAT)}`;
+    if (timeMode === Dimension.SINGLE && !time) {
+      return [];
+    }
 
-    return config.uuid
-      ? [
-          formatToUrl<MapTileRequest>({
-            baseUrl: `/api/v1/ogc/collections/${config.uuid}/items/wms_map_tile`,
-            params: {
-              layerName: config.urlParams.LAYERS?.join(",") || "",
-              bbox: config?.urlParams?.BBOX,
-              ...(datetime !== undefined && { datetime }),
-            },
-          }),
-        ]
-      : [];
+    const datetime =
+      timeMode === Dimension.SINGLE
+        ? `${time?.toISOString()}` // Must ISO format, any slight diff in format will cause internal server error
+        : `${formatUtcDateTime(start)}/${formatUtcDateTime(end)}`;
+
+    return [
+      formatToUrl<MapTileRequest>({
+        baseUrl: `/api/v1/ogc/collections/${config.uuid}/items/wms_map_tile`,
+        params: {
+          layerName,
+          bbox: config?.urlParams?.BBOX,
+          datetime,
+        },
+      }),
+    ];
   }, [
     config.urlParams.BBOX,
     config.urlParams.END_DATE,
@@ -309,6 +328,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     config.urlParams.START_DATE,
     config.urlParams.TIME,
     config.uuid,
+    resolvedTimeMode,
   ]);
 
   const handleWmsLayerChange = useCallback(
@@ -324,16 +344,25 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             setTimeSliderSupport,
             setDrawRectSupportSupport
           );
-          shouldCheckDiscreteTimeSlider &&
-            checkSupportDiscreteTimeSlider(
-              dispatch,
-              config.uuid,
-              value,
-              setDiscreteTimeSliderValues
-            );
         }
         return prev;
       });
+      if (shouldCheckDiscreteTimeSlider) {
+        // Pause tiles until we know whether this layer is single-time or range.
+        setResolvedTimeMode(undefined);
+        setDiscreteTimeSliderValues?.(undefined);
+        checkSupportDiscreteTimeSlider(dispatch, config.uuid, value, (next) => {
+          setDiscreteTimeSliderValues?.(next);
+          if (next instanceof Map) {
+            setResolvedTimeMode(Dimension.SINGLE);
+          } else if (next === null) {
+            setResolvedTimeMode(Dimension.RANGE);
+          }
+        });
+      } else {
+        setResolvedTimeMode(Dimension.RANGE);
+        setDiscreteTimeSliderValues?.(null);
+      }
     },
     [
       onLayerChange,
@@ -403,6 +432,10 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
         createLayers(); // Use default LAYER_VISIBILITY.NONE for initial creation
       }
     };
+
+    // If tile URLs arrive after the first idle (time mode resolved late),
+    // create the source immediately when the style is already loaded.
+    createLayersOnInit();
 
     const cleanUp = () => {
       if (map === null || map === undefined) return;
@@ -474,7 +507,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
             <CardContent key={index}>
               {value.time && (
                 <Typography component="div" variant="body3Small">
-                  Time: {value.time.toString()}
+                  Time: {formatDateTime(value.time)}
                 </Typography>
               )}
               {value.value && (
@@ -599,6 +632,8 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     setMapLoading?.(ProgressType.CIRCLE);
 
     const fetchLayers = () => {
+      setResolvedTimeMode(undefined);
+      setDiscreteTimeSliderValues?.(undefined);
       const layerName = getWmsLayerNames(collection)?.[0] || "";
 
       const wmsFieldsRequest: MapFeatureRequest = {
@@ -658,7 +693,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
                   // If is not allowed likely due to whitelist, we should set the wms not support to block display WMS layer
                   onWMSAvailabilityChange?.(false);
                 } else {
-                  console.log("Failed to fetch fields, ok to ignore", error);
+                  console.warn("Failed to fetch fields, ok to ignore", error);
                 }
               })
               .finally(() => {
@@ -722,6 +757,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       <TestHelper
         id={map?.getContainer().id || ""}
         getGeoServerTileLayer={() => titleLayerId}
+        isGeoServerVisible={() => visible}
       />
     </>
   );

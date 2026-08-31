@@ -8,16 +8,10 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import {
-  border,
-  borderRadius,
-  color,
-  gap,
-  padding,
-} from "../../styles/constants";
+import { border, borderRadius, color, gap, padding } from "@/styles/constants";
 import OrganizationLogo from "../icon/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
-import { ResultCardBasicType } from "./ResultCards";
+import { ResultCardBasicType } from "./types";
 import { SHOW_RESULT_CARD_THUMBNAIL } from "./constants";
 import BookmarkButton from "../bookmark/BookmarkButton";
 import default_thumbnail from "@/assets/images/default-thumbnail.png";
@@ -146,7 +140,7 @@ const GridResultCard: FC<GridResultCardProps> = ({
             <Box
               display="flex"
               alignItems="center"
-              arial-label="grid-list-card-title"
+              aria-label="grid-list-card-title"
               data-testid="grid-card-title"
               onContextMenu={(e) => menuRef.current?.openContextMenu(e)}
             >

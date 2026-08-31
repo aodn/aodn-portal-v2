@@ -20,12 +20,13 @@ export interface LayerBasicType<P = GeoJsonProperties> {
   visible?: boolean;
   setTimeSliderSupport?: Dispatch<SetStateAction<boolean>>;
   setDiscreteTimeSliderValues?: Dispatch<
-    SetStateAction<Map<string, Array<number>> | undefined>
+    SetStateAction<Map<string, Array<number>> | null | undefined>
   >;
   setDrawRectSupportSupport?: Dispatch<SetStateAction<boolean>>;
   collection?: OGCCollection;
 }
 
+/** Layer-owned dataset/product picker. UI is portaled above the map. */
 export interface LayerSelectable<T> {
   layerConfig: T;
   onLayerChange?: (layerName: string) => void;

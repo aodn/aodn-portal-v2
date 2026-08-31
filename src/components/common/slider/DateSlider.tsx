@@ -5,14 +5,18 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import dayjs from "dayjs";
 import { Grid, Stack, Typography } from "@mui/material";
-import { dateToValue, valueToDate } from "@/utils/DateUtils";
+import type { SxProps, Theme } from "@mui/material/styles";
+import {
+  dayjsToUnixMs,
+  formatDate,
+  toAppDayjs,
+  unixMsToAppDayjs,
+} from "@/utils/DateUtils";
 import { dateDefault } from "../constants";
 import { portalTheme } from "../../../styles";
 import { padding } from "@/styles/constants";
-import PlainSlider from "./PlainSlider";
-
+import PlainSlider, { ConcentrationSlider, ThumbType } from "./PlainSlider";
 /** Slider mark shape (was imported from a deep MUI path removed in v7). */
 interface Mark {
   value: number;
@@ -37,6 +41,9 @@ interface DateSliderPointProps {
     event: Event | React.SyntheticEvent<Element, Event> | undefined,
     value: number | number[]
   ) => void;
+  /** Merged onto the default overlay container styles. */
+  sx?: SxProps<Theme>;
+  thumbType?: ThumbType;
 }
 
 const COMPONENT_ID = "dateslider-daterange-menu-button";
@@ -87,6 +94,8 @@ const stepMarkValue = (
 const DateSliderPoint: React.FC<DateSliderPointProps> = ({
   valid_points,
   onDatePointChange = undefined,
+  sx,
+  thumbType = ThumbType.CIRCLE,
 }) => {
   const sorted_marks: Mark[] = useMemo(() => {
     return [...(valid_points ?? [])]
@@ -169,48 +178,44 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
   return (
     <Grid
       container
-      sx={{
-        backgroundColor: portalTheme.palette.primary6,
-        borderRadius: "6px",
-        display: "flex",
-        width: "100%",
-        mx: "8px",
-        overflow: "visible",
-      }}
+      sx={[
+        {
+          backgroundColor: portalTheme.palette.primary6,
+          borderRadius: "6px",
+          display: "flex",
+          alignItems: "center",
+          width: "100%",
+          height: portalTheme.spacing(6),
+          boxSizing: "border-box",
+          mx: "8px",
+          overflow: "visible",
+          position: "relative",
+          zIndex: 2,
+        },
+        ...(Array.isArray(sx) ? sx : [sx]),
+      ]}
       data-testid={COMPONENT_ID}
     >
       <Grid
         container
         sx={{
           px: padding.medium,
-          py: padding.small,
+          py: 0,
           overflow: "visible",
+          alignItems: "center",
         }}
         size={12}
       >
-        <Stack
-          width="100%"
-          direction="row"
-          alignItems="center"
-          mx={{ xs: "18px", sm: "6px" }}
-          gap="16px"
-        >
+        <Stack width="100%" direction="row" alignItems="center">
           <Stack flexShrink={0} alignItems="flex-start">
-            <Typography
-              sx={{
-                ...sliderCaptionSx,
-                display: { xs: "none", sm: "block" },
-              }}
-            >
-              Displaying
-            </Typography>
             <Typography sx={sliderCaptionSx}>
+              Displaying{" "}
               {datePointStamp !== undefined
-                ? valueToDate(datePointStamp).format(dateDefault.DISPLAY_FORMAT)
+                ? formatDate(unixMsToAppDayjs(datePointStamp))
                 : ""}
             </Typography>
           </Stack>
-          <PlainSlider
+          <ConcentrationSlider
             step={null} // ← key: disables free sliding
             marks={sorted_marks}
             min={sorted_marks[0].value}
@@ -230,9 +235,9 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
             }}
             valueLabelDisplay="auto"
             valueLabelFormat={(value: number) =>
-              valueToDate(value).format(dateDefault.DISPLAY_FORMAT)
+              formatDate(unixMsToAppDayjs(value))
             }
-            sx={{ flex: 1, minWidth: 0 }}
+            thumb={thumbType}
           />
         </Stack>
       </Grid>
@@ -240,15 +245,18 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
   );
 };
 
-/** Epoch ms for {@link dateDefault.min} (1 Jan 1970 local). Slider floor. */
-const SLIDER_MIN_FLOOR = dateToValue(dayjs(dateDefault.min));
+/** Epoch ms for {@link dateDefault.min} (1 Jan 1970 UTC). Slider floor. */
+const SLIDER_MIN_FLOOR = dayjsToUnixMs(dateDefault.min);
 
 /**
  * Parse a date string to slider epoch ms at **start of day**, never below
  * {@link SLIDER_MIN_FLOOR}. Used for the left thumb / rail min.
  */
 const dateStringToSliderMinValue = (date: string): number =>
-  Math.max(SLIDER_MIN_FLOOR, dateToValue(dayjs(date, dateDefault.DATE_FORMAT)));
+  Math.max(
+    SLIDER_MIN_FLOOR,
+    dayjsToUnixMs(toAppDayjs(date, dateDefault.DATE_FORMAT))
+  );
 
 /**
  * Parse a date string to slider epoch ms at **end of day**. Used for the right
@@ -257,7 +265,7 @@ const dateStringToSliderMinValue = (date: string): number =>
  * min and max share the same calendar day).
  */
 const dateStringToSliderMaxValue = (date: string): number =>
-  dateToValue(dayjs(date, dateDefault.DATE_FORMAT), true);
+  dayjsToUnixMs(toAppDayjs(date, dateDefault.DATE_FORMAT), true);
 
 /** Full-coverage thumb pair for the current rail bounds. */
 const fullCoverageRange = (minValue: number, maxValue: number): number[] => [
@@ -405,11 +413,12 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
       container
       sx={{
         backgroundColor: portalTheme.palette.primary6,
-        borderRadius: "6px",
+        borderRadius: portalTheme.borderRadius.sm,
         display: "flex",
         width: "100%",
         mx: "8px",
         overflow: "visible",
+        height: "48px",
       }}
       data-testid={COMPONENT_ID}
     >
@@ -417,7 +426,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
         container
         sx={{
           px: padding.medium,
-          py: padding.small,
+          py: "2px",
           overflow: "visible",
         }}
         size={12}
@@ -439,7 +448,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
               Start Date
             </Typography>
             <Typography sx={sliderCaptionSx}>
-              {valueToDate(minValue).format(dateDefault.DISPLAY_FORMAT)}
+              {formatDate(unixMsToAppDayjs(minValue))}
             </Typography>
           </Stack>
           <PlainSlider
@@ -459,7 +468,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
             }}
             valueLabelDisplay="auto"
             valueLabelFormat={(value: number) =>
-              valueToDate(value).format(dateDefault.DISPLAY_FORMAT)
+              formatDate(unixMsToAppDayjs(value))
             }
             sx={{ flex: 1, minWidth: 0 }}
           />
@@ -473,7 +482,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
               On going
             </Typography>
             <Typography sx={sliderCaptionSx}>
-              {valueToDate(maxValue).format(dateDefault.DISPLAY_FORMAT)}
+              {formatDate(unixMsToAppDayjs(maxValue))}
             </Typography>
           </Stack>
         </Stack>
@@ -482,5 +491,5 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
   );
 };
 
-export { DateSliderPoint };
+export { DateSliderPoint, ThumbType };
 export default DateSliderRange;

@@ -63,6 +63,7 @@ const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
       data-testid={`searchbar-button-badge-${text}`}
     >
       <IconButton
+        aria-label={text}
         sx={{
           gap: showText ? (isMobile ? "4px" : "12px") : 0,
           ...defaultButtonSx,

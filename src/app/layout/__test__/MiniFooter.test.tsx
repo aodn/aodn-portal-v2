@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
-import MapFooter from "../MapFooter";
+import MiniFooter from "../MiniFooter";
 import { openInNewTab } from "@/utils/LinkUtils";
 import { pageDefault } from "@/components/common/constants";
 
@@ -10,7 +10,7 @@ vi.mock("@/utils/LinkUtils", () => ({
 
 describe("MapFooter", () => {
   it("renders copyright and legal links", () => {
-    render(<MapFooter />);
+    render(<MiniFooter />);
 
     expect(
       screen.getByText(/Copyright © \d{4}\. All rights reserved\./)
@@ -22,7 +22,7 @@ describe("MapFooter", () => {
   });
 
   it("opens IMOS legal pages in a new tab", () => {
-    render(<MapFooter />);
+    render(<MiniFooter />);
 
     fireEvent.click(screen.getByText("Terms of Use"));
     expect(openInNewTab).toHaveBeenCalledWith(

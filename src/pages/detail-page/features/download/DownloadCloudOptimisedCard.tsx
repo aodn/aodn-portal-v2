@@ -21,6 +21,10 @@ import {
 import DownloadButton from "../../../../components/common/buttons/DownloadButton";
 import DownloadSubsetting from "./DownloadSubsetting";
 import DownloadSelect from "./DownloadSelect";
+import DownloadSizeWarning, {
+  hasDownloadSizeWarning,
+  isDownloadBlocked,
+} from "./DownloadSizeWarning";
 import useEstimateSize from "../../../../hooks/useEstimateSize";
 import { processCoEstimateSize } from "@/app/store/searchReducer";
 
@@ -51,8 +55,22 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
   setSelectedCoKey,
 }) => {
   const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
-  const { isEstimating, estimateSize, cancelEstimate, estimatedSizeBytes } =
-    useEstimateSize(processCoEstimateSize, getCoEstimatedBytes);
+  const {
+    isEstimating,
+    estimateSize,
+    cancelEstimate,
+    estimatedSizeBytes,
+    estimateFailed,
+  } = useEstimateSize(processCoEstimateSize, getCoEstimatedBytes);
+
+  const estimateState = {
+    isEstimating,
+    estimatedSizeBytes,
+    estimateFailed,
+  };
+
+  const showSizeWarning = hasDownloadSizeWarning(estimateState);
+  const downloadBlocked = isDownloadBlocked(estimateState);
 
   // add datasetselection option
   const [selectedDataItem, setSelectedDataItem] = useState<
@@ -230,16 +248,25 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
           onDownload={onDownload}
           isEstimating={isEstimating}
           estimatedSizeBytes={estimatedSizeBytes}
+          estimateFailed={estimateFailed}
+          disabled={downloadBlocked}
+        />
+        <DownloadSizeWarning
+          isEstimating={isEstimating}
+          estimatedSizeBytes={estimatedSizeBytes}
+          estimateFailed={estimateFailed}
         />
       </Stack>
       <DownloadSubsetting
         downloadConditions={downloadConditions}
         getAndSetDownloadConditions={getAndSetDownloadConditions}
         removeDownloadCondition={removeDownloadCondition}
+        hideInfoMessage={showSizeWarning}
       />
       <DownloadDialog
         isOpen={downloadDialogOpen}
         setIsOpen={setDownloadDialogOpen}
+        estimatedSizeBytes={estimatedSizeBytes}
         downloadConditions={downloadConditions}
         getAndSetDownloadConditions={getAndSetDownloadConditions}
         removeDownloadCondition={removeDownloadCondition}

@@ -116,6 +116,22 @@ window.__map_functions = {
       }
     }
 
+    // The GeoServer (WMS) tile layer is added to the style once on initial
+    // map idle and only ever toggled via setLayoutProperty, never removed,
+    // so the generic "layer exists" check below would say visible even
+    // while the layer (and its click handler) is still off.
+    if (
+      testProps &&
+      typeof testProps.isGeoServerVisible === "function" &&
+      typeof testProps.getGeoServerTileLayer === "function"
+    ) {
+      if (layerId === testProps.getGeoServerTileLayer()) {
+        const isVisible = testProps.isGeoServerVisible();
+        console.log("[DEBUG] GeoServer visibility from testProps:", isVisible);
+        return !!isVisible;
+      }
+    }
+
     // The gridded raster layer stays in the style when hidden (visibility is
     // toggled via setLayoutProperty, never by removing the layer), so the
     // generic "layer exists" check below would always say visible.

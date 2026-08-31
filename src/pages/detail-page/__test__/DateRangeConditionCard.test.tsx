@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import dayjs from "dayjs";
+import dayjs from "@/utils/DayjsUtils";
 
 // Tests for DateRangeConditionCard:
 // - the From/To pickers respect cross-field constraints (From <= To)
@@ -20,7 +20,7 @@ vi.mock("../../../components/common/datetime/PlainDatePicker", () => ({
       value={value?.format?.("YYYY-MM-DD") ?? ""}
       disabled={disabled}
       onChange={(e) =>
-        onChange(e.target.value === "" ? null : dayjs(e.target.value))
+        onChange(e.target.value === "" ? null : dayjs.tz(e.target.value))
       }
     />
   ),
@@ -149,8 +149,8 @@ describe("DateRangeConditionCard", () => {
         <DateRangeConditionCard
           dateRangeCondition={buildCondition(RANGE_START, RANGE_END)}
           onChange={onChange}
-          minDate={dayjs(DATASET_MIN)}
-          maxDate={dayjs(DATASET_MAX)}
+          minDate={dayjs.tz(DATASET_MIN)}
+          maxDate={dayjs.tz(DATASET_MAX)}
         />
       );
 
@@ -163,8 +163,8 @@ describe("DateRangeConditionCard", () => {
         <DateRangeConditionCard
           dateRangeCondition={buildCondition(RANGE_START, RANGE_END)}
           onChange={onChange}
-          minDate={dayjs(DATASET_MIN)}
-          maxDate={dayjs(DATASET_MAX)}
+          minDate={dayjs.tz(DATASET_MIN)}
+          maxDate={dayjs.tz(DATASET_MAX)}
         />
       );
 

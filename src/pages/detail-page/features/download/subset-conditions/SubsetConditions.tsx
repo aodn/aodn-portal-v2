@@ -1,6 +1,6 @@
 import { FC, useCallback, useMemo } from "react";
 import { Stack, SxProps } from "@mui/material";
-import { Dayjs } from "dayjs";
+import { Dayjs } from "@/utils/DayjsUtils";
 import { BBox } from "geojson";
 import BBoxConditionCard from "./BBoxConditionCard";
 import PolygonConditionCard from "./PolygonConditionCard";
@@ -17,6 +17,7 @@ import {
   type ConditionSupportContext,
 } from "../../../context/DownloadDefinitions";
 import { useDetailPageContext } from "../../../context/detail-page-context";
+import { dateDefault } from "@/components/common/constants";
 
 interface SubsetConditionsProps extends DownloadCondition {
   sx?: SxProps;
@@ -91,8 +92,8 @@ const SubsetConditions: FC<SubsetConditionsProps> = ({
         {
           condition: new DateRangeCondition(
             "date-range-initial",
-            dateRangeBounds?.min.format("YYYY-MM-DD") ?? "",
-            dateRangeBounds?.max.format("YYYY-MM-DD") ?? ""
+            dateRangeBounds?.min.format(dateDefault.DATE_FORMAT) ?? "",
+            dateRangeBounds?.max.format(dateDefault.DATE_FORMAT) ?? ""
           ),
           isDraft: true as const,
         },

@@ -25,7 +25,7 @@ const payload = (id: string): TileProductsResponse => ({
       id,
       variable: "GSLA",
       tile_types: ["visual"],
-      available_dates: ["2024-01-01", "2024-01-02"],
+      available_dates: ["2024-01-01T00:00:00Z", "2024-01-02T00:00:00Z"],
       visual_tile_url_template: TEMPLATE,
     },
   ],

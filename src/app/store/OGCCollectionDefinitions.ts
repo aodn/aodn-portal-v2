@@ -10,8 +10,8 @@ import default_thumbnail from "@/assets/images/default-thumbnail.png";
 import { bboxPolygon } from "@turf/turf";
 
 import * as turf from "@turf/turf";
-import dayjs from "dayjs";
-import { dateDefault } from "@/components/common/constants";
+import dayjs, { Dayjs } from "@/utils/DayjsUtils";
+import { formatDate } from "@/utils/DateUtils";
 import { IconWMS } from "@/components/icon/IconWMS";
 import { IconWFS } from "@/components/icon/IconWFS";
 import { IconLink } from "@/components/icon/IconLink";
@@ -452,6 +452,8 @@ export class OGCCollection {
   getLicense = (): string | undefined => this.propValue?.license;
   getCreation = (): string | undefined => this.propValue?.creation;
   getRevision = (): string | undefined => this.propValue?.revision;
+  getDatasetProvider = (): string | undefined =>
+    this.propValue?.dataset_provider;
   getMetadataUrl = (): string | undefined =>
     this.links?.filter(
       (link) =>
@@ -557,6 +559,7 @@ export class SummariesProperties {
   readonly dataset_group?: Array<string>;
   readonly scope?: Record<string, string>;
   readonly parameter_vocabs?: Array<string>;
+  readonly dataset_provider?: string;
 }
 
 export class Spatial {
@@ -587,17 +590,17 @@ export class Spatial {
     return this.bounding_box;
   }
 
-  getOverallTemporal = () => {
+  getOverallTemporalRange = (): [Dayjs | undefined, Dayjs | undefined] => {
     const period = this.temporal?.interval;
-    let startDate: string | undefined = undefined;
-    let endDate: string | undefined = undefined;
-    if (period?.[0][0]) {
-      startDate = dayjs(period[0][0]).format(dateDefault.DISPLAY_FORMAT);
-    }
-    if (period?.[0][1]) {
-      endDate = dayjs(period[0][1]).format(dateDefault.DISPLAY_FORMAT);
-    }
-    return [startDate, endDate];
+    return [
+      period?.[0][0] ? dayjs.tz(period[0][0]) : undefined,
+      period?.[0][1] ? dayjs.tz(period[0][1]) : undefined,
+    ];
+  };
+
+  getOverallTemporal = () => {
+    const [start, end] = this.getOverallTemporalRange();
+    return [start && formatDate(start), end && formatDate(end)];
   };
   /**
    * Create a GeoJSON FeatureCollection from the bounding boxes and points value.

@@ -11,11 +11,9 @@ import { OGC_API_BASE } from "./constants";
 // The rest of src/seo stays free of app-store imports by getting the type here
 export type { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 
-// Fields the bulk collections endpoint can return; license/citation/contacts
-// are only available per-record and are optional in Dataset JSON-LD, so they
-// are left out to avoid thousands of extra requests.
+// Fields the bulk collections endpoint returns for the SEO artifacts
 export const SEO_PROPERTIES =
-  "id,title,description,bbox,temporal,themes,providers";
+  "id,title,description,bbox,temporal,themes,creation,revision,citation,license,dataset_provider";
 
 // fetchResultNoStore returns one page; walk search_after until we have them all
 const API_URL = `${OGC_API_BASE}/api/v1/ogc/collections`;

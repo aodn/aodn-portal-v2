@@ -13,6 +13,7 @@ interface TestProps {
   getWorldBoundariesLayer?: () => string;
   getSpiderLayer?: () => string;
   getGeoServerTileLayer?: () => string;
+  isGeoServerVisible?: () => boolean | undefined;
   /** PMTiles Data Density layer id for e2e visibility checks */
   getPmtilesLayer?: () => string;
   isPmtilesVisible?: () => boolean | undefined;

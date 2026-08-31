@@ -35,11 +35,13 @@ class Routes:
     WFS_FIELD_VALUE = '*/**/items/wfs_field_value?*'
 
     DOWNLOAD_DIALOG = f'{PREFIX}/processes/download/execution'
+    DOWNLOAD_STATUS = f'{PREFIX}/jobs/*'
     DOWNLOAD_WFS = f'{PREFIX}/processes/downloadWfs/execution'
     ESTIMATE_WFS_DOWNLOAD = f'{PREFIX}/processes/estimateWfsDownload/execution'
     ESTIMATE_CO_DOWNLOAD = f'{PREFIX}/processes/estimateCOdownload/execution'
 
     STATIC_GEOJSON = f'{PREFIX}/ext/static/*.json'
+    MANAGE_INFO = f'{PREFIX}/manage/info'
 
     # S3 sidecar next to `{key}.pmtiles` — used to decide PMTiles support.
     PMTILES_METADATA = re.compile(

@@ -226,7 +226,8 @@ const Footer: FC = () => {
                     justifyContent="center"
                     marginBottom={2}
                   >
-                    <Avatar src={traditional} />
+                    {/* Decorative: the acknowledgement text alongside carries the meaning */}
+                    <Avatar src={traditional} alt="" />
                     <Typography color="#000" fontSize={fontSize.subscription}>
                       IMOS acknowledges the Traditional Custodians and Elders of
                       the land and sea on which we work and observe, and

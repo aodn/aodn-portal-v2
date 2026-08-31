@@ -111,6 +111,20 @@ describe("consumeSSEStream", () => {
     expect(onEvent).not.toHaveBeenCalled();
   });
 
+  it("does not re-deliver an event when a chunk ends on an event boundary", async () => {
+    const stream = makeStream(
+      'event: event-one\ndata: {"n":1}\n\n',
+      'event: event-two\ndata: {"n":2}\n\n'
+    );
+    const onEvent = vi.fn().mockResolvedValue(undefined);
+
+    await consumeSSEStream(stream, onEvent);
+
+    expect(onEvent).toHaveBeenCalledTimes(2);
+    expect(onEvent).toHaveBeenNthCalledWith(1, "event-one", { n: 1 });
+    expect(onEvent).toHaveBeenNthCalledWith(2, "event-two", { n: 2 });
+  });
+
   it("does not call onEvent for an empty stream", async () => {
     const stream = makeStream();
     const onEvent = vi.fn().mockResolvedValue(undefined);

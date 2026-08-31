@@ -6,8 +6,8 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { Box } from "@mui/material";
-import { padding } from "@/styles/constants";
+import { Box, useTheme } from "@mui/material";
+import { borderRadius, padding } from "@/styles/constants";
 import { useDetailPageContext } from "../context/detail-page-context";
 import Controls from "../../../components/map/mapbox/controls/Controls";
 import NavigationControl from "../../../components/map/mapbox/controls/NavigationControl";
@@ -19,7 +19,7 @@ import { LngLatBounds, MapEvent } from "mapbox-gl";
 import BaseMapSwitcher from "../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
 import MenuControl from "../../../components/map/mapbox/controls/menu/MenuControl";
 import DateRange from "../../../components/map/mapbox/controls/menu/DateRange";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "@/utils/DayjsUtils";
 import {
   BBoxCondition,
   DateRangeCondition,
@@ -48,13 +48,17 @@ import useBreakpoint from "../../../hooks/useBreakpoint";
 import FitToSpatialExtentsLayer from "../../../components/map/mapbox/layers/FitToSpatialExtentsLayer";
 import { MapEventEnum } from "@/components/map/mapbox/constants";
 import { fitToDefaultExtent } from "@/utils/MapUtils";
-import { DateSliderPoint } from "@/components/common/slider/DateSlider";
-import { dateToValue } from "@/utils/DateUtils";
+import {
+  DateSliderPoint,
+  ThumbType,
+} from "@/components/common/slider/DateSlider";
+import { dayjsToUnixMs, getAppMaxDate, toAppDayjs } from "@/utils/DateUtils";
 import { GeoserverFieldsResponse } from "@/app/store/GeoserverDefinitions";
 import * as turf from "@turf/turf";
 import { createStaticLayers } from "@/components/map/mapbox/layers/StaticLayer";
 
 import WmsLegend from "./WmsLegend";
+import { MAP_DATASET_SELECT_SLOT_ID } from "@/components/map/mapbox/component/MapLayerSelect";
 import {
   DatasetType,
   OGCCollection,
@@ -66,6 +70,7 @@ import {
 } from "@/components/map/mapbox/layers/pmtiles/Common";
 import GriddedRasterLayer from "@/components/map/mapbox/layers/raster-layers/gridded-raster-layer/GriddedRasterLayer";
 import useGriddedRasterLayer from "@/components/map/mapbox/layers/raster-layers/gridded-raster-layer/useGriddedRasterLayer";
+import { portalTheme } from "@/styles";
 
 const mapContainerId = "map-detail-container-id";
 
@@ -184,15 +189,16 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   const [timeSliderSupport, setTimeSliderSupport] = useState<boolean>(false);
   const [drawRectSupport, setDrawRectSupportSupport] = useState<boolean>(false);
   const [discreteTimeSliderValues, setDiscreteTimeSliderValues] = useState<
-    Map<string, Array<number>> | undefined
+    Map<string, Array<number>> | null | undefined
   >(undefined);
   const [datePointValue, setDatePointValue] = useState<number>(
-    dateToValue(dayjs(dateDefault.min))
+    dayjsToUnixMs(dateDefault.min)
   );
   // Period coverage from the selected parquet's PMTiles `.metadata` sidecar
   const [pmtilesPeriodRange, setPmtilesPeriodRange] =
     useState<PMTilesMetadata | null>(null);
   const { isUnderLaptop } = useBreakpoint();
+  const theme = useTheme();
 
   const handlePmtilesMetadataPeriodChange = useCallback(
     (range: PMTilesMetadata | null) => {
@@ -255,14 +261,14 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       start = pmtilesDayjs.minDate;
       end = pmtilesDayjs.maxDate;
     } else {
-      start = dayjs(dateDefault.min);
-      end = dayjs(dateDefault.max);
+      start = dateDefault.min;
+      end = getAppMaxDate();
 
       const extent = collection?.getExtent();
       if (extent) {
-        const [s, e] = extent.getOverallTemporal();
-        start = s === undefined ? start : dayjs(s, dateDefault.DISPLAY_FORMAT);
-        end = e === undefined ? end : dayjs(e, dateDefault.DISPLAY_FORMAT);
+        const [s, e] = extent.getOverallTemporalRange();
+        start = s ?? start;
+        end = e ?? end;
       }
     }
 
@@ -310,11 +316,14 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       return [undefined, undefined];
     }
     const dateRangeCondition = dateRangeConditionGeneric as DateRangeCondition;
-    const conditionStart = dayjs(
+    const conditionStart = toAppDayjs(
       dateRangeCondition.start,
       dateDefault.DATE_FORMAT
     );
-    const conditionEnd = dayjs(dateRangeCondition.end, dateDefault.DATE_FORMAT);
+    const conditionEnd = toAppDayjs(
+      dateRangeCondition.end,
+      dateDefault.DATE_FORMAT
+    );
     return [conditionStart, conditionEnd];
   }, [downloadConditions, isSubsettingSupported]);
 
@@ -364,25 +373,52 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     return features;
   }, [downloadConditions]);
 
+  // Snap the single-time thumb onto a real mark once discrete times load.
+  useEffect(() => {
+    startTransition(() => {
+      if (!discreteTimeSliderValues || !selectedWmsLayer) return;
+      const times = discreteTimeSliderValues.get(selectedWmsLayer);
+      if (!times?.length) return;
+      if (!times.includes(datePointValue)) {
+        setDatePointValue(times[times.length - 1]);
+      }
+    });
+  }, [datePointValue, discreteTimeSliderValues, selectedWmsLayer]);
+
   const geoServerLayerConfig = useMemo(() => {
-    return discreteTimeSliderValues
-      ? {
-          urlParams: {
-            TIME: dayjs.utc(datePointValue!),
-            MODE: Dimension.SINGLE,
-          },
-        }
-      : {
-          urlParams: {
-            START_DATE: filterStartDate,
-            END_DATE: filterEndDate,
-          },
-        };
+    // `undefined` = still probing whether the WMS layer is single-time (ncWMS)
+    // or a range. Omit MODE so GeoServerLayer does not request tiles yet.
+    if (discreteTimeSliderValues === undefined) {
+      return { urlParams: {} };
+    }
+    if (discreteTimeSliderValues) {
+      const times = selectedWmsLayer
+        ? discreteTimeSliderValues.get(selectedWmsLayer)
+        : undefined;
+      const timeValue =
+        times?.includes(datePointValue) && datePointValue
+          ? datePointValue
+          : times?.[times.length - 1];
+      return {
+        urlParams: {
+          TIME: timeValue !== undefined ? dayjs.utc(timeValue) : undefined,
+          MODE: Dimension.SINGLE,
+        },
+      };
+    }
+    return {
+      urlParams: {
+        START_DATE: filterStartDate,
+        END_DATE: filterEndDate,
+        MODE: Dimension.RANGE,
+      },
+    };
   }, [
     discreteTimeSliderValues,
     datePointValue,
     filterStartDate,
     filterEndDate,
+    selectedWmsLayer,
   ]);
 
   const handleMapChange = useCallback(
@@ -450,11 +486,19 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   );
 
   const additionalSlider = useMemo(() => {
+    const additionalSliderSx = {
+      mx: 0,
+      borderRadius: 0,
+      backgroundColor: portalTheme.palette.primary6,
+    };
+
     if (selectedMapLayerId === LayerName.GriddedRaster) {
       return hasGriddedDates ? (
         <DateSliderPoint
           key={griddedDateSliderKey}
           {...griddedDateSliderProps}
+          sx={additionalSliderSx}
+          thumbType={ThumbType.DIAMOND}
         />
       ) : undefined;
     }
@@ -463,6 +507,8 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
         <DateSliderPoint
           valid_points={discreteTimeSliderValues?.get(selectedWmsLayer)}
           onDatePointChange={handleSliderPointChange}
+          sx={additionalSliderSx}
+          thumbType={ThumbType.DIAMOND}
         />
       );
     }
@@ -555,119 +601,140 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   return (
     <>
       <Box
-        arial-label="map"
-        id={mapContainerId}
         sx={{
           width: "100%",
-          minHeight: "550px",
-          marginY: padding.large,
+          mt: padding.large,
+          mb: padding.large,
+          borderRadius: borderRadius.small,
+          boxShadow: theme.shadows[1],
+          // Visible so the date-slider value label can extend past the rail.
+          overflow: "visible",
         }}
       >
-        <MapBox
-          animate={false}
-          panelId={mapContainerId}
-          projection={"mercator"}
-          announcement={
-            noMapPreview
-              ? "Dataset preview is not available"
-              : griddedRasterErrorAnnouncement
-          }
-          onMoveEvent={handleMapChange}
-          onZoomEvent={handleMapChange}
+        <Box
+          id={MAP_DATASET_SELECT_SLOT_ID}
+          sx={{
+            width: "100%",
+            overflow: "hidden",
+            borderTopLeftRadius: borderRadius.small,
+            borderTopRightRadius: borderRadius.small,
+          }}
+        />
+        {additionalSlider}
+        <Box
+          aria-label="map"
+          id={mapContainerId}
+          sx={{
+            width: "100%",
+            minHeight: "588px",
+            overflow: "hidden",
+            borderBottomLeftRadius: borderRadius.small,
+            borderBottomRightRadius: borderRadius.small,
+          }}
         >
-          <Controls>
-            <NavigationControl
-              visible={!isUnderLaptop}
-              // Reset flies back to this collection's spatial extent
-              onReset={(map) => fitToDefaultExtent(map, collection)}
-            />
-            <ScaleControl />
-            <DisplayCoordinate />
-            <MenuControlGroup>
-              <MenuControl menu={<BaseMapSwitcher />} />
-              <MenuControl
-                menu={
-                  <ReferenceLayerSwitcher
-                    layers={staticBaseLayerConfig}
-                    onEvent={handleBaseMapSwitch}
-                  />
-                }
+          <MapBox
+            animate={false}
+            panelId={mapContainerId}
+            projection={"mercator"}
+            announcement={
+              noMapPreview
+                ? "Dataset preview is not available"
+                : griddedRasterErrorAnnouncement
+            }
+            onMoveEvent={handleMapChange}
+            onZoomEvent={handleMapChange}
+          >
+            <Controls>
+              <NavigationControl
+                visible={!isUnderLaptop}
+                // Reset flies back to this collection's spatial extent
+                onReset={(map) => fitToDefaultExtent(map, collection)}
               />
-              <MenuControl
-                menu={
-                  <MapLayerSwitcher
-                    layers={mapLayerConfig}
-                    onEvent={handleMapLayerChange}
-                  />
-                }
-                visible={mapLayerConfig.length !== 0}
+              <ScaleControl />
+              <DisplayCoordinate />
+              <MenuControlGroup>
+                <MenuControl menu={<BaseMapSwitcher />} />
+                <MenuControl
+                  menu={
+                    <ReferenceLayerSwitcher
+                      layers={staticBaseLayerConfig}
+                      onEvent={handleBaseMapSwitch}
+                    />
+                  }
+                />
+                <MenuControl
+                  menu={
+                    <MapLayerSwitcher
+                      layers={mapLayerConfig}
+                      onEvent={handleMapLayerChange}
+                    />
+                  }
+                  visible={mapLayerConfig.length !== 0}
+                />
+                <MenuControl
+                  visible={isSubsettingSupported(SubsettingType.TimeSlider)}
+                  menu={
+                    <DateRange
+                      // Remount when slider bounds change so thumbs reset to full coverage
+                      key={`date-range-${minDateStamp.format(dateDefault.DATE_FORMAT)}-${maxDateStamp.format(dateDefault.DATE_FORMAT)}`}
+                      minDate={minDateStamp.format(dateDefault.DATE_FORMAT)}
+                      maxDate={maxDateStamp.format(dateDefault.DATE_FORMAT)}
+                      getAndSetDownloadConditions={getAndSetDownloadConditions}
+                      downloadConditions={downloadConditions}
+                    />
+                  }
+                />
+                <MenuControl
+                  visible={isSubsettingSupported(SubsettingType.DrawRect)}
+                  menu={
+                    <DrawRect
+                      onChangeFeatures={handleFeaturesChange}
+                      features={drawFeatures}
+                    />
+                  }
+                />
+              </MenuControlGroup>
+            </Controls>
+            <Layers>
+              <FitToSpatialExtentsLayer
+                collection={collection}
+                bbox={mapFocusArea}
               />
-              <MenuControl
-                visible={isSubsettingSupported(SubsettingType.TimeSlider)}
-                menu={
-                  <DateRange
-                    // Remount when slider bounds change so thumbs reset to full coverage
-                    key={`date-range-${minDateStamp.format(dateDefault.DATE_FORMAT)}-${maxDateStamp.format(dateDefault.DATE_FORMAT)}`}
-                    minDate={minDateStamp.format(dateDefault.DATE_FORMAT)}
-                    maxDate={maxDateStamp.format(dateDefault.DATE_FORMAT)}
-                    getAndSetDownloadConditions={getAndSetDownloadConditions}
-                    downloadConditions={downloadConditions}
-                    options={
-                      additionalSlider ? { additionalSlider } : undefined
-                    }
-                  />
-                }
+              {createStaticLayers(staticLayer)}
+              <PMTilesHexLayer
+                collection={collection}
+                filterStartDate={filterStartDate}
+                filterEndDate={filterEndDate}
+                visible={selectedMapLayerId === LayerName.PMTiles}
+                layerConfig={selectedCoKey}
+                onLayerChange={setSelectedCoKey}
+                onMetadataPeriodChange={handlePmtilesMetadataPeriodChange}
+                onSupportChange={setIsSupportPMTiles}
               />
-              <MenuControl
-                visible={isSubsettingSupported(SubsettingType.DrawRect)}
-                menu={
-                  <DrawRect
-                    onChangeFeatures={handleFeaturesChange}
-                    features={drawFeatures}
-                  />
-                }
+              <GeoServerLayer
+                layerConfig={geoServerLayerConfig}
+                onLayerChange={onWmsLayerChange}
+                onWMSAvailabilityChange={onWMSAvailabilityChange}
+                setWmsFields={setWMSFields}
+                setTimeSliderSupport={setTimeSliderSupport}
+                setDiscreteTimeSliderValues={setDiscreteTimeSliderValues}
+                setDrawRectSupportSupport={setDrawRectSupportSupport}
+                collection={collection}
+                visible={selectedMapLayerId === LayerName.GeoServer}
               />
-            </MenuControlGroup>
-          </Controls>
-          <Layers>
-            <FitToSpatialExtentsLayer
-              collection={collection}
-              bbox={mapFocusArea}
-            />
-            {createStaticLayers(staticLayer)}
-            <PMTilesHexLayer
-              collection={collection}
-              filterStartDate={filterStartDate}
-              filterEndDate={filterEndDate}
-              visible={selectedMapLayerId === LayerName.PMTiles}
-              layerConfig={selectedCoKey}
-              onLayerChange={setSelectedCoKey}
-              onMetadataPeriodChange={handlePmtilesMetadataPeriodChange}
-              onSupportChange={setIsSupportPMTiles}
-            />
-            <GeoServerLayer
-              layerConfig={geoServerLayerConfig}
-              onLayerChange={onWmsLayerChange}
-              onWMSAvailabilityChange={onWMSAvailabilityChange}
-              setWmsFields={setWMSFields}
-              setTimeSliderSupport={setTimeSliderSupport}
-              setDiscreteTimeSliderValues={setDiscreteTimeSliderValues}
-              setDrawRectSupportSupport={setDrawRectSupportSupport}
-              collection={collection}
-              visible={selectedMapLayerId === LayerName.GeoServer}
-            />
-            <GeojsonLayer
-              collection={collection}
-              visible={selectedMapLayerId === LayerName.SpatialExtent}
-            />
-            {hasGriddedProducts && (
-              <GriddedRasterLayer
-                {...griddedLayerProps}
-                visible={selectedMapLayerId === LayerName.GriddedRaster}
+              <GeojsonLayer
+                collection={collection}
+                visible={selectedMapLayerId === LayerName.SpatialExtent}
               />
-            )}
-          </Layers>
-        </MapBox>
+              {hasGriddedProducts && (
+                <GriddedRasterLayer
+                  {...griddedLayerProps}
+                  visible={selectedMapLayerId === LayerName.GriddedRaster}
+                />
+              )}
+            </Layers>
+          </MapBox>
+        </Box>
       </Box>
       {/* Show the legend exactly when the GeoServer (WMS) layer is the selected
           map layer - same gate as the GeoServerLayer's own `visible` prop */}

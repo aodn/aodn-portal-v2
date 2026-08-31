@@ -1,5 +1,4 @@
 import React, {
-  ReactElement,
   useCallback,
   useEffect,
   startTransition,
@@ -16,8 +15,8 @@ import { ControlProps } from "./Definition";
 import { Box, IconButton } from "@mui/material";
 import { switcherIconButtonSx } from "./MenuControl";
 import MenuHintTooltip from "./MenuHintTooltip";
-import dayjs from "dayjs";
 import { dateDefault } from "../../../../common/constants";
+import { toAppDayjs, unixMsToAppDayjs } from "@/utils/DateUtils";
 import { TimeRangeIcon } from "@/assets/icons/map/time_range";
 import DateSlider from "../../../../common/slider/DateSlider";
 import { TimeRangeTooltipIcon } from "@/assets/icons/map/tooltip_time_range";
@@ -31,9 +30,6 @@ interface DateRangeControlProps extends ControlProps {
     conditions: IDownloadCondition[]
   ) => IDownloadCondition[];
   downloadConditions: IDownloadCondition[];
-  options?: {
-    additionalSlider: ReactElement;
-  };
 }
 
 const MENU_ID = "daterange-show-hide-menu-button";
@@ -44,7 +40,6 @@ const DateRange: React.FC<DateRangeControlProps> = ({
   getAndSetDownloadConditions,
   downloadConditions,
   map, // Map instance passed through ControlProps via cloneElement
-  options = undefined,
 }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -73,8 +68,8 @@ const DateRange: React.FC<DateRangeControlProps> = ({
       dateRangeStamps: number | number[]
     ) => {
       const d = dateRangeStamps as number[];
-      const start = dayjs(d[0]).format(dateDefault.DATE_FORMAT);
-      const end = dayjs(d[1]).format(dateDefault.DATE_FORMAT);
+      const start = unixMsToAppDayjs(d[0]).format(dateDefault.DATE_FORMAT);
+      const end = unixMsToAppDayjs(d[1]).format(dateDefault.DATE_FORMAT);
 
       if (minDate === start && maxDate === end) {
         const prev = getAndSetDownloadConditions(
@@ -113,8 +108,13 @@ const DateRange: React.FC<DateRangeControlProps> = ({
     if (dateTime && dateTime.length !== 0) {
       startTransition(() => {
         setOpen(true);
-        const start = dayjs(dateTime[0].start).format(dateDefault.DATE_FORMAT);
-        const end = dayjs(dateTime[0].end).format(dateDefault.DATE_FORMAT);
+        const start = toAppDayjs(
+          dateTime[0].start,
+          dateDefault.DATE_FORMAT
+        ).format(dateDefault.DATE_FORMAT);
+        const end = toAppDayjs(dateTime[0].end, dateDefault.DATE_FORMAT).format(
+          dateDefault.DATE_FORMAT
+        );
         setCurrentMinDate(start ?? undefined);
         setCurrentMaxDate(end ?? undefined);
       });
@@ -164,7 +164,6 @@ const DateRange: React.FC<DateRangeControlProps> = ({
               justifyContent: "center",
             }}
           >
-            {options?.additionalSlider}
             <DateSlider
               currentMinDate={currentMinDate}
               currentMaxDate={currentMaxDate}

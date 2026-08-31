@@ -30,6 +30,7 @@ const HeaderIconMenu: FC = () => {
   return (
     <>
       <IconButton
+        aria-label={isOpen ? "Close menu" : "Open menu"}
         edge="end"
         onClick={handleClick}
         sx={{

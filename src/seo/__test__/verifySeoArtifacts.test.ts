@@ -5,7 +5,7 @@
 
 import { describe, expect, test } from "vitest";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
-import { BASE_URL } from "../constants";
+import { BASE_URL, CRAWLER_UA, CRAWLER_UA_PATTERN } from "../constants";
 import { renderCrawlerPage } from "../prerender";
 import {
   checkDetailPage,
@@ -31,8 +31,48 @@ describe("checkDetailPage", () => {
     expect(checkDetailPage(page, "abc-123")).toEqual([]);
   });
 
+  test("passes a dated record whose visible date matches the JSON-LD", () => {
+    const dated = Object.assign(new OGCCollection(), {
+      id: "abc-123",
+      title: "Sea Surface Temperature",
+      description: "Gridded SST records.",
+      properties: { revision: "2026-08-12T15:24:43" },
+    });
+
+    expect(
+      checkDetailPage(renderCrawlerPage(template, dated), "abc-123")
+    ).toEqual([]);
+  });
+
+  test("flags a page whose visible date no longer matches the JSON-LD", () => {
+    const dated = Object.assign(new OGCCollection(), {
+      id: "abc-123",
+      title: "Sea Surface Temperature",
+      description: "Gridded SST records.",
+      properties: { revision: "2026-08-12T15:24:43" },
+    });
+    const page = renderCrawlerPage(template, dated).replace(
+      "<p>Updated: 2026-08-12</p>",
+      ""
+    );
+
+    expect(checkDetailPage(page, "abc-123")).toContain(
+      "visible date does not match the JSON-LD dates"
+    );
+  });
+
   test("flags a page that kept the generic site title", () => {
     expect(checkDetailPage(template, "abc-123")).toContain(
+      "title is missing or still the generic site title"
+    );
+  });
+
+  test("flags the full shell title the live site serves on a rewrite miss", () => {
+    const shell = template.replace(
+      "<title>AODN Portal</title>",
+      "<title>AODN Portal – Australian Ocean Data Network</title>"
+    );
+    expect(checkDetailPage(shell, "abc-123")).toContain(
       "title is missing or still the generic site title"
     );
   });
@@ -138,6 +178,32 @@ describe("checkHomePage", () => {
     expect(checkHomePage(page, false)).toEqual([
       "meta description is missing or empty",
     ]);
+  });
+});
+
+describe("CRAWLER_UA_PATTERN", () => {
+  test("matches our verify UA and common crawlers", () => {
+    const crawlers = [
+      CRAWLER_UA,
+      "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+      "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; GPTBot/1.0",
+      "Mozilla/5.0 (compatible; ClaudeBot/1.0; +claudebot@anthropic.com)",
+      "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)",
+    ];
+    for (const ua of crawlers) {
+      expect(ua).toMatch(CRAWLER_UA_PATTERN);
+    }
+  });
+
+  test("does not match real browsers", () => {
+    const browsers = [
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+      "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1",
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:127.0) Gecko/20100101 Firefox/127.0",
+    ];
+    for (const ua of browsers) {
+      expect(ua).not.toMatch(CRAWLER_UA_PATTERN);
+    }
   });
 });
 

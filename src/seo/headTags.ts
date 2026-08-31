@@ -5,7 +5,8 @@
 
 import { BASE_URL, SHARE_IMAGE_URL, SITE_NAME } from "./constants";
 
-const SITE_TITLE = `${SITE_NAME} – Australian Ocean Data Network`;
+// Also the <title> of the index.html shell — what verify treats as "generic"
+export const SITE_TITLE = `${SITE_NAME} – Australian Ocean Data Network`;
 const SITE_DESCRIPTION =
   "Open access to Australian marine and climate science data.";
 

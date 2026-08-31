@@ -12,8 +12,9 @@ import ResultListSortButton, {
 import useBreakpoint from "../../hooks/useBreakpoint";
 import ShareButtonMenu from "../menu/ShareButtonMenu";
 import { portalTheme } from "../../styles";
+import { SIMPLE_FILTER_DEFAULT_HEIGHT } from "../common/constants";
 
-export const SIMPLE_FILTER_DEFAULT_HEIGHT = 40;
+export { SIMPLE_FILTER_DEFAULT_HEIGHT };
 
 export interface ResultPanelSimpleFilterType
   extends

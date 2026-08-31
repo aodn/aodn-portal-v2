@@ -1,16 +1,22 @@
-import dayjs from "dayjs";
+import dayjs from "@/utils/DayjsUtils";
 
 const dateDefault = {
   // Must use this format to do search, we care about the time
   DATE_TIME_FORMAT: "YYYY-MM-DDTHH:mm:ss[Z]",
-  DATE_FORMAT: "YYYY-MM-DD",
-  DATE_YEAR_MONTH_FORMAT: "YYYY-MM",
-  DISPLAY_FORMAT: "DD/MM/YYYY",
-  // e.g. 05 Jan 2024, matching the download email
-  DISPLAY_FORMAT_LONG: "DD MMM YYYY",
-  min: new Date("01/01/1970"),
-  max: new Date(),
-  currentYear: dayjs(new Date()).year(),
+  DATE_FORMAT: "YYYY-MM-DD", // machine day keys, slider I/O
+
+  // Display formats — every user-facing date goes through formatDate().
+  DISPLAY_FORMAT: "DD MMM YYYY",
+  UTC_DATE_TIME_DISPLAY_FORMAT: "DD MMM YYYY HH:mm [UTC]",
+  // Metadata Dates panel only, keeps the GeoNetwork GMT+0000 hack — see formatMetadataDate().
+  METADATA_DISPLAY_FORMAT: "ddd DD MMM YYYY HH:mm:ss [GMT+0000]",
+  min: dayjs.tz(0),
+  get max() {
+    return dayjs.tz();
+  },
+  get currentYear() {
+    return dayjs.tz().year();
+  },
 };
 
 const pageDefault = {
@@ -18,6 +24,7 @@ const pageDefault = {
   degraded: "/degraded",
   search: "/search",
   details: "/details",
+  downloads: "/downloads",
   landing: "/",
   url: {
     IMOS: "https://imos.org.au",
@@ -77,6 +84,8 @@ const playwrightTestIds = {
   DETAIL_MAP_POPUP: "map-popup",
 };
 
+const SIMPLE_FILTER_DEFAULT_HEIGHT = 40;
+
 const imosInfoDefault = {
   EMAIL: {
     RECIPIENT: "info@aodn.org.au",
@@ -95,4 +104,5 @@ export {
   contactRoles,
   imosInfoDefault,
   playwrightTestIds,
+  SIMPLE_FILTER_DEFAULT_HEIGHT,
 };

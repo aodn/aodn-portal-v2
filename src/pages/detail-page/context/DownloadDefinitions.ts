@@ -62,6 +62,7 @@ export interface DatasetDownloadRequest {
     collection_title?: string;
     full_metadata_link?: string;
     suggested_citation?: string;
+    estimated_size_bytes?: number;
   };
   outputs: object;
   subscriber: {
@@ -71,20 +72,15 @@ export interface DatasetDownloadRequest {
   };
 }
 
-// Response of POST /ogc/processes/download/execution. Errors also come back as
-// HTTP 200, carrying status.message "400" and no jobID, so the HTTP status code
-// is not a reliable success signal here.
-export interface DatasetDownloadResponse {
-  message?: { message: string };
-  status?: { message: string };
-  jobID?: string;
-  // True when ogcapi held the job because the user already has the maximum
-  // number of downloads in flight. It is released to AWS Batch automatically.
-  queued?: boolean;
-  // Place in this user's own hold queue, this download included, so 1 means it
-  // is next to start. Omitted when queued is false. Not a time estimate.
-  queuePosition?: number;
-}
+export const getValidEstimatedSizeBytes = (
+  estimatedSizeBytes?: number | null
+): number | undefined =>
+  Number.isInteger(estimatedSizeBytes) &&
+  estimatedSizeBytes !== undefined &&
+  estimatedSizeBytes !== null &&
+  estimatedSizeBytes >= 0
+    ? estimatedSizeBytes
+    : undefined;
 
 export class DateRangeCondition
   implements IDownloadCondition, IDownloadConditionCallback

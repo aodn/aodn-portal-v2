@@ -272,7 +272,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
                 {content?.description}
               </Typography>
             )}
-            <Box sx={{ mt: 1.5 }}>
+            <Box>
               <ResultCardButtonGroup
                 content={content}
                 isGridView

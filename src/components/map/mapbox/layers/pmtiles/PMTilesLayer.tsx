@@ -8,7 +8,8 @@ import {
   useState,
 } from "react";
 
-import { Dayjs } from "dayjs";
+import { Dayjs } from "@/utils/DayjsUtils";
+import { formatDate } from "@/utils/DateUtils";
 import {
   ExpressionSpecification,
   GeoJSONSource,
@@ -51,53 +52,11 @@ import { TestHelper } from "@/components/common/test/helper";
 import { addDataLayer } from "@/components/map/mapbox/layerOrder";
 import { isMapDrawModeActive } from "@/utils/MapUtils";
 
-// Re-export pure helpers so existing imports from PMTilesLayer keep working
-// (e.g. MapPanel: metadataRangeToDayjs, PMTilesMetadata).
-export type {
-  CountFilterRange,
-  CountsTree,
-  PeriodInt,
-  SumSparseCountOptions,
-  SumSparseCountResult,
-  SumTreeResult,
-} from "./Common";
-export type { PMTilesMetadata, PMTilesMetadataRange } from "./Common";
-export {
-  COUNTS_PROPERTY,
-  DAYS_KEY,
-  DEFAULT_RANGE_START,
-  DENSITY_TOTAL_CAP,
-  TOTAL_KEY,
-  buildCountFilterRange,
-  buildCountFilterRangeFromPeriods,
-  clampPeriodsToMetadata,
-  clampRangeToMetadata,
-  clearCountsTreeCache,
-  coerceCountValue,
-  coercePeriodDigits,
-  dayjsToPeriodInt,
-  daysInMonth,
-  densityStopValue,
-  formatPeriodInt,
-  metadataRangeToDayjs,
-  parseCountsTree,
-  parsePMTilesMetadata,
-  parsePeriodInt,
-  periodNumberToDayjs,
-  probePmtilesMetadata,
-  parquetKeyCandidates,
-  buildPmtilesSourceUrl,
-  buildPmtilesMetadataUrl,
-  sumCountsTreeDensityTotal,
-  sumCountsTreeInRange,
-  sumSparseCountFromProperties,
-} from "./Common";
-
 const SOURCE_ID = "pmtiles-source-id";
 const HOVER_SOURCE_ID = "pmtiles-hover-source-id";
 const HOVER_OUTLINE_LAYER_ID = "pmtiles-hex-hover-outline";
 /** Stable id for Playwright visibility checks (zoom-band fill layers share one source). */
-export const PMTILES_TEST_LAYER_ID = "pmtiles-hex-z0";
+const PMTILES_TEST_LAYER_ID = "pmtiles-hex-z0";
 const CURSOR_POINTER_CLASS = "map-cursor-pointer";
 /** H3 cell id property; promoted to feature id so feature-state can target hexes. */
 const PROMOTE_ID_PROPERTY = "h";
@@ -113,6 +72,25 @@ const FEATURE_STATE_DEBOUNCE_MS = 120;
 
 /** Feature-state key written by sparse JS sums for density paint/filter. */
 const FEATURE_STATE_TOTAL = "total";
+
+/**
+ * Tracks which features already received feature-state for the current filter
+ * generation so tile loads only process new hexes.
+ */
+type FeatureStateTotalsSession = {
+  /** Features already written: `${sourceLayer}\\0${id}` */
+  written: Set<string>;
+};
+
+/** Latest filter/visibility values read by hex click and hover handlers. */
+type PmtilesHexHoverCtx = {
+  filterStartDate?: Dayjs;
+  filterEndDate?: Dayjs;
+  countFilterRange?: CountFilterRange;
+  hasTime: boolean;
+  densityReady: boolean;
+  visible: boolean;
+};
 
 /**
  * Density fill-color stops as a fraction of {@link DENSITY_TOTAL_CAP}.
@@ -148,7 +126,7 @@ const DENSITY_OPACITY_STOPS: ReadonlyArray<{
  * Flatten ratio-based stops into Mapbox `interpolate` input/output pairs,
  * dropping any non-increasing values after rounding so the expression stays valid.
  */
-export const buildDensityInterpolateStops = <T extends string | number>(
+const buildDensityInterpolateStops = <T extends string | number>(
   stops: ReadonlyArray<{ ratio: number; value: T }>,
   cap: number = DENSITY_TOTAL_CAP
 ): Array<number | T> => {
@@ -165,7 +143,7 @@ export const buildDensityInterpolateStops = <T extends string | number>(
 };
 /**
  * Zoom bands for hex density fills. Mapbox ranges are half-open:
- * layer is active when `minzoom ≤ zoom < maxzoom` (same as hover gating).
+ * layer is active when `minzoom ≤ zoom < maxzoom` (same as click/hover gating).
  */
 const PMTILE_LAYERS: readonly PmtilesHexLayerDef[] = [
   { id: "pmtiles-hex-z0", sourceLayer: "hex_z0", minzoom: 0, maxzoom: 2 },
@@ -181,7 +159,7 @@ const PMTILE_LAYERS: readonly PmtilesHexLayerDef[] = [
  * Usually 0–1 layer. Overzoom past the last `maxzoom` clamps to the top band;
  * underzoom below the first `minzoom` clamps to the bottom band.
  */
-export const getActivePmtilesLayers = (zoom: number): PmtilesHexLayerDef[] => {
+const getActivePmtilesLayers = (zoom: number): PmtilesHexLayerDef[] => {
   const matched = PMTILE_LAYERS.filter(
     (layer) => zoom >= layer.minzoom && zoom < layer.maxzoom
   );
@@ -199,10 +177,7 @@ export const getActivePmtilesLayers = (zoom: number): PmtilesHexLayerDef[] => {
  * Used on filter-window reset so inactive bands do not keep stale totals
  * (active band is overwritten in place to avoid a density flash).
  */
-export const clearInactivePmtilesFeatureState = (
-  map: Map,
-  zoom: number
-): void => {
+const clearInactivePmtilesFeatureState = (map: Map, zoom: number): void => {
   if (!map.getSource(SOURCE_ID)) return;
   const activeSourceLayers = new Set(
     getActivePmtilesLayers(zoom).map((layer) => layer.sourceLayer)
@@ -242,7 +217,7 @@ interface PMTilesHexLayerProps extends LayerBasicType, LayerSelectable<string> {
  * omits the Time Range line so the synthetic sentinel is not shown as a
  * real observation date.
  */
-export const buildPopupHtml = (
+const buildPopupHtml = (
   properties: Record<string, unknown>,
   filterStartDate?: Dayjs,
   filterEndDate?: Dayjs,
@@ -262,14 +237,18 @@ export const buildPopupHtml = (
   if (hasTime) {
     const first = matchedKeys[0];
     const last = matchedKeys[matchedKeys.length - 1];
-    builder.addRange("Time Range", first ?? "N/A", last ?? "N/A");
+    builder.addRange(
+      "Time Range",
+      formatDate(first, undefined, "N/A"),
+      formatDate(last, undefined, "N/A")
+    );
   }
 
   return builder.getHtml();
 };
 
 /** Density input: sparse total written via setFeatureState (0 when unset). */
-export const buildFeatureStateTotalExpression = (): ExpressionSpecification =>
+const buildFeatureStateTotalExpression = (): ExpressionSpecification =>
   [
     "coalesce",
     ["feature-state", FEATURE_STATE_TOTAL],
@@ -280,22 +259,20 @@ export const buildFeatureStateTotalExpression = (): ExpressionSpecification =>
  * True when feature-state total has been written. Unset state is `null` and must
  * not be treated like a real zero count (new tiles would vanish mid-load).
  */
-export const buildFeatureStateTotalIsSetExpression =
-  (): ExpressionSpecification =>
-    [
-      "!=",
-      ["feature-state", FEATURE_STATE_TOTAL],
-      null,
-    ] as ExpressionSpecification;
+const buildFeatureStateTotalIsSetExpression = (): ExpressionSpecification =>
+  [
+    "!=",
+    ["feature-state", FEATURE_STATE_TOTAL],
+    null,
+  ] as ExpressionSpecification;
 
 /**
  * True when the sparse total is strictly greater than zero.
  * Used so zero-count hexes (common after a narrow time-slider window) paint
  * fully transparent — including outline — rather than leaving a faint border.
  */
-export const buildFeatureStateHasCountExpression =
-  (): ExpressionSpecification =>
-    [">", buildFeatureStateTotalExpression(), 0] as ExpressionSpecification;
+const buildFeatureStateHasCountExpression = (): ExpressionSpecification =>
+  [">", buildFeatureStateTotalExpression(), 0] as ExpressionSpecification;
 
 /**
  * Layer filter for density mode.
@@ -304,26 +281,26 @@ export const buildFeatureStateHasCountExpression =
  * in paint/layout. Zero-count hexes are hidden via transparent paint instead.
  * Presence filter keeps only real hex features.
  */
-export const buildDensityLayerFilter = (): ExpressionSpecification =>
+const buildDensityLayerFilter = (): ExpressionSpecification =>
   ["has", PROMOTE_ID_PROPERTY] as ExpressionSpecification;
 
 /** Phase A: any hex feature is present (tiles only contain cells with data). */
-export const buildPresenceFilter = (): ExpressionSpecification =>
+const buildPresenceFilter = (): ExpressionSpecification =>
   ["has", PROMOTE_ID_PROPERTY] as ExpressionSpecification;
 
-export const PLACEHOLDER_FILL_COLOR = "#475569";
-export const PLACEHOLDER_FILL_OPACITY = 0.4;
+const PLACEHOLDER_FILL_COLOR = "#475569";
+const PLACEHOLDER_FILL_OPACITY = 0.4;
 /** Fully opaque white border (no alpha) so edges stay clear on the basemap. */
-export const PLACEHOLDER_OUTLINE_COLOR = "#FFFFFF";
+const PLACEHOLDER_OUTLINE_COLOR = "#FFFFFF";
 /** Fully opaque white border for hexes with a non-zero density total. */
-export const DENSITY_OUTLINE_COLOR = "#FFFFFF";
+const DENSITY_OUTLINE_COLOR = "#FFFFFF";
 /** Fully transparent fill/outline when a hex has no records in the filter window. */
-export const ZERO_COUNT_FILL_COLOR = "rgba(0, 0, 0, 0)";
-export const ZERO_COUNT_OUTLINE_COLOR = "rgba(0, 0, 0, 0)";
-export const ZERO_COUNT_FILL_OPACITY = 0;
+const ZERO_COUNT_FILL_COLOR = "rgba(0, 0, 0, 0)";
+const ZERO_COUNT_OUTLINE_COLOR = "rgba(0, 0, 0, 0)";
+const ZERO_COUNT_FILL_OPACITY = 0;
 
 /** Neutral style while feature-state totals are computed in the background. */
-export const getPlaceholderPaintProperties = (): HexFillPaint => ({
+const getPlaceholderPaintProperties = (): HexFillPaint => ({
   "fill-color": PLACEHOLDER_FILL_COLOR,
   "fill-opacity": PLACEHOLDER_FILL_OPACITY,
   "fill-outline-color": PLACEHOLDER_OUTLINE_COLOR,
@@ -340,7 +317,7 @@ export const getPlaceholderPaintProperties = (): HexFillPaint => ({
  * Color and opacity breakpoints scale with {@link DENSITY_TOTAL_CAP} via
  * {@link DENSITY_COLOR_STOPS} / {@link DENSITY_OPACITY_STOPS}.
  */
-export const getFeatureStatePaintProperties = (
+const getFeatureStatePaintProperties = (
   cap: number = DENSITY_TOTAL_CAP
 ): HexFillPaint => {
   const totalIsSet = buildFeatureStateTotalIsSetExpression();
@@ -388,7 +365,7 @@ export const getFeatureStatePaintProperties = (
 };
 
 /** Apply fill filter + paint to every PMTiles hex zoom band that exists. */
-export const applyHexLayerStyle = (
+const applyHexLayerStyle = (
   map: Map,
   filter: ExpressionSpecification | null,
   paint: HexFillPaint
@@ -409,32 +386,90 @@ export const applyHexLayerStyle = (
   });
 };
 
-/** Drop all feature-state for the PMTiles vector source (if present). */
-export const clearPmtilesFeatureState = (map: Map): void => {
-  if (!map.getSource(SOURCE_ID)) return;
-  try {
-    // Clears every feature-state entry for this source (all source-layers)
-    map.removeFeatureState({ source: SOURCE_ID });
-  } catch {
-    // Source may already be gone or style unloaded
+/** Restore the PMTiles source and layers after a Mapbox base-style change. */
+const addPmtilesSourceAndLayers = (
+  map: Map,
+  sourceUrl: string,
+  visible: boolean
+): void => {
+  if (!map.getSource(SOURCE_ID)) {
+    map.addSource(SOURCE_ID, {
+      type: "vector",
+      url: sourceUrl,
+      promoteId: PROMOTE_ID_PROPERTY,
+    });
+  }
+
+  // Density paint from the start (feature-state expressions). Unset totals
+  // use the paint expression's unset branch until refreshDensity writes them.
+  const densityPaint = getFeatureStatePaintProperties();
+  PMTILE_LAYERS.forEach((layer) => {
+    if (!map.getLayer(layer.id)) {
+      addDataLayer(map, {
+        id: layer.id,
+        type: "fill",
+        source: SOURCE_ID,
+        "source-layer": layer.sourceLayer,
+        minzoom: layer.minzoom,
+        maxzoom: layer.maxzoom,
+        filter: buildDensityLayerFilter(),
+        layout: {
+          visibility: visible ? "visible" : "none",
+        },
+        paint: {
+          "fill-color": densityPaint["fill-color"],
+          "fill-opacity": densityPaint["fill-opacity"],
+          "fill-outline-color": densityPaint["fill-outline-color"],
+        },
+      });
+    }
+  });
+
+  if (!map.getSource(HOVER_SOURCE_ID)) {
+    map.addSource(HOVER_SOURCE_ID, {
+      type: "geojson",
+      data: EMPTY_FEATURE_COLLECTION,
+    });
+  }
+  if (!map.getLayer(HOVER_OUTLINE_LAYER_ID)) {
+    addDataLayer(map, {
+      id: HOVER_OUTLINE_LAYER_ID,
+      type: "line",
+      source: HOVER_SOURCE_ID,
+      layout: {
+        visibility: visible ? "visible" : "none",
+        "line-join": "round",
+        "line-cap": "round",
+      },
+      paint: {
+        "line-color": "rgba(255, 255, 255, 0.9)",
+        "line-width": 1.5,
+      },
+    });
   }
 };
 
-/**
- * Tracks which features already received feature-state for the current filter
- * generation so tile loads only process new hexes.
- */
-export type FeatureStateTotalsSession = {
-  /** Features already written: `${sourceLayer}\\0${id}` */
-  written: Set<string>;
+/** Drop all feature-state for the PMTiles vector source (if present). */
+const clearPmtilesFeatureState = (map: Map): void => {
+  if (!map.getSource(SOURCE_ID)) return;
+  // Vector sources require sourceLayer, so clear each hex band explicitly
+  for (const layer of PMTILE_LAYERS) {
+    try {
+      map.removeFeatureState({
+        source: SOURCE_ID,
+        sourceLayer: layer.sourceLayer,
+      });
+    } catch {
+      // Source may already be gone or style unloaded
+    }
+  }
 };
 
-export const createFeatureStateTotalsSession =
-  (): FeatureStateTotalsSession => ({
-    written: new Set(),
-  });
+const createFeatureStateTotalsSession = (): FeatureStateTotalsSession => ({
+  written: new Set(),
+});
 
-export const featureStateSessionKey = (
+const featureStateSessionKey = (
   sourceLayer: string,
   id: string | number
 ): string => `${sourceLayer}\0${String(id)}`;
@@ -445,7 +480,7 @@ export const featureStateSessionKey = (
  * Falling back to a different type than promoteId leaves hexes stuck in
  * placeholder style while the session thinks they were written.
  */
-export const resolvePmtilesFeatureId = (feature: {
+const resolvePmtilesFeatureId = (feature: {
   id?: string | number | null;
   properties?: Record<string, unknown> | null;
 }): string | number | undefined => {
@@ -467,7 +502,7 @@ export const resolvePmtilesFeatureId = (feature: {
  * How many loaded hexes still need feature-state for this session.
  * Used to detect half-painted density (teal cells + empty outlined cells).
  */
-export const countUnwrittenLoadedFeatures = (
+const countUnwrittenLoadedFeatures = (
   map: Map,
   session: FeatureStateTotalsSession,
   layers: readonly PmtilesHexLayerDef[] = PMTILE_LAYERS
@@ -501,7 +536,7 @@ export const countUnwrittenLoadedFeatures = (
   return unwritten;
 };
 
-export type UpdateFeatureStateTotalsOptions = {
+type UpdateFeatureStateTotalsOptions = {
   /** Precomputed range (required for hot path; built if omitted). */
   range?: CountFilterRange;
   /**
@@ -516,7 +551,7 @@ export type UpdateFeatureStateTotalsOptions = {
   layers?: readonly PmtilesHexLayerDef[];
 };
 
-export type UpdateFeatureStateTotalsResult = {
+type UpdateFeatureStateTotalsResult = {
   /** Features written in this call (not cumulative). */
   updated: number;
   /** Features seen in querySourceFeatures (including already-written). */
@@ -531,7 +566,7 @@ export type UpdateFeatureStateTotalsResult = {
  * Pass `layers` (e.g. from {@link getActivePmtilesLayers}) to skip bands
  * that are not visible at the current zoom.
  */
-export const updateFeatureStateTotals = (
+const updateFeatureStateTotals = (
   map: Map,
   filterStartDate?: Dayjs,
   filterEndDate?: Dayjs,
@@ -610,7 +645,7 @@ export const updateFeatureStateTotals = (
  * Schedule work after the browser is idle (or on the next macrotask).
  * Returns a cancel function so stale density updates can be dropped.
  */
-export const scheduleDeferredWork = (work: () => void): (() => void) => {
+const scheduleDeferredWork = (work: () => void): (() => void) => {
   let cancelled = false;
   const run = () => {
     if (!cancelled) work();
@@ -649,7 +684,7 @@ export const scheduleDeferredWork = (work: () => void): (() => void) => {
   };
 };
 
-export const scheduleDebouncedWork = (
+const scheduleDebouncedWork = (
   work: () => void,
   delayMs: number = FEATURE_STATE_DEBOUNCE_MS
 ): (() => void) => {
@@ -662,6 +697,193 @@ export const scheduleDebouncedWork = (
     clearTimeout(timeoutId);
   };
 };
+
+/**
+ * Click opens the count popup; hover only updates the pointer and outline.
+ * Zoom and Mapbox Draw interaction clear the open popup.
+ */
+const attachPmtilesHexInteraction = (
+  map: Map,
+  hoverCtxRef: { current: PmtilesHexHoverCtx },
+  popupRef: { current: Popup | null },
+  removePopup: () => void
+): (() => void) => {
+  let hoveredId: string | number | undefined;
+  let selectedId: string | number | undefined;
+  let selectedGeometry: Geometry | undefined;
+
+  const setHoverOutline = (geometry?: Geometry) => {
+    const source = map.getSource<GeoJSONSource>(HOVER_SOURCE_ID);
+    source?.setData(
+      geometry
+        ? {
+            type: "FeatureCollection",
+            features: [{ type: "Feature", geometry, properties: {} }],
+          }
+        : EMPTY_FEATURE_COLLECTION
+    );
+  };
+
+  const restoreOutline = () => {
+    setHoverOutline(selectedGeometry);
+  };
+
+  const clearInteraction = () => {
+    map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
+    hoveredId = undefined;
+    selectedId = undefined;
+    selectedGeometry = undefined;
+    setHoverOutline(undefined);
+    removePopup();
+  };
+
+  const hexTotal = (
+    layer: (typeof PMTILE_LAYERS)[number],
+    e: MapMouseEvent
+  ): {
+    feature: NonNullable<MapMouseEvent["features"]>[number] | undefined;
+    total: number;
+  } => {
+    const ctx = hoverCtxRef.current;
+    if (!ctx.visible || !ctx.densityReady) {
+      return { feature: undefined, total: 0 };
+    }
+    const zoom = map.getZoom();
+    if (zoom < layer.minzoom || zoom >= layer.maxzoom) {
+      return { feature: undefined, total: 0 };
+    }
+    const feature = e.features?.[0];
+    if (!feature) {
+      return { feature: undefined, total: 0 };
+    }
+    const { total } = sumSparseCountFromProperties(
+      (feature.properties ?? {}) as Record<string, unknown>,
+      ctx.filterStartDate,
+      ctx.filterEndDate,
+      {
+        range: ctx.countFilterRange,
+        collectMatchedKeys: false,
+      }
+    );
+    return { feature, total };
+  };
+
+  const onHexHover = (
+    layer: (typeof PMTILE_LAYERS)[number],
+    e: MapMouseEvent
+  ) => {
+    if (isMapDrawModeActive(map)) {
+      clearInteraction();
+      return;
+    }
+
+    const { feature, total } = hexTotal(layer, e);
+    if (!feature || total <= 0) {
+      map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
+      hoveredId = undefined;
+      restoreOutline();
+      return;
+    }
+
+    map.getCanvas().classList.add(CURSOR_POINTER_CLASS);
+    if (feature.id === undefined || feature.id === hoveredId) return;
+    hoveredId = feature.id;
+    if (feature.id !== selectedId) {
+      setHoverOutline(feature.geometry);
+    }
+  };
+
+  const onHexClick = (
+    layer: (typeof PMTILE_LAYERS)[number],
+    e: MapMouseEvent
+  ) => {
+    if (isMapDrawModeActive(map)) {
+      clearInteraction();
+      return;
+    }
+
+    const { feature, total } = hexTotal(layer, e);
+    if (!feature || total <= 0) {
+      clearInteraction();
+      return;
+    }
+
+    const ctx = hoverCtxRef.current;
+    selectedId = feature.id;
+    selectedGeometry = feature.geometry;
+    setHoverOutline(feature.geometry);
+
+    if (!popupRef.current) {
+      popupRef.current = new Popup(MapDefaultConfig.DEFAULT_POPUP);
+    }
+    popupRef.current.setHTML(
+      buildPopupHtml(
+        feature.properties ?? {},
+        ctx.filterStartDate,
+        ctx.filterEndDate,
+        ctx.countFilterRange,
+        ctx.hasTime
+      )
+    );
+    popupRef.current.setLngLat(e.lngLat);
+    if (!popupRef.current.isOpen()) {
+      popupRef.current.addTo(map);
+    }
+
+    const popupElement = popupRef.current.getElement();
+    if (popupElement) {
+      popupElement.dataset.testid = playwrightTestIds.DETAIL_MAP_POPUP;
+    }
+  };
+
+  const onHexLeave = () => {
+    map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
+    hoveredId = undefined;
+    restoreOutline();
+  };
+
+  const onZoom = () => {
+    clearInteraction();
+  };
+
+  const onDrawInteractionChange = () => {
+    if (isMapDrawModeActive(map)) {
+      clearInteraction();
+    }
+  };
+
+  const layerHandlers = PMTILE_LAYERS.map((layer) => ({
+    layerId: layer.id,
+    onMouseMove: (e: MapMouseEvent) => onHexHover(layer, e),
+    onClick: (e: MapMouseEvent) => onHexClick(layer, e),
+  }));
+
+  layerHandlers.forEach(({ layerId, onMouseMove, onClick }) => {
+    map.on("mousemove", layerId, onMouseMove);
+    map.on("mouseleave", layerId, onHexLeave);
+    map.on("click", layerId, onClick);
+  });
+  map.on("zoom", onZoom);
+  map.on("draw.modechange", onDrawInteractionChange);
+  map.on("draw.selectionchange", onDrawInteractionChange);
+
+  return () => {
+    layerHandlers.forEach(({ layerId, onMouseMove, onClick }) => {
+      map.off("mousemove", layerId, onMouseMove);
+      map.off("mouseleave", layerId, onHexLeave);
+      map.off("click", layerId, onClick);
+    });
+    map.off("zoom", onZoom);
+    map.off("draw.modechange", onDrawInteractionChange);
+    map.off("draw.selectionchange", onDrawInteractionChange);
+    try {
+      clearInteraction();
+    } catch {
+      // Map may already be torn down
+    }
+  };
+};
+
 const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   collection,
   layerConfig,
@@ -723,8 +945,8 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   );
 
   /**
-   * Latest values for map event handlers (hover). Updated in an effect — not
-   * during render — so react-hooks/refs stays clean.
+   * Latest values for map event handlers (click/hover). Updated in an effect —
+   * not during render — so react-hooks/refs stays clean.
    */
   const hoverCtxRef = useRef({
     filterStartDate,
@@ -849,62 +1071,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
 
     const addSourceAndLayers = () => {
       try {
-        if (!map.getSource(SOURCE_ID)) {
-          map.addSource(SOURCE_ID, {
-            type: "vector",
-            url: sourceUrl,
-            promoteId: PROMOTE_ID_PROPERTY,
-          });
-        }
-
-        // Density paint from the start (feature-state expressions). Unset totals
-        // use the paint expression's unset branch until refreshDensity writes them.
-        const densityPaint = getFeatureStatePaintProperties();
-        PMTILE_LAYERS.forEach((layer) => {
-          if (!map.getLayer(layer.id)) {
-            addDataLayer(map, {
-              id: layer.id,
-              type: "fill",
-              source: SOURCE_ID,
-              "source-layer": layer.sourceLayer,
-              minzoom: layer.minzoom,
-              maxzoom: layer.maxzoom,
-              filter: buildDensityLayerFilter(),
-              layout: {
-                // Visibility effect owns show/hide; avoid remounting source on toggle
-                visibility: "visible",
-              },
-              paint: {
-                "fill-color": densityPaint["fill-color"],
-                "fill-opacity": densityPaint["fill-opacity"],
-                "fill-outline-color": densityPaint["fill-outline-color"],
-              },
-            });
-          }
-        });
-
-        if (!map.getSource(HOVER_SOURCE_ID)) {
-          map.addSource(HOVER_SOURCE_ID, {
-            type: "geojson",
-            data: EMPTY_FEATURE_COLLECTION,
-          });
-        }
-        if (!map.getLayer(HOVER_OUTLINE_LAYER_ID)) {
-          addDataLayer(map, {
-            id: HOVER_OUTLINE_LAYER_ID,
-            type: "line",
-            source: HOVER_SOURCE_ID,
-            layout: {
-              visibility: "visible",
-              "line-join": "round",
-              "line-cap": "round",
-            },
-            paint: {
-              "line-color": "rgba(255, 255, 255, 0.9)",
-              "line-width": 1.5,
-            },
-          });
-        }
+        addPmtilesSourceAndLayers(map, sourceUrl, hoverCtxRef.current.visible);
       } catch {
         // Style may not be ready
       }
@@ -1056,144 +1223,10 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     };
   }, [map, formSourceUrl, filterStartDate, filterEndDate, periodBounds]);
 
-  // Hover popup + outline
+  // Click popup + hover outline
   useEffect(() => {
     if (!map) return;
-
-    let hoveredId: string | number | undefined;
-
-    const setHoverOutline = (geometry?: Geometry) => {
-      const source = map.getSource<GeoJSONSource>(HOVER_SOURCE_ID);
-      source?.setData(
-        geometry
-          ? {
-              type: "FeatureCollection",
-              features: [{ type: "Feature", geometry, properties: {} }],
-            }
-          : EMPTY_FEATURE_COLLECTION
-      );
-    };
-
-    const clearHover = () => {
-      map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
-      hoveredId = undefined;
-      setHoverOutline(undefined);
-      removePopup();
-    };
-
-    const onHexHover = (
-      layer: (typeof PMTILE_LAYERS)[number],
-      e: MapMouseEvent
-    ) => {
-      // While drawing bbox/polygon, skip hover popup/outline so draw clicks win
-      if (isMapDrawModeActive(map)) {
-        clearHover();
-        return;
-      }
-
-      const ctx = hoverCtxRef.current;
-      if (!ctx.visible || !ctx.densityReady) {
-        clearHover();
-        return;
-      }
-      const zoom = map.getZoom();
-      if (zoom < layer.minzoom || zoom >= layer.maxzoom) return;
-
-      const feature = e.features?.[0];
-      if (!feature) return;
-
-      const { total: hoverTotal } = sumSparseCountFromProperties(
-        (feature.properties ?? {}) as Record<string, unknown>,
-        ctx.filterStartDate,
-        ctx.filterEndDate,
-        {
-          range: ctx.countFilterRange,
-          collectMatchedKeys: false,
-        }
-      );
-      if (hoverTotal <= 0) {
-        clearHover();
-        return;
-      }
-
-      map.getCanvas().classList.add(CURSOR_POINTER_CLASS);
-
-      if (!popupRef.current) {
-        popupRef.current = new Popup({
-          ...MapDefaultConfig.DEFAULT_POPUP,
-          closeButton: false,
-        });
-        hoveredId = undefined;
-      }
-
-      if (feature.id === undefined || feature.id !== hoveredId) {
-        hoveredId = feature.id;
-        popupRef.current.setHTML(
-          buildPopupHtml(
-            feature.properties ?? {},
-            ctx.filterStartDate,
-            ctx.filterEndDate,
-            ctx.countFilterRange,
-            ctx.hasTime
-          )
-        );
-        setHoverOutline(feature.geometry);
-      }
-
-      popupRef.current.setLngLat(e.lngLat);
-      if (!popupRef.current.isOpen()) {
-        popupRef.current.addTo(map);
-      }
-
-      const popupElement = popupRef.current.getElement();
-      if (popupElement) {
-        popupElement.dataset.testid = playwrightTestIds.DETAIL_MAP_POPUP;
-      }
-    };
-
-    const onHexLeave = () => {
-      clearHover();
-    };
-
-    const onZoom = () => {
-      clearHover();
-    };
-
-    // Drop open hover when drawing/editing starts or a feature is selected.
-    // mousemove re-enables hover once draw interaction is idle again.
-    const onDrawInteractionChange = () => {
-      if (isMapDrawModeActive(map)) {
-        clearHover();
-      }
-    };
-
-    const hoverHandlers = PMTILE_LAYERS.map((layer) => ({
-      layerId: layer.id,
-      onMouseMove: (e: MapMouseEvent) => onHexHover(layer, e),
-    }));
-
-    hoverHandlers.forEach(({ layerId, onMouseMove }) => {
-      map.on("mousemove", layerId, onMouseMove);
-      map.on("mouseleave", layerId, onHexLeave);
-    });
-    map.on("zoom", onZoom);
-    map.on("draw.modechange", onDrawInteractionChange);
-    map.on("draw.selectionchange", onDrawInteractionChange);
-
-    return () => {
-      hoverHandlers.forEach(({ layerId, onMouseMove }) => {
-        map.off("mousemove", layerId, onMouseMove);
-        map.off("mouseleave", layerId, onHexLeave);
-      });
-      map.off("zoom", onZoom);
-      map.off("draw.modechange", onDrawInteractionChange);
-      map.off("draw.selectionchange", onDrawInteractionChange);
-      try {
-        clearHover();
-      } catch {
-        // Map may already be torn down
-      }
-    };
+    return attachPmtilesHexInteraction(map, hoverCtxRef, popupRef, removePopup);
   }, [map, removePopup]);
 
   // Visibility
@@ -1255,4 +1288,31 @@ export {
   DENSITY_COLOR_STOPS,
   DENSITY_OPACITY_STOPS,
   PMTILE_LAYERS,
+  ZERO_COUNT_FILL_OPACITY,
+  ZERO_COUNT_OUTLINE_COLOR,
+  ZERO_COUNT_FILL_COLOR,
+  PLACEHOLDER_FILL_COLOR,
+  attachPmtilesHexInteraction,
+  addPmtilesSourceAndLayers,
+  buildPresenceFilter,
+  scheduleDebouncedWork,
+  scheduleDeferredWork,
+  updateFeatureStateTotals,
+  countUnwrittenLoadedFeatures,
+  resolvePmtilesFeatureId,
+  featureStateSessionKey,
+  createFeatureStateTotalsSession,
+  buildDensityInterpolateStops,
+  applyHexLayerStyle,
+  getFeatureStatePaintProperties,
+  getPlaceholderPaintProperties,
+  getActivePmtilesLayers,
+  clearInactivePmtilesFeatureState,
+  buildDensityLayerFilter,
+  buildFeatureStateHasCountExpression,
+  buildFeatureStateTotalIsSetExpression,
+  buildFeatureStateTotalExpression,
+  buildPopupHtml,
 };
+
+export type { PmtilesHexHoverCtx };

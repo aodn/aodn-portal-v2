@@ -3,6 +3,11 @@ import axios, { AxiosError } from "axios";
 import axiosRetry, { isNetworkError, isRetryableError } from "axios-retry";
 import { ParameterState, Vocab } from "./componentParamReducer";
 import {
+  SearchControl,
+  SearchParameters,
+  SuggesterParameters,
+} from "./searchTypes";
+import {
   cqlDefaultFilters,
   DatasetGroup,
   IsNotNull,
@@ -29,6 +34,12 @@ import {
   WFSDownloadRequest,
 } from "@/pages/detail-page/context/DownloadDefinitions";
 import {
+  formatUtcDateTime,
+  toAppDayjs,
+  toUtcEndOfDay,
+  toUtcStartOfDay,
+} from "@/utils/DateUtils";
+import {
   getDateConditionFrom,
   getFormatFrom,
   getKeyFrom,
@@ -45,36 +56,14 @@ import {
 } from "./GeoserverDefinitions";
 import { Health } from "./systemDefinition";
 import { TileProductsResponse } from "./GriddedTileDefinitions";
+import { DownloadExecutionResponse } from "./DownloadStatusDefinitions";
 
-export enum DatasetFrequency {
-  REALTIME = "real-time",
-  DELAYED = "delayed",
-  OTHER = "other",
-  BOTH = "both",
-}
-
-export enum DatasetStatus {
-  ONGOING = "onGoing",
-  COMPLETED = "completed",
-}
-
-export type SuggesterParameters = {
-  input?: string;
-  filter?: string;
-};
-
-export type SearchParameters = {
-  text?: string;
-  filter?: string;
-  properties?: string;
-  sortby?: string;
-};
-// Control the behavior of search behavior not part of the query
-export type SearchControl = {
-  pagesize?: number;
-  searchafter?: Array<string>;
-  score?: number;
-};
+export { DatasetFrequency, DatasetStatus } from "./datasetEnums";
+export type {
+  SearchControl,
+  SearchParameters,
+  SuggesterParameters,
+} from "./searchTypes";
 
 type OGCSearchParameters = {
   q?: string;
@@ -331,6 +320,15 @@ export interface DatasetMetadataItem {
 
 export type DatasetMetadata = Record<string, DatasetMetadataItem>;
 
+const toIsoDateOrUnspecified = (value: string, endOfDay = false): string =>
+  value === "non-specified"
+    ? value
+    : formatUtcDateTime(
+        endOfDay
+          ? toUtcEndOfDay(toAppDayjs(value))
+          : toUtcStartOfDay(toAppDayjs(value))
+      );
+
 const fetchDatasetMetadataByUuid = createAsyncThunk<
   DatasetMetadata,
   string,
@@ -343,21 +341,19 @@ const fetchDatasetMetadataByUuid = createAsyncThunk<
 );
 
 const processDatasetDownload = createAsyncThunk<
-  any,
+  DownloadExecutionResponse,
   DatasetDownloadRequest,
   { rejectValue: ErrorResponse }
 >(
   "download/downloadDataset",
   async (request: DatasetDownloadRequest, thunkAPI: any) => {
-    try {
-      const response = await ogcAxiosWithRetry.post(
+    return ogcAxiosWithRetry
+      .post<DownloadExecutionResponse>(
         "/ogc/processes/download/execution",
         request
-      );
-      return response.data;
-    } catch (error) {
-      errorHandling(thunkAPI);
-    }
+      )
+      .then((response) => response.data)
+      .catch(errorHandling(thunkAPI));
   }
 );
 
@@ -377,8 +373,8 @@ const processWFSDownload = createAsyncThunk<
       const requestBody = {
         inputs: {
           uuid: request.uuid,
-          start_date: dateRange.start,
-          end_date: dateRange.end,
+          start_date: toIsoDateOrUnspecified(dateRange.start),
+          end_date: toIsoDateOrUnspecified(dateRange.end, true),
           multi_polygon: multiPolygon,
           layer_name: request.layerName,
           output_format: format,
@@ -428,8 +424,8 @@ const processWFSEstimateSize = createAsyncThunk<
         inputs: {
           uuid: request.uuid,
           layer_name: request.layerName,
-          start_date: dateRange.start,
-          end_date: dateRange.end,
+          start_date: toIsoDateOrUnspecified(dateRange.start),
+          end_date: toIsoDateOrUnspecified(dateRange.end, true),
           output_format: format,
           multi_polygon: multiPolygon,
         },
@@ -476,8 +472,8 @@ const processCoEstimateSize = createAsyncThunk<
         inputs: {
           uuid: request.uuid,
           key,
-          start_date: dateRange.start,
-          end_date: dateRange.end,
+          start_date: toIsoDateOrUnspecified(dateRange.start),
+          end_date: toIsoDateOrUnspecified(dateRange.end, true),
           output_format: format,
           multi_polygon: multiPolygon,
         },
@@ -758,29 +754,19 @@ const createSearchParamFrom = (
     p.filter = appendFilter(p.filter, f(i.datasetStatus));
   }
 
-  if (
-    i.dateTimeFilterRange &&
-    (i.dateTimeFilterRange.start || i.dateTimeFilterRange.end)
-  ) {
-    if (i.dateTimeFilterRange.start && i.dateTimeFilterRange.end) {
-      const f = cqlDefaultFilters.get("BETWEEN_TIME_RANGE") as TemporalDuring;
-      p.filter = appendFilter(
-        p.filter,
-        f(i.dateTimeFilterRange.start, i.dateTimeFilterRange.end)
-      );
-    } else if (
-      i.dateTimeFilterRange.start === undefined &&
-      i.dateTimeFilterRange.end
-    ) {
-      const f = cqlDefaultFilters.get("BEFORE_TIME") as TemporalAfterOrBefore;
-      p.filter = appendFilter(p.filter, f(i.dateTimeFilterRange.end));
-    } else if (
-      i.dateTimeFilterRange.end === undefined &&
-      i.dateTimeFilterRange.start
-    ) {
-      const f = cqlDefaultFilters.get("AFTER_TIME") as TemporalAfterOrBefore;
-      p.filter = appendFilter(p.filter, f(i.dateTimeFilterRange.start));
-    }
+  const rangeStart = i.dateTimeFilterRange?.start;
+  const rangeEnd = i.dateTimeFilterRange?.end;
+  const hasStart = rangeStart !== undefined;
+  const hasEnd = rangeEnd !== undefined;
+  if (hasStart && hasEnd) {
+    const f = cqlDefaultFilters.get("BETWEEN_TIME_RANGE") as TemporalDuring;
+    p.filter = appendFilter(p.filter, f(rangeStart, rangeEnd));
+  } else if (hasEnd) {
+    const f = cqlDefaultFilters.get("BEFORE_TIME") as TemporalAfterOrBefore;
+    p.filter = appendFilter(p.filter, f(rangeEnd));
+  } else if (hasStart) {
+    const f = cqlDefaultFilters.get("AFTER_TIME") as TemporalAfterOrBefore;
+    p.filter = appendFilter(p.filter, f(rangeStart));
   }
 
   if (i.bbox) {

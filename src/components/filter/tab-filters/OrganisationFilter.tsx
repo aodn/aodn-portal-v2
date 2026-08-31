@@ -2,7 +2,7 @@ import React, { FC, useCallback } from "react";
 import { Box, Stack, SxProps, Typography, useTheme } from "@mui/material";
 import { useAppDispatch } from "@/app/store/hooks";
 import { updateDatasetGroup } from "@/app/store/componentParamReducer";
-import { TabFilterType } from "../Filters";
+import { TabFilterType } from "../FilterDefinition";
 import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
 import { StyledToggleButtonGroup } from "../../common/buttons/StyledToggleButtonGroup";
 import IMOSIcon from "../../icon/organisation/IMOSIcon";
