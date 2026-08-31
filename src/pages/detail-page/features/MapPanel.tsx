@@ -714,11 +714,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
                     isSubsettingSupported(SubsettingType.TimeSlider) ||
                     isSubsettingSupported(SubsettingType.DrawRect)
                   }
-                  sx={{
-                    backgroundColor: "transparent",
-                    boxShadow: "none",
-                    paddingTop: "2px",
-                  }}
+                  sx={{ paddingTop: "2px" }}
                   menu={
                     <ResetSelections
                       disabled={!hasResettableSelections}
