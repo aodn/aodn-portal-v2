@@ -19,6 +19,7 @@ import {
 } from "../utils/DownloadConditionUtils";
 import {
   DatasetDownloadRequest,
+  DatasetDownloadResponse,
   DownloadConditionType,
 } from "../pages/detail-page/context/DownloadDefinitions";
 import { processDatasetDownload } from "@/app/store/searchReducer";
@@ -40,6 +41,8 @@ const STATUS_MESSAGES = {
   SERVER_ERROR: "Server error! Please try again later",
   SUCCESS: "Download email will be sent shortly.",
   DATASET_ERROR: "Dataset unavailable! Please try again later",
+  // Kept short: this renders inside the stepper button, which does not wrap.
+  QUEUED: "Download queued",
 } as const;
 
 const TIMEOUT_LIMIT = 8000;
@@ -57,6 +60,8 @@ export const useDownloadDialog = (
   const [activeStep, setActiveStep] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isQueued, setIsQueued] = useState(false);
+  const [queuePosition, setQueuePosition] = useState<number | null>(null);
   const [processingStatus, setProcessingStatus] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [dataUsage, setDataUsage] = useState<DataUsageInformation>({
@@ -132,6 +137,8 @@ export const useDownloadDialog = (
       setActiveStep(0);
       setProcessingStatus("");
       setIsSuccess(false);
+      setIsQueued(false);
+      setQueuePosition(null);
       setIsProcessing(false);
 
       // Load saved data from localStorage
@@ -203,6 +210,8 @@ export const useDownloadDialog = (
   // ================== DIALOG MANAGEMENT ==================
   const handleIsClose = useCallback(() => {
     setIsSuccess(false);
+    setIsQueued(false);
+    setQueuePosition(null);
     setProcessingStatus("");
     setActiveStep(0);
     setEmail("");
@@ -343,7 +352,7 @@ export const useDownloadDialog = (
 
       dispatch(processDatasetDownload(request))
         .unwrap()
-        .then((response: { status: { message: string } }) => {
+        .then((response: DatasetDownloadResponse) => {
           if (response?.status?.message) {
             const statusCode = response.status.message;
             setProcessingStatus(statusCode);
@@ -351,6 +360,8 @@ export const useDownloadDialog = (
             // Only 2xx status codes are considered successful
             if (/^2\d{2}$/.test(statusCode)) {
               setIsSuccess(true);
+              setIsQueued(response.queued === true);
+              setQueuePosition(response.queuePosition ?? null);
               // Clear saved data after successful submission
               try {
                 // localStorage.removeItem("download_dialog_email");
@@ -486,7 +497,7 @@ export const useDownloadDialog = (
       return STATUS_MESSAGES.SERVER_ERROR;
     }
     if (/^2\d{2}$/.test(processingStatus)) {
-      return STATUS_MESSAGES.SUCCESS;
+      return isQueued ? STATUS_MESSAGES.QUEUED : STATUS_MESSAGES.SUCCESS;
     }
     if (/^4\d{2}$/.test(processingStatus)) {
       return processingStatus === "400"
@@ -494,7 +505,30 @@ export const useDownloadDialog = (
         : "Request failed! Please try again later";
     }
     return "Something went wrong";
-  }, [processingStatus]);
+  }, [processingStatus, isQueued]);
+
+  // Full explanation for a held download. A queued user gets no "processing"
+  // email until the job actually starts, so this screen is their only signal.
+  // queuePosition counts this download itself, so position 1 means next to go.
+  const getQueuedInfoText = useCallback((): string => {
+    const tail =
+      " It will start automatically once one of your running downloads" +
+      " finishes, and we will email you then. No action is needed.";
+
+    if (queuePosition === null) {
+      return "Your download is queued." + tail;
+    }
+    if (queuePosition <= 1) {
+      return "Your download is queued and is next to start." + tail;
+    }
+
+    const ahead = queuePosition - 1;
+    return (
+      `Your download is queued, with ${ahead} of your own download` +
+      `${ahead === 1 ? "" : "s"} ahead of it.` +
+      tail
+    );
+  }, [queuePosition]);
 
   const getStepperButtonTitle = useCallback(() => {
     if (activeStep === 0) {
@@ -508,6 +542,8 @@ export const useDownloadDialog = (
     activeStep,
     isProcessing,
     isSuccess,
+    isQueued,
+    queuePosition,
     processingStatus,
     email,
     emailError,
@@ -521,6 +557,7 @@ export const useDownloadDialog = (
     handleClearEmail,
     handleFormSubmit,
     getProcessStatusText,
+    getQueuedInfoText,
     getStepperButtonTitle,
     setEmail,
     setEmailError,

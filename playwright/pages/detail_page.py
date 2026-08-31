@@ -44,6 +44,9 @@ class DetailPage(BasePage):
             'download-email-input'
         ).locator('input')
         self.dialog_button = self.page.get_by_test_id('dialog-button')
+        self.download_queued_message = self.page.get_by_test_id(
+            'download-queued-message'
+        )
 
         # download condition boxes
         self.bbox_condition_box = self.page.get_by_test_id('bbox-condition-box')

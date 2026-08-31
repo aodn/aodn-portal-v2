@@ -118,3 +118,61 @@ def test_download_dialog_errors(
     )
     detail_page.dialog_button.click()
     expect(detail_page.dialog_button).to_contain_text(dataset_error_button_text)
+
+
+@pytest.mark.parametrize(
+    'uuid, email, default_button_text, queued_button_text',
+    [
+        (
+            'b299cdcd-3dee-48aa-abdd-e0fcdbb9cadc',
+            'test@email.com',
+            'I understand, process download',
+            'Download queued',
+        ),
+    ],
+)
+def test_download_dialog_queued(
+    desktop_page: Page,
+    uuid: str,
+    email: str,
+    default_button_text: str,
+    queued_button_text: str,
+) -> None:
+    """
+    Tests feedback when ogcapi holds the download behind the per-user limit.
+
+    - Overrides the mock so the execute response comes back with queued: true
+    - Verifies the button reports the queued state instead of the email promise
+    - Verifies the explanation states how many downloads sit ahead of this one
+    """
+    api_router = ApiRouter(desktop_page)
+    detail_page = DetailPage(desktop_page)
+    detail_page.load(uuid)
+
+    detail_page.download_button.click()
+    expect(detail_page.download_dialog).to_be_visible()
+
+    detail_page.download_email_input.fill(email)
+    detail_page.dialog_button.click()
+    expect(detail_page.dialog_button).to_contain_text(default_button_text)
+
+    # queuePosition counts this download itself, so 3 means 2 sit ahead of it.
+    api_router.route_download_dialog(
+        lambda route: route.fulfill(
+            status=HTTPStatus.OK,
+            json={
+                'message': {'message': 'Job queued with ID: test-job-id'},
+                'status': {'message': '200'},
+                'jobID': 'test-job-id',
+                'queued': True,
+                'queuePosition': 3,
+            },
+        )
+    )
+    detail_page.dialog_button.click()
+
+    expect(detail_page.dialog_button).to_contain_text(queued_button_text)
+    expect(detail_page.download_queued_message).to_be_visible()
+    expect(detail_page.download_queued_message).to_contain_text(
+        '2 of your own downloads ahead of it'
+    )
