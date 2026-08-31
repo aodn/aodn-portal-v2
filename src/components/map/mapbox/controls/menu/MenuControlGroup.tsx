@@ -78,8 +78,10 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
                 // Strip mapbox-gl.css's built-in ctrl-group background/box-shadow
                 sx: [
                   {
-                    backgroundColor: "transparent",
-                    "&.mapboxgl-ctrl-group:not(:empty)": { boxShadow: "none" },
+                    "&.mapboxgl-ctrl-group:not(:empty)": {
+                      backgroundColor: "transparent",
+                      boxShadow: "none",
+                    },
                   },
                   ...(Array.isArray(standaloneSx)
                     ? standaloneSx
