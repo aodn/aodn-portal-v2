@@ -70,8 +70,30 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
             // own styling/positioning instead of being folded into the
             // shared box (no parentRef re-parenting, no childStyles).
             if ((child.props as { standalone?: boolean }).standalone) {
-              return cloneElement<any>(child, { key: child.key || index });
+              const { sx: standaloneSx } = child.props as {
+                sx?: SxProps<Theme>;
+              };
+              return cloneElement<any>(child, {
+                key: child.key || index,
+                // Strip mapbox-gl.css's built-in ctrl-group background/box-shadow
+                sx: [
+                  {
+                    "&.mapboxgl-ctrl-group:not(:empty)": {
+                      backgroundColor: "transparent",
+                      boxShadow: "none",
+                    },
+                  },
+                  ...(Array.isArray(standaloneSx)
+                    ? standaloneSx
+                    : standaloneSx
+                      ? [standaloneSx]
+                      : []),
+                ],
+              });
             }
+            // sx here is fully overridden by childStyles, not merged — a
+            // grouped child's own sx would be silently dropped. If need custom
+            // styling, use `standalone` above instead.
             return cloneElement<any>(child, {
               key: child.key || index,
               className: className,
