@@ -26,11 +26,14 @@ import {
   DateRangeCondition,
   DownloadConditionType,
   DownloadServiceType,
-  IDownloadConditionCallback,
   PolygonCondition,
   SubsettingType,
 } from "../context/DownloadDefinitions";
 import { isValidPolygonFeature } from "@/utils/GeoJsonUtils";
+import {
+  hasResettableDownloadConditions,
+  resetDownloadConditions,
+} from "@/utils/DownloadConditionUtils";
 import { dateDefault } from "@/components/common/constants";
 import { Feature, MultiPolygon, Polygon } from "geojson";
 import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
@@ -75,12 +78,6 @@ import useGriddedRasterLayer from "@/components/map/mapbox/layers/raster-layers/
 import { portalTheme } from "@/styles";
 
 const mapContainerId = "map-detail-container-id";
-
-const RESETTABLE_TYPES = [
-  DownloadConditionType.BBOX,
-  DownloadConditionType.POLYGON,
-  DownloadConditionType.DATE_RANGE,
-];
 
 // Exported for unit tests
 export const buildMapLayerConfig = (
@@ -606,15 +603,12 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   );
 
   const hasResettableSelections = useMemo(
-    () => downloadConditions.some((c) => RESETTABLE_TYPES.includes(c.type)),
+    () => hasResettableDownloadConditions(downloadConditions),
     [downloadConditions]
   );
 
   const handleResetSelections = useCallback(() => {
-    downloadConditions
-      .filter((c) => RESETTABLE_TYPES.includes(c.type))
-      .forEach((c) => (c as IDownloadConditionCallback).removeCallback?.());
-    clearDownloadConditions(RESETTABLE_TYPES);
+    resetDownloadConditions(downloadConditions, clearDownloadConditions);
   }, [downloadConditions, clearDownloadConditions]);
 
   if (!collection) return null;

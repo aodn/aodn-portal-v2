@@ -91,6 +91,48 @@ def test_drawing_shape_adds_download_filter(
         '0015db7e-e684-7548-e053-08114f8cd4ad',
     ],
 )
+def test_reset_selections_clears_bbox_and_date_range_together(
+    desktop_page: Page, uuid: str
+) -> None:
+    """
+    Verifies that Reset Selections clears a drawn bounding box and a
+    selected date range together in a single click, not just one of them.
+    """
+    detail_page = DetailPage(desktop_page)
+    detail_page.load(uuid)
+    detail_page.detail_map.wait_for_layer_select_loading()
+
+    # Draw a rectangle on the map
+    detail_page.detail_map.draw_rect_menu_button.click()
+    detail_page.detail_map.hover_map()
+    detail_page.detail_map.click_map()
+    x, y = detail_page.detail_map.calculate_mouse_coordinates(
+        right=100, down=100
+    )
+    detail_page.mouse.move(x, y)
+    detail_page.detail_map.click_map()
+    expect(detail_page.bbox_condition_box.first).to_have_css(
+        'visibility', 'visible', timeout=5000
+    )
+
+    # Select a date range using the slider
+    detail_page.detail_map.daterange_show_hide_menu_button.click()
+    detail_page.detail_map.date_slider.hover()
+    detail_page.detail_map.click_map()
+    expect(detail_page.date_range_condition_box).to_be_visible()
+
+    # A single reset click should clear both together
+    detail_page.detail_map.reset_selections_button.click()
+    expect(detail_page.bbox_condition_box.first).not_to_be_visible()
+    expect(detail_page.date_range_condition_box).not_to_be_visible()
+
+
+@pytest.mark.parametrize(
+    'uuid',
+    [
+        '0015db7e-e684-7548-e053-08114f8cd4ad',
+    ],
+)
 def test_selecting_date_range_adds_download_filter(
     desktop_page: Page, uuid: str
 ) -> None:

@@ -6,9 +6,31 @@ import {
   FormatCondition,
   KeyCondition,
   IDownloadCondition,
+  IDownloadConditionCallback,
 } from "../pages/detail-page/context/DownloadDefinitions";
 import { MultiPolygon } from "geojson";
 import { combineToMultiPolygon } from "./GeoJsonUtils";
+
+export const RESETTABLE_DOWNLOAD_CONDITION_TYPES: DownloadConditionType[] = [
+  DownloadConditionType.BBOX,
+  DownloadConditionType.POLYGON,
+  DownloadConditionType.DATE_RANGE,
+];
+
+export const hasResettableDownloadConditions = (
+  conditions: IDownloadCondition[]
+): boolean =>
+  conditions.some((c) => RESETTABLE_DOWNLOAD_CONDITION_TYPES.includes(c.type));
+
+export const resetDownloadConditions = (
+  conditions: IDownloadCondition[],
+  clearDownloadConditions: (types: DownloadConditionType[]) => void
+): void => {
+  conditions
+    .filter((c) => RESETTABLE_DOWNLOAD_CONDITION_TYPES.includes(c.type))
+    .forEach((c) => (c as IDownloadConditionCallback).removeCallback?.());
+  clearDownloadConditions(RESETTABLE_DOWNLOAD_CONDITION_TYPES);
+};
 
 export const getDateConditionFrom = (
   conditions: IDownloadCondition[]
