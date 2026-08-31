@@ -715,10 +715,16 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
                   }
                 />
                 <MenuControl
+                  standalone
                   visible={
                     isSubsettingSupported(SubsettingType.TimeSlider) ||
                     isSubsettingSupported(SubsettingType.DrawRect)
                   }
+                  sx={{
+                    backgroundColor: "transparent",
+                    boxShadow: "none",
+                    paddingTop: "2px",
+                  }}
                   menu={
                     <ResetSelections
                       disabled={!hasResettableSelections}

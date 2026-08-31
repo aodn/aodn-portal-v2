@@ -723,6 +723,8 @@ const LocationFilter: FC<LocationFilterProps> = () => {
                     }
                   />
                   <MenuControl
+                    standalone
+                    sx={{ backgroundColor: "transparent", boxShadow: "none" }}
                     menu={
                       <ResetSelections
                         disabled={drawFeatures.length === 0}

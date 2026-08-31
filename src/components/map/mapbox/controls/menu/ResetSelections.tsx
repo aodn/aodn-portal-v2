@@ -2,7 +2,7 @@ import React from "react";
 import { Box, IconButton } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { ControlProps } from "./Definition";
-import { switcherIconButtonSx } from "./MenuControl";
+import { portalTheme } from "../../../../../styles";
 import MenuHintTooltip from "./MenuHintTooltip";
 
 interface ResetSelectionsProps extends ControlProps {
@@ -12,6 +12,37 @@ interface ResetSelectionsProps extends ControlProps {
 }
 
 const RESET_ID = "map-reset-selections-button";
+
+// Standalone control rendered below the MenuControlGroup, not inside it
+const resetSelectionsButtonSx = (disabled: boolean) => ({
+  "&.MuiIconButton-root.MuiIconButton-root": {
+    backgroundColor: "#FFF",
+    color: portalTheme.palette.grey700,
+    width: "42px",
+    height: "42px",
+    padding: "2px",
+    borderRadius: "50%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: "4px 4px 4px 0px rgba(0, 0, 0, 0.10)",
+    cursor: disabled ? "not-allowed" : "pointer",
+    "& svg": {
+      width: "26px",
+      height: "26px",
+      opacity: disabled ? 0.5 : 1,
+    },
+    "&:hover": {
+      backgroundColor: portalTheme.palette.primary4,
+      "& svg": {
+        filter: "brightness(0)",
+      },
+    },
+    "&.Mui-focusVisible": {
+      backgroundColor: portalTheme.palette.grey300,
+    },
+  },
+});
 
 const ResetSelections: React.FC<ResetSelectionsProps> = ({
   disabled = false,
@@ -28,9 +59,7 @@ const ResetSelections: React.FC<ResetSelectionsProps> = ({
           onClick={onReset}
           disabled={disabled}
           sx={{
-            ...switcherIconButtonSx(false),
-            opacity: disabled ? 0.5 : 1,
-            cursor: disabled ? "not-allowed" : "pointer",
+            ...resetSelectionsButtonSx(disabled),
             "&.MuiIconButton-root": { border: "0px solid transparent" },
             "&.Mui-disabled": {
               border: "0px solid transparent",
