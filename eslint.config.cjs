@@ -75,8 +75,11 @@ module.exports = [
       "@typescript-eslint/no-empty-object-type": "off",
       "no-undef": "off", // tsc already checks this
 
-      // console.log is debug noise; real problems should use warn/error
-      "no-console": ["error", { allow: ["warn", "error"] }],
+      // console.log is debug noise; real problems should use warn/error.
+      // Kept at "warn" (not "error") so it doesn't block dev.
+      // Lint-staged and `yarn lint` both run with --max-warnings 0
+      // so it's still enforced at commit time and in CI.
+      "no-console": ["warn", { allow: ["warn", "error"] }],
 
       quotes: ["error", "double", { avoidEscape: true }],
 
