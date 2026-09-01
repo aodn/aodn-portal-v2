@@ -1,6 +1,7 @@
 import { styled } from "@mui/material";
 import { DatePicker, DatePickerProps } from "@mui/x-date-pickers";
 import { Dayjs, getAppTimezone } from "@/utils/DayjsUtils";
+import { toUtcStartOfDay } from "@/utils/DateUtils";
 import {
   border,
   borderRadius,
@@ -11,6 +12,13 @@ import {
   fontWeight,
   padding,
 } from "@/styles/constants";
+
+const toPickerDate = (
+  date: Dayjs | null | undefined
+): Dayjs | null | undefined => {
+  if (date == null || !date.isValid()) return date;
+  return toUtcStartOfDay(date);
+};
 
 const StyledDatePicker = styled(DatePicker<Dayjs>)(() => ({
   border: `${border.sm} ${color.blue.darkSemiTransparent}`,
@@ -36,8 +44,25 @@ const StyledDatePicker = styled(DatePicker<Dayjs>)(() => ({
   },
 }));
 
-const PlainDatePicker = (props: DatePickerProps<Dayjs>) => (
-  <StyledDatePicker {...props} timezone={getAppTimezone()} />
+const PlainDatePicker = ({
+  value,
+  defaultValue,
+  minDate,
+  maxDate,
+  referenceDate,
+  ...props
+}: DatePickerProps<Dayjs>) => (
+  <StyledDatePicker
+    {...props}
+    timezone={getAppTimezone()}
+    value={value === undefined ? undefined : toPickerDate(value)}
+    defaultValue={
+      defaultValue === undefined ? undefined : toPickerDate(defaultValue)
+    }
+    minDate={toPickerDate(minDate) ?? undefined}
+    maxDate={toPickerDate(maxDate) ?? undefined}
+    referenceDate={toPickerDate(referenceDate) ?? undefined}
+  />
 );
 
 export default PlainDatePicker;
