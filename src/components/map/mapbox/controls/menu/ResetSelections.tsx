@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, IconButton } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { TrashIcon } from "@/components/icon/TrashIcon";
 import { ControlProps } from "./Definition";
 import { portalTheme } from "../../../../../styles";
 import MenuHintTooltip from "./MenuHintTooltip";
@@ -66,7 +66,7 @@ const ResetSelections: React.FC<ResetSelectionsProps> = ({
             },
           }}
         >
-          <DeleteIcon />
+          <TrashIcon />
         </IconButton>
       </MenuHintTooltip>
     </Box>
