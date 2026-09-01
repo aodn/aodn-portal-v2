@@ -55,6 +55,9 @@ jobs:
           name: build
           path: ./dist
 
+      - name: Checkout
+        uses: actions/checkout@v5
+
       - name: Configure AWS credentials
         id: aws_auth
         uses: aws-actions/configure-aws-credentials@v6
@@ -62,6 +65,15 @@ jobs:
           audience: sts.amazonaws.com
           aws-region: ${{ vars.AWS_REGION }}
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+
+      - name: Upload CloudFront function artifacts
+        run: |
+          aws s3 sync \
+          ./microservices/ \
+          "s3://${{ vars.ARTIFACT_BUCKET }}/" \
+          --delete \
+          --region ${{ vars.AWS_REGION }} \
+          --only-show-errors 
 
       - name: Copy files to the production website with the AWS CLI
         run: |
