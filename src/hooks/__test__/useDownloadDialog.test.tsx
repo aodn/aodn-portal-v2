@@ -28,8 +28,12 @@ vi.mock("@/pages/detail-page/context/detail-page-context", () => ({
   useDetailPageContext: () => ({
     downloadConditions: [],
     collection: {
+      id: "collection-id",
       title: "Test Ocean Data Collection",
-      getCitation: () => ({ suggestedCitation: "Citation" }),
+      getCitation: () => ({
+        suggestedCitation:
+          "IMOS [year-of-data-download], [Title], [data-access-URL], accessed [date-of-access]",
+      }),
     },
   }),
 }));
@@ -84,6 +88,9 @@ describe("useDownloadDialog", () => {
           output_format: "netcdf",
           full_metadata_link: "http://localhost:3000/details/collection-id",
           estimated_size_bytes: 987654,
+          suggested_citation: expect.stringMatching(
+            /^IMOS \d{4}, Test Ocean Data Collection, http:\/\/localhost:3000\/details\/collection-id\?tab=summary, accessed \d{2}-[A-Za-z]{3}-\d{4}$/
+          ),
         }),
       })
     );

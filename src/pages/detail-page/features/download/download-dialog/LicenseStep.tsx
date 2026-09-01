@@ -5,14 +5,19 @@ import { useDetailPageContext } from "../../../context/detail-page-context";
 import { portalTheme } from "../../../../../styles";
 import { trackCustomEvent } from "../../../../../analytics/customEventTracker";
 import { AnalyticsEvent } from "../../../../../analytics/analyticsEvents";
+import { resolveSuggestedCitation } from "@/utils/CitationUtils";
 
 const LicenseStep = () => {
   const context = useDetailPageContext();
 
   const citationText = useMemo(
     () =>
-      context.collection?.getCitation()?.suggestedCitation ||
-      "IMOS [year-of-data-downloaded], [Title], [data-access-url], accessed [date-of-access]",
+      resolveSuggestedCitation(
+        context.collection?.getCitation()?.suggestedCitation ||
+          "IMOS [year-of-data-downloaded], [Title], [data-access-url], accessed [date-of-access]",
+        context.collection?.id,
+        context.collection?.title
+      ),
     [context.collection]
   );
 
