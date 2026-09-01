@@ -154,6 +154,38 @@ describe("DateRangeFilter", () => {
     ).toBe(false);
   });
 
+  it("resets start date when a year before the filter min is typed", () => {
+    const rangeStart = toAppDayjs("2020-01-01", dateDefault.DATE_FORMAT);
+    const rangeEnd = toAppDayjs("2020-12-31", dateDefault.DATE_FORMAT);
+    store = createMockStore({
+      paramReducer: {
+        dateTimeFilterRange: {
+          start: dayjsToUnixMs(rangeStart),
+          end: dayjsToUnixMs(rangeEnd),
+        },
+      },
+    });
+    vi.spyOn(store, "dispatch");
+    renderComponent();
+
+    const startDisplay = rangeStart.format(dateDefault.DISPLAY_FORMAT);
+    fireEvent.change(screen.getByDisplayValue(startDisplay), {
+      target: { value: "01 Aug 0202" },
+    });
+
+    expect(screen.getByDisplayValue(startDisplay)).toBeInTheDocument();
+    expect(screen.queryByDisplayValue("DD MMM YYYY")).not.toBeInTheDocument();
+    expect(
+      dispatchedDateRanges().some(
+        (action) =>
+          !Number.isFinite(action?.payload?.dateTimeFilterRange?.start) ||
+          unixMsToAppDayjs(
+            action?.payload?.dateTimeFilterRange?.start
+          ).year() === 202
+      )
+    ).toBe(false);
+  });
+
   it("resets end date when a date before the start date is typed", () => {
     const rangeStart = toAppDayjs("2020-01-01", dateDefault.DATE_FORMAT);
     const rangeEnd = toAppDayjs("2020-12-31", dateDefault.DATE_FORMAT);
