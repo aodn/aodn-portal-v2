@@ -9,6 +9,7 @@ describe("ResetSelections", () => {
     expect(
       screen.getByRole("button", { name: "Reset Selections" })
     ).toBeInTheDocument();
+    expect(screen.getByTestId("TrashIcon")).toBeInTheDocument();
   });
 
   it("fires onReset once on click when enabled", async () => {
