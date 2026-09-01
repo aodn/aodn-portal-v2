@@ -357,7 +357,8 @@ export const useDownloadDialog = (
           full_metadata_link: `${window.location.origin}${pageDefault.details}/${uuid}`,
           suggested_citation: resolveSuggestedCitation(
             collection?.getCitation()?.suggestedCitation,
-            uuid
+            uuid,
+            collection?.title
           ),
           ...(validEstimatedSizeBytes !== undefined && {
             estimated_size_bytes: validEstimatedSizeBytes,

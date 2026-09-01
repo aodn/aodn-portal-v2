@@ -15,7 +15,8 @@ const LicenseStep = () => {
       resolveSuggestedCitation(
         context.collection?.getCitation()?.suggestedCitation ||
           "IMOS [year-of-data-downloaded], [Title], [data-access-url], accessed [date-of-access]",
-        context.collection?.id
+        context.collection?.id,
+        context.collection?.title
       ),
     [context.collection]
   );

@@ -3,6 +3,7 @@ import { formatDate, toAppDayjs } from "@/utils/DateUtils";
 import { Dayjs } from "@/utils/DayjsUtils";
 
 const YEAR_PLACEHOLDER = /\[year-of-data-download(?:ed)?\]/gi;
+const TITLE_PLACEHOLDER = /\[title\]/gi;
 const ACCESS_URL_PLACEHOLDER = /\[data-access-url\]/gi;
 const ACCESS_DATE_PLACEHOLDER = /\[date-of-access\]/gi;
 
@@ -14,6 +15,7 @@ export const buildDataAccessUrl = (uuid: string): string =>
 export const resolveSuggestedCitation = (
   suggestedCitation: string | undefined,
   uuid: string | undefined,
+  title: string | undefined,
   accessDate: Dayjs = toAppDayjs()
 ): string => {
   if (!suggestedCitation) return "";
@@ -22,6 +24,7 @@ export const resolveSuggestedCitation = (
 
   return suggestedCitation
     .replace(YEAR_PLACEHOLDER, String(accessDate.year()))
+    .replace(TITLE_PLACEHOLDER, title ?? "")
     .replace(ACCESS_URL_PLACEHOLDER, accessUrl)
     .replace(
       ACCESS_DATE_PLACEHOLDER,

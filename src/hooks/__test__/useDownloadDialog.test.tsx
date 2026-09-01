@@ -32,7 +32,7 @@ vi.mock("@/pages/detail-page/context/detail-page-context", () => ({
       title: "Test Ocean Data Collection",
       getCitation: () => ({
         suggestedCitation:
-          "IMOS [year-of-data-download], Test Ocean Data Collection, [data-access-URL], accessed [date-of-access]",
+          "IMOS [year-of-data-download], [Title], [data-access-URL], accessed [date-of-access]",
       }),
     },
   }),
