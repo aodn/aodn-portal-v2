@@ -9,6 +9,7 @@ permissions:
 
 jobs:
   upload-artifacts:
+    environment: edge
     name: Upload CloudFront function artifacts
     runs-on: ubuntu-latest
 
