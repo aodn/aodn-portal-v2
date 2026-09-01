@@ -217,6 +217,9 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
             end: value[1],
           })
         );
+      } else {
+        // Force reset to previous value and text box refresh
+        setValue([value[0], value[1]]);
       }
     },
     [determineSelectedOption, dispatch, maxDate, value]
@@ -240,6 +243,9 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
             end: newEnd,
           })
         );
+      } else {
+        // Force reset to previous value and text box refresh
+        setValue([value[0], value[1]]);
       }
     },
     [determineSelectedOption, dispatch, minDate, value]
