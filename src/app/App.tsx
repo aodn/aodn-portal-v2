@@ -22,7 +22,6 @@ const app = () => {
               <RouterProvider
                 router={AppRouter}
                 fallbackElement={<Fallback />}
-                future={{ v7_startTransition: true }}
               />
             </AdminScreen>
           </ClipboardProvider>
