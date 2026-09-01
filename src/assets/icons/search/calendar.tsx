@@ -1,16 +1,11 @@
 import { ComponentType, SVGProps } from "react";
 
-type CalendarIconProps = SVGProps<SVGSVGElement> & {
-  ownerState?: unknown;
-};
-
-export const CalendarIcon: ComponentType<CalendarIconProps> = ({
+export const CalendarIcon: ComponentType<SVGProps<SVGSVGElement>> = ({
   color = "black",
   width = 40,
   height = 40,
-  ownerState: _ownerState,
   ...props
-}: CalendarIconProps) => (
+}: SVGProps<SVGSVGElement>) => (
   <svg
     width={width}
     height={height}
