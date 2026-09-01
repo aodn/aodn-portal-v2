@@ -113,6 +113,82 @@ describe("DateRangeFilter", () => {
     ).toBe("2020-01-01");
   });
 
+  const dispatchedDateRanges = () =>
+    vi
+      .mocked(store.dispatch)
+      .mock.calls.map(([action]) => action as { type?: string; payload?: any })
+      .filter((action) => action?.type === "UPDATE_DATETIME_FILTER_VARIABLE");
+
+  it("resets start date when a date after the end date is typed", () => {
+    const rangeStart = toAppDayjs("2020-01-01", dateDefault.DATE_FORMAT);
+    const rangeEnd = toAppDayjs("2020-12-31", dateDefault.DATE_FORMAT);
+    store = createMockStore({
+      paramReducer: {
+        dateTimeFilterRange: {
+          start: dayjsToUnixMs(rangeStart),
+          end: dayjsToUnixMs(rangeEnd),
+        },
+      },
+    });
+    vi.spyOn(store, "dispatch");
+    renderComponent();
+
+    const startDisplay = rangeStart.format(dateDefault.DISPLAY_FORMAT);
+    const startDatePicker = screen.getByDisplayValue(startDisplay);
+    fireEvent.change(startDatePicker, {
+      target: {
+        value: toAppDayjs("2021-01-01", dateDefault.DATE_FORMAT).format(
+          dateDefault.DISPLAY_FORMAT
+        ),
+      },
+    });
+
+    expect(screen.getByDisplayValue(startDisplay)).toBeInTheDocument();
+    expect(
+      dispatchedDateRanges().some(
+        (action) =>
+          unixMsToAppDayjs(action?.payload?.dateTimeFilterRange?.start).format(
+            dateDefault.DATE_FORMAT
+          ) === "2021-01-01"
+      )
+    ).toBe(false);
+  });
+
+  it("resets end date when a date before the start date is typed", () => {
+    const rangeStart = toAppDayjs("2020-01-01", dateDefault.DATE_FORMAT);
+    const rangeEnd = toAppDayjs("2020-12-31", dateDefault.DATE_FORMAT);
+    store = createMockStore({
+      paramReducer: {
+        dateTimeFilterRange: {
+          start: dayjsToUnixMs(rangeStart),
+          end: dayjsToUnixMs(rangeEnd),
+        },
+      },
+    });
+    vi.spyOn(store, "dispatch");
+    renderComponent();
+
+    const endDisplay = rangeEnd.format(dateDefault.DISPLAY_FORMAT);
+    const endDatePicker = screen.getByDisplayValue(endDisplay);
+    fireEvent.change(endDatePicker, {
+      target: {
+        value: toAppDayjs("2019-12-31", dateDefault.DATE_FORMAT).format(
+          dateDefault.DISPLAY_FORMAT
+        ),
+      },
+    });
+
+    expect(screen.getByDisplayValue(endDisplay)).toBeInTheDocument();
+    expect(
+      dispatchedDateRanges().some(
+        (action) =>
+          unixMsToAppDayjs(action?.payload?.dateTimeFilterRange?.end).format(
+            dateDefault.DATE_FORMAT
+          ) === "2019-12-31"
+      )
+    ).toBe(false);
+  });
+
   it("updates date range when end date is changed via date picker", () => {
     renderComponent();
     const maxDate = dateDefault.max.format(dateDefault.DISPLAY_FORMAT);
