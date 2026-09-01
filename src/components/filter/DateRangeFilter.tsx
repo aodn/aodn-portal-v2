@@ -202,13 +202,17 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
   const handleMinDateChange = useCallback(
     (newMinDate: Dayjs | null) => {
       // Date-only picker: the chosen calendar day at UTC 00:00:00, not host midnight.
-      const localMinDate = newMinDate ? toUtcStartOfDay(newMinDate) : null;
+      const localMinDate = newMinDate?.isValid()
+        ? toUtcStartOfDay(newMinDate)
+        : null;
+      const newStart = localMinDate ? dayjsToUnixMs(localMinDate) : NaN;
 
       if (
-        localMinDate &&
-        dayjsToUnixMs(localMinDate) < dayjsToUnixMs(maxDate)
+        localMinDate?.isValid() &&
+        Number.isFinite(newStart) &&
+        !localMinDate.isBefore(initialMinDate, "day") &&
+        !localMinDate.isAfter(maxDate, "day")
       ) {
-        const newStart = dayjsToUnixMs(localMinDate);
         setValue([newStart, value[1]]);
         setSelectedOption(determineSelectedOption(localMinDate, maxDate));
         dispatch(
@@ -228,13 +232,17 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
   const handleMaxDateChange = useCallback(
     (newMaxDate: Dayjs | null) => {
       // Date-only picker: the chosen calendar day at UTC 23:59:59, not host local.
-      const localMaxDate = newMaxDate ? toUtcEndOfDay(newMaxDate) : null;
+      const localMaxDate = newMaxDate?.isValid()
+        ? toUtcEndOfDay(newMaxDate)
+        : null;
+      const newEnd = localMaxDate ? dayjsToUnixMs(localMaxDate) : NaN;
 
       if (
-        localMaxDate &&
-        dayjsToUnixMs(localMaxDate) > dayjsToUnixMs(minDate)
+        localMaxDate?.isValid() &&
+        Number.isFinite(newEnd) &&
+        !localMaxDate.isBefore(minDate, "day") &&
+        !localMaxDate.isAfter(initialMaxDate, "day")
       ) {
-        const newEnd = dayjsToUnixMs(localMaxDate);
         setValue([value[0], newEnd]);
         setSelectedOption(determineSelectedOption(minDate, localMaxDate));
         dispatch(
@@ -248,7 +256,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
         setValue([value[0], value[1]]);
       }
     },
-    [determineSelectedOption, dispatch, minDate, value]
+    [determineSelectedOption, dispatch, initialMaxDate, minDate, value]
   );
 
   const renderFilterBy = useCallback(
