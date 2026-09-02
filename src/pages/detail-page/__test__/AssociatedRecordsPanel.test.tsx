@@ -174,8 +174,7 @@ describe("AssociatedRecordsPanel", async () => {
     );
   });
 
-  it("should render this record under Sub Records on its parent (reciprocal of multiple parents)", () => {
-    // When a record has multiple parents, each parent must list it back under "Sub Records".
+  it("should render a child record under Sub Records for the current record", () => {
     vi.mocked(useLocation).mockReturnValue({
       state: null,
       hash: "111",
