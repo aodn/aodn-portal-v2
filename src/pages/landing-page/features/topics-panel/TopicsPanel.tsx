@@ -217,7 +217,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       {
         title: "Ocean Colour",
         icon: IconOceanColor,
-        handler: () => handleClickTopicCard("Colour"),
+        handler: () => handleClickTopicCard("Ocean Colour"),
       },
       {
         title: "Benthic",
