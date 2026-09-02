@@ -76,10 +76,10 @@ describe("AssociatedRecordsPanel", async () => {
       </Provider>
     );
 
-    return waitFor(() => screen.findAllByText("Parent Record"), {
+    return waitFor(() => screen.findAllByText("Parent Records"), {
       timeout: 2000,
     }).then(() => {
-      const parentRecordText = screen.queryAllByText("Parent Record");
+      const parentRecordText = screen.queryAllByText("Parent Records");
       // one is button, another is list title
       expect(parentRecordText).toHaveLength(2);
     });
@@ -132,6 +132,81 @@ describe("AssociatedRecordsPanel", async () => {
         });
       });
     });
+  });
+
+  it("should render all parent records when a collection has more than one parent", () => {
+    vi.mocked(useLocation).mockReturnValue({
+      state: null,
+      hash: "111",
+      key: "default",
+      pathname: "/details/5fc91100-4ade-11dc-8f56-00008a07204e",
+      search: "",
+    });
+
+    vi.mocked(useParams).mockReturnValue({
+      uuid: "5fc91100-4ade-11dc-8f56-00008a07204e",
+    });
+
+    render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <DetailPageProvider>
+            <AssociatedRecordsPanel />
+          </DetailPageProvider>
+        </ThemeProvider>
+      </Provider>
+    );
+
+    return waitFor(
+      () => {
+        expect(
+          screen.getByTestId(
+            `link-card-${window.location.origin}/details/0887cb5b-b443-4e08-a169-038208109466`
+          )
+        ).to.exist;
+        expect(
+          screen.getByTestId(
+            `link-card-${window.location.origin}/details/c46ea3a7-1279-4e5d-8fb7-c1c2440fc5c8`
+          )
+        ).to.exist;
+      },
+      { timeout: 10000 }
+    );
+  });
+
+  it("should render a child record under Sub Records for the current record", () => {
+    vi.mocked(useLocation).mockReturnValue({
+      state: null,
+      hash: "111",
+      key: "default",
+      pathname: "/details/5fc91100-4ade-11dc-8f56-00008a07204e",
+      search: "",
+    });
+
+    vi.mocked(useParams).mockReturnValue({
+      uuid: "5fc91100-4ade-11dc-8f56-00008a07204e",
+    });
+
+    render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <DetailPageProvider>
+            <AssociatedRecordsPanel />
+          </DetailPageProvider>
+        </ThemeProvider>
+      </Provider>
+    );
+
+    return waitFor(
+      () => {
+        expect(
+          screen.getByTestId(
+            `link-card-${window.location.origin}/details/2e573ea5-b17b-4b5a-8462-2464009c013d`
+          )
+        ).to.exist;
+      },
+      { timeout: 10000 }
+    );
   });
 
   it("should be able to show / hide more records", async () => {
@@ -225,12 +300,12 @@ describe("AssociatedRecordsPanel", async () => {
       </Provider>
     );
 
-    return waitFor(() => screen.findAllByText("Parent Record"), {
+    return waitFor(() => screen.findAllByText("Parent Records"), {
       timeout: 2000,
     }).then(() => {
       // There are some malform json in the associated links, we make sure parse error will not
-      // cause the whole page to die, so as long as we get Parent Record, we know we handled the error
-      const parentRecordText = screen.queryAllByText("Parent Record");
+      // cause the whole page to die, so as long as we get Parent Records, we know we handled the error
+      const parentRecordText = screen.queryAllByText("Parent Records");
       expect(parentRecordText).toHaveLength(2);
     });
   });
