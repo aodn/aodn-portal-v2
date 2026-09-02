@@ -76,10 +76,10 @@ describe("AssociatedRecordsPanel", async () => {
       </Provider>
     );
 
-    return waitFor(() => screen.findAllByText("Parent Record"), {
+    return waitFor(() => screen.findAllByText("Parent Records"), {
       timeout: 2000,
     }).then(() => {
-      const parentRecordText = screen.queryAllByText("Parent Record");
+      const parentRecordText = screen.queryAllByText("Parent Records");
       // one is button, another is list title
       expect(parentRecordText).toHaveLength(2);
     });
@@ -225,12 +225,12 @@ describe("AssociatedRecordsPanel", async () => {
       </Provider>
     );
 
-    return waitFor(() => screen.findAllByText("Parent Record"), {
+    return waitFor(() => screen.findAllByText("Parent Records"), {
       timeout: 2000,
     }).then(() => {
       // There are some malform json in the associated links, we make sure parse error will not
-      // cause the whole page to die, so as long as we get Parent Record, we know we handled the error
-      const parentRecordText = screen.queryAllByText("Parent Record");
+      // cause the whole page to die, so as long as we get Parent Records, we know we handled the error
+      const parentRecordText = screen.queryAllByText("Parent Records");
       expect(parentRecordText).toHaveLength(2);
     });
   });
