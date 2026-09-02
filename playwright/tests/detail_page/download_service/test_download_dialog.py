@@ -197,7 +197,5 @@ def test_download_dialog_rate_limited(
     )
     detail_page.dialog_button.click()
 
-    expect(detail_page.dialog_button).to_contain_text(
-        limit_reached_button_text
-    )
+    expect(detail_page.dialog_button).to_contain_text(limit_reached_button_text)
     expect(detail_page.view_download_status_link).not_to_be_visible()
