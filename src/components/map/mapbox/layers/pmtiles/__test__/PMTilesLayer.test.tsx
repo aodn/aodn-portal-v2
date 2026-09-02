@@ -1284,7 +1284,7 @@ describe("PMTilesLayer - base style restoration", () => {
     addPmtilesSourceAndLayers(map, "pmtiles://density", false);
 
     const restoredLayers = addLayer.mock.calls.map(([layer]) => layer);
-    expect(restoredLayers).toHaveLength(PMTILE_LAYERS.length + 1);
+    expect(restoredLayers).toHaveLength(PMTILE_LAYERS.length * 2 + 1);
     expect(restoredLayers).toEqual(
       expect.arrayContaining(
         PMTILE_LAYERS.map((layer) =>
@@ -1302,6 +1302,16 @@ describe("PMTilesLayer - base style restoration", () => {
           layout: expect.objectContaining({ visibility: "none" }),
         }),
       ])
+    );
+    expect(restoredLayers).toEqual(
+      expect.arrayContaining(
+        PMTILE_LAYERS.map((layer) =>
+          expect.objectContaining({
+            id: `${layer.id}-hit`,
+            layout: expect.objectContaining({ visibility: "none" }),
+          })
+        )
+      )
     );
   });
 });
