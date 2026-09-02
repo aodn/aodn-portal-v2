@@ -28,7 +28,8 @@ import {
 } from "@/app/store/DownloadStatusDefinitions";
 import { portalTheme } from "@/styles";
 import useBreakpoint from "@/hooks/useBreakpoint";
-import { toAppDayjs } from "@/utils/DateUtils";
+import { toAppDayjs, formatDateTime } from "@/utils/DateUtils";
+import { dateDefault } from "@/components/common/constants";
 import useDownloadStatus from "./useDownloadStatus";
 
 const EMPTY_VALUE = "—";
@@ -38,22 +39,22 @@ interface DateCellProps {
 }
 
 const DateCell = ({ value }: DateCellProps) => {
-  if (!value) return <>{EMPTY_VALUE}</>;
+  const datePart = formatDateTime(value, dateDefault.DISPLAY_FORMAT);
+  if (!datePart) return <>{EMPTY_VALUE}</>;
 
-  const date = toAppDayjs(value);
-  if (!date.isValid()) return <>{EMPTY_VALUE}</>;
+  const timePart = formatDateTime(value, "HH:mm:ss [UTC]");
 
   return (
     <Stack spacing={0} whiteSpace="nowrap">
       <Typography component="span" variant="body3Small">
-        {date.format("DD MMM YYYY")}
+        {datePart}
       </Typography>
       <Typography
         component="span"
         variant="body3Small"
         color={portalTheme.palette.grey700}
       >
-        {date.format("HH:mm:ss")}
+        {timePart}
       </Typography>
     </Stack>
   );
