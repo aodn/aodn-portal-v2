@@ -9,12 +9,6 @@ export interface DownloadExecutionResponse {
   message: { type?: "InlineValue"; message: string };
   status: { type?: "InlineValue"; message: string };
   jobID?: string;
-  // True when ogcapi held the job because the user already has the maximum
-  // number of downloads in flight. It is released to AWS Batch automatically.
-  queued?: boolean;
-  // Place in this user's own hold queue, this download included, so 1 means it
-  // is next to start. Omitted when queued is false. Not a time estimate.
-  queuePosition?: number;
 }
 
 export const getSubmittedDownloadJobID = (

@@ -44,9 +44,6 @@ class DetailPage(BasePage):
             'download-email-input'
         ).locator('input')
         self.dialog_button = self.page.get_by_test_id('dialog-button')
-        self.download_queued_message = self.page.get_by_test_id(
-            'download-queued-message'
-        )
         self.view_download_status_link = self.page.get_by_role(
             'link', name='View download status'
         )

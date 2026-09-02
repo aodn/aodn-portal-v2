@@ -64,10 +64,12 @@ def test_download_dialog_success(
     )
     expect(downloads_page.status_table).to_contain_text('NETCDF')
 
-    responsive_page.set_viewport_size({'width': 1024, 'height': 800})
+    responsive_page.set_viewport_size({'width': 900, 'height': 800})
     expect(downloads_page.status_cards).to_have_count(1)
 
-    responsive_page.set_viewport_size({'width': 1440, 'height': 900})
+    # A narrower desktop/laptop width (below the old 1440 "above desktop"
+    # cutoff) should still get the table, not the stacked card layout.
+    responsive_page.set_viewport_size({'width': 1170, 'height': 900})
     expect(downloads_page.status_cards).to_have_count(0)
     expect(downloads_page.desktop_status_table).to_be_visible()
 
@@ -145,29 +147,29 @@ def test_download_dialog_errors(
 
 
 @pytest.mark.parametrize(
-    'uuid, email, default_button_text, queued_button_text',
+    'uuid, email, default_button_text, limit_reached_button_text',
     [
         (
             'b299cdcd-3dee-48aa-abdd-e0fcdbb9cadc',
             'test@email.com',
             'I understand, process download',
-            'Download queued',
+            'You already have 10 downloads in progress',
         ),
     ],
 )
-def test_download_dialog_queued(
+def test_download_dialog_rate_limited(
     desktop_page: Page,
     uuid: str,
     email: str,
     default_button_text: str,
-    queued_button_text: str,
+    limit_reached_button_text: str,
 ) -> None:
     """
-    Tests feedback when ogcapi holds the download behind the per-user limit.
+    Tests feedback when the recipient already has 10 downloads running.
 
-    - Overrides the mock so the execute response comes back with queued: true
-    - Verifies the button reports the queued state instead of the email promise
-    - Verifies the explanation states how many downloads sit ahead of this one
+    - Overrides the mock so the execute call returns HTTP 429
+    - Verifies the button reports a distinct "at your limit" message, not a
+      generic failure, and that no job id / download status link is offered
     """
     api_router = ApiRouter(desktop_page)
     detail_page = DetailPage(desktop_page)
@@ -180,23 +182,22 @@ def test_download_dialog_queued(
     detail_page.dialog_button.click()
     expect(detail_page.dialog_button).to_contain_text(default_button_text)
 
-    # queuePosition counts this download itself, so 3 means 2 sit ahead of it.
     api_router.route_download_dialog(
         lambda route: route.fulfill(
-            status=HTTPStatus.OK,
+            status=HTTPStatus.TOO_MANY_REQUESTS,
             json={
-                'message': {'message': 'Job queued with ID: test-job-id'},
-                'status': {'message': '200'},
-                'jobID': 'test-job-id',
-                'queued': True,
-                'queuePosition': 3,
+                'timestamp': '2026-09-02T10:15:30',
+                'message': (
+                    'You already have 10 downloads in progress. Wait for '
+                    'one of them to complete before starting another.'
+                ),
+                'details': 'uri=/api/v1/ogc/processes/download/execution',
             },
         )
     )
     detail_page.dialog_button.click()
 
-    expect(detail_page.dialog_button).to_contain_text(queued_button_text)
-    expect(detail_page.download_queued_message).to_be_visible()
-    expect(detail_page.download_queued_message).to_contain_text(
-        '2 of your own downloads ahead of it'
+    expect(detail_page.dialog_button).to_contain_text(
+        limit_reached_button_text
     )
+    expect(detail_page.view_download_status_link).not_to_be_visible()

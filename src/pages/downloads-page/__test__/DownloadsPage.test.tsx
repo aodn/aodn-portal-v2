@@ -22,7 +22,7 @@ describe("DownloadsPage", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUseBreakpoint.mockReturnValue({ isAboveDesktop: true });
+    mockUseBreakpoint.mockReturnValue({ isUnderLaptop: false });
     mockUseDownloadStatus.mockReturnValue({
       downloads: [
         {
@@ -73,8 +73,8 @@ describe("DownloadsPage", () => {
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
   });
 
-  it("renders download cards on mobile, tablet, and laptop widths", () => {
-    mockUseBreakpoint.mockReturnValue({ isAboveDesktop: false });
+  it("renders download cards on mobile and tablet widths", () => {
+    mockUseBreakpoint.mockReturnValue({ isUnderLaptop: true });
     renderPage();
 
     expect(

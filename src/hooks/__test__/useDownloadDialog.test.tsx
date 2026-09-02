@@ -54,7 +54,15 @@ const JOB_ID = "123e4567-e89b-12d3-a456-426614174000";
 const respondWith = (payload: Record<string, unknown>) =>
   mockDispatch.mockReturnValue({ unwrap: () => Promise.resolve(payload) });
 
-const executionResponse = (extra: Record<string, unknown>) => ({
+// Reject the next execute call, as errorHandling()/rejectWithValue() does for
+// a genuine HTTP error status (statusCode), not the 200-with-embedded-status
+// shape the OGC endpoint otherwise uses for domain errors.
+const rejectWith = (statusCode: number) =>
+  mockDispatch.mockReturnValue({
+    unwrap: () => Promise.reject({ statusCode }),
+  });
+
+const executionResponse = (extra: Record<string, unknown> = {}) => ({
   message: { message: "Job submitted" },
   status: { message: "200" },
   jobID: JOB_ID,
@@ -127,7 +135,7 @@ describe("useDownloadDialog", () => {
   });
 });
 
-describe("useDownloadDialog queued downloads", () => {
+describe("useDownloadDialog per-user download limit", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
@@ -135,77 +143,29 @@ describe("useDownloadDialog queued downloads", () => {
 
   afterEach(() => vi.restoreAllMocks());
 
-  it("reports a download that ogcapi sent straight to AWS as not queued", async () => {
-    respondWith(executionResponse({ queued: false }));
+  it("reports a distinct message when the submit endpoint returns 429", async () => {
+    rejectWith(429);
     const { result } = renderHook(() => useDownloadDialog(true, vi.fn()));
 
     submit(result);
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.isQueued).toBe(false);
-    expect(result.current.queuePosition).toBeNull();
+    await waitFor(() => expect(result.current.processingStatus).toBe("429"));
+    expect(result.current.isSuccess).toBe(false);
+    expect(result.current.createdJobID).toBeUndefined();
     expect(result.current.getProcessStatusText()).toBe(
-      "Download email will be sent shortly."
+      "You already have 10 downloads in progress. Please wait for one to finish before starting another."
     );
   });
 
-  it("reports a held download as queued and keeps its position", async () => {
-    respondWith(executionResponse({ queued: true, queuePosition: 3 }));
-    const { result } = renderHook(() => useDownloadDialog(true, vi.fn()));
-
-    submit(result);
-
-    await waitFor(() => expect(result.current.isQueued).toBe(true));
-    expect(result.current.isSuccess).toBe(true);
-    expect(result.current.queuePosition).toBe(3);
-    expect(result.current.getProcessStatusText()).toBe("Download queued");
-  });
-
-  it("counts positions excluding the download itself and never promises a time", async () => {
-    respondWith(executionResponse({ queued: true, queuePosition: 3 }));
-    const { result } = renderHook(() => useDownloadDialog(true, vi.fn()));
-
-    submit(result);
-    await waitFor(() => expect(result.current.isQueued).toBe(true));
-
-    const text = result.current.getQueuedInfoText();
-    // queuePosition 3 includes this download, so 2 sit ahead of it.
-    expect(text).toContain("2 of your own downloads ahead of it");
-    expect(text).toContain("we will email you then");
-    expect(text).not.toMatch(/minute|hour|estimat/i);
-  });
-
-  it("says a download at position 1 is next to start", async () => {
-    respondWith(executionResponse({ queued: true, queuePosition: 1 }));
-    const { result } = renderHook(() => useDownloadDialog(true, vi.fn()));
-
-    submit(result);
-    await waitFor(() => expect(result.current.isQueued).toBe(true));
-
-    expect(result.current.getQueuedInfoText()).toContain("next to start");
-  });
-
-  it("treats a response without the queue fields as not queued", async () => {
-    respondWith(executionResponse({}));
+  it("still reports plain success when the request is accepted", async () => {
+    respondWith(executionResponse());
     const { result } = renderHook(() => useDownloadDialog(true, vi.fn()));
 
     submit(result);
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.isQueued).toBe(false);
-  });
-
-  it("does not mark a rejected request as queued", async () => {
-    respondWith({
-      message: { message: "Error while getting dataset" },
-      status: { message: "400" },
-    });
-    const { result } = renderHook(() => useDownloadDialog(true, vi.fn()));
-
-    submit(result);
-
-    await waitFor(() => expect(result.current.processingStatus).toBe("400"));
-    expect(result.current.isSuccess).toBe(false);
-    expect(result.current.isQueued).toBe(false);
+    expect(result.current.getProcessStatusText()).toBe(
+      "Download email will be sent shortly."
+    );
   });
 });

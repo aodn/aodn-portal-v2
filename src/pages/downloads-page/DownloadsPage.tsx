@@ -421,7 +421,7 @@ const DownloadMobileCard = ({
 
 const DownloadsPage = () => {
   const { downloads, retryDownload, removeDownload } = useDownloadStatus();
-  const { isAboveDesktop } = useBreakpoint();
+  const { isUnderLaptop } = useBreakpoint();
 
   return (
     <SectionContainer
@@ -486,7 +486,7 @@ const DownloadsPage = () => {
               No downloads are being tracked.
             </Typography>
           </Box>
-        ) : !isAboveDesktop ? (
+        ) : isUnderLaptop ? (
           <Box component="ul" aria-label="Download status" sx={{ m: 0, p: 0 }}>
             {downloads.map((download) => (
               <DownloadMobileCard
@@ -534,7 +534,7 @@ const DownloadsPage = () => {
             >
               <TableHead>
                 <TableRow>
-                  <TableCell>Job ID</TableCell>
+                  <TableCell sx={{ minWidth: 200 }}>Job ID</TableCell>
                   <TableCell>Status</TableCell>
                   <TableCell>Collection / data selection</TableCell>
                   <TableCell>Format</TableCell>

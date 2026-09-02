@@ -11,7 +11,6 @@ import {
 } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import SubsetConditions from "../subset-conditions/SubsetConditions";
-import InfoMessage from "../InfoMessage";
 import LicenseStep from "./LicenseStep";
 import { useDownloadDialog } from "@/hooks/useDownloadDialog";
 import EmailInputStep from "./EmailInputStep";
@@ -65,7 +64,6 @@ const DownloadDialog = ({
     activeStep,
     isProcessing,
     isSuccess,
-    isQueued,
     createdJobID,
     processingStatus,
     email,
@@ -80,7 +78,6 @@ const DownloadDialog = ({
     handleClearEmail,
     handleFormSubmit,
     getProcessStatusText,
-    getQueuedInfoText,
     getStepperButtonTitle,
     setEmail,
     setEmailError,
@@ -257,14 +254,6 @@ const DownloadDialog = ({
         }}
       >
         {renderStepContent()}
-
-        {/* The queued download sends no email until it actually starts, so
-            this is the only signal the user gets that it is alive. */}
-        {isSuccess && isQueued && (
-          <Box data-testid="download-queued-message" sx={{ mt: 2 }}>
-            <InfoMessage infoText={getQueuedInfoText()} />
-          </Box>
-        )}
       </DialogContent>
 
       {/* Action Buttons */}

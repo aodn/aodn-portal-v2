@@ -52,8 +52,10 @@ const STATUS_MESSAGES = {
   SERVER_ERROR: "Server error! Please try again later",
   SUCCESS: "Download email will be sent shortly.",
   DATASET_ERROR: "Dataset unavailable! Please try again later",
-  // Kept short: this renders inside the stepper button, which does not wrap.
-  QUEUED: "Download queued",
+  // The per-user concurrency limit was hit; this is a hard rejection, not a
+  // queue - the request has no jobID and must be retried later by the user.
+  LIMIT_REACHED:
+    "You already have 10 downloads in progress. Please wait for one to finish before starting another.",
 } as const;
 
 const TIMEOUT_LIMIT = 8000;
@@ -72,8 +74,6 @@ export const useDownloadDialog = (
   const [activeStep, setActiveStep] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [isQueued, setIsQueued] = useState(false);
-  const [queuePosition, setQueuePosition] = useState<number | null>(null);
   const [createdJobID, setCreatedJobID] = useState<string | undefined>();
   const [processingStatus, setProcessingStatus] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -150,8 +150,6 @@ export const useDownloadDialog = (
       setActiveStep(0);
       setProcessingStatus("");
       setIsSuccess(false);
-      setIsQueued(false);
-      setQueuePosition(null);
       setCreatedJobID(undefined);
       setIsProcessing(false);
 
@@ -224,8 +222,6 @@ export const useDownloadDialog = (
   // ================== DIALOG MANAGEMENT ==================
   const handleIsClose = useCallback(() => {
     setIsSuccess(false);
-    setIsQueued(false);
-    setQueuePosition(null);
     setCreatedJobID(undefined);
     setProcessingStatus("");
     setActiveStep(0);
@@ -387,10 +383,6 @@ export const useDownloadDialog = (
             setCreatedJobID(isTracked ? jobID : undefined);
             setProcessingStatus(statusCode);
             setIsSuccess(true);
-            // ogcapi held this job behind the per-user concurrency limit. It
-            // still has a jobID and is released to AWS Batch on its own.
-            setIsQueued(response.queued === true);
-            setQueuePosition(response.queuePosition ?? null);
           } else if (statusCode) {
             setProcessingStatus(
               statusCode === STATUS_CODES.SUCCESS
@@ -403,17 +395,18 @@ export const useDownloadDialog = (
           }
           setIsProcessing(false);
         })
-        .catch(
-          (error: { response: { status: { toString: () => string } } }) => {
-            if (error?.response?.status) {
-              setProcessingStatus(error.response.status.toString());
-            } else {
-              console.error("Internal server error.");
-              setProcessingStatus(STATUS_CODES.SERVER_ERROR);
-            }
-            setIsProcessing(false);
+        .catch((error: { statusCode?: number }) => {
+          // Rejected via ErrorBoundary's errorHandling()/rejectWithValue(),
+          // which carries the real HTTP status as statusCode - e.g. 429 when
+          // the recipient is already at the per-user concurrency limit.
+          if (error?.statusCode) {
+            setProcessingStatus(error.statusCode.toString());
+          } else {
+            console.error("Internal server error.");
+            setProcessingStatus(STATUS_CODES.SERVER_ERROR);
           }
-        );
+          setIsProcessing(false);
+        });
     },
     [uuid, dispatch, collection, estimatedSizeBytes]
   );
@@ -524,7 +517,10 @@ export const useDownloadDialog = (
       return STATUS_MESSAGES.SERVER_ERROR;
     }
     if (/^2\d{2}$/.test(processingStatus)) {
-      return isQueued ? STATUS_MESSAGES.QUEUED : STATUS_MESSAGES.SUCCESS;
+      return STATUS_MESSAGES.SUCCESS;
+    }
+    if (processingStatus === "429") {
+      return STATUS_MESSAGES.LIMIT_REACHED;
     }
     if (/^4\d{2}$/.test(processingStatus)) {
       return processingStatus === "400"
@@ -532,30 +528,7 @@ export const useDownloadDialog = (
         : "Request failed! Please try again later";
     }
     return "Something went wrong";
-  }, [processingStatus, isQueued]);
-
-  // Full explanation for a held download. A queued user gets no "processing"
-  // email until the job actually starts, so this screen is their only signal.
-  // queuePosition counts this download itself, so position 1 means next to go.
-  const getQueuedInfoText = useCallback((): string => {
-    const tail =
-      " It will start automatically once one of your running downloads" +
-      " finishes, and we will email you then. No action is needed.";
-
-    if (queuePosition === null) {
-      return "Your download is queued." + tail;
-    }
-    if (queuePosition <= 1) {
-      return "Your download is queued and is next to start." + tail;
-    }
-
-    const ahead = queuePosition - 1;
-    return (
-      `Your download is queued, with ${ahead} of your own download` +
-      `${ahead === 1 ? "" : "s"} ahead of it.` +
-      tail
-    );
-  }, [queuePosition]);
+  }, [processingStatus]);
 
   const getStepperButtonTitle = useCallback(() => {
     if (activeStep === 0) {
@@ -569,8 +542,6 @@ export const useDownloadDialog = (
     activeStep,
     isProcessing,
     isSuccess,
-    isQueued,
-    queuePosition,
     createdJobID,
     processingStatus,
     email,
@@ -585,7 +556,6 @@ export const useDownloadDialog = (
     handleClearEmail,
     handleFormSubmit,
     getProcessStatusText,
-    getQueuedInfoText,
     getStepperButtonTitle,
     setEmail,
     setEmailError,
