@@ -181,6 +181,9 @@ const ReactMap = memo(
           testMode: import.meta.env.MODE === "playwright-local",
           attributionControl: true,
           failIfMajorPerformanceCaveat: false,
+          // Default 3px is too tight for a finger tap; larger values still
+          // count as a click instead of a pan.
+          clickTolerance: 15,
           localIdeographFontFamily:
             "'Open Sans', 'Open Sans CJK SC', sans-serif",
         });
