@@ -106,4 +106,3 @@ jobs:
           --distribution-id ${{ vars.DISTRIBUTION_ID }} \
           --paths "/*" \
           --region ${{ vars.AWS_REGION }}
-
