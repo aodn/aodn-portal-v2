@@ -28,7 +28,8 @@ import {
 } from "@/app/store/DownloadStatusDefinitions";
 import { portalTheme } from "@/styles";
 import useBreakpoint from "@/hooks/useBreakpoint";
-import { toAppDayjs } from "@/utils/DateUtils";
+import { toAppDayjs, formatDateTime } from "@/utils/DateUtils";
+import { dateDefault } from "@/components/common/constants";
 import useDownloadStatus from "./useDownloadStatus";
 
 const EMPTY_VALUE = "—";
@@ -38,22 +39,22 @@ interface DateCellProps {
 }
 
 const DateCell = ({ value }: DateCellProps) => {
-  if (!value) return <>{EMPTY_VALUE}</>;
+  const datePart = formatDateTime(value, dateDefault.DISPLAY_FORMAT);
+  if (!datePart) return <>{EMPTY_VALUE}</>;
 
-  const date = toAppDayjs(value);
-  if (!date.isValid()) return <>{EMPTY_VALUE}</>;
+  const timePart = formatDateTime(value, dateDefault.UTC_TIME_DISPLAY_FORMAT);
 
   return (
     <Stack spacing={0} whiteSpace="nowrap">
       <Typography component="span" variant="body3Small">
-        {date.format("DD MMM YYYY")}
+        {datePart}
       </Typography>
       <Typography
         component="span"
         variant="body3Small"
         color={portalTheme.palette.grey700}
       >
-        {date.format("HH:mm:ss")}
+        {timePart}
       </Typography>
     </Stack>
   );
@@ -420,7 +421,7 @@ const DownloadMobileCard = ({
 
 const DownloadsPage = () => {
   const { downloads, retryDownload, removeDownload } = useDownloadStatus();
-  const { isAboveDesktop } = useBreakpoint();
+  const { isUnderLaptop } = useBreakpoint();
 
   return (
     <SectionContainer
@@ -485,7 +486,7 @@ const DownloadsPage = () => {
               No downloads are being tracked.
             </Typography>
           </Box>
-        ) : !isAboveDesktop ? (
+        ) : isUnderLaptop ? (
           <Box component="ul" aria-label="Download status" sx={{ m: 0, p: 0 }}>
             {downloads.map((download) => (
               <DownloadMobileCard
@@ -533,7 +534,7 @@ const DownloadsPage = () => {
             >
               <TableHead>
                 <TableRow>
-                  <TableCell>Job ID</TableCell>
+                  <TableCell sx={{ minWidth: 200 }}>Job ID</TableCell>
                   <TableCell>Status</TableCell>
                   <TableCell>Collection / data selection</TableCell>
                   <TableCell>Format</TableCell>

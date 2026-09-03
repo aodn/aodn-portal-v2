@@ -52,18 +52,38 @@ vi.mock("@/analytics/customEventTracker", () => ({
   trackCustomEvent: vi.fn(),
 }));
 
+const JOB_ID = "123e4567-e89b-12d3-a456-426614174000";
+
+// Reply to the next execute call with this payload.
+const respondWith = (payload: Record<string, unknown>) =>
+  mockDispatch.mockReturnValue({ unwrap: () => Promise.resolve(payload) });
+
+// Reject the next execute call, as errorHandling()/rejectWithValue() does for
+// a genuine HTTP error status (statusCode), not the 200-with-embedded-status
+// shape the OGC endpoint otherwise uses for domain errors.
+const rejectWith = (statusCode: number) =>
+  mockDispatch.mockReturnValue({
+    unwrap: () => Promise.reject({ statusCode }),
+  });
+
+const executionResponse = (extra: Record<string, unknown> = {}) => ({
+  message: { message: "Job submitted" },
+  status: { message: "200" },
+  jobID: JOB_ID,
+  ...extra,
+});
+
+const submit = (result: { current: ReturnType<typeof useDownloadDialog> }) => {
+  act(() => result.current.setEmail("user@example.com"));
+  act(() => result.current.handleStepperButtonClick());
+  act(() => result.current.handleStepperButtonClick());
+};
+
 describe("useDownloadDialog", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-    mockDispatch.mockReturnValue({
-      unwrap: () =>
-        Promise.resolve({
-          message: { message: "Job submitted" },
-          status: { message: "200" },
-          jobID: "123e4567-e89b-12d3-a456-426614174000",
-        }),
-    });
+    respondWith(executionResponse({}));
   });
 
   afterEach(() => vi.restoreAllMocks());
@@ -94,11 +114,7 @@ describe("useDownloadDialog", () => {
         }),
       })
     );
-    await waitFor(() =>
-      expect(result.current.createdJobID).toBe(
-        "123e4567-e89b-12d3-a456-426614174000"
-      )
-    );
+    await waitFor(() => expect(result.current.createdJobID).toBe(JOB_ID));
   });
 
   it("does not expose an untracked job when browser storage is unavailable", async () => {
@@ -123,5 +139,40 @@ describe("useDownloadDialog", () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.createdJobID).toBeUndefined();
+  });
+});
+
+describe("useDownloadDialog per-user download limit", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    localStorage.clear();
+  });
+
+  afterEach(() => vi.restoreAllMocks());
+
+  it("reports a distinct message when the submit endpoint returns 429", async () => {
+    rejectWith(429);
+    const { result } = renderHook(() => useDownloadDialog(true, vi.fn()));
+
+    submit(result);
+
+    await waitFor(() => expect(result.current.processingStatus).toBe("429"));
+    expect(result.current.isSuccess).toBe(false);
+    expect(result.current.createdJobID).toBeUndefined();
+    expect(result.current.getProcessStatusText()).toBe(
+      "You already have 10 downloads in progress. Please wait for one to finish before starting another."
+    );
+  });
+
+  it("still reports plain success when the request is accepted", async () => {
+    respondWith(executionResponse());
+    const { result } = renderHook(() => useDownloadDialog(true, vi.fn()));
+
+    submit(result);
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.getProcessStatusText()).toBe(
+      "Download email will be sent shortly."
+    );
   });
 });

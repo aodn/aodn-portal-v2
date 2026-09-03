@@ -8,6 +8,8 @@ const dateDefault = {
   // Display formats — every user-facing date goes through formatDate().
   DISPLAY_FORMAT: "DD MMM YYYY",
   UTC_DATE_TIME_DISPLAY_FORMAT: "DD MMM YYYY HH:mm [UTC]",
+  // Time-only companion to DISPLAY_FORMAT, e.g. the downloads status table.
+  UTC_TIME_DISPLAY_FORMAT: "HH:mm:ss [UTC]",
   // Metadata Dates panel only, keeps the GeoNetwork GMT+0000 hack — see formatMetadataDate().
   METADATA_DISPLAY_FORMAT: "ddd DD MMM YYYY HH:mm:ss [GMT+0000]",
   min: dayjs.tz(0),
