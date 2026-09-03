@@ -66,14 +66,15 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
 
-      - name: Upload CloudFront function artifacts
+      - name: Sync Microservices Artifacts
         run: |
           aws s3 sync \
-          ./microservices/ \
-          "s3://${{ vars.ARTIFACT_BUCKET }}/" \
-          --delete \
-          --region ${{ vars.AWS_REGION }} \
-          --only-show-errors 
+            ./microservices/ \
+            "s3://${{ vars.ARTIFACT_BUCKET }}/" \
+            --delete \
+            --exclude "*.test.js" \
+            --region "${{ vars.AWS_REGION }}" \
+            --only-show-errors
 
       - name: Copy files to the production website with the AWS CLI
         run: |
@@ -105,3 +106,4 @@ jobs:
           --distribution-id ${{ vars.DISTRIBUTION_ID }} \
           --paths "/*" \
           --region ${{ vars.AWS_REGION }}
+
