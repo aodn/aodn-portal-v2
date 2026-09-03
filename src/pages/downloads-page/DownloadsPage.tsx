@@ -42,7 +42,7 @@ const DateCell = ({ value }: DateCellProps) => {
   const datePart = formatDateTime(value, dateDefault.DISPLAY_FORMAT);
   if (!datePart) return <>{EMPTY_VALUE}</>;
 
-  const timePart = formatDateTime(value, "HH:mm:ss [UTC]");
+  const timePart = formatDateTime(value, dateDefault.UTC_TIME_DISPLAY_FORMAT);
 
   return (
     <Stack spacing={0} whiteSpace="nowrap">
