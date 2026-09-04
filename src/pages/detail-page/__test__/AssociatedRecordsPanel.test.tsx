@@ -169,6 +169,12 @@ describe("AssociatedRecordsPanel", async () => {
             `link-card-${window.location.origin}/details/c46ea3a7-1279-4e5d-8fb7-c1c2440fc5c8`
           )
         ).to.exist;
+        // This record has two valid parents, so the heading is plural
+        // ("Parent Records"), not singular ("Parent Record").
+        expect(screen.queryAllByText("Parent Records").length).toBeGreaterThan(
+          0
+        );
+        expect(screen.queryByText("Parent Record")).to.not.exist;
       },
       { timeout: 10000 }
     );
@@ -300,12 +306,14 @@ describe("AssociatedRecordsPanel", async () => {
       </Provider>
     );
 
-    return waitFor(() => screen.findAllByText("Parent Records"), {
+    return waitFor(() => screen.findAllByText("Parent Record"), {
       timeout: 2000,
     }).then(() => {
       // There are some malform json in the associated links, we make sure parse error will not
-      // cause the whole page to die, so as long as we get Parent Records, we know we handled the error
-      const parentRecordText = screen.queryAllByText("Parent Records");
+      // cause the whole page to die, so as long as we get Parent Record, we know we handled the error.
+      // This record has exactly one valid parent, so the heading is singular ("Parent Record"),
+      // not plural - see parentsTitle in AssociatedRecordsPanel.tsx
+      const parentRecordText = screen.queryAllByText("Parent Record");
       expect(parentRecordText).toHaveLength(2);
     });
   });

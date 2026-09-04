@@ -70,14 +70,16 @@ const AssociatedRecordsPanel = () => {
     return { parents, children, siblings };
   }, [links]);
 
-  const lists: NavigatablePanelChild[] = useMemo(
-    () => [
+  const lists: NavigatablePanelChild[] = useMemo(() => {
+    const parentsTitle = `Parent ${associatedRecords.parents.length === 1 ? "Record" : "Records"}`;
+
+    return [
       {
-        title: "Parent Records",
+        title: parentsTitle,
         component: (props: Record<string, any>) => (
           <AssociatedRecordList
             {...props}
-            title={"Parent Records"}
+            title={parentsTitle}
             records={associatedRecords.parents}
           />
         ),
@@ -102,13 +104,12 @@ const AssociatedRecordsPanel = () => {
           />
         ),
       },
-    ],
-    [
-      associatedRecords.children,
-      associatedRecords.parents,
-      associatedRecords.siblings,
-    ]
-  );
+    ];
+  }, [
+    associatedRecords.children,
+    associatedRecords.parents,
+    associatedRecords.siblings,
+  ]);
 
   return <NavigatablePanel childrenList={lists} isLoading={isLoading} />;
 };
