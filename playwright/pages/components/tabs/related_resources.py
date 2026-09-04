@@ -5,7 +5,7 @@ from pages.base_page import BasePage
 
 class RelatedResourcesTab(BasePage):
     TAB_NAME = 'Related Resources'
-    PARENT_RECORD = 'Parent Records'
+    PARENT_RECORD = 'Parent Record'
     ASSOCIATED_RECORDS = 'Associated Records'
     SUB_RECORDS = 'Sub Records'
 
