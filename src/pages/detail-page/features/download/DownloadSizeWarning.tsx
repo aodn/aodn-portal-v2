@@ -32,7 +32,7 @@ const WARNING_MESSAGES: Record<
   [DownloadSizeWarningLevel.LARGE]:
     "The estimated download size is over 10 GB — please subset your selection to reduce it.",
   [DownloadSizeWarningLevel.ESTIMATE_FAILED]:
-    "The download size could not be estimated — please subset your selection.",
+    "Download size could not be estimated. Consider reducing the size of your selection before downloading.",
 };
 
 interface DownloadSizeWarningInput {
