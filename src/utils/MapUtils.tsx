@@ -5,8 +5,12 @@ import {
   Map as MapboxMap,
   MercatorCoordinate,
 } from "mapbox-gl";
-import { Position } from "geojson";
-import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { FeatureCollection, Position } from "geojson";
+import {
+  ISpatialExtent,
+  OGCCollection,
+} from "@/app/store/OGCCollectionDefinitions";
+import { bbox as turfBbox } from "@turf/turf";
 import {
   AUSTRALIA_CENTER_LNG,
   MapDefaultConfig,
@@ -127,6 +131,38 @@ const isWorldScale = (
   north: number
 ): boolean =>
   east - west >= WORLD_SCALE_LNG_SPAN || north - south >= WORLD_SCALE_LAT_SPAN;
+
+/**
+ * Attach the matching spatial extent description to each feature, so the map
+ * can show it in a popup. Features and extents both come from the same
+ * EX_Extent blocks, so they are matched by bbox value.
+ *
+ * @param featureCollection - Features built from the collection extent bboxes
+ * @param spatialExtents - The spatial_extents summary of the collection
+ * @returns The same feature collection with description set where matched
+ */
+export const attachSpatialExtentDescriptions = (
+  featureCollection: FeatureCollection | undefined,
+  spatialExtents: Array<ISpatialExtent> | undefined
+): FeatureCollection | undefined => {
+  if (!featureCollection || !spatialExtents?.length) return featureCollection;
+  const tolerance = 0.000001;
+  const matches = (a: Array<number>, b: Array<number>) =>
+    a.length === 4 &&
+    b.length === 4 &&
+    a.every((value, i) => Math.abs(value - b[i]) < tolerance);
+  featureCollection.features.forEach((feature) => {
+    const featureBbox = turfBbox(feature);
+    const extent = spatialExtents.find((e) => matches(e.bbox, featureBbox));
+    if (extent) {
+      feature.properties = {
+        ...feature.properties,
+        description: extent.description,
+      };
+    }
+  });
+  return featureCollection;
+};
 
 /**
  * Fits the map view to the specified bounding box with intelligent zoom calculation

@@ -12,9 +12,9 @@ import * as turf from "@turf/turf";
 import MapContext from "../MapContext";
 import { stringToColor } from "../../../common/colors/colorsUtils";
 import { Feature, Polygon, Position } from "geojson";
-import { LngLat, LngLatBounds, MapMouseEvent } from "mapbox-gl";
+import { LngLat, LngLatBounds, MapMouseEvent, Popup } from "mapbox-gl";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
-import { fitToBound } from "@/utils/MapUtils";
+import { attachSpatialExtentDescriptions, fitToBound } from "@/utils/MapUtils";
 import bluePin from "@/assets/icons/blue_pin.png";
 import { MapEventEnum } from "../constants";
 import { TestHelper } from "../../../common/test/helper";
@@ -51,6 +51,14 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
   const { map } = useContext(MapContext);
   const [_, setMapLoaded] = useState<boolean | null>(null);
   const extent = useMemo(() => collection.extent, [collection.extent]);
+  const sourceData = useMemo(
+    () =>
+      attachSpatialExtentDescriptions(
+        extent?.getGeojsonFromBBox(1),
+        collection.properties?.spatial_extents
+      ),
+    [extent, collection.properties?.spatial_extents]
+  );
 
   const [collectionId, sourceId, layerPolygonId, layerPointId] = useMemo(() => {
     const collectionId = collection.id;
@@ -151,6 +159,23 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
     [map, onLayerClick, layerPolygonId]
   );
 
+  const handlePointClick = useCallback(
+    (event: MapMouseEvent) => {
+      if (!map) return;
+      const features = map.queryRenderedFeatures(map.project(event.lngLat), {
+        layers: [layerPointId],
+      });
+      const description = features?.[0]?.properties?.description;
+      if (description) {
+        new Popup({ closeButton: false })
+          .setLngLat(event.lngLat)
+          .setText(description)
+          .addTo(map);
+      }
+    },
+    [map, layerPointId]
+  );
+
   const createLayer = useCallback(() => {
     // If style changed, we may need to add the layer again, hence listen to this event.
     // https://github.com/mapbox/mapbox-gl-js/issues/8660
@@ -160,7 +185,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
     map?.addSource(sourceId, {
       type: "geojson",
       // Use a URL for the value for the `data` property.
-      data: extent?.getGeojsonFromBBox(1),
+      data: sourceData,
     });
 
     if (map) {
@@ -193,7 +218,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
     map,
     sourceId,
     collectionId,
-    extent,
+    sourceData,
     layerPolygonId,
     visible,
     layerPointId,
@@ -246,6 +271,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
           const onceIdle = () => handleIdle(extent?.bbox);
           map?.once("idle", onceIdle);
           map?.on("click", layerPolygonId, handleLayerClick);
+          map?.on("click", layerPointId, handlePointClick);
           if (onMouseEnter) map?.on("mouseenter", layerPolygonId, onMouseEnter);
           if (onMouseLeave) map?.on("mouseleave", layerPolygonId, onMouseLeave);
           if (onMouseMove) map?.on("mousemove", layerPolygonId, onMouseMove);
@@ -268,6 +294,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
         // OK to ignore error here
       } finally {
         map?.off("click", layerPolygonId, handleLayerClick);
+        map?.off("click", layerPointId, handlePointClick);
         if (onMouseEnter) map?.off("mouseenter", layerPolygonId, onMouseEnter);
         if (onMouseLeave) map?.off("mouseleave", layerPolygonId, onMouseLeave);
         if (onMouseMove) map?.off("mousemove", layerPolygonId, onMouseMove);

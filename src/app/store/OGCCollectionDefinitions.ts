@@ -96,6 +96,12 @@ export interface IAssociatedRecord {
   abstract: string;
 }
 
+// One gex:EX_Extent block that has a description, e.g. a named site
+export interface ISpatialExtent {
+  description: string;
+  bbox: Array<number>;
+}
+
 // Enums
 export enum RelationType {
   SELF = "self",
@@ -560,6 +566,7 @@ export class SummariesProperties {
   readonly scope?: Record<string, string>;
   readonly parameter_vocabs?: Array<string>;
   readonly dataset_provider?: string;
+  readonly spatial_extents?: Array<ISpatialExtent>;
 }
 
 export class Spatial {

@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { MapDefaultConfig } from "@/components/map/mapbox/constants";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import {
+  attachSpatialExtentDescriptions,
   cssFontFamilyToMapboxTextFont,
   fitToBound,
   fitToDefaultExtent,
@@ -10,6 +11,7 @@ import {
   overallBoundingBox,
   setMapDrawInteractionActive,
 } from "../MapUtils";
+import { Feature, FeatureCollection } from "geojson";
 import { FONT_FAMILIES } from "@/styles/fontsRC8";
 import { Map as MapboxMap } from "mapbox-gl";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
@@ -412,6 +414,56 @@ describe("MapUtils", () => {
 
       setMapDrawInteractionActive(map, false);
       expect(isMapDrawModeActive(map)).toBe(false);
+    });
+  });
+
+  describe("attachSpatialExtentDescriptions", () => {
+    const pointFeature = (lng: number, lat: number): Feature => ({
+      type: "Feature",
+      properties: {},
+      geometry: { type: "Point", coordinates: [lng, lat] },
+    });
+
+    const featureCollection = (): FeatureCollection => ({
+      type: "FeatureCollection",
+      features: [
+        pointFeature(146.862133, -19.10415),
+        pointFeature(150.0, -20.0),
+      ],
+    });
+
+    it("sets description on features whose bbox matches a spatial extent", () => {
+      const result = attachSpatialExtentDescriptions(featureCollection(), [
+        {
+          description: "Magnetic Island",
+          bbox: [146.862133, -19.10415, 146.862133, -19.10415],
+        },
+      ]);
+
+      expect(result?.features[0].properties?.description).toBe(
+        "Magnetic Island"
+      );
+      expect(result?.features[1].properties?.description).toBeUndefined();
+    });
+
+    it("returns the input unchanged when there are no spatial extents", () => {
+      const input = featureCollection();
+      expect(attachSpatialExtentDescriptions(input, undefined)).toBe(input);
+      expect(attachSpatialExtentDescriptions(input, [])).toBe(input);
+      expect(attachSpatialExtentDescriptions(undefined, [])).toBeUndefined();
+    });
+
+    it("matches within a small tolerance for rounding differences", () => {
+      const result = attachSpatialExtentDescriptions(featureCollection(), [
+        {
+          description: "Magnetic Island",
+          bbox: [146.8621330000001, -19.10415, 146.862133, -19.1041500000001],
+        },
+      ]);
+
+      expect(result?.features[0].properties?.description).toBe(
+        "Magnetic Island"
+      );
     });
   });
 });
