@@ -39,7 +39,7 @@ const PLATFORMS = [
   },
   {
     value: "mooring and buoy",
-    label: "Moorings & Buoy",
+    label: "Mooring & Buoy",
     icon: <MooringsBuoyIcon />,
   },
   {
@@ -54,7 +54,7 @@ const PLATFORMS = [
   },
   {
     value: "biological platform",
-    label: "Bio Platform",
+    label: "Biological",
     icon: <BioPlatformIcon />,
   },
   {
@@ -64,7 +64,7 @@ const PLATFORMS = [
   },
   {
     value: "auv",
-    label: "AUV",
+    label: "Autonomous Underwater Vehicles",
     icon: <AUVIcon />,
   },
 ];
