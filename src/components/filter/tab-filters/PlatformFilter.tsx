@@ -140,7 +140,7 @@ const PlatformFilter: FC<PlatformFilterProps> = ({
                   whiteSpace: "normal",
                   wordWrap: "break-word",
                   textAlign: "center",
-                  maxWidth: "96px",
+                  maxWidth: "100px",
                 }}
               >
                 {item.label}
