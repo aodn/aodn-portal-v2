@@ -82,7 +82,7 @@ describe("MenuTooltip auto-close", () => {
     expect(onClose).not.toHaveBeenCalled();
     fireEvent.mouseLeave(anchor);
     advance(1000);
-    const popup = screen.getByRole("tooltip");
+    const popup = screen.getByTestId("menu-tooltip");
     fireEvent.mouseEnter(popup);
     advance(3000);
     expect(onClose).not.toHaveBeenCalled();

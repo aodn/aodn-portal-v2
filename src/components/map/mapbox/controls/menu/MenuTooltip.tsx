@@ -72,6 +72,7 @@ const MenuTooltip: React.FC<MenuTooltipProps> = ({
 
   return (
     <Popper
+      data-testid="menu-tooltip"
       ref={popperRef}
       disablePortal
       open={open}
