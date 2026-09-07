@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { Feature, FeatureCollection } from "geojson";
 import {
   attachSpatialExtentDescriptions,
+  spatialExtentsFromGeometry,
   readDescriptions,
 } from "../SpatialExtentUtils";
 
@@ -87,6 +88,40 @@ describe("attachSpatialExtentDescriptions", () => {
     const collection = input();
     attachSpatialExtentDescriptions(collection, [magneticIsland]);
     expect(descriptions(collection)).toEqual([undefined, undefined]);
+  });
+});
+
+describe("spatialExtentsFromGeometry", () => {
+  it("reads described members, skips the rest", () => {
+    const geometry = {
+      type: "GeometryCollection",
+      geometries: [
+        {
+          type: "Point",
+          coordinates: [146.5, -18.5],
+          description: "Pelorus Reef",
+        },
+        { type: "Point", coordinates: [150.0, -20.0] },
+        {
+          type: "Polygon",
+          coordinates: [
+            [
+              [150.0, -21.0],
+              [151.0, -21.0],
+              [151.0, -20.0],
+              [150.0, -20.0],
+              [150.0, -21.0],
+            ],
+          ],
+          description: "Survey box",
+        },
+      ],
+    } as never;
+    expect(spatialExtentsFromGeometry(geometry)).toEqual([
+      { description: "Pelorus Reef", bbox: [146.5, -18.5, 146.5, -18.5] },
+      { description: "Survey box", bbox: [150.0, -21.0, 151.0, -20.0] },
+    ]);
+    expect(spatialExtentsFromGeometry(undefined)).toEqual([]);
   });
 });
 

@@ -1,6 +1,27 @@
-import { Feature, FeatureCollection } from "geojson";
+import { Feature, FeatureCollection, GeometryCollection } from "geojson";
 import { bbox as turfBbox } from "@turf/turf";
-import { ISpatialExtent } from "@/app/store/OGCCollectionDefinitions";
+
+// One described location from the record's metadata, e.g. a named site
+export interface ISpatialExtent {
+  description: string;
+  bbox: Array<number>;
+}
+
+// The indexer writes each extent's description onto its geometries, turn those
+// members into {description, bbox} entries for the matcher below
+export const spatialExtentsFromGeometry = (
+  geometry: GeometryCollection | undefined
+): Array<ISpatialExtent> => {
+  if (!geometry?.geometries) return [];
+  const extents: Array<ISpatialExtent> = [];
+  for (const geometryMember of geometry.geometries) {
+    const description = (geometryMember as { description?: unknown })
+      .description;
+    if (typeof description !== "string" || description === "") continue;
+    extents.push({ description, bbox: [...turfBbox(geometryMember)] });
+  }
+  return extents;
+};
 
 // Coordinates this close are the same place: far above float noise, far below the spacing of real sites
 const ONE_DEGREE_IN_METERS = 111_000;
@@ -32,14 +53,16 @@ const findExtentsAround = (
   spatialExtents: Array<ISpatialExtent>
 ): Array<ISpatialExtent> => {
   const featureBbox = turfBbox(feature);
-  const around = spatialExtents.filter((extent) =>
+  const containingExtents = spatialExtents.filter((extent) =>
     bboxContains(extent.bbox, featureBbox)
   );
-  if (around.length === 0) return [];
+  if (containingExtents.length === 0) return [];
   const smallestArea = Math.min(
-    ...around.map((extent) => bboxArea(extent.bbox))
+    ...containingExtents.map((extent) => bboxArea(extent.bbox))
   );
-  return around.filter((extent) => bboxArea(extent.bbox) <= smallestArea);
+  return containingExtents.filter(
+    (extent) => bboxArea(extent.bbox) <= smallestArea
+  );
 };
 
 // Read back what attachSpatialExtentDescriptions wrote on the clicked features, without repeats.
@@ -47,10 +70,10 @@ const findExtentsAround = (
 export const readDescriptions = (
   features: Array<Feature> | undefined
 ): Array<string> => {
-  const ofOneFeature = (value: unknown): Array<string> => {
-    if (Array.isArray(value)) return value;
+  const parseDescriptions = (propertyValue: unknown): Array<string> => {
+    if (Array.isArray(propertyValue)) return propertyValue;
     try {
-      return typeof value === "string" ? JSON.parse(value) : [];
+      return typeof propertyValue === "string" ? JSON.parse(propertyValue) : [];
     } catch {
       return [];
     }
@@ -58,7 +81,7 @@ export const readDescriptions = (
   return [
     ...new Set(
       (features ?? []).flatMap((feature) =>
-        ofOneFeature(feature.properties?.descriptions)
+        parseDescriptions(feature.properties?.descriptions)
       )
     ),
   ];

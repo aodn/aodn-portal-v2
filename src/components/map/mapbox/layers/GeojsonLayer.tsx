@@ -17,6 +17,7 @@ import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { fitToBound } from "@/utils/MapUtils";
 import {
   attachSpatialExtentDescriptions,
+  spatialExtentsFromGeometry,
   readDescriptions,
 } from "@/utils/SpatialExtentUtils";
 import { useTheme } from "@mui/material/styles";
@@ -65,9 +66,9 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
     () =>
       attachSpatialExtentDescriptions(
         extent?.getGeojsonFromBBox(1),
-        collection.properties?.spatial_extents
+        spatialExtentsFromGeometry(collection.getGeometry())
       ),
-    [extent, collection.properties?.spatial_extents]
+    [extent, collection]
   );
 
   const [collectionId, sourceId, layerPolygonId, layerPointId] = useMemo(() => {
