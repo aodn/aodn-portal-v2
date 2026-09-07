@@ -754,6 +754,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
               <GeojsonLayer
                 collection={collection}
                 visible={selectedMapLayerId === LayerName.SpatialExtent}
+                showExtentPopup
               />
               {hasGriddedProducts && (
                 <GriddedRasterLayer

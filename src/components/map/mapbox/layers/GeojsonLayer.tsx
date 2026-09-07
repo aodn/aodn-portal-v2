@@ -16,6 +16,7 @@ import { LngLat, LngLatBounds, MapMouseEvent, Popup } from "mapbox-gl";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { fitToBound } from "@/utils/MapUtils";
 import { attachSpatialExtentDescriptions } from "@/utils/SpatialExtentUtils";
+import { useTheme } from "@mui/material/styles";
 import bluePin from "@/assets/icons/blue_pin.png";
 import { MapEventEnum } from "../constants";
 import { TestHelper } from "../../../common/test/helper";
@@ -35,6 +36,9 @@ interface GeojsonLayerProps {
   setPhotos?: Dispatch<SetStateAction<SpatialExtentPhoto[]>>;
   animate?: boolean;
   visible?: boolean;
+  // Detail page map only: in the search page mini maps a click closes the
+  // hosting popup first, so the extent popup there is unreachable
+  showExtentPopup?: boolean;
 }
 
 const BLUE_PIN_NAME = "blue_pin_name";
@@ -48,8 +52,10 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
   setPhotos,
   animate = false,
   visible = false,
+  showExtentPopup = false,
 }) => {
   const { map } = useContext(MapContext);
+  const theme = useTheme();
   const [_, setMapLoaded] = useState<boolean | null>(null);
   const extent = useMemo(() => collection.extent, [collection.extent]);
   const sourceData = useMemo(
@@ -163,19 +169,45 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
   const handlePointClick = useCallback(
     (event: MapMouseEvent) => {
       if (!map) return;
-      const features = map.queryRenderedFeatures(map.project(event.lngLat), {
-        layers: [layerPointId],
-      });
-      const description = features?.[0]?.properties?.description;
-      if (description) {
-        new Popup({ closeButton: false })
-          .setLngLat(event.lngLat)
-          .setText(description)
-          .addTo(map);
+      const description = event.features?.[0]?.properties?.description;
+      if (!description) return;
+      // textContent keeps the metadata text as plain text
+      const content = document.createElement("div");
+      content.textContent = description;
+      content.style.fontFamily = String(
+        theme.typography.body3Small?.fontFamily ?? ""
+      );
+      content.style.fontSize = String(
+        theme.typography.body3Small?.fontSize ?? ""
+      );
+      content.style.color = theme.palette.text2;
+      content.style.textAlign = "center";
+      const popup = new Popup({ closeButton: false, offset: [0, -4] })
+        .setLngLat(event.lngLat)
+        .setDOMContent(content)
+        .addTo(map);
+      // Mapbox default content padding is uneven (10 10 15), even it out so the text sits centred
+      const box = popup
+        .getElement()
+        ?.querySelector<HTMLElement>(".mapboxgl-popup-content");
+      if (box) box.style.padding = "8px 12px";
+    },
+    [map, theme]
+  );
+
+  // Pointer cursor only over points that have a description to show
+  const handlePointEnter = useCallback(
+    (event: MapMouseEvent) => {
+      if (map && event.features?.[0]?.properties?.description) {
+        map.getCanvas().style.cursor = "pointer";
       }
     },
-    [map, layerPointId]
+    [map]
   );
+
+  const handlePointLeave = useCallback(() => {
+    if (map) map.getCanvas().style.cursor = "";
+  }, [map]);
 
   const createLayer = useCallback(() => {
     // If style changed, we may need to add the layer again, hence listen to this event.
@@ -272,7 +304,11 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
           const onceIdle = () => handleIdle(extent?.bbox);
           map?.once("idle", onceIdle);
           map?.on("click", layerPolygonId, handleLayerClick);
-          map?.on("click", layerPointId, handlePointClick);
+          if (showExtentPopup) {
+            map?.on("click", layerPointId, handlePointClick);
+            map?.on("mouseenter", layerPointId, handlePointEnter);
+            map?.on("mouseleave", layerPointId, handlePointLeave);
+          }
           if (onMouseEnter) map?.on("mouseenter", layerPolygonId, onMouseEnter);
           if (onMouseLeave) map?.on("mouseleave", layerPolygonId, onMouseLeave);
           if (onMouseMove) map?.on("mousemove", layerPolygonId, onMouseMove);
@@ -296,6 +332,8 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
       } finally {
         map?.off("click", layerPolygonId, handleLayerClick);
         map?.off("click", layerPointId, handlePointClick);
+        map?.off("mouseenter", layerPointId, handlePointEnter);
+        map?.off("mouseleave", layerPointId, handlePointLeave);
         if (onMouseEnter) map?.off("mouseenter", layerPolygonId, onMouseEnter);
         if (onMouseLeave) map?.off("mouseleave", layerPolygonId, onMouseLeave);
         if (onMouseMove) map?.off("mousemove", layerPolygonId, onMouseMove);
