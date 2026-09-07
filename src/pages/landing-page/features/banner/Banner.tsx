@@ -7,8 +7,9 @@ import bannerImage1 from "@/assets/images/banner_image_1.png";
 import bannerImage2 from "@/assets/images/banner_image_2.png";
 import bannerImage3 from "@/assets/images/banner_image_3.png";
 import { portalTheme } from "../../../../styles";
+import FeedbackButton from "@/components/feedback/FeedbackButton";
 
-const renderBannerText = () => {
+const renderBannerText = (isMobile: boolean) => {
   return (
     <Box flex={1}>
       <Stack
@@ -61,6 +62,11 @@ const renderBannerText = () => {
           &quot;Open access to Australian marine and climate science
           data.&rdquo;
         </Typography>
+        {isMobile && (
+          <Box sx={{ width: "100%", mt: 3.5 }}>
+            <FeedbackButton mobile />
+          </Box>
+        )}
       </Stack>
     </Box>
   );
@@ -194,7 +200,7 @@ const Banner = () => {
       }}
       gap={2}
     >
-      {renderBannerText()}
+      {renderBannerText(isMobile)}
       {renderBannerImages(isMobile, setOpenImage)}
       <Dialog
         open={!!openImage}

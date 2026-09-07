@@ -13,6 +13,7 @@ class LandingPage(BasePage):
 
         # -- Page locators --
         self.hero_text = page.get_by_test_id('hero-text')
+        self.feedback_button = page.get_by_test_id('feedback-button')
 
     def load(self) -> None:
         self.page.goto(settings.baseURL, wait_until='load')
