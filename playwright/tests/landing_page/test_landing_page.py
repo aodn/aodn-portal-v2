@@ -6,6 +6,32 @@ from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 
 
+FEEDBACK_URL = (
+    'https://forms.office.com/pages/responsepage.aspx?'
+    'id=VV3rFZEZvEaNp6slI03uCIbxNcrqZltDmWw3jsls7JBUMEJTRENHV1o4QzcyWUtKUzJZU1U2SDk1US4u&route=shorturl'
+)
+
+
+def test_feedback_button_on_desktop(desktop_page: Page) -> None:
+    landing_page = LandingPage(desktop_page)
+    landing_page.load()
+
+    expect(landing_page.feedback_button).to_be_visible()
+    expect(landing_page.feedback_button).to_have_attribute('href', FEEDBACK_URL)
+    expect(
+        landing_page.hero_text.get_by_test_id('feedback-button')
+    ).to_have_count(0)
+
+
+def test_feedback_button_in_mobile_hero(mobile_page: Page) -> None:
+    landing_page = LandingPage(mobile_page)
+    landing_page.load()
+
+    feedback_button = landing_page.hero_text.get_by_test_id('feedback-button')
+    expect(feedback_button).to_be_visible()
+    expect(feedback_button).to_have_attribute('href', FEEDBACK_URL)
+
+
 @pytest.mark.parametrize(
     'dataset_id, dataset_title',
     [

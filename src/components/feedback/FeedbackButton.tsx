@@ -17,6 +17,7 @@ const FeedbackButton = ({ mobile = false }: FeedbackButtonProps) => {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Feedback for Portal (opens survey in a new tab)"
+      data-testid="feedback-button"
       startIcon={
         <FeedbackIcon
           width={mobile ? 26.55 : 34}
@@ -38,7 +39,7 @@ const FeedbackButton = ({ mobile = false }: FeedbackButtonProps) => {
         lineHeight: mobile ? "20px" : "22px",
         textTransform: "none",
         "& .MuiButton-startIcon": {
-          mr: mobile ? 1 : 1,
+          mr: 1,
           "& > svg": { width: mobile ? "26.55px" : "34px" },
         },
         "&:hover": { backgroundColor: "#3B6E8F" },
