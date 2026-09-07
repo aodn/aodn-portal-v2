@@ -15,7 +15,10 @@ import { Feature, Polygon, Position } from "geojson";
 import { LngLat, LngLatBounds, MapMouseEvent, Popup } from "mapbox-gl";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { fitToBound } from "@/utils/MapUtils";
-import { attachSpatialExtentDescriptions } from "@/utils/SpatialExtentUtils";
+import {
+  attachSpatialExtentDescriptions,
+  readDescriptions,
+} from "@/utils/SpatialExtentUtils";
 import { useTheme } from "@mui/material/styles";
 import bluePin from "@/assets/icons/blue_pin.png";
 import { MapEventEnum } from "../constants";
@@ -169,11 +172,10 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
   const handlePointClick = useCallback(
     (event: MapMouseEvent) => {
       if (!map) return;
-      const description = event.features?.[0]?.properties?.description;
-      if (!description) return;
-      // textContent keeps the metadata text as plain text
+      // Several sites can sit on the same spot, list every description under the click
+      const descriptions = readDescriptions(event.features);
+      if (descriptions.length === 0) return;
       const content = document.createElement("div");
-      content.textContent = description;
       content.style.fontFamily = String(
         theme.typography.body3Small?.fontFamily ?? ""
       );
@@ -181,7 +183,16 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
         theme.typography.body3Small?.fontSize ?? ""
       );
       content.style.color = theme.palette.text2;
-      content.style.textAlign = "center";
+      content.style.textAlign = descriptions.length > 1 ? "left" : "center";
+      // Long lists scroll instead of covering the map
+      content.style.maxHeight = "150px";
+      content.style.overflowY = "auto";
+      descriptions.forEach((description) => {
+        // textContent keeps the metadata text as plain text
+        const line = document.createElement("div");
+        line.textContent = String(description);
+        content.appendChild(line);
+      });
       const popup = new Popup({ closeButton: false, offset: [0, -4] })
         .setLngLat(event.lngLat)
         .setDOMContent(content)
@@ -195,10 +206,10 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
     [map, theme]
   );
 
-  // Pointer cursor only over points that have a description to show
+  // Pointer cursor only over points that have descriptions to show
   const handlePointEnter = useCallback(
     (event: MapMouseEvent) => {
-      if (map && event.features?.[0]?.properties?.description) {
+      if (map && event.features?.[0]?.properties?.descriptions) {
         map.getCanvas().style.cursor = "pointer";
       }
     },

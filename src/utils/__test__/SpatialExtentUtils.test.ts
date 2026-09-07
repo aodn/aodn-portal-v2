@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { Feature, FeatureCollection } from "geojson";
-import { attachSpatialExtentDescriptions } from "../SpatialExtentUtils";
+import {
+  attachSpatialExtentDescriptions,
+  readDescriptions,
+} from "../SpatialExtentUtils";
 
 describe("attachSpatialExtentDescriptions", () => {
   const point = (lng: number, lat: number): Feature => ({
@@ -21,11 +24,11 @@ describe("attachSpatialExtentDescriptions", () => {
   };
 
   const descriptions = (result: FeatureCollection | undefined) =>
-    result?.features.map((feature) => feature.properties?.description);
+    result?.features.map((feature) => feature.properties?.descriptions);
 
   it("describes the feature whose bbox matches", () => {
     const result = attachSpatialExtentDescriptions(input(), [magneticIsland]);
-    expect(descriptions(result)).toEqual(["Magnetic Island", undefined]);
+    expect(descriptions(result)).toEqual([["Magnetic Island"], undefined]);
   });
 
   it("returns input unchanged when no extents", () => {
@@ -43,7 +46,7 @@ describe("attachSpatialExtentDescriptions", () => {
       bbox: [146.8621330000001, -19.10415, 146.862133, -19.1041500000001],
     };
     const result = attachSpatialExtentDescriptions(input(), [nudged]);
-    expect(descriptions(result)).toEqual(["Magnetic Island", undefined]);
+    expect(descriptions(result)).toEqual([["Magnetic Island"], undefined]);
   });
 
   it("describes every feature inside a shared extent", () => {
@@ -52,7 +55,20 @@ describe("attachSpatialExtentDescriptions", () => {
       bbox: [146.0, -21.0, 151.0, -18.0],
     };
     const result = attachSpatialExtentDescriptions(input(), [survey]);
-    expect(descriptions(result)).toEqual(["Survey area", "Survey area"]);
+    expect(descriptions(result)).toEqual([["Survey area"], ["Survey area"]]);
+  });
+
+  it("keeps every site sharing one spot", () => {
+    const sameSpotSites = [
+      { ...magneticIsland, description: "Site A - Temperature" },
+      { ...magneticIsland, description: "Site B - Currents" },
+      { ...magneticIsland, description: "Site C - Waves" },
+    ];
+    const result = attachSpatialExtentDescriptions(input(), sameSpotSites);
+    expect(descriptions(result)).toEqual([
+      ["Site A - Temperature", "Site B - Currents", "Site C - Waves"],
+      undefined,
+    ]);
   });
 
   it("smallest extent wins on overlap", () => {
@@ -64,12 +80,24 @@ describe("attachSpatialExtentDescriptions", () => {
       wide,
       magneticIsland,
     ]);
-    expect(descriptions(result)).toEqual(["Magnetic Island", "Wide area"]);
+    expect(descriptions(result)).toEqual([["Magnetic Island"], ["Wide area"]]);
   });
 
   it("does not mutate input", () => {
     const collection = input();
     attachSpatialExtentDescriptions(collection, [magneticIsland]);
     expect(descriptions(collection)).toEqual([undefined, undefined]);
+  });
+});
+
+describe("readDescriptions", () => {
+  it("reads mapbox features, where array properties come back as JSON strings", () => {
+    const clicked = [
+      { properties: { descriptions: '["Site A","Site B"]' } },
+      { properties: { descriptions: ["Site B", "Site C"] } },
+      { properties: {} },
+    ] as unknown as Feature[];
+    expect(readDescriptions(clicked)).toEqual(["Site A", "Site B", "Site C"]);
+    expect(readDescriptions(undefined)).toEqual([]);
   });
 });

@@ -25,23 +25,47 @@ const bboxArea = (bbox: Array<number>): number => {
   return (east - west) * (north - south);
 };
 
-// The smallest spatial extent whose bbox holds the feature, undefined if none does
-const findExtentAround = (
+// The spatial extents tied for the smallest bbox holding the feature. Ties matter:
+// several sites can share one spot, and each keeps its own text
+const findExtentsAround = (
   feature: Feature,
   spatialExtents: Array<ISpatialExtent>
-): ISpatialExtent | undefined => {
+): Array<ISpatialExtent> => {
   const featureBbox = turfBbox(feature);
   const around = spatialExtents.filter((extent) =>
     bboxContains(extent.bbox, featureBbox)
   );
-  if (around.length === 0) return undefined;
-  return around.reduce((smallest, extent) =>
-    bboxArea(extent.bbox) < bboxArea(smallest.bbox) ? extent : smallest
+  if (around.length === 0) return [];
+  const smallestArea = Math.min(
+    ...around.map((extent) => bboxArea(extent.bbox))
   );
+  return around.filter((extent) => bboxArea(extent.bbox) <= smallestArea);
 };
 
-// Set properties.description on every feature that sits inside one of the spatial extents,
-// so the map popup can show it. A feature inside several extents gets the smallest one.
+// Read back what attachSpatialExtentDescriptions wrote on the clicked features, without repeats.
+// Mapbox returns array properties as JSON strings, so parse them.
+export const readDescriptions = (
+  features: Array<Feature> | undefined
+): Array<string> => {
+  const ofOneFeature = (value: unknown): Array<string> => {
+    if (Array.isArray(value)) return value;
+    try {
+      return typeof value === "string" ? JSON.parse(value) : [];
+    } catch {
+      return [];
+    }
+  };
+  return [
+    ...new Set(
+      (features ?? []).flatMap((feature) =>
+        ofOneFeature(feature.properties?.descriptions)
+      )
+    ),
+  ];
+};
+
+// Set properties.descriptions on every feature that sits inside one of the spatial extents,
+// so the map popup can list them. A feature inside several extents gets the smallest ones.
 export const attachSpatialExtentDescriptions = (
   featureCollection: FeatureCollection | undefined,
   spatialExtents: Array<ISpatialExtent> | undefined
@@ -49,11 +73,14 @@ export const attachSpatialExtentDescriptions = (
   if (!featureCollection || !spatialExtents?.length) return featureCollection;
 
   const features = featureCollection.features.map((feature) => {
-    const extent = findExtentAround(feature, spatialExtents);
-    if (!extent) return feature;
+    const extents = findExtentsAround(feature, spatialExtents);
+    if (extents.length === 0) return feature;
     return {
       ...feature,
-      properties: { ...feature.properties, description: extent.description },
+      properties: {
+        ...feature.properties,
+        descriptions: extents.map((extent) => extent.description),
+      },
     };
   });
 
