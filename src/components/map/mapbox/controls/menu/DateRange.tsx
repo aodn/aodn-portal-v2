@@ -55,12 +55,12 @@ const DateRange: React.FC<DateRangeControlProps> = ({
 
   const handleIconClick = () => {
     setOpen((prev) => !prev);
-    setShowTooltip((prev) => !prev);
+    setShowTooltip(!open);
   };
 
-  const handleCloseTooltip = () => {
+  const handleCloseTooltip = useCallback(() => {
     setShowTooltip(false);
-  };
+  }, []);
 
   const onDateRangeChange = useCallback(
     (
