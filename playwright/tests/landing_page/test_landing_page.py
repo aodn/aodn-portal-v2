@@ -5,7 +5,6 @@ from mocks.apply import apply_mock
 from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 
-
 FEEDBACK_URL = (
     'https://forms.office.com/pages/responsepage.aspx?'
     'id=VV3rFZEZvEaNp6slI03uCIbxNcrqZltDmWw3jsls7JBUMEJTRENHV1o4QzcyWUtKUzJZU1U2SDk1US4u&route=shorturl'
