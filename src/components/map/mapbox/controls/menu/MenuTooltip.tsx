@@ -15,7 +15,7 @@ interface MenuTooltipProps {
   description: string;
   icon: React.ReactNode;
   onClose: () => void;
-  /** Delay in milliseconds after the pointer leaves the button and popup. */
+  /** Delay in milliseconds after the pointer leaves the tooltip and anchor element. */
   autoCloseDelay?: number;
   hideIconOnSmallScreen?: boolean;
 }
