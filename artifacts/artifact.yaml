@@ -1,0 +1,5 @@
+cloudfront_functions:
+  - name: route_by_user_agent
+    description: Route requests based on user agent to different origins
+    source_key: functions/cloudfront/route_by_user_agent.js
+    runtime: cloudfront-js-2.0
