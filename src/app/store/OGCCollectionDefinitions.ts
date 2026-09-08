@@ -85,7 +85,7 @@ export interface ITheme {
 }
 
 export interface IAssociatedRecordGroup {
-  parent?: IAssociatedRecord;
+  parents: IAssociatedRecord[];
   children: IAssociatedRecord[];
   siblings: IAssociatedRecord[];
 }

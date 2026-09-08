@@ -14,6 +14,7 @@ import {
 import {
   PMTILE_LAYERS,
   attachPmtilesHexInteraction,
+  pmtilesHitLayerId,
   type PmtilesHexHoverCtx,
 } from "../PMTilesLayer";
 
@@ -109,6 +110,7 @@ const makeFeature = (
 
 const makeEvent = (feature?: TestHexFeature): Partial<MapMouseEvent> => ({
   lngLat: { lng: 147, lat: -42 } as MapMouseEvent["lngLat"],
+  point: { x: 10, y: 20 } as MapMouseEvent["point"],
   features: feature ? ([feature] as MapMouseEvent["features"]) : [],
 });
 
@@ -119,6 +121,7 @@ describe("PMTilesLayer - click popup", () => {
     remove: ReturnType<typeof vi.fn>;
   };
   let setData: ReturnType<typeof vi.fn>;
+  let queryRenderedFeatures: ReturnType<typeof vi.fn>;
   let map: Map;
   let popupRef: { current: { remove: ReturnType<typeof vi.fn> } | null };
   let removePopup: ReturnType<typeof vi.fn>;
@@ -139,6 +142,7 @@ describe("PMTilesLayer - click popup", () => {
     listeners = {};
     classList = { add: vi.fn(), remove: vi.fn() };
     setData = vi.fn();
+    queryRenderedFeatures = vi.fn().mockReturnValue([]);
     popupRef = { current: null };
     removePopup = vi.fn(() => {
       popupRef.current?.remove();
@@ -148,6 +152,14 @@ describe("PMTilesLayer - click popup", () => {
     map = {
       getZoom: vi.fn().mockReturnValue(5),
       getCanvas: () => ({ classList }),
+      getLayer: vi.fn((id: string) =>
+        PMTILE_LAYERS.some(
+          (layer) => layer.id === id || pmtilesHitLayerId(layer.id) === id
+        )
+          ? {}
+          : undefined
+      ),
+      queryRenderedFeatures,
       getSource: vi.fn((id: string) =>
         id === "pmtiles-hover-source-id" ? { setData } : undefined
       ),
@@ -182,15 +194,18 @@ describe("PMTilesLayer - click popup", () => {
       removePopup
     );
 
-  it("registers click and mousemove on every hex band", () => {
+  it("registers map click, touchend, and mousemove on every hex band", () => {
     attach();
     const layerIds = PMTILE_LAYERS.map((layer) => layer.id);
     for (const id of layerIds) {
       expect(listeners[`mousemove:${id}`]).toHaveLength(1);
-      expect(listeners[`click:${id}`]).toHaveLength(1);
+      expect(listeners[`click:${id}`]).toBeUndefined();
       expect(listeners[`mouseleave:${id}`]).toHaveLength(1);
     }
-    expect(listeners.zoom).toHaveLength(1);
+    expect(listeners.click).toHaveLength(1);
+    expect(listeners.touchend).toHaveLength(1);
+    expect(listeners.zoomend).toHaveLength(1);
+    expect(listeners.zoom).toBeUndefined();
   });
 
   it("hover outlines the hex and sets the pointer, but does not open a popup", () => {
@@ -210,7 +225,7 @@ describe("PMTilesLayer - click popup", () => {
 
   it("click opens the count popup with the default close button", () => {
     attach();
-    emit("click", HEX_LAYER.id, makeEvent(makeFeature("hex-1")));
+    emit("click", undefined, makeEvent(makeFeature("hex-1")));
 
     expect(popupMocks.Popup).toHaveBeenCalledWith(
       MapDefaultConfig.DEFAULT_POPUP
@@ -226,9 +241,39 @@ describe("PMTilesLayer - click popup", () => {
     });
   });
 
+  it("queries a padded hit layer when the click event has no features", () => {
+    attach();
+    const feature = makeFeature("hex-1");
+    queryRenderedFeatures.mockReturnValue([feature]);
+    emit("click", undefined, makeEvent());
+
+    expect(queryRenderedFeatures).toHaveBeenCalledWith(
+      [
+        [-14, -4],
+        [34, 44],
+      ],
+      { layers: [pmtilesHitLayerId(HEX_LAYER.id)] }
+    );
+    expect(popupMocks.Popup).toHaveBeenCalled();
+    expect(popupMocks.instances[0].setHTML).toHaveBeenCalledWith(
+      expect.stringContaining("Data Record Count: 12")
+    );
+  });
+
+  it("touchend opens the popup for a single-finger tap", () => {
+    attach();
+    queryRenderedFeatures.mockReturnValue([makeFeature("hex-1")]);
+    emit("touchend", undefined, {
+      ...makeEvent(),
+      points: [{ x: 10, y: 20 }],
+    });
+
+    expect(popupMocks.Popup).toHaveBeenCalled();
+  });
+
   it("mouseleave after click restores the selected outline and leaves the popup open", () => {
     attach();
-    emit("click", HEX_LAYER.id, makeEvent(makeFeature("hex-1")));
+    emit("click", undefined, makeEvent(makeFeature("hex-1")));
     setData.mockClear();
     classList.remove.mockClear();
 
@@ -243,10 +288,20 @@ describe("PMTilesLayer - click popup", () => {
     expect(removePopup).not.toHaveBeenCalled();
   });
 
-  it("zoom clears the open popup and outline", () => {
+  it("zoomend in the same hex band leaves the popup open", () => {
     attach();
-    emit("click", HEX_LAYER.id, makeEvent(makeFeature("hex-1")));
-    emit("zoom");
+    emit("click", undefined, makeEvent(makeFeature("hex-1")));
+    vi.mocked(map.getZoom).mockReturnValue(5.4);
+    emit("zoomend");
+
+    expect(removePopup).not.toHaveBeenCalled();
+  });
+
+  it("zoomend into another hex band clears the open popup and outline", () => {
+    attach();
+    emit("click", undefined, makeEvent(makeFeature("hex-1")));
+    vi.mocked(map.getZoom).mockReturnValue(7);
+    emit("zoomend");
 
     expect(removePopup).toHaveBeenCalled();
     expect(setData).toHaveBeenCalledWith({
@@ -257,7 +312,7 @@ describe("PMTilesLayer - click popup", () => {
 
   it("does not open a popup when density is not ready", () => {
     attach(makeCtx({ densityReady: false }));
-    emit("click", HEX_LAYER.id, makeEvent(makeFeature("hex-1")));
+    emit("click", undefined, makeEvent(makeFeature("hex-1")));
     expect(popupMocks.Popup).not.toHaveBeenCalled();
     expect(removePopup).toHaveBeenCalled();
   });
@@ -266,7 +321,7 @@ describe("PMTilesLayer - click popup", () => {
     attach();
     emit(
       "click",
-      HEX_LAYER.id,
+      undefined,
       makeEvent(
         makeFeature("hex-empty", {
           "2010": {
@@ -283,7 +338,7 @@ describe("PMTilesLayer - click popup", () => {
   it("skips popup and outline while Mapbox Draw is active", () => {
     vi.mocked(isMapDrawModeActive).mockReturnValue(true);
     attach();
-    emit("click", HEX_LAYER.id, makeEvent(makeFeature("hex-1")));
+    emit("click", undefined, makeEvent(makeFeature("hex-1")));
     emit("mousemove", HEX_LAYER.id, makeEvent(makeFeature("hex-1")));
     expect(popupMocks.Popup).not.toHaveBeenCalled();
     expect(removePopup).toHaveBeenCalled();
@@ -292,8 +347,9 @@ describe("PMTilesLayer - click popup", () => {
   it("unbinds map listeners on cleanup", () => {
     const detach = attach();
     detach();
-    expect(listeners[`click:${HEX_LAYER.id}`]).toHaveLength(0);
+    expect(listeners.click).toHaveLength(0);
+    expect(listeners.touchend).toHaveLength(0);
     expect(listeners[`mousemove:${HEX_LAYER.id}`]).toHaveLength(0);
-    expect(listeners.zoom).toHaveLength(0);
+    expect(listeners.zoomend).toHaveLength(0);
   });
 });

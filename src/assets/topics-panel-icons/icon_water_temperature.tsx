@@ -1,7 +1,7 @@
 import { ComponentType, SVGProps } from "react";
 import { portalTheme } from "../../styles";
 
-export const IconSeaTemperature: ComponentType<SVGProps<SVGSVGElement>> = ({
+export const IconWaterTemperature: ComponentType<SVGProps<SVGSVGElement>> = ({
   color = portalTheme.palette.grey700,
   width = 19,
   height = 64,

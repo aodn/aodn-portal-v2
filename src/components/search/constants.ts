@@ -15,7 +15,7 @@ export const POPUP_MIN_WIDTH_XL = 1440;
 export enum SearchKeys {
   IMOS = "imos",
   AIMS = "aims",
-  AAD = "australian_antarctic_division",
+  AAD = "aad",
   CSIRO = "csiro",
   IMAS = "imas",
 }

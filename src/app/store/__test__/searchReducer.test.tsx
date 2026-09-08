@@ -93,6 +93,26 @@ describe("Search Reducer Function Test", () => {
     );
   });
 
+  it("uses exact dataset_group match for IMOS", () => {
+    const parameterState: ParameterState = {
+      datasetGroup: "imos",
+    };
+
+    const sp: SearchParameters = createSearchParamFrom(parameterState);
+
+    expect(sp.filter).equals("dataset_group='imos'");
+  });
+
+  it("uses dataset_group IN for non-IMOS organisations", () => {
+    const parameterState: ParameterState = {
+      datasetGroup: "aims",
+    };
+
+    const sp: SearchParameters = createSearchParamFrom(parameterState);
+
+    expect(sp.filter).equals("dataset_group IN('aims')");
+  });
+
   it("should exclude document scope when excludeDocument is true", () => {
     const param: ParameterState = {
       excludeDocument: true,

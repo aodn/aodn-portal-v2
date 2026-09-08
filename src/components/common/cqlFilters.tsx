@@ -68,8 +68,12 @@ const funcStatus: Status = (stat: DatasetStatus) => `status='${stat}'`;
 const funcExcludeDatasetScope: ExcludeDatasetScope = (scope: string) =>
   `NOT (scope='${scope}')`;
 
-const funcUpdateDatasetGroup: DatasetGroup = (name: string) =>
-  `dataset_group='${name}'`;
+// Special case for imos, for imos we should find dataset where group belong to imos only
+// however if it is not imos say aims, match should be group contains aims
+const funcUpdateDatasetGroup: DatasetGroup = (value: string) =>
+  value.toLowerCase() === "imos"
+    ? `dataset_group='${value}'`
+    : `dataset_group IN('${value}')`;
 
 const utcInstant = (epoch: number) => dayjs.utc(epoch);
 

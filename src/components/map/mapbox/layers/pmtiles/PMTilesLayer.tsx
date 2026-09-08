@@ -16,6 +16,7 @@ import {
   Map,
   MapMouseEvent,
   MapSourceDataEvent,
+  MapTouchEvent,
   Popup,
 } from "mapbox-gl";
 import { FeatureCollection, Geometry } from "geojson";
@@ -55,6 +56,14 @@ import { isMapDrawModeActive } from "@/utils/MapUtils";
 const SOURCE_ID = "pmtiles-source-id";
 const HOVER_SOURCE_ID = "pmtiles-hover-source-id";
 const HOVER_OUTLINE_LAYER_ID = "pmtiles-hex-hover-outline";
+/** Sibling fill used only for hit-testing; density paint can be fully transparent. */
+const pmtilesHitLayerId = (layerId: string): string => `${layerId}-hit`;
+/** Fat-finger box around a tap so mobile hits still resolve a hex. */
+const HIT_QUERY_PADDING_PX = 24;
+/** Ignore the synthetic mouse `click` that follows `touchend` on phones. */
+const POINTER_DEBOUNCE_MS = 400;
+/** Keep the hit fill queryable; Mapbox skips features whose rendered opacity is 0. */
+const HIT_FILL_OPACITY = 0.01;
 /** Stable id for Playwright visibility checks (zoom-band fill layers share one source). */
 const PMTILES_TEST_LAYER_ID = "pmtiles-hex-z0";
 const CURSOR_POINTER_CLASS = "map-cursor-pointer";
@@ -423,6 +432,26 @@ const addPmtilesSourceAndLayers = (
         },
       });
     }
+    const hitId = pmtilesHitLayerId(layer.id);
+    if (!map.getLayer(hitId)) {
+      addDataLayer(map, {
+        id: hitId,
+        type: "fill",
+        source: SOURCE_ID,
+        "source-layer": layer.sourceLayer,
+        minzoom: layer.minzoom,
+        maxzoom: layer.maxzoom,
+        filter: buildDensityLayerFilter(),
+        layout: {
+          visibility: visible ? "visible" : "none",
+        },
+        paint: {
+          "fill-color": "#000000",
+          "fill-opacity": HIT_FILL_OPACITY,
+          "fill-outline-color": "rgba(0, 0, 0, 0)",
+        },
+      });
+    }
   });
 
   if (!map.getSource(HOVER_SOURCE_ID)) {
@@ -698,9 +727,17 @@ const scheduleDebouncedWork = (
   };
 };
 
+type HexMapFeature = NonNullable<MapMouseEvent["features"]>[number];
+
 /**
- * Click opens the count popup; hover only updates the pointer and outline.
- * Zoom and Mapbox Draw interaction clear the open popup.
+ * Click / tap opens the count popup; hover only updates the pointer and outline.
+ *
+ * Mapbox layer `click` misses many mobile taps: density fills with opacity 0
+ * are not queryable, and a finger often moves more than the default 3px
+ * clickTolerance. Interaction therefore:
+ * - uses a near-invisible sibling hit fill (always queryable)
+ * - listens on the map (`click` + `touchend`) and queries a padded box
+ * - only clears the popup when the hex zoom band actually changes
  */
 const attachPmtilesHexInteraction = (
   map: Map,
@@ -711,6 +748,8 @@ const attachPmtilesHexInteraction = (
   let hoveredId: string | number | undefined;
   let selectedId: string | number | undefined;
   let selectedGeometry: Geometry | undefined;
+  let lastZoomBandId = getActivePmtilesLayers(map.getZoom())[0]?.id;
+  let lastPointerAt = 0;
 
   const setHoverOutline = (geometry?: Geometry) => {
     const source = map.getSource<GeoJSONSource>(HOVER_SOURCE_ID);
@@ -737,25 +776,8 @@ const attachPmtilesHexInteraction = (
     removePopup();
   };
 
-  const hexTotal = (
-    layer: (typeof PMTILE_LAYERS)[number],
-    e: MapMouseEvent
-  ): {
-    feature: NonNullable<MapMouseEvent["features"]>[number] | undefined;
-    total: number;
-  } => {
+  const featureTotal = (feature: HexMapFeature): number => {
     const ctx = hoverCtxRef.current;
-    if (!ctx.visible || !ctx.densityReady) {
-      return { feature: undefined, total: 0 };
-    }
-    const zoom = map.getZoom();
-    if (zoom < layer.minzoom || zoom >= layer.maxzoom) {
-      return { feature: undefined, total: 0 };
-    }
-    const feature = e.features?.[0];
-    if (!feature) {
-      return { feature: undefined, total: 0 };
-    }
     const { total } = sumSparseCountFromProperties(
       (feature.properties ?? {}) as Record<string, unknown>,
       ctx.filterStartDate,
@@ -765,7 +787,52 @@ const attachPmtilesHexInteraction = (
         collectMatchedKeys: false,
       }
     );
-    return { feature, total };
+    return total;
+  };
+
+  const pickHex = (
+    layer: (typeof PMTILE_LAYERS)[number],
+    features: HexMapFeature[] | undefined
+  ): { feature: HexMapFeature | undefined; total: number } => {
+    const ctx = hoverCtxRef.current;
+    if (!ctx.visible || !ctx.densityReady) {
+      return { feature: undefined, total: 0 };
+    }
+    const zoom = map.getZoom();
+    if (zoom < layer.minzoom || zoom >= layer.maxzoom) {
+      return { feature: undefined, total: 0 };
+    }
+    for (const feature of features ?? []) {
+      const total = featureTotal(feature);
+      if (total > 0) return { feature, total };
+    }
+    return { feature: undefined, total: 0 };
+  };
+
+  const queryHitFeatures = (
+    e: MapMouseEvent | MapTouchEvent
+  ): HexMapFeature[] => {
+    const fromEvent = (e as MapMouseEvent).features;
+    if (fromEvent?.length) return fromEvent;
+    const layer = getActivePmtilesLayers(map.getZoom())[0];
+    if (!layer) return [];
+    const hitId = pmtilesHitLayerId(layer.id);
+    const queryId = map.getLayer(hitId)
+      ? hitId
+      : map.getLayer(layer.id)
+        ? layer.id
+        : undefined;
+    if (!queryId) return [];
+    const p = e.point;
+    const box: [[number, number], [number, number]] = [
+      [p.x - HIT_QUERY_PADDING_PX, p.y - HIT_QUERY_PADDING_PX],
+      [p.x + HIT_QUERY_PADDING_PX, p.y + HIT_QUERY_PADDING_PX],
+    ];
+    try {
+      return map.queryRenderedFeatures(box, { layers: [queryId] });
+    } catch {
+      return [];
+    }
   };
 
   const onHexHover = (
@@ -777,7 +844,7 @@ const attachPmtilesHexInteraction = (
       return;
     }
 
-    const { feature, total } = hexTotal(layer, e);
+    const { feature, total } = pickHex(layer, e.features);
     if (!feature || total <= 0) {
       map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
       hoveredId = undefined;
@@ -793,16 +860,22 @@ const attachPmtilesHexInteraction = (
     }
   };
 
-  const onHexClick = (
-    layer: (typeof PMTILE_LAYERS)[number],
-    e: MapMouseEvent
-  ) => {
+  const openHexPopup = (e: MapMouseEvent | MapTouchEvent) => {
     if (isMapDrawModeActive(map)) {
       clearInteraction();
       return;
     }
 
-    const { feature, total } = hexTotal(layer, e);
+    const now = Date.now();
+    if (now - lastPointerAt < POINTER_DEBOUNCE_MS) return;
+    lastPointerAt = now;
+
+    const layer = getActivePmtilesLayers(map.getZoom())[0];
+    if (!layer) {
+      clearInteraction();
+      return;
+    }
+    const { feature, total } = pickHex(layer, queryHitFeatures(e));
     if (!feature || total <= 0) {
       clearInteraction();
       return;
@@ -836,13 +909,21 @@ const attachPmtilesHexInteraction = (
     }
   };
 
+  const onTouchEnd = (e: MapTouchEvent) => {
+    if (e.points.length !== 1) return;
+    openHexPopup(e);
+  };
+
   const onHexLeave = () => {
     map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
     hoveredId = undefined;
     restoreOutline();
   };
 
-  const onZoom = () => {
+  const onZoomEnd = () => {
+    const bandId = getActivePmtilesLayers(map.getZoom())[0]?.id;
+    if (bandId === lastZoomBandId) return;
+    lastZoomBandId = bandId;
     clearInteraction();
   };
 
@@ -855,25 +936,26 @@ const attachPmtilesHexInteraction = (
   const layerHandlers = PMTILE_LAYERS.map((layer) => ({
     layerId: layer.id,
     onMouseMove: (e: MapMouseEvent) => onHexHover(layer, e),
-    onClick: (e: MapMouseEvent) => onHexClick(layer, e),
   }));
 
-  layerHandlers.forEach(({ layerId, onMouseMove, onClick }) => {
+  layerHandlers.forEach(({ layerId, onMouseMove }) => {
     map.on("mousemove", layerId, onMouseMove);
     map.on("mouseleave", layerId, onHexLeave);
-    map.on("click", layerId, onClick);
   });
-  map.on("zoom", onZoom);
+  map.on("click", openHexPopup);
+  map.on("touchend", onTouchEnd);
+  map.on("zoomend", onZoomEnd);
   map.on("draw.modechange", onDrawInteractionChange);
   map.on("draw.selectionchange", onDrawInteractionChange);
 
   return () => {
-    layerHandlers.forEach(({ layerId, onMouseMove, onClick }) => {
+    layerHandlers.forEach(({ layerId, onMouseMove }) => {
       map.off("mousemove", layerId, onMouseMove);
       map.off("mouseleave", layerId, onHexLeave);
-      map.off("click", layerId, onClick);
     });
-    map.off("zoom", onZoom);
+    map.off("click", openHexPopup);
+    map.off("touchend", onTouchEnd);
+    map.off("zoomend", onZoomEnd);
     map.off("draw.modechange", onDrawInteractionChange);
     map.off("draw.selectionchange", onDrawInteractionChange);
     try {
@@ -1095,6 +1177,10 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
         clearPmtilesFeatureState(map);
         PMTILE_LAYERS.forEach((layer) => {
+          const hitId = pmtilesHitLayerId(layer.id);
+          if (map.getLayer(hitId)) {
+            map.removeLayer(hitId);
+          }
           if (map.getLayer(layer.id)) {
             map.removeLayer(layer.id);
           }
@@ -1234,12 +1320,13 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     if (!map) return;
     try {
       PMTILE_LAYERS.forEach((layer) => {
+        const vis = visible ? "visible" : "none";
         if (map.getLayer(layer.id)) {
-          map.setLayoutProperty(
-            layer.id,
-            "visibility",
-            visible ? "visible" : "none"
-          );
+          map.setLayoutProperty(layer.id, "visibility", vis);
+        }
+        const hitId = pmtilesHitLayerId(layer.id);
+        if (map.getLayer(hitId)) {
+          map.setLayoutProperty(hitId, "visibility", vis);
         }
       });
       if (map.getLayer(HOVER_OUTLINE_LAYER_ID)) {
@@ -1288,6 +1375,7 @@ export {
   DENSITY_COLOR_STOPS,
   DENSITY_OPACITY_STOPS,
   PMTILE_LAYERS,
+  pmtilesHitLayerId,
   ZERO_COUNT_FILL_OPACITY,
   ZERO_COUNT_OUTLINE_COLOR,
   ZERO_COUNT_FILL_COLOR,

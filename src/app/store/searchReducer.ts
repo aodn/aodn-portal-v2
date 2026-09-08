@@ -350,7 +350,22 @@ const processDatasetDownload = createAsyncThunk<
     return ogcAxiosWithRetry
       .post<DownloadExecutionResponse>(
         "/ogc/processes/download/execution",
-        request
+        request,
+        {
+          // 429 here means this recipient is already at the per-user
+          // concurrency limit - a stable rejection, not transient server
+          // load. The shared instance's default retryCondition treats 429
+          // as retryable (10x exponential back-off, up to ~17 minutes),
+          // which would leave the user staring at a spinner instead of the
+          // "you're at your limit" message.
+          "axios-retry": {
+            retryCondition: (error) =>
+              error.response?.status !== 429 &&
+              (isNetworkError(error) ||
+                isRetryableError(error) ||
+                error.code === "ECONNABORTED"),
+          },
+        }
       )
       .then((response) => response.data)
       .catch(errorHandling(thunkAPI));

@@ -18,6 +18,11 @@ from pages.detail_page import DetailPage
             'The Australian National Mooring Network Facility is a series of national reference stations',
         ),
     ],
+    # Explicit short id: the default id concatenates every string param above,
+    # producing a test id long enough that a failure screenshot filename
+    # (built from the id by pytest-html-plus) exceeds the OS filename limit
+    # and crashes the whole pytest-xdist worker (OSError: File name too long).
+    ids=['imos_location_of_assets'],
 )
 def test_related_resources_sections_in_desktop(
     desktop_page: Page,
@@ -80,6 +85,11 @@ def test_related_resources_sections_in_desktop(
             'The Australian National Mooring Network Facility is a series of national reference stations',
         ),
     ],
+    # Explicit short id: the default id concatenates every string param above,
+    # producing a test id long enough that a failure screenshot filename
+    # (built from the id by pytest-html-plus) exceeds the OS filename limit
+    # and crashes the whole pytest-xdist worker (OSError: File name too long).
+    ids=['imos_location_of_assets'],
 )
 def test_related_resources_sections_in_mobile(
     mobile_page: Page,

@@ -141,7 +141,7 @@ const ActiveFiltersChips: FC = () => {
     // Dataset Group
     if (params.datasetGroup) {
       chips.push({
-        label: `Group: ${params.datasetGroup}`,
+        label: `Organisation: ${params.datasetGroup.toUpperCase()}`,
         onDelete: () => {
           dispatch(updateDatasetGroup(undefined));
           triggerRedirectIfOnSearchPage();

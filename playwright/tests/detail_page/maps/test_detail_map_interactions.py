@@ -306,6 +306,11 @@ def test_map_layer_persists_after_tab_navigation(
             'AusEEZ_bathy_slope_composite_multires',
         ),
     ],
+    # Explicit short id: the default id concatenates every string param above,
+    # producing a test id long enough that a failure screenshot filename
+    # (built from the id by pytest-html-plus) exceeds the OS filename limit
+    # and crashes the whole pytest-xdist worker (OSError: File name too long).
+    ids=['aus_eez_bathy_slope_composite'],
 )
 def test_layer_selection_triggers_correct_wms_map_tile_request(
     responsive_page: Page,

@@ -55,9 +55,53 @@ describe("searchReducer async thunks", () => {
 
     expect(spy).toHaveBeenCalledWith(
       "/ogc/processes/download/execution",
-      request
+      request,
+      expect.objectContaining({
+        "axios-retry": expect.objectContaining({
+          retryCondition: expect.any(Function),
+        }),
+      })
     );
     expect(result.payload).toEqual(response);
+  });
+
+  it("processDatasetDownload does not retry a 429 (per-user limit hit)", async () => {
+    const request: DatasetDownloadRequest = {
+      inputs: {
+        uuid: "collection-id",
+        key: "dataset.zarr",
+        recipient: "user@example.com",
+        start_date: "2026-01-01",
+        end_date: "2026-01-31",
+        multi_polygon: "non-specified",
+        output_format: "netcdf",
+        collection_title: "Collection title",
+        full_metadata_link: "https://example.com/details/collection-id",
+        suggested_citation: "Citation",
+        estimated_size_bytes: 987654,
+      },
+      outputs: {},
+      subscriber: {
+        successUri: "place_holder",
+        inProgressUri: "place_holder",
+        failedUri: "place_holder",
+      },
+    };
+    const spy = vi.spyOn(ogcAxiosWithRetry, "post").mockResolvedValue({
+      data: {},
+    } as any);
+    const store = configureStore({ reducer: (state = {}) => state });
+
+    await store.dispatch(processDatasetDownload(request) as any);
+
+    // 429 from this endpoint means the recipient is already at the per-user
+    // concurrency limit - a stable rejection, not transient server load, so
+    // it must be excluded from the shared instance's default 10x
+    // exponential-backoff retry (which treats 429 as retryable).
+    const retryCondition = (spy.mock.calls[0][2] as any)["axios-retry"]
+      .retryCondition;
+    expect(retryCondition({ response: { status: 429 } })).toBe(false);
+    expect(retryCondition({ response: { status: 500 } })).toBe(true);
   });
 
   it("processWFSDownload sends correct request body", async () => {

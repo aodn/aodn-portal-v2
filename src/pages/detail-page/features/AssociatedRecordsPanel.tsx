@@ -67,22 +67,20 @@ const AssociatedRecordsPanel = () => {
       }
     });
 
-    if (parents.length > 1) {
-      //TODO: handle error when toast is implemented
-    }
-
-    return { parent: parents?.[0], children, siblings };
+    return { parents, children, siblings };
   }, [links]);
 
-  const lists: NavigatablePanelChild[] = useMemo(
-    () => [
+  const lists: NavigatablePanelChild[] = useMemo(() => {
+    const parentsTitle = `Parent ${associatedRecords.parents.length === 1 ? "Record" : "Records"}`;
+
+    return [
       {
-        title: "Parent Record",
+        title: parentsTitle,
         component: (props: Record<string, any>) => (
           <AssociatedRecordList
             {...props}
-            title={"Parent Record"}
-            records={associatedRecords.parent ? [associatedRecords.parent] : []}
+            title={parentsTitle}
+            records={associatedRecords.parents}
           />
         ),
       },
@@ -106,13 +104,12 @@ const AssociatedRecordsPanel = () => {
           />
         ),
       },
-    ],
-    [
-      associatedRecords.children,
-      associatedRecords.parent,
-      associatedRecords.siblings,
-    ]
-  );
+    ];
+  }, [
+    associatedRecords.children,
+    associatedRecords.parents,
+    associatedRecords.siblings,
+  ]);
 
   return <NavigatablePanel childrenList={lists} isLoading={isLoading} />;
 };

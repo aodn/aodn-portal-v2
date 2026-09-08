@@ -17,7 +17,8 @@ permissions:
 
 concurrency:
   group: seo-artifacts
-  cancel-in-progress: false
+  # Every run rebuilds everything, so a superseded run is safe to cancel
+  cancel-in-progress: true
 
 jobs:
   publish:

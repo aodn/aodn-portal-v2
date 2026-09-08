@@ -53,6 +53,10 @@ const STATUS_MESSAGES = {
   SERVER_ERROR: "Server error! Please try again later",
   SUCCESS: "Download email will be sent shortly.",
   DATASET_ERROR: "Dataset unavailable! Please try again later",
+  // The per-user concurrency limit was hit; this is a hard rejection, not a
+  // queue - the request has no jobID and must be retried later by the user.
+  LIMIT_REACHED:
+    "You already have 10 downloads in progress. Please wait for one to finish before starting another.",
 } as const;
 
 const TIMEOUT_LIMIT = 8000;
@@ -395,17 +399,18 @@ export const useDownloadDialog = (
           }
           setIsProcessing(false);
         })
-        .catch(
-          (error: { response: { status: { toString: () => string } } }) => {
-            if (error?.response?.status) {
-              setProcessingStatus(error.response.status.toString());
-            } else {
-              console.error("Internal server error.");
-              setProcessingStatus(STATUS_CODES.SERVER_ERROR);
-            }
-            setIsProcessing(false);
+        .catch((error: { statusCode?: number }) => {
+          // Rejected via ErrorBoundary's errorHandling()/rejectWithValue(),
+          // which carries the real HTTP status as statusCode - e.g. 429 when
+          // the recipient is already at the per-user concurrency limit.
+          if (error?.statusCode) {
+            setProcessingStatus(error.statusCode.toString());
+          } else {
+            console.error("Internal server error.");
+            setProcessingStatus(STATUS_CODES.SERVER_ERROR);
           }
-        );
+          setIsProcessing(false);
+        });
     },
     [uuid, dispatch, collection, estimatedSizeBytes]
   );
@@ -517,6 +522,9 @@ export const useDownloadDialog = (
     }
     if (/^2\d{2}$/.test(processingStatus)) {
       return STATUS_MESSAGES.SUCCESS;
+    }
+    if (processingStatus === "429") {
+      return STATUS_MESSAGES.LIMIT_REACHED;
     }
     if (/^4\d{2}$/.test(processingStatus)) {
       return processingStatus === "400"
