@@ -14,7 +14,7 @@ const CRAWLER_TOKENS = [
   "telegram",
   "aodn-seo-verify", // our own smoke check, see CRAWLER_UA
 ];
-export const CRAWLER_UA_PATTERN = new RegExp(CRAWLER_TOKENS.join("|"), "i");
+const CRAWLER_UA_PATTERN = new RegExp(CRAWLER_TOKENS.join("|"), "i");
 
 // cloudfront function name must be "handler"
 function handler(event) {
