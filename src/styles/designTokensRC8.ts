@@ -193,6 +193,9 @@ export const designTokensRC8 = {
       secondary1: "#54BCEB",
       secondary2: "#52BDEC",
 
+      // Feedback button
+      feedback: "#459BD0",
+
       // Neutral series
       neutral1: "#090C02",
       neutral2: "#FFF",
