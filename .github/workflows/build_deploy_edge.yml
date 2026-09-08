@@ -131,7 +131,7 @@ jobs:
               workflow_id: 'deploy.yml',
               ref: 'main',
               inputs: {
-                app_name: '${{ inputs.app_name }}',
-                environment: '${{ inputs.environment }}'
+                app_name: 'portal',
+                environment: 'edge'
               }
             })
