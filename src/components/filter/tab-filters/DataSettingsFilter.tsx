@@ -109,8 +109,8 @@ const renderFilterLabel = (label: string, isAiGenerated: boolean = false) => (
     sx={{
       display: "flex",
       alignItems: "flex-start",
-      width: "318.66px",
-      height: "30.445px",
+      width: "318px",
+      height: "30px",
       boxSizing: "border-box",
       padding: "0 20px",
     }}
