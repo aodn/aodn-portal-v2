@@ -736,7 +736,8 @@ type HexMapFeature = NonNullable<MapMouseEvent["features"]>[number];
  * are not queryable, and a finger often moves more than the default 3px
  * clickTolerance. Interaction therefore:
  * - uses a near-invisible sibling hit fill (always queryable)
- * - listens on the map (`click` + `touchend`) and queries a padded box
+ * - listens on the map (`click` + `touchend`) and queries the tap point first,
+ *   then a padded box only if the point missed (fat-finger fallback)
  * - only clears the popup when the hex zoom band actually changes
  */
 const attachPmtilesHexInteraction = (
@@ -790,9 +791,26 @@ const attachPmtilesHexInteraction = (
     return total;
   };
 
+  const polygonCentroid = (
+    geometry: Geometry | undefined
+  ): { lng: number; lat: number } | undefined => {
+    if (!geometry || geometry.type !== "Polygon") return undefined;
+    const ring = geometry.coordinates[0];
+    if (!ring || ring.length < 2) return undefined;
+    const vertexCount = ring.length - 1;
+    let lng = 0;
+    let lat = 0;
+    for (let i = 0; i < vertexCount; i++) {
+      lng += ring[i][0];
+      lat += ring[i][1];
+    }
+    return { lng: lng / vertexCount, lat: lat / vertexCount };
+  };
+
   const pickHex = (
     layer: (typeof PMTILE_LAYERS)[number],
-    features: HexMapFeature[] | undefined
+    features: HexMapFeature[] | undefined,
+    tapPoint?: { x: number; y: number }
   ): { feature: HexMapFeature | undefined; total: number } => {
     const ctx = hoverCtxRef.current;
     if (!ctx.visible || !ctx.densityReady) {
@@ -802,18 +820,37 @@ const attachPmtilesHexInteraction = (
     if (zoom < layer.minzoom || zoom >= layer.maxzoom) {
       return { feature: undefined, total: 0 };
     }
+    const scored: Array<{
+      feature: HexMapFeature;
+      total: number;
+      dist: number;
+    }> = [];
     for (const feature of features ?? []) {
       const total = featureTotal(feature);
-      if (total > 0) return { feature, total };
+      if (total <= 0) continue;
+      if (!tapPoint) {
+        return { feature, total };
+      }
+      const centroid = polygonCentroid(feature.geometry);
+      if (!centroid) {
+        scored.push({ feature, total, dist: Number.POSITIVE_INFINITY });
+        continue;
+      }
+      const screen = map.project(centroid);
+      const dx = screen.x - tapPoint.x;
+      const dy = screen.y - tapPoint.y;
+      scored.push({ feature, total, dist: dx * dx + dy * dy });
     }
-    return { feature: undefined, total: 0 };
+    if (!scored.length) {
+      return { feature: undefined, total: 0 };
+    }
+    scored.sort((a, b) => a.dist - b.dist);
+    return { feature: scored[0].feature, total: scored[0].total };
   };
 
   const queryHitFeatures = (
     e: MapMouseEvent | MapTouchEvent
   ): HexMapFeature[] => {
-    const fromEvent = (e as MapMouseEvent).features;
-    if (fromEvent?.length) return fromEvent;
     const layer = getActivePmtilesLayers(map.getZoom())[0];
     if (!layer) return [];
     const hitId = pmtilesHitLayerId(layer.id);
@@ -823,12 +860,16 @@ const attachPmtilesHexInteraction = (
         ? layer.id
         : undefined;
     if (!queryId) return [];
+    const fromEvent = (e as MapMouseEvent).features;
+    if (fromEvent?.length) return fromEvent;
     const p = e.point;
-    const box: [[number, number], [number, number]] = [
-      [p.x - HIT_QUERY_PADDING_PX, p.y - HIT_QUERY_PADDING_PX],
-      [p.x + HIT_QUERY_PADDING_PX, p.y + HIT_QUERY_PADDING_PX],
-    ];
     try {
+      const atPoint = map.queryRenderedFeatures(p, { layers: [queryId] });
+      if (atPoint.length) return atPoint;
+      const box: [[number, number], [number, number]] = [
+        [p.x - HIT_QUERY_PADDING_PX, p.y - HIT_QUERY_PADDING_PX],
+        [p.x + HIT_QUERY_PADDING_PX, p.y + HIT_QUERY_PADDING_PX],
+      ];
       return map.queryRenderedFeatures(box, { layers: [queryId] });
     } catch {
       return [];
@@ -844,7 +885,7 @@ const attachPmtilesHexInteraction = (
       return;
     }
 
-    const { feature, total } = pickHex(layer, e.features);
+    const { feature, total } = pickHex(layer, e.features, e.point);
     if (!feature || total <= 0) {
       map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
       hoveredId = undefined;
@@ -875,7 +916,7 @@ const attachPmtilesHexInteraction = (
       clearInteraction();
       return;
     }
-    const { feature, total } = pickHex(layer, queryHitFeatures(e));
+    const { feature, total } = pickHex(layer, queryHitFeatures(e), e.point);
     if (!feature || total <= 0) {
       clearInteraction();
       return;
