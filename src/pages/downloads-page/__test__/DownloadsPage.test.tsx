@@ -1,8 +1,9 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { rgbToHex } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { portalTheme } from "@/styles";
+import dayjs from "@/utils/DayjsUtils";
 import DownloadsPage from "../DownloadsPage";
 
 const mockUseDownloadStatus = vi.hoisted(() => vi.fn());
@@ -19,6 +20,8 @@ vi.mock("@/hooks/useBreakpoint", () => ({
 describe("DownloadsPage", () => {
   const retryDownload = vi.fn();
   const removeDownload = vi.fn();
+
+  afterEach(() => vi.restoreAllMocks());
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -182,6 +185,7 @@ describe("DownloadsPage", () => {
   });
 
   it("defaults to Local and switches every date cell to UTC when toggled, persisting the choice", () => {
+    vi.spyOn(dayjs.tz, "guess").mockReturnValue("Australia/Sydney");
     renderPage();
 
     const localButton = screen.getByRole("button", { name: "Local" });
