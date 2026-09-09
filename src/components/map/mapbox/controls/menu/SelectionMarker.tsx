@@ -3,26 +3,18 @@ import { createPortal } from "react-dom";
 import { Box, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { Map as MapboxMap, Marker } from "mapbox-gl";
+import type MapboxDraw from "@mapbox/mapbox-gl-draw";
 import type { Feature, Polygon, MultiPolygon } from "geojson";
 
 interface Props {
   map: MapboxMap;
+  draw: MapboxDraw;
   feature: Feature<Polygon | MultiPolygon>;
   number: number;
   onRemove: (id: string) => void;
 }
 
-export default function SelectionMarker({
-  map,
-  feature,
-  number,
-  onRemove,
-}: Props) {
-  const element = useMemo(() => document.createElement("div"), []);
-  const marker = useMemo(
-    () => new Marker({ element, anchor: "bottom-left", offset: [4, -4] }),
-    [element]
-  );
+function getCorner(feature: Feature<Polygon | MultiPolygon>): [number, number] {
   const rings =
     feature.geometry.type === "Polygon"
       ? feature.geometry.coordinates
@@ -34,7 +26,21 @@ export default function SelectionMarker({
       ? point
       : best
   );
-  const [lng, lat] = corner;
+  return [corner[0], corner[1]];
+}
+
+export default function SelectionMarker({
+  map,
+  draw,
+  feature,
+  number,
+  onRemove,
+}: Props) {
+  const element = useMemo(() => document.createElement("div"), []);
+  const marker = useMemo(
+    () => new Marker({ element, anchor: "bottom-right", offset: [0, -4] }),
+    [element]
+  );
 
   useEffect(() => {
     // Stop native events before they reach Mapbox Draw's map listeners.
@@ -50,7 +56,7 @@ export default function SelectionMarker({
       "keydown",
     ];
     events.forEach((event) => element.addEventListener(event, stop));
-    marker.setLngLat([lng, lat]).addTo(map);
+    marker.setLngLat(getCorner(feature)).addTo(map);
     return () => {
       events.forEach((event) => element.removeEventListener(event, stop));
       marker.remove();
@@ -60,8 +66,25 @@ export default function SelectionMarker({
   }, [map, marker, element]);
 
   useEffect(() => {
-    marker.setLngLat([lng, lat]);
-  }, [marker, lng, lat]);
+    const updatePosition = () => {
+      const current = draw.get(String(feature.id));
+      if (
+        current &&
+        (current.geometry.type === "Polygon" ||
+          current.geometry.type === "MultiPolygon")
+      ) {
+        marker.setLngLat(getCorner(current as Feature<Polygon | MultiPolygon>));
+      }
+    };
+    marker.setLngLat(getCorner(feature));
+    // Draw updates its geometry throughout dragging, but draw.update only fires
+    // on release. Move the marker directly on each Draw render, without syncing
+    // download conditions or re-rendering the React tree on every frame.
+    map.on("draw.render", updatePosition);
+    return () => {
+      map.off("draw.render", updatePosition);
+    };
+  }, [map, draw, marker, feature]);
 
   return createPortal(
     <Box

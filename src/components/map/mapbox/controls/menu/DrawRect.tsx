@@ -413,6 +413,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
           )
           .map((feature, index) => (
             <SelectionMarker
+              draw={mapDraw}
               key={feature.id}
               map={map}
               feature={feature}

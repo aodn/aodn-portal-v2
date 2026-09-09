@@ -5,8 +5,10 @@ import DrawRect, { DRAW_POLYGON_MODE, DRAW_RECTANGLE_MODE } from "../DrawRect";
 
 const mocks = vi.hoisted(() => ({
   currentMode: "simple_select",
+  setLngLat: vi.fn(),
   draw: {
     add: vi.fn(),
+    get: vi.fn(),
     changeMode: vi.fn(),
     delete: vi.fn(),
     deleteAll: vi.fn(),
@@ -34,7 +36,8 @@ vi.mock("mapbox-gl", async (importOriginal) => {
       constructor({ element }: { element: HTMLElement }) {
         this.element = element;
       }
-      setLngLat() {
+      setLngLat(position: [number, number]) {
+        mocks.setLngLat(position);
         return this;
       }
       addTo(map: Mapbox) {
@@ -275,4 +278,60 @@ describe("selection labels and individual removal", () => {
     unmount();
     expect(map.getContainer().children).toHaveLength(0);
   });
+});
+
+it("moves the box marker during dragging before draw.update and cleans up the listener", () => {
+  const feature = {
+    id: "drag-box",
+    type: "Feature",
+    properties: { selectionType: "bbox" },
+    geometry: {
+      type: "Polygon",
+      coordinates: [
+        [
+          [0, 0],
+          [1, 0],
+          [1, 1],
+          [0, 1],
+          [0, 0],
+        ],
+      ],
+    },
+  };
+  mocks.draw.getAll.mockReturnValue({ features: [feature] });
+  const map = createMockMap();
+  const onChangeFeatures = vi.fn();
+  const { unmount } = render(
+    <DrawRect map={map} onChangeFeatures={onChangeFeatures} />
+  );
+  const renderListener = vi
+    .mocked(map.on)
+    .mock.calls.find(
+      ([event]) => event === "draw.render"
+    )?.[1] as unknown as () => void;
+  expect(renderListener).toBeTypeOf("function");
+  onChangeFeatures.mockClear();
+  mocks.setLngLat.mockClear();
+  mocks.draw.get.mockReturnValue({
+    ...feature,
+    geometry: {
+      type: "Polygon",
+      coordinates: [
+        [
+          [2, 3],
+          [3, 3],
+          [3, 4],
+          [2, 4],
+          [2, 3],
+        ],
+      ],
+    },
+  });
+  act(() => renderListener());
+  expect(mocks.draw.get).toHaveBeenCalledWith("drag-box");
+  expect(mocks.setLngLat).toHaveBeenLastCalledWith([3, 4]);
+  expect(onChangeFeatures).not.toHaveBeenCalled();
+  unmount();
+  expect(map.off).toHaveBeenCalledWith("draw.render", renderListener);
+  mocks.draw.getAll.mockReturnValue({ features: [] });
 });
