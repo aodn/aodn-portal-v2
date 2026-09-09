@@ -360,7 +360,11 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
             ],
           ],
         },
-        properties: { selectionType: "bbox" },
+        id: condition.id,
+        properties: {
+          selectionType: "bbox",
+          selectionOrder: condition.selectionOrder,
+        },
       });
     });
 
@@ -372,11 +376,19 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
           type: "Polygon",
           coordinates: [closedCoords],
         },
-        properties: { selectionType: "polygon" },
+        id: condition.id,
+        properties: {
+          selectionType: "polygon",
+          selectionOrder: condition.selectionOrder,
+        },
       });
     });
 
-    return features;
+    return features.sort(
+      (a, b) =>
+        (a.properties?.selectionOrder ?? 0) -
+        (b.properties?.selectionOrder ?? 0)
+    );
   }, [downloadConditions]);
 
   // Snap the single-time thumb onto a real mark once discrete times load.
@@ -559,7 +571,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       const polygonConditions: PolygonCondition[] = [];
       const validFeatures = newFeatures.filter(isValidPolygonFeature);
 
-      validFeatures.forEach((feature) => {
+      validFeatures.forEach((feature, index) => {
         const id = String(feature.id);
         const selectionType = feature.properties?.selectionType || "bbox";
         const removeCallback = () => removeFeature(id);
@@ -577,7 +589,8 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
               new PolygonCondition(
                 id,
                 vertices as [number, number][],
-                removeCallback
+                removeCallback,
+                index
               )
             );
           }
@@ -585,7 +598,9 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
           try {
             const bbox = turf.bbox(feature);
             if (bbox && bbox.every((n) => isFinite(n))) {
-              bboxConditions.push(new BBoxCondition(id, bbox, removeCallback));
+              bboxConditions.push(
+                new BBoxCondition(id, bbox, removeCallback, index)
+              );
             }
           } catch (e) {
             console.warn("turf.bbox failed on feature", e, feature);

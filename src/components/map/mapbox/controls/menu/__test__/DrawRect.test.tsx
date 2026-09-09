@@ -25,6 +25,29 @@ vi.mock("@mapbox/mapbox-gl-draw", () => {
   return { default: MapboxDraw };
 });
 
+vi.mock("mapbox-gl", async (importOriginal) => {
+  const original = await importOriginal<typeof import("mapbox-gl")>();
+  return {
+    ...original,
+    Marker: class {
+      element: HTMLElement;
+      constructor({ element }: { element: HTMLElement }) {
+        this.element = element;
+      }
+      setLngLat() {
+        return this;
+      }
+      addTo(map: Mapbox) {
+        map.getContainer().appendChild(this.element);
+        return this;
+      }
+      remove() {
+        this.element.remove();
+      }
+    },
+  };
+});
+
 const createMockMap = () => {
   const container = document.createElement("div");
   container.id = "draw-rect-test-map";
@@ -189,5 +212,67 @@ describe("DrawRect keyboard delete", () => {
 
     expect(mocks.draw.deleteAll).not.toHaveBeenCalled();
     expect(mocks.draw.delete).not.toHaveBeenCalled();
+  });
+});
+
+describe("selection labels and individual removal", () => {
+  afterEach(() => {
+    mocks.draw.getAll.mockReturnValue({ features: [] });
+  });
+
+  it("numbers only boxes and renumbers them after individual deletion", () => {
+    const features = ["box", "polygon", "box-2"].map((id) => ({
+      id,
+      type: "Feature",
+      properties: { selectionType: id === "polygon" ? "polygon" : "bbox" },
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [0, 0],
+            [1, 0],
+            [1, 1],
+            [0, 1],
+            [0, 0],
+          ],
+        ],
+      },
+    }));
+    mocks.draw.getAll.mockReturnValue({ features });
+    mocks.draw.delete.mockImplementation((id: string) => {
+      mocks.draw.getAll.mockReturnValue({
+        features: features.filter((feature) => feature.id !== id),
+      });
+    });
+    const onChangeFeatures = vi.fn();
+    const map = createMockMap();
+    const mapClick = vi.fn();
+    map.getContainer().addEventListener("click", mapClick);
+    const { unmount } = render(
+      <DrawRect map={map} onChangeFeatures={onChangeFeatures} />
+    );
+    expect(
+      screen.getByRole("button", { name: "Remove selection 2" })
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByRole("button", { name: /Remove selection/ })
+    ).toHaveLength(2);
+    mocks.draw.delete.mockClear();
+    fireEvent.click(screen.getByRole("button", { name: "Remove selection 1" }));
+    expect(mocks.draw.delete).toHaveBeenCalledExactlyOnceWith("box");
+    expect(
+      screen.queryByRole("button", { name: "Remove selection 2" })
+    ).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Selection 1")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Selection 2")).not.toBeInTheDocument();
+    expect(onChangeFeatures).toHaveBeenLastCalledWith(
+      features.slice(1),
+      expect.any(Function)
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Remove selection 1" }));
+    expect(mocks.draw.delete).toHaveBeenLastCalledWith("box-2");
+    expect(mapClick).not.toHaveBeenCalled();
+    unmount();
+    expect(map.getContainer().children).toHaveLength(0);
   });
 });
