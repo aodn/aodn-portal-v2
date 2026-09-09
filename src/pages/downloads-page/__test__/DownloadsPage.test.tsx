@@ -22,6 +22,7 @@ describe("DownloadsPage", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear();
     mockUseBreakpoint.mockReturnValue({ isUnderLaptop: false });
     mockUseDownloadStatus.mockReturnValue({
       downloads: [
@@ -178,5 +179,42 @@ describe("DownloadsPage", () => {
 
     expect(retryDownload).toHaveBeenCalledWith("job-1");
     expect(removeDownload).toHaveBeenCalledWith("job-1");
+  });
+
+  it("defaults to Local and switches every date cell to UTC when toggled, persisting the choice", () => {
+    renderPage();
+
+    const localButton = screen.getByRole("button", { name: "Local" });
+    const utcButton = screen.getByRole("button", { name: "UTC" });
+    expect(localButton).toHaveAttribute("aria-pressed", "true");
+    expect(utcButton).toHaveAttribute("aria-pressed", "false");
+    expect(screen.queryByText("01:20:05 UTC")).not.toBeInTheDocument();
+
+    fireEvent.click(utcButton);
+
+    expect(utcButton).toHaveAttribute("aria-pressed", "true");
+    expect(localButton).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByText("25 Aug 2026")).toBeInTheDocument();
+    expect(screen.getByText("01:20:05 UTC")).toBeInTheDocument();
+    expect(localStorage.getItem("aodn_downloads_timezone_mode_v1")).toBe("utc");
+
+    fireEvent.click(localButton);
+
+    expect(localButton).toHaveAttribute("aria-pressed", "true");
+    expect(screen.queryByText("01:20:05 UTC")).not.toBeInTheDocument();
+    expect(localStorage.getItem("aodn_downloads_timezone_mode_v1")).toBe(
+      "local"
+    );
+  });
+
+  it("restores a previously persisted UTC preference on mount", () => {
+    localStorage.setItem("aodn_downloads_timezone_mode_v1", "utc");
+    renderPage();
+
+    expect(screen.getByRole("button", { name: "UTC" })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
+    expect(screen.getByText("01:20:05 UTC")).toBeInTheDocument();
   });
 });

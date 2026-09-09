@@ -1,8 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   addTrackedDownloadId,
+  getDownloadTimeZoneMode,
   getTrackedDownloadIds,
   removeTrackedDownloadId,
+  setDownloadTimeZoneMode,
+  TIMEZONE_MODE_KEY,
   TRACKED_DOWNLOAD_IDS_KEY,
 } from "../DownloadStorageUtils";
 
@@ -40,5 +43,29 @@ describe("DownloadStorageUtils", () => {
     });
 
     expect(addTrackedDownloadId("job-1")).toBe(false);
+  });
+
+  it("defaults the timezone mode to local and persists a switch to UTC", () => {
+    expect(getDownloadTimeZoneMode()).toBe("local");
+
+    setDownloadTimeZoneMode("utc");
+    expect(localStorage.getItem(TIMEZONE_MODE_KEY)).toBe("utc");
+    expect(getDownloadTimeZoneMode()).toBe("utc");
+
+    setDownloadTimeZoneMode("local");
+    expect(getDownloadTimeZoneMode()).toBe("local");
+  });
+
+  it("ignores garbage stored against the timezone mode key", () => {
+    localStorage.setItem(TIMEZONE_MODE_KEY, "some-other-value");
+    expect(getDownloadTimeZoneMode()).toBe("local");
+  });
+
+  it("falls back to local when storage is unavailable", () => {
+    vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      throw new DOMException("Storage unavailable", "SecurityError");
+    });
+
+    expect(getDownloadTimeZoneMode()).toBe("local");
   });
 });
