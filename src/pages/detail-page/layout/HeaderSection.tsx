@@ -37,7 +37,6 @@ import { DataTestId } from "@/components/map/mapbox/constants";
 import { ReplyIcon } from "@/assets/icons/details/back";
 import LabelChip from "../../../components/common/label/LabelChip";
 import AIGenStarIcon from "../../../components/icon/AIGenStarIcon";
-import { SearchKeys } from "@/components/search/constants";
 
 interface HeaderButtonProps {
   children: ReactNode;
@@ -133,10 +132,7 @@ const renderSubTitle = (
   endDate: string | undefined,
   scope: string | undefined,
   aiUpdateFrequency: string | undefined,
-  isSmallMobile: boolean,
-  isImosProvider: boolean,
-  hasCloudOptimisedData: boolean,
-  hasWfsService: boolean
+  isSmallMobile: boolean
 ) => (
   <Stack flexDirection="row" flexWrap="wrap" gap={1}>
     {startDate && (
@@ -176,51 +172,6 @@ const renderSubTitle = (
         <LabelChip
           text={["Document"]}
           color={color.success.light}
-          sx={{
-            padding: 0,
-            paddingX: padding.extraSmall,
-            ...portalTheme.typography.title1Medium,
-            color: fontColor.black.dark,
-            fontWeight: fontWeight.regular,
-          }}
-        />
-      </RoundCard>
-    )}
-    {isImosProvider && (
-      <RoundCard sx={{ backgroundColor: portalTheme.palette.tag3 }}>
-        <LabelChip
-          text={["IMOS Data"]}
-          color={portalTheme.palette.tag3}
-          sx={{
-            padding: 0,
-            paddingX: padding.extraSmall,
-            ...portalTheme.typography.title1Medium,
-            color: fontColor.black.dark,
-            fontWeight: fontWeight.regular,
-          }}
-        />
-      </RoundCard>
-    )}
-    {hasCloudOptimisedData && (
-      <RoundCard sx={{ backgroundColor: portalTheme.palette.tag4 }}>
-        <LabelChip
-          text={["Cloud-optimised"]}
-          color={portalTheme.palette.tag4}
-          sx={{
-            padding: 0,
-            paddingX: padding.extraSmall,
-            ...portalTheme.typography.title1Medium,
-            color: fontColor.black.dark,
-            fontWeight: fontWeight.regular,
-          }}
-        />
-      </RoundCard>
-    )}
-    {hasWfsService && (
-      <RoundCard sx={{ backgroundColor: portalTheme.palette.tag4 }}>
-        <LabelChip
-          text={["WFS Service Available"]}
-          color={portalTheme.palette.tag4}
           sx={{
             padding: 0,
             paddingX: padding.extraSmall,
@@ -282,16 +233,7 @@ const HeaderSection = () => {
   const redirectHome = useRedirectHome();
   const redirectSearch = useRedirectSearch();
 
-  const [
-    title,
-    startDate,
-    endDate,
-    scope,
-    aiUpdateFrequency,
-    isImosProvider,
-    hasCloudOptimisedData,
-    hasWfsService,
-  ] = useMemo(() => {
+  const [title, startDate, endDate, scope, aiUpdateFrequency] = useMemo(() => {
     const title = collection?.title;
     const extent = collection?.getExtent();
     const scope = collection?.getScope();
@@ -305,21 +247,7 @@ const HeaderSection = () => {
       endDate = e;
     }
 
-    const isImosProvider =
-      collection?.getDatasetProvider()?.toLowerCase() === SearchKeys.IMOS;
-    const hasCloudOptimisedData = collection?.hasCloudOptimisedData() ?? false;
-    const hasWfsService = (collection?.getWFSLinks()?.length ?? 0) > 0;
-
-    return [
-      title,
-      startDate,
-      endDate,
-      scope,
-      aiUpdateFrequency,
-      isImosProvider,
-      hasCloudOptimisedData,
-      hasWfsService,
-    ];
+    return [title, startDate, endDate, scope, aiUpdateFrequency];
   }, [collection]);
 
   // Capture the referer only on first mount (lazy useState init runs once).
@@ -425,10 +353,7 @@ const HeaderSection = () => {
                   endDate,
                   scope,
                   aiUpdateFrequency,
-                  isSmallMobile,
-                  isImosProvider,
-                  hasCloudOptimisedData,
-                  hasWfsService
+                  isSmallMobile
                 )}
             </Grid>
             <Grid
@@ -465,10 +390,7 @@ const HeaderSection = () => {
                   endDate,
                   scope,
                   aiUpdateFrequency,
-                  isSmallMobile,
-                  isImosProvider,
-                  hasCloudOptimisedData,
-                  hasWfsService
+                  isSmallMobile
                 )}
               </Grid>
             )}

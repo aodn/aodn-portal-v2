@@ -5,9 +5,17 @@ import {
   MenuProps,
   Select,
   SelectChangeEvent,
+  Stack,
   SxProps,
 } from "@mui/material";
-import { FC, memo, ReactElement, useCallback, useState } from "react";
+import {
+  FC,
+  memo,
+  ReactElement,
+  ReactNode,
+  useCallback,
+  useState,
+} from "react";
 import { IconProps } from "../../icon/types";
 import { disableScroll, enableScroll } from "../../../utils/ScrollUtils";
 import { portalTheme } from "../../../styles";
@@ -24,6 +32,8 @@ export interface CommonSelectProps<T = string> {
   // Once value is provided, the component is controllable
   value?: T | null;
   label?: string;
+  // Rendered inline after the label, e.g. a small tag indicating data source
+  labelAdornment?: ReactNode;
   onSelectCallback?: (value: T) => void;
   disabled?: boolean;
   dataTestId?: string;
@@ -69,6 +79,7 @@ const CommonSelect: FC<CommonSelectProps> = memo(
     items,
     value,
     label,
+    labelAdornment,
     onSelectCallback,
     disabled = false,
     dataTestId = "common-select",
@@ -100,7 +111,12 @@ const CommonSelect: FC<CommonSelectProps> = memo(
 
     return (
       <FormControl fullWidth data-testid={dataTestId} disabled={disabled}>
-        {label && <FormLabel sx={labelSx}>{label}</FormLabel>}
+        {label && (
+          <Stack direction="row" alignItems="baseline" gap={1}>
+            <FormLabel sx={labelSx}>{label}</FormLabel>
+            {labelAdornment}
+          </Stack>
+        )}
         <Select
           value={value || selectedItem}
           onOpen={handleOpenState(true)}

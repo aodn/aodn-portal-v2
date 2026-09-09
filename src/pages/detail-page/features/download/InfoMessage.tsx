@@ -7,9 +7,15 @@ interface InfoMessageProps {
   infoText: ReactNode;
   iconColor?: string;
   sx?: SxProps;
+  flushLeft?: boolean;
 }
 
-const InfoMessage: FC<InfoMessageProps> = ({ infoText, iconColor, sx }) => {
+const InfoMessage: FC<InfoMessageProps> = ({
+  infoText,
+  iconColor,
+  sx,
+  flushLeft = false,
+}) => {
   return (
     <Box
       sx={{
@@ -19,7 +25,14 @@ const InfoMessage: FC<InfoMessageProps> = ({ infoText, iconColor, sx }) => {
         ...sx,
       }}
     >
-      <Box sx={{ minWidth: 22, flexShrink: 0, px: "8px" }}>
+      <Box
+        sx={{
+          minWidth: 22,
+          flexShrink: 0,
+          pl: flushLeft ? 0 : "8px",
+          pr: "8px",
+        }}
+      >
         <InformationIcon
           color={iconColor ? iconColor : portalTheme.palette.primary1}
           height={30}

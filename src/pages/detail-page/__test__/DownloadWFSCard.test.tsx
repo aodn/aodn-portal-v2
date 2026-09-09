@@ -12,9 +12,10 @@ beforeAll(() => {
 // Same stub as DownloadCloudOptimisedCard.test.tsx so the two card tests query
 // their dropdowns the same way
 vi.mock("../features/download/DownloadSelect", () => ({
-  default: ({ label, items, value, onSelectCallback }: any) => (
+  default: ({ label, labelAdornment, items, value, onSelectCallback }: any) => (
     <div>
       <label>{label}</label>
+      {labelAdornment}
       <select
         data-testid={`select-${label.toLowerCase().replace(/\s+/g, "-")}`}
         value={value || (items && items[0]?.value)}
@@ -105,7 +106,10 @@ const expectWarningLevel = (level: DownloadSizeWarningLevel) =>
     level
   );
 
-const renderComponent = (uuid: string | undefined = TEST_UUID) =>
+const renderComponent = (
+  uuid: string | undefined = TEST_UUID,
+  isImosProvider?: boolean
+) =>
   render(
     <Provider store={store}>
       <MemoryRouter initialEntries={[`/details/${TEST_UUID}`]}>
@@ -123,6 +127,7 @@ const renderComponent = (uuid: string | undefined = TEST_UUID) =>
                     }
                     removeDownloadCondition={mockRemoveDownloadCondition}
                     onWFSAvailabilityChange={mockOnWFSAvailabilityChange}
+                    isImosProvider={isImosProvider}
                   />
                 }
               />
@@ -299,5 +304,32 @@ describe("DownloadWFSCard", () => {
         "false"
       );
     });
+  });
+
+  it("should always show the external download warning, since WFS is served by an external Geoserver", async () => {
+    renderComponent();
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId("external-download-warning")
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("should show an IMOS tag next to Data Selection when the collection is IMOS-provided", async () => {
+    renderComponent(TEST_UUID, true);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("label-chip-IMOS")).toBeInTheDocument();
+    });
+  });
+
+  it("should not show an IMOS tag when the collection is not IMOS-provided", async () => {
+    renderComponent(TEST_UUID, false);
+
+    await waitFor(() => {
+      expect(screen.getByText("Data Selection")).toBeInTheDocument();
+    });
+    expect(screen.queryByTestId("label-chip-IMOS")).not.toBeInTheDocument();
   });
 });

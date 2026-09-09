@@ -4,6 +4,7 @@ import DownloadWFSCard from "./DownloadWFSCard";
 import DownloadCloudOptimisedCard from "./DownloadCloudOptimisedCard";
 import SideCardContainer from "../../layout/SideCardContainer";
 import { DownloadServiceType } from "../../context/DownloadDefinitions";
+import { SearchKeys } from "@/components/search/constants";
 
 const DownloadCard: FC = () => {
   const {
@@ -17,10 +18,12 @@ const DownloadCard: FC = () => {
     setSelectedCoKey,
   } = useDetailPageContext();
 
-  const [wfsLinks, hasCloudOptimisedData] = useMemo(() => {
+  const [wfsLinks, hasCloudOptimisedData, isImosProvider] = useMemo(() => {
     const wfsLinks = collection?.getWFSLinks() || [];
     const hasCloudOptimisedData = collection?.hasCloudOptimisedData() || false;
-    return [wfsLinks, hasCloudOptimisedData];
+    const isImosProvider =
+      collection?.getDatasetProvider()?.toLowerCase() === SearchKeys.IMOS;
+    return [wfsLinks, hasCloudOptimisedData, isImosProvider];
   }, [collection]);
 
   const onWFSAvailabilityChange = useCallback(
@@ -64,6 +67,7 @@ const DownloadCard: FC = () => {
             downloadConditions={downloadConditions}
             getAndSetDownloadConditions={getAndSetDownloadConditions}
             removeDownloadCondition={removeDownloadCondition}
+            isImosProvider={isImosProvider}
           />
         );
       case DownloadServiceType.WFS:
@@ -74,6 +78,7 @@ const DownloadCard: FC = () => {
             getAndSetDownloadConditions={getAndSetDownloadConditions}
             removeDownloadCondition={removeDownloadCondition}
             onWFSAvailabilityChange={onWFSAvailabilityChange}
+            isImosProvider={isImosProvider}
           />
         );
       // hide download card if no CO download or WFS download
@@ -85,6 +90,7 @@ const DownloadCard: FC = () => {
     downloadConditions,
     downloadService,
     getAndSetDownloadConditions,
+    isImosProvider,
     onWFSAvailabilityChange,
     removeDownloadCondition,
     selectedCoKey,

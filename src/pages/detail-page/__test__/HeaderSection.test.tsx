@@ -107,48 +107,6 @@ describe("HeaderSection", async () => {
     });
   });
 
-  test("shows the WFS badge but not the IMOS Data or Cloud-optimised badges for the base fixture", async () => {
-    renderHeader(null);
-
-    await waitFor(() => {
-      expect(screen.getByTestId("label-chip-WFS Service Available")).to.exist;
-    });
-    expect(screen.queryByTestId("label-chip-IMOS Data")).to.be.null;
-    expect(screen.queryByTestId("label-chip-Cloud-optimised")).to.be.null;
-  });
-
-  test("shows the IMOS Data, Cloud-optimised and WFS badges together, independently", async () => {
-    vi.mocked(useParams).mockReturnValue({
-      uuid: "5fc91100-4ade-11dc-8f56-00008a07204eimosandco",
-    });
-
-    renderHeader(null);
-
-    await waitFor(() => {
-      expect(screen.getByTestId("label-chip-IMOS Data")).to.exist;
-    });
-    expect(screen.getByTestId("label-chip-Cloud-optimised")).to.exist;
-    expect(screen.getByTestId("label-chip-WFS Service Available")).to.exist;
-  });
-
-  test("hides the WFS badge when the collection has no WFS links", async () => {
-    vi.mocked(useParams).mockReturnValue({
-      uuid: "5fc91100-4ade-11dc-8f56-00008a07204enowfs",
-    });
-
-    renderHeader(null);
-
-    await waitFor(() => {
-      expect(
-        screen.getByRole("heading", {
-          level: 1,
-          name: "Davies Reef Automated Marine Weather And Oceanographic Station",
-        })
-      ).to.exist;
-    });
-    expect(screen.queryByTestId("label-chip-WFS Service Available")).to.be.null;
-  });
-
   test("return button goes to search when opened from search, even after side-card navigation overwrites location.state", async () => {
     const { rerender } = renderHeader({
       referer: pageReferer.SEARCH_PAGE_REFERER,

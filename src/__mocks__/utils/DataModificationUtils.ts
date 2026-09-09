@@ -56,31 +56,3 @@ export const emptyAssociatedRecordInfo = (json: any) => {
     console.error(e);
   }
 };
-
-export const imosProviderWithCloudOptimisedInfo = (json: any) => {
-  const jsonToResponse = structuredClone(json);
-  try {
-    jsonToResponse.properties.dataset_provider = "IMOS";
-    jsonToResponse.links.push({
-      href: "https://example.com/data.zarr",
-      rel: "summary",
-      type: "application/vnd+zarr",
-      title: "data.zarr",
-    });
-    return jsonToResponse;
-  } catch (e) {
-    console.error(e);
-  }
-};
-
-export const noWfsLinksInfo = (json: any) => {
-  const jsonToResponse = structuredClone(json);
-  try {
-    jsonToResponse.links = jsonToResponse.links.filter(
-      (link: any) => link.rel !== "wfs"
-    );
-    return jsonToResponse;
-  } catch (e) {
-    console.error(e);
-  }
-};

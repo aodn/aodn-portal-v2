@@ -32,7 +32,6 @@ import { OpenType } from "../../hooks/useTabNavigation";
 import ContextMenu, { ContextMenuRef } from "../menu/ContextMenu";
 import LabelChip from "../common/label/LabelChip";
 import { pageDefault } from "../common/constants";
-import { SearchKeys } from "../search/constants";
 
 interface ListResultCardProps extends ResultCardBasicType {}
 
@@ -56,13 +55,6 @@ const getTagColor = (tagText: string | undefined): string => {
     case UpdateFrequency.delayed:
       tagColor = portalTheme.palette.tag2;
       break;
-    case "imos data":
-      tagColor = portalTheme.palette.tag3;
-      break;
-    case "cloud-optimised":
-    case "wfs service available":
-      tagColor = portalTheme.palette.tag4;
-      break;
     default:
       tagColor = color.tabPanel.background;
   }
@@ -82,10 +74,9 @@ const renderTagChip = (text: string) => (
       text={[text]}
       sx={{
         display: "inline-flex",
-        minWidth: "100px",
-        width: "auto",
+        width: "100px",
         height: "26px",
-        padding: "2px 10px",
+        padding: "2px 0",
         alignItems: "center",
         justifyContent: "center",
         borderRadius: "6px",
@@ -139,12 +130,6 @@ const ListResultCard: FC<ListResultCardProps> = ({
   const parsedFrequencies = parseUpdateFrequencies(aiUpdateFrequency);
   const hasAiUpdateFrequency = parsedFrequencies.length > 0;
   const hasDocumentTag = scope?.toLowerCase() === "document";
-  const isImosProvider =
-    content.getDatasetProvider()?.toLowerCase() === SearchKeys.IMOS;
-  const hasCloudOptimisedData = content.hasCloudOptimisedData();
-  const hasWfsService = (content.getWFSLinks()?.length ?? 0) > 0;
-  const hasServiceBadges =
-    isImosProvider || hasCloudOptimisedData || hasWfsService;
   const shouldHideTags = isSelectedDataset || showButtons;
 
   return (
@@ -258,7 +243,7 @@ const ListResultCard: FC<ListResultCardProps> = ({
                   display: "-webkit-box",
                   cursor: "pointer",
                   WebkitLineClamp:
-                    hasDocumentTag || hasAiUpdateFrequency || hasServiceBadges
+                    hasDocumentTag || hasAiUpdateFrequency
                       ? "4" // show less text for document records on responsive page
                       : isSimplified
                         ? "6" //default with 6 lines
@@ -272,29 +257,23 @@ const ListResultCard: FC<ListResultCardProps> = ({
               >
                 {description}
               </Typography>
-              {!shouldHideTags &&
-                (hasDocumentTag ||
-                  hasAiUpdateFrequency ||
-                  hasServiceBadges) && (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "row",
-                      flexWrap: "wrap",
-                      gap: "8px",
-                      mt: 0.5,
-                    }}
-                  >
-                    {hasDocumentTag && renderTagChip("Document")}
-                    {hasAiUpdateFrequency &&
-                      parsedFrequencies.map((freq, index) => (
-                        <Fragment key={index}>{renderTagChip(freq)}</Fragment>
-                      ))}
-                    {isImosProvider && renderTagChip("IMOS Data")}
-                    {hasCloudOptimisedData && renderTagChip("Cloud-optimised")}
-                    {hasWfsService && renderTagChip("WFS Service Available")}
-                  </Box>
-                )}
+              {!shouldHideTags && (hasDocumentTag || hasAiUpdateFrequency) && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    gap: "8px",
+                    mt: 0.5,
+                  }}
+                >
+                  {hasDocumentTag && renderTagChip("Document")}
+                  {hasAiUpdateFrequency &&
+                    parsedFrequencies.map((freq, index) => (
+                      <Fragment key={index}>{renderTagChip(freq)}</Fragment>
+                    ))}
+                </Box>
+              )}
             </Box>
             {SHOW_RESULT_CARD_THUMBNAIL && thumbnail !== default_thumbnail && (
               <Box

@@ -14,8 +14,6 @@ import {
   emptyCitationInfo,
   emptyLineageInfo,
   emptyMetadataInfo,
-  imosProviderWithCloudOptimisedInfo,
-  noWfsLinksInfo,
 } from "./utils/DataModificationUtils";
 import { SearchKeys } from "../components/search/constants";
 
@@ -148,16 +146,6 @@ export const handlers = [
 
     if (uuid == NORMAL_COLLECTION.id + "emptyassociatedrecords") {
       return HttpResponse.json(emptyAssociatedRecordInfo(NORMAL_COLLECTION));
-    }
-
-    if (uuid == NORMAL_COLLECTION.id + "imosandco") {
-      return HttpResponse.json(
-        imosProviderWithCloudOptimisedInfo(NORMAL_COLLECTION)
-      );
-    }
-
-    if (uuid == NORMAL_COLLECTION.id + "nowfs") {
-      return HttpResponse.json(noWfsLinksInfo(NORMAL_COLLECTION));
     }
 
     return HttpResponse.json(
