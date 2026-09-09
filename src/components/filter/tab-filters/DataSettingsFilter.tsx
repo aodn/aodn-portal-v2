@@ -13,6 +13,9 @@ import { StyledToggleButton } from "../../common/buttons/StyledToggleButton";
 import { DatasetFrequency, DatasetStatus } from "@/app/store/datasetEnums";
 import { IndexDataType, ItemButton } from "../FilterDefinition";
 import { portalTheme } from "../../../styles";
+import AIGenStarIcon from "../../icon/AIGenStarIcon";
+import AIGenTag from "../../info/AIGenTag";
+import { InfoContentType } from "../../info/InfoDefinition";
 
 enum DataSettingsCategory {
   dataDeliverMode = "dataDeliveryMode",
@@ -96,6 +99,44 @@ const DATA_SETTINGS: DataSettingsFilterType = {
   ],
 };
 
+const AI_SUPPORTED_CONTENTS_INFO: InfoContentType = {
+  title: "AI Supported Contents",
+  body: "The Data Delivery Mode and Download Service Availability filters use AI-generated classifications to support discovery. These predictions may not always be accurate.<br/><br/>If you believe an entry is incorrectly grouped, please contact us at info@aodn.org.au",
+};
+
+const renderFilterLabel = (label: string, isAiGenerated: boolean = false) => (
+  <Box
+    sx={{
+      display: "flex",
+      alignItems: "flex-start",
+      width: "318px",
+      height: "30px",
+      boxSizing: "border-box",
+      padding: "0 20px",
+    }}
+  >
+    <Typography
+      sx={{
+        ...portalTheme.typography.title1Medium,
+        color: portalTheme.palette.text1,
+        fontWeight: 500,
+        padding: 0,
+      }}
+    >
+      {label}
+    </Typography>
+    {isAiGenerated && (
+      <Box sx={{ display: "flex", paddingTop: "1px" }}>
+        <AIGenStarIcon
+          color={portalTheme.palette.primary1}
+          width={12}
+          height={12}
+        />
+      </Box>
+    )}
+  </Box>
+);
+
 interface DataSettingsFilterProps extends TabFilterType {
   sx?: SxProps;
 }
@@ -170,7 +211,7 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
     [dispatch, setFilters]
   );
 
-  return (
+  const filterGroups = (
     <Stack direction="column" spacing={2} sx={sx}>
       {/* TODO: Comment blocks below and wait for ogcapi, can restore it in the future  */}
       {/* <Box>
@@ -198,16 +239,7 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
         </StyledToggleButtonGroup>
       </Box> */}
       <Box>
-        <Typography
-          sx={{
-            ...portalTheme.typography.title1Medium,
-            color: portalTheme.palette.text1,
-            fontWeight: 500,
-            padding: "8px 20px",
-          }}
-        >
-          Data Delivery Mode
-        </Typography>
+        {renderFilterLabel("Data Delivery Mode", true)}
         <StyledToggleButtonGroup
           exclusive={true}
           value={filters.dataDeliveryFrequency?.[0]}
@@ -243,16 +275,7 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
         </StyledToggleButtonGroup>
       </Box>
       <Box>
-        <Typography
-          sx={{
-            ...portalTheme.typography.title1Medium,
-            color: portalTheme.palette.text1,
-            fontWeight: 500,
-            padding: "8px 20px",
-          }}
-        >
-          Download Service Availablility
-        </Typography>
+        {renderFilterLabel("Download Service Availablility", true)}
         <StyledToggleButtonGroup
           value={filters.dataIndexedType}
           onChange={handleChange(DataSettingsCategory.dataIndexedType)}
@@ -287,16 +310,7 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
         </StyledToggleButtonGroup>
       </Box>
       <Box>
-        <Typography
-          sx={{
-            ...portalTheme.typography.title1Medium,
-            color: portalTheme.palette.text1,
-            fontWeight: 500,
-            padding: "8px 20px",
-          }}
-        >
-          Exclude Documents
-        </Typography>
+        {renderFilterLabel("Exclude Documents")}
         <StyledToggleButtonGroup
           value={filters.excludeDocument}
           onChange={handleChange(DataSettingsCategory.excludeDocument)}
@@ -331,16 +345,7 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
         </StyledToggleButtonGroup>
       </Box>
       <Box>
-        <Typography
-          sx={{
-            ...portalTheme.typography.title1Medium,
-            color: portalTheme.palette.text1,
-            fontWeight: 500,
-            padding: "8px 20px",
-          }}
-        >
-          Dataset Status
-        </Typography>
+        {renderFilterLabel("Dataset Status")}
         <StyledToggleButtonGroup
           exclusive={true}
           value={filters.dataStatus?.[0]}
@@ -376,6 +381,43 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
         </StyledToggleButtonGroup>
       </Box>
     </Stack>
+  );
+
+  return (
+    <Box sx={{ position: "relative" }}>
+      <Box sx={{ position: "absolute", top: "8px", right: "20px", zIndex: 1 }}>
+        <AIGenTag
+          infoContent={AI_SUPPORTED_CONTENTS_INFO}
+          cardSx={{
+            width: "340px",
+            height: "220px",
+            padding: "10px 0 0 10px",
+          }}
+          headerSx={{
+            alignItems: "flex-start",
+            justifyContent: "flex-start",
+            paddingLeft: "16px",
+            gap: "18px",
+            "& > svg": { marginTop: "4px" },
+            "& > .MuiTypography-root": {
+              width: "183px",
+              marginTop: "3px",
+              color: "#3A6F8F",
+              textAlign: "center",
+            },
+          }}
+          contentSx={{
+            color: portalTheme.palette.text1,
+            width: "293px",
+            height: "171px",
+            marginLeft: "16px",
+            marginTop: "11px",
+            padding: 0,
+          }}
+        />
+      </Box>
+      {filterGroups}
+    </Box>
   );
 };
 

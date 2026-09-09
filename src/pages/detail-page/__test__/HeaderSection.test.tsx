@@ -15,12 +15,15 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
+import { userEvent } from "@testing-library/user-event";
 import AppTheme from "@/styles/theme";
 import { Provider } from "react-redux";
 import store from "@/app/store/store";
 import { ThemeProvider } from "@mui/material/styles";
+import { http, HttpResponse } from "msw";
 import { DetailPageProvider } from "../context/detail-page-provider";
 import { server } from "@/__mocks__/server";
+import { NORMAL_COLLECTION } from "@/__mocks__/data/COLLECTIONS";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import HeaderSection from "../layout/HeaderSection";
 import { pageReferer } from "@/components/common/constants";
@@ -105,6 +108,35 @@ describe("HeaderSection", async () => {
         })
       ).to.exist;
     });
+  });
+
+  test("shows the AI update-frequency explanation on chip hover", async () => {
+    server.use(
+      http.get("/api/v1/ogc/collections/:uuid", () =>
+        HttpResponse.json({
+          ...NORMAL_COLLECTION,
+          properties: {
+            ...NORMAL_COLLECTION.properties,
+            "ai:update_frequency": "real-time",
+          },
+        })
+      )
+    );
+
+    renderHeader(null);
+
+    const tooltipText = "The data status is grouped by AI models.";
+    const chip = await screen.findByTestId(
+      DataTestId.HeaderSection.AiUpdateFrequencyChip
+    );
+    expect(screen.queryByText(tooltipText)).not.toBeInTheDocument();
+
+    const user = userEvent.setup();
+    await user.hover(chip);
+
+    const tooltip = await screen.findByRole("tooltip");
+    expect(tooltip).toHaveTextContent(tooltipText);
+    expect(tooltip).toHaveAttribute("data-popper-placement", "right-end");
   });
 
   test("return button goes to search when opened from search, even after side-card navigation overwrites location.state", async () => {
