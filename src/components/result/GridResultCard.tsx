@@ -14,7 +14,7 @@ import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import { ResultCardBasicType } from "./types";
 import { SHOW_RESULT_CARD_THUMBNAIL } from "./constants";
 import BookmarkButton from "../bookmark/BookmarkButton";
-import default_thumbnail from "@/assets/images/default-thumbnail.png";
+import default_thumbnail from "@/assets/images/default-thumbnail.webp";
 import { portalTheme } from "../../styles";
 import { OpenType } from "../../hooks/useTabNavigation";
 import ContextMenu, { ContextMenuRef } from "../menu/ContextMenu";

@@ -8,7 +8,7 @@ import {
 } from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import SliderLine from "./SliderLine";
-import depth_image from "@/assets/images/depth-selector.png";
+import depth_image from "@/assets/images/depth-selector.webp";
 import {
   fontColor,
   fontFamily,

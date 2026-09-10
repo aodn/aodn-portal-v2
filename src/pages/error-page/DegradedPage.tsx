@@ -1,5 +1,5 @@
 import React from "react";
-import notFoundImage from "@/assets/images/no_matching_record.png";
+import notFoundImage from "@/assets/images/no_matching_record.webp";
 import { Box, Typography } from "@mui/material";
 import { useDocumentTitle } from "@/seo/useDocumentTitle";
 import { useRobotsNoIndex } from "@/seo/useRobotsNoIndex";

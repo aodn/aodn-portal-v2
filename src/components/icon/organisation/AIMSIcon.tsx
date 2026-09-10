@@ -1,4 +1,4 @@
-import icon_img from "@/assets/logos/aims_logo3.png";
+import icon_img from "@/assets/logos/aims_logo3.webp";
 import IconContainer from "../IconContainer";
 
 const AIMSIcon = () => {
