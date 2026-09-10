@@ -3,6 +3,7 @@ import { useAppDispatch } from "@/app/store/hooks";
 import { processWFSDownload } from "@/app/store/searchReducer";
 import { IDownloadCondition } from "../pages/detail-page/context/DownloadDefinitions";
 import { consumeSSEStream } from "../utils/SSEUtils";
+import { getDownloadFileExtension } from "../utils/DownloadFileNameUtils";
 
 // Aligned with backend SSE event names (ogc-api SseEventName enum)
 enum EventName {
@@ -62,12 +63,14 @@ const useWFSDownload = (onCallback?: () => void) => {
   const fileChunksRef = useRef<string[]>([]);
   const receivedChunksRef = useRef<Set<number>>(new Set());
   const expectedTotalChunksRef = useRef<number>(0);
+  // File name chosen by the caller; wins over the one the server suggests
+  const fileNameRef = useRef<string | undefined>(undefined);
 
   // Helper functions
-  const generateFileName = (layerName: string) => {
+  const generateFileName = (layerName: string, mediaType?: string) => {
     const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, "-");
     const sanitizedLayerName = layerName.replace(/[^a-z0-9]/gi, "_");
-    return `${sanitizedLayerName}_${timestamp}.csv`;
+    return `${sanitizedLayerName}_${timestamp}.${getDownloadFileExtension(mediaType)}`;
   };
 
   const downloadFile = (blob: Blob, filename: string) => {
@@ -233,7 +236,10 @@ const useWFSDownload = (onCallback?: () => void) => {
             const blob = new Blob([finalBytes], {
               type: data.mediaType || "text/csv",
             });
-            const filename = data.filename || generateFileName(layerName);
+            const filename =
+              fileNameRef.current ||
+              data.filename ||
+              generateFileName(layerName, data.mediaType);
             downloadFile(blob, filename);
 
             setDownloadingStatus(DownloadStatus.COMPLETED);
@@ -273,10 +279,12 @@ const useWFSDownload = (onCallback?: () => void) => {
     async (
       uuid: string,
       layerName: string,
-      downloadConditions: IDownloadCondition[]
+      downloadConditions: IDownloadCondition[],
+      fileName?: string
     ) => {
       // Clean up any existing download
       cleanupDownload();
+      fileNameRef.current = fileName;
 
       if (!layerName || !uuid) {
         setDownloadingStatus(DownloadStatus.ERROR);

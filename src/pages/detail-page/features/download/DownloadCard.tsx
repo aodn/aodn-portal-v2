@@ -74,6 +74,7 @@ const DownloadCard: FC = () => {
         return (
           <DownloadWFSCard
             uuid={collection?.id}
+            collectionTitle={collection?.title}
             downloadConditions={downloadConditions}
             getAndSetDownloadConditions={getAndSetDownloadConditions}
             removeDownloadCondition={removeDownloadCondition}

@@ -41,6 +41,7 @@ import {
 import AdminScreenContext from "../../../../components/admin/AdminScreenContext";
 import { formatBytes } from "@/utils/Helpers";
 import LabelChip from "@/components/common/label/LabelChip";
+import { buildDownloadFileName } from "@/utils/DownloadFileNameUtils";
 
 // Currently only CSV is supported for WFS downloading
 // TODO:the format options will be fetched from the backend in the future
@@ -51,6 +52,7 @@ const formatOptions = [
 
 interface DownloadWFSCardProps extends DownloadCondition {
   uuid?: string;
+  collectionTitle?: string;
   onWFSAvailabilityChange?: (isWFSAvailable: boolean) => void;
   isImosProvider?: boolean;
 }
@@ -67,6 +69,7 @@ const formWfsDataOptions = (
 
 const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
   uuid,
+  collectionTitle,
   downloadConditions,
   getAndSetDownloadConditions,
   removeDownloadCondition,
@@ -132,11 +135,27 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
       wfs_download_format: selectedFormat,
     });
 
-    await startDownload(uuid, selectedDataItem, downloadConditions);
+    // The collection name alone identifies the file when there is only one
+    // layer to download; otherwise the selected layer title is appended
+    const datasetTitle =
+      dataSelectOptions.length > 1
+        ? dataSelectOptions.find((option) => option.value === selectedDataItem)
+            ?.label
+        : undefined;
+
+    const fileName = buildDownloadFileName({
+      collectionTitle,
+      datasetTitle,
+      format: selectedFormat,
+    });
+
+    await startDownload(uuid, selectedDataItem, downloadConditions, fileName);
   }, [
     selectedDataItem,
     selectedFormat,
     uuid,
+    dataSelectOptions,
+    collectionTitle,
     startDownload,
     downloadConditions,
   ]);
