@@ -6,15 +6,24 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import * as turf from "@turf/turf";
 import MapContext from "../MapContext";
 import { stringToColor } from "../../../common/colors/colorsUtils";
 import { Feature, Polygon, Position } from "geojson";
-import { LngLat, LngLatBounds, MapMouseEvent } from "mapbox-gl";
+import { LngLat, LngLatBounds, MapMouseEvent, Popup } from "mapbox-gl";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { fitToBound } from "@/utils/MapUtils";
+import {
+  toFeatureCollection,
+  hasDescription,
+  getFeatureDescriptions,
+  openExtentPopup,
+  getPopupTextStyle,
+} from "@/utils/ExtentPopupUtils";
+import { useTheme } from "@mui/material/styles";
 import bluePin from "@/assets/icons/blue_pin.png";
 import { MapEventEnum } from "../constants";
 import { TestHelper } from "../../../common/test/helper";
@@ -34,6 +43,9 @@ interface GeojsonLayerProps {
   setPhotos?: Dispatch<SetStateAction<SpatialExtentPhoto[]>>;
   animate?: boolean;
   visible?: boolean;
+  // Detail page map only: in the search page mini maps a click closes the
+  // hosting popup first, so the extent popup there is unreachable
+  showExtentPopup?: boolean;
 }
 
 const BLUE_PIN_NAME = "blue_pin_name";
@@ -47,10 +59,22 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
   setPhotos,
   animate = false,
   visible = false,
+  showExtentPopup = false,
 }) => {
   const { map } = useContext(MapContext);
+  const theme = useTheme();
   const [_, setMapLoaded] = useState<boolean | null>(null);
   const extent = useMemo(() => collection.extent, [collection.extent]);
+  // Draw the record's own geometries so each keeps its metadata; a collection fetched
+  // without geometry (search page lists) falls back to its bbox outline
+  const sourceData = useMemo(
+    () =>
+      toFeatureCollection(collection.getGeometry()) ??
+      extent?.getGeojsonFromBBox(1),
+    [extent, collection]
+  );
+  const openPopup = useRef<Popup | null>(null);
+  const popupTextStyle = useMemo(() => getPopupTextStyle(theme), [theme]);
 
   const [collectionId, sourceId, layerPolygonId, layerPointId] = useMemo(() => {
     const collectionId = collection.id;
@@ -151,6 +175,37 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
     [map, onLayerClick, layerPolygonId]
   );
 
+  const handlePointClick = useCallback(
+    (event: MapMouseEvent) => {
+      if (!map) return;
+      // Several sites can sit on the same spot, list every description under the click
+      const descriptions = getFeatureDescriptions(event.features);
+      if (descriptions.length === 0) return;
+      openPopup.current?.remove();
+      openPopup.current = openExtentPopup(
+        map,
+        event.lngLat,
+        descriptions,
+        popupTextStyle
+      );
+    },
+    [map, popupTextStyle]
+  );
+
+  // Pointer cursor only over points that have descriptions to show
+  const handlePointEnter = useCallback(
+    (event: MapMouseEvent) => {
+      if (map && hasDescription(event.features?.[0])) {
+        map.getCanvas().style.cursor = "pointer";
+      }
+    },
+    [map]
+  );
+
+  const handlePointLeave = useCallback(() => {
+    if (map) map.getCanvas().style.cursor = "";
+  }, [map]);
+
   const createLayer = useCallback(() => {
     // If style changed, we may need to add the layer again, hence listen to this event.
     // https://github.com/mapbox/mapbox-gl-js/issues/8660
@@ -160,7 +215,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
     map?.addSource(sourceId, {
       type: "geojson",
       // Use a URL for the value for the `data` property.
-      data: extent?.getGeojsonFromBBox(1),
+      data: sourceData,
     });
 
     if (map) {
@@ -193,7 +248,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
     map,
     sourceId,
     collectionId,
-    extent,
+    sourceData,
     layerPolygonId,
     visible,
     layerPointId,
@@ -246,6 +301,11 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
           const onceIdle = () => handleIdle(extent?.bbox);
           map?.once("idle", onceIdle);
           map?.on("click", layerPolygonId, handleLayerClick);
+          if (showExtentPopup) {
+            map?.on("click", layerPointId, handlePointClick);
+            map?.on("mouseenter", layerPointId, handlePointEnter);
+            map?.on("mouseleave", layerPointId, handlePointLeave);
+          }
           if (onMouseEnter) map?.on("mouseenter", layerPolygonId, onMouseEnter);
           if (onMouseLeave) map?.on("mouseleave", layerPolygonId, onMouseLeave);
           if (onMouseMove) map?.on("mousemove", layerPolygonId, onMouseMove);
@@ -267,7 +327,12 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
       } catch (error) {
         // OK to ignore error here
       } finally {
+        openPopup.current?.remove();
+        openPopup.current = null;
         map?.off("click", layerPolygonId, handleLayerClick);
+        map?.off("click", layerPointId, handlePointClick);
+        map?.off("mouseenter", layerPointId, handlePointEnter);
+        map?.off("mouseleave", layerPointId, handlePointLeave);
         if (onMouseEnter) map?.off("mouseenter", layerPolygonId, onMouseEnter);
         if (onMouseLeave) map?.off("mouseleave", layerPolygonId, onMouseLeave);
         if (onMouseMove) map?.off("mousemove", layerPolygonId, onMouseMove);
