@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import * as turf from "@turf/turf";
@@ -16,10 +17,12 @@ import { LngLat, LngLatBounds, MapMouseEvent, Popup } from "mapbox-gl";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { fitToBound } from "@/utils/MapUtils";
 import {
-  attachSpatialExtentDescriptions,
-  spatialExtentsFromGeometry,
-  readDescriptions,
-} from "@/utils/SpatialExtentUtils";
+  toFeatureCollection,
+  hasDescription,
+  getFeatureDescriptions,
+  openExtentPopup,
+  getPopupTextStyle,
+} from "@/utils/ExtentPopupUtils";
 import { useTheme } from "@mui/material/styles";
 import bluePin from "@/assets/icons/blue_pin.png";
 import { MapEventEnum } from "../constants";
@@ -62,14 +65,16 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
   const theme = useTheme();
   const [_, setMapLoaded] = useState<boolean | null>(null);
   const extent = useMemo(() => collection.extent, [collection.extent]);
+  // Draw the record's own geometries so each keeps its metadata; a collection fetched
+  // without geometry (search page lists) falls back to its bbox outline
   const sourceData = useMemo(
     () =>
-      attachSpatialExtentDescriptions(
-        extent?.getGeojsonFromBBox(1),
-        spatialExtentsFromGeometry(collection.getGeometry())
-      ),
+      toFeatureCollection(collection.getGeometry()) ??
+      extent?.getGeojsonFromBBox(1),
     [extent, collection]
   );
+  const openPopup = useRef<Popup | null>(null);
+  const popupTextStyle = useMemo(() => getPopupTextStyle(theme), [theme]);
 
   const [collectionId, sourceId, layerPolygonId, layerPointId] = useMemo(() => {
     const collectionId = collection.id;
@@ -174,43 +179,23 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
     (event: MapMouseEvent) => {
       if (!map) return;
       // Several sites can sit on the same spot, list every description under the click
-      const descriptions = readDescriptions(event.features);
+      const descriptions = getFeatureDescriptions(event.features);
       if (descriptions.length === 0) return;
-      const content = document.createElement("div");
-      content.style.fontFamily = String(
-        theme.typography.body3Small?.fontFamily ?? ""
+      openPopup.current?.remove();
+      openPopup.current = openExtentPopup(
+        map,
+        event.lngLat,
+        descriptions,
+        popupTextStyle
       );
-      content.style.fontSize = String(
-        theme.typography.body3Small?.fontSize ?? ""
-      );
-      content.style.color = theme.palette.text2;
-      content.style.textAlign = descriptions.length > 1 ? "left" : "center";
-      // Long lists scroll instead of covering the map
-      content.style.maxHeight = "150px";
-      content.style.overflowY = "auto";
-      descriptions.forEach((description) => {
-        // textContent keeps the metadata text as plain text
-        const line = document.createElement("div");
-        line.textContent = String(description);
-        content.appendChild(line);
-      });
-      const popup = new Popup({ closeButton: false, offset: [0, -4] })
-        .setLngLat(event.lngLat)
-        .setDOMContent(content)
-        .addTo(map);
-      // Mapbox default content padding is uneven (10 10 15), even it out so the text sits centred
-      const box = popup
-        .getElement()
-        ?.querySelector<HTMLElement>(".mapboxgl-popup-content");
-      if (box) box.style.padding = "8px 12px";
     },
-    [map, theme]
+    [map, popupTextStyle]
   );
 
   // Pointer cursor only over points that have descriptions to show
   const handlePointEnter = useCallback(
     (event: MapMouseEvent) => {
-      if (map && event.features?.[0]?.properties?.descriptions) {
+      if (map && hasDescription(event.features?.[0])) {
         map.getCanvas().style.cursor = "pointer";
       }
     },
@@ -342,6 +327,8 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
       } catch (error) {
         // OK to ignore error here
       } finally {
+        openPopup.current?.remove();
+        openPopup.current = null;
         map?.off("click", layerPolygonId, handleLayerClick);
         map?.off("click", layerPointId, handlePointClick);
         map?.off("mouseenter", layerPointId, handlePointEnter);
