@@ -169,20 +169,24 @@ const renderSubTitle = (
         >
           {startDate}
         </Typography>
-        <TemporalIcon
-          color={color.gray.light}
-          width={fontSize.label}
-          height={fontSize.label}
-        />
-        <Typography
-          padding={0}
-          paddingLeft={padding.small}
-          variant="title1Medium"
-          color={portalTheme.palette.text1}
-          sx={{ fontSize: isSmallMobile ? "14px" : undefined }}
-        >
-          {endDate ?? "Ongoing"}
-        </Typography>
+        {endDate && (
+          <>
+            <TemporalIcon
+              color={color.gray.light}
+              width={fontSize.label}
+              height={fontSize.label}
+            />
+            <Typography
+              padding={0}
+              paddingLeft={padding.small}
+              variant="title1Medium"
+              color={portalTheme.palette.text1}
+              sx={{ fontSize: isSmallMobile ? "14px" : undefined }}
+            >
+              {endDate}
+            </Typography>
+          </>
+        )}
       </RoundCard>
     )}
     {!startDate && !endDate && renderOnGoingStatus()}
