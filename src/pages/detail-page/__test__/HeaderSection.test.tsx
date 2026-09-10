@@ -110,6 +110,45 @@ describe("HeaderSection", async () => {
     });
   });
 
+  test("shows only the start date, with no 'Ongoing' text, when there is no end date", async () => {
+    renderHeader(null);
+
+    await waitFor(() => {
+      expect(screen.getByText("17 Oct 1991")).to.exist;
+    });
+    expect(screen.queryByText(/ongoing/i)).not.toBeInTheDocument();
+  });
+
+  test("shows both start and end dates when the record has an end date", async () => {
+    server.use(
+      http.get("/api/v1/ogc/collections/:uuid", () =>
+        HttpResponse.json({
+          ...NORMAL_COLLECTION,
+          extent: {
+            ...NORMAL_COLLECTION.extent,
+            temporal: {
+              ...NORMAL_COLLECTION.extent.temporal,
+              interval: [
+                [
+                  "1991-10-17T13:00:00.000+00:00",
+                  "1995-05-20T00:00:00.000+00:00",
+                ],
+              ],
+            },
+          },
+        })
+      )
+    );
+
+    renderHeader(null);
+
+    await waitFor(() => {
+      expect(screen.getByText("17 Oct 1991")).to.exist;
+    });
+    expect(screen.getByText("20 May 1995")).to.exist;
+    expect(screen.queryByText(/ongoing/i)).not.toBeInTheDocument();
+  });
+
   test("shows the AI update-frequency explanation on chip hover", async () => {
     server.use(
       http.get("/api/v1/ogc/collections/:uuid", () =>
