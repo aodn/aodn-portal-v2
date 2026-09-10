@@ -41,7 +41,6 @@ import {
 import AdminScreenContext from "../../../../components/admin/AdminScreenContext";
 import { formatBytes } from "@/utils/Helpers";
 import LabelChip from "@/components/common/label/LabelChip";
-import ExternalDownloadWarning from "./ExternalDownloadWarning";
 
 // Currently only CSV is supported for WFS downloading
 // TODO:the format options will be fetched from the backend in the future
@@ -257,14 +256,6 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
   return (
     <Stack>
       <Stack sx={{ p: "16px" }} spacing={2}>
-        <ExternalDownloadWarning />
-        <DownloadSelect
-          label="Format Selection"
-          disabled={isDownloading}
-          items={formatOptions}
-          value={selectedFormat}
-          onSelectCallback={handleSelectFormat}
-        />
         <DownloadSelect
           label="Data Selection"
           labelAdornment={
@@ -277,12 +268,28 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
                   ...portalTheme.typography.body3Small,
                 }}
               />
-            ) : undefined
+            ) : (
+              <LabelChip
+                text={["External"]}
+                color={portalTheme.palette.warning.light}
+                sx={{
+                  padding: "2px 8px",
+                  ...portalTheme.typography.body3Small,
+                }}
+              />
+            )
           }
           disabled={isDownloading}
           items={dataSelectOptions}
           value={selectedDataItem}
           onSelectCallback={handleSelectDataItem}
+        />
+        <DownloadSelect
+          label="Format Selection"
+          disabled={isDownloading}
+          items={formatOptions}
+          value={selectedFormat}
+          onSelectCallback={handleSelectFormat}
         />
         <DownloadButton
           onDownload={handleDownload}
@@ -309,6 +316,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
         removeDownloadCondition={removeDownloadCondition}
         hideInfoMessage={isDownloading || showSizeWarning}
         disable={isDownloading}
+        isExternal={!isImosProvider}
         sx={{ px: "16px" }}
       />
       <Snackbar

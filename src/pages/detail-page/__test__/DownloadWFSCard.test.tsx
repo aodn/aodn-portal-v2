@@ -306,29 +306,20 @@ describe("DownloadWFSCard", () => {
     });
   });
 
-  it("should always show the external download warning, since WFS is served by an external Geoserver", async () => {
-    renderComponent();
-
-    await waitFor(() => {
-      expect(
-        screen.getByTestId("external-download-warning")
-      ).toBeInTheDocument();
-    });
-  });
-
   it("should show an IMOS tag next to Data Selection when the collection is IMOS-provided", async () => {
     renderComponent(TEST_UUID, true);
 
     await waitFor(() => {
       expect(screen.getByTestId("label-chip-IMOS")).toBeInTheDocument();
     });
+    expect(screen.queryByTestId("label-chip-External")).not.toBeInTheDocument();
   });
 
-  it("should not show an IMOS tag when the collection is not IMOS-provided", async () => {
+  it("should show an External tag next to Data Selection when the collection is not IMOS-provided, since WFS is served by an external Geoserver", async () => {
     renderComponent(TEST_UUID, false);
 
     await waitFor(() => {
-      expect(screen.getByText("Data Selection")).toBeInTheDocument();
+      expect(screen.getByTestId("label-chip-External")).toBeInTheDocument();
     });
     expect(screen.queryByTestId("label-chip-IMOS")).not.toBeInTheDocument();
   });
