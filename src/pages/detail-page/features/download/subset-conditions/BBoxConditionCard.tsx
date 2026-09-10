@@ -44,8 +44,8 @@ const SOFT_SHADOW = "1px 1px 4px 0 rgba(0, 0, 0, 0.10)";
 const COORD_RANGES: Record<CoordKey, [number, number]> = {
   N: [-90, 90],
   S: [-90, 90],
-  E: [-180, 180],
-  W: [-180, 180],
+  E: [-360, 360],
+  W: [-360, 360],
 };
 
 interface ValidationResult {
