@@ -27,6 +27,8 @@ import DownloadSizeWarning, {
 } from "./DownloadSizeWarning";
 import useEstimateSize from "../../../../hooks/useEstimateSize";
 import { processCoEstimateSize } from "@/app/store/searchReducer";
+import LabelChip from "@/components/common/label/LabelChip";
+import { portalTheme } from "../../../../styles";
 
 const downloadFormats = [
   { label: "NetCDFs", value: "netcdf" },
@@ -44,6 +46,7 @@ interface DownloadCardProps extends DownloadCondition {
   collection: OGCCollection;
   selectedCoKey?: string;
   setSelectedCoKey?: (value: string) => void;
+  isImosProvider?: boolean;
 }
 
 const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
@@ -53,6 +56,7 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
   removeDownloadCondition,
   selectedCoKey,
   setSelectedCoKey,
+  isImosProvider,
 }) => {
   const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
   const {
@@ -234,6 +238,18 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
       <Stack sx={{ p: "16px" }} spacing={2}>
         <DownloadSelect
           label="Data Selection"
+          labelAdornment={
+            isImosProvider ? (
+              <LabelChip
+                text={["IMOS"]}
+                color={portalTheme.palette.tag3}
+                sx={{
+                  padding: "2px 8px",
+                  ...portalTheme.typography.body3Small,
+                }}
+              />
+            ) : undefined
+          }
           items={dataSelectOptions}
           value={selectedDataItem}
           onSelectCallback={handleSelectDataItem}

@@ -52,4 +52,25 @@ export const removeTrackedDownloadId = (jobID: string): void => {
   );
 };
 
-export { TRACKED_DOWNLOAD_IDS_KEY };
+const TIMEZONE_MODE_KEY = "aodn_downloads_timezone_mode_v1";
+
+export type DownloadTimeZoneMode = "local" | "utc";
+
+/** Defaults to "local" — the toggle only needs to persist a switch away from it. */
+export const getDownloadTimeZoneMode = (): DownloadTimeZoneMode => {
+  try {
+    return localStorage.getItem(TIMEZONE_MODE_KEY) === "utc" ? "utc" : "local";
+  } catch {
+    return "local";
+  }
+};
+
+export const setDownloadTimeZoneMode = (mode: DownloadTimeZoneMode): void => {
+  try {
+    localStorage.setItem(TIMEZONE_MODE_KEY, mode);
+  } catch {
+    // Preference is a nice-to-have; ignore storage failures.
+  }
+};
+
+export { TRACKED_DOWNLOAD_IDS_KEY, TIMEZONE_MODE_KEY };

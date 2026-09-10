@@ -11,6 +11,7 @@ const DownloadSelect: FC<DownloadSelectProps> = ({
   disabled,
   items,
   label,
+  labelAdornment,
   value,
   onSelectCallback,
 }) => {
@@ -60,6 +61,7 @@ const DownloadSelect: FC<DownloadSelectProps> = ({
       disabled={disabled}
       items={items}
       label={label}
+      labelAdornment={labelAdornment}
       value={value}
       onSelectCallback={onSelectCallback}
       selectSx={selectSxProps}

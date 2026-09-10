@@ -33,7 +33,10 @@ describe("DownloadSubsetting time range", () => {
   const getAndSetDownloadConditions = vi.fn(() => []);
   const removeDownloadCondition = vi.fn();
 
-  const renderComponent = (downloadConditions: DateRangeCondition[] = []) =>
+  const renderComponent = (
+    downloadConditions: DateRangeCondition[] = [],
+    isExternal?: boolean
+  ) =>
     render(
       <DetailPageContext.Provider
         value={{
@@ -57,6 +60,7 @@ describe("DownloadSubsetting time range", () => {
           downloadConditions={downloadConditions}
           getAndSetDownloadConditions={getAndSetDownloadConditions}
           removeDownloadCondition={removeDownloadCondition}
+          isExternal={isExternal}
         />
       </DetailPageContext.Provider>
     );
@@ -100,5 +104,52 @@ describe("DownloadSubsetting time range", () => {
     expect(screen.getByTestId("to-date")).toHaveTextContent("2020-06-30");
     expect(screen.getByTestId("minimum-date")).toHaveTextContent("2006-10-01");
     expect(screen.getByTestId("maximum-date")).toHaveTextContent("2024-12-31");
+  });
+});
+
+describe("DownloadSubsetting info message", () => {
+  const getAndSetDownloadConditions = vi.fn(() => []);
+  const removeDownloadCondition = vi.fn();
+
+  const renderComponent = (isExternal?: boolean) =>
+    render(
+      <DetailPageContext.Provider
+        value={{
+          ...DetailPageContextDefault,
+          getAndSetDownloadConditions,
+          removeDownloadCondition,
+        }}
+      >
+        <DownloadSubsetting
+          downloadConditions={[]}
+          getAndSetDownloadConditions={getAndSetDownloadConditions}
+          removeDownloadCondition={removeDownloadCondition}
+          isExternal={isExternal}
+        />
+      </DetailPageContext.Provider>
+    );
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("shows the default subsetting message when not external", () => {
+    renderComponent();
+
+    expect(
+      screen.getByText(
+        "To download data directly please use the selections below, or utilise the map tools to make your selection."
+      )
+    ).toBeInTheDocument();
+  });
+
+  it("shows the external-source warning message when isExternal is true", () => {
+    renderComponent(true);
+
+    expect(
+      screen.getByText(
+        "This downloading is from external services that is not managed by IMOS. Download speed, formats and availability depend on the external providers."
+      )
+    ).toBeInTheDocument();
   });
 });

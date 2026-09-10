@@ -193,6 +193,9 @@ export const designTokensRC8 = {
       secondary1: "#54BCEB",
       secondary2: "#52BDEC",
 
+      // Feedback button
+      feedback: "#459BD0",
+
       // Neutral series
       neutral1: "#090C02",
       neutral2: "#FFF",
@@ -202,6 +205,9 @@ export const designTokensRC8 = {
       // Tag series
       tag1: "#D7F4F2",
       tag2: "#F6F0ED",
+      // Detail-page header service-availability badges
+      tag3: "#CFEAF7",
+      tag4: "#DCE4FF",
     },
   },
 

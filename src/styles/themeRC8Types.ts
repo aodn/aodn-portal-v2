@@ -118,6 +118,8 @@ declare module "@mui/material/styles" {
     neutral4: string;
     tag1: string;
     tag2: string;
+    tag3: string;
+    tag4: string;
   }
 
   interface PaletteOptions {
@@ -144,6 +146,8 @@ declare module "@mui/material/styles" {
     neutral4?: string;
     tag1?: string;
     tag2?: string;
+    tag3?: string;
+    tag4?: string;
   }
 }
 

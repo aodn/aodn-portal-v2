@@ -8,7 +8,6 @@ import {
   SxProps,
   Tooltip,
   Typography,
-  Badge,
 } from "@mui/material";
 import { useDetailPageContext } from "../context/detail-page-context";
 import imosLogoWithTitle from "@/assets/logos/imos_logo_with_title.png";
@@ -29,7 +28,6 @@ import ShareButtonMenu from "../../../components/menu/ShareButtonMenu";
 import DataUsageIcon from "@mui/icons-material/DataUsage";
 import { TemporalIcon } from "@/assets/icons/details/temporal";
 import { pageReferer } from "@/components/common/constants";
-import { capitalizeFirstLetter } from "@/utils/StringUtils";
 import { portalTheme } from "../../../styles";
 import InfoCard from "../../../components/info/InfoCard";
 import { InfoStatusType } from "@/components/info/InfoDefinition";
@@ -127,6 +125,27 @@ const renderOnGoingStatus = () => (
   </RoundCard>
 );
 
+const renderAiFrequencyTooltip = () => (
+  <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
+    <AIGenStarIcon
+      color={portalTheme.palette.primary1}
+      width={20}
+      height={20}
+    />
+    <Typography
+      sx={{
+        ...portalTheme.typography.body2Regular,
+        width: "153px",
+        height: "46px",
+        color: portalTheme.palette.text1,
+        padding: 0,
+      }}
+    >
+      The data status is grouped by AI models.
+    </Typography>
+  </Box>
+);
+
 const renderSubTitle = (
   startDate: string | undefined,
   endDate: string | undefined,
@@ -150,20 +169,24 @@ const renderSubTitle = (
         >
           {startDate}
         </Typography>
-        <TemporalIcon
-          color={color.gray.light}
-          width={fontSize.label}
-          height={fontSize.label}
-        />
-        <Typography
-          padding={0}
-          paddingLeft={padding.small}
-          variant="title1Medium"
-          color={portalTheme.palette.text1}
-          sx={{ fontSize: isSmallMobile ? "14px" : undefined }}
-        >
-          {endDate ?? "Ongoing"}
-        </Typography>
+        {endDate && (
+          <>
+            <TemporalIcon
+              color={color.gray.light}
+              width={fontSize.label}
+              height={fontSize.label}
+            />
+            <Typography
+              padding={0}
+              paddingLeft={padding.small}
+              variant="title1Medium"
+              color={portalTheme.palette.text1}
+              sx={{ fontSize: isSmallMobile ? "14px" : undefined }}
+            >
+              {endDate}
+            </Typography>
+          </>
+        )}
       </RoundCard>
     )}
     {!startDate && !endDate && renderOnGoingStatus()}
@@ -185,43 +208,63 @@ const renderSubTitle = (
     {aiUpdateFrequency &&
       aiUpdateFrequency.toLowerCase() !== "other" &&
       aiUpdateFrequency.toLowerCase() !== "completed" &&
-      // parse 'both' into ['real-time', 'delayed'], render one badge per frequency
+      // parse 'both' into ['real-time', 'delayed'], render one chip per frequency
       (aiUpdateFrequency.toLowerCase() === "both"
         ? ["real-time", "delayed"]
         : [aiUpdateFrequency]
       ).map((freq, index) => (
-        <Badge
+        <Tooltip
           key={index}
-          anchorOrigin={{ vertical: "top", horizontal: "right" }}
-          badgeContent={<AIGenStarIcon color={color.brightBlue.medium} />}
-          sx={{
-            "& .MuiBadge-badge": {
-              backgroundColor: "transparent",
-              padding: 0,
-              minWidth: "unset",
-              height: "unset",
-              top: 0,
-              right: 0,
+          title={renderAiFrequencyTooltip()}
+          placement="right-end"
+          enterDelay={100}
+          enterTouchDelay={0}
+          slotProps={{
+            popper: {
+              modifiers: [{ name: "flip", enabled: false }],
+            },
+            tooltip: {
+              sx: {
+                maxWidth: "250px",
+                padding: "9px",
+                backgroundColor: "common.white",
+                borderRadius: "8px",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.25)",
+              },
             },
           }}
         >
-          <RoundCard
-            sx={{
-              bgcolor:
+          <Box
+            component="span"
+            sx={{ display: "inline-flex" }}
+            data-testid={DataTestId.HeaderSection.AiUpdateFrequencyChip}
+          >
+            <LabelChip
+              text={[freq]}
+              color={
                 freq.toLowerCase() === "real-time"
                   ? portalTheme.palette.tag1
-                  : portalTheme.palette.tag2,
-            }}
-          >
-            <Typography
-              padding={0}
-              variant="title1Medium"
-              color={portalTheme.palette.text1}
-            >
-              {capitalizeFirstLetter(freq)}
-            </Typography>
-          </RoundCard>
-        </Badge>
+                  : portalTheme.palette.tag2
+              }
+              startIcon={
+                <AIGenStarIcon
+                  color={fontColor.blue.header}
+                  width={16}
+                  height={16}
+                />
+              }
+              sx={{
+                display: "flex",
+                padding: "4px 16px 4px 10px",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "8px",
+                ...portalTheme.typography.title1Medium,
+                color: portalTheme.palette.text1,
+              }}
+            />
+          </Box>
+        </Tooltip>
       ))}
   </Stack>
 );

@@ -141,4 +141,22 @@ describe("CommonSelect", () => {
     fireEvent.mouseDown(select);
     expect(screen.queryAllByRole("option")).toHaveLength(0);
   });
+
+  it("renders labelAdornment next to the label when provided", () => {
+    render(
+      <CommonSelect
+        {...defaultProps}
+        label="My Label"
+        labelAdornment={<span data-testid="my-adornment">Tag</span>}
+      />
+    );
+    expect(screen.getByText("My Label")).toBeInTheDocument();
+    expect(screen.getByTestId("my-adornment")).toBeInTheDocument();
+  });
+
+  it("does not render an adornment when labelAdornment is not provided", () => {
+    render(<CommonSelect {...defaultProps} label="My Label" />);
+    expect(screen.getByText("My Label")).toBeInTheDocument();
+    expect(screen.queryByTestId("my-adornment")).not.toBeInTheDocument();
+  });
 });
