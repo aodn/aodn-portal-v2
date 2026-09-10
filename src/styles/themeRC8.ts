@@ -178,6 +178,8 @@ const rc8ThemeOptions: ThemeOptions = {
     neutral4: designTokens.colours.product.neutral4,
     tag1: designTokens.colours.product.tag1,
     tag2: designTokens.colours.product.tag2,
+    tag3: designTokens.colours.product.tag3,
+    tag4: designTokens.colours.product.tag4,
   },
 
   // TODO: Add custom RC8 theme properties

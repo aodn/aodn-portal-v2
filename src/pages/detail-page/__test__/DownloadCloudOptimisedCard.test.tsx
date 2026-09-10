@@ -11,9 +11,10 @@ beforeAll(() => {
 });
 
 vi.mock("../features/download/DownloadSelect", () => ({
-  default: ({ label, items, value, onSelectCallback }: any) => (
+  default: ({ label, labelAdornment, items, value, onSelectCallback }: any) => (
     <div>
       <label>{label}</label>
+      {labelAdornment}
       <select
         data-testid={`select-${label.toLowerCase().replace(/\s+/g, "-")}`}
         value={value || (items && items[0]?.value)}
@@ -120,7 +121,8 @@ describe("DownloadCloudOptimisedCard", () => {
     collection: OGCCollection = createMockCollection(DatasetType.ZARR),
     downloadConditions: any[] = [],
     selectedCoKey?: string,
-    setSelectedCoKey = mockSetSelectedCoKey
+    setSelectedCoKey = mockSetSelectedCoKey,
+    isImosProvider?: boolean
   ) => {
     return render(
       <Provider store={store}>
@@ -134,6 +136,7 @@ describe("DownloadCloudOptimisedCard", () => {
                 removeDownloadCondition={mockRemoveDownloadCondition}
                 selectedCoKey={selectedCoKey}
                 setSelectedCoKey={setSelectedCoKey}
+                isImosProvider={isImosProvider}
               />
             </AppLocalizationProvider>
           </ThemeProvider>
@@ -409,6 +412,31 @@ describe("DownloadCloudOptimisedCard", () => {
       return waitFor(() => {
         expect(screen.queryByTestId("download-dialog")).not.toBeInTheDocument();
       });
+    });
+  });
+
+  describe("IMOS data selection tag", () => {
+    it("should show an IMOS tag next to Data Selection when the collection is IMOS-provided", async () => {
+      renderComponent(
+        createMockCollection(DatasetType.ZARR),
+        [],
+        undefined,
+        mockSetSelectedCoKey,
+        true
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("label-chip-IMOS")).toBeInTheDocument();
+      });
+    });
+
+    it("should not show an IMOS tag when the collection is not IMOS-provided", async () => {
+      renderComponent();
+
+      await waitFor(() => {
+        expect(screen.getByText("Data Selection")).toBeInTheDocument();
+      });
+      expect(screen.queryByTestId("label-chip-IMOS")).not.toBeInTheDocument();
     });
   });
 });
