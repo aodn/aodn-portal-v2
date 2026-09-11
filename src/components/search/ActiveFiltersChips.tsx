@@ -28,7 +28,7 @@ import {
   fetchAllenCoralAtlasOptions,
   fetchMarineEcoregionOptions,
   fetchMarineParkOptions,
-} from "../map/mapbox/layers/StaticLayer";
+} from "../map/mapbox/layers/staticLayerOptions";
 import { DATA_SETTINGS } from "../filter/tab-filters/DataSettingsFilter";
 import useElementSize from "../../hooks/useElementSize";
 

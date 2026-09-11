@@ -21,7 +21,7 @@ import {
 import {
   fetchMarineParkOptions,
   BoundaryName,
-} from "../../map/mapbox/layers/StaticLayer";
+} from "../../map/mapbox/layers/staticLayerOptions";
 import { server } from "../../../__mocks__/server";
 import { ThemeProvider } from "@mui/material/styles";
 import AppTheme from "@/styles/theme";
@@ -127,25 +127,25 @@ describe("Searchbar", () => {
     userEvent.click(filterButton);
 
     // Wait for the filter popup to appear
-    return waitFor(() => screen.getByTestId("searchbar-popup")).then(
-      (popup) => {
-        // Check if the first tab - "Parameters" is present in the popup
-        expect(screen.getByText("Parameters")).toBeInTheDocument();
+    return screen.findByTestId("tab-panel-Parameters").then(() => {
+      // Filters is lazy: the panel resolving is what proves the chunk landed.
+      const popup = screen.getByTestId("searchbar-popup");
+      // Check if the first tab - "Parameters" is present in the popup
+      expect(screen.getByText("Parameters")).toBeInTheDocument();
 
-        // By default, the first tab - "Parameters" should be selected
-        // Check if the first tab - "Parameters" is selected
-        const parametersTab = within(popup).getByText("Parameters");
-        expect(parametersTab).toHaveAttribute("aria-selected", "true");
+      // By default, the first tab - "Parameters" should be selected
+      // Check if the first tab - "Parameters" is selected
+      const parametersTab = within(popup).getByText("Parameters");
+      expect(parametersTab).toHaveAttribute("aria-selected", "true");
 
-        // Check if there is a button with the name "Acoustics" (which comes from mock vocabs data) in the parameters tab
-        const parameterPanel = screen.getByTestId("tab-panel-Parameters");
-        expect(
-          within(parameterPanel).getByRole("button", {
-            name: "Acoustics",
-          })
-        ).toBeInTheDocument();
-      }
-    );
+      // Check if there is a button with the name "Acoustics" (which comes from mock vocabs data) in the parameters tab
+      const parameterPanel = screen.getByTestId("tab-panel-Parameters");
+      expect(
+        within(parameterPanel).getByRole("button", {
+          name: "Acoustics",
+        })
+      ).toBeInTheDocument();
+    });
   });
 
   it("should render correct number of selected parameters", () => {
@@ -164,33 +164,33 @@ describe("Searchbar", () => {
     userEvent.click(filterButton);
 
     // Wait for the filter popup to appear
-    return waitFor(() => screen.getByTestId("searchbar-popup")).then(() => {
-      const parameterPanel = screen.getByTestId("tab-panel-Parameters");
+    return screen
+      .findByTestId("tab-panel-Parameters")
+      .then((parameterPanel) => {
+        // User click on two parameter buttons "Acoustics" and "Air-Sea Fluxes"
+        const parameterButton1 = within(parameterPanel).getByRole("button", {
+          name: "Acoustics",
+        });
+        userEvent.click(parameterButton1);
 
-      // User click on two parameter buttons "Acoustics" and "Air-Sea Fluxes"
-      const parameterButton1 = within(parameterPanel).getByRole("button", {
-        name: "Acoustics",
-      });
-      userEvent.click(parameterButton1);
+        const parameterButton2 = within(parameterPanel).getByRole("button", {
+          name: "Air-Sea Fluxes",
+        });
+        userEvent.click(parameterButton2);
 
-      const parameterButton2 = within(parameterPanel).getByRole("button", {
-        name: "Air-Sea Fluxes",
+        // Wait for the parameter buttons to be selected
+        return waitFor(() => {
+          expect(parameterButton1).toHaveAttribute("aria-pressed", "true");
+          expect(parameterButton2).toHaveAttribute("aria-pressed", "true");
+        }).then(() => {
+          // Check if the filter button badge is updated with the correct number of selected parameters
+          const filterButtonBadge = screen.getByTestId(
+            "searchbar-button-badge-Filter"
+          );
+          expect(filterButtonBadge).toBeInTheDocument();
+          expect(filterButtonBadge).toHaveTextContent("2");
+        });
       });
-      userEvent.click(parameterButton2);
-
-      // Wait for the parameter buttons to be selected
-      return waitFor(() => {
-        expect(parameterButton1).toHaveAttribute("aria-pressed", "true");
-        expect(parameterButton2).toHaveAttribute("aria-pressed", "true");
-      }).then(() => {
-        // Check if the filter button badge is updated with the correct number of selected parameters
-        const filterButtonBadge = screen.getByTestId(
-          "searchbar-button-badge-Filter"
-        );
-        expect(filterButtonBadge).toBeInTheDocument();
-        expect(filterButtonBadge).toHaveTextContent("2");
-      });
-    });
   });
 
   // Redux to UI flow: make sure the searchbar states are updated correctly across pages given redux states
@@ -225,23 +225,29 @@ describe("Searchbar", () => {
         userEvent.click(filterButton);
 
         // Wait for the filter popup to appear
-        return waitFor(() => screen.getByTestId("searchbar-popup")).then(() => {
-          const parameterPanel = screen.getByTestId("tab-panel-Parameters");
+        return screen
+          .findByTestId("tab-panel-Parameters")
+          .then((parameterPanel) => {
+            // Get the parameter buttons "Air pressure" and "Visibility" which are selected
+            const parameterButton1 = within(parameterPanel).getByRole(
+              "button",
+              {
+                name: PARAMETER_VOCABS[0].narrower[0].label,
+              }
+            );
+            const parameterButton2 = within(parameterPanel).getByRole(
+              "button",
+              {
+                name: PARAMETER_VOCABS[0].narrower[1].label,
+              }
+            );
 
-          // Get the parameter buttons "Air pressure" and "Visibility" which are selected
-          const parameterButton1 = within(parameterPanel).getByRole("button", {
-            name: PARAMETER_VOCABS[0].narrower[0].label,
+            // Wait for the parameter buttons to be selected
+            return waitFor(() => {
+              expect(parameterButton1).toHaveAttribute("aria-pressed", "true");
+              expect(parameterButton2).toHaveAttribute("aria-pressed", "true");
+            });
           });
-          const parameterButton2 = within(parameterPanel).getByRole("button", {
-            name: PARAMETER_VOCABS[0].narrower[1].label,
-          });
-
-          // Wait for the parameter buttons to be selected
-          return waitFor(() => {
-            expect(parameterButton1).toHaveAttribute("aria-pressed", "true");
-            expect(parameterButton2).toHaveAttribute("aria-pressed", "true");
-          });
-        });
       }
     );
   });
