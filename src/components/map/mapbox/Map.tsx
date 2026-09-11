@@ -13,10 +13,7 @@ import type {
   ProjectionSpecification,
   StyleSpecification,
 } from "mapbox-gl";
-/**
- * This is due to vite version
- */
-import mapboxgl from "mapbox-gl/esm";
+import mapboxgl from "mapbox-gl";
 
 // eslint-disable-next-line import/extensions
 import workerUrl from "mapbox-gl/dist/mapbox-gl-csp-worker.js?url";
@@ -26,7 +23,7 @@ mapboxgl.workerUrl = workerUrl;
 import MapContext, { ProgressType } from "./MapContext";
 import "mapbox-gl/dist/mapbox-gl.css";
 import ERSIWorldImagery from "./styles/ESRIWorldImagery.json";
-import lodash from "lodash";
+import debounce from "lodash/debounce";
 import { TestHelper } from "../../common/test/helper";
 import { MapDefaultConfig, MapEventEnum } from "./constants";
 import { CircularProgress, LinearProgress, Paper } from "@mui/material";
@@ -146,7 +143,7 @@ const ReactMap = memo(
     // 1. Create the debounced functions using useMemo
     const debounceOnZoomEvent = useMemo(
       () =>
-        lodash.debounce((event: MapEvent | undefined) => {
+        debounce((event: MapEvent | undefined) => {
           onZoomEvent?.(event);
         }, MapDefaultConfig.DEBOUNCE_BEFORE_EVENT_FIRE),
       [onZoomEvent] // Re-creates when the prop changes
@@ -154,7 +151,7 @@ const ReactMap = memo(
 
     const debounceOnMoveEvent = useMemo(
       () =>
-        lodash.debounce((event: MapEvent | undefined) => {
+        debounce((event: MapEvent | undefined) => {
           onMoveEvent?.(event);
         }, MapDefaultConfig.DEBOUNCE_BEFORE_EVENT_FIRE),
       [onMoveEvent]
