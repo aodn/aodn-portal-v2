@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, beforeAll } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
+import { userEvent } from "@testing-library/user-event";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { Provider } from "react-redux";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
@@ -11,7 +12,7 @@ beforeAll(() => {
 
 // Same stub as DownloadCloudOptimisedCard.test.tsx so the two card tests query
 // their dropdowns the same way
-vi.mock("../features/download/DownloadSelect", () => ({
+vi.mock("@/pages/detail-page/features/download/DownloadSelect", () => ({
   default: ({ label, labelAdornment, items, value, onSelectCallback }: any) => (
     <div>
       <label>{label}</label>
@@ -33,7 +34,7 @@ vi.mock("../features/download/DownloadSelect", () => ({
 
 // Stubbed out to keep the card isolated from the subsetting tree, and to expose
 // hideInfoMessage (which the size warning suppresses) as an assertable attribute
-vi.mock("../features/download/DownloadSubsetting", () => ({
+vi.mock("@/pages/detail-page/features/download/DownloadSubsetting", () => ({
   default: ({ hideInfoMessage }: any) => (
     <div
       data-testid="download-subsetting"
@@ -57,7 +58,7 @@ vi.mock("@/app/store/hooks", async (importOriginal) => {
   return { ...actual, useAppDispatch: vi.fn() };
 });
 
-import DownloadWFSCard from "../features/download/DownloadWFSCard";
+import DownloadWFSCard from "@/pages/detail-page/features/download/DownloadWFSCard";
 import useWFSDownload from "@/hooks/useWFSDownload";
 import useEstimateSize from "@/hooks/useEstimateSize";
 import { useAppDispatch } from "@/app/store/hooks";
@@ -65,8 +66,8 @@ import store from "@/app/store/store";
 import {
   LARGE_DOWNLOAD_BYTES,
   EXTRA_LARGE_DOWNLOAD_BYTES,
-} from "../features/download/constants";
-import { DownloadSizeWarningLevel } from "../features/download/DownloadSizeWarning";
+} from "@/pages/detail-page/features/download/constants";
+import { DownloadSizeWarningLevel } from "@/pages/detail-page/features/download/DownloadSizeWarning";
 
 const theme = createTheme();
 const TEST_UUID = "test-uuid";
@@ -108,7 +109,8 @@ const expectWarningLevel = (level: DownloadSizeWarningLevel) =>
 
 const renderComponent = (
   uuid: string | undefined = TEST_UUID,
-  isImosProvider?: boolean
+  isImosProvider?: boolean,
+  collectionTitle?: string
 ) =>
   render(
     <Provider store={store}>
@@ -121,6 +123,7 @@ const renderComponent = (
                 element={
                   <DownloadWFSCard
                     uuid={uuid}
+                    collectionTitle={collectionTitle}
                     downloadConditions={[]}
                     getAndSetDownloadConditions={
                       mockGetAndSetDownloadConditions
@@ -322,5 +325,114 @@ describe("DownloadWFSCard", () => {
       expect(screen.getByTestId("label-chip-External")).toBeInTheDocument();
     });
     expect(screen.queryByTestId("label-chip-IMOS")).not.toBeInTheDocument();
+  });
+  describe("download file name", () => {
+    const COLLECTION_TITLE = "IMOS - Argo Profiles";
+    const DATA_SELECT_TEST_ID = "select-data-selection";
+
+    // startDownload(uuid, layerName, downloadConditions, fileName)
+    const fileNamesPassedToStartDownload = () =>
+      mockStartDownload.mock.calls.map((call) => call[3]);
+
+    it("should append the selected layer so switching layers does not reuse the same file name", () => {
+      renderComponent(TEST_UUID, true, COLLECTION_TITLE);
+
+      return waitFor(() => screen.findByTestId(DATA_SELECT_TEST_ID))
+        .then(() => {
+          userEvent.click(screen.getByTestId(DOWNLOAD_BUTTON_TEST_ID));
+          return waitFor(() =>
+            expect(mockStartDownload).toHaveBeenCalledTimes(1)
+          );
+        })
+        .then(() => {
+          userEvent.selectOptions(
+            screen.getByTestId(DATA_SELECT_TEST_ID),
+            "layer-two"
+          );
+          return waitFor(() =>
+            expect(
+              (screen.getByTestId(DATA_SELECT_TEST_ID) as HTMLSelectElement)
+                .value
+            ).toBe("layer-two")
+          );
+        })
+        .then(() => {
+          userEvent.click(screen.getByTestId(DOWNLOAD_BUTTON_TEST_ID));
+          return waitFor(() =>
+            expect(mockStartDownload).toHaveBeenCalledTimes(2)
+          );
+        })
+        .then(() => {
+          expect(fileNamesPassedToStartDownload()).toEqual([
+            "IMOS_-_Argo_Profiles-Layer_One.csv",
+            "IMOS_-_Argo_Profiles-Layer_Two.csv",
+          ]);
+        });
+    });
+
+    it("should use the collection title alone when the collection has a single layer", () => {
+      mockDispatch.mockReturnValue({
+        unwrap: () => Promise.resolve([{ name: "only-layer", title: "Only" }]),
+      });
+
+      renderComponent(TEST_UUID, true, COLLECTION_TITLE);
+
+      return waitFor(() => screen.findByTestId(DATA_SELECT_TEST_ID))
+        .then(() => {
+          userEvent.click(screen.getByTestId(DOWNLOAD_BUTTON_TEST_ID));
+          return waitFor(() =>
+            expect(mockStartDownload).toHaveBeenCalledTimes(1)
+          );
+        })
+        .then(() => {
+          expect(fileNamesPassedToStartDownload()).toEqual([
+            "IMOS_-_Argo_Profiles.csv",
+          ]);
+        });
+    });
+
+    it("should fall back to the layer name when two layers share a title, so the file names still differ", () => {
+      mockDispatch.mockReturnValue({
+        unwrap: () =>
+          Promise.resolve([
+            { name: "imos:layer_one", title: "Shared title" },
+            { name: "imos:layer_two", title: "Shared title" },
+          ]),
+      });
+
+      renderComponent(TEST_UUID, true, COLLECTION_TITLE);
+
+      return waitFor(() => screen.findByTestId(DATA_SELECT_TEST_ID))
+        .then(() => {
+          userEvent.click(screen.getByTestId(DOWNLOAD_BUTTON_TEST_ID));
+          return waitFor(() =>
+            expect(mockStartDownload).toHaveBeenCalledTimes(1)
+          );
+        })
+        .then(() => {
+          userEvent.selectOptions(
+            screen.getByTestId(DATA_SELECT_TEST_ID),
+            "imos:layer_two"
+          );
+          return waitFor(() =>
+            expect(
+              (screen.getByTestId(DATA_SELECT_TEST_ID) as HTMLSelectElement)
+                .value
+            ).toBe("imos:layer_two")
+          );
+        })
+        .then(() => {
+          userEvent.click(screen.getByTestId(DOWNLOAD_BUTTON_TEST_ID));
+          return waitFor(() =>
+            expect(mockStartDownload).toHaveBeenCalledTimes(2)
+          );
+        })
+        .then(() => {
+          expect(fileNamesPassedToStartDownload()).toEqual([
+            "IMOS_-_Argo_Profiles-imos_layer_one.csv",
+            "IMOS_-_Argo_Profiles-imos_layer_two.csv",
+          ]);
+        });
+    });
   });
 });
