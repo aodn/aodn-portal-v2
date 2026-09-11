@@ -3,7 +3,7 @@ import {
   buildDownloadFileName,
   getDownloadFileExtension,
   sanitiseFileNamePart,
-} from "../DownloadFileNameUtils";
+} from "@/utils/DownloadFileNameUtils";
 
 describe("sanitiseFileNamePart", () => {
   it("replaces whitespace with underscores", () => {

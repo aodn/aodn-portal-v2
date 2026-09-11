@@ -8,18 +8,16 @@ import {
   Typography,
 } from "@mui/material";
 import { borderRadius } from "@/styles/constants";
-import { portalTheme } from "../../../../styles";
-import useWFSDownload, {
-  DownloadStatus,
-} from "../../../../hooks/useWFSDownload";
-import useEstimateSize from "../../../../hooks/useEstimateSize";
+import { portalTheme } from "@/styles";
+import useWFSDownload, { DownloadStatus } from "@/hooks/useWFSDownload";
+import useEstimateSize from "@/hooks/useEstimateSize";
 import {
   DownloadCondition,
   DownloadConditionType,
   FormatCondition,
-} from "../../context/DownloadDefinitions";
+} from "@/pages/detail-page/context/DownloadDefinitions";
 import InfoMessage from "./InfoMessage";
-import DownloadButton from "../../../../components/common/buttons/DownloadButton";
+import DownloadButton from "@/components/common/buttons/DownloadButton";
 import DownloadSubsetting from "./DownloadSubsetting";
 import DownloadSelect from "./DownloadSelect";
 import DownloadSizeWarning, {
@@ -38,7 +36,7 @@ import {
   fetchGeoServerDownloadLayers,
   processWFSEstimateSize,
 } from "@/app/store/searchReducer";
-import AdminScreenContext from "../../../../components/admin/AdminScreenContext";
+import AdminScreenContext from "@/components/admin/AdminScreenContext";
 import { formatBytes } from "@/utils/Helpers";
 import LabelChip from "@/components/common/label/LabelChip";
 import { buildDownloadFileName } from "@/utils/DownloadFileNameUtils";

@@ -1,9 +1,9 @@
 import { useCallback, useState, useRef } from "react";
 import { useAppDispatch } from "@/app/store/hooks";
 import { processWFSDownload } from "@/app/store/searchReducer";
-import { IDownloadCondition } from "../pages/detail-page/context/DownloadDefinitions";
-import { consumeSSEStream } from "../utils/SSEUtils";
-import { getDownloadFileExtension } from "../utils/DownloadFileNameUtils";
+import { IDownloadCondition } from "@/pages/detail-page/context/DownloadDefinitions";
+import { consumeSSEStream } from "@/utils/SSEUtils";
+import { getDownloadFileExtension } from "@/utils/DownloadFileNameUtils";
 
 // Aligned with backend SSE event names (ogc-api SseEventName enum)
 enum EventName {
