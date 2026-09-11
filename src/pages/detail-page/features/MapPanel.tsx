@@ -59,7 +59,7 @@ import {
 } from "@/components/common/slider/DateSlider";
 import { dayjsToUnixMs, getAppMaxDate, toAppDayjs } from "@/utils/DateUtils";
 import { GeoserverFieldsResponse } from "@/app/store/GeoserverDefinitions";
-import * as turf from "@turf/turf";
+import { bbox as turfBbox } from "@turf/bbox";
 import { createStaticLayers } from "@/components/map/mapbox/layers/StaticLayer";
 
 import WmsLegend from "./WmsLegend";
@@ -583,12 +583,12 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
           }
         } else {
           try {
-            const bbox = turf.bbox(feature);
+            const bbox = turfBbox(feature);
             if (bbox && bbox.every((n) => isFinite(n))) {
               bboxConditions.push(new BBoxCondition(id, bbox, removeCallback));
             }
           } catch (e) {
-            console.warn("turf.bbox failed on feature", e, feature);
+            console.warn("bbox failed on feature", e, feature);
           }
         }
       });

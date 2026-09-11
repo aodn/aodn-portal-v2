@@ -28,7 +28,7 @@ import {
   fetchAllenCoralAtlasOptions,
   fetchMarineEcoregionOptions,
   fetchMarineParkOptions,
-} from "../map/mapbox/layers/StaticLayer";
+} from "../map/mapbox/layers/staticLayerOptions";
 import { DATA_SETTINGS } from "../filter/tab-filters/DataSettingsFilter";
 import useElementSize from "../../hooks/useElementSize";
 
@@ -54,12 +54,28 @@ const ActiveFiltersChips: FC = () => {
     []
   );
 
+  // These three boundary files are 1.8 MB of GeoJSON combined (Marine Parks
+  // alone is 1.1 MB). They are only ever read to turn a selected static area
+  // into a chip label, so fetch a set only once an area from it is actually
+  // selected -- fetching all three on mount made every landing page load pay
+  // 1.8 MB of download plus the grouping/sorting pass for nothing.
+  const selectedBoundaryNames = useMemo(
+    () => new Set((params.staticAreas ?? []).map((area) => area.boundaryName)),
+    [params.staticAreas]
+  );
+
   useEffect(() => {
-    // Cached value so will return fast
-    fetchMarineEcoregionOptions().then(setMarineEcoregion);
-    fetchMarineParkOptions().then(setMarinePark);
-    fetchAllenCoralAtlasOptions().then(setAllenCoralAtlas);
-  }, []);
+    // loadAndProcessGeoJSON caches per URL, so re-selecting is free.
+    if (selectedBoundaryNames.has(BoundaryName.MEOW)) {
+      fetchMarineEcoregionOptions().then(setMarineEcoregion);
+    }
+    if (selectedBoundaryNames.has(BoundaryName.AUSTRALIAN_MARINE_PARKS)) {
+      fetchMarineParkOptions().then(setMarinePark);
+    }
+    if (selectedBoundaryNames.has(BoundaryName.CORAL_ATLAS)) {
+      fetchAllenCoralAtlasOptions().then(setAllenCoralAtlas);
+    }
+  }, [selectedBoundaryNames]);
 
   const handleClearAll = useCallback(() => {
     dispatch(clearComponentParam());

@@ -3,9 +3,9 @@ import { Box, Dialog, Stack, Tooltip, Typography } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import { padding } from "../../../../styles/constants";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
-import bannerImage1 from "@/assets/images/banner_image_1.png";
-import bannerImage2 from "@/assets/images/banner_image_2.png";
-import bannerImage3 from "@/assets/images/banner_image_3.png";
+import bannerImage1 from "@/assets/images/banner_image_1.webp";
+import bannerImage2 from "@/assets/images/banner_image_2.webp";
+import bannerImage3 from "@/assets/images/banner_image_3.webp";
 import { portalTheme } from "../../../../styles";
 import FeedbackButton from "@/components/feedback/FeedbackButton";
 
@@ -101,6 +101,10 @@ const renderBannerImages = (
           >
             <img
               src={bannerImage2}
+              width={279}
+              height={132}
+              loading="eager"
+              decoding="async"
               alt="banner-image-2"
               style={{
                 objectFit: "cover",
@@ -145,6 +149,11 @@ const renderBannerImages = (
         >
           <img
             src={bannerImage1}
+            width={488}
+            height={288}
+            loading="eager"
+            decoding="sync"
+            fetchPriority="high"
             alt="banner-image-1"
             style={{
               objectFit: "cover",
@@ -170,6 +179,10 @@ const renderBannerImages = (
         >
           <img
             src={bannerImage3}
+            width={240}
+            height={165}
+            loading="lazy"
+            decoding="async"
             alt="banner-image-3"
             style={{
               objectFit: "cover",

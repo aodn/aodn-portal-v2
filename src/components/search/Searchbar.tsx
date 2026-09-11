@@ -2,6 +2,8 @@ import React, {
   Dispatch,
   FC,
   KeyboardEvent,
+  Suspense,
+  lazy,
   useCallback,
   useEffect,
   useMemo,
@@ -22,11 +24,8 @@ import {
   POPUP_MIN_WIDTH_TABLET,
   POPUP_MIN_WIDTH_XL,
 } from "./constants";
-import DateRangeFilter from "../filter/DateRangeFilter";
 import { useLocation } from "react-router-dom";
 import { pageDefault, pageReferer } from "../common/constants";
-import LocationFilter from "../filter/LocationFilter";
-import Filters from "../filter/Filters";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import useScrollToElement from "../../hooks/useScrollToElement";
 import { HEADER_HEIGHT, HEADER_HEIGHT_MOBILE } from "@/app/layout/constant";
@@ -41,6 +40,15 @@ import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import ActiveFiltersChips from "./ActiveFiltersChips";
 
 import { createPortal } from "react-dom";
+
+// These three only ever render inside the Popper below, so they are a free
+// code-split boundary. Keeping them static pulled mapbox-gl + mapbox-gl-draw
+// (LocationFilter), @mui/x-charts (DateRangeFilter) and ~1 MB of organisation
+// logos (Filters) into the landing page's critical path for a popover that is
+// closed on first paint.
+const DateRangeFilter = lazy(() => import("../filter/DateRangeFilter"));
+const LocationFilter = lazy(() => import("../filter/LocationFilter"));
+const Filters = lazy(() => import("../filter/Filters"));
 
 interface SearchbarProps {
   chipsContainer?: HTMLElement | null;
@@ -225,15 +233,17 @@ const Searchbar: FC<SearchbarProps> = ({
               >
                 <Fade in={true} key={activeButton} timeout={200}>
                   <Box>
-                    {activeButton === SearchbarButtonNames.Date && (
-                      <DateRangeFilter />
-                    )}
-                    {activeButton === SearchbarButtonNames.Location && (
-                      <LocationFilter />
-                    )}
-                    {activeButton === SearchbarButtonNames.Filter && (
-                      <Filters />
-                    )}
+                    <Suspense fallback={null}>
+                      {activeButton === SearchbarButtonNames.Date && (
+                        <DateRangeFilter />
+                      )}
+                      {activeButton === SearchbarButtonNames.Location && (
+                        <LocationFilter />
+                      )}
+                      {activeButton === SearchbarButtonNames.Filter && (
+                        <Filters />
+                      )}
+                    </Suspense>
                   </Box>
                 </Fade>
               </Paper>

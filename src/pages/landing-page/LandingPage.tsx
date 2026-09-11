@@ -36,11 +36,6 @@ const LandingPage: FC = () => {
         <TopicsPanel />
       </SectionContainer>
 
-      {/*commented out the StoryBoardPanel for demo purposes*/}
-      {/* <SectionContainer sectionAreaStyle={{ backgroundColor: "#fff" }}>
-        <StoryBoardPanel />
-      </SectionContainer> */}
-
       <SectionContainer
         sectionAreaStyle={{ backgroundColor: color.blue.extraDark }}
         contentAreaStyle={{ width: PAGE_CONTENT_WIDTH_LANDING }}

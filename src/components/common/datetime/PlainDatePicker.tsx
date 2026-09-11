@@ -1,5 +1,5 @@
 import { styled } from "@mui/material";
-import { DatePicker, DatePickerProps } from "@mui/x-date-pickers";
+import { DatePicker, DatePickerProps } from "@mui/x-date-pickers/DatePicker";
 import { Dayjs, getAppTimezone } from "@/utils/DayjsUtils";
 import { toUtcStartOfDay } from "@/utils/DateUtils";
 import {

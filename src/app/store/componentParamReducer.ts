@@ -2,7 +2,7 @@
  * This reducer is used to allow different component share value between pages, it is useful for filter
  * to preserve value between pages. The number below must be unique across the whole application
  */
-import { bboxPolygon } from "@turf/turf";
+import { bboxPolygon } from "@turf/bbox-polygon";
 import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from "geojson";
 import { DatasetFrequency, DatasetStatus } from "./datasetEnums";
 import { MapDefaultConfig } from "@/components/map/mapbox/constants";

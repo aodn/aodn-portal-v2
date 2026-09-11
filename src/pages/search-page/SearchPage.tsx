@@ -10,7 +10,8 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import { LngLatBounds, MapEvent } from "mapbox-gl";
 import { Box } from "@mui/material";
-import { bboxPolygon, booleanEqual } from "@turf/turf";
+import { bboxPolygon } from "@turf/bbox-polygon";
+import { booleanEqual } from "@turf/boolean-equal";
 import store, {
   getComponentState,
   getSearchQueryResult,
@@ -64,7 +65,8 @@ import {
   MapDefaultConfig,
   MapEventEnum,
 } from "@/components/map/mapbox/constants";
-import _ from "lodash";
+import debounce from "lodash/debounce";
+import type { DebouncedFunc } from "lodash";
 import useFetchData from "../../hooks/useFetchData";
 import { ProgressType } from "../../components/map/mapbox/MapContext";
 import AdminScreenContext from "../../components/admin/AdminScreenContext";
@@ -123,10 +125,10 @@ const SearchPage = () => {
   const mapSearchAbortRef = useRef<AbortController | null>(null);
   // This is use to avoid update called too many times in short period that
   // hurt the performace
-  const debounceHistoryUpdateRef = useRef<_.DebouncedFunc<
+  const debounceHistoryUpdateRef = useRef<DebouncedFunc<
     (url: string) => void
   > | null>(
-    _.debounce((url: string) => {
+    debounce((url: string) => {
       const pathname = window.location.pathname;
       if (pathname.includes(pageDefault.search)) {
         // Must use navigator, otherwise useLocation will not work, we

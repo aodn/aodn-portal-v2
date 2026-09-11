@@ -115,6 +115,12 @@ export default ({ mode }: ConfigEnv) => {
       },
       proxy: apiProxy,
     },
+    // `vite preview` serves the production build. Without the same proxy the
+    // health check in HealthChecker 404s and every page renders DegradedPage,
+    // which makes a local Lighthouse run measure the wrong thing.
+    preview: {
+      proxy: apiProxy,
+    },
     plugins: [
       react(),
       mode !== "test" &&
@@ -125,6 +131,24 @@ export default ({ mode }: ConfigEnv) => {
     ].filter(Boolean),
     build: {
       outDir: "dist",
+      // mapbox-gl alone is ~800 kB; splitting it out is the point, so the
+      // default 500 kB warning would just be noise.
+      chunkSizeWarningLimit: 1500,
+      rollupOptions: {
+        output: {
+          // Keep the big, rarely-changing vendors in their own long-lived
+          // chunks so a deploy does not invalidate them, and so the landing
+          // page never has to download mapbox-gl to paint.
+          // Only leaf libraries belong here. Naming a package that depends on
+          // @mui/material (x-charts did) drags those shared internals into the
+          // manual chunk, and then every chunk using MUI has to import it --
+          // which put the whole charting lib back on the landing page.
+          manualChunks: {
+            react: ["react", "react-dom", "react-router-dom", "react-redux"],
+            mapbox: ["mapbox-gl", "@mapbox/mapbox-gl-draw"],
+          },
+        },
+      },
     },
     // mapbox-gl 3.x emits a worker that uses dynamic imports (code-splitting),
     // which Vite's default "iife" worker format can't support. Build workers as

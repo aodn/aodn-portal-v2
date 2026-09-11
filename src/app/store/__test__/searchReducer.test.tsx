@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import default_thumbnail from "@/assets/images/default-thumbnail.png";
+import default_thumbnail from "@/assets/images/default-thumbnail.webp";
 import { OGCCollection } from "../OGCCollectionDefinitions";
 import { DateTimeFilterRange, ParameterState } from "../componentParamReducer";
 import { createSearchParamFrom, SearchParameters } from "../searchReducer";

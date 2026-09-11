@@ -4,14 +4,14 @@ import AUMS from "@/assets/logos/aus-unstitute-of-marine-science.png";
 import BM from "@/assets/logos/bureo-of-meteorology.png";
 import CSIRO from "@/assets/logos/csiro-logo.png";
 import CurtinUni from "@/assets/logos/curtinuni-logo.png";
-import DAWE from "@/assets/logos/dawe-aap.png";
+import DAWE from "@/assets/logos/dawe-aap.webp";
 import DeakinUni from "@/assets/logos/deakinuniversity-logo.png";
 import GovSA from "@/assets/logos/govsa-logo.png";
 import MacquarieUni from "@/assets/logos/macquarie-uni.png";
 import NCRIS from "@/assets/logos/ncris-logo.png";
 import SARDI from "@/assets/logos/sardi-logo.png";
 import SIMS from "@/assets/logos/sims-logo.png";
-import UMEL from "@/assets/logos/the-university-of-melbourne-logo.png";
+import UMEL from "@/assets/logos/the-university-of-melbourne-logo.webp";
 import USYD from "@/assets/logos/unisyd-logo.png";
 import UNSW from "@/assets/logos/unsw-logo.png";
 import UTAS from "@/assets/logos/utas-logo.png";
@@ -41,7 +41,7 @@ const LogoList: FC = () => {
             }}
           >
             <LogoContainer>
-              <Logo src={NCRIS} alt={NCRIS} />
+              <Logo src={NCRIS} alt="NCRIS" />
             </LogoContainer>
           </Grid>
           <Grid
@@ -76,7 +76,7 @@ const LogoList: FC = () => {
             }}
           >
             <LogoContainer>
-              <Logo src={UTAS} alt={UTAS} height="40px" />
+              <Logo src={UTAS} alt="University of Tasmania" height="40px" />
             </LogoContainer>
           </Grid>
           <Grid
@@ -87,7 +87,11 @@ const LogoList: FC = () => {
             }}
           >
             <LogoContainer>
-              <Logo src={AUMS} alt={AUMS} height="50px" />
+              <Logo
+                src={AUMS}
+                alt="Australian Institute of Marine Science"
+                height="50px"
+              />
             </LogoContainer>
           </Grid>
           <Grid
@@ -98,7 +102,7 @@ const LogoList: FC = () => {
             }}
           >
             <LogoContainer>
-              <Logo src={BM} alt={UTAS} height="100px" />
+              <Logo src={BM} alt="Bureau of Meteorology" height="100px" />
             </LogoContainer>
           </Grid>
           <Grid
@@ -109,7 +113,7 @@ const LogoList: FC = () => {
             }}
           >
             <LogoContainer>
-              <Logo src={CSIRO} alt={CSIRO} height="70px" />
+              <Logo src={CSIRO} alt="CSIRO" height="70px" />
             </LogoContainer>
           </Grid>
           <Grid
@@ -121,10 +125,18 @@ const LogoList: FC = () => {
           >
             <LogoContainer>
               <Box>
-                <Logo src={GovSA} alt={GovSA} height="75px" />
+                <Logo
+                  src={GovSA}
+                  alt="Government of South Australia"
+                  height="75px"
+                />
               </Box>
               <Box>
-                <Logo src={SARDI} alt={SARDI} height="85px" />
+                <Logo
+                  src={SARDI}
+                  alt="South Australian Research and Development Institute"
+                  height="85px"
+                />
               </Box>
             </LogoContainer>
           </Grid>
@@ -136,7 +148,11 @@ const LogoList: FC = () => {
             }}
           >
             <LogoContainer>
-              <Logo src={UWA} alt={UWA} height="60px" />
+              <Logo
+                src={UWA}
+                alt="The University of Western Australia"
+                height="60px"
+              />
             </LogoContainer>
           </Grid>
         </Grid>
@@ -151,7 +167,11 @@ const LogoList: FC = () => {
             p: 1,
           }}
         >
-          <Logo src={SIMS} alt={SIMS} height="80px" />
+          <Logo
+            src={SIMS}
+            alt="Sydney Institute of Marine Science"
+            height="80px"
+          />
           <Divider
             sx={{
               height: { xs: 0, sm: "58px" },
@@ -161,10 +181,10 @@ const LogoList: FC = () => {
             }}
             orientation={isMobile ? "horizontal" : "vertical"}
           />
-          <Logo src={UTS} alt={UTS} height="50px" />
-          <Logo src={USYD} alt={USYD} height="50px" />
-          <Logo src={MacquarieUni} alt={MacquarieUni} height="80px" />
-          <Logo src={UNSW} alt={UNSW} height="70px" />
+          <Logo src={UTS} alt="University of Technology Sydney" height="50px" />
+          <Logo src={USYD} alt="The University of Sydney" height="50px" />
+          <Logo src={MacquarieUni} alt="Macquarie University" height="80px" />
+          <Logo src={UNSW} alt="UNSW Sydney" height="70px" />
         </LogoContainer>
         <Typography
           paddingTop={-padding.small}
@@ -189,7 +209,7 @@ const LogoList: FC = () => {
             }}
           >
             <LogoContainer>
-              <Logo src={CurtinUni} alt={CurtinUni} height="35px" />
+              <Logo src={CurtinUni} alt="Curtin University" height="35px" />
             </LogoContainer>
           </Grid>
           <Grid
@@ -200,7 +220,11 @@ const LogoList: FC = () => {
             }}
           >
             <LogoContainer>
-              <Logo src={DAWE} alt={DAWE} height="50px" />
+              <Logo
+                src={DAWE}
+                alt="Department of Agriculture, Water and the Environment"
+                height="50px"
+              />
             </LogoContainer>
           </Grid>
           <Grid
@@ -211,7 +235,7 @@ const LogoList: FC = () => {
             }}
           >
             <LogoContainer>
-              <Logo src={DeakinUni} alt={DeakinUni} height="65px" />
+              <Logo src={DeakinUni} alt="Deakin University" height="65px" />
             </LogoContainer>
           </Grid>
           <Grid
@@ -222,7 +246,11 @@ const LogoList: FC = () => {
             }}
           >
             <LogoContainer>
-              <Logo src={UMEL} alt={UMEL} height="70px" />
+              <Logo
+                src={UMEL}
+                alt="The University of Melbourne"
+                height="70px"
+              />
             </LogoContainer>
           </Grid>
           <Grid size={12}>
