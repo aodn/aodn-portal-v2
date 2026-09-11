@@ -114,7 +114,12 @@ export class BBoxCondition
   support: ConditionSupportFn = drawRectSupported;
   removeCallback?: () => void;
 
-  constructor(id: string, bbox: BBox, removeCallback?: () => void) {
+  constructor(
+    id: string,
+    bbox: BBox,
+    removeCallback?: () => void,
+    public selectionOrder?: number
+  ) {
     this.type = DownloadConditionType.BBOX;
     this.id = id;
     this.bbox = bbox;
@@ -134,7 +139,8 @@ export class PolygonCondition
   constructor(
     id: string,
     coordinates: [number, number][],
-    removeCallback?: () => void
+    removeCallback?: () => void,
+    public selectionOrder?: number
   ) {
     this.id = id;
     this.coordinates = coordinates;
