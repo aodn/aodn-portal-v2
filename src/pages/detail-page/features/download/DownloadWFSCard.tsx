@@ -65,6 +65,28 @@ const formWfsDataOptions = (
   }));
 };
 
+// A collection with more than one layer must carry the selected layer in the
+// file name, otherwise downloading a second layer overwrites the first. The
+// layer title is the human readable choice, but GeoServer does not guarantee
+// one is present or unique, so fall back to the layer name (which is) when it
+// would not tell two downloads apart.
+const resolveDatasetTitle = (
+  options: SelectItem[],
+  selectedValue: string
+): string | undefined => {
+  if (options.length <= 1) return undefined;
+
+  const label = options
+    .find((option) => option.value === selectedValue)
+    ?.label?.trim();
+  const isLabelUnique =
+    !!label &&
+    options.filter((option) => option.label?.trim() === label).length === 1;
+
+  // The workspace separator in a layer name is not file name safe
+  return isLabelUnique ? label : selectedValue.replace(/:/g, "_");
+};
+
 const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
   uuid,
   collectionTitle,
@@ -134,12 +156,11 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
     });
 
     // The collection name alone identifies the file when there is only one
-    // layer to download; otherwise the selected layer title is appended
-    const datasetTitle =
-      dataSelectOptions.length > 1
-        ? dataSelectOptions.find((option) => option.value === selectedDataItem)
-            ?.label
-        : undefined;
+    // layer to download; otherwise the selected layer is appended
+    const datasetTitle = resolveDatasetTitle(
+      dataSelectOptions,
+      selectedDataItem
+    );
 
     const fileName = buildDownloadFileName({
       collectionTitle,
