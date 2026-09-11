@@ -3,7 +3,7 @@ import { useDetailPageContext } from "../context/detail-page-context";
 import NavigatablePanel, {
   NavigatablePanelChild,
 } from "../layout/NavigatablePanel";
-import _ from "lodash";
+import sortBy from "lodash/sortBy";
 import KeywordList from "../../../components/list/KeywordList";
 import StatementList from "../../../components/list/StatementList";
 import ThemeList from "../../../components/list/ThemeList";
@@ -110,7 +110,7 @@ const AdditionalInfoPanel = () => {
           ]
         : otherKeywords;
 
-    keywords = _.sortBy(keywords, (item) => {
+    keywords = sortBy(keywords, (item) => {
       return item.title ? item.title : "\uffff";
     });
 

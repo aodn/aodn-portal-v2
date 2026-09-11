@@ -1,8 +1,16 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import type { Middleware } from "@reduxjs/toolkit";
 import { logger } from "redux-logger";
 import searchReducer from "./searchReducer";
 import paramReducer from "./componentParamReducer";
 import bookmarkListReducer from "./bookmarkListReducer";
+
+// redux-logger deep-clones and console-logs state on every dispatched action.
+// It used to be concatenated unconditionally, so production shipped it and ran
+// it on every map-move-driven dispatch (the search page dispatches on every map
+// move). `import.meta.env.DEV` is statically replaced at build time, so the
+// array collapses to [] in production and the logger never runs there.
+const devMiddleware: Middleware[] = import.meta.env.DEV ? [logger] : [];
 
 // https://stackoverflow.com/questions/69502147/changing-from-redux-to-redux-toolkit
 // https://redux-toolkit.js.org/api/getDefaultMiddleware
@@ -13,7 +21,7 @@ const store = configureStore({
     getDefaultMiddleware({
       serializableCheck: false,
       thunk: true,
-    }).concat(logger),
+    }).concat(devMiddleware),
   reducer: combineReducers({
     // Add your reducers here
     searcher: searchReducer,

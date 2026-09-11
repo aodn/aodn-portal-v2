@@ -4,7 +4,7 @@ import {
   unFlattenToParameterState,
   ParameterState,
 } from "../componentParamReducer";
-import { bboxPolygon } from "@turf/turf";
+import { bboxPolygon } from "@turf/bbox-polygon";
 import { MapDefaultConfig } from "@/components/map/mapbox/constants";
 import { decodeParam } from "@/utils/UrlUtils";
 import { SearchKeys } from "@/components/search/constants";

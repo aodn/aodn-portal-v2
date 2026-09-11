@@ -12,7 +12,7 @@ import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from "geojson";
 import * as wellknown from "wellknown";
 import { SelectedStaticArea, Vocab } from "@/app/store/componentParamReducer";
 import { DatasetFrequency, DatasetStatus } from "@/app/store/datasetEnums";
-import { bbox } from "@turf/turf";
+import { bbox } from "@turf/bbox";
 
 // TODO: refactor this, naming like this is not ideal for readability,
 //  what are T, J, R, p, i , j, c, d, x, y, z, etc. actually mean?

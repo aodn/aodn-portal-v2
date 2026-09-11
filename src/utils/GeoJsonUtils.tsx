@@ -6,7 +6,7 @@ import {
   Polygon,
 } from "geojson";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
-import * as turf from "@turf/turf";
+import { centerOfMass } from "@turf/center-of-mass";
 
 export const generateFeatureCollectionFrom = (
   collections: OGCCollection[] | undefined
@@ -32,7 +32,7 @@ export const generateFeatureCollectionFrom = (
       // We skip the first one which is the overall bounding box, then add the remaining
       collection.extent?.getGeojsonFromBBox(1).features.forEach((i) =>
         featureCollections.features.push({
-          ...turf.centerOfMass(i.geometry),
+          ...centerOfMass(i.geometry),
           // Add the id so we can reference it easily
           properties: { uuid: collection.id },
         })

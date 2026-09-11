@@ -1,5 +1,5 @@
 // This component is for general purposes helper methods
-import { sortBy } from "lodash";
+import sortBy from "lodash/sortBy";
 
 /**
  * Parses a JSON string into a JavaScript object.
