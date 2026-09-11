@@ -1,9 +1,9 @@
 import { FC, useCallback, useEffect, useMemo } from "react";
-import { useDetailPageContext } from "../../context/detail-page-context";
+import { useDetailPageContext } from "@/pages/detail-page/context/detail-page-context";
 import DownloadWFSCard from "./DownloadWFSCard";
 import DownloadCloudOptimisedCard from "./DownloadCloudOptimisedCard";
-import SideCardContainer from "../../layout/SideCardContainer";
-import { DownloadServiceType } from "../../context/DownloadDefinitions";
+import SideCardContainer from "@/pages/detail-page/layout/SideCardContainer";
+import { DownloadServiceType } from "@/pages/detail-page/context/DownloadDefinitions";
 import { SearchKeys } from "@/components/search/constants";
 
 const DownloadCard: FC = () => {
@@ -74,6 +74,7 @@ const DownloadCard: FC = () => {
         return (
           <DownloadWFSCard
             uuid={collection?.id}
+            collectionTitle={collection?.title}
             downloadConditions={downloadConditions}
             getAndSetDownloadConditions={getAndSetDownloadConditions}
             removeDownloadCondition={removeDownloadCondition}
