@@ -8,6 +8,7 @@ import {
   hasDescription,
   openExtentPopup,
   renderDescriptionList,
+  sanitizeDescription,
 } from "../ExtentPopupUtils";
 
 // A Popup that records what it was given, the real one needs a WebGL map
@@ -77,12 +78,64 @@ describe("openExtentPopup", () => {
   });
 });
 
+describe("sanitizeDescription", () => {
+  it("should keep the line breaks and links some records carry", () => {
+    expect(
+      sanitizeDescription(
+        "Cape Flattery</br><a href='https://apps.aims.gov.au/metadata/view/1'>Metadata Record</a>"
+      )
+    ).toBe(
+      'Cape Flattery<br><a href="https://apps.aims.gov.au/metadata/view/1">Metadata Record</a>'
+    );
+  });
+
+  it("should turn newlines into line breaks", () => {
+    expect(sanitizeDescription("Pelorus Island\n\nCollection site")).toBe(
+      "Pelorus Island<br><br>Collection site"
+    );
+  });
+
+  it("should drop scripts, event handlers and javascript links", () => {
+    expect(
+      sanitizeDescription(
+        "<img src=x onerror=alert(1)>evil<script>alert(2)</script><a href='javascript:alert(3)' target='blank'>x</a>"
+      )
+    ).toBe("evil<a>x</a>");
+  });
+
+  it("should leave plain text with angle brackets readable", () => {
+    expect(sanitizeDescription("Region 1 < Region 2 & co")).toBe(
+      "Region 1 &lt; Region 2 &amp; co"
+    );
+  });
+});
+
 describe("renderDescriptionList", () => {
-  it("should render one plain-text line per description", () => {
-    const element = renderDescriptionList(["Site A", "<b>Site B</b>"], style);
+  it("should render one line per description with its markup", () => {
+    const element = renderDescriptionList(
+      ["Site A", "<b>Site B</b><script>alert(1)</script>"],
+      style
+    );
     const lines = Array.from(element.children).map((line) => line.textContent);
-    expect(lines).toEqual(["Site A", "<b>Site B</b>"]);
-    expect(element.querySelector("b")).toBeNull();
+    expect(lines).toEqual(["Site A", "Site B"]);
+    expect(element.querySelector("b")?.textContent).toBe("Site B");
+    expect(element.querySelector("script")).toBeNull();
+  });
+
+  it("should open links in a new tab", () => {
+    const element = renderDescriptionList(
+      [
+        "Reef</br><a href='https://apps.aims.gov.au/metadata/view/1'>Metadata Record</a>",
+      ],
+      style
+    );
+    const link = element.querySelector("a");
+    expect(link?.getAttribute("href")).toBe(
+      "https://apps.aims.gov.au/metadata/view/1"
+    );
+    expect(link?.target).toBe("_blank");
+    expect(link?.rel).toBe("noopener noreferrer");
+    expect(element.querySelector("br")).not.toBeNull();
   });
 
   it("should centre a single line and left-align a list that scrolls", () => {

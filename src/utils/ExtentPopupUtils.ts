@@ -6,6 +6,7 @@ import {
 } from "geojson";
 import { LngLatLike, Map as MapboxMap, Popup } from "mapbox-gl";
 import type { Theme } from "@mui/material/styles";
+import * as DOMPurify from "dompurify";
 
 // Spatial extent descriptions on the detail map.
 //
@@ -47,7 +48,19 @@ export const openExtentPopup = (
   return popup;
 };
 
-// One line per description, as plain text so metadata cannot inject markup.
+// Some records write line breaks and links into the description, keep those and drop the rest
+const DESCRIPTION_HTML = {
+  ALLOWED_TAGS: ["a", "br", "b", "i", "em", "strong"],
+  ALLOWED_ATTR: ["href"],
+};
+
+export const sanitizeDescription = (description: string): string =>
+  DOMPurify.default.sanitize(
+    description.replace(/\r?\n/g, "<br>"),
+    DESCRIPTION_HTML
+  );
+
+// One line per description, sanitized so metadata cannot inject scripts.
 // Long lists scroll instead of covering the map.
 export const renderDescriptionList = (
   descriptions: Array<string>,
@@ -62,7 +75,12 @@ export const renderDescriptionList = (
   content.style.overflowY = "auto";
   descriptions.forEach((description) => {
     const line = document.createElement("div");
-    line.textContent = description;
+    line.innerHTML = sanitizeDescription(description);
+    // Links open in a new tab so the map page stays put
+    line.querySelectorAll("a").forEach((link) => {
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+    });
     content.appendChild(line);
   });
   return content;
