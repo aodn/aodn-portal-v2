@@ -1,5 +1,15 @@
 import * as DOMPurify from "dompurify";
 
+/**
+ * Every link in the sanitized html opens in a new tab
+ */
+DOMPurify.default.addHook("afterSanitizeAttributes", (node) => {
+  if (node.tagName === "A") {
+    node.setAttribute("target", "_blank");
+    node.setAttribute("rel", "noopener noreferrer");
+  }
+});
+
 class InnerHtmlBuilder {
   private html: string = "";
   constructor() {}

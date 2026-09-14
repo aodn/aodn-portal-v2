@@ -63,9 +63,7 @@ describe("openExtentPopup", () => {
     });
     expect(popupCalls[1]).toEqual({ lngLat: [146.5, -18.5] });
     const content = popupCalls[2]?.content as HTMLElement;
-    expect(
-      Array.from(content.children).map((line) => line.textContent)
-    ).toEqual(["Masig", "Dungeness"]);
+    expect(content.innerHTML).toBe("Masig<br>Dungeness<br>");
     expect(content.style.fontFamily).toBe("Arial");
     expect(content.style.fontSize).toBe("12px");
     expect(content.style.color).toBe("rgb(51, 51, 51)");
@@ -78,11 +76,48 @@ describe("openExtentPopup", () => {
 });
 
 describe("renderDescriptionList", () => {
-  it("should render one plain-text line per description", () => {
-    const element = renderDescriptionList(["Site A", "<b>Site B</b>"], style);
-    const lines = Array.from(element.children).map((line) => line.textContent);
-    expect(lines).toEqual(["Site A", "<b>Site B</b>"]);
-    expect(element.querySelector("b")).toBeNull();
+  it("should render one line per description, keeping safe markup only", () => {
+    const element = renderDescriptionList(
+      ["Site A", "<b>Site B</b><script>alert(1)</script>"],
+      style
+    );
+    expect(element.innerHTML).toBe("Site A<br><b>Site B</b><br>");
+  });
+
+  it("should keep the line breaks and links some records carry", () => {
+    const element = renderDescriptionList(
+      [
+        "Cape Flattery</br><a href='https://apps.aims.gov.au/metadata/view/1' target='blank'>Metadata Record</a>",
+      ],
+      style
+    );
+    expect(element.innerHTML).toBe(
+      'Cape Flattery<br><a href="https://apps.aims.gov.au/metadata/view/1" target="_blank" rel="noopener noreferrer">Metadata Record</a><br>'
+    );
+  });
+
+  it("should keep newlines and let them render as line breaks", () => {
+    const element = renderDescriptionList(
+      ["Pelorus Island\n\nCollection site"],
+      style
+    );
+    expect(element.innerHTML).toBe("Pelorus Island\n\nCollection site<br>");
+    expect(element.style.whiteSpace).toBe("pre-line");
+  });
+
+  it("should drop event handlers and javascript links", () => {
+    const element = renderDescriptionList(
+      ["<img src=x onerror=alert(1)>evil<a href='javascript:alert(3)'>x</a>"],
+      style
+    );
+    expect(element.querySelector("img")?.getAttribute("onerror")).toBeNull();
+    expect(element.querySelector("a")?.getAttribute("href")).toBeNull();
+    expect(element.textContent).toBe("evilx");
+  });
+
+  it("should leave plain text with angle brackets readable", () => {
+    const element = renderDescriptionList(["Region 1 < Region 2 & co"], style);
+    expect(element.textContent).toBe("Region 1 < Region 2 & co");
   });
 
   it("should centre a single line and left-align a list that scrolls", () => {
