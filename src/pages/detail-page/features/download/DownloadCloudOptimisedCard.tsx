@@ -248,7 +248,16 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
                   ...portalTheme.typography.body3Small,
                 }}
               />
-            ) : undefined
+            ) : (
+              <LabelChip
+                text={["External"]}
+                color={portalTheme.palette.warning.light}
+                sx={{
+                  padding: "2px 8px",
+                  ...portalTheme.typography.body3Small,
+                }}
+              />
+            )
           }
           items={dataSelectOptions}
           value={selectedDataItem}
@@ -278,6 +287,7 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
         getAndSetDownloadConditions={getAndSetDownloadConditions}
         removeDownloadCondition={removeDownloadCondition}
         hideInfoMessage={showSizeWarning}
+        isExternal={!isImosOnly}
       />
       <DownloadDialog
         isOpen={downloadDialogOpen}

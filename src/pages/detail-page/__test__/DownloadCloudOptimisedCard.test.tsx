@@ -384,7 +384,13 @@ describe("DownloadCloudOptimisedCard", () => {
     it("should keep the subsetting info message when there is no size warning", async () => {
       estimateState.estimatedSizeBytes = 1024;
 
-      renderComponent();
+      renderComponent(
+        createMockCollection(DatasetType.ZARR),
+        [],
+        undefined,
+        mockSetSelectedCoKey,
+        true
+      );
 
       expect(await screen.findByText(SUBSETTING_INFO_TEXT)).toBeInTheDocument();
     });
@@ -415,7 +421,7 @@ describe("DownloadCloudOptimisedCard", () => {
     });
   });
 
-  describe("IMOS data selection tag", () => {
+  describe("IMOS/External data selection tag", () => {
     it("should show an IMOS tag next to Data Selection when the collection's dataset_group is exactly ['imos']", async () => {
       renderComponent(
         createMockCollection(DatasetType.ZARR),
@@ -428,13 +434,16 @@ describe("DownloadCloudOptimisedCard", () => {
       await waitFor(() => {
         expect(screen.getByTestId("label-chip-IMOS")).toBeInTheDocument();
       });
+      expect(
+        screen.queryByTestId("label-chip-External")
+      ).not.toBeInTheDocument();
     });
 
-    it("should not show an IMOS tag when the collection is not IMOS-only", async () => {
+    it("should show an External tag next to Data Selection when the collection is not IMOS-only", async () => {
       renderComponent();
 
       await waitFor(() => {
-        expect(screen.getByText("Data Selection")).toBeInTheDocument();
+        expect(screen.getByTestId("label-chip-External")).toBeInTheDocument();
       });
       expect(screen.queryByTestId("label-chip-IMOS")).not.toBeInTheDocument();
     });
