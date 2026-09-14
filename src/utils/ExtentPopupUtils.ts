@@ -6,7 +6,7 @@ import {
 } from "geojson";
 import { LngLatLike, Map as MapboxMap, Popup } from "mapbox-gl";
 import type { Theme } from "@mui/material/styles";
-import * as DOMPurify from "dompurify";
+import { InnerHtmlBuilder } from "@/utils/HtmlUtils";
 
 // Spatial extent descriptions on the detail map.
 //
@@ -48,20 +48,6 @@ export const openExtentPopup = (
   return popup;
 };
 
-// Some records write line breaks and links into the description, keep those and drop the rest
-const DESCRIPTION_HTML = {
-  ALLOWED_TAGS: ["a", "br", "b", "i", "em", "strong"],
-  ALLOWED_ATTR: ["href"],
-};
-
-export const sanitizeDescription = (description: string): string =>
-  DOMPurify.default.sanitize(
-    description.replace(/\r?\n/g, "<br>"),
-    DESCRIPTION_HTML
-  );
-
-// One line per description, sanitized so metadata cannot inject scripts.
-// Long lists scroll instead of covering the map.
 export const renderDescriptionList = (
   descriptions: Array<string>,
   style: PopupTextStyle
@@ -73,15 +59,15 @@ export const renderDescriptionList = (
   content.style.textAlign = descriptions.length > 1 ? "left" : "center";
   content.style.maxHeight = "150px";
   content.style.overflowY = "auto";
-  descriptions.forEach((description) => {
-    const line = document.createElement("div");
-    line.innerHTML = sanitizeDescription(description);
-    // Links open in a new tab so the map page stays put
-    line.querySelectorAll("a").forEach((link) => {
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-    });
-    content.appendChild(line);
+  // Some descriptions carry newlines
+  content.style.whiteSpace = "pre-line";
+  const builder = new InnerHtmlBuilder();
+  descriptions.forEach((description) => builder.addText(description));
+  content.innerHTML = builder.getHtml();
+  // Links open in a new tab
+  content.querySelectorAll("a").forEach((link) => {
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
   });
   return content;
 };
