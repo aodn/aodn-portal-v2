@@ -1,5 +1,6 @@
 import random
 import time
+from typing import Any
 
 from playwright.sync_api import Error, Locator, Page, TimeoutError, expect
 
@@ -198,8 +199,20 @@ class Map(BasePage):
 
     def center_map(self, lng: str, lat: str) -> None:
         """Center the map to a given longitude and latitude coordinates"""
-        execute_map_js(self.page, 'centerMap', self.map_id, lng, lat)
+        self._map_js('centerMap', self.map_id, lng, lat)
         self.wait_for_map_loading()
+
+    def _map_js(self, func_name: str, *args: Any) -> Any:
+        """
+        Run a map JS helper, waiting for the map to be registered first.
+
+        Call sites cannot be trusted to wait: several guard their wait behind
+        `if main_map.is_visible()`, which is False on a freshly opened tab, and
+        then read the map anyway. Putting the wait here means every map getter
+        is safe regardless of how the test got to it.
+        """
+        self.wait_for_map_registered()
+        return execute_map_js(self.page, func_name, *args)
 
     def wait_for_map_registered(self) -> None:
         """
@@ -248,7 +261,7 @@ class Map(BasePage):
     def get_map_layers(self) -> str:
         """Get the total number of heatmap layers"""
         self.wait_for_map_idle()
-        layers = execute_map_js(self.page, 'getMapLayers', self.map_id)
+        layers = self._map_js('getMapLayers', self.map_id)
         return str(layers)
 
     def get_layer_id_from_test_props(
@@ -259,7 +272,7 @@ class Map(BasePage):
             self.wait_for_map_loading()
         else:
             self.page.wait_for_timeout(1000)
-        layer_id = execute_map_js(self.page, layer_function_name, self.map_id)
+        layer_id = self._map_js(layer_function_name, self.map_id)
         return str(layer_id)
 
     def get_Allen_Coral_Atlas_Layer_id(self) -> str:
@@ -325,36 +338,34 @@ class Map(BasePage):
             zoom_level (float, optional): The zoom level to set the map to. Defaults to random.uniform(4, 6).
         """
         self.wait_for_map_loading()
-        execute_map_js(self.page, 'zoomToLevel', self.map_id, zoom_level)
+        self._map_js('zoomToLevel', self.map_id, zoom_level)
 
     def get_map_center(self) -> dict:
         """Get the current center coordinates of the map"""
-        map_center = execute_map_js(self.page, 'getMapCenter', self.map_id)
+        map_center = self._map_js('getMapCenter', self.map_id)
         return dict(map_center)
 
     def get_map_zoom(self) -> float:
         """Get the current zoom level of the map"""
-        map_zoom = execute_map_js(self.page, 'getMapZoom', self.map_id)
+        map_zoom = self._map_js('getMapZoom', self.map_id)
         return float(map_zoom)
 
     def find_and_click_cluster(self) -> bool:
         """Find and click on a cluster on the map"""
-        return execute_map_js(self.page, 'findAndClickCluster', self.map_id)
+        return self._map_js('findAndClickCluster', self.map_id)
 
     def get_map_click_lng_lat(self) -> dict:
         """Get the lnglat of the last clicked point on the map"""
-        click_coordinate = execute_map_js(
-            self.page, 'getMapClickLngLat', self.map_id
-        )
+        click_coordinate = self._map_js('getMapClickLngLat', self.map_id)
         return dict(click_coordinate)
 
     def fire_click_at_lng_lat(self, lng: float, lat: float) -> None:
         """Fire a programmatic map click at the given coordinates"""
-        execute_map_js(self.page, 'fireClickAtLngLat', self.map_id, lng, lat)
+        self._map_js('fireClickAtLngLat', self.map_id, lng, lat)
 
     def get_map_bounds(self) -> dict:
         """Get the current visible bounds of the map {west, east, south, north}"""
-        bounds = execute_map_js(self.page, 'getMapBounds', self.map_id)
+        bounds = self._map_js('getMapBounds', self.map_id)
         return dict(bounds)
 
     def find_and_click_data_point(
