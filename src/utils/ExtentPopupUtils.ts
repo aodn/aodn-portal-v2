@@ -64,11 +64,6 @@ export const renderDescriptionList = (
   const builder = new InnerHtmlBuilder();
   descriptions.forEach((description) => builder.addText(description));
   content.innerHTML = builder.getHtml();
-  // Links open in a new tab
-  content.querySelectorAll("a").forEach((link) => {
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-  });
   return content;
 };
 
