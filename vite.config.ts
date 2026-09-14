@@ -136,16 +136,19 @@ export default ({ mode }: ConfigEnv) => {
       chunkSizeWarningLimit: 1500,
       rollupOptions: {
         output: {
-          // Keep the big, rarely-changing vendors in their own long-lived
-          // chunks so a deploy does not invalidate them, and so the landing
-          // page never has to download mapbox-gl to paint.
-          // Only leaf libraries belong here. Naming a package that depends on
-          // @mui/material (x-charts did) drags those shared internals into the
-          // manual chunk, and then every chunk using MUI has to import it --
-          // which put the whole charting lib back on the landing page.
+          // Long-lived vendor chunks: a deploy touching only app code leaves
+          // them cached.
+          //
+          // A listed package drags its own dependencies into the chunk, and
+          // any other chunk needing one of those must then import this whole
+          // chunk. So only list a package whose deps are either in here too
+          // (react-redux and react-router-dom need react) or used nowhere
+          // else. Ignoring that put a megabyte-scale chunk on the landing
+          // page twice: @mui/x-charts via @mui/material internals, and
+          // @mapbox/mapbox-gl-draw via @turf/helpers.
           manualChunks: {
             react: ["react", "react-dom", "react-router-dom", "react-redux"],
-            mapbox: ["mapbox-gl", "@mapbox/mapbox-gl-draw"],
+            mapbox: ["mapbox-gl"],
           },
         },
       },
