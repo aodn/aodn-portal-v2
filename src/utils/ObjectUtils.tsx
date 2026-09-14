@@ -1,4 +1,4 @@
-import { merge } from "lodash";
+import merge from "lodash/merge";
 
 const groupBy = <T, K extends keyof T>(
   array: T[],

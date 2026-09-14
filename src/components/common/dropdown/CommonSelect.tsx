@@ -19,7 +19,7 @@ import {
 import { IconProps } from "../../icon/types";
 import { disableScroll, enableScroll } from "../../../utils/ScrollUtils";
 import { portalTheme } from "../../../styles";
-import { ExpandMore } from "@mui/icons-material";
+import ExpandMore from "@mui/icons-material/ExpandMore";
 
 export interface SelectItem<T = string> {
   queryable?: boolean;
