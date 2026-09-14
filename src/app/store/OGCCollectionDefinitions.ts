@@ -6,10 +6,10 @@ import {
   Point,
   Position,
 } from "geojson";
-import default_thumbnail from "@/assets/images/default-thumbnail.png";
-import { bboxPolygon } from "@turf/turf";
+import default_thumbnail from "@/assets/images/default-thumbnail.webp";
+import { bboxPolygon } from "@turf/bbox-polygon";
 
-import * as turf from "@turf/turf";
+import { lineString, point } from "@turf/helpers";
 import dayjs, { Dayjs } from "@/utils/DayjsUtils";
 import { formatDate } from "@/utils/DateUtils";
 import { IconWMS } from "@/components/icon/IconWMS";
@@ -445,7 +445,7 @@ export class OGCCollection {
   // It is a well form geometry collection of detail spatial extents
   getGeometry = (): GeometryCollection | undefined => this.propValue?.geometry;
   getCentroid = (): Array<Feature<Point>> | undefined =>
-    this.propValue?.centroid?.map((i) => turf.point(i));
+    this.propValue?.centroid?.map((i) => point(i));
   getExtent = () => this.propExtent;
   getCitation = (): ICitation | undefined => this.propValue?.citation;
   getStatement = (): string | undefined => this.propValue?.statement;
@@ -628,16 +628,16 @@ export class Spatial {
             return bboxPolygon([pos[0], pos[1], pos[2], pos[3]]);
           } else if (pos[0] === pos[2] && pos[1] === pos[3]) {
             // Must be point
-            return turf.point(pos);
+            return point(pos);
           }
         } else {
-          return turf.lineString([
+          return lineString([
             [pos[0], pos[1]],
             [pos[2], pos[3]],
           ]);
         }
         // Assume it is point it will be two pos
-        return turf.point(pos);
+        return point(pos);
       });
 
       // Add individual bounding boxes and points

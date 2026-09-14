@@ -16,7 +16,7 @@ import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import InstagramIcon from "@mui/icons-material/Instagram";
-import traditional from "@/assets/icons/traditional.png";
+import traditional from "@/assets/icons/traditional.webp";
 import {
   borderRadius,
   color,
@@ -227,7 +227,13 @@ const Footer: FC = () => {
                     marginBottom={2}
                   >
                     {/* Decorative: the acknowledgement text alongside carries the meaning */}
-                    <Avatar src={traditional} alt="" />
+                    <Avatar
+                      src={traditional}
+                      alt=""
+                      slotProps={{
+                        img: { loading: "lazy", decoding: "async" },
+                      }}
+                    />
                     <Typography color="#000" fontSize={fontSize.subscription}>
                       IMOS acknowledges the Traditional Custodians and Elders of
                       the land and sea on which we work and observe, and

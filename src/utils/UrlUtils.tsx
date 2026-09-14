@@ -1,4 +1,4 @@
-import { escapeRegExp } from "lodash";
+import escapeRegExp from "lodash/escapeRegExp";
 
 // Table lookup for param shortening, simple replacement
 const paramLookup: Map<string, string> = new Map<string, string>([

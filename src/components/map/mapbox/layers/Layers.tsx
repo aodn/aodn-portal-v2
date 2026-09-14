@@ -1,7 +1,8 @@
 import { Dispatch, PropsWithChildren, SetStateAction } from "react";
 import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson";
 import { LngLatBounds, MapMouseEvent, LngLat, Map as Mapbox } from "mapbox-gl";
-import * as turf from "@turf/turf";
+import { distance } from "@turf/distance";
+import { point } from "@turf/helpers";
 import { TabNavigation } from "@/hooks/useTabNavigation";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 
@@ -102,12 +103,12 @@ const findSuitableVisiblePoint = (
 
   // If more than one point is visible, we select one (e.g., based on proximity to the center)
   // This part can be adjusted based on criteria (distance from center, zoom, etc.)
-  const mapCenter = turf.point([map.getCenter().lng, map.getCenter().lat]);
+  const mapCenter = point([map.getCenter().lng, map.getCenter().lat]);
   visibleFeatures.sort((a, b) => {
-    const distA = turf.distance(mapCenter, a.geometry.coordinates, {
+    const distA = distance(mapCenter, a.geometry.coordinates, {
       units: "kilometers",
     });
-    const distB = turf.distance(mapCenter, b.geometry.coordinates, {
+    const distB = distance(mapCenter, b.geometry.coordinates, {
       units: "kilometers",
     });
     return distA - distB; // Sort by proximity to the map center

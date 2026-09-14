@@ -1,4 +1,4 @@
-import icon_img from "@/assets/logos/csiro-logo.png";
+import icon_img from "@/assets/logos/csiro-logo.webp";
 import IconContainer from "../IconContainer";
 
 const CSIROIcon = () => {

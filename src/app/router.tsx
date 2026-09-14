@@ -1,6 +1,3 @@
-import LandingPage from "../pages/landing-page/LandingPage";
-import SearchPage from "../pages/search-page/SearchPage";
-import DetailsPage from "../pages/detail-page/DetailsPage";
 import { createBrowserRouter, redirect } from "react-router-dom";
 import NotFoundPage from "../pages/error-page/NotFoundPage";
 import ErrorPage from "../pages/error-page/ErrorPage";
@@ -10,8 +7,15 @@ import HealthChecker from "@/utils/HealthChecker";
 import DegradedPage from "../pages/error-page/DegradedPage";
 import { syncCanonicalUrl } from "@/seo/canonicalUrl";
 import Layout from "./layout/Layout";
-import React from "react";
-import DownloadsPage from "@/pages/downloads-page/DownloadsPage";
+import React, { Suspense, lazy } from "react";
+import Fallback from "@/pages/error-page/Fallback";
+
+const LandingPage = lazy(() => import("../pages/landing-page/LandingPage"));
+const SearchPage = lazy(() => import("../pages/search-page/SearchPage"));
+const DetailsPage = lazy(() => import("../pages/detail-page/DetailsPage"));
+const DownloadsPage = lazy(
+  () => import("@/pages/downloads-page/DownloadsPage")
+);
 
 // Helper to conditionally wrap a page with HealthChecker based on the mode
 const wrapWithHealthChecker = (node: React.ReactNode) =>
@@ -20,6 +24,15 @@ const wrapWithHealthChecker = (node: React.ReactNode) =>
   ) : (
     node
   );
+
+// Suspense sits inside ErrorBoundary and inside HealthChecker so a chunk that
+// fails to load still surfaces through the existing error/degraded handling
+// rather than bubbling past it.
+const wrapPage = (node: React.ReactNode) => (
+  <ErrorBoundary>
+    {wrapWithHealthChecker(<Suspense fallback={<Fallback />}>{node}</Suspense>)}
+  </ErrorBoundary>
+);
 
 export const searchLoader = ({ request }: { request: Request }) => {
   const url = new URL(request.url);
@@ -41,34 +54,20 @@ const router = createBrowserRouter([
     children: [
       {
         path: pageDefault.landing,
-        element: (
-          <ErrorBoundary>
-            {wrapWithHealthChecker(<LandingPage />)}
-          </ErrorBoundary>
-        ),
+        element: wrapPage(<LandingPage />),
       },
       {
         path: pageDefault.search,
         loader: searchLoader,
-        element: (
-          <ErrorBoundary>{wrapWithHealthChecker(<SearchPage />)}</ErrorBoundary>
-        ),
+        element: wrapPage(<SearchPage />),
       },
       {
         path: `${pageDefault.details}/:uuid`,
-        element: (
-          <ErrorBoundary>
-            {wrapWithHealthChecker(<DetailsPage />)}
-          </ErrorBoundary>
-        ),
+        element: wrapPage(<DetailsPage />),
       },
       {
         path: pageDefault.downloads,
-        element: (
-          <ErrorBoundary>
-            {wrapWithHealthChecker(<DownloadsPage />)}
-          </ErrorBoundary>
-        ),
+        element: wrapPage(<DownloadsPage />),
       },
     ],
   },

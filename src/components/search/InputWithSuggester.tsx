@@ -35,7 +35,7 @@ import {
   gap,
   padding,
 } from "../../styles/constants";
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
 import { sortByRelevance } from "../../utils/Helpers";
 import { useAppDispatch } from "@/app/store/hooks";
 import {

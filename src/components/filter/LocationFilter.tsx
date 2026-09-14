@@ -23,7 +23,8 @@ import {
   updateFilterStaticAreas,
 } from "@/app/store/componentParamReducer";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
-import { featureCollection, union } from "@turf/turf";
+import { featureCollection } from "@turf/helpers";
+import { union } from "@turf/union";
 import { isValidPolygonFeature } from "@/utils/GeoJsonUtils";
 import {
   fetchAllenCoralAtlasOptions,
