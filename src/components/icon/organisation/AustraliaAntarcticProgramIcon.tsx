@@ -1,4 +1,4 @@
-import icon_img from "@/assets/logos/aad_color_logo.png";
+import icon_img from "@/assets/logos/aad_color_logo.webp";
 import IconContainer from "../IconContainer";
 
 const AustraliaAntarcticProgramIcon = () => {

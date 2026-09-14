@@ -11,6 +11,8 @@ const Logo: FC<LogoProps> = ({ src, alt, height = "80%" }) => {
     <img
       src={src}
       alt={alt}
+      loading="lazy"
+      decoding="async"
       style={{
         objectFit: "contain",
         width: "80%",

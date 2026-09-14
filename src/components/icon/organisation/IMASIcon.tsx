@@ -1,4 +1,4 @@
-import icon_img from "@/assets/logos/imas-logo.png";
+import icon_img from "@/assets/logos/imas-logo.webp";
 import IconContainer from "../IconContainer";
 
 const IMASIcon = () => {
