@@ -454,6 +454,7 @@ export class OGCCollection {
   getRevision = (): string | undefined => this.propValue?.revision;
   getDatasetProvider = (): string | undefined =>
     this.propValue?.dataset_provider;
+  getDatasetGroup = (): string[] | undefined => this.propValue?.dataset_group;
   getMetadataUrl = (): string | undefined =>
     this.links?.filter(
       (link) =>

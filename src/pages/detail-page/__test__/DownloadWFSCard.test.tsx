@@ -109,7 +109,7 @@ const expectWarningLevel = (level: DownloadSizeWarningLevel) =>
 
 const renderComponent = (
   uuid: string | undefined = TEST_UUID,
-  isImosProvider?: boolean,
+  isImosOnly?: boolean,
   collectionTitle?: string
 ) =>
   render(
@@ -130,7 +130,7 @@ const renderComponent = (
                     }
                     removeDownloadCondition={mockRemoveDownloadCondition}
                     onWFSAvailabilityChange={mockOnWFSAvailabilityChange}
-                    isImosProvider={isImosProvider}
+                    isImosOnly={isImosOnly}
                   />
                 }
               />
@@ -309,7 +309,7 @@ describe("DownloadWFSCard", () => {
     });
   });
 
-  it("should show an IMOS tag next to Data Selection when the collection is IMOS-provided", async () => {
+  it("should show an IMOS tag next to Data Selection when the collection's dataset_group is exactly ['imos']", async () => {
     renderComponent(TEST_UUID, true);
 
     await waitFor(() => {
@@ -318,7 +318,7 @@ describe("DownloadWFSCard", () => {
     expect(screen.queryByTestId("label-chip-External")).not.toBeInTheDocument();
   });
 
-  it("should show an External tag next to Data Selection when the collection is not IMOS-provided, since WFS is served by an external Geoserver", async () => {
+  it("should show an External tag next to Data Selection when the collection is not IMOS-only, since WFS is served by an external Geoserver", async () => {
     renderComponent(TEST_UUID, false);
 
     await waitFor(() => {

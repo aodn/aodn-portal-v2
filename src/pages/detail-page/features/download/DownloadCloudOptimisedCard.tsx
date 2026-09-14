@@ -46,7 +46,7 @@ interface DownloadCardProps extends DownloadCondition {
   collection: OGCCollection;
   selectedCoKey?: string;
   setSelectedCoKey?: (value: string) => void;
-  isImosProvider?: boolean;
+  isImosOnly?: boolean;
 }
 
 const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
@@ -56,7 +56,7 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
   removeDownloadCondition,
   selectedCoKey,
   setSelectedCoKey,
-  isImosProvider,
+  isImosOnly,
 }) => {
   const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
   const {
@@ -239,7 +239,7 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
         <DownloadSelect
           label="Data Selection"
           labelAdornment={
-            isImosProvider ? (
+            isImosOnly ? (
               <LabelChip
                 text={["IMOS"]}
                 color={portalTheme.palette.tag3}

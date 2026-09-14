@@ -1,4 +1,5 @@
 import { BBox, MultiPolygon } from "geojson";
+import { SearchKeys } from "@/components/search/constants";
 
 export enum DownloadConditionType {
   BBOX = "bbox",
@@ -71,6 +72,11 @@ export interface DatasetDownloadRequest {
     failedUri: string;
   };
 }
+
+// True only when dataset_group is exactly ["imos"] (case-insensitive) — any other value or combination, even one that still includes "imos", is external.
+export const isImosOnlyDataset = (datasetGroup?: string[]): boolean =>
+  datasetGroup?.length === 1 &&
+  datasetGroup[0]?.toLowerCase() === SearchKeys.IMOS;
 
 export const getValidEstimatedSizeBytes = (
   estimatedSizeBytes?: number | null

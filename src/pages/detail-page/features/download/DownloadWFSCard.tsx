@@ -52,7 +52,7 @@ interface DownloadWFSCardProps extends DownloadCondition {
   uuid?: string;
   collectionTitle?: string;
   onWFSAvailabilityChange?: (isWFSAvailable: boolean) => void;
-  isImosProvider?: boolean;
+  isImosOnly?: boolean;
 }
 
 const formWfsDataOptions = (
@@ -94,7 +94,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
   getAndSetDownloadConditions,
   removeDownloadCondition,
   onWFSAvailabilityChange,
-  isImosProvider,
+  isImosOnly,
 }) => {
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const {
@@ -297,7 +297,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
         <DownloadSelect
           label="Data Selection"
           labelAdornment={
-            isImosProvider ? (
+            isImosOnly ? (
               <LabelChip
                 text={["IMOS"]}
                 color={portalTheme.palette.tag3}
@@ -354,7 +354,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
         removeDownloadCondition={removeDownloadCondition}
         hideInfoMessage={isDownloading || showSizeWarning}
         disable={isDownloading}
-        isExternal={!isImosProvider}
+        isExternal={!isImosOnly}
         sx={{ px: "16px" }}
       />
       <Snackbar

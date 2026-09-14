@@ -122,7 +122,7 @@ describe("DownloadCloudOptimisedCard", () => {
     downloadConditions: any[] = [],
     selectedCoKey?: string,
     setSelectedCoKey = mockSetSelectedCoKey,
-    isImosProvider?: boolean
+    isImosOnly?: boolean
   ) => {
     return render(
       <Provider store={store}>
@@ -136,7 +136,7 @@ describe("DownloadCloudOptimisedCard", () => {
                 removeDownloadCondition={mockRemoveDownloadCondition}
                 selectedCoKey={selectedCoKey}
                 setSelectedCoKey={setSelectedCoKey}
-                isImosProvider={isImosProvider}
+                isImosOnly={isImosOnly}
               />
             </AppLocalizationProvider>
           </ThemeProvider>
@@ -416,7 +416,7 @@ describe("DownloadCloudOptimisedCard", () => {
   });
 
   describe("IMOS data selection tag", () => {
-    it("should show an IMOS tag next to Data Selection when the collection is IMOS-provided", async () => {
+    it("should show an IMOS tag next to Data Selection when the collection's dataset_group is exactly ['imos']", async () => {
       renderComponent(
         createMockCollection(DatasetType.ZARR),
         [],
@@ -430,7 +430,7 @@ describe("DownloadCloudOptimisedCard", () => {
       });
     });
 
-    it("should not show an IMOS tag when the collection is not IMOS-provided", async () => {
+    it("should not show an IMOS tag when the collection is not IMOS-only", async () => {
       renderComponent();
 
       await waitFor(() => {
