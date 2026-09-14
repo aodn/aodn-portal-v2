@@ -201,9 +201,26 @@ class Map(BasePage):
         execute_map_js(self.page, 'centerMap', self.map_id, lng, lat)
         self.wait_for_map_loading()
 
+    def wait_for_map_registered(self) -> None:
+        """
+        Wait until TestHelper has registered the map on window.testProps.
+
+        The container is attached to the DOM before the mapbox instance exists,
+        and the page code that creates it is loaded on demand, so waiting for
+        the selector alone is not enough: the map getters would run against an
+        unregistered map and fail.
+        """
+        self.page.wait_for_selector(f'#{self.map_id}', state='attached')
+        try:
+            wait_for_js_function(
+                self.page, 'isMapRegistered', 20000, self.map_id
+            )
+        except TimeoutError:
+            pass  # Let the caller fail with its own assertion instead
+
     def wait_for_map_loading(self) -> None:
         """Wait until the map is fully loaded"""
-        self.page.wait_for_selector(f'#{self.map_id}', state='attached')
+        self.wait_for_map_registered()
         try:
             wait_for_js_function(self.page, 'isMapLoaded', 20000, self.map_id)
         except TimeoutError:
@@ -211,7 +228,7 @@ class Map(BasePage):
 
     def wait_for_map_idle(self) -> None:
         """Wait until the map is idle"""
-        self.page.wait_for_selector(f'#{self.map_id}', state='attached')
+        self.wait_for_map_registered()
         try:
             wait_for_js_function(self.page, 'isMapIdle', 20000, self.map_id)
         except TimeoutError:
