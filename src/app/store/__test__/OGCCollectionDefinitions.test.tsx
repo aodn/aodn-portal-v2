@@ -470,4 +470,25 @@ describe("OGCCollection", () => {
       expect(allGroupedLinks?.[0].title).toBe("WMS Fallback");
     });
   });
+
+  describe("isImosOnly", () => {
+    it.each([
+      [["imos"], true],
+      [["IMOS"], true],
+      [["aims"], false],
+      [["csiro"], false],
+      [["imos", "aims"], false],
+      [["imos", "csiro"], false],
+      [[], false],
+      [undefined, false],
+    ])(
+      "treats dataset_group %s as isImosOnly = %s",
+      (datasetGroup, expected) => {
+        const collection = new OGCCollection();
+        collection.properties = { dataset_group: datasetGroup };
+
+        expect(collection.isImosOnly()).toBe(expected);
+      }
+    );
+  });
 });

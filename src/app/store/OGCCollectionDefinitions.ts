@@ -15,6 +15,7 @@ import { formatDate } from "@/utils/DateUtils";
 import { IconWMS } from "@/components/icon/IconWMS";
 import { IconWFS } from "@/components/icon/IconWFS";
 import { IconLink } from "@/components/icon/IconLink";
+import { SearchKeys } from "@/components/search/constants";
 
 // interfaces:
 export interface IKeyword {
@@ -455,6 +456,11 @@ export class OGCCollection {
   getDatasetProvider = (): string | undefined =>
     this.propValue?.dataset_provider;
   getDatasetGroup = (): string[] | undefined => this.propValue?.dataset_group;
+  // True only when dataset_group is exactly ["imos"] (case-insensitive) — any other value or combination, even one that still includes "imos", is external.
+  isImosOnly = (): boolean => {
+    const group = this.getDatasetGroup();
+    return group?.length === 1 && group[0]?.toLowerCase() === SearchKeys.IMOS;
+  };
   getMetadataUrl = (): string | undefined =>
     this.links?.filter(
       (link) =>

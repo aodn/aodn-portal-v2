@@ -3,10 +3,7 @@ import { useDetailPageContext } from "@/pages/detail-page/context/detail-page-co
 import DownloadWFSCard from "./DownloadWFSCard";
 import DownloadCloudOptimisedCard from "./DownloadCloudOptimisedCard";
 import SideCardContainer from "../../layout/SideCardContainer";
-import {
-  DownloadServiceType,
-  isImosOnlyDataset,
-} from "../../context/DownloadDefinitions";
+import { DownloadServiceType } from "../../context/DownloadDefinitions";
 
 const DownloadCard: FC = () => {
   const {
@@ -23,7 +20,7 @@ const DownloadCard: FC = () => {
   const [wfsLinks, hasCloudOptimisedData, isImosOnly] = useMemo(() => {
     const wfsLinks = collection?.getWFSLinks() || [];
     const hasCloudOptimisedData = collection?.hasCloudOptimisedData() || false;
-    const isImosOnly = isImosOnlyDataset(collection?.getDatasetGroup());
+    const isImosOnly = collection?.isImosOnly() ?? false;
     return [wfsLinks, hasCloudOptimisedData, isImosOnly];
   }, [collection]);
 
