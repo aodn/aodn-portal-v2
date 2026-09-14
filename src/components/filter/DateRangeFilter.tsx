@@ -369,19 +369,22 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
     )
       .unwrap()
       .then((value: string) => {
-        // Find all id of collection from imosOnly
+        // Find all id of collection from imosOnly. The CQL filter below is a
+        // coarse pre-filter (it may also match a dataset_group that merely
+        // contains "imos" alongside other groups); isImosOnly() enforces the
+        // exact ["imos"]-only rule client-side.
         dispatch(
           fetchResultNoStore({
-            properties: "id,providers",
+            properties: "id,dataset_group",
             filter: `${cqlDefaultFilters.get("ALL_TIME_RANGE")} AND ${(cqlDefaultFilters.get("DATASET_GROUP") as DatasetGroup)("imos")}`,
             sortby: "id",
           })
         )
           .unwrap()
           .then((imosOnlyCollection: string) => {
-            const ids = jsonToOGCCollections(
-              imosOnlyCollection
-            ).collections.map((value: OGCCollection) => value.id);
+            const ids = jsonToOGCCollections(imosOnlyCollection)
+              .collections.filter((value: OGCCollection) => value.isImosOnly())
+              .map((value: OGCCollection) => value.id);
             setImosDataIds(ids);
             setTotalDataset(jsonToOGCCollections(value));
           });
