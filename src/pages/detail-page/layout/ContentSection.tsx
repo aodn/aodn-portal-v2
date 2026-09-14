@@ -22,7 +22,7 @@ import { LngLatBounds, MapEvent } from "mapbox-gl";
 import { detailPageDefault, pageReferer } from "@/components/common/constants";
 import useTabNavigation from "../../../hooks/useTabNavigation";
 import useBreakpoint from "../../../hooks/useBreakpoint";
-import notMatchingRecordImage from "@/assets/images/no_matching_record.png";
+import notMatchingRecordImage from "@/assets/images/no_matching_record.webp";
 
 interface ContentSectionProps {
   mapFocusArea?: LngLatBounds;

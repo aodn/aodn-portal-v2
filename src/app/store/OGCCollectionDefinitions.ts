@@ -6,7 +6,7 @@ import {
   Point,
   Position,
 } from "geojson";
-import default_thumbnail from "@/assets/images/default-thumbnail.png";
+import default_thumbnail from "@/assets/images/default-thumbnail.webp";
 import { bboxPolygon } from "@turf/turf";
 
 import * as turf from "@turf/turf";

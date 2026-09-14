@@ -7,8 +7,8 @@ import {
 } from "../OGCCollectionDefinitions"; // Adjust the import path as needed
 
 // Mock the imported icons and default thumbnail
-vi.mock("@/assets/images/default-thumbnail.png", () => ({
-  default: "mocked-default-thumbnail.png",
+vi.mock("@/assets/images/default-thumbnail.webp", () => ({
+  default: "mocked-default-thumbnail.webp",
 }));
 vi.mock("@/components/assets/icons/wms.png", () => "mocked-wms-icon.png");
 vi.mock("@/components/assets/icons/wfs.png", () => "mocked-wfs-icon.png");
@@ -37,7 +37,7 @@ describe("OGCCollection", () => {
       collection.links = [];
 
       const result = collection.findThumbnail();
-      expect(result).toBe("mocked-default-thumbnail.png");
+      expect(result).toBe("mocked-default-thumbnail.webp");
     });
 
     it("should return the default thumbnail when preview link exists but href is empty", () => {
@@ -53,7 +53,7 @@ describe("OGCCollection", () => {
       ];
 
       const result = collection.findThumbnail();
-      expect(result).toBe("mocked-default-thumbnail.png");
+      expect(result).toBe("mocked-default-thumbnail.webp");
     });
 
     it("should return the default thumbnail when no link matches type 'image' and rel 'preview'", () => {
@@ -70,7 +70,7 @@ describe("OGCCollection", () => {
       ];
 
       const result = collection.findThumbnail();
-      expect(result).toBe("mocked-default-thumbnail.png");
+      expect(result).toBe("mocked-default-thumbnail.webp");
     });
 
     it("should return a static map url when no preview link exists but bbox does", () => {
@@ -127,7 +127,7 @@ describe("OGCCollection", () => {
       collection.extentInt = spatial;
 
       const result = collection.findThumbnail();
-      expect(result).toBe("mocked-default-thumbnail.png");
+      expect(result).toBe("mocked-default-thumbnail.webp");
       vi.unstubAllEnvs();
     });
 
