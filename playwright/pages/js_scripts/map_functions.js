@@ -1,6 +1,19 @@
 window.__map_functions = {
+  // TestHelper populates window.testProps from a useEffect, so it does not
+  // exist yet while the page is still booting. Reading it unguarded threw
+  // "Cannot read properties of undefined", which surfaced as a hard error
+  // instead of letting the callers below wait.
   getTestProps: function (id) {
-    return window.testProps[id];
+    return (window.testProps || {})[id];
+  },
+  // True once TestHelper has registered this map. Use it to wait rather than
+  // assuming the map exists as soon as its container is in the DOM: the
+  // container is attached before the map instance is created and registered.
+  isMapRegistered: function (mapId) {
+    const props = this.getTestProps(mapId);
+    return Boolean(
+      props && typeof props.getMap === "function" && props.getMap()
+    );
   },
   getMap: function (mapId) {
     return this.getTestProps(mapId).getMap();
@@ -19,12 +32,12 @@ window.__map_functions = {
     map.setCenter([lng, lat]);
   },
   isMapLoaded: function (mapId) {
-    const map = this.getMap(mapId);
-    return map.loaded();
+    if (!this.isMapRegistered(mapId)) return false;
+    return this.getMap(mapId).loaded();
   },
   isMapIdle: function (mapId) {
-    const map = this.getMap(mapId);
-    return map.idle();
+    if (!this.isMapRegistered(mapId)) return false;
+    return this.getMap(mapId).idle();
   },
   getMapLayers: function (mapId) {
     const map = this.getMap(mapId);

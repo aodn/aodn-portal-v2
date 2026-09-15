@@ -52,9 +52,12 @@ vi.mock("./analytics/customEventTracker", () => ({
 
 // A global mock to avoid real layer fetch calls, if you need different return value
 // you can override in the test file
-vi.mock("./components/map/mapbox/layers/StaticLayer", async () => {
+// Mock the leaf module, not StaticLayer: StaticLayer re-exports these fetchers,
+// so mocking here covers both import paths without pulling mapbox-gl into the
+// module graph.
+vi.mock("./components/map/mapbox/layers/staticLayerOptions", async () => {
   const actual = (await vi.importActual(
-    "./components/map/mapbox/layers/StaticLayer"
+    "./components/map/mapbox/layers/staticLayerOptions"
   )) as any;
   return {
     ...actual,
