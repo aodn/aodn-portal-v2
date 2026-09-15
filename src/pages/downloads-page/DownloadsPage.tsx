@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import ListAltOutlinedIcon from "@mui/icons-material/ListAltOutlined";
 import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
@@ -15,6 +15,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  ToggleButton,
+  ToggleButtonGroup,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -28,24 +30,49 @@ import {
 } from "@/app/store/DownloadStatusDefinitions";
 import { portalTheme } from "@/styles";
 import useBreakpoint from "@/hooks/useBreakpoint";
-import { toAppDayjs, formatDateTime } from "@/utils/DateUtils";
+import {
+  toAppDayjs,
+  formatDateTime,
+  formatLocalDate,
+  formatLocalTime,
+} from "@/utils/DateUtils";
 import { dateDefault } from "@/components/common/constants";
+import {
+  DownloadTimeZoneMode,
+  getDownloadTimeZoneMode,
+  setDownloadTimeZoneMode,
+} from "@/utils/DownloadStorageUtils";
 import useDownloadStatus from "./useDownloadStatus";
 
 const EMPTY_VALUE = "—";
+const DATE_CELL_TABLE_WIDTH = 150;
 
 interface DateCellProps {
   value?: string;
+  timeZoneMode: DownloadTimeZoneMode;
+  width?: number;
 }
 
-const DateCell = ({ value }: DateCellProps) => {
-  const datePart = formatDateTime(value, dateDefault.DISPLAY_FORMAT);
+const DateCell = ({ value, timeZoneMode, width }: DateCellProps) => {
+  const datePart =
+    timeZoneMode === "utc"
+      ? formatDateTime(value, dateDefault.DISPLAY_FORMAT)
+      : formatLocalDate(value);
   if (!datePart) return <>{EMPTY_VALUE}</>;
 
-  const timePart = formatDateTime(value, dateDefault.UTC_TIME_DISPLAY_FORMAT);
+  const timePart =
+    timeZoneMode === "utc"
+      ? formatDateTime(value, dateDefault.UTC_TIME_DISPLAY_FORMAT)
+      : formatLocalTime(value);
 
   return (
-    <Stack spacing={0} whiteSpace="nowrap">
+    <Stack
+      spacing={0}
+      sx={{
+        whiteSpace: width ? "normal" : "nowrap",
+        ...(width ? { width } : {}),
+      }}
+    >
       <Typography component="span" variant="body3Small">
         {datePart}
       </Typography>
@@ -324,12 +351,15 @@ const MobileField = ({ label, children }: MobileFieldProps) => (
   </Stack>
 );
 
-type DownloadMobileCardProps = DownloadActionsProps;
+interface DownloadMobileCardProps extends DownloadActionsProps {
+  timeZoneMode: DownloadTimeZoneMode;
+}
 
 const DownloadMobileCard = ({
   download,
   retryDownload,
   removeDownload,
+  timeZoneMode,
 }: DownloadMobileCardProps) => (
   <Box
     component="li"
@@ -389,16 +419,19 @@ const DownloadMobileCard = ({
           {formatDuration(download.started, download.finished)}
         </MobileField>
         <MobileField label="Created">
-          <DateCell value={download.created} />
+          <DateCell value={download.created} timeZoneMode={timeZoneMode} />
         </MobileField>
         <MobileField label="Started">
-          <DateCell value={download.started} />
+          <DateCell value={download.started} timeZoneMode={timeZoneMode} />
         </MobileField>
         <MobileField label="Finished">
-          <DateCell value={download.finished} />
+          <DateCell value={download.finished} timeZoneMode={timeZoneMode} />
         </MobileField>
         <MobileField label="Last checked">
-          <DateCell value={download.lastCheckedAt} />
+          <DateCell
+            value={download.lastCheckedAt}
+            timeZoneMode={timeZoneMode}
+          />
         </MobileField>
       </Box>
 
@@ -419,9 +452,59 @@ const DownloadMobileCard = ({
   </Box>
 );
 
+const TimeZoneToggle = ({
+  timeZoneMode,
+  onChange,
+}: {
+  timeZoneMode: DownloadTimeZoneMode;
+  onChange: (mode: DownloadTimeZoneMode) => void;
+}) => (
+  <ToggleButtonGroup
+    value={timeZoneMode}
+    exclusive
+    size="small"
+    aria-label="Time zone"
+    onChange={(_, mode: DownloadTimeZoneMode | null) => {
+      if (mode) onChange(mode);
+    }}
+    sx={{
+      border: `1px solid ${portalTheme.palette.primary4}`,
+      borderRadius: "999px",
+      backgroundColor: portalTheme.palette.primary6,
+      padding: "3px",
+      "& .MuiToggleButtonGroup-grouped": {
+        border: 0,
+        borderRadius: "999px !important",
+        textTransform: "none",
+        ...portalTheme.typography.body3Small,
+        fontWeight: 600,
+        color: portalTheme.palette.grey700,
+        px: 1.75,
+        py: 0.25,
+        "&.Mui-selected": {
+          backgroundColor: portalTheme.palette.primary1,
+          color: portalTheme.palette.neutral2,
+          "&:hover": { backgroundColor: portalTheme.palette.primary1 },
+        },
+      },
+    }}
+  >
+    <ToggleButton value="local">Local</ToggleButton>
+    <ToggleButton value="utc">UTC</ToggleButton>
+  </ToggleButtonGroup>
+);
+
 const DownloadsPage = () => {
   const { downloads, retryDownload, removeDownload } = useDownloadStatus();
   const { isUnderLaptop } = useBreakpoint();
+  const [timeZoneMode, setTimeZoneMode] = useState<DownloadTimeZoneMode>(
+    getDownloadTimeZoneMode
+  );
+
+  const handleTimeZoneModeChange = (mode: DownloadTimeZoneMode) => {
+    setTimeZoneMode(mode);
+    setDownloadTimeZoneMode(mode);
+  };
 
   return (
     <SectionContainer
@@ -467,9 +550,24 @@ const DownloadsPage = () => {
               Downloads
             </Typography>
           </Stack>
-          <Typography variant="body3Small" color={portalTheme.palette.grey700}>
-            Status is shown for jobs created in this browser.
-          </Typography>
+          <Stack
+            direction="row"
+            spacing={1.5}
+            alignItems="center"
+            flexWrap="wrap"
+            useFlexGap
+          >
+            <Typography
+              variant="body3Small"
+              color={portalTheme.palette.grey700}
+            >
+              Status is shown for jobs created in this browser.
+            </Typography>
+            <TimeZoneToggle
+              timeZoneMode={timeZoneMode}
+              onChange={handleTimeZoneModeChange}
+            />
+          </Stack>
         </Stack>
 
         {downloads.length === 0 ? (
@@ -494,6 +592,7 @@ const DownloadsPage = () => {
                 download={download}
                 retryDownload={retryDownload}
                 removeDownload={removeDownload}
+                timeZoneMode={timeZoneMode}
               />
             ))}
           </Box>
@@ -589,19 +688,35 @@ const DownloadsPage = () => {
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <DateCell value={download.created} />
+                        <DateCell
+                          value={download.created}
+                          timeZoneMode={timeZoneMode}
+                          width={DATE_CELL_TABLE_WIDTH}
+                        />
                       </TableCell>
                       <TableCell>
-                        <DateCell value={download.started} />
+                        <DateCell
+                          value={download.started}
+                          timeZoneMode={timeZoneMode}
+                          width={DATE_CELL_TABLE_WIDTH}
+                        />
                       </TableCell>
                       <TableCell>
-                        <DateCell value={download.finished} />
+                        <DateCell
+                          value={download.finished}
+                          timeZoneMode={timeZoneMode}
+                          width={DATE_CELL_TABLE_WIDTH}
+                        />
                       </TableCell>
                       <TableCell>
                         {formatDuration(download.started, download.finished)}
                       </TableCell>
                       <TableCell>
-                        <DateCell value={download.lastCheckedAt} />
+                        <DateCell
+                          value={download.lastCheckedAt}
+                          timeZoneMode={timeZoneMode}
+                          width={DATE_CELL_TABLE_WIDTH}
+                        />
                       </TableCell>
                       <TableCell>
                         <DownloadActions

@@ -67,6 +67,7 @@ const SpatialCoverageCard: FC<SpatialCoverageCardProps> = ({
                 onMouseMove={onMouseMoveHandler}
                 animate={false}
                 visible={true}
+                showExtentPopup
               />
             </Layers>
           </Map>

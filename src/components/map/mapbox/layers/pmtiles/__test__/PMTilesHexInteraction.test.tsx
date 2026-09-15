@@ -151,6 +151,10 @@ describe("PMTilesLayer - click popup", () => {
 
     map = {
       getZoom: vi.fn().mockReturnValue(5),
+      project: vi.fn((lngLat: { lng: number; lat: number }) => ({
+        x: lngLat.lng * 10,
+        y: lngLat.lat * 10,
+      })),
       getCanvas: () => ({ classList }),
       getLayer: vi.fn((id: string) =>
         PMTILE_LAYERS.some(
@@ -241,13 +245,21 @@ describe("PMTilesLayer - click popup", () => {
     });
   });
 
-  it("queries a padded hit layer when the click event has no features", () => {
+  it("queries the tap point first, then a padded hit layer if the point missed", () => {
     attach();
     const feature = makeFeature("hex-1");
-    queryRenderedFeatures.mockReturnValue([feature]);
+    queryRenderedFeatures
+      .mockReturnValueOnce([])
+      .mockReturnValueOnce([feature]);
     emit("click", undefined, makeEvent());
 
-    expect(queryRenderedFeatures).toHaveBeenCalledWith(
+    expect(queryRenderedFeatures).toHaveBeenNthCalledWith(
+      1,
+      { x: 10, y: 20 },
+      { layers: [pmtilesHitLayerId(HEX_LAYER.id)] }
+    );
+    expect(queryRenderedFeatures).toHaveBeenNthCalledWith(
+      2,
       [
         [-14, -4],
         [34, 44],
@@ -260,9 +272,50 @@ describe("PMTilesLayer - click popup", () => {
     );
   });
 
+  it("opens the popup for the hex closest to the tap when several are in the hit box", () => {
+    attach();
+    const far = makeFeature("hex-far");
+    far.geometry = {
+      type: "Polygon",
+      coordinates: [
+        [
+          [20, 20],
+          [21, 20],
+          [21, 21],
+          [20, 21],
+          [20, 20],
+        ],
+      ],
+    };
+    const near = makeFeature("hex-near");
+    near.geometry = {
+      type: "Polygon",
+      coordinates: [
+        [
+          [1, 2],
+          [2, 2],
+          [2, 3],
+          [1, 3],
+          [1, 2],
+        ],
+      ],
+    };
+    queryRenderedFeatures
+      .mockReturnValueOnce([])
+      .mockReturnValueOnce([far, near]);
+    emit("click", undefined, makeEvent());
+
+    expect(popupMocks.Popup).toHaveBeenCalled();
+    expect(setData).toHaveBeenCalledWith(
+      expect.objectContaining({
+        features: [expect.objectContaining({ geometry: near.geometry })],
+      })
+    );
+  });
+
   it("touchend opens the popup for a single-finger tap", () => {
     attach();
-    queryRenderedFeatures.mockReturnValue([makeFeature("hex-1")]);
+    queryRenderedFeatures.mockReturnValueOnce([makeFeature("hex-1")]);
     emit("touchend", undefined, {
       ...makeEvent(),
       points: [{ x: 10, y: 20 }],

@@ -54,6 +54,7 @@ export const DataTestId = {
   HeaderSection: {
     ReturnButton: "return-button",
     PageTitle: "detail-page-title",
+    AiUpdateFrequencyChip: "ai-update-frequency-chip",
   },
   MapLayerSwitcher: {
     RadioGroup: "layer-style-menu-items",

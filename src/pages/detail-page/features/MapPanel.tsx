@@ -59,7 +59,7 @@ import {
 } from "@/components/common/slider/DateSlider";
 import { dayjsToUnixMs, getAppMaxDate, toAppDayjs } from "@/utils/DateUtils";
 import { GeoserverFieldsResponse } from "@/app/store/GeoserverDefinitions";
-import * as turf from "@turf/turf";
+import { bbox as turfBbox } from "@turf/bbox";
 import { createStaticLayers } from "@/components/map/mapbox/layers/StaticLayer";
 
 import WmsLegend from "./WmsLegend";
@@ -398,6 +398,8 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       const times = discreteTimeSliderValues.get(selectedWmsLayer);
       if (!times?.length) return;
       if (!times.includes(datePointValue)) {
+        // GeoServerLayer sorts `times`, so the last one is the newest date.
+        // The slider falls back to the same date.
         setDatePointValue(times[times.length - 1]);
       }
     });
@@ -416,7 +418,8 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       const timeValue =
         times?.includes(datePointValue) && datePointValue
           ? datePointValue
-          : times?.[times.length - 1];
+          : // GeoServerLayer sorts `times`, so use the newest date.
+            times?.[times.length - 1];
       return {
         urlParams: {
           TIME: timeValue !== undefined ? dayjs.utc(timeValue) : undefined,
@@ -596,14 +599,14 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
           }
         } else {
           try {
-            const bbox = turf.bbox(feature);
+            const bbox = turfBbox(feature);
             if (bbox && bbox.every((n) => isFinite(n))) {
               bboxConditions.push(
                 new BBoxCondition(id, bbox, removeCallback, index)
               );
             }
           } catch (e) {
-            console.warn("turf.bbox failed on feature", e, feature);
+            console.warn("bbox failed on feature", e, feature);
           }
         }
       });
@@ -769,6 +772,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
               <GeojsonLayer
                 collection={collection}
                 visible={selectedMapLayerId === LayerName.SpatialExtent}
+                showExtentPopup
               />
               {hasGriddedProducts && (
                 <GriddedRasterLayer

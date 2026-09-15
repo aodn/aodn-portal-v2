@@ -8,18 +8,16 @@ import {
   Typography,
 } from "@mui/material";
 import { borderRadius } from "@/styles/constants";
-import { portalTheme } from "../../../../styles";
-import useWFSDownload, {
-  DownloadStatus,
-} from "../../../../hooks/useWFSDownload";
-import useEstimateSize from "../../../../hooks/useEstimateSize";
+import { portalTheme } from "@/styles";
+import useWFSDownload, { DownloadStatus } from "@/hooks/useWFSDownload";
+import useEstimateSize from "@/hooks/useEstimateSize";
 import {
   DownloadCondition,
   DownloadConditionType,
   FormatCondition,
-} from "../../context/DownloadDefinitions";
+} from "@/pages/detail-page/context/DownloadDefinitions";
 import InfoMessage from "./InfoMessage";
-import DownloadButton from "../../../../components/common/buttons/DownloadButton";
+import DownloadButton from "@/components/common/buttons/DownloadButton";
 import DownloadSubsetting from "./DownloadSubsetting";
 import DownloadSelect from "./DownloadSelect";
 import DownloadSizeWarning, {
@@ -38,8 +36,10 @@ import {
   fetchGeoServerDownloadLayers,
   processWFSEstimateSize,
 } from "@/app/store/searchReducer";
-import AdminScreenContext from "../../../../components/admin/AdminScreenContext";
+import AdminScreenContext from "@/components/admin/AdminScreenContext";
 import { formatBytes } from "@/utils/Helpers";
+import LabelChip from "@/components/common/label/LabelChip";
+import { buildDownloadFileName } from "@/utils/DownloadFileNameUtils";
 
 // Currently only CSV is supported for WFS downloading
 // TODO:the format options will be fetched from the backend in the future
@@ -50,7 +50,9 @@ const formatOptions = [
 
 interface DownloadWFSCardProps extends DownloadCondition {
   uuid?: string;
+  collectionTitle?: string;
   onWFSAvailabilityChange?: (isWFSAvailable: boolean) => void;
+  isImosOnly?: boolean;
 }
 
 const formWfsDataOptions = (
@@ -63,12 +65,36 @@ const formWfsDataOptions = (
   }));
 };
 
+// A collection with more than one layer must carry the selected layer in the
+// file name, otherwise downloading a second layer overwrites the first. The
+// layer title is the human readable choice, but GeoServer does not guarantee
+// one is present or unique, so fall back to the layer name (which is) when it
+// would not tell two downloads apart.
+const resolveDatasetTitle = (
+  options: SelectItem[],
+  selectedValue: string
+): string | undefined => {
+  if (options.length <= 1) return undefined;
+
+  const label = options
+    .find((option) => option.value === selectedValue)
+    ?.label?.trim();
+  const isLabelUnique =
+    !!label &&
+    options.filter((option) => option.label?.trim() === label).length === 1;
+
+  // The workspace separator in a layer name is not file name safe
+  return isLabelUnique ? label : selectedValue.replace(/:/g, "_");
+};
+
 const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
   uuid,
+  collectionTitle,
   downloadConditions,
   getAndSetDownloadConditions,
   removeDownloadCondition,
   onWFSAvailabilityChange,
+  isImosOnly,
 }) => {
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const {
@@ -129,11 +155,26 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
       wfs_download_format: selectedFormat,
     });
 
-    await startDownload(uuid, selectedDataItem, downloadConditions);
+    // The collection name alone identifies the file when there is only one
+    // layer to download; otherwise the selected layer is appended
+    const datasetTitle = resolveDatasetTitle(
+      dataSelectOptions,
+      selectedDataItem
+    );
+
+    const fileName = buildDownloadFileName({
+      collectionTitle,
+      datasetTitle,
+      format: selectedFormat,
+    });
+
+    await startDownload(uuid, selectedDataItem, downloadConditions, fileName);
   }, [
     selectedDataItem,
     selectedFormat,
     uuid,
+    dataSelectOptions,
+    collectionTitle,
     startDownload,
     downloadConditions,
   ]);
@@ -254,18 +295,39 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
     <Stack>
       <Stack sx={{ p: "16px" }} spacing={2}>
         <DownloadSelect
+          label="Data Selection"
+          labelAdornment={
+            isImosOnly ? (
+              <LabelChip
+                text={["IMOS"]}
+                color={portalTheme.palette.tag3}
+                sx={{
+                  padding: "2px 8px",
+                  ...portalTheme.typography.body3Small,
+                }}
+              />
+            ) : (
+              <LabelChip
+                text={["External"]}
+                color={portalTheme.palette.warning.light}
+                sx={{
+                  padding: "2px 8px",
+                  ...portalTheme.typography.body3Small,
+                }}
+              />
+            )
+          }
+          disabled={isDownloading}
+          items={dataSelectOptions}
+          value={selectedDataItem}
+          onSelectCallback={handleSelectDataItem}
+        />
+        <DownloadSelect
           label="Format Selection"
           disabled={isDownloading}
           items={formatOptions}
           value={selectedFormat}
           onSelectCallback={handleSelectFormat}
-        />
-        <DownloadSelect
-          label="Data Selection"
-          disabled={isDownloading}
-          items={dataSelectOptions}
-          value={selectedDataItem}
-          onSelectCallback={handleSelectDataItem}
         />
         <DownloadButton
           onDownload={handleDownload}
@@ -292,6 +354,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
         removeDownloadCondition={removeDownloadCondition}
         hideInfoMessage={isDownloading || showSizeWarning}
         disable={isDownloading}
+        isExternal={!isImosOnly}
         sx={{ px: "16px" }}
       />
       <Snackbar

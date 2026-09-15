@@ -107,6 +107,28 @@ describe("BBoxConditionCard", () => {
       );
     });
 
+    it("accepts an antimeridian-crossing box via unwrapped longitude", () => {
+      render(<BBoxConditionCard bboxConditions={[]} onAddBBox={onAddBBox} />);
+
+      fillAll("10", "-10", "190", "170");
+      clickActionButton();
+
+      expect(onAddBBox).toHaveBeenCalledWith([170, -10, 190, 10]);
+      expect(screen.getByLabelText("N coordinate")).toHaveValue("");
+    });
+
+    it("rejects a longitude outside the widened range with an alert", () => {
+      render(<BBoxConditionCard bboxConditions={[]} onAddBBox={onAddBBox} />);
+
+      fillAll("10", "-10", "400", "170");
+      clickActionButton();
+
+      expect(onAddBBox).not.toHaveBeenCalled();
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        /must be between -360° and 360°/i
+      );
+    });
+
     it("rejects an empty field with an alert and does not submit", () => {
       render(<BBoxConditionCard bboxConditions={[]} onAddBBox={onAddBBox} />);
 

@@ -1,8 +1,10 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   formatDate,
   formatDateRange,
   formatDateTime,
+  formatLocalDate,
+  formatLocalTime,
   formatMetadataDate,
   formatUtcDateTime,
   getAppMaxDate,
@@ -207,5 +209,45 @@ describe("toUtcDayjs", () => {
       "2024-05-31T15:20:00.000Z"
     );
     expect(Math.abs(toUtcDayjs().valueOf() - Date.now())).toBeLessThan(1000);
+  });
+});
+
+describe("formatLocalDate / formatLocalTime", () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it("renders the viewer's local calendar day, which can differ from the UTC day", () => {
+    vi.spyOn(dayjs.tz, "guess").mockReturnValue("Pacific/Auckland");
+
+    // 2024-01-08T22:00Z is already 2024-01-09 in Auckland (NZDT, UTC+13 in January).
+    expect(formatLocalDate("2024-01-08T22:00:00.000Z")).toBe("09 Jan 2024");
+    expect(formatDate("2024-01-08T22:00:00.000Z")).toBe("08 Jan 2024");
+  });
+
+  it("renders the time of day with a zone abbreviation instead of a literal UTC", () => {
+    vi.spyOn(dayjs.tz, "guess").mockReturnValue("Pacific/Auckland");
+
+    expect(formatLocalTime("2024-01-08T22:00:00.000Z")).toBe("11:00:00 GMT+13");
+  });
+
+  it("preserves the instant, not just the offset label — the historic bug this guards against", () => {
+    vi.spyOn(dayjs.tz, "guess").mockReturnValue("Pacific/Auckland");
+
+    // dayjs.tz(value, zone) parses the clock digits as *already local*, silently
+    // shifting the instant; toUtcDayjs(value).tz(zone) must not do that.
+    expect(
+      toUtcDayjs("2024-01-08T22:00:00.000Z")
+        .tz("Pacific/Auckland")
+        .toISOString()
+    ).toBe("2024-01-08T22:00:00.000Z");
+  });
+
+  it("falls back for nullish, empty or unparseable input", () => {
+    expect(formatLocalDate(null)).toBe("");
+    expect(formatLocalDate(undefined)).toBe("");
+    expect(formatLocalDate("")).toBe("");
+    expect(formatLocalDate("not-a-date", undefined, "N/A")).toBe("N/A");
+
+    expect(formatLocalTime(null)).toBe("");
+    expect(formatLocalTime("not-a-date", "N/A")).toBe("N/A");
   });
 });

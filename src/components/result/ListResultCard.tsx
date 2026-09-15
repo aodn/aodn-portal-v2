@@ -22,7 +22,7 @@ import OrganizationLogo from "../icon/OrganizationLogo";
 import ResultCardButtonGroup from "./ResultCardButtonGroup";
 import { ResultCardBasicType } from "./types";
 import BookmarkButton from "../bookmark/BookmarkButton";
-import default_thumbnail from "@/assets/images/default-thumbnail.png";
+import default_thumbnail from "@/assets/images/default-thumbnail.webp";
 import {
   LIST_CARD_TITLE_HEIGHT,
   SHOW_RESULT_CARD_THUMBNAIL,

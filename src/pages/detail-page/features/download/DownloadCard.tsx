@@ -1,5 +1,5 @@
 import { FC, useCallback, useEffect, useMemo } from "react";
-import { useDetailPageContext } from "../../context/detail-page-context";
+import { useDetailPageContext } from "@/pages/detail-page/context/detail-page-context";
 import DownloadWFSCard from "./DownloadWFSCard";
 import DownloadCloudOptimisedCard from "./DownloadCloudOptimisedCard";
 import SideCardContainer from "../../layout/SideCardContainer";
@@ -17,10 +17,11 @@ const DownloadCard: FC = () => {
     setSelectedCoKey,
   } = useDetailPageContext();
 
-  const [wfsLinks, hasCloudOptimisedData] = useMemo(() => {
+  const [wfsLinks, hasCloudOptimisedData, isImosOnly] = useMemo(() => {
     const wfsLinks = collection?.getWFSLinks() || [];
     const hasCloudOptimisedData = collection?.hasCloudOptimisedData() || false;
-    return [wfsLinks, hasCloudOptimisedData];
+    const isImosOnly = collection?.isImosOnly() ?? false;
+    return [wfsLinks, hasCloudOptimisedData, isImosOnly];
   }, [collection]);
 
   const onWFSAvailabilityChange = useCallback(
@@ -64,16 +65,19 @@ const DownloadCard: FC = () => {
             downloadConditions={downloadConditions}
             getAndSetDownloadConditions={getAndSetDownloadConditions}
             removeDownloadCondition={removeDownloadCondition}
+            isImosOnly={isImosOnly}
           />
         );
       case DownloadServiceType.WFS:
         return (
           <DownloadWFSCard
             uuid={collection?.id}
+            collectionTitle={collection?.title}
             downloadConditions={downloadConditions}
             getAndSetDownloadConditions={getAndSetDownloadConditions}
             removeDownloadCondition={removeDownloadCondition}
             onWFSAvailabilityChange={onWFSAvailabilityChange}
+            isImosOnly={isImosOnly}
           />
         );
       // hide download card if no CO download or WFS download
@@ -85,6 +89,7 @@ const DownloadCard: FC = () => {
     downloadConditions,
     downloadService,
     getAndSetDownloadConditions,
+    isImosOnly,
     onWFSAvailabilityChange,
     removeDownloadCondition,
     selectedCoKey,

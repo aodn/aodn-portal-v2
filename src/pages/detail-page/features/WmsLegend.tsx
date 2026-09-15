@@ -7,7 +7,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { ExpandMore } from "@mui/icons-material";
+import ExpandMore from "@mui/icons-material/ExpandMore";
 import { formatToUrl } from "../../../utils/UrlUtils";
 import { MapTileRequest } from "@/app/store/GeoserverDefinitions";
 

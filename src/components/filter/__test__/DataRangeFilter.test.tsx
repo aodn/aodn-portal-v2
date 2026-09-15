@@ -1,7 +1,17 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import {
+  describe,
+  it,
+  expect,
+  vi,
+  beforeAll,
+  beforeEach,
+  afterEach,
+  afterAll,
+} from "vitest";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
+import { http, HttpResponse } from "msw";
 import { AppLocalizationProvider } from "@/app/providers/AppLocalizationProvider";
 import dayjs from "@/utils/DayjsUtils";
 import DateRangeFilter from "../DateRangeFilter";
@@ -9,9 +19,15 @@ import { dateDefault } from "../../common/constants";
 import { updateDateTimeFilterRange } from "@/app/store/componentParamReducer";
 import { dayjsToUnixMs, toAppDayjs, unixMsToAppDayjs } from "@/utils/DateUtils";
 import axios from "axios";
+import { server } from "@/__mocks__/server";
+
+let capturedImosDataIds: string[] | undefined;
 
 vi.mock("../../common/charts/TimeRangeBarChart", () => ({
-  default: () => <div data-testid="time-range-bar-chart" />,
+  default: (props: { imosDataIds: string[] }) => {
+    capturedImosDataIds = props.imosDataIds;
+    return <div data-testid="time-range-bar-chart" />;
+  },
 }));
 
 vi.mock("../../../hooks/useBreakpoint", () => ({
@@ -45,14 +61,29 @@ const createMockStore = (initialState = mockInitialState) =>
 describe("DateRangeFilter", () => {
   let store: ReturnType<typeof createMockStore>;
 
+  beforeAll(() => {
+    server.listen();
+  });
+
   beforeEach(() => {
     store = createMockStore();
     vi.spyOn(store, "dispatch");
     vi.spyOn(axios, "get").mockResolvedValue({ data: { collections: [] } });
+    server.use(
+      http.get("/api/v1/ogc/collections", () =>
+        HttpResponse.json({ collections: [] })
+      )
+    );
+    capturedImosDataIds = undefined;
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
+    server.resetHandlers();
+  });
+
+  afterAll(() => {
+    server.close();
   });
 
   const renderComponent = () =>
@@ -255,5 +286,33 @@ describe("DateRangeFilter", () => {
     renderComponent();
 
     expect(screen.getByLabelText("Last 5 years")).toBeChecked();
+  });
+
+  it("only counts a collection as IMOS-only when dataset_group is exactly ['imos'], even if the backend's coarse pre-filter returns more", async () => {
+    server.use(
+      http.get("/api/v1/ogc/collections", ({ request }) => {
+        const url = new URL(request.url);
+        const filter = url.searchParams.get("filter") ?? "";
+        if (filter.includes("dataset_group")) {
+          return HttpResponse.json({
+            collections: [
+              { id: "imos-only", properties: { dataset_group: ["imos"] } },
+              {
+                id: "imos-and-aims",
+                properties: { dataset_group: ["imos", "aims"] },
+              },
+              { id: "aims-only", properties: { dataset_group: ["aims"] } },
+            ],
+          });
+        }
+        return HttpResponse.json({ collections: [] });
+      })
+    );
+
+    renderComponent();
+
+    await waitFor(() => {
+      expect(capturedImosDataIds).toEqual(["imos-only"]);
+    });
   });
 });

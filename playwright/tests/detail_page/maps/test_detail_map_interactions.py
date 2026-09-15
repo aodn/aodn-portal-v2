@@ -1,9 +1,10 @@
+from urllib.parse import parse_qs, urlparse
+
 import pytest
 from playwright.sync_api import Locator, Page, expect
 
 from core.enums.map_layers.layer_style import LayerStyle
 from core.factories.layer import LayerFactory
-from mocks.routes import Routes
 from pages.detail_page import DetailPage
 from utils.map_utils import (
     are_coordinates_equal,
@@ -332,10 +333,16 @@ def test_layer_selection_triggers_correct_wms_map_tile_request(
     expect(detail_page.get_text(first_data_title).first).to_be_visible()
     expect(detail_page.get_text(last_data_title)).to_be_visible()
 
-    # Verify that selecting the last layer triggers a map tile request with the correct layer parameter
-    with responsive_page.expect_response(Routes.WMS_MAP_TILE) as response_info:
+    # Tiles from the initial layer may still arrive after the selection changes.
+    # Wait for the selected layer, rather than the first WMS response to arrive.
+    with responsive_page.expect_response(
+        lambda response: (
+            urlparse(response.url).path
+            == f'/api/v1/ogc/collections/{uuid}/items/wms_map_tile'
+            and parse_qs(urlparse(response.url).query).get('layerName')
+            == [last_data_value]
+        )
+    ) as response_info:
         detail_page.get_text(last_data_title).click()
-        response = response_info.value
-        assert (
-            last_data_value in response.url
-        ), f'Unexpected URL: {response.url}'
+
+    assert response_info.value.ok

@@ -24,10 +24,18 @@ import InfoMessage from "./InfoMessage";
 import { useDetailPageContext } from "../../context/detail-page-context";
 import { dateDefault } from "@/components/common/constants";
 
+const DEFAULT_INFO_TEXT =
+  "To download data directly please use the selections below, or utilise the map tools to make your selection.";
+const EXTERNAL_INFO_TEXT =
+  "This downloading is from external services that is not managed by IMOS. Download speed, formats and availability depend on the external providers.";
+
 interface DownloadSubsettingProps extends DownloadCondition {
   hideInfoMessage?: boolean;
   sx?: SxProps;
   disable?: boolean;
+  // Served by an external (non-AODN-managed) service, e.g. WFS/Geoserver for
+  // a non-IMOS provider — swaps the info message to the external-source warning.
+  isExternal?: boolean;
 }
 
 const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
@@ -36,6 +44,7 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
   getAndSetDownloadConditions,
   removeDownloadCondition,
   disable,
+  isExternal = false,
 }) => {
   const { isSubsettingSupported, mapSubsettingCapabilities } =
     useDetailPageContext();
@@ -72,8 +81,12 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
     <Stack direction="column">
       {!hideInfoMessage && subsettingSelectionCount === 0 && (
         <InfoMessage
-          infoText="To download data directly please use the selections below, or utilise the map tools to make your selection."
-          iconColor={portalTheme.palette.info.main}
+          infoText={isExternal ? EXTERNAL_INFO_TEXT : DEFAULT_INFO_TEXT}
+          iconColor={
+            isExternal
+              ? portalTheme.palette.warning.main
+              : portalTheme.palette.info.main
+          }
           sx={{ pl: "8px", pr: "16px" }}
         />
       )}

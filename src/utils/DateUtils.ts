@@ -133,6 +133,42 @@ export const toUtcDayjs = (value?: DateInput, format?: string): Dayjs => {
   return dayjs.utc(value);
 };
 
+/**
+ * Renders a date-only string in the viewer's local (browser) timezone —
+ * as opposed to formatDate()/toAppDayjs(), which use the app timezone (UTC).
+ * Companion to formatLocalTime(); see the downloads status table's Local/UTC toggle.
+ *
+ * Deliberately `toUtcDayjs(value).tz(zone)` (parse as an instant, then reproject)
+ * rather than the static `dayjs.tz(value, zone)` — the latter parses the string's
+ * clock digits as if they were already wall-clock time *in* `zone`, which silently
+ * shifts the instant for anything but a zero offset.
+ */
+export const formatLocalDate = (
+  value: DateInput,
+  format: string = dateDefault.DISPLAY_FORMAT,
+  fallback: string = ""
+): string => {
+  if (value === null || value === undefined || value === "") return fallback;
+  const date = toUtcDayjs(value).tz(dayjs.tz.guess());
+  return date.isValid() ? date.format(format) : fallback;
+};
+
+/**
+ * Renders a time of day plus its short zone abbreviation (e.g. "14:32:10 AEST"),
+ * in the viewer's local (browser) timezone. Companion to formatLocalDate().
+ */
+export const formatLocalTime = (
+  value: DateInput,
+  fallback: string = ""
+): string => {
+  if (value === null || value === undefined || value === "") return fallback;
+  const zone = dayjs.tz.guess();
+  const date = toUtcDayjs(value).tz(zone);
+  if (!date.isValid()) return fallback;
+  const zoneLabel = date.offsetName("short") ?? zone;
+  return `${date.format(dateDefault.LOCAL_TIME_DISPLAY_FORMAT)} ${zoneLabel}`;
+};
+
 /** Calendar month → YYYYMM integer. */
 export const dayjsToMonthPeriod = (d: Dayjs): number =>
   d.year() * 100 + (d.month() + 1);

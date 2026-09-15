@@ -1,6 +1,6 @@
-import { ComponentType, createElement, FC, SVGProps, useState } from "react";
+import { FC, useState } from "react";
 import { Box, Paper, Typography } from "@mui/material";
-import { borderRadius, padding, shadow } from "../../../../styles/constants";
+import { borderRadius, shadow } from "../../../../styles/constants";
 import {
   TOPICS_CARD_HEIGHT,
   TOPICS_CARD_ICON_BOX_SIZE,
@@ -10,7 +10,7 @@ import { portalTheme } from "../../../../styles";
 
 export interface TopicCardType {
   title: string;
-  icon: string | ComponentType<SVGProps<SVGSVGElement>>;
+  icon: string;
   handler?: () => void;
   iconSize?: number;
   iconOpacity?: number;
@@ -50,36 +50,20 @@ const TopicCard: FC<TopicCardProps> = ({ cardData }) => {
           justifyContent: "center",
         }}
       >
-        {typeof cardData.icon === "string" ? (
-          <img
-            src={cardData.icon}
-            alt={cardData.icon}
-            style={{
-              padding: padding.medium,
-              objectFit: "contain",
-              width: "100%",
-              height: "100%",
-              scale: isHovered ? "105%" : "none",
-            }}
-          />
-        ) : (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: iconSize,
-              height: iconSize,
-              opacity: cardData.iconOpacity ?? 0.9,
-              transform: isHovered ? "scale(1.05)" : "none",
-              "& svg": { width: "100%", height: "100%" },
-            }}
-          >
-            {createElement(cardData.icon, {
-              color: portalTheme.palette.grey700,
-            })}
-          </Box>
-        )}
+        <Box
+          sx={{
+            width: iconSize,
+            height: iconSize,
+            opacity: cardData.iconOpacity ?? 0.9,
+            transform: isHovered ? "scale(1.05)" : "none",
+            backgroundColor: portalTheme.palette.grey700,
+            maskImage: `url("${cardData.icon}")`,
+            maskRepeat: "no-repeat",
+            maskPosition: "center",
+            maskSize: "contain",
+          }}
+          role="presentation"
+        />
       </Paper>
       <Box
         width={TOPICS_CARD_ICON_BOX_SIZE}

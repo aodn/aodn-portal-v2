@@ -205,6 +205,9 @@ export const designTokensRC8 = {
       // Tag series
       tag1: "#D7F4F2",
       tag2: "#F6F0ED",
+      // Detail-page header service-availability badges
+      tag3: "#CFEAF7",
+      tag4: "#DCE4FF",
     },
   },
 

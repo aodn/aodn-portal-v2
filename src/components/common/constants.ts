@@ -10,6 +10,9 @@ const dateDefault = {
   UTC_DATE_TIME_DISPLAY_FORMAT: "DD MMM YYYY HH:mm [UTC]",
   // Time-only companion to DISPLAY_FORMAT, e.g. the downloads status table.
   UTC_TIME_DISPLAY_FORMAT: "HH:mm:ss [UTC]",
+  // Local-zone companion to UTC_TIME_DISPLAY_FORMAT — the zone abbreviation
+  // (e.g. "AEST") is appended separately since it isn't a static literal.
+  LOCAL_TIME_DISPLAY_FORMAT: "HH:mm:ss",
   // Metadata Dates panel only, keeps the GeoNetwork GMT+0000 hack — see formatMetadataDate().
   METADATA_DISPLAY_FORMAT: "ddd DD MMM YYYY HH:mm:ss [GMT+0000]",
   min: dayjs.tz(0),

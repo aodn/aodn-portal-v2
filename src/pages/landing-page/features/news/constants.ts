@@ -1,6 +1,6 @@
-import news1 from "@/assets/images/news1.jpg";
-import news2 from "@/assets/images/news2.png";
-import news3 from "@/assets/images/news3.jpg";
+import news1 from "@/assets/images/news1.webp";
+import news2 from "@/assets/images/news2.webp";
+import news3 from "@/assets/images/news3.webp";
 
 export interface NewsCardData {
   id: number;

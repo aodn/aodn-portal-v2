@@ -1,5 +1,5 @@
 import { FC, useCallback, MouseEvent, useState } from "react";
-import { Box, IconButton, Popover, Typography } from "@mui/material";
+import { Box, IconButton, Popover, SxProps, Typography } from "@mui/material";
 import AIGenIcon from "../icon/AIGenIcon";
 import { InfoContentType, InfoStatusType } from "./InfoDefinition";
 import { disableScroll, enableScroll } from "../../utils/ScrollUtils";
@@ -11,9 +11,17 @@ import TextRender from "../common/text/TextRender";
 
 interface AIGenTagProps {
   infoContent?: InfoContentType;
+  cardSx?: SxProps; // InfoCard surface
+  headerSx?: SxProps; // Star and title row
+  contentSx?: SxProps; // Body text
 }
 
-const AIGenTag: FC<AIGenTagProps> = ({ infoContent }) => {
+const AIGenTag: FC<AIGenTagProps> = ({
+  infoContent,
+  cardSx,
+  headerSx,
+  contentSx,
+}) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   const handleClick = useCallback((event: MouseEvent<HTMLButtonElement>) => {
@@ -64,6 +72,7 @@ const AIGenTag: FC<AIGenTagProps> = ({ infoContent }) => {
             width: "310px",
             height: "auto",
             padding: "10px",
+            ...cardSx,
           }}
         >
           <IconButton
@@ -78,12 +87,15 @@ const AIGenTag: FC<AIGenTagProps> = ({ infoContent }) => {
             <CloseIcon />
           </IconButton>
           <Box
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            flexWrap="nowrap"
-            width="100%"
-            gap={1}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexWrap: "nowrap",
+              width: "100%",
+              gap: 1,
+              ...headerSx,
+            }}
           >
             <AIGenStarIcon color={portalTheme.palette.primary1} />
             <Typography
@@ -97,7 +109,13 @@ const AIGenTag: FC<AIGenTagProps> = ({ infoContent }) => {
             </Typography>
           </Box>
 
-          <Typography sx={{ ...portalTheme.typography.body2Regular, p: "8px" }}>
+          <Typography
+            sx={{
+              ...portalTheme.typography.body2Regular,
+              p: "8px",
+              ...contentSx,
+            }}
+          >
             <TextRender text={infoContent?.body ?? ""} />
           </Typography>
         </InfoCard>
