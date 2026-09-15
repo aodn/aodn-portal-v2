@@ -140,7 +140,7 @@ describe("Searchbar", () => {
 
     // Check if there is a button with the name "Acoustics" (which comes from mock vocabs data) in the parameters tab
     expect(
-      within(parameterPanel).getByRole("button", {
+      await within(parameterPanel).findByRole("button", {
         name: "Acoustics",
       })
     ).toBeInTheDocument();
@@ -165,12 +165,12 @@ describe("Searchbar", () => {
     const parameterPanel = await screen.findByTestId("tab-panel-Parameters");
 
     // User click on two parameter buttons "Acoustics" and "Air-Sea Fluxes"
-    const parameterButton1 = within(parameterPanel).getByRole("button", {
+    const parameterButton1 = await within(parameterPanel).findByRole("button", {
       name: "Acoustics",
     });
     await userEvent.click(parameterButton1);
 
-    const parameterButton2 = within(parameterPanel).getByRole("button", {
+    const parameterButton2 = await within(parameterPanel).findByRole("button", {
       name: "Air-Sea Fluxes",
     });
     await userEvent.click(parameterButton2);
@@ -224,10 +224,10 @@ describe("Searchbar", () => {
     const parameterPanel = await screen.findByTestId("tab-panel-Parameters");
 
     // Get the parameter buttons "Air pressure" and "Visibility" which are selected
-    const parameterButton1 = within(parameterPanel).getByRole("button", {
+    const parameterButton1 = await within(parameterPanel).findByRole("button", {
       name: PARAMETER_VOCABS[0].narrower[0].label,
     });
-    const parameterButton2 = within(parameterPanel).getByRole("button", {
+    const parameterButton2 = await within(parameterPanel).findByRole("button", {
       name: PARAMETER_VOCABS[0].narrower[1].label,
     });
 

@@ -1,5 +1,5 @@
 import { MultiPolygon, Polygon } from "geojson";
-import * as turf from "@turf/turf";
+import { bbox } from "@turf/bbox";
 
 /**
  * Calculates bounding boxes for each polygon in a MultiPolygon
@@ -21,7 +21,7 @@ export const calculateBboxes = (
       coordinates: polygonCoordinates,
     };
 
-    const [minLon, minLat, maxLon, maxLat] = turf.bbox(polygon);
+    const [minLon, minLat, maxLon, maxLat] = bbox(polygon);
 
     const bboxKey = `bbox_${polygonIndex + 1}`;
     const bboxValue = `[${minLon},${minLat},${maxLon},${maxLat}]`;
