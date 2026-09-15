@@ -91,8 +91,8 @@ export default function SelectionMarker({
       sx={{
         display: "flex",
         alignItems: "center",
-        bgcolor: "background.paper",
-        color: "text.primary",
+        bgcolor: "primary.light",
+        color: "common.white",
         border: 1,
         borderColor: "divider",
         borderRadius: 1,
@@ -105,6 +105,7 @@ export default function SelectionMarker({
       <span aria-label={`Selection ${number}`}>{number}</span>
       <IconButton
         size="small"
+        color="inherit"
         aria-label={`Remove selection ${number}`}
         title={`Remove selection ${number}`}
         onClick={(event) => {
