@@ -30,6 +30,8 @@ jobs:
         include:
           - environment: edge
             site: https://portal-edge.aodn.org.au
+          - environment: staging
+            site: https://portal-staging.aodn.org.au
           - environment: production
             site: https://portal-beta.aodn.org.au
     environment: ${{ matrix.environment }}
@@ -124,6 +126,8 @@ jobs:
         include:
           - environment: edge
             site: https://portal-edge.aodn.org.au
+          - environment: staging
+            site: https://portal-staging.aodn.org.au
           - environment: production
             site: https://portal-beta.aodn.org.au
     steps:
