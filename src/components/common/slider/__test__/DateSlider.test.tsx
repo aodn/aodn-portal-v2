@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import DateSliderRange, { DateSliderPoint } from "../DateSlider";
 import dayjs from "@/utils/DayjsUtils";
@@ -37,7 +37,8 @@ describe("DateSliderRange keyboard", () => {
 
     const startAfterRight = Number(startThumb.getAttribute("aria-valuenow"));
     expect(startAfterRight - startBefore).toBe(DAY_MS);
-    expect(onDateRangeChange).toHaveBeenCalled();
+    // The thumb moves at once; the commit lands after the 0.5s debounce.
+    await waitFor(() => expect(onDateRangeChange).toHaveBeenCalled());
 
     await user.keyboard("{ArrowLeft}");
 
@@ -180,9 +181,12 @@ describe("DateSliderPoint keyboard", () => {
 
     await user.keyboard("{ArrowLeft}");
     expect(Number(thumb.getAttribute("aria-valuenow"))).toBe(points[1]);
-    expect(onDatePointChange).toHaveBeenLastCalledWith(
-      expect.anything(),
-      points[1]
+    // The thumb moves at once; the commit lands after the 0.5s debounce.
+    await waitFor(() =>
+      expect(onDatePointChange).toHaveBeenLastCalledWith(
+        expect.anything(),
+        points[1]
+      )
     );
 
     await user.keyboard("{ArrowLeft}");
@@ -197,13 +201,19 @@ describe("DateSliderPoint keyboard", () => {
   });
 });
 
+/** Longer than the slider's 0.5s commit debounce. */
+const PAST_DEBOUNCE_MS = 600;
+
 describe("DateSliderPoint empty marks", () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
   // Reachable on the tile path (marks arrive async) and on the WMS path, where
   // discreteTimeSliderValues.get() misses whenever the selected layer name
   // differs from the stored key. Both used to throw on sorted_marks[0].value.
   it.each([[[]], [undefined]])(
     "renders nothing for %j without throwing",
-    (points) => {
+    async (points) => {
       const onDatePointChange = vi.fn();
 
       expect(() =>
@@ -216,13 +226,20 @@ describe("DateSliderPoint empty marks", () => {
       ).not.toThrow();
 
       expect(screen.queryByRole("slider")).not.toBeInTheDocument();
+
+      await act(async () => {
+        vi.advanceTimersByTime(PAST_DEBOUNCE_MS);
+      });
       expect(onDatePointChange).not.toHaveBeenCalled();
     }
   );
 });
 
 describe("DateSliderPoint resync", () => {
-  it("snaps to the new last mark when marks change, without notifying", () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  it("snaps to the new last mark when marks change, without notifying", async () => {
     const onDatePointChange = vi.fn();
     const first = [
       dayjs.tz("2020-01-01").valueOf(),
@@ -253,6 +270,10 @@ describe("DateSliderPoint resync", () => {
     expect(
       Number(screen.getByRole("slider").getAttribute("aria-valuenow"))
     ).toBe(second[1]);
+
+    await act(async () => {
+      vi.advanceTimersByTime(PAST_DEBOUNCE_MS);
+    });
     // The parent derives the same default from the same source; notifying here
     // would be a render loop.
     expect(onDatePointChange).not.toHaveBeenCalled();
