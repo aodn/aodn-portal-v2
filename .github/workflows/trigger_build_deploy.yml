@@ -82,8 +82,18 @@ jobs:
           # sitemap.xml and prerender/ are owned by the Publish SEO Artifacts workflow.
           # assets/ uses cp, not sync: every deploy re-stamps the live build's files,
           # so the prune step below can treat old timestamps as unreferenced.
-          aws s3 sync --delete ${{ env.DIST }} s3://${{ vars.BUCKET }} --region ${{ vars.AWS_REGION }} --exclude "prerender/*" --exclude "sitemap.xml" --exclude "assets/*"
-          aws s3 cp ${{ env.DIST }}/assets s3://${{ vars.BUCKET }}/assets --recursive --region ${{ vars.AWS_REGION }}
+          # Everything outside assets/ keeps a non-immutable default: index.html
+          # is re-uploaded with no-cache below so a cached HTML can never keep
+          # pointing at a bundle the next deploy pruned.
+          aws s3 sync --delete ${{ env.DIST }} s3://${{ vars.BUCKET }} --region ${{ vars.AWS_REGION }} --exclude "prerender/*" --exclude "sitemap.xml" --exclude "assets/*" \
+            --cache-control "public,max-age=300"
+          # assets/ filenames carry a content hash, so they can be cached forever.
+          aws s3 cp ${{ env.DIST }}/assets s3://${{ vars.BUCKET }}/assets --recursive --region ${{ vars.AWS_REGION }} \
+            --cache-control "public,max-age=31536000,immutable"
+          # index.html must always be revalidated: it is the file that names the
+          # hashed bundles.
+          aws s3 cp ${{ env.DIST }}/index.html s3://${{ vars.BUCKET }}/index.html --region ${{ vars.AWS_REGION }} \
+            --cache-control "no-cache" --content-type "text/html"
           # Seed the fallback sitemap only when the bucket has none
           aws s3api head-object --bucket ${{ vars.BUCKET }} --key sitemap.xml --region ${{ vars.AWS_REGION }} >/dev/null 2>&1 \
             || aws s3 cp ${{ env.DIST }}/sitemap.xml s3://${{ vars.BUCKET }}/sitemap.xml --region ${{ vars.AWS_REGION }}

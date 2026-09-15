@@ -115,6 +115,12 @@ export default ({ mode }: ConfigEnv) => {
       },
       proxy: apiProxy,
     },
+    // `vite preview` serves the production build. Without the same proxy the
+    // health check in HealthChecker 404s and every page renders DegradedPage,
+    // which makes a local Lighthouse run measure the wrong thing.
+    preview: {
+      proxy: apiProxy,
+    },
     plugins: [
       react(),
       mode !== "test" &&
