@@ -324,4 +324,54 @@ describe("GeoServerLayer", () => {
       );
     });
   });
+
+  it("should sort discrete time slider values oldest to newest", () => {
+    // The endpoint returns the times in no order, and in a different order on
+    // every call, so the newest time has to be sorted to the end.
+    mocks.axiosInstance.get.mockImplementation((url: string) => {
+      if (url.includes("wms_layers")) {
+        return Promise.resolve({
+          data: [
+            {
+              name: "test_with_discrete",
+              title: "Test Layer",
+              ncWmsLayerInfo: {},
+            },
+          ],
+        });
+      } else if (url.includes("wms_fields")) {
+        return Promise.resolve({ data: [{ type: "dateTime" }] });
+      } else if (url.includes("wfs_field_value")) {
+        return Promise.resolve({
+          data: {
+            time: [
+              "2022-10-13T00:00:00.000Z",
+              "2022-10-11T00:00:00.000Z",
+              "2022-10-14T00:00:00.000Z",
+              "2022-10-12T00:00:00.000Z",
+            ],
+          },
+        });
+      }
+      return Promise.resolve({ data: [] });
+    });
+
+    const setDiscreteTimeSliderValues = vi.fn();
+
+    renderComponent({
+      setDiscreteTimeSliderValues,
+      geoServerLayerConfig: { uuid: "test-uuid" },
+    });
+
+    return waitFor(() => {
+      expect(setDiscreteTimeSliderValues).toHaveBeenCalledWith(
+        new Map([
+          [
+            "test_with_discrete",
+            [1665446400000, 1665532800000, 1665619200000, 1665705600000],
+          ],
+        ])
+      );
+    });
+  });
 });

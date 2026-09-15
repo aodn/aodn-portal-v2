@@ -46,4 +46,23 @@ describe("ConcentrationSlider", () => {
 
     expect(screen.getByRole("slider")).toHaveAttribute("aria-valuenow", "50");
   });
+
+  it("does not forward marks to the slider DOM", () => {
+    // Marks feed the rail gradient only. Rendering one node each made dragging
+    // slow on layers with thousands of marks.
+    const marks = Array.from({ length: 2000 }, (_, i) => ({ value: i }));
+
+    const { container } = render(
+      <ConcentrationSlider
+        marks={marks}
+        min={0}
+        max={1999}
+        defaultValue={1000}
+        aria-label="concentration"
+      />
+    );
+
+    expect(container.querySelectorAll(".MuiSlider-mark")).toHaveLength(0);
+    expect(screen.getByRole("slider")).toHaveAttribute("aria-valuenow", "1000");
+  });
 });
