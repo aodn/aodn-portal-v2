@@ -23,12 +23,8 @@ function handler(event) {
   const userAgentHeader = request.headers["user-agent"];
   const userAgent = userAgentHeader ? userAgentHeader.value : "";
 
-  // Static files pass through untouched.
-  if (/\/[^/]+\.[^/]+$/.test(uri)) {
-    return request;
-  }
-
-  // Only rewrite /details/<uuid> requests.
+  // Only rewrite /details/<uuid> requests; anything else passes through.
+  // Ids may contain dots (ASAC_2201_HCL_0.5), so no "looks like a file" check.
   const match = uri.match(/^\/details\/([^/]+)\/?$/);
 
   if (!match) {
