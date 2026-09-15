@@ -26,6 +26,7 @@ const page = {
       id: "rec-1",
       title: "Sea Surface Temperature",
       description: "Daily SST observations around Australia.",
+      properties: { revision: "2026-08-12T15:24:43" },
     },
     // no description: sitemap lists it, prerender skips it
     { id: "rec-2", title: "Half-filled record" },
@@ -54,9 +55,11 @@ describe("the artifacts pipeline on controlled data", () => {
     await prerenderDetailPages(outDir, collections);
 
     const sitemap = await readFile(path.join(outDir, "sitemap.xml"), "utf8");
-    expect(sitemap).toContain(`<loc>${BASE_URL}/</loc>`);
-    expect(sitemap).toContain(`<loc>${BASE_URL}/details/rec-1</loc>`);
-    expect(sitemap).toContain(`<loc>${BASE_URL}/details/rec-2</loc>`);
+    expect(sitemap).toContain(`<loc>${BASE_URL}/</loc></url>`);
+    expect(sitemap).toContain(
+      `<loc>${BASE_URL}/details/rec-1</loc><lastmod>2026-08-12</lastmod>`
+    );
+    expect(sitemap).toContain(`<loc>${BASE_URL}/details/rec-2</loc></url>`);
     expect(sitemap.match(/<loc>/g)).toHaveLength(3);
 
     // only the record with id, title and description becomes a page
