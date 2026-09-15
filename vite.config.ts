@@ -125,6 +125,27 @@ export default ({ mode }: ConfigEnv) => {
     ].filter(Boolean),
     build: {
       outDir: "dist",
+      // mapbox-gl alone is ~800 kB; splitting it out is the point, so the
+      // default 500 kB warning would just be noise.
+      chunkSizeWarningLimit: 1500,
+      rollupOptions: {
+        output: {
+          // Long-lived vendor chunks: a deploy touching only app code leaves
+          // them cached.
+          //
+          // A listed package drags its own dependencies into the chunk, and
+          // any other chunk needing one of those must then import this whole
+          // chunk. So only list a package whose deps are either in here too
+          // (react-redux and react-router-dom need react) or used nowhere
+          // else. Ignoring that put a megabyte-scale chunk on the landing
+          // page twice: @mui/x-charts via @mui/material internals, and
+          // @mapbox/mapbox-gl-draw via @turf/helpers.
+          manualChunks: {
+            react: ["react", "react-dom", "react-router-dom", "react-redux"],
+            mapbox: ["mapbox-gl"],
+          },
+        },
+      },
     },
     // mapbox-gl 3.x emits a worker that uses dynamic imports (code-splitting),
     // which Vite's default "iife" worker format can't support. Build workers as

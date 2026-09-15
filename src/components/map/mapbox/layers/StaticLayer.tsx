@@ -8,53 +8,25 @@ import React, {
   useState,
 } from "react";
 import MapContext from "../MapContext";
-import {
-  Feature,
-  FeatureCollection,
-  MultiPolygon,
-  Polygon,
-  GeoJsonProperties,
-} from "geojson";
+import { FeatureCollection, MultiPolygon, Polygon } from "geojson";
 import { stringToColor } from "../../../common/colors/colorsUtils";
-import { simplify } from "@turf/turf";
-import _ from "lodash";
 import { TestHelper } from "../../../common/test/helper";
-import {
-  allenCoralAtlasDefault,
-  marineEcoregionOfWorldDefault,
-  marineParkDefault,
-} from "../../../common/constants";
 import MapboxWorldLayer, { MapboxWorldLayersDef } from "./MapboxWorldLayer";
 import { cssFontFamilyToMapboxTextFont } from "@/utils/MapUtils";
 import { useTheme } from "@mui/material";
 import { SymbolLayerSpecification } from "mapbox-gl";
 import { addMenuOverlayLayer } from "../layerOrder";
-
-export enum BoundaryName {
-  AUSTRALIAN_MARINE_PARKS = "AMP",
-  CORAL_ATLAS = "ACA",
-  MEOW = "MEOW",
-}
-
-export interface StaticLayersProps {
-  id: string;
-  name: string;
-  boundaryName: BoundaryName;
-  label: string;
-  geojson: string;
-  termsOfUse: string;
-  features?: FeatureCollection;
-}
-
-/**
- * Properties injected into GeoJSON features for boundary selection.
- * Extends GeoJsonProperties (non-null part) by including metadata for the boundary.
- */
-export type BoundaryProperties = {
-  boundaryName: BoundaryName;
-  label: string;
-  value: string;
-} & GeoJsonProperties;
+import {
+  BoundaryName,
+  StaticLayersDef,
+  fetchAllenCoralAtlasOptions,
+  fetchMarineEcoregionOptions,
+  fetchMarineParkOptions,
+} from "./staticLayerOptions";
+import type {
+  BoundaryProperties,
+  StaticLayersProps,
+} from "./staticLayerOptions";
 
 const STATIC_LAYER_LABEL_PAINT: SymbolLayerSpecification["paint"] = {
   "text-color": "#ffffff",
@@ -68,88 +40,6 @@ const STATIC_LAYER_LABEL_LAYOUT: SymbolLayerSpecification["layout"] = {
   "text-allow-overlap": false,
   "text-ignore-placement": false,
   "symbol-placement": "point",
-};
-
-const StaticLayersDef: Record<string, StaticLayersProps> = {
-  AUSTRALIA_MARINE_PARKS: {
-    id: "static-australia-marine-parks",
-    name: "Australian Marine Parks",
-    boundaryName: BoundaryName.AUSTRALIAN_MARINE_PARKS,
-    geojson: marineParkDefault.geojson,
-    termsOfUse: marineParkDefault.termsOfUse,
-    label: "RESNAME",
-  },
-  ALLEN_CORAL_ATLAS: {
-    id: "static-allen-coral-atlas",
-    name: "Allen Coral Atlas",
-    boundaryName: BoundaryName.CORAL_ATLAS,
-    geojson: allenCoralAtlasDefault.geojson,
-    termsOfUse: allenCoralAtlasDefault.termsOfUse,
-    label: "ECOREGION",
-  },
-  MEOW: {
-    id: "static-meow",
-    name: "Marine Ecoregion of the World",
-    boundaryName: BoundaryName.MEOW,
-    geojson: marineEcoregionOfWorldDefault.geojson,
-    termsOfUse: marineEcoregionOfWorldDefault.termsOfUse,
-    label: "ECOREGION",
-  },
-};
-
-// Cache for processed GeoJSON data to prevent redundant fetches
-const dataCache: Record<string, any> = {};
-
-const loadAndProcessGeoJSON = async (
-  url: string,
-  boundaryName: BoundaryName,
-  groupKey: string,
-  labelKey: string,
-  idKey: string,
-  shouldSimplify = false
-): Promise<Array<BoundaryProperties>> => {
-  const cacheKey = `${url}_${shouldSimplify}`;
-  if (dataCache[cacheKey]) return dataCache[cacheKey];
-
-  const response = await fetch(url);
-  const json: FeatureCollection<Polygon | MultiPolygon> = await response.json();
-
-  const grouped = _.groupBy(
-    json.features,
-    (feature) => feature.properties?.[groupKey]
-  );
-
-  const options = Object.values(grouped)
-    .map((features) => {
-      const firstFeature = features[0] as Feature<Polygon | MultiPolygon>;
-      const geometry = shouldSimplify
-        ? (simplify(firstFeature, {
-            tolerance: 0.05,
-            highQuality: false,
-          }) as Feature<Polygon | MultiPolygon>)
-        : firstFeature;
-
-      const label = firstFeature.properties?.[labelKey];
-      const value = "" + firstFeature.properties?.[idKey];
-      const collection: FeatureCollection<
-        Polygon | MultiPolygon,
-        GeoJsonProperties
-      > = {
-        type: "FeatureCollection",
-        features: [geometry],
-      };
-
-      return {
-        boundaryName,
-        label,
-        value,
-        geo: collection,
-      };
-    })
-    .sort((a, b) => (a.label ?? "").localeCompare(b.label ?? ""));
-
-  dataCache[cacheKey] = options;
-  return options;
 };
 
 // Use to create a static layer on a map, you need to add a menu item to select those layers,
@@ -335,43 +225,21 @@ const MapBoundaryLayer: FC<StaticLayersProps> = (props) => {
   );
 };
 
-const fetchMarineParkOptions = (shouldSimplify = false) =>
-  loadAndProcessGeoJSON(
-    StaticLayersDef.AUSTRALIA_MARINE_PARKS.geojson,
-    StaticLayersDef.AUSTRALIA_MARINE_PARKS.boundaryName,
-    "RESNAME",
-    "RESNAME",
-    "OBJECTID",
-    shouldSimplify
-  );
-
-const fetchMarineEcoregionOptions = (shouldSimplify = false) =>
-  loadAndProcessGeoJSON(
-    StaticLayersDef.MEOW.geojson,
-    StaticLayersDef.MEOW.boundaryName,
-    "ECOREGION",
-    "ECOREGION",
-    "ECO_CODE",
-    shouldSimplify
-  );
-
-const fetchAllenCoralAtlasOptions = (shouldSimplify = false) =>
-  loadAndProcessGeoJSON(
-    StaticLayersDef.ALLEN_CORAL_ATLAS.geojson,
-    StaticLayersDef.ALLEN_CORAL_ATLAS.boundaryName,
-    "ECOREGION",
-    "ECOREGION",
-    "OBJECTID",
-    shouldSimplify
-  );
-
 // Export need layers
 export {
-  StaticLayersDef,
   createStaticLayers,
-  fetchMarineParkOptions,
-  fetchMarineEcoregionOptions,
-  fetchAllenCoralAtlasOptions,
   STATIC_LAYER_LABEL_PAINT,
   STATIC_LAYER_LABEL_LAYOUT,
 };
+
+// Re-exported so existing importers keep working. New code should import these
+// straight from ./staticLayerOptions -- that module carries no mapbox-gl
+// dependency, which is what keeps them off the landing page's critical path.
+export {
+  BoundaryName,
+  StaticLayersDef,
+  fetchMarineParkOptions,
+  fetchMarineEcoregionOptions,
+  fetchAllenCoralAtlasOptions,
+};
+export type { BoundaryProperties, StaticLayersProps };
