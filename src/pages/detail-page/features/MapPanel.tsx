@@ -386,6 +386,8 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       const times = discreteTimeSliderValues.get(selectedWmsLayer);
       if (!times?.length) return;
       if (!times.includes(datePointValue)) {
+        // GeoServerLayer sorts `times`, so the last one is the newest date.
+        // The slider falls back to the same date.
         setDatePointValue(times[times.length - 1]);
       }
     });
@@ -404,7 +406,8 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       const timeValue =
         times?.includes(datePointValue) && datePointValue
           ? datePointValue
-          : times?.[times.length - 1];
+          : // GeoServerLayer sorts `times`, so use the newest date.
+            times?.[times.length - 1];
       return {
         urlParams: {
           TIME: timeValue !== undefined ? dayjs.utc(timeValue) : undefined,

@@ -207,7 +207,10 @@ const ConcentrationSlider = ({
     <PlainSlider
       min={min}
       max={max}
-      marks={marks}
+      // Marks are only used for the rail gradient above, never in the DOM.
+      // MUI renders one span per mark on every render, which makes dragging
+      // slow when there are thousands of marks. Callers snap the value.
+      marks={false}
       value={value}
       sx={[
         {
