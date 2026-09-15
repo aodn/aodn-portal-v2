@@ -6,6 +6,7 @@ from playwright.sync_api import Page
 from core.dataclasses.search_filter import SearchFilterConfig
 from core.enums.data_settings_filter import DataSettingsFilter
 from pages.detail_page import DetailPage
+from pages.js_scripts.js_utils import wait_for_js_function
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
 
@@ -235,14 +236,28 @@ def test_search_api_request_urls_after_map_state_change(
         search_page.result_view_button.click()
         search_page.full_map_view_button.click()
 
+    # Opening the mobile map triggers a resize search and a debounced URL
+    # update. That navigation restores the camera and temporarily detaches
+    # its move/zoom listeners, even if the map was already idle once.
+    search_page.wait_for_page_stabilization()
+    # Unlike wait_for_map_idle(), this wait must fail if the map is not ready.
+    wait_for_js_function(
+        responsive_page, 'isMapIdle', 30_000, search_page.map.map_id
+    )
+    target_zoom = search_page.map.get_map_zoom() + 1
+
     def zoom_in_and_wait() -> None:
-        search_page.map.zoom_in()
+        # This test checks API filters; use an explicit camera change so a
+        # wheel event lost during mobile layout changes cannot skip the zoom.
+        search_page.map.zoom_to_level(target_zoom)
         search_page.map.wait_for_map_idle()
 
     api_url_result = search_page.perform_action_and_get_api_url(
         action=zoom_in_and_wait
     )
     api_url_collection, api_url_centroid = api_url_result
+
+    assert search_page.map.get_map_zoom() == pytest.approx(target_zoom)
 
     search_page.validate_search_parameters_in_url(
         api_url_collection, expected_filters_reset
