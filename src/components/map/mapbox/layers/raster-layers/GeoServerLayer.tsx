@@ -199,9 +199,14 @@ const checkSupportDiscreteTimeSlider = (
       .then((val) => {
         if (val["time"] !== undefined && val["time"].length > 0) {
           const result: Map<string, Array<number>> = new Map();
+          // The field-value endpoint returns the times unordered, and in a
+          // different order on every call. Sort ascending here so consumers can
+          // rely on the last entry being the most recent time.
           result.set(
             layerName,
-            val["time"]?.map((v) => dayjsToUnixMs(dayjs.utc(v.toString())))
+            val["time"]
+              ?.map((v) => dayjsToUnixMs(dayjs.utc(v.toString())))
+              .sort((a, b) => a - b)
           );
           setDiscreteTimeSliderValues?.(result);
         } else {
