@@ -111,7 +111,7 @@ describe("Searchbar", () => {
     expect(screen.getByTestId("SearchIcon")).toBeInTheDocument();
   });
 
-  it("should render the filter popup - parameters correctly", () => {
+  it("should render the filter popup - parameters correctly", async () => {
     render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
@@ -124,31 +124,29 @@ describe("Searchbar", () => {
 
     // User click on the filter button
     const filterButton = screen.getByTestId("filtersBtn");
-    userEvent.click(filterButton);
+    await userEvent.click(filterButton);
 
-    // Wait for the filter popup to appear
-    return screen.findByTestId("tab-panel-Parameters").then(() => {
-      // Filters is lazy: the panel resolving is what proves the chunk landed.
-      const popup = screen.getByTestId("searchbar-popup");
-      // Check if the first tab - "Parameters" is present in the popup
-      expect(screen.getByText("Parameters")).toBeInTheDocument();
+    // Filters is lazy: the panel resolving is what proves the chunk landed.
+    const parameterPanel = await screen.findByTestId("tab-panel-Parameters");
+    const popup = screen.getByTestId("searchbar-popup");
 
-      // By default, the first tab - "Parameters" should be selected
-      // Check if the first tab - "Parameters" is selected
-      const parametersTab = within(popup).getByText("Parameters");
-      expect(parametersTab).toHaveAttribute("aria-selected", "true");
+    // Check if the first tab - "Parameters" is present in the popup
+    expect(screen.getByText("Parameters")).toBeInTheDocument();
 
-      // Check if there is a button with the name "Acoustics" (which comes from mock vocabs data) in the parameters tab
-      const parameterPanel = screen.getByTestId("tab-panel-Parameters");
-      expect(
-        within(parameterPanel).getByRole("button", {
-          name: "Acoustics",
-        })
-      ).toBeInTheDocument();
-    });
+    // By default, the first tab - "Parameters" should be selected
+    // Check if the first tab - "Parameters" is selected
+    const parametersTab = within(popup).getByText("Parameters");
+    expect(parametersTab).toHaveAttribute("aria-selected", "true");
+
+    // Check if there is a button with the name "Acoustics" (which comes from mock vocabs data) in the parameters tab
+    expect(
+      within(parameterPanel).getByRole("button", {
+        name: "Acoustics",
+      })
+    ).toBeInTheDocument();
   });
 
-  it("should render correct number of selected parameters", () => {
+  it("should render correct number of selected parameters", async () => {
     render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
@@ -161,40 +159,38 @@ describe("Searchbar", () => {
 
     // User click on the filter button
     const filterButton = screen.getByTestId("filtersBtn");
-    userEvent.click(filterButton);
+    await userEvent.click(filterButton);
 
-    // Wait for the filter popup to appear
-    return screen
-      .findByTestId("tab-panel-Parameters")
-      .then((parameterPanel) => {
-        // User click on two parameter buttons "Acoustics" and "Air-Sea Fluxes"
-        const parameterButton1 = within(parameterPanel).getByRole("button", {
-          name: "Acoustics",
-        });
-        userEvent.click(parameterButton1);
+    // Filters is lazy: the panel resolving is what proves the chunk landed.
+    const parameterPanel = await screen.findByTestId("tab-panel-Parameters");
 
-        const parameterButton2 = within(parameterPanel).getByRole("button", {
-          name: "Air-Sea Fluxes",
-        });
-        userEvent.click(parameterButton2);
+    // User click on two parameter buttons "Acoustics" and "Air-Sea Fluxes"
+    const parameterButton1 = within(parameterPanel).getByRole("button", {
+      name: "Acoustics",
+    });
+    await userEvent.click(parameterButton1);
 
-        // Wait for the parameter buttons to be selected
-        return waitFor(() => {
-          expect(parameterButton1).toHaveAttribute("aria-pressed", "true");
-          expect(parameterButton2).toHaveAttribute("aria-pressed", "true");
-        }).then(() => {
-          // Check if the filter button badge is updated with the correct number of selected parameters
-          const filterButtonBadge = screen.getByTestId(
-            "searchbar-button-badge-Filter"
-          );
-          expect(filterButtonBadge).toBeInTheDocument();
-          expect(filterButtonBadge).toHaveTextContent("2");
-        });
-      });
+    const parameterButton2 = within(parameterPanel).getByRole("button", {
+      name: "Air-Sea Fluxes",
+    });
+    await userEvent.click(parameterButton2);
+
+    // Wait for the parameter buttons to be selected
+    await waitFor(() => {
+      expect(parameterButton1).toHaveAttribute("aria-pressed", "true");
+      expect(parameterButton2).toHaveAttribute("aria-pressed", "true");
+    });
+
+    // Check if the filter button badge is updated with the correct number of selected parameters
+    const filterButtonBadge = screen.getByTestId(
+      "searchbar-button-badge-Filter"
+    );
+    expect(filterButtonBadge).toBeInTheDocument();
+    expect(filterButtonBadge).toHaveTextContent("2");
   });
 
   // Redux to UI flow: make sure the searchbar states are updated correctly across pages given redux states
-  it("should render correct badge number and selected parameter button given redux states", () => {
+  it("should render correct badge number and selected parameter button given redux states", async () => {
     render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
@@ -218,38 +214,28 @@ describe("Searchbar", () => {
     );
 
     // Check if the filter button badge is updated with the correct number of selected parameters
-    return waitFor(() => expect(filterButtonBadge).toHaveTextContent("2")).then(
-      () => {
-        // User click on the filter button
-        const filterButton = screen.getByTestId("filtersBtn");
-        userEvent.click(filterButton);
+    await waitFor(() => expect(filterButtonBadge).toHaveTextContent("2"));
 
-        // Wait for the filter popup to appear
-        return screen
-          .findByTestId("tab-panel-Parameters")
-          .then((parameterPanel) => {
-            // Get the parameter buttons "Air pressure" and "Visibility" which are selected
-            const parameterButton1 = within(parameterPanel).getByRole(
-              "button",
-              {
-                name: PARAMETER_VOCABS[0].narrower[0].label,
-              }
-            );
-            const parameterButton2 = within(parameterPanel).getByRole(
-              "button",
-              {
-                name: PARAMETER_VOCABS[0].narrower[1].label,
-              }
-            );
+    // User click on the filter button
+    const filterButton = screen.getByTestId("filtersBtn");
+    await userEvent.click(filterButton);
 
-            // Wait for the parameter buttons to be selected
-            return waitFor(() => {
-              expect(parameterButton1).toHaveAttribute("aria-pressed", "true");
-              expect(parameterButton2).toHaveAttribute("aria-pressed", "true");
-            });
-          });
-      }
-    );
+    // Filters is lazy: the panel resolving is what proves the chunk landed.
+    const parameterPanel = await screen.findByTestId("tab-panel-Parameters");
+
+    // Get the parameter buttons "Air pressure" and "Visibility" which are selected
+    const parameterButton1 = within(parameterPanel).getByRole("button", {
+      name: PARAMETER_VOCABS[0].narrower[0].label,
+    });
+    const parameterButton2 = within(parameterPanel).getByRole("button", {
+      name: PARAMETER_VOCABS[0].narrower[1].label,
+    });
+
+    // Wait for the parameter buttons to be selected
+    await waitFor(() => {
+      expect(parameterButton1).toHaveAttribute("aria-pressed", "true");
+      expect(parameterButton2).toHaveAttribute("aria-pressed", "true");
+    });
   });
 
   // URL to Redux flow: make sure the searchbar states are updated correctly from URL parameters
