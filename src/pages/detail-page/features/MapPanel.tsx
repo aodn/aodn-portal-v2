@@ -386,8 +386,8 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
 
     return features.sort(
       (a, b) =>
-        (a.properties?.selectionOrder ?? 0) -
-        (b.properties?.selectionOrder ?? 0)
+        (a.properties?.selectionOrder ?? Number.MAX_SAFE_INTEGER) -
+        (b.properties?.selectionOrder ?? Number.MAX_SAFE_INTEGER)
     );
   }, [downloadConditions]);
 
