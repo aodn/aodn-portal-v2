@@ -23,6 +23,50 @@ interface Mark {
   label?: React.ReactNode;
 }
 
+/**
+ * Trailing debounce on the outgoing commit. The thumb and caption still move
+ * instantly; only the downstream work (WMS tile reload, download conditions)
+ * waits until the user stops, so holding an arrow key or clicking repeatedly
+ * costs one call instead of one per step.
+ */
+const SLIDER_COMMIT_DEBOUNCE_MS = 500;
+
+/**
+ * Hold the latest commit and release it once the user has been quiet for
+ * {@link SLIDER_COMMIT_DEBOUNCE_MS}. Returns a stable emitter to call on every
+ * commit; each new call replaces the pending one.
+ *
+ * The React synthetic event reaches the callback ~0.5s late. React no longer
+ * pools events, and every caller ignores the argument, so it is passed through
+ * unchanged.
+ */
+const useDebouncedCommit = <E,>(
+  callback: ((event: E, value: number | number[]) => void) | undefined
+) => {
+  const [pendingCommit, setPendingCommit] = useState<{
+    event: E;
+    value: number | number[];
+  } | null>(null);
+
+  useEffect(() => {
+    if (pendingCommit === null) return;
+
+    const timer = setTimeout(() => {
+      setPendingCommit(null);
+      callback?.(pendingCommit.event, pendingCommit.value);
+    }, SLIDER_COMMIT_DEBOUNCE_MS);
+
+    // A newer commit restarts the wait; unmounting — menu closed, map layer
+    // switched — drops the pending commit so it never lands on another layer.
+    return () => clearTimeout(timer);
+  }, [callback, pendingCommit]);
+
+  return useCallback(
+    (event: E, value: number | number[]) => setPendingCommit({ event, value }),
+    []
+  );
+};
+
 interface DateSliderRangeProps {
   visible?: boolean;
   currentMinDate: string | undefined;
@@ -170,12 +214,14 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
     [markValues]
   );
 
+  const commitPointValue = useDebouncedCommit(onDatePointChange);
+
   const applyPointValue = useCallback(
     (event: Event | React.SyntheticEvent<Element, Event>, newValue: number) => {
       setPickedStamp(newValue);
-      onDatePointChange?.(event, newValue);
+      commitPointValue(event, newValue);
     },
-    [onDatePointChange]
+    [commitPointValue]
   );
 
   // The slider moves freely, so snap the value before sending it out.
@@ -359,15 +405,17 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
     );
   });
 
+  const commitRangeValue = useDebouncedCommit(onDateRangeChange);
+
   const applyRangeValue = useCallback(
     (
       event: Event | React.SyntheticEvent<Element, Event>,
       newValue: number[]
     ) => {
       setDateRangeStamp(newValue);
-      onDateRangeChange(event, newValue);
+      commitRangeValue(event, newValue);
     },
-    [onDateRangeChange]
+    [commitRangeValue]
   );
 
   const handleSliderChange = useCallback(
@@ -503,7 +551,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
             // day with endOf max) use the full span so both ends are reachable.
             step={stepMs}
             shiftStep={MONTH_MS}
-            onChangeCommitted={(_, value) => onDateRangeChange(_, value)}
+            onChangeCommitted={commitRangeValue}
             onChange={handleSliderChange}
             slotProps={{
               input: {
