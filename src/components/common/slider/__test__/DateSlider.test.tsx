@@ -390,3 +390,77 @@ describe("DateSliderPoint arrow key notifications", () => {
     });
   });
 });
+
+describe("slider commit debounce", () => {
+  it("collapses a burst of point steps into one commit on the last mark", () => {
+    const user = userEvent.setup();
+    const onDatePointChange = vi.fn();
+    const points = [
+      dayjs.tz("2020-01-01").valueOf(),
+      dayjs.tz("2020-01-15").valueOf(),
+      dayjs.tz("2020-02-01").valueOf(),
+    ];
+
+    render(
+      <DateSliderPoint
+        valid_points={[...points]}
+        onDatePointChange={onDatePointChange}
+      />
+    );
+
+    const thumb = screen.getByRole("slider");
+    thumb.focus();
+
+    // Starts on the newest mark; two quick steps back land on the first one.
+    user.keyboard("{ArrowLeft}{ArrowLeft}");
+
+    return waitFor(() => {
+      expect(onDatePointChange).toHaveBeenLastCalledWith(
+        expect.anything(),
+        points[0]
+      );
+    }).then(() => {
+      // Only the final mark is sent: no call per step, and none up front.
+      expect(onDatePointChange).toHaveBeenCalledTimes(1);
+      expect(Number(thumb.getAttribute("aria-valuenow"))).toBe(points[0]);
+    });
+  });
+
+  it("collapses a burst of range steps into one commit on the final range", () => {
+    const user = userEvent.setup();
+    const onDateRangeChange = vi.fn();
+    const minDate = "2020-01-01";
+    const maxDate = "2020-01-31";
+
+    render(
+      <DateSliderRange
+        currentMinDate={minDate}
+        currentMaxDate={maxDate}
+        minDate={minDate}
+        maxDate={maxDate}
+        onDateRangeChange={onDateRangeChange}
+      />
+    );
+
+    const [startThumb, endThumb] = screen.getAllByRole("slider");
+    const startBefore = Number(startThumb.getAttribute("aria-valuenow"));
+    const end = Number(endThumb.getAttribute("aria-valuenow"));
+    startThumb.focus();
+
+    user.keyboard("{ArrowRight}{ArrowRight}{ArrowRight}");
+
+    const expectedStart = startBefore + 3 * DAY_MS;
+
+    return waitFor(() => {
+      expect(onDateRangeChange).toHaveBeenLastCalledWith(expect.anything(), [
+        expectedStart,
+        end,
+      ]);
+    }).then(() => {
+      expect(onDateRangeChange).toHaveBeenCalledTimes(1);
+      expect(Number(startThumb.getAttribute("aria-valuenow"))).toBe(
+        expectedStart
+      );
+    });
+  });
+});
