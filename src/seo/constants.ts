@@ -21,28 +21,8 @@ export const detailsUrl = (id: string) => `${BASE_URL}/details/${id}`;
 // users get the SPA shell. Keep in sync with seo.yml and the CloudFront function.
 export const PRERENDER_DETAILS_DIR = "prerender/details";
 
-// Who counts as a crawler — the CloudFront function copies this regex.
-// Plain lowercase substrings only, matched case-insensitively.
-const CRAWLER_TOKENS = [
-  "bot", // Googlebot, Bingbot, GPTBot, ClaudeBot, DuckDuckBot, Applebot...
-  "crawler",
-  "spider", // Baiduspider...
-  "slurp", // Yahoo
-  "facebookexternalhit", // Facebook/Instagram link previews
-  "embedly",
-  "quora link preview",
-  "outbrain",
-  "pinterest",
-  "vkshare",
-  "w3c_validator",
-  "whatsapp",
-  "telegram",
-  "aodn-seo-verify", // our own smoke check, see CRAWLER_UA
-];
-export const CRAWLER_UA_PATTERN = new RegExp(CRAWLER_TOKENS.join("|"), "i");
-
 // UA for seo:verify against the live site — "Googlebot" makes the CloudFront
-// function treat it as a crawler, "aodn-seo-verify" names us in access logs
+// function (artifacts/functions/cloudfront/) treat it as a crawler
 export const CRAWLER_UA = "aodn-seo-verify (compatible; Googlebot/2.1)";
 
 // Safe as an S3 object key / file name; skips the class default id "undefined"
