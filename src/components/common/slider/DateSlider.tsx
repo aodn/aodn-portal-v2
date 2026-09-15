@@ -106,9 +106,49 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const MONTH_MS = 30 * DAY_MS;
 
 /**
- * Resolve the next/previous discrete mark for keyboard navigation.
- * MUI's step=null uses step="any" on the native range input, which does not
- * reliably step between marks with ArrowLeft/ArrowRight.
+ * Find the mark closest to `value`. Marks are sorted, so use a binary search.
+ * A layer can have tens of thousands of marks, and this runs every time the
+ * thumb moves.
+ */
+const nearestMarkIndex = (marks: number[], value: number): number => {
+  if (marks.length === 0) return -1;
+
+  let low = 0;
+  let high = marks.length - 1;
+  while (low < high) {
+    const mid = (low + high) >> 1;
+    if (marks[mid] < value) {
+      low = mid + 1;
+    } else {
+      high = mid;
+    }
+  }
+
+  // `low` is the first mark >= value. The mark before it can be closer.
+  const prev = low > 0 ? low - 1 : low;
+  return Math.abs(marks[prev] - value) <= Math.abs(marks[low] - value)
+    ? prev
+    : low;
+};
+
+/**
+ * Move a raw slider value onto the nearest mark. MUI no longer gets the marks,
+ * so the slider moves freely and we snap the value here.
+ */
+const snapToMark = (marks: number[], value: number): number | undefined => {
+  const index = nearestMarkIndex(marks, value);
+  return index === -1 ? undefined : marks[index];
+};
+
+/** True when `value` is one of the marks. */
+const includesMark = (marks: number[], value: number): boolean => {
+  const index = nearestMarkIndex(marks, value);
+  return index !== -1 && marks[index] === value;
+};
+
+/**
+ * Get the next or previous mark for arrow key navigation. MUI cannot step
+ * between marks on its own, so we do it here.
  */
 const stepMarkValue = (
   marks: number[],
@@ -117,18 +157,8 @@ const stepMarkValue = (
 ): number | undefined => {
   if (marks.length === 0) return current;
 
-  let index = current === undefined ? -1 : marks.indexOf(current);
-  if (index === -1) {
-    // Snap to nearest mark, then step in the requested direction.
-    index = marks.reduce(
-      (best, value, i) =>
-        current !== undefined &&
-        Math.abs(value - current) < Math.abs(marks[best] - current)
-          ? i
-          : best,
-      0
-    );
-  }
+  // Start from the nearest mark, then move one step.
+  const index = current === undefined ? 0 : nearestMarkIndex(marks, current);
 
   const next = index + direction;
   if (next < 0 || next >= marks.length) return marks[index] ?? current;
@@ -155,7 +185,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
   const [pickedStamp, setPickedStamp] = useState<number | undefined>(undefined);
 
   const datePointStamp =
-    pickedStamp !== undefined && markValues.includes(pickedStamp)
+    pickedStamp !== undefined && includesMark(markValues, pickedStamp)
       ? pickedStamp
       : markValues[markValues.length - 1];
 
@@ -167,7 +197,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
         return;
       }
       setPickedStamp((current) =>
-        current !== undefined && markValues.includes(current)
+        current !== undefined && includesMark(markValues, current)
           ? current
           : sorted_marks[sorted_marks.length - 1].value
       );
@@ -176,9 +206,12 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
 
   const handleSliderChange = useCallback(
     (_: Event, newValue: number | number[]) => {
-      setPickedStamp(newValue as number);
+      const snapped = snapToMark(markValues, newValue as number);
+      if (snapped !== undefined) {
+        setPickedStamp(snapped);
+      }
     },
-    []
+    [markValues]
   );
 
   const commitPointValue = useDebouncedCommit(onDatePointChange);
@@ -191,9 +224,28 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
     [commitPointValue]
   );
 
-  // Explicit left/right (and up/down) handling so the thumb steps between
-  // discrete valid timestamps instead of relying on native range step="any".
-  const handleKeyDown = useCallback(
+  // The slider moves freely, so snap the value before sending it out.
+  const handleSliderCommit = useCallback(
+    (
+      event: Event | React.SyntheticEvent<Element, Event>,
+      newValue: number | number[]
+    ) => {
+      const snapped = snapToMark(markValues, newValue as number);
+      if (snapped !== undefined) {
+        applyPointValue(event, snapped);
+      }
+    },
+    [applyPointValue, markValues]
+  );
+
+  /**
+   * Move the thumb one mark per arrow key.
+   *
+   * This runs in the capture phase, above the hidden range input. MUI has its
+   * own keydown handler that steps by `step` and sends out a stale value, and
+   * it runs before any `onKeyDown` we pass in. So we stop arrow keys here.
+   */
+  const handleKeyDownCapture = useCallback(
     (event: React.KeyboardEvent) => {
       const direction: -1 | 1 | 0 =
         event.key === "ArrowLeft" || event.key === "ArrowDown"
@@ -204,14 +256,13 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
 
       if (direction === 0) return;
 
-      const next = stepMarkValue(markValues, datePointStamp, direction);
-      if (next === undefined || next === datePointStamp) {
-        event.preventDefault();
-        return;
-      }
-
+      // Stop the key even at the two ends, so MUI never sees it.
       event.preventDefault();
       event.stopPropagation();
+
+      const next = stepMarkValue(markValues, datePointStamp, direction);
+      if (next === undefined || next === datePointStamp) return;
+
       applyPointValue(event, next);
     },
     [applyPointValue, datePointStamp, markValues]
@@ -241,6 +292,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
         ...(Array.isArray(sx) ? sx : [sx]),
       ]}
       data-testid={COMPONENT_ID}
+      onKeyDownCapture={handleKeyDownCapture}
     >
       <Grid
         container
@@ -262,21 +314,15 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
             </Typography>
           </Stack>
           <ConcentrationSlider
-            step={null} // ← key: disables free sliding
+            // `marks` only draws the rail density. MUI does not get them, so
+            // the slider moves freely and `handleSliderChange` snaps the value.
             marks={sorted_marks}
             min={sorted_marks[0].value}
             max={sorted_marks[sorted_marks.length - 1].value}
             value={datePointStamp}
             defaultValue={datePointStamp}
-            onChangeCommitted={commitPointValue}
+            onChangeCommitted={handleSliderCommit}
             onChange={handleSliderChange}
-            slotProps={{
-              // Keyboard focus is on the hidden range input; handle arrows here
-              // so the thumb steps between discrete marks (step=null alone is unreliable).
-              input: {
-                onKeyDown: handleKeyDown,
-              },
-            }}
             valueLabelDisplay="auto"
             valueLabelFormat={(value: number) =>
               formatDate(unixMsToAppDayjs(value))

@@ -9,7 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
-import * as turf from "@turf/turf";
+import { bbox } from "@turf/bbox";
 import MapContext from "../MapContext";
 import { stringToColor } from "../../../common/colors/colorsUtils";
 import { Feature, Polygon, Position } from "geojson";
@@ -159,7 +159,7 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
         });
         if (features && features.length > 0) {
           const feature = features[0] as Feature<Polygon>;
-          const featureBbox = turf.bbox(feature);
+          const featureBbox = bbox(feature);
           if (featureBbox && featureBbox.length === 4) {
             const bounds = new LngLatBounds(
               new LngLat(featureBbox[0], featureBbox[1]), // SW

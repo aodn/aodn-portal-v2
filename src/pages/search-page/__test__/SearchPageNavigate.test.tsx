@@ -72,8 +72,11 @@ vi.mock("@/app/store/bookmarkListReducer", () => ({
   setTemporaryItem: vi.fn(),
 }));
 
-vi.mock("@turf/turf", () => ({
+vi.mock("@turf/bbox-polygon", () => ({
   bboxPolygon: vi.fn().mockReturnValue({ type: "Polygon", coordinates: [] }),
+}));
+
+vi.mock("@turf/boolean-equal", () => ({
   booleanEqual: vi.fn().mockReturnValue(true),
 }));
 

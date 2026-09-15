@@ -19,7 +19,7 @@ import {
   MultiPolygon,
   Polygon,
 } from "geojson";
-import { simplify } from "@turf/turf";
+import { simplify } from "@turf/simplify";
 import groupBy from "lodash/groupBy";
 import {
   allenCoralAtlasDefault,

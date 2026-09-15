@@ -308,3 +308,85 @@ describe("DateSliderPoint display", () => {
     });
   });
 });
+
+describe("DateSliderPoint marks", () => {
+  it("keeps mark nodes out of the DOM", () => {
+    // MUI renders one span per mark on every render, which made dragging slow
+    // on layers with thousands of times. The rail gradient shows them instead.
+    const start = dayjs.tz("2020-01-01").valueOf();
+    const points = Array.from({ length: 500 }, (_, i) => start + i * DAY_MS);
+
+    const { container } = render(<DateSliderPoint valid_points={points} />);
+
+    expect(container.querySelectorAll(".MuiSlider-mark")).toHaveLength(0);
+    // The thumb still starts on the newest mark.
+    expect(
+      Number(screen.getByRole("slider").getAttribute("aria-valuenow"))
+    ).toBe(points[points.length - 1]);
+  });
+});
+
+describe("DateSliderPoint arrow key notifications", () => {
+  const points = [
+    dayjs.tz("2020-01-01").valueOf(),
+    dayjs.tz("2020-01-15").valueOf(),
+    dayjs.tz("2020-02-01").valueOf(),
+  ];
+
+  it("notifies once per arrow key press", () => {
+    const user = userEvent.setup();
+    const onDatePointChange = vi.fn();
+
+    render(
+      <DateSliderPoint
+        valid_points={[...points]}
+        onDatePointChange={onDatePointChange}
+      />
+    );
+
+    const thumb = screen.getByRole("slider");
+    thumb.focus();
+
+    user.keyboard("{ArrowLeft}");
+
+    return waitFor(() => {
+      expect(onDatePointChange).toHaveBeenCalledTimes(1);
+    }).then(() => {
+      // MUI's own key handler used to fire a second, stale notification.
+      expect(onDatePointChange).toHaveBeenCalledWith(
+        expect.anything(),
+        points[1]
+      );
+      expect(Number(thumb.getAttribute("aria-valuenow"))).toBe(points[1]);
+    });
+  });
+
+  it("stays on the last mark when pressing ArrowRight at the end", () => {
+    const user = userEvent.setup();
+    const onDatePointChange = vi.fn();
+
+    render(
+      <DateSliderPoint
+        valid_points={[...points]}
+        onDatePointChange={onDatePointChange}
+      />
+    );
+
+    const thumb = screen.getByRole("slider");
+    thumb.focus();
+
+    // ArrowRight does nothing at the end, so only ArrowLeft should notify.
+    user.keyboard("{ArrowRight}{ArrowLeft}");
+
+    // The thumb moves at once; the commit lands after the 0.5s debounce.
+    return waitFor(() => {
+      expect(onDatePointChange).toHaveBeenCalledTimes(1);
+    }).then(() => {
+      expect(Number(thumb.getAttribute("aria-valuenow"))).toBe(points[1]);
+      expect(onDatePointChange).toHaveBeenCalledWith(
+        expect.anything(),
+        points[1]
+      );
+    });
+  });
+});
