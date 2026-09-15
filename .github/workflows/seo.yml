@@ -30,8 +30,10 @@ jobs:
         include:
           - environment: edge
             site: https://portal-edge.aodn.org.au
-          #- environment: production
-          #  site: https://portal-beta.aodn.org.au
+          - environment: staging
+            site: https://portal-staging.aodn.org.au
+          - environment: production
+            site: https://portal-beta.aodn.org.au
     environment: ${{ matrix.environment }}
     steps:
       - name: Checkout
@@ -95,17 +97,12 @@ jobs:
           --query Invalidation.Id --output text)
           echo "id=$invalidation_id" >> "$GITHUB_OUTPUT"
 
-      - name: Smoke check the SEO pages are live on CloudFront
-        env:
-          SITE: ${{ matrix.site }}
+      - name: Wait for the CloudFront cache to clear
         run: |
-          # Everything above already succeeded, so say so — a bare AWS error here
-          # reads like the publish failed. Needs cloudfront:GetInvalidation.
+          # The artifacts ARE published by now; this only makes sure Google and
+          # the verify job below see the new files. Needs cloudfront:GetInvalidation.
           aws cloudfront wait invalidation-completed --distribution-id ${{ vars.DISTRIBUTION_ID }} --id ${{ steps.invalidation.outputs.id }} --region ${{ vars.AWS_REGION }} \
-            || { echo "::error title=could not confirm the invalidation::the artifacts ARE published (see the step above); only this check failed — see the AWS error above"; exit 1; }
-          # CloudFront answers 200 with index.html for a missing file, so verify
-          # the served content, not status codes — same checks as seo:verify locally
-          yarn seo:verify "$SITE"
+            || { echo "::error title=could not confirm the invalidation::the artifacts ARE published (see the step above); only this wait failed — see the AWS error above"; exit 1; }
 
       # Publishing does not make Google index the pages — this reports coverage
       # so an indexing stall is noticed
@@ -116,3 +113,41 @@ jobs:
         run: |
           yarn seo:gsc submit
           yarn seo:gsc inspect 50
+
+  # Separate job so a CloudFront routing problem (owned by appdeploy) fails
+  # the check, not the publish. Public fetches only, so no environment needed.
+  verify:
+    needs: publish
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Same legs as publish
+        include:
+          - environment: edge
+            site: https://portal-edge.aodn.org.au
+          - environment: staging
+            site: https://portal-staging.aodn.org.au
+          - environment: production
+            site: https://portal-beta.aodn.org.au
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup node
+        uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+
+      - name: Yarn install
+        run: |
+          yarn install --immutable
+
+      - name: Smoke check the SEO pages are live on CloudFront
+        run: |
+          # CloudFront answers 200 with index.html for a missing file, so verify
+          # the served content, not status codes — same checks as seo:verify locally
+          yarn seo:verify "${{ matrix.site }}"

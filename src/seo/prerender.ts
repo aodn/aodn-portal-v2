@@ -97,9 +97,10 @@ export const renderCrawlerPage = (
         /\s*<script async src="https:\/\/www\.googletagmanager\.com\/gtag\/js[^"]*"><\/script>\s*<script>.*?<\/script>/s,
         ""
       )
+      // #root carries the static home body (homeBody.ts, no nested div)
       .replace(
-        '<div id="root"></div>',
-        `<div id="root">${renderBody(collection, related)}</div>`
+        /<div id="root">.*?<\/div>/s,
+        () => `<div id="root">${renderBody(collection, related)}</div>`
       )
   );
 };
