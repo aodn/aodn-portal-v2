@@ -16,7 +16,7 @@ crawlers need, delivered two ways:
   links so pages link to each other — crawlers only discover pages through
   `<a href>`); `fetchCollections.ts` is the only module importing app-store code
 
-A CloudFront function (in the appdeploy repo) rewrites crawler requests for
+A CloudFront function (in `artifacts/`) rewrites crawler requests for
 `/details/<uuid>` to the pre-rendered pages; real users always get the latest
 SPA shell. The `prerender/` folder never appears in a public URL, sitemap or
 canonical, and robots.txt disallows crawling it directly.
