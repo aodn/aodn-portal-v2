@@ -1,12 +1,14 @@
 /**
- * Vite build plugins: inline the static SEO head tags into index.html and
- * pick the per-environment robots.txt. Node-only — never import in app code.
+ * Vite build plugins: inline the static SEO head tags and home body into
+ * index.html and pick the per-environment robots.txt. Node-only — never
+ * import in app code.
  */
 
 import fs from "fs";
 import path from "path";
 import type { ViteDevServer } from "vite";
 import { buildSeoHeadTags } from "./headTags";
+import { buildHomeBody } from "./homeBody";
 
 interface SeoPluginOptions {
   mode: string;
@@ -22,6 +24,16 @@ export const inlineSeoTagsPlugin = ({ mode }: SeoPluginOptions) => ({
     // Canonical is set at runtime per route (canonicalUrl.ts) — the SPA has a
     // single index.html, so a static canonical would point every page at "/"
     return html.replace("<!-- seo-tags -->", buildSeoHeadTags(mode === "prod"));
+  },
+});
+
+export const inlineHomeBodyPlugin = () => ({
+  name: "inline-home-body",
+  transformIndexHtml(html: string) {
+    return html.replace(
+      '<div id="root"></div>',
+      `<div id="root">${buildHomeBody()}</div>`
+    );
   },
 });
 
@@ -51,5 +63,6 @@ export const copyRobotsPlugin = ({ mode, rootDir }: SeoPluginOptions) => ({
 
 export const seoPlugins = (options: SeoPluginOptions) => [
   inlineSeoTagsPlugin(options),
+  inlineHomeBodyPlugin(),
   copyRobotsPlugin(options),
 ];
