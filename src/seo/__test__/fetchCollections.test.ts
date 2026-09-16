@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
+import { AxiosError } from "axios";
 import { ogcAxiosWithRetry } from "@/app/store/searchReducer";
+import { createErrorResponse } from "@/utils/ErrorBoundary";
 import {
   describeFetchError,
   fetchCollections,
@@ -24,6 +26,19 @@ describe("describeFetchError", () => {
   test("falls back to the message when there is no cause", () => {
     expect(describeFetchError(new Error("HTTP 503 for /collections"))).toBe(
       "HTTP 503 for /collections"
+    );
+  });
+
+  test("shows the status and the backend's own message of an HTTP error", () => {
+    // searchReducer passes the backend's details as message and its message as details
+    const error = createErrorResponse(
+      500,
+      "uri=/api/v1/ogc/collections;client=10.64.3.210",
+      "Invalid properties in query [creation, revision, citation, license], check ?properties=xx"
+    );
+
+    expect(describeFetchError(error)).toBe(
+      "HTTP 500 — Invalid properties in query [creation, revision, citation, license], check ?properties=xx — uri=/api/v1/ogc/collections;client=10.64.3.210"
     );
   });
 });
@@ -124,6 +139,60 @@ describe("fetchCollections walks every page", () => {
 
     await expect(fetchCollections()).rejects.toThrow(
       /Failed to fetch collections from .* — boom/
+    );
+  });
+
+  test("keeps the status and reason of an HTTP error the backend rejected", async () => {
+    // The production backend replies 500 to properties it does not know yet
+    const response = {
+      status: 500,
+      statusText: "Internal Server Error",
+      headers: {},
+      config: {},
+      data: {
+        message:
+          "Invalid properties in query [creation, revision, citation, license], check ?properties=xx",
+        details: "uri=/api/v1/ogc/collections;client=10.64.3.210",
+      },
+    };
+    vi.spyOn(ogcAxiosWithRetry, "get").mockRejectedValue(
+      new AxiosError(
+        "Request failed with status code 500",
+        AxiosError.ERR_BAD_RESPONSE,
+        undefined,
+        undefined,
+        response as never
+      )
+    );
+
+    await expect(fetchCollections()).rejects.toThrow(
+      /Failed to fetch collections from .* — HTTP 500 — Invalid properties in query \[creation, revision, citation, license\], check \?properties=xx — uri=/
+    );
+  });
+
+  test("shows a 2xx body that is not the collections JSON, such as a WAF challenge page", async () => {
+    const challengePage = `<!DOCTYPE html><html><head><title>Checking your browser</title></head><body>${"x".repeat(5000)}</body></html>`;
+    vi.spyOn(ogcAxiosWithRetry, "get").mockResolvedValue({
+      data: challengePage,
+    } as never);
+
+    const failure = await fetchCollections().catch((error: Error) => error);
+
+    expect(failure).toBeInstanceOf(Error);
+    const message = (failure as Error).message;
+    expect(message).toMatch(
+      /^Unexpected response from .*\/ogc\/collections, expected collections JSON but got string: <!DOCTYPE html><html><head><title>Checking your browser<\/title>/
+    );
+    // a preview, not the whole page
+    expect(message).not.toContain("x".repeat(3000));
+    expect(message).toMatch(/… \(\d+ chars in total\)$/);
+  });
+
+  test("says so when the 2xx body is empty", async () => {
+    vi.spyOn(ogcAxiosWithRetry, "get").mockResolvedValue({ data: "" } as never);
+
+    await expect(fetchCollections()).rejects.toThrow(
+      /expected collections JSON but got string: \(empty body\)$/
     );
   });
 });
