@@ -52,6 +52,21 @@ describe("renderCrawlerPage", () => {
     expect(html).toContain('<body><div id="root">');
   });
 
+  test("keeps $ sequences in the abstract literal", () => {
+    // "$&" in a string replacement would splice the matched template back in
+    const html = renderCrawlerPage(
+      TEMPLATE,
+      toCollection({
+        id: "abc-123",
+        title: "Prices",
+        description: "Costs $& per sample, see $1",
+      })
+    );
+
+    expect(html).toContain("<p>Costs $&#38; per sample, see $1</p>");
+    expect(html.match(/<div id="root">/g)).toHaveLength(1);
+  });
+
   test("injects the record's title and abstract into the body", () => {
     const html = renderCrawlerPage(TEMPLATE, collection);
 

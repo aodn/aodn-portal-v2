@@ -14,6 +14,7 @@ import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 
 import { Box, IconButton } from "@mui/material";
 import DrawRectangle from "./DrawRectangle";
+import SelectionMarker from "./SelectionMarker";
 import { ControlProps } from "./Definition";
 import { BboxSelectionIcon } from "@/assets/icons/map/bbox_selection";
 import { switcherIconButtonSx } from "./MenuControl";
@@ -54,6 +55,9 @@ const DrawRect: React.FC<DrawControlProps> = ({
   const [hasFeatures, setHasFeatures] = useState<boolean>(false);
   const [hasSelectedFeatures, setHasSelectedFeatures] = useState(false);
   const activeToolRef = useRef<SelectionTool>("bbox");
+  const [selections, setSelections] = useState<
+    Feature<Polygon | MultiPolygon>[]
+  >([]);
 
   const mapDraw = useMemo<MapboxDraw>(
     () =>
@@ -126,6 +130,9 @@ const DrawRect: React.FC<DrawControlProps> = ({
             isValidPolygonFeature(feature)
         ) as Feature<Polygon | MultiPolygon>[];
 
+      setSelections(features);
+      setHasFeatures(features.length > 0);
+
       const removeFeature = (id: string) => {
         try {
           mapDraw.delete(id);
@@ -143,6 +150,14 @@ const DrawRect: React.FC<DrawControlProps> = ({
       }
     },
     [onChangeFeatures]
+  );
+
+  const removeSelection = useCallback(
+    (id: string) => {
+      mapDraw.delete(id);
+      syncMapFeaturesToContext(mapDraw);
+    },
+    [mapDraw, syncMapFeaturesToContext]
   );
 
   const [anchorRef, setAnchorRef] = useState<HTMLButtonElement | null>(null);
@@ -390,6 +405,22 @@ const DrawRect: React.FC<DrawControlProps> = ({
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 0 }}>
+      {map &&
+        selections
+          .filter(
+            (feature) =>
+              (feature.properties?.selectionType ?? "bbox") === "bbox"
+          )
+          .map((feature, index) => (
+            <SelectionMarker
+              draw={mapDraw}
+              key={feature.id}
+              map={map}
+              feature={feature}
+              number={index + 1}
+              onRemove={removeSelection}
+            />
+          ))}
       <MenuHintTooltip
         hint="Subset Bounding Box Selection"
         disable={isDrawingMode && activeTool === "bbox"}

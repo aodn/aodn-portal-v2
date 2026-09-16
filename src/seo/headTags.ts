@@ -7,7 +7,7 @@ import { BASE_URL, SHARE_IMAGE_URL, SITE_NAME } from "./constants";
 
 // Also the <title> of the index.html shell — what verify treats as "generic"
 export const SITE_TITLE = `${SITE_NAME} – Australian Ocean Data Network`;
-const SITE_DESCRIPTION =
+export const SITE_DESCRIPTION =
   "Open access to Australian marine and climate science data.";
 
 export const buildSeoHeadTags = (isProduction: boolean) => `
