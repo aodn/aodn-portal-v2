@@ -16,7 +16,7 @@ import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import InstagramIcon from "@mui/icons-material/Instagram";
-import traditional from "@/assets/icons/traditional.webp";
+import traditional from "@/assets/icons/traditional_80.webp";
 import {
   borderRadius,
   color,
