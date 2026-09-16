@@ -11,7 +11,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ui_test:
+  ui_test_shard:
+    name: ui_test shard ${{ matrix.shard }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
@@ -51,3 +52,16 @@ jobs:
             playwright/html-reports/
             playwright/test-results/
           retention-days: 7
+
+  # Branch protection requires a check named "ui_test", but matrix jobs report
+  # as "ui_test shard N". This job reports the combined shard result under that
+  # name. always() keeps it from being skipped, which would count as passing.
+  ui_test:
+    needs: ui_test_shard
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check shard results
+        run: |
+          echo "Shard result: ${{ needs.ui_test_shard.result }}"
+          test "${{ needs.ui_test_shard.result }}" = "success"
