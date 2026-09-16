@@ -54,6 +54,7 @@ class Map(BasePage):
         self.date_slider = page.get_by_test_id(
             'dateslider-daterange-menu-button'
         )
+        self.date_slider_rail = self.date_slider.locator('.MuiSlider-root')
 
     def wait_for_search_loading(self) -> None:
         """
@@ -251,6 +252,19 @@ class Map(BasePage):
         """Click the map at the current position of the mouse"""
         self.page.mouse.down()
         self.page.mouse.up()
+
+    def click_date_slider_rail(self, ratio: float) -> None:
+        """
+        Click the date slider rail at ``ratio`` of its width, moving the
+        nearest thumb there. A locator click waits for the slider to be
+        visible, stable and not covered, unlike a raw mouse down/up.
+        """
+        expect(self.date_slider_rail).to_be_visible()
+        box = self.date_slider_rail.bounding_box()
+        assert box is not None, 'Date slider rail has no bounding box'
+        self.date_slider_rail.click(
+            position={'x': box['width'] * ratio, 'y': box['height'] / 2}
+        )
 
     def click_map_center(self) -> None:
         """Click the map at the center position of the map element"""

@@ -112,18 +112,20 @@ def test_reset_selections_clears_bbox_and_date_range_together(
     )
     detail_page.mouse.move(x, y)
     detail_page.detail_map.click_map()
-    expect(detail_page.bbox_condition_box.first).to_have_css(
-        'visibility', 'visible', timeout=5000
-    )
+    expect(detail_page.bbox_condition_remove_button).to_be_visible()
 
-    # Select a date range using the slider
+    # Select a date range using the slider. Wait for the condition itself: the
+    # bbox already expanded the Download Selection accordion, so the date range
+    # box is visible before the slider change lands. Resetting before it lands
+    # lets the date range condition be added after the reset.
     detail_page.detail_map.daterange_show_hide_menu_button.click()
-    detail_page.detail_map.date_slider.hover()
-    detail_page.detail_map.click_map()
-    expect(detail_page.date_range_condition_box).to_be_visible()
+    detail_page.detail_map.click_date_slider_rail(ratio=0.3)
+    expect(detail_page.date_range_condition_remove_button).to_be_visible()
 
     # A single reset click should clear both together
     detail_page.detail_map.reset_selections_button.click()
+    expect(detail_page.bbox_condition_remove_button).to_have_count(0)
+    expect(detail_page.date_range_condition_remove_button).to_have_count(0)
     expect(detail_page.bbox_condition_box.first).not_to_be_visible()
     expect(detail_page.date_range_condition_box).not_to_be_visible()
 
@@ -143,14 +145,16 @@ def test_selecting_date_range_adds_download_filter(
     """
     detail_page = DetailPage(desktop_page)
     detail_page.load(uuid)
-    detail_page.wait_for_timeout(2000)
+    # The date range menu remounts when the layer's time bounds load, which
+    # closes the slider, so let the layer finish loading first.
+    detail_page.detail_map.wait_for_layer_select_loading()
 
     # Select date range show/hide menu
     detail_page.detail_map.daterange_show_hide_menu_button.click()
 
     # Select a date range using the slider
-    detail_page.detail_map.date_slider.hover()
-    detail_page.detail_map.click_map()
+    detail_page.detail_map.click_date_slider_rail(ratio=0.3)
+    expect(detail_page.date_range_condition_remove_button).to_be_visible()
     expect(detail_page.date_range_condition_box).to_be_visible()
 
 
