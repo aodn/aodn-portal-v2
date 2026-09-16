@@ -27,7 +27,7 @@ import { dateDefault } from "@/components/common/constants";
 const DEFAULT_INFO_TEXT =
   "To download data directly please use the selections below, or utilise the map tools to make your selection.";
 const EXTERNAL_INFO_TEXT =
-  "This downloading is from external services that is not managed by IMOS. Download speed, formats and availability depend on the external providers.";
+  "This download uses external services that are not managed by IMOS. Download speed, formats and availability depend on the external providers.";
 
 interface DownloadSubsettingProps extends DownloadCondition {
   hideInfoMessage?: boolean;
