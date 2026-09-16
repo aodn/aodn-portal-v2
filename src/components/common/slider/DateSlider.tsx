@@ -16,6 +16,7 @@ import {
 import { dateDefault } from "../constants";
 import { portalTheme } from "../../../styles";
 import { padding } from "@/styles/constants";
+import useDebounce from "@/hooks/useDebounce";
 import PlainSlider, { ConcentrationSlider, ThumbType } from "./PlainSlider";
 /** Slider mark shape (was imported from a deep MUI path removed in v7). */
 interface Mark {
@@ -24,48 +25,9 @@ interface Mark {
 }
 
 /**
- * Trailing debounce on the outgoing commit. The thumb and caption still move
- * instantly; only the downstream work (WMS tile reload, download conditions)
- * waits until the user stops, so holding an arrow key or clicking repeatedly
- * costs one call instead of one per step.
+ * The thumb moves at once; the downstream call waits until the user stops.
  */
 const SLIDER_COMMIT_DEBOUNCE_MS = 500;
-
-/**
- * Hold the latest commit and release it once the user has been quiet for
- * {@link SLIDER_COMMIT_DEBOUNCE_MS}. Returns a stable emitter to call on every
- * commit; each new call replaces the pending one.
- *
- * The React synthetic event reaches the callback ~0.5s late. React no longer
- * pools events, and every caller ignores the argument, so it is passed through
- * unchanged.
- */
-const useDebouncedCommit = <E,>(
-  callback: ((event: E, value: number | number[]) => void) | undefined
-) => {
-  const [pendingCommit, setPendingCommit] = useState<{
-    event: E;
-    value: number | number[];
-  } | null>(null);
-
-  useEffect(() => {
-    if (pendingCommit === null) return;
-
-    const timer = setTimeout(() => {
-      setPendingCommit(null);
-      callback?.(pendingCommit.event, pendingCommit.value);
-    }, SLIDER_COMMIT_DEBOUNCE_MS);
-
-    // A newer commit restarts the wait; unmounting — menu closed, map layer
-    // switched — drops the pending commit so it never lands on another layer.
-    return () => clearTimeout(timer);
-  }, [callback, pendingCommit]);
-
-  return useCallback(
-    (event: E, value: number | number[]) => setPendingCommit({ event, value }),
-    []
-  );
-};
 
 interface DateSliderRangeProps {
   visible?: boolean;
@@ -167,7 +129,7 @@ const stepMarkValue = (
 
 const DateSliderPoint: React.FC<DateSliderPointProps> = ({
   valid_points,
-  onDatePointChange = undefined,
+  onDatePointChange = () => {},
   sx,
   thumbType = ThumbType.CIRCLE,
 }) => {
@@ -214,7 +176,10 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
     [markValues]
   );
 
-  const commitPointValue = useDebouncedCommit(onDatePointChange);
+  const commitPointValue = useDebounce(
+    onDatePointChange,
+    SLIDER_COMMIT_DEBOUNCE_MS
+  );
 
   const applyPointValue = useCallback(
     (event: Event | React.SyntheticEvent<Element, Event>, newValue: number) => {
@@ -405,7 +370,10 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
     );
   });
 
-  const commitRangeValue = useDebouncedCommit(onDateRangeChange);
+  const commitRangeValue = useDebounce(
+    onDateRangeChange,
+    SLIDER_COMMIT_DEBOUNCE_MS
+  );
 
   const applyRangeValue = useCallback(
     (
