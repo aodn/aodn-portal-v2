@@ -3,7 +3,6 @@
  *
  * What must hold:
  * - the head tags land in index.html in place of the placeholder
- * - the static home body lands inside #root
  * - each environment ships its own robots.txt
  * - the build never fetches records; sitemap.xml and the pre-rendered
  *   /details pages come from the Publish SEO Artifacts workflow
@@ -13,7 +12,6 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import fs from "fs";
 import {
   copyRobotsPlugin,
-  inlineHomeBodyPlugin,
   inlineSeoTagsPlugin,
   seoPlugins,
 } from "../vitePlugins";
@@ -31,26 +29,11 @@ describe("inlineSeoTagsPlugin", () => {
   });
 });
 
-describe("inlineHomeBodyPlugin", () => {
-  test("puts the static home body inside #root", () => {
-    const html = inlineHomeBodyPlugin().transformIndexHtml(
-      '<body><div id="root"></div></body>'
-    );
-
-    expect(html).toContain('<div id="root"><main>');
-    expect(html).toContain("<h1>IMOS Australian Ocean Data Portal</h1>");
-  });
-});
-
 describe("seoPlugins", () => {
   test("no plugin fetches records at build time", () => {
     const names = seoPlugins(options("prod")).map((plugin) => plugin.name);
 
-    expect(names).toEqual([
-      "inline-seo",
-      "inline-home-body",
-      "copy-robots-txt",
-    ]);
+    expect(names).toEqual(["inline-seo", "copy-robots-txt"]);
   });
 });
 
