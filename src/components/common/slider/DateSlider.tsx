@@ -16,12 +16,18 @@ import {
 import { dateDefault } from "../constants";
 import { portalTheme } from "../../../styles";
 import { padding } from "@/styles/constants";
+import useDebounce from "@/hooks/useDebounce";
 import PlainSlider, { ConcentrationSlider, ThumbType } from "./PlainSlider";
 /** Slider mark shape (was imported from a deep MUI path removed in v7). */
 interface Mark {
   value: number;
   label?: React.ReactNode;
 }
+
+/**
+ * The thumb moves at once; the downstream call waits until the user stops.
+ */
+const SLIDER_COMMIT_DEBOUNCE_MS = 500;
 
 interface DateSliderRangeProps {
   visible?: boolean;
@@ -123,7 +129,7 @@ const stepMarkValue = (
 
 const DateSliderPoint: React.FC<DateSliderPointProps> = ({
   valid_points,
-  onDatePointChange = undefined,
+  onDatePointChange = () => {},
   sx,
   thumbType = ThumbType.CIRCLE,
 }) => {
@@ -170,12 +176,17 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
     [markValues]
   );
 
+  const commitPointValue = useDebounce(
+    onDatePointChange,
+    SLIDER_COMMIT_DEBOUNCE_MS
+  );
+
   const applyPointValue = useCallback(
     (event: Event | React.SyntheticEvent<Element, Event>, newValue: number) => {
       setPickedStamp(newValue);
-      onDatePointChange?.(event, newValue);
+      commitPointValue(event, newValue);
     },
-    [onDatePointChange]
+    [commitPointValue]
   );
 
   // The slider moves freely, so snap the value before sending it out.
@@ -359,15 +370,20 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
     );
   });
 
+  const commitRangeValue = useDebounce(
+    onDateRangeChange,
+    SLIDER_COMMIT_DEBOUNCE_MS
+  );
+
   const applyRangeValue = useCallback(
     (
       event: Event | React.SyntheticEvent<Element, Event>,
       newValue: number[]
     ) => {
       setDateRangeStamp(newValue);
-      onDateRangeChange(event, newValue);
+      commitRangeValue(event, newValue);
     },
-    [onDateRangeChange]
+    [commitRangeValue]
   );
 
   const handleSliderChange = useCallback(
@@ -503,7 +519,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
             // day with endOf max) use the full span so both ends are reachable.
             step={stepMs}
             shiftStep={MONTH_MS}
-            onChangeCommitted={(_, value) => onDateRangeChange(_, value)}
+            onChangeCommitted={commitRangeValue}
             onChange={handleSliderChange}
             slotProps={{
               input: {
