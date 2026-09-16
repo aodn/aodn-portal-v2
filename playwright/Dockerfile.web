@@ -8,14 +8,13 @@ COPY .yarnrc.yml ./
 
 # Install dependencies
 RUN \
-    apt-get update -y \
-    && apt-get upgrade -y \
-    && npm install -g corepack \
+    npm install -g corepack \
     && corepack enable \
     && yarn install
 
 # Expose the port the app runs on
 EXPOSE 5173
 
-# Command to run the application
-CMD ["yarn", "playwright-local", "--host", "0.0.0.0"]
+# The unit suite already runs in lint-test.yml, so serve the app directly
+# instead of going through `playwright-local`, which prepends `vitest run`.
+CMD ["yarn", "playwright:no-vitest", "--host", "0.0.0.0", "--port", "5173"]

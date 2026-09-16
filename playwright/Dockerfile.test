@@ -4,17 +4,15 @@ FROM mcr.microsoft.com/playwright/python:v1.51.0-jammy
 WORKDIR /app
 
 COPY pyproject.toml poetry.lock /app/
-COPY scripts/entrypoint.sh /app/
 
 RUN \
-    apt-get update -y \
-    && apt-get upgrade -y \
-    # Install dependencies
-    && python3 -m pip install poetry \
-    && python3 -m poetry install --no-root --no-interaction --no-ansi \
-    # Set entrypoint for Docker Image
-    && cp /app/entrypoint.sh /entrypoint.sh \
-    && chmod +x /entrypoint.sh
+    python3 -m pip install poetry \
+    && python3 -m poetry install --no-root --no-interaction --no-ansi
+
+# Kept in its own layer so editing the entrypoint does not invalidate the
+# dependency install above.
+COPY scripts/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 # Set the entrypoint
 ENTRYPOINT ["/entrypoint.sh"]
