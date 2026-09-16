@@ -29,6 +29,8 @@ const NewsCard: FC<NewsCardProps> = ({ news }) => {
           component="img"
           height="280px"
           image={news.image}
+          srcSet={news.imageSrcSet}
+          sizes="(min-width: 1440px) 400px, (min-width: 768px) calc((100vw - 132px) / 2), calc(100vw - 30px)"
           alt={`news image-${news.title}`}
           loading="lazy"
           decoding="async"

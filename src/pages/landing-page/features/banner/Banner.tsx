@@ -4,8 +4,10 @@ import InfoIcon from "@mui/icons-material/Info";
 import { padding } from "../../../../styles/constants";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 import bannerImage1 from "@/assets/images/banner_image_1.webp";
+import bannerImage1Small from "@/assets/images/banner_image_1_320.webp";
 import bannerImage2 from "@/assets/images/banner_image_2.webp";
 import bannerImage3 from "@/assets/images/banner_image_3.webp";
+import bannerImage3Small from "@/assets/images/banner_image_3_120.webp";
 import { portalTheme } from "../../../../styles";
 import FeedbackButton from "@/components/feedback/FeedbackButton";
 
@@ -149,6 +151,8 @@ const renderBannerImages = (
         >
           <img
             src={bannerImage1}
+            srcSet={`${bannerImage1Small} 320w, ${bannerImage1} 488w`}
+            sizes="(max-width: 1023px) 320px, 306px"
             width={488}
             height={288}
             loading="eager"
@@ -179,6 +183,8 @@ const renderBannerImages = (
         >
           <img
             src={bannerImage3}
+            srcSet={`${bannerImage3Small} 120w, ${bannerImage3} 240w`}
+            sizes="120px"
             width={240}
             height={165}
             loading="lazy"

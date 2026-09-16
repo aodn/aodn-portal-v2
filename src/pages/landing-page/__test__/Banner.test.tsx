@@ -23,4 +23,21 @@ describe("Banner", () => {
       })
     ).to.exist;
   });
+
+  test("serves responsive sources for the hero and decorative image", () => {
+    render(
+      <ThemeProvider theme={AppTheme}>
+        <Banner />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByAltText("banner-image-1")).toHaveAttribute(
+      "srcset",
+      expect.stringContaining("320w")
+    );
+    expect(screen.getByAltText("banner-image-3")).toHaveAttribute(
+      "srcset",
+      expect.stringContaining("120w")
+    );
+  });
 });
