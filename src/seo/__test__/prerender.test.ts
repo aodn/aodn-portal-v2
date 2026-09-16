@@ -1,6 +1,5 @@
 import { describe, expect, test } from "vitest";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
-import { buildHomeBody } from "../homeBody";
 import { renderCrawlerPage } from "../prerender";
 import { BASE_URL } from "../constants";
 
@@ -51,18 +50,6 @@ describe("renderCrawlerPage", () => {
     // The rest of the template is preserved
     expect(html).toContain('<meta charset="utf-8">');
     expect(html).toContain('<body><div id="root">');
-  });
-
-  test("replaces the static home body the deployed shell carries", () => {
-    const shell = TEMPLATE.replace(
-      '<div id="root"></div>',
-      `<div id="root">${buildHomeBody()}</div>`
-    );
-    const html = renderCrawlerPage(shell, collection);
-
-    expect(html).not.toContain("Featured datasets");
-    expect(html.match(/<h1>/g)).toHaveLength(1);
-    expect(html).toContain("<h1>Sea Surface Temperature</h1>");
   });
 
   test("keeps $ sequences in the abstract literal", () => {
