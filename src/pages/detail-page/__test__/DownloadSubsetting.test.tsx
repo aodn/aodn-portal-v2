@@ -148,7 +148,7 @@ describe("DownloadSubsetting info message", () => {
 
     expect(
       screen.getByText(
-        "This downloading is from external services that is not managed by IMOS. Download speed, formats and availability depend on the external providers."
+        "This download uses external services that are not managed by IMOS. Download speed, formats and availability depend on the external providers."
       )
     ).toBeInTheDocument();
   });
