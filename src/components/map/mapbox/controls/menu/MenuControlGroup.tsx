@@ -33,16 +33,22 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
     [`&.${className}`]: {
       width: "40px",
       borderRadius: 0,
-      background: "#FFF",
+      background: "transparent",
       boxShadow: "none",
       "& button + button": {
         borderTop: "none",
       },
       marginY: 0,
-      mx: "1px",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
+    },
+    "&.mapboxgl-ctrl.mapboxgl-ctrl-group": {
+      margin: 0,
+      background: "transparent",
+    },
+    "&.mapboxgl-ctrl.mapboxgl-ctrl-group:not(:empty)": {
+      boxShadow: "none",
     },
   };
 
@@ -55,6 +61,7 @@ const MenuControlGroup: FC<MenuControlGroupProps> = ({
         width: "42px",
         bgcolor: "#FFF",
         borderRadius: "6px",
+        alignItems: "center",
         boxShadow: "4px 4px 4px 0px rgba(0, 0, 0, 0.10)",
         mt: "10px",
         mr: "10px",
