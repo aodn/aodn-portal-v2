@@ -130,9 +130,9 @@ module.exports = [
     },
   },
 
-  // seo/ = CLI scripts, console output is their UI
+  // seo/ and lighthouse/ = CLI scripts, console output is their UI
   {
-    files: ["src/seo/**"],
+    files: ["src/seo/**", "src/lighthouse/**"],
     rules: {
       "no-console": "off",
     },
