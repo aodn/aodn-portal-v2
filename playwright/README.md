@@ -163,12 +163,12 @@ pytest --tracing retain-on-failure
 
 In CI runs, traces are automatically saved for failed tests.
 
-Traces are recorded without screenshots or DOM snapshots, because those are
-captured on every action and then thrown away for the tests that pass. The
-action log, network traffic and stack traces are still there; the visual
-time-travel view is not. To get it back while reproducing a failure locally,
-start tracing with `screenshots=True, snapshots=True` in
-[`tests/conftest.py`](./tests/conftest.py).
+`retain-on-failure` only controls whether the trace is _saved_, not what it
+contains: [`tests/conftest.py`](./tests/conftest.py) starts tracing with
+`screenshots=True, snapshots=True, sources=True` for every test, so a saved
+trace from a failed CI run includes the full visual time-travel view, action
+log, network traffic and stack traces. Passing tests still record all of that
+during the run — it's just discarded instead of written to disk.
 
 - Navigate to the specific workflow run.
 - Scroll down to the **Artifacts** section.
