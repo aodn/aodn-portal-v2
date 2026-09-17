@@ -9,8 +9,10 @@
 import fs from "fs";
 import path from "path";
 import {
+  ALL_FORM_FACTORS,
   COMMENT_MARKER,
   blockingPerformanceDrop,
+  formFactorLabels,
   isScoreMetric,
   metricLabels,
   metricOrder,
@@ -26,9 +28,9 @@ import {
   runCli,
 } from "./cli";
 import type {
+  FormFactor,
   LighthouseReport,
   MetricKey,
-  RouteMetrics,
   RouteReport,
 } from "./types";
 
@@ -69,6 +71,7 @@ const isWarning = (metric: MetricKey, baseline: number, current: number) => {
 const warningSentence = (
   metric: MetricKey,
   routePath: string,
+  formFactor: FormFactor,
   baseline: number,
   current: number,
   baselineLabel: string
@@ -78,14 +81,17 @@ const warningSentence = (
   const unit = isScoreMetric(metric)
     ? `${Math.round(amount)} point${Math.round(amount) === 1 ? "" : "s"}`
     : formatDelta(metric, amount).replace(/^\+/, "");
-  return `⚠️ ${metricLabels[metric]} on \`${routePath}\` ${direction} by ${unit} compared with \`${baselineLabel}\`.`;
+  return (
+    `⚠️ ${metricLabels[metric]} (${formFactorLabels[formFactor]}) on \`${routePath}\` ` +
+    `${direction} by ${unit} compared with \`${baselineLabel}\`.`
+  );
 };
 
 const findBaselineRoute = (
   baseline: LighthouseReport | undefined,
   routePath: string,
   route: RouteReport
-): RouteMetrics | undefined => {
+): RouteReport | undefined => {
   if (!baseline) return undefined;
   const exact = baseline.routes[routePath];
   if (exact) return exact;
@@ -94,63 +100,89 @@ const findBaselineRoute = (
   return Object.values(baseline.routes).find((entry) => entry.id === route.id);
 };
 
+/** One table cell: `before → after (delta)`, or just the value with no baseline. */
+const cell = (
+  metric: MetricKey,
+  routePath: string,
+  formFactor: FormFactor,
+  before: number | undefined,
+  value: number | undefined,
+  baselineLabel: string,
+  blockingDrop: number
+): { text: string; warning?: string; blocking?: string } => {
+  if (value === undefined) {
+    return { text: before === undefined ? "—" : "not measured" };
+  }
+  if (before === undefined) {
+    return { text: formatValue(metric, value) };
+  }
+
+  const drop = regression(metric, before, value);
+  const blocks =
+    metric === "performance" && blockingDrop > 0 && drop >= blockingDrop - 1e-9;
+  const warns = isWarning(metric, before, value);
+
+  const delta = value - before;
+  let text = formatValue(metric, value);
+  if (delta !== 0) {
+    const marker = drop > 0 ? (blocks ? " ❌" : warns ? " ⚠️" : "") : " ✅";
+    text = `${formatValue(metric, before)} → ${formatValue(metric, value)} (${formatDelta(metric, delta)}${marker})`;
+  }
+
+  return {
+    text,
+    blocking: blocks
+      ? `❌ Performance (${formFactorLabels[formFactor]}) on \`${routePath}\` dropped by ` +
+        `${Math.round(drop)} points compared with \`${baselineLabel}\` — this check fails at ${blockingDrop} or more.`
+      : undefined,
+    warning:
+      !blocks && warns
+        ? warningSentence(
+            metric,
+            routePath,
+            formFactor,
+            before,
+            value,
+            baselineLabel
+          )
+        : undefined,
+  };
+};
+
 const routeTable = (
   routePath: string,
   current: RouteReport,
-  baseline: RouteMetrics | undefined,
+  baseline: RouteReport | undefined,
   baselineLabel: string,
   blockingDrop: number
 ) => {
   const lines = [
     `### \`${routePath}\``,
     "",
-    `| Metric | ${baselineLabel} | PR | Change |`,
-    "|---|---:|---:|---:|",
+    "| Metric | Mobile | Desktop |",
+    "|---|---:|---:|",
   ];
   const warnings: string[] = [];
   const blocking: string[] = [];
 
   for (const metric of metricOrder) {
-    const value = current[metric];
-    const before = baseline?.[metric];
-
-    if (before === undefined) {
-      lines.push(
-        `| ${metricLabels[metric]} | n/a | ${formatValue(metric, value)} | — |`
-      );
-      continue;
-    }
-
-    const drop = regression(metric, before, value);
-    const blocks =
-      metric === "performance" &&
-      blockingDrop > 0 &&
-      drop >= blockingDrop - 1e-9;
-    const warns = isWarning(metric, before, value);
-
-    const delta = value - before;
-    let change = "—";
-    if (delta !== 0) {
-      const marker = drop > 0 ? (blocks ? " ❌" : warns ? " ⚠️" : "") : " ✅";
-      change = `${formatDelta(metric, delta)}${marker}`;
-    }
-
-    if (blocks) {
-      blocking.push(
-        `❌ Performance on \`${routePath}\` dropped by ${Math.round(drop)} points ` +
-          `compared with \`${baselineLabel}\` — this check fails at ${blockingDrop} or more.`
-      );
-    } else if (warns) {
-      warnings.push(
-        warningSentence(metric, routePath, before, value, baselineLabel)
-      );
-    }
-
-    lines.push(
-      `| ${metricLabels[metric]} | ${formatValue(metric, before)} | ${formatValue(
+    const cells = ALL_FORM_FACTORS.map((formFactor) =>
+      cell(
         metric,
-        value
-      )} | ${change} |`
+        routePath,
+        formFactor,
+        baseline?.metrics[formFactor]?.[metric],
+        current.metrics[formFactor]?.[metric],
+        baselineLabel,
+        blockingDrop
+      )
+    );
+    for (const result of cells) {
+      if (result.blocking) blocking.push(result.blocking);
+      if (result.warning) warnings.push(result.warning);
+    }
+    lines.push(
+      `| ${metricLabels[metric]} | ${cells[0].text} | ${cells[1].text} |`
     );
   }
 
@@ -207,30 +239,11 @@ export const buildMarkdown = ({
     );
   }
 
-  if (baseline && baseline.formFactor !== current.formFactor) {
-    lines.push(
-      `⚠️ The baseline was measured as \`${baseline.formFactor}\` and this run as ` +
-        `\`${current.formFactor}\`; the numbers are not comparable.`,
-      ""
-    );
-  }
-
-  lines.push(
-    "<details><summary>How this was measured</summary>",
-    "",
-    `- Median of ${current.runs} Lighthouse run${current.runs === 1 ? "" : "s"} per route, \`${current.formFactor}\` emulation`,
-    `- Production build served locally, with API responses recorded once from \`${current.apiHost}\` and replayed to every run`,
-    `- PR commit \`${current.commit.slice(0, 7)}\`, generated ${current.generatedAt}`,
-    "- Warning thresholds: performance 5 points, accessibility/best practices/SEO 3 points, LCP 500ms, TBT 100ms, CLS 0.03",
-    "",
-    "</details>",
-    "",
-    blockingDrop > 0
-      ? `Everything here is informational except one thing: a performance drop of ${blockingDrop} points or more against \`${baselineLabel}\` fails the check.`
-      : "This report is informational and does not block the PR based on Lighthouse scores."
-  );
-
-  return { markdown: `${lines.join("\n")}\n`, warnings, blocking };
+  return {
+    markdown: `${lines.join("\n").replace(/\n+$/, "")}\n`,
+    warnings,
+    blocking,
+  };
 };
 
 const readReport = (file: string): LighthouseReport =>

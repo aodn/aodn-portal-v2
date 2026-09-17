@@ -159,7 +159,13 @@ export const DEFAULT_RUNS = 3;
 
 export const DEFAULT_PORT = 4173;
 
-export const DEFAULT_FORM_FACTOR: FormFactor = "mobile";
+/** Measured by default — every PR sees how it moved on both. */
+export const ALL_FORM_FACTORS: FormFactor[] = ["mobile", "desktop"];
+
+export const formFactorLabels: Record<FormFactor, string> = {
+  mobile: "Mobile",
+  desktop: "Desktop",
+};
 
 /** Marks the PR comment this workflow owns, so it updates instead of piling up. */
 export const COMMENT_MARKER = "<!-- lighthouse-ci-report -->";

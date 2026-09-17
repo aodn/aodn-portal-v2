@@ -1,9 +1,9 @@
 # Lighthouse CI
 
 Detects performance regressions on pull requests. Every PR measures `/`,
-`/search` and `/details/<uuid>` with Lighthouse and reports how they moved
-against the latest run on `main`, as a single comment that is updated on each
-push.
+`/search` and `/details/<uuid>` with Lighthouse, on both mobile and desktop
+emulation, and reports how they moved against the latest run on `main`, as a
+single comment that is updated on each push.
 
 **Small score movements never fail a PR.** The job goes red when a run could not
 be trusted — no build, Chrome or Lighthouse erroring, or a page that did not
@@ -51,25 +51,26 @@ Run it locally exactly as CI does:
 
 ```bash
 yarn lh:build
-yarn lh:measure                 # ~2 min: 3 routes x (1 warm-up + 3 runs)
+yarn lh:measure                 # ~4 min: 3 routes x 2 form factors x (1 warm-up + 3 runs)
 yarn lh:compare                 # no baseline locally: reports current values
 cat .lighthouse/report.md
 ```
 
 Useful flags on `yarn lh:measure`:
 
-| flag                    | for                                                            |
-| ----------------------- | -------------------------------------------------------------- |
-| `--runs 1`              | a quick check while changing this tooling                      |
-| `--form-factor desktop` | desktop emulation instead of mobile                            |
-| `--uuid <uuid>`         | measure a different record on `/details`                       |
-| `--api-host <url>`      | record from another environment (default `portal-edge`)        |
-| `--fresh`               | drop the recorded API responses and record them again          |
-| `--serve-only`          | just serve the build + recorded API data, to open in a browser |
-| `--no-keep-lhr`         | skip writing the full results to `.lighthouse/lhr/`            |
+| flag                   | for                                                            |
+| ---------------------- | -------------------------------------------------------------- |
+| `--runs 1`             | a quick check while changing this tooling                      |
+| `--form-factor mobile` | measure only mobile (or only `desktop`); default is both       |
+| `--uuid <uuid>`        | measure a different record on `/details`                       |
+| `--api-host <url>`     | record from another environment (default `portal-edge`)        |
+| `--fresh`              | drop the recorded API responses and record them again          |
+| `--serve-only`         | just serve the build + recorded API data, to open in a browser |
+| `--no-keep-lhr`        | skip writing the full results to `.lighthouse/lhr/`            |
 
-`LH_RUNS`, `LH_FORM_FACTOR`, `LH_DETAILS_UUID`, `LH_API_HOST`, `LH_PORT` and
-`LH_COMMIT` do the same as their flags, for the workflow.
+`LH_RUNS`, `LH_FORM_FACTOR` (`mobile`, `desktop` or `both`), `LH_DETAILS_UUID`,
+`LH_API_HOST`, `LH_PORT` and `LH_COMMIT` do the same as their flags, for the
+workflow.
 
 ## How the baseline works
 
@@ -87,8 +88,9 @@ Routes are matched by path, then by route id, so changing which record
 
 ## Warning thresholds
 
-Anything smaller is treated as noise. Regressions are listed in the comment with
-a ⚠️; any improvement gets a ✅.
+Checked independently for mobile and desktop, on every route. Anything smaller
+is treated as noise. Regressions are listed in the comment with a ⚠️; any
+improvement gets a ✅.
 
 | metric                             | warns at      |
 | ---------------------------------- | ------------- |
@@ -104,9 +106,9 @@ FCP moves with LCP, so warning on both would report one regression twice.
 ## Blocking threshold
 
 Everything above is informational. The one exception: **a Performance score 15
-points or more below `main`, on any route, fails the job.** That is far outside
-normal run-to-run variability, so it means the PR actually made a page slower,
-not noise.
+points or more below `main`, on any route, on either mobile or desktop, fails
+the job.** That is far outside normal run-to-run variability, so it means the
+PR actually made a page slower, not noise.
 
 - `yarn lh:compare` writes the routes that hit this into `.lighthouse/gate.json`;
   `yarn lh:gate` reads it and fails (after the PR comment has already been
@@ -128,5 +130,8 @@ not noise.
   `.lighthouse/lhr/*.json` in the run artifact.
 - **Third parties are measured.** GA and New Relic load in an edge build, and
   the map fetches Mapbox tiles, so their variance is in TBT.
-- **Mobile only by default.** Desktop doubles the runtime for a weaker signal;
-  run the workflow manually with the `desktop` input when it is needed.
+- **Both form factors run on every PR.** They score differently — different
+  throttling, different Lighthouse config — so the comment shows them as
+  separate columns rather than picking one. Run the workflow manually with the
+  `form-factor` input set to `mobile` or `desktop` for a faster, single-factor
+  check.

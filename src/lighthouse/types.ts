@@ -21,13 +21,19 @@ export interface RouteMetrics {
 
 export type MetricKey = keyof RouteMetrics;
 
+export type FormFactor = "mobile" | "desktop";
+
 /**
  * A route's medians plus the route id. Keys of `routes` are paths (so the PR
  * comment can show them), and the id lets a comparison still line up when a
- * path changes — e.g. a different `/details/<uuid>`.
+ * path changes — e.g. a different `/details/<uuid>`. `metrics` is keyed by
+ * form factor because Lighthouse scores mobile and desktop very differently
+ * (different throttling, different config) — a run can measure either or
+ * both, so a factor missing from `metrics` just means it was not measured.
  */
-export interface RouteReport extends RouteMetrics {
+export interface RouteReport {
   id: string;
+  metrics: Partial<Record<FormFactor, RouteMetrics>>;
 }
 
 /** What gets uploaded as the `lighthouse-baseline` artifact. */
@@ -35,15 +41,12 @@ export interface LighthouseReport {
   commit: string;
   branch: string;
   generatedAt: string;
-  formFactor: FormFactor;
-  /** Lighthouse runs per route; every value above is their median. */
+  /** Lighthouse runs per route/form factor; every value above is their median. */
   runs: number;
   /** Upstream the recorded API responses came from. */
   apiHost: string;
   routes: Record<string, RouteReport>;
 }
-
-export type FormFactor = "mobile" | "desktop";
 
 /** Minimal view of the Lighthouse result the scripts read. */
 export interface Lhr {

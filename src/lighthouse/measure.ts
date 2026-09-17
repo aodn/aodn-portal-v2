@@ -14,7 +14,7 @@ import path from "path";
 import { createApiCache } from "./apiCache";
 import { startAppServer } from "./appServer";
 import {
-  DEFAULT_FORM_FACTOR,
+  ALL_FORM_FACTORS,
   DEFAULT_PORT,
   DEFAULT_RUNS,
   apiHost,
@@ -70,15 +70,24 @@ const branchName = () =>
   git("rev-parse", "--abbrev-ref", "HEAD") ||
   "unknown";
 
-const formFactorArg = (): FormFactor => {
-  const value =
+/**
+ * Both mobile and desktop by default — Lighthouse scores them very
+ * differently, so the report and the PR comment carry both. `--form-factor`
+ * restricts a run to one, for a quick check while iterating on this tooling.
+ */
+const formFactorsArg = (): FormFactor[] => {
+  const value = (
     argValue("--form-factor") ||
     process.env.LH_FORM_FACTOR ||
-    DEFAULT_FORM_FACTOR;
+    "both"
+  ).trim();
+  if (value === "both" || value === "") return [...ALL_FORM_FACTORS];
   if (value !== "mobile" && value !== "desktop") {
-    throw new Error(`--form-factor must be mobile or desktop, got "${value}"`);
+    throw new Error(
+      `--form-factor must be mobile, desktop or both, got "${value}"`
+    );
   }
-  return value;
+  return [value];
 };
 
 const positiveInt = (value: string | undefined, fallback: number) => {
@@ -147,7 +156,7 @@ const measureRoute = async ({
 };
 
 export const measure = async () => {
-  const formFactor = formFactorArg();
+  const formFactors = formFactorsArg();
   const runs = positiveInt(
     argValue("--runs") ?? process.env.LH_RUNS,
     DEFAULT_RUNS
@@ -186,14 +195,17 @@ export const measure = async () => {
   const routes: Record<string, RouteReport> = {};
   try {
     for (const route of lighthouseRoutes(uuid)) {
-      const metrics = await measureRoute({
-        route,
-        origin: server.url,
-        runs,
-        formFactor,
-        keepLhr,
-      });
-      routes[route.path] = { id: route.id, ...metrics };
+      const metrics: RouteReport["metrics"] = {};
+      for (const formFactor of formFactors) {
+        metrics[formFactor] = await measureRoute({
+          route,
+          origin: server.url,
+          runs,
+          formFactor,
+          keepLhr,
+        });
+      }
+      routes[route.path] = { id: route.id, metrics };
     }
   } finally {
     await server.close();
@@ -216,7 +228,6 @@ export const measure = async () => {
     commit: commitSha(),
     branch: branchName(),
     generatedAt: new Date().toISOString(),
-    formFactor,
     runs,
     apiHost: upstream,
     routes,

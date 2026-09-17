@@ -20,8 +20,8 @@ on:
       form-factor:
         description: "Emulation to measure"
         type: choice
-        default: mobile
-        options: [mobile, desktop]
+        default: both
+        options: [both, mobile, desktop]
 
 # cancel currently running workflow from the same PR or branch
 concurrency:
@@ -38,8 +38,9 @@ permissions:
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
-    # Three routes x (1 warm-up + 3 measured runs) takes ~4 min; the rest is
-    # install and build. A hang should not sit here for an hour.
+    # Three routes x 2 form factors (mobile, desktop) x (1 warm-up + 3 measured
+    # runs) takes ~8 min; the rest is install and build. A hang should not sit
+    # here for an hour.
     timeout-minutes: 20
 
     steps:
@@ -70,7 +71,7 @@ jobs:
           # On pull_request GITHUB_SHA is the merge commit; report the PR's own
           # commit instead
           LH_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
-          LH_FORM_FACTOR: ${{ inputs.form-factor || 'mobile' }}
+          LH_FORM_FACTOR: ${{ inputs.form-factor || 'both' }}
         run: yarn lh:measure
 
       # The baseline is whatever the latest successful main run published. Also
