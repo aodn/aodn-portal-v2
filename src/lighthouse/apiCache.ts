@@ -207,7 +207,7 @@ export const createApiCache = ({
       const reason = error instanceof Error ? error.message : String(error);
       stats.failures.push(`${method} ${url}: ${reason}`);
       res.writeHead(502, { "content-type": "application/json" });
-      res.end(JSON.stringify({ error: reason }));
+      res.end(JSON.stringify({ error: "upstream request failed" }));
     }
   };
 
