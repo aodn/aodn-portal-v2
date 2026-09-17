@@ -3,6 +3,10 @@ services:
     build:
       context: ..
       dockerfile: playwright/Dockerfile.web
+      cache_from:
+        - type=gha,scope=pw-web
+      cache_to:
+        - type=gha,scope=pw-web,mode=max
     ports:
       - "5173:5173"
     network_mode: host
@@ -14,11 +18,18 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.test
+      cache_from:
+        - type=gha,scope=pw-tests
+      cache_to:
+        - type=gha,scope=pw-tests,mode=max
     depends_on:
       - web
     environment:
       - BASE_URL=http://localhost:5173
       - POETRY_VIRTUALENVS_CREATE=false
+      - PYTEST_WORKERS=${PYTEST_WORKERS:-2}
+      - PYTEST_SPLITS=${PYTEST_SPLITS:-}
+      - PYTEST_GROUP=${PYTEST_GROUP:-}
     network_mode: host
     volumes:
       - ./:/app
