@@ -43,6 +43,9 @@ tsconfig.node.tsbuildinfo
 .yarn/install-state.gz
 .last-run.json
 
+# Lighthouse CI working directory: build reports, recorded API responses
+.lighthouse/
+
 CLAUDE.md
 .claude
 .agents

@@ -1,0 +1,48 @@
+{
+  "recordedFrom": "https://portal-edge.aodn.org.au",
+  "recordedAt": "2026-09-17T07:09:34.775Z",
+  "fixtures": [
+    {
+      "method": "GET",
+      "url": "/api/v1/ogc/collections?properties=id,centroid&filter=page_size%3D800+AND+BBOX(geometry,104,-43,163,-8)&sortby=id",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "get-collections-20fad964.json"
+    },
+    {
+      "method": "GET",
+      "url": "/api/v1/ogc/collections?properties=id,title,description,status,scope,ai_update_frequency,links,assets_summary,bbox&filter=page_size%3D11+AND+(BBOX(geometry,104,-43,163,-8)+OR+geometry+IS+NULL)",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "get-collections-0af2dae1.json"
+    },
+    {
+      "method": "GET",
+      "url": "/api/v1/ogc/collections?properties=id,title,description,status,scope,ai_update_frequency,links,assets_summary,bbox&filter=page_size%3D21+AND+search_after%3D%271.0%7C%7C161%7C%7Cstr:4402cb50-e20a-44ee-93e6-4728259250d2%27+AND+(BBOX(geometry,104,-43,163,-8)+OR+geometry+IS+NULL)",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "get-collections-3e3db9c4.json"
+    },
+    {
+      "method": "GET",
+      "url": "/api/v1/ogc/collections/0015db7e-e684-7548-e053-08114f8cd4ad",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "get-0015db7e-e684-7548-e053-08114f8cd4ad-7cf546d4.json"
+    },
+    {
+      "method": "GET",
+      "url": "/api/v1/ogc/manage/health",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "get-health-727c1f42.json"
+    },
+    {
+      "method": "GET",
+      "url": "/api/v1/ogc/manage/info",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "get-info-14a2f7b9.json"
+    }
+  ]
+}

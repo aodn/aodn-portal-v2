@@ -1,0 +1,18 @@
+{
+  "status": "UP",
+  "components": {
+    "ogcApiHealth": {
+      "status": "UP"
+    },
+    "ping": {
+      "status": "UP"
+    },
+    "ssl": {
+      "status": "UP",
+      "details": {
+        "validChains": [],
+        "invalidChains": []
+      }
+    }
+  }
+}
