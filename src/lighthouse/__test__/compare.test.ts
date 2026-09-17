@@ -79,14 +79,16 @@ describe("buildMarkdown", () => {
 
     expect(markdown.startsWith(COMMENT_MARKER)).toBe(true);
     expect(markdown).toContain("Compared with `main` (`base123`)");
-    expect(markdown).toContain("| Metric | Mobile | Desktop |");
+    expect(markdown).toContain(
+      "| Metric | main Mobile | main Desktop | PR Mobile | PR Desktop |"
+    );
     // An improvement of any size is worth showing
-    expect(markdown).toContain("| Performance | 76 → 79 (+3 ✅) | — |");
+    expect(markdown).toContain("| Performance | 76 | n/a | 79 (+3 ✅) | — |");
     // One point down is variability, not a regression: no icon
-    expect(markdown).toContain("| Best Practices | 96 → 95 (-1) | — |");
-    expect(markdown).toContain("| Performance | 60 → 53 (-7 ⚠️) | — |");
-    // Unchanged: just the value, no arrow
-    expect(markdown).toContain("| Accessibility | 96 | — |");
+    expect(markdown).toContain("| Best Practices | 96 | n/a | 95 (-1) | — |");
+    expect(markdown).toContain("| Performance | 60 | n/a | 53 (-7 ⚠️) | — |");
+    // Unchanged: just the value, no delta
+    expect(markdown).toContain("| Accessibility | 96 | n/a | 96 | — |");
     expect(warnings).toEqual([
       "⚠️ Performance (Mobile) on `/search` decreased by 7 points compared with `main`.",
     ]);
@@ -121,7 +123,7 @@ describe("buildMarkdown", () => {
       baseline: report({ "/": route("landing", { fcp: 1000 }) }),
       current: report({ "/": route("landing", { fcp: 4000 }) }),
     });
-    expect(markdown).toContain("| FCP | 1.0s → 4.0s (+3.0s) | — |");
+    expect(markdown).toContain("| FCP | 1.0s | n/a | 4.0s (+3.0s) | — |");
     expect(warnings).toEqual([]);
   });
 
@@ -135,7 +137,7 @@ describe("buildMarkdown", () => {
       }),
     });
     expect(markdown).toContain(
-      "| Performance | 90 → 79 (-11 ⚠️) | 70 → 68 (-2) |"
+      "| Performance | 90 | 70 | 79 (-11 ⚠️) | 68 (-2) |"
     );
   });
 
@@ -145,7 +147,7 @@ describe("buildMarkdown", () => {
       current: report({ "/details/new-uuid": route("details", { tbt: 120 }) }),
     });
     expect(markdown).toContain("### `/details/new-uuid`");
-    expect(markdown).toContain("| TBT | 100ms → 120ms (+20ms) | — |");
+    expect(markdown).toContain("| TBT | 100ms | n/a | 120ms (+20ms) | — |");
   });
 
   test("says so when main has no baseline yet, without failing", () => {
@@ -153,7 +155,7 @@ describe("buildMarkdown", () => {
       current: report({ "/": route("landing") }),
     });
     expect(markdown).toContain("No `main` baseline is available yet");
-    expect(markdown).toContain("| Performance | 76 | — |");
+    expect(markdown).toContain("| Performance | n/a | n/a | 76 | — |");
     expect(warnings).toEqual([]);
   });
 
@@ -177,7 +179,7 @@ describe("buildMarkdown", () => {
     ]);
     expect(atThreshold.warnings).toEqual([]);
     expect(atThreshold.markdown).toContain(
-      "| Performance | 90 → 75 (-15 ❌) | — |"
+      "| Performance | 90 | n/a | 75 (-15 ❌) | — |"
     );
     expect(atThreshold.markdown).toContain(
       "❌ Performance (Mobile) on `/` dropped by 15 points"

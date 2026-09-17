@@ -100,8 +100,8 @@ const findBaselineRoute = (
   return Object.values(baseline.routes).find((entry) => entry.id === route.id);
 };
 
-/** One table cell: `before → after (delta)`, or just the value with no baseline. */
-const cell = (
+/** A metric's baseline and PR cells for one form factor, plus any regression it hit. */
+const cellPair = (
   metric: MetricKey,
   routePath: string,
   formFactor: FormFactor,
@@ -109,12 +109,19 @@ const cell = (
   value: number | undefined,
   baselineLabel: string,
   blockingDrop: number
-): { text: string; warning?: string; blocking?: string } => {
+): {
+  mainText: string;
+  prText: string;
+  warning?: string;
+  blocking?: string;
+} => {
+  const mainText = before === undefined ? "n/a" : formatValue(metric, before);
+
   if (value === undefined) {
-    return { text: before === undefined ? "—" : "not measured" };
+    return { mainText, prText: "—" };
   }
   if (before === undefined) {
-    return { text: formatValue(metric, value) };
+    return { mainText, prText: formatValue(metric, value) };
   }
 
   const drop = regression(metric, before, value);
@@ -123,14 +130,15 @@ const cell = (
   const warns = isWarning(metric, before, value);
 
   const delta = value - before;
-  let text = formatValue(metric, value);
+  let prText = formatValue(metric, value);
   if (delta !== 0) {
     const marker = drop > 0 ? (blocks ? " ❌" : warns ? " ⚠️" : "") : " ✅";
-    text = `${formatValue(metric, before)} → ${formatValue(metric, value)} (${formatDelta(metric, delta)}${marker})`;
+    prText = `${formatValue(metric, value)} (${formatDelta(metric, delta)}${marker})`;
   }
 
   return {
-    text,
+    mainText,
+    prText,
     blocking: blocks
       ? `❌ Performance (${formFactorLabels[formFactor]}) on \`${routePath}\` dropped by ` +
         `${Math.round(drop)} points compared with \`${baselineLabel}\` — this check fails at ${blockingDrop} or more.`
@@ -159,15 +167,15 @@ const routeTable = (
   const lines = [
     `### \`${routePath}\``,
     "",
-    "| Metric | Mobile | Desktop |",
-    "|---|---:|---:|",
+    `| Metric | ${baselineLabel} Mobile | ${baselineLabel} Desktop | PR Mobile | PR Desktop |`,
+    "|---|---:|---:|---:|---:|",
   ];
   const warnings: string[] = [];
   const blocking: string[] = [];
 
   for (const metric of metricOrder) {
-    const cells = ALL_FORM_FACTORS.map((formFactor) =>
-      cell(
+    const [mobile, desktop] = ALL_FORM_FACTORS.map((formFactor) =>
+      cellPair(
         metric,
         routePath,
         formFactor,
@@ -177,12 +185,12 @@ const routeTable = (
         blockingDrop
       )
     );
-    for (const result of cells) {
+    for (const result of [mobile, desktop]) {
       if (result.blocking) blocking.push(result.blocking);
       if (result.warning) warnings.push(result.warning);
     }
     lines.push(
-      `| ${metricLabels[metric]} | ${cells[0].text} | ${cells[1].text} |`
+      `| ${metricLabels[metric]} | ${mobile.mainText} | ${desktop.mainText} | ${mobile.prText} | ${desktop.prText} |`
     );
   }
 
