@@ -66,6 +66,9 @@ jobs:
       - name: Build
         run: yarn lh:build
 
+      # No backend involved: /api is answered from the fixtures committed in
+      # src/lighthouse/fixtures/api (refreshed with `yarn lh:record`), so an
+      # unavailable environment cannot fail this job.
       - name: Measure the routes
         env:
           # On pull_request GITHUB_SHA is the merge commit; report the PR's own

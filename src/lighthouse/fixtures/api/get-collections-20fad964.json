@@ -1,0 +1,6317 @@
+{
+  "links": [],
+  "collections": [
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "0015db7e-e684-7548-e053-08114f8cd4ad",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.625, -29.5]]
+      },
+      "id": "0024b456-4636-42cd-b097-388f6d39a835",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.25, -18.5]]
+      },
+      "id": "003a7540-ce5d-431d-9c25-824a3b4aa200",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[114, -31.5]]
+      },
+      "id": "00462296-be7a-452f-afaf-36c809cd51f8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[145.64583, -42.875]]
+      },
+      "id": "00469ca0-49ad-4781-8508-ef395d6992d4",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.875, -13.75]]
+      },
+      "id": "005371a9-b1fc-3ef2-e053-08114f8c6aca",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[115.125, -21.375]]
+      },
+      "id": "0055ec4e-f5b9-2dbb-e053-08114f8c75e9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[115.625, -20.875]]
+      },
+      "id": "00562caf-3ddf-59e3-e053-08114f8cd206",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[108.65341, -26.375]]
+      },
+      "id": "005c59c3-4c76-4aaf-96a8-747328c2caf0",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[142.63068, -41.875]]
+      },
+      "id": "005cb0d3-c96e-4124-8852-19fa741b633a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "00648206-505c-4858-8b9d-c2324cc2c7ba",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[123.48214, -13.25]]
+      },
+      "id": "006565f1-90e2-7971-e053-08114f8c5c31",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[138, -36.625]]
+      },
+      "id": "0069c212-fb51-4547-b7e5-676cfe188dcf",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[139, -15.5]]
+      },
+      "id": "006bb7dc-860b-4b89-bf4c-6bd930bd35b7",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[136.875, -15.625]]
+      },
+      "id": "00713afb-28fd-4878-96da-431d16944732",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.25, -33.5]]
+      },
+      "id": "00748bd0-93f9-11dc-b8ca-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[124.25, -15.25]]
+      },
+      "id": "008bd009-60e8-4c8f-8372-f858bf252057",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[124.125, -16.125]]
+      },
+      "id": "008f4a19-b6a2-4e5c-9c25-1292f1cad6fe",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[128, -14.375]]
+      },
+      "id": "008f9098-d166-4904-b1bd-e91ce51982a3",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[142.25, -10.5]]
+      },
+      "id": "0094682a-e438-41e8-a39b-19cf2093025d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[137, -34.375]]
+      },
+      "id": "0095dad3-8fca-4da4-a0db-a1555b302e64",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[127.08125, -34.875]]
+      },
+      "id": "009a1131-efc1-4a61-8f90-cf289e7c043d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[114.5, -33.5]]
+      },
+      "id": "009e8219-9699-40b4-bcbc-f6c43156eb09",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[114.625, -21.625]]
+      },
+      "id": "00a64d43-86a8-4f2b-89e6-40f1abf288f6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[150.25, -14]]
+      },
+      "id": "00b9f4b2-9e95-481b-8609-c3bdd2a2617a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "00c3e9a2-5d2f-44de-9c30-00f4af385b6a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.5, -17.125]]
+      },
+      "id": "00ce1c70-1bbc-4f3f-8345-7091484d6ed4",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[124, -13.25]]
+      },
+      "id": "00d28713-6f79-4608-bd89-dcbae1ff5d1b",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.3125, -23.5]]
+      },
+      "id": "00d34cd4-24fe-4361-b667-1782c919e870",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[145.375, -43]]
+      },
+      "id": "00d65d56-d0d4-49a7-9d05-98ec29080598",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.875, -22]]
+      },
+      "id": "00fd279f-8c0e-465d-954c-0a8d173fc127",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[145, -37.75]]
+      },
+      "id": "00fd2eb0-bfe9-11dc-8c42-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[139.12013, -13.25]]
+      },
+      "id": "010aebb9-8444-4fda-9302-b59594b6df52",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "01136b18-682d-4da5-a6eb-cfb57da7c546",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[149.875, -19.5]]
+      },
+      "id": "012595de-6f4c-4e0a-b4e2-a6523f6f6809",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[112.79688, -25.875]]
+      },
+      "id": "01260816-a617-48e0-bb30-19ce9aa4af2c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[120.25, -16.875]]
+      },
+      "id": "01321141-96eb-42bc-85f1-9178ff5e690a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151, -34.875]]
+      },
+      "id": "0138b420-806d-450b-832f-28ce7bed83a5",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[149.125, -38.375]]
+      },
+      "id": "0145df96-3847-474b-8b63-a66f0e03ff54",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[154.8125, -27]]
+      },
+      "id": "014de258-e375-445c-a541-0e72f87bb688",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.75, -40.25]]
+      },
+      "id": "014e1d03-beb4-43c7-a861-221b95663949",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.75, -18.75]]
+      },
+      "id": "0155375c-8070-4662-9c93-b593ee4891b0",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144.5, -41.5]]
+      },
+      "id": "015c9733-1a3b-4ee1-81c3-f1c0ba8051c2",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[149.125, -12.375]]
+      },
+      "id": "0161005c-fa71-45ce-a721-874dcbcf4d48",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.375, -41.5]]
+      },
+      "id": "017c1557-7617-439d-884d-af22ec9beb3d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.125, -18.5]]
+      },
+      "id": "0185229d-d095-468a-befd-4ada9f23fd30",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[114.875, -34.125]]
+      },
+      "id": "018e2542-d1f1-4821-9fed-9ecc2815a6d0",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.125, -39.125]]
+      },
+      "id": "01909e52-a452-4bce-9847-cd0606e64429",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[133.5, -25.5]]
+      },
+      "id": "01C380CA-05B8-4D4D-A8FB-E30A8F9B15C1",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.73214, -17.625]]
+      },
+      "id": "01ac6cd2-51b1-4213-96e8-8f887e73e6b7",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[149.125, -43]]
+      },
+      "id": "01b48376-88de-41e4-aa94-348279098c31",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[130.625, -12.375]]
+      },
+      "id": "01b71c10-6f71-42bf-9e6d-49728df301de",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "01b95c20-3989-11dc-a05e-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[112.79688, -25.875]]
+      },
+      "id": "01c73952-3e14-4e9c-b39c-b3ff6352ffd8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[137, -33.75]]
+      },
+      "id": "01cc04eb-5bb9-4e61-bb3c-b890a33237ae",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[112.625, -25.5]]
+      },
+      "id": "01cffaa2-d1c9-43ea-bbca-a6b1107700c9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[143.75, -39]]
+      },
+      "id": "01d3d40d-f6a1-4fc3-9acf-ba266e39fbd3",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[130.625, -12.375]]
+      },
+      "id": "01e5f143-1a05-4ec2-ae39-5900659b752c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.3125, -42.875]]
+      },
+      "id": "01f24c90-6d75-11dc-9520-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[122.34375, -15.875]]
+      },
+      "id": "01f6feb9-f681-1253-e054-00144fdd4fa6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "01f81b37-50b3-40ff-894b-e9a02b5cb2ce",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "01fe5c16-652a-4b9f-b229-f756a8c4274c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "0200b104-2259-4261-bcf1-78dbe5b5f7cf",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[116.75, -19.5]]
+      },
+      "id": "02077f4e-395c-4f6c-b85d-fd934788a5ae",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.5, -39.375]]
+      },
+      "id": "020ae2c0-44a6-11dc-8cd0-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "02110bff-1c83-4e51-93d9-73645a3122b7",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[141.75, -12.75]]
+      },
+      "id": "02132000-49ef-4fae-87b3-c45ffae4b988",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[154.375, -27.5]]
+      },
+      "id": "021b494f-aa31-4dd4-8c10-9afad74da1aa",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.75, -33.375]]
+      },
+      "id": "021f65eb-38c6-4db2-9dbe-821b6b427780",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[145.375, -40.625]]
+      },
+      "id": "0221908a-2b15-4321-adb5-44060eaa71d7",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[154.375, -27.5]]
+      },
+      "id": "022331ec-1ace-4988-8369-10264ce08f49",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[114.25, -21.875]]
+      },
+      "id": "0224a83a-6cc9-4b3f-e053-08114f8ce23d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "022bb080-398a-11dc-a05e-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[143.75, -9.75]]
+      },
+      "id": "022ecb27-8f4b-4a0e-9fe4-e506fd25c2d8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.25, -19.25]]
+      },
+      "id": "022efb39-e572-44e5-ba5a-ddbb4eae98df",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.25, -34]]
+      },
+      "id": "0231d2c0-e4b7-11dc-9b6b-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[124, -15.875]]
+      },
+      "id": "02396b33-724f-3adf-e053-08114f8cf264",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "023ae12a-8c0c-4abc-997a-7884f9fec9cd",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[125, -12.5]]
+      },
+      "id": "023be554-7b84-4c36-92ba-32c0ebb7d690",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.06696, -25.875]]
+      },
+      "id": "023fa111-4007-408d-8aaf-e7058d765378",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148, -40.5]]
+      },
+      "id": "0245d25f-d8a2-413c-bcb3-327a4dfdf38b",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[145.5, -39.875]]
+      },
+      "id": "02640f4e-08d0-4f3a-956b-7f9b58966ccc",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[153.5, -28]]
+      },
+      "id": "0265bde9-1ba0-4fa1-9b92-4f17b7875dcd",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[136, -35.5]]
+      },
+      "id": "0267b46b-d5b2-470c-a03c-6754dd2edd33",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.5, -16.875]]
+      },
+      "id": "0268abc0-d836-11dc-b424-00008a07204e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[143.75, -42.875]]
+      },
+      "id": "02808bae-9f0b-48d6-ac37-245e4b473f22",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[141.375, -10.875]]
+      },
+      "id": "0282ce4a-db37-4910-a079-3908d2bb8ba8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[129.71875, -33.125]]
+      },
+      "id": "028783f1-d4a9-4c2a-a9fc-2750d81bb44d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[108.85714, -25]]
+      },
+      "id": "02887a2e-b97d-3bbd-e053-08114f8c5556",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[112, -9]]
+      },
+      "id": "028951ac-95bf-425b-e053-08114f8c8c0e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[114.25, -32.125]]
+      },
+      "id": "028b9801-279f-427c-964b-0ffcdf310b59",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[135.875, -35.5]]
+      },
+      "id": "028d4759-7246-4419-979d-94f071b7be27",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "02964150-af4e-4970-b137-ec886202db94",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144, -39.875]]
+      },
+      "id": "029a5df5-04da-4c64-a73d-d15f1201965d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.75, -19.25]]
+      },
+      "id": "029b8d30-847d-11dd-a89f-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151, -20.5]]
+      },
+      "id": "02a37d5b-a64f-4a3d-b7b6-09a45b039baf",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[152, -33.125]]
+      },
+      "id": "02ab2e80-8ee8-4f21-83ab-926a396887f9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[154.375, -16]]
+      },
+      "id": "02b1ff7c-279e-4890-8daa-ea05851a4139",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[108.375, -20.5]]
+      },
+      "id": "02b7bb84-dd1a-49d6-b6e0-afa5f00cd488",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.5, -19.25]]
+      },
+      "id": "02bae081-efbb-4162-9661-a23e945c5c8f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[119.25, -34.5]]
+      },
+      "id": "02bf12fe-7f8f-44df-95be-a9ce3f0a1843",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[138.90091, -13.75]]
+      },
+      "id": "02c32147-b73c-20fe-e053-08114f8c48ee",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[136.5, -10.5]]
+      },
+      "id": "02c535c2-b69f-4680-88d3-a847508a4ebc",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[153.5, -23]]
+      },
+      "id": "02c8b1d3-9a71-4822-b6ce-b54098efaf47",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[137.125, -13]]
+      },
+      "id": "02ca91f9-cef4-4c39-8e85-d0827bc7bb7c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.06696, -25.875]]
+      },
+      "id": "02cd2c56-a3dc-466d-86dc-96f85befeab4",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[119.5, -17]]
+      },
+      "id": "02d5ee70-f3bf-11dc-953c-00008a07204e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[142.5, -10]]
+      },
+      "id": "02d8cb34-83a1-4833-b41e-7b8e2db72f74",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.25, -23.75]]
+      },
+      "id": "02d949fa-13c9-48a5-8e09-0a15c29095b0",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[135.875, -35.625]]
+      },
+      "id": "02e1bec5-dc22-40a8-8df6-5a1ee1ee8105",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[154.375, -27.25]]
+      },
+      "id": "02ef70ef-db29-4540-8cfc-4205c3511526",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[153, -26.75]]
+      },
+      "id": "02ffadd0-e048-11dc-8e65-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "031508ba-db79-471e-bff8-4a65c758f686",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[156.20759, -25.875]]
+      },
+      "id": "03175b97-9b6b-44c3-9407-06e10ffc1d56",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[139.625, -17.125]]
+      },
+      "id": "031fee01-ba5c-437c-9940-8b934abf9c27",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[116.75, -20.25]]
+      },
+      "id": "0324f110-3ade-4747-a15d-c84c5b6ea9cc",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[108.9375, -25.375]]
+      },
+      "id": "032f4500-5c91-4d96-b141-597992da3d3a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[138.5697, -14.5]]
+      },
+      "id": "03343c53-b189-4ae3-a931-aca9735ccf13",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.25, -39]]
+      },
+      "id": "0334f189-b68d-4361-82dc-d36a11f20706",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "033a1ddd-b206-09d0-e053-08114f8c3b40",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.25, -14.75]]
+      },
+      "id": "033c0b80-4571-11dc-ae0d-00008a07204e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[155.125, -43]]
+      },
+      "id": "033c4d4e-28c4-42d4-abff-3ca0ee003989",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147, -18.5]]
+      },
+      "id": "033db4d7-9877-4f00-8cf2-78a537fb318e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[141.75, -9.625]]
+      },
+      "id": "034ce816-0777-4bbd-aefc-8b73bd540245",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[132.25, -14.875]]
+      },
+      "id": "034f6694-cf7e-4df4-b941-be31f73c7de7",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.17188, -25.875]]
+      },
+      "id": "03602fca-d7e9-4e44-b8fd-2ceb9bdd8da1",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[112.75, -22.5]]
+      },
+      "id": "03656bf4-5351-4e21-8e51-01ef55028964",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[136.75, -34.625]]
+      },
+      "id": "03665dec-4b8a-4692-9220-8e57e0ca6a67",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.125, -39.875]]
+      },
+      "id": "0366f981-3fc0-4a28-9ff6-aee8bbf5a7a0",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[123, -16.5]]
+      },
+      "id": "03671CBF-8038-158D-E064-6805CAA9DBF0",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[145.75, -16]]
+      },
+      "id": "03671CBF-803B-158D-E064-6805CAA9DBF0",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[125.25, -15.25]]
+      },
+      "id": "03675b95-2f38-761e-e053-08114f8cbf86",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[112.79688, -25.875]]
+      },
+      "id": "036b505e-4dc9-4d3f-a7b1-f9ffd92289a4",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.75, -19]]
+      },
+      "id": "03786fb0-852d-11dd-91d8-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.25, -24]]
+      },
+      "id": "038aaecc-e6ad-479d-ace6-c06fbf8594a9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[143.125, -8.5]]
+      },
+      "id": "038b8050-2f52-11dc-a71c-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.25, -34]]
+      },
+      "id": "03938050-7874-11dc-96be-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[156.375, -33.25]]
+      },
+      "id": "03974493-dee6-46db-b25b-871cf2cbf53c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[112.79688, -25.875]]
+      },
+      "id": "039e74aa-be9b-4935-8160-5c0c5c50e53f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[116, -20]]
+      },
+      "id": "03a1461c-ad29-4755-b6a0-f3a44067ba2c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[156.125, -21.375]]
+      },
+      "id": "03a5693e-d764-48d4-8e9c-211a5d52c13b",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147, -18.75]]
+      },
+      "id": "03b651b5-7708-4306-9ec9-ec43f22c96a9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[156.20759, -25.875]]
+      },
+      "id": "03b9a2f4-f544-443d-a9ee-6c4f40112da0",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.5, -41.5]]
+      },
+      "id": "03bc58da-d17b-4fc3-84df-e65daf8216e2",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "03bd98e0-ea5f-4071-bb4a-d87ec9232d5e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.5, -36.5]]
+      },
+      "id": "03c72baa-8d30-47cd-89c5-c9ec6e6c8cc1",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[156.32143, -25.75]]
+      },
+      "id": "03ccae10-4e27-4ec3-9ce0-7f3ffae81ec0",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[130.625, -12.375]]
+      },
+      "id": "03d1ad07-3835-4051-88d1-d72494033ba6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[145, -38.5]]
+      },
+      "id": "03d3a5ca-a2b2-4aeb-bab1-fa6f2e958669",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[142.75, -9.875]]
+      },
+      "id": "03d84b70-d64c-4d89-846b-f1aa14f30ff7",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[119, -17.5]]
+      },
+      "id": "03d9f978-f700-4e98-b00d-5574c80faa07",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "03df0310-e8d4-11dc-a271-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[115, -17]]
+      },
+      "id": "03e1e59c-43bb-4624-b7a5-1e14d6488acb",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[109.65341, -26.375]]
+      },
+      "id": "03ede90b-361a-419c-833b-d35546b6758d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[135, -35]]
+      },
+      "id": "03f13603-22a9-4205-9346-9f6b963eed8f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.25, -18.25]]
+      },
+      "id": "041e4c73-5787-4806-8439-655b107ad322",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[152, -23.5]]
+      },
+      "id": "041f55ba-092f-4875-8aaa-10b658f0a8ad",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.5, -19.25]]
+      },
+      "id": "0420dd84-084f-4d07-be71-b27658614a18",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[150, -21.5]]
+      },
+      "id": "0427a520-45ff-4095-94ae-36f1e1fd96ad",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.25, -17.375]]
+      },
+      "id": "0436e7b2-04fe-4c12-8787-8da6c02cfa35",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[122, -15]]
+      },
+      "id": "0442b640-6714-11dc-9280-00008a07204e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[130.625, -12.375]]
+      },
+      "id": "0442cef8-fc9c-425c-bc35-903cc3186595",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[155, -36.5]]
+      },
+      "id": "0450d737-262f-4a8b-9efb-0d9e549698fc",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[152.875, -34.25]]
+      },
+      "id": "04512e6a-1922-4034-9e1c-18c735dd5562",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[122, -14]]
+      },
+      "id": "047636b7-afc2-439d-a14f-5f2237520ee5",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[149.75, -21.75]]
+      },
+      "id": "0478852b-27ad-48dc-833f-ae93920ce73e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[139.5, -12.5]]
+      },
+      "id": "048efc65-d861-4e07-ac12-67e68553cf12",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "04913765-d129-4425-92aa-0aa376c7074a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[149.25, -38.25]]
+      },
+      "id": "04978602-bb50-4b6c-9d0b-39fd3e66ad84",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[125.875, -37.5]]
+      },
+      "id": "0499dc08-751b-4ceb-9f49-8fa2ca62f30b",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[127, -12.5]]
+      },
+      "id": "049ab2f7-e03b-440e-a148-e3749f7facb0",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[156.56696, -25.875]]
+      },
+      "id": "04A90B4B-DF23-4EE5-89EF-E88C4E7317BA",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[136.5, -13.5]]
+      },
+      "id": "04a97356-53a6-48e3-aa31-9f38cc44b4ce",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[153.375, -30.25]]
+      },
+      "id": "04abc909-d691-435e-a50f-3d22ae875fb6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[153.25, -33.125]]
+      },
+      "id": "04afcd60-1eb3-4edb-843d-623050bc7511",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[150, -21.125]]
+      },
+      "id": "04b17433-3d50-4eaa-bce4-4982b8f9f64f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[135, -35]]
+      },
+      "id": "04b4ac46-68b6-40f3-9528-2aa9f425d78e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147, -19.25]]
+      },
+      "id": "04c7257a-9941-4378-8fca-2d8dc05e6c67",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[154.625, -35.375]]
+      },
+      "id": "04ca3df9-de3d-4795-88e1-4fc61300a3fa",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[145.75, -25.25]]
+      },
+      "id": "04d0ec72-3251-40b2-8a60-c8e9372999f6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.875, -38.875]]
+      },
+      "id": "04d2c63e-39ae-4a45-9f57-5320c77cbfef",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.5, -18.25]]
+      },
+      "id": "04dfd9ff-d491-4007-aa8e-1bb76faad6f0",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.12054, -26.375]]
+      },
+      "id": "04e6d3ba-5f0c-49c2-b40a-640dceeb163c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[154.625, -32.75]]
+      },
+      "id": "04f2a7be-63a1-47ac-b4ee-99fdb08e90a3",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[114, -21.75]]
+      },
+      "id": "0503d5ff-d0f4-490d-ba6d-1c0d225b8996",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.5, -39.5]]
+      },
+      "id": "050ca30f-1448-46f9-b985-02c7991ac355",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[154, -32.375]]
+      },
+      "id": "0510b834-cc32-41e7-a94e-078005b0b2b5",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[154.625, -35.375]]
+      },
+      "id": "0511edd5-ac59-41f7-9a7c-5b08e2ba01bf",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113, -33.125]]
+      },
+      "id": "05185a01-8efe-4b8f-8cfc-e472bb8866e9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.5, -18.5]]
+      },
+      "id": "051b0f2c-b46d-4697-8893-69560c898322",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "05275334-30ae-48b9-8c8a-9e514c1f5aad",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[118.5, -20.25]]
+      },
+      "id": "052b3df2-feb6-45a0-b1e5-4ccfa5b5d0ed",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.8125, -24.25]]
+      },
+      "id": "053aa966-6661-4825-99c2-1757f0e6d52a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[149.84028, -21.5]]
+      },
+      "id": "053f0b32-47cc-4a3f-8325-b37feb33c0e3",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[149, -41.5]]
+      },
+      "id": "0548a280-6917-25a9-e053-08114f8cc60b",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[155.44196, -25.875]]
+      },
+      "id": "054d861c-72d0-4923-9375-d81bc1ae7f85",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[114.375, -31.125]]
+      },
+      "id": "055342fc-f970-4be7-a764-8903220d42fb",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.12054, -26.375]]
+      },
+      "id": "05674b86-4dc0-40df-818e-36e1f01cb865",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.75, -23]]
+      },
+      "id": "056848f6-33c1-49ef-a549-25220aafb285",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "0570c470-0829-11dc-82f8-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[135.875, -35.5]]
+      },
+      "id": "05754aab-e42a-46cd-ae9a-6fead381ece0",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.125, -35]]
+      },
+      "id": "05818c50-14c2-11dd-bdaa-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.75, -18.75]]
+      },
+      "id": "05827ba0-b702-4860-b7b8-4695b5a857a8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.875, -38.875]]
+      },
+      "id": "05847dc3-ba64-46f5-8253-f70c5b6b2da9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[150.75, -13.625]]
+      },
+      "id": "058a8edc-cef3-4018-bd8e-9ab822f85f2b",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144.38068, -41.875]]
+      },
+      "id": "058c6de3-9f38-4266-a755-a6fab7b8962f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[114, -21.75]]
+      },
+      "id": "05908b6a-b391-4559-acea-7d351dd189b6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[121.875, -14.125]]
+      },
+      "id": "05966112-387a-4bdb-b27b-882ac1c2fe72",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[157, -40.875]]
+      },
+      "id": "0596d2cc-65a0-6289-e053-08114f8c6b28",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[156.20759, -25.875]]
+      },
+      "id": "059b319a-e631-4a90-9c77-0dec58f7ee25",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[145.75, -15.625]]
+      },
+      "id": "059ec1aa-52d9-4ea1-a0da-5e98ae1794b8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[116, -20]]
+      },
+      "id": "05adb03c-1998-40b0-99ee-36baff34bbba",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.15625, -16.25]]
+      },
+      "id": "05bde62a-70ec-407b-b999-30cf369498af",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[132.375, -37.5]]
+      },
+      "id": "05bfdadc-320d-4b78-b8e3-acd0efe53db2",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[126, -8.5]]
+      },
+      "id": "05c195ad-e32f-4296-ad9d-d2702b6e5f03",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[152.25, -23.5]]
+      },
+      "id": "05c9319d-ebde-4ba5-8c25-08ea82cbe77f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[152, -23.5]]
+      },
+      "id": "05cbcfc1-8d43-4309-931c-b16603785be5",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148, -43]]
+      },
+      "id": "05d4f308-72fa-49d6-8405-3b80f7d278e4",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.5, -41.25]]
+      },
+      "id": "05eb95df-1bd3-49ad-9b8e-85c488075d2b",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144.75, -41.875]]
+      },
+      "id": "05ee4e06-5cf6-4051-acb7-0e99bc3737d1",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[123.125, -16.375]]
+      },
+      "id": "05f33378-b7df-433f-8019-16e9c7eb8620",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[145, -38.5]]
+      },
+      "id": "05f4f7f0-f49f-11dc-9f74-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.875, -39.75]]
+      },
+      "id": "05f6dfbd-8801-486c-80b1-df8724cbfcb9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": null
+      },
+      "id": "05fe6362-4c19-25f9-e053-08114f8c25b4",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.125, -16.875]]
+      },
+      "id": "060118b4-fbb8-4dbe-b740-336c114cd662",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.25, -23.75]]
+      },
+      "id": "06090c9c-1def-4e8f-b52c-af928e633db2",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[135.375, -34.625]]
+      },
+      "id": "0610d300-8c15-11dc-a1c4-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144, -11.5]]
+      },
+      "id": "0623b316-8eb0-4f67-bb7f-5d669f782199",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "0623ff60-13d0-11dc-b213-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.5, -18.75]]
+      },
+      "id": "0625cffb-89e1-443c-bd76-9d6ac6973a8c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[149.5, -17]]
+      },
+      "id": "062812b7-5977-4bee-962a-981001e457a6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[153.6875, -27]]
+      },
+      "id": "062bf50e-3e31-4a9a-91ea-ab3642d3649c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[145.5, -16.25]]
+      },
+      "id": "062d3ab2-849c-48c3-8294-5a098e0d04b3",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[153.0625, -32.5]]
+      },
+      "id": "062ff0b3-1b3c-4227-a694-c6f479c4279f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.3125, -23.25]]
+      },
+      "id": "06326fc4-adc8-4bea-abad-4630eab1cbe2",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[150, -36.5]]
+      },
+      "id": "063f10e1-3d08-4264-a8e7-7964cc661cff",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[115.125, -31.5]]
+      },
+      "id": "0641edce-2c27-4c26-857d-71f1f9866b69",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[124.25, -13.75]]
+      },
+      "id": "06440f55-1ee1-49d0-ae42-a1bee20886a1",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[142.25, -10.125]]
+      },
+      "id": "064bff02-7ba3-46e0-b873-afdf387a1205",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [
+          [157.125, -8.125],
+          [143.25, -9.875],
+          [152.875, -25.125],
+          [147.75, -19.75]
+        ]
+      },
+      "id": "0661cf33-4f86-44d7-885b-4489ca84dffe",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.875, -38.875]]
+      },
+      "id": "0669441d-4db6-440a-939f-82d54e33bae8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.75, -19]]
+      },
+      "id": "06812371-4efd-4088-8657-983e785db1d5",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.625, -30]]
+      },
+      "id": "0687912f-320d-1519-e053-08114f8c4f80",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[153.75, -31.625]]
+      },
+      "id": "06944f88-0533-40e1-900f-da9a4f7235a9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[143.75, -42.875]]
+      },
+      "id": "069480c0-c0e0-48c3-8f5e-84c23ebbfae2",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[152, -32.75]]
+      },
+      "id": "069c1550-e8d6-11dc-a271-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[153.3125, -35.5]]
+      },
+      "id": "06b09398-d3d0-47dc-a54a-a745319fbece",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.75, -18.75]]
+      },
+      "id": "06b18157-2c9f-4c5e-839e-4018402cfd71",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.125, -35]]
+      },
+      "id": "06bf0e30-2ae3-11dd-a735-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.25, -35.875]]
+      },
+      "id": "06cd0457-9237-45b5-a109-c97203b7f048",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "06d2fff4-8e2c-4bd7-b98f-cd98e588df6f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.3125, -23.5]]
+      },
+      "id": "06d38b5b-049e-41c4-a4e4-a8ea772e5471",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[138, -36.625]]
+      },
+      "id": "06d7034a-8bcd-4799-a5b9-eca807b7038e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[115.375, -31.625]]
+      },
+      "id": "06daa91a-2970-43ad-a8df-4dabcf3e237a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[145.125, -40]]
+      },
+      "id": "06df5a1d-41dc-4e39-85c3-1c23691364e2",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[114, -22]]
+      },
+      "id": "06ea6230-55f3-11dc-8d3c-00008a07204e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[135.15625, -36.625]]
+      },
+      "id": "06eb1e96-9ab1-4d83-9734-d7bb2bbc5042",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.875, -38.875]]
+      },
+      "id": "06eec1b3-3cef-42a0-96b8-778acce5ef1c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": null
+      },
+      "id": "06eef0fa-0e97-0a0a-e053-08114f8c783c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148, -43]]
+      },
+      "id": "06f002fc-1e67-4357-935a-cfa4e364705a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[138.5, -35]]
+      },
+      "id": "06f125d0-af80-4f34-9f71-c92c1adb8fc9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.25, -17.25]]
+      },
+      "id": "06f33d8f-150d-40f5-8290-c1cabd744250",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.12054, -26.375]]
+      },
+      "id": "06fe9d32-6287-6439-e053-08114f8cc098",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.57143, -42.25]]
+      },
+      "id": "0714e759-aa9b-12c2-e053-08114f8cdfb0",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[118.90625, -19.875]]
+      },
+      "id": "0715091c-53e2-436a-a080-f71ec09bbfeb",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[115.625, -20.625]]
+      },
+      "id": "07181600-3b25-11dc-95ef-00008a07204e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[153.75, -35]]
+      },
+      "id": "071ba6be-f388-4976-b484-6ee44491b9d7",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.75, -19.25]]
+      },
+      "id": "072fc60c-6cfe-4dd9-9ee2-a560dddc389c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148, -43]]
+      },
+      "id": "07355471-c07d-447d-ad66-9bfde95486bf",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.625, -42.25]]
+      },
+      "id": "073cff1e-94a4-1965-e053-08114f8c015c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.5, -43]]
+      },
+      "id": "073d9a5a-e8ab-7462-e053-08114f8cf7f9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.5, -42.625]]
+      },
+      "id": "073fb1e7-f1ae-66ea-e053-08114f8c9743",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.57143, -42.25]]
+      },
+      "id": "073fde5a-bff3-1c1f-e053-08114f8c5588",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[125.75, -37.5]]
+      },
+      "id": "074180bf-6bdc-4e2b-b0e5-d5eb903efc70",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[129.375, -11.625]]
+      },
+      "id": "0746c9e1-28f9-4b0b-abf3-f5f531a852b6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "074eb0ba-1936-4be7-98c9-09e015ab616e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[133.5, -25.5]]
+      },
+      "id": "07500226-5b2f-4686-8ca6-9d2fb8c2da94",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144, -9.25]]
+      },
+      "id": "0754780a-7bb4-4a43-be6f-065e14a80a77",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "07556fa0-d8ae-4b19-95dd-def52db223a1",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[122, -13.875]]
+      },
+      "id": "075a8c40-78bb-466c-8399-da5159f69174",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.375, -20.125]]
+      },
+      "id": "0767c4d6-44ec-424e-8993-b3c0260b850e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.75, -18.75]]
+      },
+      "id": "076c8641-6e72-4be7-9eb7-e21145cc6525",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[104.5, -25.5]]
+      },
+      "id": "076ead3a-ae3d-4a21-90fa-d7dfbee3ed33",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[154.625, -35.375]]
+      },
+      "id": "0774058f-e201-47c7-8509-23db20b9452f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.625, -42.25]]
+      },
+      "id": "0777afcd-8fb1-1009-e053-08114f8cb22a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "07818819-2e5c-4a12-9395-0082b57b2fe8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.3125, -35.5]]
+      },
+      "id": "07858b26-77ae-4071-a1a8-691363b433e1",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[110.75, -20.5]]
+      },
+      "id": "07868390-33dd-4696-bd90-82deaee7ca37",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[150.25, -38.25]]
+      },
+      "id": "07893005-c9c4-4e34-aa0f-9a01b888eeac",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.25, -42.75]]
+      },
+      "id": "078bec19-0483-4f5c-af46-7f07d8e33f6f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[156.20759, -25.875]]
+      },
+      "id": "078c3c3f-6f92-4e16-beda-4bc0c299dc42",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[156.51339, -25.375]]
+      },
+      "id": "078d4c8a-7f55-40c6-b158-53d1c083b203",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[122, -15.5]]
+      },
+      "id": "078ffe36-d5f4-0f56-e053-08114f8c04ed",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[132.25, -35.25]]
+      },
+      "id": "07977920-4b73-48d1-a675-72a1fc9a198c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.875, -39.625]]
+      },
+      "id": "079d86da-d915-4a30-8da9-f194a0f0d460",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[142.13068, -41.875]]
+      },
+      "id": "079da4fb-98c6-4bb1-b306-cfabd65bd054",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[156.09722, -21.25]]
+      },
+      "id": "07a1f599-3f8d-4a1a-8d35-99d3d4eb008c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.25, -18.25]]
+      },
+      "id": "07b23888-c314-4bca-be31-84fbbfb55109",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.5, -35.5]]
+      },
+      "id": "07b5e966-93f5-44e1-9299-e96aca4738ab",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[125.75, -43]]
+      },
+      "id": "07d617f7-9871-4c6f-abee-aa4db3dea19e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[109.75, -37.875]]
+      },
+      "id": "07e9cab1-920e-4195-8fe5-e51c85a59d36",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[115.5625, -32.125]]
+      },
+      "id": "07eaf2f0-2aa9-11dc-8881-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[142.75, -10.125]]
+      },
+      "id": "07ec3ceb-00c3-485c-816d-23eb02078295",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[114, -30.5]]
+      },
+      "id": "07eccb62-3229-4b28-8d7c-53e4d0377ef3",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144.25, -8.25]]
+      },
+      "id": "07f36fab-f442-4b64-b2a7-494f0a53417d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[153.0625, -32.5]]
+      },
+      "id": "07fa52d2-0288-459c-a665-e87d2163591a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.25, -35.875]]
+      },
+      "id": "07fa8370-49e8-4a42-8695-e9ca35a45c0a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[152, -23.5]]
+      },
+      "id": "07fca61b-d7f8-462c-9445-c261fa45dea2",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.125, -40.125]]
+      },
+      "id": "08067a15-2615-4b3e-9b04-23f6a08abb75",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.5, -22.5]]
+      },
+      "id": "080c6d0f-94ec-4cda-8442-b0b3f91fdfdd",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[133.5, -25.5]]
+      },
+      "id": "080de2ad-b09b-4857-aafe-921c99b7be3d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "080ee273-4f4e-4cec-9fd9-f55cc1dee8a7",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[149.75, -37.25]]
+      },
+      "id": "08162a00-6764-4732-8879-12ff9dc82bac",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.25, -42.875]]
+      },
+      "id": "0816da77-787a-6be6-e053-08114f8c5404",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144.33333, -38.5]]
+      },
+      "id": "0817509a-232d-4fd6-94b3-8d24d9942ce4",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "081f208f-1a23-42f5-9462-0e72bd3ab067",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[130.625, -12.375]]
+      },
+      "id": "08250acf-5f7a-4d72-b647-37cecb89722b",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[115.25, -21.25]]
+      },
+      "id": "08358639-ddfa-4746-9861-dc8e6f86714f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "0845e5ae-1021-4bd4-ba8e-536ff4506c1f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[110.3125, -25.375]]
+      },
+      "id": "084e90fe-ef03-4b41-8991-832116db2ffb",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[111, -21.5]]
+      },
+      "id": "08566af2-55d5-4c09-9348-7b0953cca0ef",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[115.125, -31.625]]
+      },
+      "id": "085b8530-cada-4b71-9c27-229d0e981bba",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113, -26.5]]
+      },
+      "id": "086b65d7-f2f5-43aa-866b-c018528cd57f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.06696, -25.875]]
+      },
+      "id": "086c6836-a2e5-4f9b-bd94-f90c81310163",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.12054, -26.375]]
+      },
+      "id": "086d0695-37df-43bd-8013-44e77d8d93f3",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.25, -43]]
+      },
+      "id": "086e5be9-6c6b-4366-8a45-47428ec67184",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.06696, -25.875]]
+      },
+      "id": "08711f5d-482d-474e-b428-3d67f6c44dc8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[135.875, -35.625]]
+      },
+      "id": "08794ba2-f94f-464c-a2e8-329f1cd3323d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.25, -18.25]]
+      },
+      "id": "0887cb5b-b443-4e08-a169-038208109466",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[152.3125, -35.5]]
+      },
+      "id": "0889035e-163a-4902-bd90-ecd5ba819c0b",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[108.9375, -25.375]]
+      },
+      "id": "0889bfb0-cec7-4cde-be1e-788ce66af2a4",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144.25568, -41.875]]
+      },
+      "id": "088d5cac-65b6-4aa8-b240-9b6d13320e5d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.5, -18.75]]
+      },
+      "id": "0890fccd-3dde-4b90-bbfe-95fdd006782d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[114.625, -30.625]]
+      },
+      "id": "08929dca-af64-46b2-b94d-600878d1c8ee",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[115.125, -31.5]]
+      },
+      "id": "089dc24e-4835-4bf1-8319-7572e1b3beb0",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[112.79688, -25.875]]
+      },
+      "id": "08b43ce0-d643-4b53-b697-c9c6d6a47fb8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.25, -18.25]]
+      },
+      "id": "08b68c0e-dbc1-4e8c-8a95-c9f49ff98cac",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[109.625, -21.5]]
+      },
+      "id": "08b6b404-e76d-4f82-82e2-b96022eb86c1",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[129.75, -11.375]]
+      },
+      "id": "08bbb4d1-18f2-6fe3-e054-00144fdd4fa6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[129.75, -11.375]]
+      },
+      "id": "08bc52ac-0fd9-2750-e054-00144fdd4fa6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[121.75, -15.875]]
+      },
+      "id": "08bc892b-399e-3cb7-e054-00144fdd4fa6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[129.75, -11.375]]
+      },
+      "id": "08bcded0-d208-40ed-e054-00144fdd4fa6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "08c660ec-a168-4b63-9a92-bd5a2867e1b4",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[129.75, -11.375]]
+      },
+      "id": "08cdd541-9e89-06af-e054-00144fdd4fa6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[129.75, -11.375]]
+      },
+      "id": "08d071fa-da6c-570d-e054-00144fdd4fa6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.5, -40]]
+      },
+      "id": "08d11698-78a0-4379-b572-d89523d8fecb",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[150.5, -20.75]]
+      },
+      "id": "08d420b9-3f58-4d3b-a153-e52dcd7b85eb",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[139.25, -37.75]]
+      },
+      "id": "08db4f0e-711e-4067-a332-7a8cae6e0768",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[155.125, -31.375]]
+      },
+      "id": "08db99a8-86b7-476a-8b92-b27645a54e18",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "08e04227-4da1-479b-bec1-06ee27a69a40",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[160.625, -26.625]]
+      },
+      "id": "08e10292-83e6-2c3a-e054-00144fdd4fa6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[160.625, -26.625]]
+      },
+      "id": "08e355b9-b614-67bd-e054-00144fdd4fa6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[160.625, -26.625]]
+      },
+      "id": "08e3f2c7-2df4-1da5-e054-00144fdd4fa6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[160.625, -26.625]]
+      },
+      "id": "08e4757f-5c2a-4801-e054-00144fdd4fa6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[108.9375, -25.375]]
+      },
+      "id": "08eb9abd-85de-41ef-ba93-a9486034a861",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144.88068, -41.875]]
+      },
+      "id": "08ecc259-e8ea-4375-9fa4-10a3823134e4",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "09011a61-cdcf-4fe1-a6ec-1aff8a078f6e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[150, -21.125]]
+      },
+      "id": "090da243-de41-41ac-bb6a-c7cc4906d1a1",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[136.625, -11.625]]
+      },
+      "id": "09108db7-db1c-4211-97f1-943843745122",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[150, -21.625]]
+      },
+      "id": "0916009a-232e-49c6-8a7a-e7aa0c6abc76",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[126.8125, -12.375]]
+      },
+      "id": "09163cdc-decc-40ec-b5a8-9a07dabf7fb8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[109.875, -20.5]]
+      },
+      "id": "0919c0e4-3f11-4253-9ae2-35025eeede30",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[115.25, -32]]
+      },
+      "id": "091f3e07-109f-446c-ae7f-8152807e85c0",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[153.4375, -32.5]]
+      },
+      "id": "092ef17f-eefe-4411-9f14-2a2c505c0b2e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[145.125, -14.375]]
+      },
+      "id": "09311b48-e6f1-484f-945b-8a5b5bfba232",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113, -26.5]]
+      },
+      "id": "0938b757-5938-47ef-a0e5-0d8559976f1e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[156.51339, -25.375]]
+      },
+      "id": "093f68d1-3bdf-4141-9d93-d0d354592c46",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[128, -13.125]]
+      },
+      "id": "0941212a-5d50-4e7e-9add-3c6401c0aec0",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.125, -39.125]]
+      },
+      "id": "0944a299-e6d5-4aa8-a863-63b6fd7440e7",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147, -18.5]]
+      },
+      "id": "094b327e-6c19-4c2e-9cce-69a8a2914efb",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.72222, -29.375]]
+      },
+      "id": "094e3124-97cb-44cf-9a60-f622381ac29c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[150.5, -39.5]]
+      },
+      "id": "094e5005-e09a-4bee-9622-b5ebe9903c16",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.25, -33.75]]
+      },
+      "id": "09504de0-e4ba-11dc-9b6b-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[117.00521, -18.625]]
+      },
+      "id": "0953353e-5e9d-4edd-814f-8c457830bbdd",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "0957ffed-8554-4017-a2d1-cd470f875e3f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.5, -19.25]]
+      },
+      "id": "0967af49-2945-4044-8729-d4b22c13466e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146, -16.375]]
+      },
+      "id": "096ceb90-3865-4096-ac7b-d9bf979c2003",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "097a31c7-331e-4673-b7a0-889cba1f5318",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[133.5, -25.5]]
+      },
+      "id": "097a5435-91f4-4730-90aa-ddae94afcbda",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[115.125, -21.375]]
+      },
+      "id": "097b1446-b32f-4235-b131-4b111f37b3e1",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.57031, -42.125]]
+      },
+      "id": "097bcc70-9904-4d61-965d-28050ae4de16",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[141.75, -12.75]]
+      },
+      "id": "097fcd8d-0279-4765-9eee-b8639807f17d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "0985c77d-5b2e-498b-9016-bfcce78df2da",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.75, -18.25]]
+      },
+      "id": "09a44df4-a6e2-4d71-8dde-c7a959a5f944",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[119.5, -15.375]]
+      },
+      "id": "09ac8e36-5d65-40f9-9bb7-c32a0dd9f24f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[114.875, -32]]
+      },
+      "id": "09aec52b-da64-4b13-9925-49a7a5cd05df",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147, -19.25]]
+      },
+      "id": "09b1a0eb-67b6-41d0-92c5-9463b7d6a099",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "09bb945e-77aa-4e76-a792-797b1c19b8bf",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[142.5, -10]]
+      },
+      "id": "09be4c83-4884-4855-ace7-974d153a3d46",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.39583, -42.875]]
+      },
+      "id": "09beeedf-6b0a-7edd-e053-08114f8ce1eb",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[129.75, -11.375]]
+      },
+      "id": "09c0dfe3-17b3-1ea5-e054-00144fdd4fa6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[129.75, -11.375]]
+      },
+      "id": "09c0ffcb-f0d1-2c42-e054-00144fdd4fa6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[129.75, -11.375]]
+      },
+      "id": "09c1281f-f327-3992-e054-00144fdd4fa6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[129.75, -11.375]]
+      },
+      "id": "09c1f29c-630a-1f3d-e054-00144fdd4fa6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151, -23]]
+      },
+      "id": "09c1f802-28bf-4db9-b93d-781d56702406",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[138, -38]]
+      },
+      "id": "09c6e32d-afdc-46bb-bf4f-30d8e15f92ad",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[114.25, -31.375]]
+      },
+      "id": "09c97d8b-327a-42f0-b903-c357591fb76f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[155, -43]]
+      },
+      "id": "09cd4bb8-89e2-438c-93e5-19bfe1f87ecc",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144.125, -43]]
+      },
+      "id": "09d0c67b-5624-4818-ba05-b1eba3fdd058",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[129.75, -11.375]]
+      },
+      "id": "09d47cbd-24ad-3882-e054-00144fdd4fa6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[125, -13]]
+      },
+      "id": "09de34e6-a626-4059-a1de-f6872f055b0a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[153.125, -32.25]]
+      },
+      "id": "09df3cc3-6d91-4b87-a3b7-cca7a288ff6f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144.25568, -41.875]]
+      },
+      "id": "09e1f9a0-bfc4-41d5-ad2a-aa81e1f17900",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.08333, -42.875]]
+      },
+      "id": "09e7cfb2-6bd6-4843-bae6-d3908a95f4ba",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[160.625, -26.625]]
+      },
+      "id": "09e92bb5-3585-2c5a-e054-00144fdd4fa6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.39583, -42.875]]
+      },
+      "id": "09e95de8-e0dc-5930-e053-08114f8c2b57",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.75, -19.25]]
+      },
+      "id": "09efcb81-af78-41bb-9d11-7cd49e04e4bf",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.39583, -42.875]]
+      },
+      "id": "09f983c3-a931-3051-e053-08114f8c1573",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[108.85714, -25]]
+      },
+      "id": "09f9dfa1-30ad-496b-8f65-33ef2a340f16",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.39583, -42.875]]
+      },
+      "id": "09fa0f74-0e21-6795-e053-08114f8ca13d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[149.79688, -18.375]]
+      },
+      "id": "0D709B10-2A07-43D8-86AB-DD4C207CC946",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[150.17188, -18.375]]
+      },
+      "id": "0DDC8826-AB51-44D9-A47D-D157B3A4053B",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[117.75, -19]]
+      },
+      "id": "0a019a44-eac6-40b7-aede-f107ba9d42e4",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[157, -25.5]]
+      },
+      "id": "0a03b790-8a9f-4ffb-8436-67529499b290",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.375, -42.875]]
+      },
+      "id": "0a0cb241-a135-4a13-8157-09dc5afc3192",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[134.25, -35]]
+      },
+      "id": "0a0dca44-8434-4e2b-ac42-6c55aa74b2f1",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144.875, -14.75]]
+      },
+      "id": "0a10b805-bc67-490e-902c-8a145127bf56",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[155.5, -43]]
+      },
+      "id": "0a11fcc4-0955-4318-b08b-3f063c030795",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.125, -35.5]]
+      },
+      "id": "0a1c561a-54c5-4b61-aec4-7021ad882dba",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144.75, -38]]
+      },
+      "id": "0a212310-2918-11dc-be20-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[112.9375, -25.375]]
+      },
+      "id": "0a21e0b9-8acb-4dc2-8c82-57c3ea94dd85",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[153.6875, -27]]
+      },
+      "id": "0a318ced-e385-4308-ba24-c5208e9bda70",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[112.3125, -27.625]]
+      },
+      "id": "0a3a2761-9a4f-411f-9503-3cd661005ab1",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[152.9375, -24.375]]
+      },
+      "id": "0a3b68c4-7130-4c72-be2a-2d6eec466b5f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[149, -13]]
+      },
+      "id": "0a4017cb-ae84-4ee0-a350-7e549263c5ee",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[112.79688, -25.875]]
+      },
+      "id": "0a4416ab-ae71-49ab-9ab6-59493379ad22",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146, -15.125]]
+      },
+      "id": "0a519cbf-d286-4726-b0f8-6bd2eedd435d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[140.375, -15.75]]
+      },
+      "id": "0a59875c-4a81-42b9-b830-b10351a73f0e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[114.375, -32.5]]
+      },
+      "id": "0a606f1f-412c-43e6-b170-e6bf8f75a52f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[153.5, -28]]
+      },
+      "id": "0a63003b-975d-497e-b835-319779fa8e08",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "0a644b00-1acd-4fa6-bb18-5c4624fff23c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113, -26.5]]
+      },
+      "id": "0a64824d-bea7-4062-97b1-bf956bc8615e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.15625, -16.25]]
+      },
+      "id": "0a65682c-1090-49ed-af94-1b152d8cd902",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": null
+      },
+      "id": "0a65be6d-1c76-49ac-a151-80acf123612c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[133.5, -25.5]]
+      },
+      "id": "0a6c66df-8c90-4f1e-a580-0e0e474e309d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[135.875, -35.625]]
+      },
+      "id": "0a6fe257-64a6-4ae8-8c01-c0d86f4dbd59",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[145.625, -16.125]]
+      },
+      "id": "0a6feff4-1208-498c-9d57-58767071fa71",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[154.9375, -27]]
+      },
+      "id": "0a73013c-b4a9-4085-815f-f10abd9b68d7",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[108.375, -20.5]]
+      },
+      "id": "0a7ccd5a-e717-42d4-ab0c-f1fb24bb2da5",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[145.5, -14.75]]
+      },
+      "id": "0a997f36-4cb1-4014-8bfd-0e6adbd2a377",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[150.875, -23.25]]
+      },
+      "id": "0aabc000-01d6-11dd-b549-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[152, -23.5]]
+      },
+      "id": "0abcf26e-f3de-4e2a-80b4-909090d9c91d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.625, -21.5]]
+      },
+      "id": "0ac1c7a6-1693-44dc-81df-5946c6cb653d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[142.875, -10]]
+      },
+      "id": "0ac5955a-912e-469d-b0ee-ad110f1a052d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[115.75, -31.75]]
+      },
+      "id": "0ac7aa7e-e87b-486c-a31c-e53bc48c08f3",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[133, -10.5]]
+      },
+      "id": "0ae89929-0394-4639-8dd9-180679866c31",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[154.75, -30.375]]
+      },
+      "id": "0aee3b14-cbd1-4598-b48e-b87cae450b15",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "0aef54fc-6e97-46ef-a912-3cb85b0ef327",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "0af82cc5-7ae1-4a3e-b3e4-597d559a7fc9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[149.625, -18.375]]
+      },
+      "id": "0af98fb1-c197-4a74-8d3b-874effa1e82e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.5, -12.5]]
+      },
+      "id": "0afd9365-6af1-4a23-878f-9b7fa0151f19",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.5, -18.5]]
+      },
+      "id": "0afea5aa-ad62-4ef7-88f7-9cb2780362bb",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144.875, -43]]
+      },
+      "id": "0b0af569-a49d-4934-8315-6610581855b3",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[112.79688, -25.875]]
+      },
+      "id": "0b174350-a798-46b7-bc10-b80a27f5fcaf",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[115.5, -32.125]]
+      },
+      "id": "0b176745-8089-4675-b723-94b4b67422bf",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[117.72917, -17]]
+      },
+      "id": "0b1796db-6686-4577-95fe-770e1e8ffb46",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[114.25, -21.75]]
+      },
+      "id": "0b1a9e94-6324-44a8-859b-d0ac084d10dd",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[131.125, -37.5]]
+      },
+      "id": "0b1e7456-8522-4d70-bae3-619466085090",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.25, -18.5]]
+      },
+      "id": "0b3342ef-7bf4-48da-b72c-6fe0b85b31d0",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[126.75, -11.625]]
+      },
+      "id": "0b3e3250-6712-11dc-9280-00008a07204e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[145.5, -16.25]]
+      },
+      "id": "0b4cc769-d92b-4f32-81af-03c796761ff8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[108.9375, -25.375]]
+      },
+      "id": "0b585e9b-1515-4fa8-bc5b-f46ffeecc27f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[154.375, -27.5]]
+      },
+      "id": "0b726b36-c06e-4d16-b9ff-c9963e8ba9b5",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[139.375, -37.25]]
+      },
+      "id": "0b7f4a55-2025-43b3-8b77-024a34b2892f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[114.875, -33.875]]
+      },
+      "id": "0b8504cd-3866-48af-aea4-a132cd3803c9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "0b8b4cab-bbb8-450d-83bb-8c7e7751f6bf",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.25, -18.5]]
+      },
+      "id": "0b8da168-20b7-4cce-95e9-4071dfc2c354",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.31875, -41.875]]
+      },
+      "id": "0b91d7fd-7d29-452f-954a-78cf75151035",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[155.51339, -25.375]]
+      },
+      "id": "0b9aeca2-0b09-4047-b335-81457eb48f9a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.75, -18.75]]
+      },
+      "id": "0ba80e4d-eeb9-4b34-9fff-fc6d2787bad1",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[154, -28]]
+      },
+      "id": "0bacd980-7211-11dc-a0c6-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[140.3125, -42.5]]
+      },
+      "id": "0baee321-e360-43e5-8573-c695138c9e28",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[134.21875, -34.625]]
+      },
+      "id": "0bbc661d-d18b-441f-9b81-58810d1cf767",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[133.5, -25.5]]
+      },
+      "id": "0bc2cda9-4ea3-447a-8eb6-ad4536dc7171",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148, -43]]
+      },
+      "id": "0bc3e383-7187-4fd4-bca2-f3de4e0a4935",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[140.75, -43]]
+      },
+      "id": "0bc4b4a5-ecbe-456a-b66c-bf23714eeab0",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[137.875, -34.75]]
+      },
+      "id": "0bd457a0-a3f6-11dc-99ce-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.5, -18.5]]
+      },
+      "id": "0bd6ebaf-f978-45c9-b351-639e1b84f06c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.50568, -30.125]]
+      },
+      "id": "0bded71d-a3c3-40b9-b92f-82689b913c7b",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[143, -9.5]]
+      },
+      "id": "0beb70a0-2e9b-11dc-9bc1-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[115.25, -32]]
+      },
+      "id": "0bef8589-71b8-48c9-a7ba-f185c9ece6dd",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[110, -26]]
+      },
+      "id": "0bf01609-fde2-3d9c-e054-00144fdd4fa6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[139.11477, -13.25]]
+      },
+      "id": "0bf036b8-5665-430c-95d2-258f4927972b",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144.63068, -41.875]]
+      },
+      "id": "0bf48ddd-bbca-4272-a731-c6f12cc26a33",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[118.90625, -19.875]]
+      },
+      "id": "0bf544ee-1a95-4db4-b37e-1c06cafcde65",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[137, -33.75]]
+      },
+      "id": "0bf700d1-9000-4f57-a194-f29e780f9449",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[130.625, -12.375]]
+      },
+      "id": "0c05326f-a786-40ab-9fc3-0ed2e3ff8571",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[118, -17]]
+      },
+      "id": "0c060eed-57cb-4ab4-8222-32ebef792600",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.125, -43]]
+      },
+      "id": "0c06e0a9-4d49-451f-8c6a-9cba460d53f8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[114, -21.75]]
+      },
+      "id": "0c16de41-964c-4ce4-8334-f8b1044f7f98",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.06696, -25.875]]
+      },
+      "id": "0c1bb667-29b2-4848-ade7-a98417121a66",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[149.875, -18.375]]
+      },
+      "id": "0c1c1cd9-d4e6-46c8-951c-f54378a07d59",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.125, -17.75]]
+      },
+      "id": "0c26dc2e-2a64-4e9c-ad10-cdbf8ed7d758",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[156.875, -23]]
+      },
+      "id": "0c2abc5b-64a9-4a7a-8984-1e5238c209d2",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[139.06818, -13.375]]
+      },
+      "id": "0c3118c7-88d4-48f7-8276-1c6cf54a42b8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.27841, -29.125]]
+      },
+      "id": "0c369d29-6063-4cce-9d58-61ec8c6b4f0f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[121.875, -13.875]]
+      },
+      "id": "0c3ce59d-1aab-499c-9655-6870a735b0cc",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[138.75, -14.75]]
+      },
+      "id": "0c40d593-4a23-4085-88f5-84c86bf1a761",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[117.125, -20.375]]
+      },
+      "id": "0c47b415-266a-4d54-994a-aaa1aa99f78c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[150.25, -38.25]]
+      },
+      "id": "0c5a427c-2e13-4ce6-b5cb-6c469a40c2bb",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[133.5, -25.5]]
+      },
+      "id": "0c5e284b-366b-402a-8d76-8d447e419b52",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "0c63dafd-0ed3-48a4-93cc-63c1a8b8399f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[125.75, -43]]
+      },
+      "id": "0c65a602-253d-4b2d-8134-9dd7cf2a9c19",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[159, -17.5]]
+      },
+      "id": "0c681199-06cd-435c-9468-be6998799b1f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.125, -17.625]]
+      },
+      "id": "0c783859-e3cf-42f0-89cd-ad57ae6b1a8c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[111.35714, -25]]
+      },
+      "id": "0c7e889b-dca1-3286-e053-08114f8cb7e9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[155, -30]]
+      },
+      "id": "0c7eeb6a-ef36-6d8d-e053-08114f8ce14d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[112.79688, -25.875]]
+      },
+      "id": "0c85b182-1110-45d5-8d3a-da3a7198101a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[133.5, -25.5]]
+      },
+      "id": "0c918e59-9bdd-44d7-806f-43067c3df8ee",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.125, -35]]
+      },
+      "id": "0c995f90-15a8-11dd-9ec7-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "0c9bdfd6-2760-4bde-8230-241132790701",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "0c9eb39c-9cbe-4c6a-8a10-5867087e703a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[126, -9.25]]
+      },
+      "id": "0c9ef58d-7bb5-4899-ae04-1975c0a0dcef",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[132, -34.5]]
+      },
+      "id": "0c9feb07-6e37-45dc-8e36-18eadbc4ddeb",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[114.125, -30.5]]
+      },
+      "id": "0ca20ab4-eee4-431b-b677-47674f15c3ed",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "0ca6d72d-e46a-d34f-e053-10a3070aad3a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[143.625, -8.75]]
+      },
+      "id": "0cb1c018-ef13-4de8-be2b-76a5c8f9c79f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[145.5, -14.75]]
+      },
+      "id": "0cb48954-9c86-4bcf-8527-63dd5a2dddac",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.5, -10]]
+      },
+      "id": "0cc1afaf-2a24-43bd-b541-84c1146b7f1c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[139.06818, -13.375]]
+      },
+      "id": "0cd266b3-b052-4a77-bc64-f53656faa514",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[141.375, -10.875]]
+      },
+      "id": "0cd8e69f-2ce5-492e-b834-907dd63b75b7",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "0cdd7eb0-55e0-11dc-8d3c-00008a07204e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "0cde3f9e-2799-4c34-b71c-7367c4a8d604",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147, -18.75]]
+      },
+      "id": "0cdfce2f-3658-4de8-ad0b-49d454100f5d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.625, -18.25]]
+      },
+      "id": "0ce4f380-ac99-46d5-a327-571bd20a0478",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[112, -20]]
+      },
+      "id": "0cecc789-3b9c-4825-9c3e-2127d8013890",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.34722, -21.25]]
+      },
+      "id": "0cf003cd-52a2-45cf-8483-367b0ecd774f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[109.625, -21.5]]
+      },
+      "id": "0cf402d8-6e20-4831-80e0-393e3911223f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "0cfc425a-c666-42f6-8132-bc214f4970f7",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[112.79688, -25.875]]
+      },
+      "id": "0cfed70e-0afd-4a7c-82b2-bb54a25b6552",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[116.25, -29.5]]
+      },
+      "id": "0cff963d-a338-4985-8e75-31e6c080e962",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[122.25, -17]]
+      },
+      "id": "0d0f8633-3b3c-48d1-9296-d8bdd651b4a2",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[150, -20.25]]
+      },
+      "id": "0d1de851-7561-4a4c-8eb9-40bd308e46d9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144, -41.5]]
+      },
+      "id": "0d20bd6b-2d5d-40d7-8e9f-61777581f381",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113, -36]]
+      },
+      "id": "0d350248-3580-4cff-b9c1-7bb78af23665",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[156.20759, -25.875]]
+      },
+      "id": "0d362652-862a-40ff-88b1-e1bf0e0e5bb7",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[153.6875, -30.125]]
+      },
+      "id": "0d36a3de-f8e7-45e7-969f-a1aa4eb36274",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.23214, -25]]
+      },
+      "id": "0d36acac-dabf-41e7-b78b-c1f441ce0dd7",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151, -23.25]]
+      },
+      "id": "0d371696-f677-4504-829f-9f6ae9a394fc",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[120.5, -19.25]]
+      },
+      "id": "0d389dab-d6e2-4895-ba09-389e689b565e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.06696, -25.875]]
+      },
+      "id": "0d3c7edc-463a-4fa0-8039-4d5a779035c3",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "0d3de707-472b-4535-bcc3-b4cc49abd62d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.5, -18.25]]
+      },
+      "id": "0d5ed6bd-7887-4d8a-9653-b76b50be298f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[110, -36.5]]
+      },
+      "id": "0d63f685-18bb-4375-824e-3c022af14e9b",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[138.25, -36.75]]
+      },
+      "id": "0d7e212b-5b28-4263-bcfd-d3264067e042",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[149, -19.25]]
+      },
+      "id": "0d807af8-a690-4729-a73e-c273bd6fb672",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[141.75, -12.75]]
+      },
+      "id": "0d85d21d-42a3-4025-8a4b-053d286400c7",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[133.5, -25.5]]
+      },
+      "id": "0d924d35-5869-45c4-9fa4-c9dc1d6b0356",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[138.75649, -14.125]]
+      },
+      "id": "0d973370-85ca-48f3-8621-729f00a12a77",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.25, -18.25]]
+      },
+      "id": "0d98f9a2-85e0-4ac4-9d47-ec5c5391eaac",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[145.625, -43]]
+      },
+      "id": "0d991694-9795-49f2-9bd8-773ebab4c488",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144.25, -43]]
+      },
+      "id": "0d9d231b-ecdc-4bcc-9fba-db10a0f89081",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.58333, -42]]
+      },
+      "id": "0d9e87e4-847c-445d-89b9-daf70fb344b5",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[152.25, -23]]
+      },
+      "id": "0da32d66-ba2d-4164-bb38-f3b13716a4f1",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "0da8bd74-f3bc-42fc-ac6b-bab627a5e0ea",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.58333, -42.75]]
+      },
+      "id": "0da9ff64-dc3f-43b0-b03a-581ab0b34cf2",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.625, -43]]
+      },
+      "id": "0dad7311-28b2-486c-84f5-427f19dfc28e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[142.91667, -42.875]]
+      },
+      "id": "0db16f1a-b02e-4efd-e053-08114f8c3207",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "0dbd882d-4759-415a-9bab-43d68254b014",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.73214, -17.625]]
+      },
+      "id": "0dd09a6c-5787-47bc-b26a-7106543edb35",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.75, -30.25]]
+      },
+      "id": "0dd3832a-cf67-4068-a446-a9c91c77273e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.08333, -42.875]]
+      },
+      "id": "0dded2e5-b513-465f-bc98-d052d805e89b",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "0de17500-75fc-11dc-8bf5-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[135, -35]]
+      },
+      "id": "0de8f0a9-d8b8-419f-b663-c72368d59301",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "0e01cc13-cc11-4158-beef-755fae43ad0d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[122, -17.75]]
+      },
+      "id": "0e025767-ecc6-4863-92f3-45a8e231baf6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.25, -34.375]]
+      },
+      "id": "0e14fab1-3162-440c-8161-7e5dde1b91c9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[142.3125, -9.875]]
+      },
+      "id": "0e1e9e63-3535-4eac-9551-88c6be9c4a81",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[152.875, -36.625]]
+      },
+      "id": "0e21f5c8-f943-44d8-afe6-85390178f26c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[150.25, -20.75]]
+      },
+      "id": "0e24a73b-cf55-478c-a9cd-38b3fec8e50d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[115.5, -32]]
+      },
+      "id": "0e257376-0685-d0f4-e053-10a3070acedc",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "0e2a5b59-13ee-4200-8870-d0be98770daa",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[115.5, -32]]
+      },
+      "id": "0e3a5f5e-a8ce-c80a-e053-10a3070a17c0",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[153.04688, -18.375]]
+      },
+      "id": "0e40695c-95b9-4275-a0da-5994cb5bbc5a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[123.5, -34.25]]
+      },
+      "id": "0e431de4-43c6-4101-8930-c7705f1522fc",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "0e478200-67d3-11dc-b822-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[142.63068, -41.875]]
+      },
+      "id": "0e545167-f35a-463e-bbef-725401ebf6f9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.625, -22.375]]
+      },
+      "id": "0e558f8f-2564-4d25-bf05-3687e8967d11",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[120.5, -18.625]]
+      },
+      "id": "0e5ca52f-5525-44da-b0ca-df758850963e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.21875, -21.125]]
+      },
+      "id": "0e5ff858-875e-40fc-a431-61d6ad100d28",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[123.625, -13.5]]
+      },
+      "id": "0e62fbcd-f9a8-a736-e053-10a3070ab4d1",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.17411, -18.25]]
+      },
+      "id": "0e68c413-2f56-4c28-b6fb-f665edeb312e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[108.9375, -25.375]]
+      },
+      "id": "0e6f833f-5fdd-40d4-8309-efdf6cd10941",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.75, -19.25]]
+      },
+      "id": "0e781a14-fbac-482d-afdd-e348c4996ea9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[159, -42]]
+      },
+      "id": "0e8244f9-9255-49d8-b419-4d234248d775",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144.88068, -41.875]]
+      },
+      "id": "0e84c73a-7bfe-4477-a389-95634386ebe4",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[136.5, -14]]
+      },
+      "id": "0e936aaa-3e25-4459-8bc7-2235726055fb",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.75, -19.25]]
+      },
+      "id": "0eb44196-fccc-45be-9ab8-830c355adf97",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[136.625, -15.125]]
+      },
+      "id": "0eb63db1-bf27-4107-ac0d-ba3c2c5b0821",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[116.375, -35.125]]
+      },
+      "id": "0ec64a97-1128-46a6-9417-6ef4964a00c7",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[152.18182, -36.5]]
+      },
+      "id": "0ec6f823-40c9-4486-9052-c6cc3323773e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.375, -42.875]]
+      },
+      "id": "0ec80c50-68df-11dd-a210-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113, -21.125]]
+      },
+      "id": "0ede6b3d-8635-472f-b91c-56a758b4e091",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "0efeb0b0-6388-4eb5-b9fb-d2158f7bfd94",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[114.0625, -29.25]]
+      },
+      "id": "0f232fb6-01ad-45f0-9c8f-f24fdbb7e8a4",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.75, -19.25]]
+      },
+      "id": "0f237e30-1491-11dc-80b6-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[125.75, -37.5]]
+      },
+      "id": "0f253f27-26b1-4dca-8945-a7f5ad6edb62",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[133.5, -25.5]]
+      },
+      "id": "0f32414a-911f-4b5c-a6c7-c1924f5cc20c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[118.875, -17.625]]
+      },
+      "id": "0f32ffe0-3dad-11dd-ad1b-00008a07204e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[153.4375, -27.375]]
+      },
+      "id": "0f405c6a-3dd2-4c15-8d9f-56d161faafd4",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "0f441ced-8462-373c-e053-08114f8c62d0",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.0625, -23.5]]
+      },
+      "id": "0f44986b-2a52-4586-a613-c8de2c4102a4",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[135.875, -36.5]]
+      },
+      "id": "0f4b67fe-4336-430f-907e-649632e98c28",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[145.5, -14.75]]
+      },
+      "id": "0f51bc55-2860-49ec-9529-8f9451e42349",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[130.75, -12.375]]
+      },
+      "id": "0f541ef2-0a18-4582-897b-e943019c9615",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144.5, -42.875]]
+      },
+      "id": "0f73b319-6c8d-46fe-ba72-2a0c81150f83",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[117.25, -19]]
+      },
+      "id": "0f81a07b-b26e-421c-b8f6-3bb4ee52c2a8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.125, -42.75]]
+      },
+      "id": "0f8262f0-8693-11dc-a9fc-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[154, -28]]
+      },
+      "id": "0f9c3100-71a1-11dc-aaa0-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.125, -18.375]]
+      },
+      "id": "0fb9926d-6716-443d-9c96-fc9d391c77de",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[119.40625, -15.375]]
+      },
+      "id": "0fc0f59b-c188-4865-9ddf-8733ff06d4d9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[129.875, -37.25]]
+      },
+      "id": "0fd07880-ac0b-43fc-adc7-8c1434840804",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147, -19.25]]
+      },
+      "id": "0fd1bd49-a6a1-494d-81df-4393644737ff",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.75, -19.25]]
+      },
+      "id": "0fd70612-a07a-492a-bacf-8e0b7951da4d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.5, -26]]
+      },
+      "id": "0fd95121-3dc4-4000-9082-f0b7f2f2e6f7",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "0fe29a80-b529-4230-8878-fe088d799ee1",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[137.5, -12]]
+      },
+      "id": "0fe88707-1423-4eb5-b451-4b6e886748c3",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[112.85714, -25]]
+      },
+      "id": "0febf5ef-2491-47b0-a43c-d72859fab0c9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[156.51339, -25.375]]
+      },
+      "id": "0ff26c91-2070-432f-bd1a-a65bb580316b",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.5, -18.75]]
+      },
+      "id": "0ff3a65f-6ee9-4448-bfff-8ae3c86b6115",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[149.125, -43]]
+      },
+      "id": "0ff4a198-0e5a-4e5c-83d4-9a8131be2e9b",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[149, -42.75]]
+      },
+      "id": "100c8f96-354f-4509-8be4-d60020946580",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[127, -13]]
+      },
+      "id": "1010ac13-e033-489d-b9ce-ae11fd0e11ef",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[108.9375, -25.375]]
+      },
+      "id": "1011e4ce-45a7-496d-91df-525f47e2898c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.3125, -23.5]]
+      },
+      "id": "101ef6fd-f7f0-4ccd-953e-e7c8de6827d7",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[149.375, -38.375]]
+      },
+      "id": "10323298-7513-4073-8b4d-943070bdce40",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.625, -42.625]]
+      },
+      "id": "104466cd-9776-17fd-e053-08114f8cd794",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.125, -40.5]]
+      },
+      "id": "1045cb37-d0de-4596-8e5f-c9e77df44742",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[118.36905, -19.375]]
+      },
+      "id": "1045e83b-62cd-4bf2-afb3-684c39a1a72d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[125, -35]]
+      },
+      "id": "104b9b4a-d1c9-44a0-a6ed-11c7ce0d3238",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "104c166e-f192-40c6-8d58-79b99323b741",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144.75, -38.75]]
+      },
+      "id": "104db3c8-e439-4c36-bd35-0d4bd9f97aca",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[145.375, -43]]
+      },
+      "id": "104e4ea0-15c6-466b-8abd-46cbc1b5c135",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.625, -42.5]]
+      },
+      "id": "105d171e-e014-4e36-e053-08114f8c6731",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.625, -42.625]]
+      },
+      "id": "105d1b52-ed9b-396a-e053-08114f8c46ed",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.625, -42.5]]
+      },
+      "id": "105d1b52-ed9c-396a-e053-08114f8c46ed",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.3125, -42.75]]
+      },
+      "id": "105d1b52-ed9d-396a-e053-08114f8c46ed",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144.25, -43]]
+      },
+      "id": "105dc69b-a00f-0eba-e053-08114f8c131d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[131.25, -40.25]]
+      },
+      "id": "1061dba4-523f-4e3d-b584-f0e89117ffe3",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[125.75, -37.5]]
+      },
+      "id": "106a89bb-66e8-4ea2-9475-a29052a45dd1",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.75, -19.25]]
+      },
+      "id": "10712837-c3bd-4b68-a1f8-03e2c387b6d6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[108.9375, -25.375]]
+      },
+      "id": "107b720c-6542-4a4a-9653-230f3454ce2c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "107e6eab-b647-4310-9bc5-a4792ebbf25b",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[155, -36.5]]
+      },
+      "id": "1080523f-7f69-44f9-af48-2016e6357724",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "10867e76-1645-4f22-8f81-abf4f246ee30",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.15625, -16.25]]
+      },
+      "id": "108ee868-4fb1-4e5f-ae57-5d65198384cc",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "10955a94-8737-08e4-e053-08114f8c5e74",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[150.5, -36.375]]
+      },
+      "id": "10a77ae3-4237-44de-9097-6ca773e06b5a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[137, -22]]
+      },
+      "id": "10ab1fb4-dc0b-8edc-e053-10a3070aaee0",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[112.79688, -25.875]]
+      },
+      "id": "10abd9b8-aed4-4cb1-a8b3-9ab26e6b5b67",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "10c00710-0823-11dc-82f8-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.25, -27.5]]
+      },
+      "id": "10c6dd20-45cf-4f5c-a844-4e4465bfffad",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151, -23.75]]
+      },
+      "id": "10cbf22f-5059-490d-af7a-b2ec7db916a2",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.25, -40.25]]
+      },
+      "id": "10d1750e-570f-40ba-b8a9-b5af7029def4",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[122.5, -10]]
+      },
+      "id": "10d2ca00-3fc1-11dc-b6a8-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[150.75, -36]]
+      },
+      "id": "10d739e5-7e52-4b01-8bda-475c7eef9d01",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[156.20759, -25.875]]
+      },
+      "id": "10e0d526-a1dc-45fc-bde6-26787cb08c08",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147, -19.25]]
+      },
+      "id": "10e22c77-2d67-4e3e-ba13-80ed161f3782",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[125.75, -10.75]]
+      },
+      "id": "10ec75f7-e582-40ec-a744-69811bbbee41",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[136, -35.25]]
+      },
+      "id": "10ee2b2b-1d8b-4811-a4f2-cc293317b1c9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.5, -18.75]]
+      },
+      "id": "10f6bb28-27fd-4e16-ac3b-51b55b018c09",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[132.125, -10.75]]
+      },
+      "id": "10f739c6-605a-4d16-a1e0-ad02afb50aa2",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[133.5, -36.5]]
+      },
+      "id": "10fcb776-d331-4a04-ac1f-4a48fa050385",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[127.875, -13]]
+      },
+      "id": "1102ef11-6a2d-4134-802a-8a2d34eb9d05",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151, -38.5]]
+      },
+      "id": "11075fdf-e53e-4d8c-8999-0b239a742243",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.375, -43]]
+      },
+      "id": "110a0ff8-8c6d-4ac5-97b8-63d9c1c3a085",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[133.5, -25.5]]
+      },
+      "id": "1119bf54-47a0-40ad-9dc4-1db0aa1d7725",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "1131e4f9-1fb6-4601-a844-0c9cb7fc7b86",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147, -18.75]]
+      },
+      "id": "11332b6d-577c-49d3-bdd8-50b13d293eaf",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.125, -40.625]]
+      },
+      "id": "1134763e-2116-400c-be87-a20638788076",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.25, -33.75]]
+      },
+      "id": "1134cefe-4a36-415e-9a9f-9aee605c69d4",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "115346a9-f94b-487a-a9cb-d338bae0137f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.4375, -23.125]]
+      },
+      "id": "115e12ec-e9b5-43b5-a8f6-862e68ccf452",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144.375, -43]]
+      },
+      "id": "1160f9f9-c2b1-027f-e053-08114f8c709e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[152, -33.75]]
+      },
+      "id": "11639c9a-fbe2-4af0-84a3-13340516f59c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "1164b61f-3127-462b-af28-e27d278e812b",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[115.4375, -20.625]]
+      },
+      "id": "11812b01-19f8-4126-a3f3-6e87a7b83dc2",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[115.125, -31.625]]
+      },
+      "id": "118252ee-3b5f-40cf-9f64-f6ff232da58a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148, -18]]
+      },
+      "id": "118367c7-1c52-47d8-ba20-c7aac8f517b4",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[126, -13]]
+      },
+      "id": "1187b9d2-7b97-4b0c-a817-26289518c167",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[156.20759, -25.875]]
+      },
+      "id": "1197e747-06c8-40b3-aef5-b23f559fce9a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[108.9375, -25.375]]
+      },
+      "id": "119b4076-b081-472d-b183-d1706c267873",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[137.2125, -12.375]]
+      },
+      "id": "11ad4367-3dac-4da7-b66d-83c2105789bc",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[155.06696, -25.875]]
+      },
+      "id": "11b3ccd0-d9e0-11dc-8635-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[111.35714, -25]]
+      },
+      "id": "11bc59db-1d78-438f-bb37-7adc7eea1d29",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[155, -36.5]]
+      },
+      "id": "11bfb384-f886-4632-b666-985c1fa62875",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.25, -18.25]]
+      },
+      "id": "11c307bd-89bf-4616-b3df-52645ca56b6e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[154.25, -20.5]]
+      },
+      "id": "11cf5ee7-b2bd-4ab3-8c29-ce9a3c47cba5",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "11d4b1d8-c03e-4e37-8ecc-b085ca80e7df",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [
+          [110.375, -20],
+          [114.75, -8]
+        ]
+      },
+      "id": "11d7680e-6224-4a46-8e84-d6d6a59eef2b",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.625, -42.75]]
+      },
+      "id": "11ec94aa-6dc2-4ad9-b183-e18291a9e2e7",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.39583, -42.875]]
+      },
+      "id": "11ed7e60-a73a-1214-e053-08114f8c4883",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.39583, -42.875]]
+      },
+      "id": "11ef4d42-7098-62a4-e053-08114f8c16b3",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[150.9375, -35.625]]
+      },
+      "id": "11f72494-53a4-4dfd-af50-2ffe28572fad",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[122.5, -14.5]]
+      },
+      "id": "11fe77f6-b5b3-cc95-e053-12a3070a6e18",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[120.90625, -14.375]]
+      },
+      "id": "120154f1-1572-4636-b141-26daa929799b",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[150.5, -21.5]]
+      },
+      "id": "120354cc-8878-45c9-ac1c-fc47eb07f764",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[150.5, -35.25]]
+      },
+      "id": "12324184-f623-4f90-ac0f-27bf4357d863",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[109.27841, -29.125]]
+      },
+      "id": "12331b0e-a6be-40a2-84c3-4bb211f18d7f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[118, -19.625]]
+      },
+      "id": "1239bc18-e873-4b60-a655-3b22506a15c6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[152.75, -22]]
+      },
+      "id": "12409e74-1c2e-42f0-80ec-656565bf005c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[142.5, -10]]
+      },
+      "id": "124193ec-d1a7-4a0a-aa2b-ae18ef5ee93f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "1241a51d-c8c2-4432-aa68-3d2bae142794",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.625, -29]]
+      },
+      "id": "124b426b-4d98-4743-abd4-b6fc4c04738d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.5, -19.25]]
+      },
+      "id": "124def9a-4b3f-498b-b5f6-e19f2e81187b",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[143.375, -9.875]]
+      },
+      "id": "124fd872-53c2-4e11-b2be-bb3271023c0c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[138, -38]]
+      },
+      "id": "125c1ec2-2a3b-49a5-94b2-999ba66f8449",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[145.75, -16.75]]
+      },
+      "id": "125e2180-453e-11dc-967c-00008a07204e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[153.125, -23]]
+      },
+      "id": "126770df-558f-4910-b824-961d8f9f5640",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[136.875, -36.75]]
+      },
+      "id": "1273e926-e68b-4421-acb8-213cb8341d78",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[108.9375, -25.375]]
+      },
+      "id": "12754fd2-13ac-45e5-9da6-e9ac42ab3dc5",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[153.56696, -25.875]]
+      },
+      "id": "12777e32-ec4f-055a-e053-10a3070a2ce2",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[153.56696, -25.875]]
+      },
+      "id": "12777e32-ec50-055a-e053-10a3070a2ce2",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.45833, -42.875]]
+      },
+      "id": "127c4c72-bad4-36eb-e053-08114f8cae46",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[149.375, -38.375]]
+      },
+      "id": "12801480-9a1e-45fe-8513-9d1ea6975679",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[114.5, -21.875]]
+      },
+      "id": "12863a10-6647-11dc-b5b7-00008a07204e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148, -17.25]]
+      },
+      "id": "12936f89-3265-4393-96fa-fe09a11100f0",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144.375, -14.375]]
+      },
+      "id": "1297e33c-bb09-4733-b483-b80bca6e2d96",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[155.125, -30.625]]
+      },
+      "id": "12a13cfa-b3a8-4ec6-aeab-e26ab42ada5c",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "12a21cfa-b8fc-43df-a9a4-784728209c21",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[136, -35.5]]
+      },
+      "id": "12a95df1-8958-4234-85bb-ef78900939f2",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[149.875, -18.375]]
+      },
+      "id": "12aa09af-23a1-4174-8e21-f0c5515b2b18",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[150.375, -38.5]]
+      },
+      "id": "12ab99cf-6abe-4924-b58b-64f2e66df505",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144.88068, -41.875]]
+      },
+      "id": "12c68a10-44ab-11dc-8cd0-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[118.75, -20.25]]
+      },
+      "id": "12cee48b-e373-4fa3-9c7a-7a2a7fb50e39",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[130.625, -12.25]]
+      },
+      "id": "12d575e6-3592-4a79-9a00-2214fa3a96d1",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "12d75132-0a32-44b1-83a9-44ab1b2421de",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.06696, -25.875]]
+      },
+      "id": "12dd3c6c-16a3-487c-bc8f-d9114e707e25",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "12f73d1e-3e46-41ec-89f9-6e88c184c589",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[117.625, -19.75]]
+      },
+      "id": "12f7edac-050f-42b9-9d6b-8eac55d102a1",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[154.6875, -27]]
+      },
+      "id": "12f90f4f-4d8d-4173-8f1c-3f37cbf56e77",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.5, -17]]
+      },
+      "id": "12fdf335-f950-401c-a6c5-f0537df5ca85",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "13025329-5f90-4dbd-8c2d-de4f80011a1f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[153.94196, -25.875]]
+      },
+      "id": "130781a8-0d1d-4778-a8e5-d5d3f5a32ba4",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[108.8125, -23.5]]
+      },
+      "id": "131025e6-6625-4392-a92b-7ae3a572f928",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "1312EDED-E3C1-47D3-9971-FA35FA45A98D",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[155.125, -30.25]]
+      },
+      "id": "13151e6e-7033-4a05-89c3-e8f00d457b3f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.375, -35.5]]
+      },
+      "id": "132c0942-2149-0bcc-e053-08114f8c5c13",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "132cbd8e-b008-0670-e053-12a3070add7e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "132cbd8e-b00a-0670-e053-12a3070add7e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151.125, -35]]
+      },
+      "id": "13391430-2ae8-11dd-a735-00188b4c0af8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.75, -30.25]]
+      },
+      "id": "133b2add-6e03-49b4-9b4e-f2c450d9590e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144, -11.5]]
+      },
+      "id": "133b9c43-2190-453c-bcc2-027cd812baf7",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[143.5, -43]]
+      },
+      "id": "13409b16-ec19-6348-e053-08114f8c4e79",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.5, -18.25]]
+      },
+      "id": "1342bfa4-57e9-4d8a-ac77-1ec34ec2d16b",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[153.75, -32.25]]
+      },
+      "id": "1345b271-c293-448f-928c-8bd88af93f3a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[114.5, -31.25]]
+      },
+      "id": "1347085e-e5b2-4d80-834f-74b1e3399672",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.75, -16.5]]
+      },
+      "id": "134a9691-60a7-455a-8604-e59211512322",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[112.79688, -25.875]]
+      },
+      "id": "134e7a84-5d50-4653-b34e-e17af276566e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[156.5, -22]]
+      },
+      "id": "134f081a-4c08-41a9-82ab-6e013fca284d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[123.625, -13.5]]
+      },
+      "id": "1358ff7e-5774-8aea-e053-10a3070a0919",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[150.04688, -18.375]]
+      },
+      "id": "135EB151-D406-4094-9E9F-40ABC5AA0C7B",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.12054, -26.375]]
+      },
+      "id": "135b1337-b58f-4ac1-aba0-b4094a848316",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[113.0625, -23.5]]
+      },
+      "id": "135c8f01-82e9-47cd-8729-523c3eeb92b6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[152.125, -32.625]]
+      },
+      "id": "13682e14-1d4d-46d5-839d-8c40a3713ce6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[139.12013, -13.25]]
+      },
+      "id": "1371fc7a-dc67-4269-87e2-a1cce48e0cba",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146.5, -18.5]]
+      },
+      "id": "13846fdf-515a-46e3-836a-3a09906de215",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[122, -14]]
+      },
+      "id": "1389cc8d-202c-47de-a11d-1258b34b3548",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[156.1875, -27]]
+      },
+      "id": "138c95cb-0c71-4619-86d7-3227f235cacf",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[154.1875, -30.125]]
+      },
+      "id": "13b3900f-2623-463c-98a7-ea60ac8e61ae",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.5, -18.25]]
+      },
+      "id": "13b3cacf-2c8d-4a7d-bff3-440b3f26ba7e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.25, -43]]
+      },
+      "id": "13b99286-24cc-23d6-e053-08114f8c9c44",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "13bc7d14-0c06-86ec-e053-12a3070a933e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[158.01339, -25.375]]
+      },
+      "id": "13bc7d14-0c08-86ec-e053-12a3070a933e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[114, -22.25]]
+      },
+      "id": "13c368f0-3bf6-11dd-b666-00008a07204e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[152, -23.25]]
+      },
+      "id": "13c86aee-63d7-4e84-900d-d3f9e52f46da",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[117.16667, -18.5]]
+      },
+      "id": "13cdd9bb-cdbe-4b41-81a9-3a7f096a3d37",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[138, -13]]
+      },
+      "id": "13d03ff2-814d-49ec-923c-ddfa667308a4",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[123.625, -13.5]]
+      },
+      "id": "13d0ef19-a13b-6c54-e053-10a3070a2f65",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[123.625, -13.5]]
+      },
+      "id": "13d15b84-4923-71b3-e053-12a3070a5543",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[155.5, -18]]
+      },
+      "id": "13dc8678-32d6-46ac-aa8e-66abce9b5fa8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[146, -17.5]]
+      },
+      "id": "13e0bbc2-7168-487b-9938-74dbb4174d7f",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[130.875, -12.375]]
+      },
+      "id": "13e25bed-e904-8e8d-e053-10a3070a2e6d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.45833, -42.875]]
+      },
+      "id": "13e45097-1bf4-2a32-e053-08114f8ca216",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[138, -13]]
+      },
+      "id": "13f63aa6-f250-4242-ab33-70f22ffe14b6",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[149.25, -38.375]]
+      },
+      "id": "13f7bf87-7b49-4c65-902d-7073af6c1453",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.25, -18.625]]
+      },
+      "id": "1409191c-8b02-4f9e-855e-4410bdcaea23",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147, -19.25]]
+      },
+      "id": "1412c636-afbe-4aba-b265-38e56f67e99a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[144.5, -42]]
+      },
+      "id": "141ae802-d75e-4b98-9cd4-9f2cacb395ba",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151, -20.75]]
+      },
+      "id": "14215010-f009-40a7-a80d-2f03f0878fd5",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[152.84375, -33]]
+      },
+      "id": "14229075-3293-46a4-a514-3d5b6678633a",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[151, -34.75]]
+      },
+      "id": "1425ac74-a153-437b-af28-c1d0d0fd6506",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[115.625, -20.625]]
+      },
+      "id": "142f2aef-28dd-4cdb-b2c1-35162900cfa8",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.5, -43]]
+      },
+      "id": "142fc452-55ce-4b85-8eae-9be6f2ce5152",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[115.625, -20.375]]
+      },
+      "id": "1430d936-68ee-4d7e-829b-bfcc7a6bbd30",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {},
+      "id": "1445b34e-f6ff-4a0f-96d4-e885ce697614",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.57292, -42.375]]
+      },
+      "id": "1447b041-2144-69ae-e053-08114f8c1ef9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.57143, -42.25]]
+      },
+      "id": "144922fe-90f0-128d-e053-08114f8c30a4",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.57292, -42.375]]
+      },
+      "id": "144bec83-f686-5768-e053-08114f8c9659",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[152, -23.5]]
+      },
+      "id": "14576635-cbb8-4bf1-94d8-5dcc2c67435e",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[149.79688, -18.375]]
+      },
+      "id": "1457d483-c77f-4e66-8dbf-f4d3a5843a45",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.57292, -42.375]]
+      },
+      "id": "145a0015-3b88-23f3-e053-08114f8c079d",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148.57292, -42.375]]
+      },
+      "id": "145b1489-cd95-0b11-e053-08114f8c1e4b",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148, -43]]
+      },
+      "id": "145b34af-4b22-367f-e053-08114f8c6344",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[147.75, -43]]
+      },
+      "id": "145bd3cc-1d51-605a-e053-08114f8c0dd9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[123.625, -13.5]]
+      },
+      "id": "145bdd0a-3e53-44c1-e053-12a3070a6188",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148, -43]]
+      },
+      "id": "145d05ea-1909-032e-e053-08114f8c7ad3",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[148, -43]]
+      },
+      "id": "145d5b6e-1b1d-2433-e053-08114f8cff15",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[131.36875, -34.625]]
+      },
+      "id": "145deac6-7550-4032-99fd-8ee06482eef9",
+      "links": [],
+      "itemType": "Collection"
+    },
+    {
+      "properties": {
+        "centroid": [[145.625, -42.875]]
+      },
+      "id": "146e7097-e2b3-5c94-e053-08114f8c9559",
+      "links": [],
+      "itemType": "Collection"
+    }
+  ],
+  "total": 11653,
+  "search_after": ["str:146e7097-e2b3-5c94-e053-08114f8c9559"]
+}

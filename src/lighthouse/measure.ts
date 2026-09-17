@@ -11,21 +11,20 @@
 import { execFileSync } from "child_process";
 import fs from "fs";
 import path from "path";
-import { createApiCache } from "./apiCache";
+import { createApiReplayer, type ApiReplayer } from "./apiFixtures";
 import { startAppServer } from "./appServer";
 import {
   ALL_FORM_FACTORS,
   DEFAULT_PORT,
   DEFAULT_RUNS,
-  apiHost,
   detailsUuid,
   lighthouseRoutes,
   metricOrder,
   type LighthouseRoute,
 } from "./constants";
 import {
+  apiFixturesDir,
   argValue,
-  apiCacheDir,
   distDir,
   isLighthouseCli,
   lhrDir,
@@ -108,17 +107,19 @@ const measureRoute = async ({
   runs,
   formFactor,
   keepLhr,
+  api,
 }: {
   route: LighthouseRoute;
   origin: string;
   runs: number;
   formFactor: FormFactor;
   keepLhr: boolean;
+  api: ApiReplayer;
 }): Promise<RouteMetrics> => {
   const url = `${origin}${route.path}`;
 
-  // Records the API responses (and warms the OS caches) so the measured runs
-  // replay them instead of waiting on a backend.
+  // Discarded: warms Chrome and the OS caches so the first measured run is
+  // not the odd one out.
   console.log(`[${route.id}] warm-up run`);
   await runLighthouse({ url, formFactor, warmup: true });
 
@@ -128,9 +129,16 @@ const measureRoute = async ({
 
     const problems = checkRendered(lhr, route, origin);
     if (problems.length > 0) {
+      const missing = api.missing();
       throw new Error(
         `${route.path} did not render a page worth measuring:\n` +
-          problems.map((problem) => `  - ${problem}`).join("\n")
+          problems.map((problem) => `  - ${problem}`).join("\n") +
+          (missing.length > 0
+            ? "\nThe app made API requests that have no recorded fixture:\n" +
+              missing.map((request) => `  - ${request}`).join("\n") +
+              '\nIf it now calls the OGC API differently, run "yarn lh:build && ' +
+              'yarn lh:record" and commit src/lighthouse/fixtures/api.'
+            : "")
       );
     }
 
@@ -166,23 +174,20 @@ export const measure = async () => {
     DEFAULT_PORT
   );
   const uuid = argValue("--uuid") || detailsUuid();
-  const upstream = argValue("--api-host") || apiHost();
   const outputPath = argValue("--out") || reportJsonPath();
-  const cacheDir = argValue("--cache-dir") || apiCacheDir();
+  const fixturesDir = argValue("--fixtures") || apiFixturesDir();
   const keepLhr = !process.argv.includes("--no-keep-lhr");
 
   fs.mkdirSync(workDir(), { recursive: true });
   if (keepLhr) fs.mkdirSync(lhrDir(), { recursive: true });
-  // Recorded responses are kept between local runs for speed; --fresh
-  // re-records them when the upstream data has moved on.
-  if (process.argv.includes("--fresh")) {
-    fs.rmSync(cacheDir, { recursive: true, force: true });
-  }
-
-  const api = createApiCache({ upstream, cacheDir });
+  // The OGC API is mocked: only the committed fixtures are served, so a
+  // missing or slow environment can never fail or skew the run.
+  const api = createApiReplayer({ fixturesDir });
   const server = await startAppServer({ distDir: distDir(), port, api });
   console.log(
-    `serving ${distDir()} on ${server.url}, /api recorded from ${upstream}`
+    `serving ${distDir()} on ${server.url}, /api replayed from ` +
+      `${api.manifest.fixtures.length} fixtures recorded from ` +
+      `${api.manifest.recordedFrom} on ${api.manifest.recordedAt}`
   );
 
   // Handy when a run reports an unrendered page: serve the exact same build
@@ -203,6 +208,7 @@ export const measure = async () => {
           runs,
           formFactor,
           keepLhr,
+          api,
         });
       }
       routes[route.path] = { id: route.id, metrics };
@@ -211,17 +217,13 @@ export const measure = async () => {
     await server.close();
   }
 
-  const stats = api.stats();
-  console.log(
-    `api cache: ${stats.hits} replayed, ${stats.misses} recorded` +
-      (stats.errors.length > 0
-        ? `, upstream errors: ${stats.errors.join(", ")}`
-        : "")
-  );
-  if (stats.failures.length > 0) {
+  const missing = api.missing();
+  if (missing.length > 0) {
     // The readiness checks above already passed, so these were requests the
     // pages tolerate — worth seeing, not worth failing on.
-    console.warn(`unreachable upstream requests: ${stats.failures.join(", ")}`);
+    console.warn(
+      `API requests with no recorded fixture (answered 504): ${missing.join(", ")}`
+    );
   }
 
   const report: LighthouseReport = {
@@ -229,7 +231,7 @@ export const measure = async () => {
     branch: branchName(),
     generatedAt: new Date().toISOString(),
     runs,
-    apiHost: upstream,
+    apiHost: api.manifest.recordedFrom,
     routes,
   };
 

@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit && tsc -p tsconfig.node.json --noEmit",
     "lh:build": "bash generateEnv.sh edge && vite build --mode edge",
     "lh:measure": "tsx src/lighthouse/measure.ts",
+    "lh:record": "tsx src/lighthouse/record.ts",
     "lh:compare": "tsx src/lighthouse/compare.ts",
     "lh:comment": "tsx src/lighthouse/postComment.ts",
     "lh:gate": "tsx src/lighthouse/gate.ts",

@@ -28,7 +28,8 @@ export interface LighthouseRunOptions {
   url: string;
   formFactor: FormFactor;
   /**
-   * Discarded run whose only job is to fill the API cache. Unthrottled and
+   * A run whose scores nobody reads: the warm-up before the measured runs, and
+   * each page load while recording the API fixtures. Unthrottled and
    * performance-only, so it costs a fraction of a measured run.
    */
   warmup?: boolean;

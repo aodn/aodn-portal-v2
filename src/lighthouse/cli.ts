@@ -26,8 +26,11 @@ export const gateJsonPath = () => path.join(workDir(), "gate.json");
 export const baselineJsonPath = () =>
   path.join(workDir(), "baseline", "report.json");
 
-/** Recorded upstream API responses, so the measured runs never hit the network. */
-export const apiCacheDir = () => path.join(workDir(), "api-cache");
+/**
+ * The mocked OGC API: committed responses the measured runs replay, refreshed
+ * with `yarn lh:record`. Not under workDir(), which is gitignored.
+ */
+export const apiFixturesDir = () => path.join(here(), "fixtures", "api");
 
 /** Full Lighthouse results, kept for the run artifact. */
 export const lhrDir = () => path.join(workDir(), "lhr");

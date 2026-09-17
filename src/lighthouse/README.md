@@ -26,9 +26,11 @@ Two things make that comparison mean something:
   checked for the final URL, a plausible DOM size and the API calls the route
   needs (`metrics.ts`), and anything else fails the job instead of publishing
   meaningless numbers.
-- **The backend is not in the numbers.** A warm-up run records every API
-  response to `.lighthouse/api-cache`, and the measured runs replay them from
-  memory (`apiCache.ts`). Real payloads, no live-backend latency in LCP.
+- **The backend is mocked.** The runs never call a real OGC API: every `/api`
+  request is answered from responses committed in `fixtures/api/`
+  (`apiFixtures.ts`). A down or slow environment cannot fail the job or move
+  a metric, and the payloads only change when someone refreshes them — see
+  [Refreshing the API fixtures](#refreshing-the-api-fixtures).
 
 The build is served by a small in-memory server (`appServer.ts`) rather than
 `vite preview`: preview's `/api` proxy target is resolved from the `.env` files,
@@ -43,6 +45,7 @@ CloudFront does for the app.
 | ----------------- | ---------------------------------------------------------- |
 | `yarn lh:build`   | production (edge) build into `dist/`, no tsc/Vitest        |
 | `yarn lh:measure` | measures every route, writes `.lighthouse/report.json`     |
+| `yarn lh:record`  | re-records `fixtures/api/` from a real environment         |
 | `yarn lh:compare` | `report.json` + baseline → `.lighthouse/report.md`         |
 | `yarn lh:comment` | creates/updates the PR comment (needs `GITHUB_TOKEN`)      |
 | `yarn lh:gate`    | fails (exit 1) if `lh:compare` found a blocking regression |
@@ -58,19 +61,41 @@ cat .lighthouse/report.md
 
 Useful flags on `yarn lh:measure`:
 
-| flag                   | for                                                            |
-| ---------------------- | -------------------------------------------------------------- |
-| `--runs 1`             | a quick check while changing this tooling                      |
-| `--form-factor mobile` | measure only mobile (or only `desktop`); default is both       |
-| `--uuid <uuid>`        | measure a different record on `/details`                       |
-| `--api-host <url>`     | record from another environment (default `portal-edge`)        |
-| `--fresh`              | drop the recorded API responses and record them again          |
-| `--serve-only`         | just serve the build + recorded API data, to open in a browser |
-| `--no-keep-lhr`        | skip writing the full results to `.lighthouse/lhr/`            |
+| flag                   | for                                                        |
+| ---------------------- | ---------------------------------------------------------- |
+| `--runs 1`             | a quick check while changing this tooling                  |
+| `--form-factor mobile` | measure only mobile (or only `desktop`); default is both   |
+| `--uuid <uuid>`        | measure a different record on `/details` (record it first) |
+| `--serve-only`         | just serve the build + mocked API, to open in a browser    |
+| `--no-keep-lhr`        | skip writing the full results to `.lighthouse/lhr/`        |
 
 `LH_RUNS`, `LH_FORM_FACTOR` (`mobile`, `desktop` or `both`), `LH_DETAILS_UUID`,
-`LH_API_HOST`, `LH_PORT` and `LH_COMMIT` do the same as their flags, for the
-workflow.
+`LH_PORT` and `LH_COMMIT` do the same as their flags, for the workflow.
+
+## Refreshing the API fixtures
+
+`fixtures/api/` holds one JSON file per API response plus `manifest.json`,
+which maps each request (method + URL) to its file. Bodies are pretty-printed
+so a refresh can be reviewed in the PR diff.
+
+Refresh them when the OGC API response format changes, or when a PR changes
+the requests the app makes — `yarn lh:measure` then fails with the requests
+that have no fixture and tells you to do this:
+
+```bash
+yarn lh:build
+yarn lh:record   # ~1 min: loads each route on mobile and desktop against portal-edge
+git add src/lighthouse/fixtures/api
+```
+
+`yarn lh:record` only needs the real environment on the machine running it,
+never in CI. It writes nothing unless every page rendered and every request got
+an answer, so a flaky environment cannot leave a partial set behind. Flags:
+`--api-host <url>` (or `LH_API_HOST`) to record from another environment, and
+`--uuid <uuid>` to record a different `/details` record.
+
+Expect the scores to move a little in the PR that refreshes the fixtures: the
+new data is what the pages render.
 
 ## How the baseline works
 
@@ -121,13 +146,12 @@ PR actually made a page slower, not noise.
 ## What it does not tell you
 
 - **These are not production numbers.** No CloudFront, no real network, no real
-  device; the API is replayed from disk. The number is comparable with other runs
+  device; the API is mocked from committed fixtures. The number is comparable with other runs
   of this workflow and with nothing else. Field data lives in GA4 via
   `src/analytics/webVitalsEvents.ts`.
-- **The recorded payloads change over time.** Each run records fresh responses
-  from `portal-edge`, so a record gaining attachments can move a metric on its
-  own. Big unexplained jumps are worth checking against
-  `.lighthouse/lhr/*.json` in the run artifact.
+- **The API data is a snapshot.** It is whatever `portal-edge` returned when the
+  fixtures were last recorded (`recordedAt` in `fixtures/api/manifest.json`),
+  not what the catalogue holds today.
 - **Third parties are measured.** GA and New Relic load in an edge build, and
   the map fetches Mapbox tiles, so their variance is in TBT.
 - **Both form factors run on every PR.** They score differently — different

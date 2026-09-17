@@ -16,7 +16,7 @@ import fs from "fs";
 import http from "http";
 import path from "path";
 import { gzipSync } from "zlib";
-import type { ApiCache } from "./apiCache";
+import type { ApiHandler } from "./apiFixtures";
 
 const CONTENT_TYPES: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
@@ -99,7 +99,7 @@ export const startAppServer = async ({
 }: {
   distDir: string;
   port: number;
-  api: ApiCache;
+  api: ApiHandler;
 }): Promise<AppServer> => {
   const indexPath = path.join(distDir, "index.html");
   if (!fs.existsSync(indexPath)) {
