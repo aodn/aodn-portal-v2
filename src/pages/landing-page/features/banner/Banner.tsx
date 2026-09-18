@@ -152,7 +152,7 @@ const renderBannerImages = (
           <img
             src={bannerImage1}
             srcSet={`${bannerImage1Small} 320w, ${bannerImage1} 488w`}
-            sizes="(max-width: 1023px) 320px, 306px"
+            sizes="(max-width: 1023px) 320px, 488px"
             width={488}
             height={288}
             loading="eager"
@@ -184,7 +184,7 @@ const renderBannerImages = (
           <img
             src={bannerImage3}
             srcSet={`${bannerImage3Small} 120w, ${bannerImage3} 240w`}
-            sizes="120px"
+            sizes="(max-width: 1023px) 120px, 240px"
             width={240}
             height={165}
             loading="lazy"
