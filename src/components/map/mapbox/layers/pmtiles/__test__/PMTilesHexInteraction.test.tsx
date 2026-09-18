@@ -17,6 +17,7 @@ import {
   pmtilesHitLayerId,
   type PmtilesHexHoverCtx,
 } from "../PMTilesLayer";
+import { loadH3 } from "../hexHit";
 
 const popupMocks = vi.hoisted(() => {
   const instances: Array<{
@@ -45,6 +46,34 @@ const popupMocks = vi.hoisted(() => {
 
 vi.mock("mapbox-gl", () => ({
   Popup: popupMocks.Popup,
+}));
+
+const h3Mocks = vi.hoisted(() => {
+  const center = { lng: 148.2, lat: -41.5 };
+  const ring: [number, number][] = [
+    [148.2, -41.5],
+    [148.3, -41.5],
+    [148.3, -41.6],
+    [148.2, -41.6],
+    [148.2, -41.5],
+  ];
+  return {
+    center,
+    ring,
+    latLngToCell: vi.fn(() => "h3-tap-cell"),
+    isValidCell: vi.fn((id: string) => id === "h3-tap-cell" || id === "hex-1"),
+    getResolution: vi.fn(() => 4),
+    cellToLatLng: vi.fn(() => [center.lat, center.lng]),
+    cellToBoundary: vi.fn(() => ring.slice(0, -1)),
+  };
+});
+
+vi.mock("h3-js", () => ({
+  latLngToCell: h3Mocks.latLngToCell,
+  isValidCell: h3Mocks.isValidCell,
+  getResolution: h3Mocks.getResolution,
+  cellToLatLng: h3Mocks.cellToLatLng,
+  cellToBoundary: h3Mocks.cellToBoundary,
 }));
 
 vi.mock("@/utils/MapUtils", async (importOriginal) => {
@@ -134,7 +163,7 @@ describe("PMTilesLayer - click popup", () => {
     handlers.forEach((handler) => handler(payload));
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
     popupMocks.instances.length = 0;
     vi.mocked(isMapDrawModeActive).mockReturnValue(false);
@@ -188,6 +217,8 @@ describe("PMTilesLayer - click popup", () => {
         }
       ),
     } as unknown as Map;
+
+    await loadH3();
   });
 
   const attach = (ctx = makeCtx()) =>
@@ -220,7 +251,14 @@ describe("PMTilesLayer - click popup", () => {
     expect(setData).toHaveBeenCalledWith(
       expect.objectContaining({
         type: "FeatureCollection",
-        features: [expect.objectContaining({ geometry: HEX_GEOMETRY })],
+        features: [
+          expect.objectContaining({
+            geometry: {
+              type: "Polygon",
+              coordinates: [h3Mocks.ring],
+            },
+          }),
+        ],
       })
     );
     expect(popupMocks.Popup).not.toHaveBeenCalled();
@@ -238,7 +276,7 @@ describe("PMTilesLayer - click popup", () => {
     expect(popup.setHTML).toHaveBeenCalledWith(
       expect.stringContaining("Data Record Count: 12")
     );
-    expect(popup.setLngLat).toHaveBeenCalledWith({ lng: 147, lat: -42 });
+    expect(popup.setLngLat).toHaveBeenCalledWith(h3Mocks.center);
     expect(popup.addTo).toHaveBeenCalledWith(map);
     expect(popup.getElement()).toMatchObject({
       dataset: { testid: playwrightTestIds.DETAIL_MAP_POPUP },
@@ -247,7 +285,7 @@ describe("PMTilesLayer - click popup", () => {
 
   it("queries the tap point first, then a padded hit layer if the point missed", () => {
     attach();
-    const feature = makeFeature("hex-1");
+    const feature = makeFeature("h3-tap-cell");
     queryRenderedFeatures
       .mockReturnValueOnce([])
       .mockReturnValueOnce([feature]);
@@ -272,10 +310,23 @@ describe("PMTilesLayer - click popup", () => {
     );
   });
 
-  it("opens the popup for the hex closest to the tap when several are in the hit box", () => {
+  it("opens the popup for the H3 cell of the tap when several hexes are in the hit box", () => {
     attach();
-    const far = makeFeature("hex-far");
-    far.geometry = {
+    const other = makeFeature("hex-other");
+    other.geometry = {
+      type: "Polygon",
+      coordinates: [
+        [
+          [1, 2],
+          [2, 2],
+          [2, 3],
+          [1, 3],
+          [1, 2],
+        ],
+      ],
+    };
+    const trueCell = makeFeature("h3-tap-cell");
+    trueCell.geometry = {
       type: "Polygon",
       coordinates: [
         [
@@ -287,8 +338,30 @@ describe("PMTilesLayer - click popup", () => {
         ],
       ],
     };
-    const near = makeFeature("hex-near");
-    near.geometry = {
+    queryRenderedFeatures
+      .mockReturnValueOnce([])
+      .mockReturnValueOnce([other, trueCell]);
+    emit("click", undefined, makeEvent());
+
+    expect(popupMocks.Popup).toHaveBeenCalled();
+    expect(setData).toHaveBeenCalledWith(
+      expect.objectContaining({
+        features: [
+          expect.objectContaining({
+            geometry: {
+              type: "Polygon",
+              coordinates: [h3Mocks.ring],
+            },
+          }),
+        ],
+      })
+    );
+  });
+
+  it("does not open a popup for a neighbour in an occupancy gap", () => {
+    attach();
+    const neighbour = makeFeature("hex-near");
+    neighbour.geometry = {
       type: "Polygon",
       coordinates: [
         [
@@ -302,15 +375,10 @@ describe("PMTilesLayer - click popup", () => {
     };
     queryRenderedFeatures
       .mockReturnValueOnce([])
-      .mockReturnValueOnce([far, near]);
+      .mockReturnValueOnce([neighbour]);
     emit("click", undefined, makeEvent());
 
-    expect(popupMocks.Popup).toHaveBeenCalled();
-    expect(setData).toHaveBeenCalledWith(
-      expect.objectContaining({
-        features: [expect.objectContaining({ geometry: near.geometry })],
-      })
-    );
+    expect(popupMocks.Popup).not.toHaveBeenCalled();
   });
 
   it("touchend opens the popup for a single-finger tap", () => {
@@ -335,7 +403,14 @@ describe("PMTilesLayer - click popup", () => {
     expect(classList.remove).toHaveBeenCalledWith("map-cursor-pointer");
     expect(setData).toHaveBeenCalledWith(
       expect.objectContaining({
-        features: [expect.objectContaining({ geometry: HEX_GEOMETRY })],
+        features: [
+          expect.objectContaining({
+            geometry: {
+              type: "Polygon",
+              coordinates: [h3Mocks.ring],
+            },
+          }),
+        ],
       })
     );
     expect(removePopup).not.toHaveBeenCalled();
