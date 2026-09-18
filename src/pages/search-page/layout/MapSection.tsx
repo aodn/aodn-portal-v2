@@ -1,40 +1,36 @@
-import React, { memo, useState } from "react";
-import { MapEvent } from "mapbox-gl";
+import React, { memo, useMemo, useState } from "react";
+import { LngLatBounds, type MapEvent } from "mapbox-gl";
 import { Box, Paper, SxProps, Theme } from "@mui/material";
-import Map, { MapBasicType } from "../../../components/map/mapbox/Map";
-import Controls from "../../../components/map/mapbox/controls/Controls";
+import Map, { MapBasicType } from "@/components/map/mapbox/Map";
+import Controls from "@/components/map/mapbox/controls/Controls";
 import ToggleControl, {
   ToggleControlProps,
-} from "../../../components/map/mapbox/controls/ToggleControl";
-import NavigationControl from "../../../components/map/mapbox/controls/NavigationControl";
-import ScaleControl from "../../../components/map/mapbox/controls/ScaleControl";
-import MenuControl from "../../../components/map/mapbox/controls/menu/MenuControl";
-import BaseMapSwitcher from "../../../components/map/mapbox/controls/menu/BaseMapSwitcher";
-import Layers, {
-  LayerBasicType,
-} from "../../../components/map/mapbox/layers/Layers";
-import ClusterLayer from "../../../components/map/mapbox/layers/ClusterLayer";
-import HeatmapLayer from "../../../components/map/mapbox/layers/HeatmapLayer";
-import UnclusterLayer from "../../../components/map/mapbox/layers/UnclusterLayer";
+} from "@/components/map/mapbox/controls/ToggleControl";
+import NavigationControl from "@/components/map/mapbox/controls/NavigationControl";
+import ScaleControl from "@/components/map/mapbox/controls/ScaleControl";
+import MenuControl from "@/components/map/mapbox/controls/menu/MenuControl";
+import BaseMapSwitcher from "@/components/map/mapbox/controls/menu/BaseMapSwitcher";
+import Layers, { LayerBasicType } from "@/components/map/mapbox/layers/Layers";
+import ClusterLayer from "@/components/map/mapbox/layers/ClusterLayer";
+import HeatmapLayer from "@/components/map/mapbox/layers/HeatmapLayer";
+import UnclusterLayer from "@/components/map/mapbox/layers/UnclusterLayer";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
-import DisplayCoordinate from "../../../components/map/mapbox/controls/DisplayCoordinate";
+import DisplayCoordinate from "@/components/map/mapbox/controls/DisplayCoordinate";
 import { generateFeatureCollectionFrom } from "@/utils/GeoJsonUtils";
 import { capitalizeFirstLetter } from "@/utils/StringUtils";
-import useTabNavigation, {
-  TabNavigation,
-} from "../../../hooks/useTabNavigation";
+import useTabNavigation, { TabNavigation } from "@/hooks/useTabNavigation";
 import MapLayerSwitcher, {
   LayerName,
   LayerSwitcherLayer,
-} from "../../../components/map/mapbox/controls/menu/MapLayerSwitcher";
+} from "@/components/map/mapbox/controls/menu/MapLayerSwitcher";
 import BookmarkListMenu, {
   BookmarkListMenuBasicType,
-} from "../../../components/map/mapbox/controls/menu/BookmarkListMenu";
-import useBreakpoint from "../../../hooks/useBreakpoint";
-import MenuControlGroup from "../../../components/map/mapbox/controls/menu/MenuControlGroup";
+} from "@/components/map/mapbox/controls/menu/BookmarkListMenu";
+import useBreakpoint from "@/hooks/useBreakpoint";
+import MenuControlGroup from "@/components/map/mapbox/controls/menu/MenuControlGroup";
 import ReferenceLayerSwitcher, {
   staticBaseLayerConfig,
-} from "../../../components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
+} from "@/components/map/mapbox/controls/menu/ReferenceLayerSwitcher";
 import { ProgressType } from "@/components/map/mapbox/MapContext";
 import { createStaticLayers } from "@/components/map/mapbox/layers/StaticLayer";
 import { fitToDefaultExtent } from "@/utils/MapUtils";
@@ -42,10 +38,11 @@ import MiniFooter, { MAP_FOOTER_HEIGHT } from "@/app/layout/MiniFooter";
 
 interface MapSectionProps
   extends
-    Partial<MapBasicType>,
+    Omit<Partial<MapBasicType>, "bbox">,
     Partial<LayerBasicType>,
     BookmarkListMenuBasicType,
     ToggleControlProps {
+  bbox?: [number, number, number, number];
   collections: OGCCollection[];
   onMapZoomOrMove: (event: MapEvent | undefined) => void;
   progress?: ProgressType;
@@ -118,6 +115,10 @@ const MapSection: React.FC<MapSectionProps> = memo(
     );
     const [staticLayer, setStaticLayer] = useState<Array<string>>([]);
     const tabNavigation = useTabNavigation();
+    const mapBounds = useMemo(
+      () => (bbox ? new LngLatBounds(bbox) : undefined),
+      [bbox]
+    );
     // Early return if it is full list view
     if (showFullList) return null;
     return (
@@ -147,7 +148,7 @@ const MapSection: React.FC<MapSectionProps> = memo(
         >
           <Map
             panelId={mapContainerId}
-            bbox={bbox}
+            bbox={mapBounds}
             zoom={zoom}
             progress={progress}
             onZoomEvent={onMapZoomOrMove}
