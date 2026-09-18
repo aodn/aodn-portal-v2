@@ -107,13 +107,24 @@ describe("HeaderMenu", () => {
     const accordions = screen.getAllByTestId("accordion-menu");
     expect(accordions).toHaveLength(5);
 
-    // Should render menu summaries (About Us, Resources)
-    // Here we trust MUI Accordion so no need to test the expand of accordion
+    // Should render menu summaries in order:
+    // IMOS Home | Downloads | Resources | Subscribe | About Us
     expect(screen.getByText("IMOS Home")).toBeInTheDocument();
     expect(screen.getByText("Downloads")).toBeInTheDocument();
     expect(screen.getByText("About Us")).toBeInTheDocument();
     expect(screen.getByText("Subscribe")).toBeInTheDocument();
     expect(screen.getByText("Resources")).toBeInTheDocument();
+
+    const menuOrder = accordions.map(
+      (a) => a.querySelector(".MuiAccordionSummary-content")?.textContent
+    );
+    expect(menuOrder).toEqual([
+      "IMOS Home",
+      "Downloads",
+      "Resources",
+      "Subscribe",
+      "About Us",
+    ]);
   });
 
   it("calls openInNewTab with the newsletter URL when Subscribe is clicked", () => {
