@@ -114,6 +114,27 @@ To install `Conda`, please refer to the [official guide](https://conda.io/projec
 
    Here, `--count=5` creates 5 instances of the test, and `-n 5` distributes them across 5 parallel workers.
 
+## Sharding in CI
+
+`ui_test.yml` runs the suite as two parallel jobs. Each one passes
+`PYTEST_SPLITS=2` and `PYTEST_GROUP=<1|2>` through `docker-compose.yml` into
+`scripts/entrypoint.sh`, which turns them into `pytest --splits --group`
+(pytest-split). Both variables must be set for sharding to kick in, so a plain
+`pytest` or `yarn playwright` still runs everything.
+
+`--numprocesses` comes from `PYTEST_WORKERS` (default 2). Raising it is worth
+measuring rather than assuming: the map tests render mapbox-gl on SwiftShader,
+which is CPU-bound, and a GitHub runner only has 4 vCPU.
+
+Shards are balanced by `.test_durations`, which is committed. Without it
+pytest-split falls back to splitting by test count, which skews badly —
+`detail_page/maps` alone is ~28% of the runtime. Regenerate it after adding or
+substantially changing tests:
+
+```bash
+pytest --store-durations
+```
+
 ## Test Results & Debugging Failed Tests
 
 After a test run, two types of documentation are generated to help analyze results:
@@ -142,9 +163,16 @@ pytest --tracing retain-on-failure
 
 In CI runs, traces are automatically saved for failed tests.
 
+`retain-on-failure` only controls whether the trace is _saved_, not what it
+contains: [`tests/conftest.py`](./tests/conftest.py) starts tracing with
+`screenshots=True, snapshots=True, sources=True` for every test, so a saved
+trace from a failed CI run includes the full visual time-travel view, action
+log, network traffic and stack traces. Passing tests still record all of that
+during the run — it's just discarded instead of written to disk.
+
 - Navigate to the specific workflow run.
 - Scroll down to the **Artifacts** section.
-- Download the artifact named `test-report`.
+- Download the artifact named `test-report-1` or `test-report-2` (one per shard).
 - After extracting the zip file:
   - `reports/`: Contains the HTML test report.
   - `test-results/`: Contains trace files for failed tests, structured by folder just like the [`tests/`](./tests/) directory.

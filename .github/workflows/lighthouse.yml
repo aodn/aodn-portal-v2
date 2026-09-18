@@ -1,0 +1,135 @@
+name: Lighthouse
+
+# Measures /, /search and /details/<uuid> on every PR and reports how they moved
+# against the latest baseline from main. Mostly informational: the job fails when
+# a run could not be trusted (build, Chrome, or a page that did not render), and
+# also when performance drops 15+ points against main (see "Gate on a large
+# performance drop" below) — everything else is a warning in the PR comment, not
+# a failure. What it measures and why: src/lighthouse/README.md
+#
+# Runs as its own workflow so it happens in parallel with lint/test, the
+# Playwright suite and CodeQL.
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      form-factor:
+        description: "Emulation to measure"
+        type: choice
+        default: both
+        options: [both, mobile, desktop]
+
+# cancel currently running workflow from the same PR or branch
+concurrency:
+  group: lighthouse-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  # Reads the lighthouse-baseline artifact from the last main run
+  actions: read
+  # Creates/updates the single report comment
+  pull-requests: write
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    # Three routes x 2 form factors (mobile, desktop) x (1 warm-up + 3 measured
+    # runs) takes ~8 min; the rest is install and build. A hang should not sit
+    # here for an hour.
+    timeout-minutes: 20
+
+    steps:
+      - name: Enable Corepack
+        run: corepack enable
+
+      - uses: actions/checkout@v5
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+          cache: yarn
+
+      - run: yarn install --immutable
+
+      # Lighthouse drives the Chrome that ships with the runner image
+      - name: Chrome version
+        run: google-chrome --version
+
+      # Same production build as an edge deploy. Skips tsc and Vitest on
+      # purpose — lint-test.yml already runs both.
+      - name: Build
+        run: yarn lh:build
+
+      # No backend involved: /api is answered from the fixtures committed in
+      # src/lighthouse/fixtures/api (refreshed with `yarn lh:record`), so an
+      # unavailable environment cannot fail this job.
+      - name: Measure the routes
+        env:
+          # On pull_request GITHUB_SHA is the merge commit; report the PR's own
+          # commit instead
+          LH_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+          LH_FORM_FACTOR: ${{ inputs.form-factor || 'both' }}
+        run: yarn lh:measure
+
+      # The baseline is whatever the latest successful main run published. Also
+      # downloaded on main, where it compares this merge with the one before.
+      - name: Download the main baseline
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          artifact_id=$(gh api \
+            "repos/$GITHUB_REPOSITORY/actions/artifacts?name=lighthouse-baseline&per_page=100" \
+            --jq '[.artifacts[] | select(.expired == false and .workflow_run.head_branch == "main")]
+                  | sort_by(.created_at) | reverse | .[0].id // empty')
+          if [ -z "$artifact_id" ]; then
+            echo "::notice title=no Lighthouse baseline::main has not published one yet; reporting the current values only"
+            exit 0
+          fi
+          mkdir -p .lighthouse/baseline
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$artifact_id/zip" > baseline.zip
+          unzip -o baseline.zip -d .lighthouse/baseline
+          echo "baseline commit: $(jq -r .commit .lighthouse/baseline/report.json)"
+
+      - name: Build the report
+        run: yarn lh:compare
+
+      - name: Add the report to the job summary
+        run: cat .lighthouse/report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Comment on the pull request
+        if: github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: yarn lh:comment
+
+      # The one score that fails the check: performance 15+ points below main.
+      # Runs after the comment so a failing PR still carries the numbers.
+      - name: Gate on a large performance drop
+        run: yarn lh:gate
+
+      # What a PR compares itself against next time. Kept for the default
+      # artifact retention, so a quiet week still has a baseline to use.
+      - name: Publish the baseline
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: actions/upload-artifact@v6
+        with:
+          name: lighthouse-baseline
+          path: .lighthouse/report.json
+          if-no-files-found: error
+
+      # Full Lighthouse results, for digging into a reported regression
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: lighthouse-run-${{ github.run_attempt }}
+          path: |
+            .lighthouse/report.json
+            .lighthouse/report.md
+            .lighthouse/lhr/
+          retention-days: 7

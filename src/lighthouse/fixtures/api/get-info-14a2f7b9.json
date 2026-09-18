@@ -1,0 +1,30 @@
+{
+  "application": {
+    "name": "ogcapi-server-java",
+    "description": "REST API that implements OGC API",
+    "version": "main-SNAPSHOT"
+  },
+  "git": {
+    "commit": {
+      "id": "d6ab8f6"
+    }
+  },
+  "depService": {
+    "es-indexer": {
+      "version": "main-SNAPSHOT",
+      "description": "Meta data indexer for Elastic Search"
+    },
+    "geonetwork4-core": {
+      "version": "main-SNAPSHOT",
+      "description": "AODN customized Geonetwork Instance"
+    },
+    "data-access-service": {
+      "version": "unknown",
+      "description": "Data Access Service"
+    },
+    "data-discovery-ai": {
+      "version": "unknown",
+      "description": "Data Discovery AI"
+    }
+  }
+}

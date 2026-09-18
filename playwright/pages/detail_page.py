@@ -53,6 +53,18 @@ class DetailPage(BasePage):
         self.date_range_condition_box = self.page.get_by_test_id(
             'date-range-condition-box'
         )
+        # The boxes above are rendered for every card inside the Download
+        # Selection accordion, even with no condition added, so their
+        # visibility only says whether the accordion is expanded. These remove
+        # buttons exist only once a condition has actually been added.
+        self.bbox_condition_remove_button = self.page.get_by_role(
+            'button', name='remove bbox 1', exact=True
+        )
+        self.date_range_condition_remove_button = (
+            self.page.locator('.MuiCard-root')
+            .filter(has=self.date_range_condition_box)
+            .get_by_role('button', name='remove', exact=True)
+        )
 
     # Mobile breakpoint matches `theme.breakpoints.down("sm")` (< 768px) used
     # by the app to decide whether the map lives on its own "Map" tab.
