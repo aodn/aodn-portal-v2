@@ -1,13 +1,22 @@
-import {
-  cellToBoundary,
-  cellToLatLng,
-  getResolution,
-  isValidCell,
-  latLngToCell,
-} from "h3-js";
 import type { Geometry, Position } from "geojson";
 
 export type HexHitSource = "point" | "box";
+
+type H3Module = typeof import("h3-js");
+
+let h3Module: H3Module | undefined;
+let h3Load: Promise<H3Module> | undefined;
+
+/** Load the H3 runtime on first hex hover/click — not on details-page parse. */
+export const loadH3 = (): Promise<H3Module> => {
+  h3Load ??= import("h3-js").then((mod) => {
+    h3Module = mod;
+    return mod;
+  });
+  return h3Load;
+};
+
+export const getH3 = (): H3Module | undefined => h3Module;
 
 export const h3ResolutionFromSourceLayer = (sourceLayer: string): number => {
   const match = /^hex_z(\d+)$/.exec(sourceLayer);
@@ -33,8 +42,10 @@ export const tapH3Cell = (
   lng: number,
   resolution: number
 ): string | undefined => {
+  const h3 = getH3();
+  if (!h3) return undefined;
   try {
-    return latLngToCell(lat, lng, resolution);
+    return h3.latLngToCell(lat, lng, resolution);
   } catch {
     return undefined;
   }
@@ -48,13 +59,16 @@ export const inferH3Resolution = (
   }>,
   sourceLayer: string
 ): number => {
-  for (const feature of candidates) {
-    const id = featureH3CellId(feature);
-    if (!id) continue;
-    try {
-      if (isValidCell(id)) return getResolution(id);
-    } catch {
-      // keep scanning
+  const h3 = getH3();
+  if (h3) {
+    for (const feature of candidates) {
+      const id = featureH3CellId(feature);
+      if (!id) continue;
+      try {
+        if (h3.isValidCell(id)) return h3.getResolution(id);
+      } catch {
+        // keep scanning
+      }
     }
   }
   return h3ResolutionFromSourceLayer(sourceLayer);
@@ -63,9 +77,11 @@ export const inferH3Resolution = (
 export const h3CellLngLat = (
   cellId: string
 ): { lng: number; lat: number } | undefined => {
+  const h3 = getH3();
+  if (!h3) return undefined;
   try {
-    if (!isValidCell(cellId)) return undefined;
-    const [lat, lng] = cellToLatLng(cellId);
+    if (!h3.isValidCell(cellId)) return undefined;
+    const [lat, lng] = h3.cellToLatLng(cellId);
     return { lng, lat };
   } catch {
     return undefined;
@@ -73,9 +89,11 @@ export const h3CellLngLat = (
 };
 
 export const h3CellPolygon = (cellId: string): Geometry | undefined => {
+  const h3 = getH3();
+  if (!h3) return undefined;
   try {
-    if (!isValidCell(cellId)) return undefined;
-    const ring = cellToBoundary(cellId, true);
+    if (!h3.isValidCell(cellId)) return undefined;
+    const ring = h3.cellToBoundary(cellId, true);
     if (ring.length < 3) return undefined;
     const first = ring[0];
     const last = ring[ring.length - 1];

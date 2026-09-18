@@ -17,6 +17,7 @@ import {
   pmtilesHitLayerId,
   type PmtilesHexHoverCtx,
 } from "../PMTilesLayer";
+import { loadH3 } from "../hexHit";
 
 const popupMocks = vi.hoisted(() => {
   const instances: Array<{
@@ -162,7 +163,7 @@ describe("PMTilesLayer - click popup", () => {
     handlers.forEach((handler) => handler(payload));
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
     popupMocks.instances.length = 0;
     vi.mocked(isMapDrawModeActive).mockReturnValue(false);
@@ -216,6 +217,8 @@ describe("PMTilesLayer - click popup", () => {
         }
       ),
     } as unknown as Map;
+
+    await loadH3();
   });
 
   const attach = (ctx = makeCtx()) =>

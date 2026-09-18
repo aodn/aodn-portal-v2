@@ -54,8 +54,10 @@ import { addDataLayer } from "@/components/map/mapbox/layerOrder";
 import { isMapDrawModeActive } from "@/utils/MapUtils";
 import {
   featureH3CellId,
+  getH3,
   h3CellLngLat,
   h3CellPolygon,
+  loadH3,
   pickHexAmongFeatures,
   type HexHitSource,
 } from "./hexHit";
@@ -876,6 +878,8 @@ const attachPmtilesHexInteraction = (
       return;
     }
 
+    if (!getH3()) void loadH3();
+
     const { feature, total } = pickHex(layer, e.features, "point", e);
     if (!feature || total <= 0) {
       map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
@@ -897,6 +901,11 @@ const attachPmtilesHexInteraction = (
   const openHexPopup = (e: MapMouseEvent | MapTouchEvent) => {
     if (isMapDrawModeActive(map)) {
       clearInteraction();
+      return;
+    }
+
+    if (!getH3()) {
+      void loadH3().then(() => openHexPopup(e));
       return;
     }
 

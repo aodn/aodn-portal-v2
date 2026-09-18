@@ -1,8 +1,9 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import type { Geometry } from "geojson";
 import {
   featureH3CellId,
   h3ResolutionFromSourceLayer,
+  loadH3,
   pickHexAmongFeatures,
   pointInPolygonGeometry,
 } from "../hexHit";
@@ -42,6 +43,10 @@ const square = (
 });
 
 describe("hexHit", () => {
+  beforeAll(async () => {
+    await loadH3();
+  });
+
   it("parses H3 resolution from the PMTiles source-layer name", () => {
     expect(h3ResolutionFromSourceLayer("hex_z0")).toBe(0);
     expect(h3ResolutionFromSourceLayer("hex_z10")).toBe(10);
