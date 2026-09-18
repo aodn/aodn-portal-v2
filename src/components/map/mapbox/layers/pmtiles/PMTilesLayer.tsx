@@ -52,6 +52,7 @@ import MapLayerSelect from "@/components/map/mapbox/component/MapLayerSelect";
 import { TestHelper } from "@/components/common/test/helper";
 import { addDataLayer } from "@/components/map/mapbox/layerOrder";
 import { isMapDrawModeActive } from "@/utils/MapUtils";
+import { pickHexAmongFeatures, type HexHitSource } from "./hexHit";
 
 const SOURCE_ID = "pmtiles-source-id";
 const HOVER_SOURCE_ID = "pmtiles-hover-source-id";
@@ -738,6 +739,8 @@ type HexMapFeature = NonNullable<MapMouseEvent["features"]>[number];
  * - uses a near-invisible sibling hit fill (always queryable)
  * - listens on the map (`click` + `touchend`) and queries the tap point first,
  *   then a padded box only if the point missed (fat-finger fallback)
+ * - picks the H3 cell for the tap (`latLngToCell`) among query results, not a
+ *   vertex-average centroid (clipped tiles make that centroid lie in a neighbour)
  * - only clears the popup when the hex zoom band actually changes
  */
 const attachPmtilesHexInteraction = (
@@ -791,26 +794,11 @@ const attachPmtilesHexInteraction = (
     return total;
   };
 
-  const polygonCentroid = (
-    geometry: Geometry | undefined
-  ): { lng: number; lat: number } | undefined => {
-    if (!geometry || geometry.type !== "Polygon") return undefined;
-    const ring = geometry.coordinates[0];
-    if (!ring || ring.length < 2) return undefined;
-    const vertexCount = ring.length - 1;
-    let lng = 0;
-    let lat = 0;
-    for (let i = 0; i < vertexCount; i++) {
-      lng += ring[i][0];
-      lat += ring[i][1];
-    }
-    return { lng: lng / vertexCount, lat: lat / vertexCount };
-  };
-
   const pickHex = (
     layer: (typeof PMTILE_LAYERS)[number],
     features: HexMapFeature[] | undefined,
-    tapPoint?: { x: number; y: number }
+    hitSource: HexHitSource,
+    e: MapMouseEvent | MapTouchEvent
   ): { feature: HexMapFeature | undefined; total: number } => {
     const ctx = hoverCtxRef.current;
     if (!ctx.visible || !ctx.densityReady) {
@@ -820,59 +808,58 @@ const attachPmtilesHexInteraction = (
     if (zoom < layer.minzoom || zoom >= layer.maxzoom) {
       return { feature: undefined, total: 0 };
     }
-    const scored: Array<{
-      feature: HexMapFeature;
-      total: number;
-      dist: number;
-    }> = [];
+    const withCounts: HexMapFeature[] = [];
+    const totals: number[] = [];
     for (const feature of features ?? []) {
       const total = featureTotal(feature);
       if (total <= 0) continue;
-      if (!tapPoint) {
-        return { feature, total };
-      }
-      const centroid = polygonCentroid(feature.geometry);
-      if (!centroid) {
-        scored.push({ feature, total, dist: Number.POSITIVE_INFINITY });
-        continue;
-      }
-      const screen = map.project(centroid);
-      const dx = screen.x - tapPoint.x;
-      const dy = screen.y - tapPoint.y;
-      scored.push({ feature, total, dist: dx * dx + dy * dy });
+      withCounts.push(feature);
+      totals.push(total);
     }
-    if (!scored.length) {
-      return { feature: undefined, total: 0 };
-    }
-    scored.sort((a, b) => a.dist - b.dist);
-    return { feature: scored[0].feature, total: scored[0].total };
+    const feature = pickHexAmongFeatures(withCounts, {
+      sourceLayer: layer.sourceLayer,
+      hitSource,
+      lngLat: e.lngLat,
+      tapPoint: e.point,
+      project: (lngLat) => map.project(lngLat),
+    });
+    if (!feature) return { feature: undefined, total: 0 };
+    const index = withCounts.indexOf(feature);
+    return { feature, total: index >= 0 ? totals[index] : 0 };
   };
 
   const queryHitFeatures = (
     e: MapMouseEvent | MapTouchEvent
-  ): HexMapFeature[] => {
+  ): { features: HexMapFeature[]; hitSource: HexHitSource } => {
+    const empty = {
+      features: [] as HexMapFeature[],
+      hitSource: "point" as const,
+    };
     const layer = getActivePmtilesLayers(map.getZoom())[0];
-    if (!layer) return [];
+    if (!layer) return empty;
     const hitId = pmtilesHitLayerId(layer.id);
     const queryId = map.getLayer(hitId)
       ? hitId
       : map.getLayer(layer.id)
         ? layer.id
         : undefined;
-    if (!queryId) return [];
+    if (!queryId) return empty;
     const fromEvent = (e as MapMouseEvent).features;
-    if (fromEvent?.length) return fromEvent;
+    if (fromEvent?.length) return { features: fromEvent, hitSource: "point" };
     const p = e.point;
     try {
       const atPoint = map.queryRenderedFeatures(p, { layers: [queryId] });
-      if (atPoint.length) return atPoint;
+      if (atPoint.length) return { features: atPoint, hitSource: "point" };
       const box: [[number, number], [number, number]] = [
         [p.x - HIT_QUERY_PADDING_PX, p.y - HIT_QUERY_PADDING_PX],
         [p.x + HIT_QUERY_PADDING_PX, p.y + HIT_QUERY_PADDING_PX],
       ];
-      return map.queryRenderedFeatures(box, { layers: [queryId] });
+      return {
+        features: map.queryRenderedFeatures(box, { layers: [queryId] }),
+        hitSource: "box",
+      };
     } catch {
-      return [];
+      return empty;
     }
   };
 
@@ -885,7 +872,7 @@ const attachPmtilesHexInteraction = (
       return;
     }
 
-    const { feature, total } = pickHex(layer, e.features, e.point);
+    const { feature, total } = pickHex(layer, e.features, "point", e);
     if (!feature || total <= 0) {
       map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
       hoveredId = undefined;
@@ -916,7 +903,8 @@ const attachPmtilesHexInteraction = (
       clearInteraction();
       return;
     }
-    const { feature, total } = pickHex(layer, queryHitFeatures(e), e.point);
+    const hit = queryHitFeatures(e);
+    const { feature, total } = pickHex(layer, hit.features, hit.hitSource, e);
     if (!feature || total <= 0) {
       clearInteraction();
       return;

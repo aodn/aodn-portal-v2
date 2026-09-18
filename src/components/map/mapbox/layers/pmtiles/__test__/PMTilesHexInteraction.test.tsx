@@ -47,6 +47,10 @@ vi.mock("mapbox-gl", () => ({
   Popup: popupMocks.Popup,
 }));
 
+vi.mock("h3-js", () => ({
+  latLngToCell: vi.fn(() => "h3-tap-cell"),
+}));
+
 vi.mock("@/utils/MapUtils", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/utils/MapUtils")>();
   return {
@@ -269,6 +273,47 @@ describe("PMTilesLayer - click popup", () => {
     expect(popupMocks.Popup).toHaveBeenCalled();
     expect(popupMocks.instances[0].setHTML).toHaveBeenCalledWith(
       expect.stringContaining("Data Record Count: 12")
+    );
+  });
+
+  it("opens the popup for the H3 cell of the tap when several hexes are in the hit box", () => {
+    attach();
+    const other = makeFeature("hex-other");
+    other.geometry = {
+      type: "Polygon",
+      coordinates: [
+        [
+          [1, 2],
+          [2, 2],
+          [2, 3],
+          [1, 3],
+          [1, 2],
+        ],
+      ],
+    };
+    const trueCell = makeFeature("h3-tap-cell");
+    trueCell.geometry = {
+      type: "Polygon",
+      coordinates: [
+        [
+          [20, 20],
+          [21, 20],
+          [21, 21],
+          [20, 21],
+          [20, 20],
+        ],
+      ],
+    };
+    queryRenderedFeatures
+      .mockReturnValueOnce([])
+      .mockReturnValueOnce([other, trueCell]);
+    emit("click", undefined, makeEvent());
+
+    expect(popupMocks.Popup).toHaveBeenCalled();
+    expect(setData).toHaveBeenCalledWith(
+      expect.objectContaining({
+        features: [expect.objectContaining({ geometry: trueCell.geometry })],
+      })
     );
   });
 
