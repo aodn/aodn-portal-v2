@@ -12,6 +12,15 @@ vi.mock("h3-js", () => ({
     if (res === 4 && lat === -42 && lng === 147) return "cell-from-h3";
     return "other-cell";
   }),
+  isValidCell: vi.fn((id: string) => id === "cell-from-h3"),
+  getResolution: vi.fn(() => 4),
+  cellToLatLng: vi.fn(() => [-42, 147]),
+  cellToBoundary: vi.fn(() => [
+    [147, -42],
+    [147.1, -42],
+    [147.1, -42.1],
+    [147, -42.1],
+  ]),
 }));
 
 const square = (
@@ -30,11 +39,6 @@ const square = (
       [minLng, minLat],
     ],
   ],
-});
-
-const project = (lngLat: { lng: number; lat: number }) => ({
-  x: lngLat.lng * 10,
-  y: lngLat.lat * 10,
 });
 
 describe("hexHit", () => {
@@ -64,8 +68,6 @@ describe("hexHit", () => {
       sourceLayer: "hex_z4",
       hitSource: "box",
       lngLat: { lng: 147, lat: -42 },
-      tapPoint: { x: 1470, y: -420 },
-      project,
     });
     expect(picked?.id).toBe("cell-from-h3");
   });
@@ -80,8 +82,6 @@ describe("hexHit", () => {
       sourceLayer: "hex_z4",
       hitSource: "point",
       lngLat: { lng: 147, lat: -42 },
-      tapPoint: { x: 10, y: 20 },
-      project,
     });
     expect(picked?.id).toBe("rendered");
   });
@@ -101,10 +101,22 @@ describe("hexHit", () => {
       sourceLayer: "hex_z2",
       hitSource: "box",
       lngLat: { lng: 147, lat: -42 },
-      tapPoint: { x: 10, y: 20 },
-      project,
     });
     expect(picked?.id).toBe("inside");
+  });
+
+  it("does not pick a neighbour when a box query hits occupancy gaps", () => {
+    const neighbour = {
+      id: "neighbour",
+      properties: { h: "neighbour" },
+      geometry: square(0, 0, 1, 1),
+    };
+    const picked = pickHexAmongFeatures([neighbour], {
+      sourceLayer: "hex_z4",
+      hitSource: "box",
+      lngLat: { lng: 147, lat: -42 },
+    });
+    expect(picked).toBeUndefined();
   });
 
   it("detects a point inside a polygon", () => {

@@ -1,4 +1,10 @@
-import { latLngToCell } from "h3-js";
+import {
+  cellToBoundary,
+  cellToLatLng,
+  getResolution,
+  isValidCell,
+  latLngToCell,
+} from "h3-js";
 import type { Geometry, Position } from "geojson";
 
 export type HexHitSource = "point" | "box";
@@ -29,6 +35,53 @@ export const tapH3Cell = (
 ): string | undefined => {
   try {
     return latLngToCell(lat, lng, resolution);
+  } catch {
+    return undefined;
+  }
+};
+
+/** Prefer the resolution encoded in a real cell id over the `hex_zN` band name. */
+export const inferH3Resolution = (
+  candidates: Array<{
+    id?: string | number;
+    properties?: { h?: unknown } | null;
+  }>,
+  sourceLayer: string
+): number => {
+  for (const feature of candidates) {
+    const id = featureH3CellId(feature);
+    if (!id) continue;
+    try {
+      if (isValidCell(id)) return getResolution(id);
+    } catch {
+      // keep scanning
+    }
+  }
+  return h3ResolutionFromSourceLayer(sourceLayer);
+};
+
+export const h3CellLngLat = (
+  cellId: string
+): { lng: number; lat: number } | undefined => {
+  try {
+    if (!isValidCell(cellId)) return undefined;
+    const [lat, lng] = cellToLatLng(cellId);
+    return { lng, lat };
+  } catch {
+    return undefined;
+  }
+};
+
+export const h3CellPolygon = (cellId: string): Geometry | undefined => {
+  try {
+    if (!isValidCell(cellId)) return undefined;
+    const ring = cellToBoundary(cellId, true);
+    if (ring.length < 3) return undefined;
+    const first = ring[0];
+    const last = ring[ring.length - 1];
+    const closed =
+      first[0] === last[0] && first[1] === last[1] ? ring : [...ring, first];
+    return { type: "Polygon", coordinates: [closed] };
   } catch {
     return undefined;
   }
@@ -70,38 +123,13 @@ export const pointInPolygonGeometry = (
   return false;
 };
 
-const minScreenDistSqToGeometry = (
-  tapPoint: { x: number; y: number },
-  geometry: Geometry | undefined,
-  project: (lngLat: { lng: number; lat: number }) => { x: number; y: number }
-): number => {
-  if (!geometry) return Number.POSITIVE_INFINITY;
-  const rings: Position[][] =
-    geometry.type === "Polygon"
-      ? geometry.coordinates
-      : geometry.type === "MultiPolygon"
-        ? geometry.coordinates.flat()
-        : [];
-  let min = Number.POSITIVE_INFINITY;
-  for (const ring of rings) {
-    for (const pos of ring) {
-      const screen = project({ lng: pos[0], lat: pos[1] });
-      const dx = screen.x - tapPoint.x;
-      const dy = screen.y - tapPoint.y;
-      const dist = dx * dx + dy * dy;
-      if (dist < min) min = dist;
-    }
-  }
-  return min;
-};
-
 /**
  * Choose the hex under a tap.
  *
  * Prefer the H3 cell for the tap (true cell, independent of tile clipping).
  * A Mapbox point query already hit-tested the fill; if H3 is missing from the
- * result set, keep that feature. A padded box query falls back to
- * point-in-polygon, then nearest vertex in screen space (fat-finger only).
+ * result set, keep that feature. A padded box query only keeps a hex that
+ * actually contains the tap — never the nearest neighbour in an occupancy gap.
  */
 export const pickHexAmongFeatures = <
   T extends {
@@ -115,8 +143,6 @@ export const pickHexAmongFeatures = <
     sourceLayer: string;
     hitSource: HexHitSource;
     lngLat?: { lng: number; lat: number };
-    tapPoint?: { x: number; y: number };
-    project: (lngLat: { lng: number; lat: number }) => { x: number; y: number };
   }
 ): T | undefined => {
   if (!candidates.length) return undefined;
@@ -125,7 +151,7 @@ export const pickHexAmongFeatures = <
     const cell = tapH3Cell(
       opts.lngLat.lat,
       opts.lngLat.lng,
-      h3ResolutionFromSourceLayer(opts.sourceLayer)
+      inferH3Resolution(candidates, opts.sourceLayer)
     );
     if (cell) {
       const matched = candidates.find(
@@ -140,30 +166,14 @@ export const pickHexAmongFeatures = <
   }
 
   if (opts.lngLat) {
-    const contained = candidates.find((feature) =>
+    return candidates.find((feature) =>
       pointInPolygonGeometry(
         opts.lngLat!.lng,
         opts.lngLat!.lat,
         feature.geometry
       )
     );
-    if (contained) return contained;
   }
 
-  if (!opts.tapPoint) return candidates[0];
-
-  let best: T | undefined;
-  let bestDist = Number.POSITIVE_INFINITY;
-  for (const feature of candidates) {
-    const dist = minScreenDistSqToGeometry(
-      opts.tapPoint,
-      feature.geometry,
-      opts.project
-    );
-    if (dist < bestDist) {
-      bestDist = dist;
-      best = feature;
-    }
-  }
-  return best ?? candidates[0];
+  return undefined;
 };

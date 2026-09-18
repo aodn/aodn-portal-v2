@@ -52,7 +52,13 @@ import MapLayerSelect from "@/components/map/mapbox/component/MapLayerSelect";
 import { TestHelper } from "@/components/common/test/helper";
 import { addDataLayer } from "@/components/map/mapbox/layerOrder";
 import { isMapDrawModeActive } from "@/utils/MapUtils";
-import { pickHexAmongFeatures, type HexHitSource } from "./hexHit";
+import {
+  featureH3CellId,
+  h3CellLngLat,
+  h3CellPolygon,
+  pickHexAmongFeatures,
+  type HexHitSource,
+} from "./hexHit";
 
 const SOURCE_ID = "pmtiles-source-id";
 const HOVER_SOURCE_ID = "pmtiles-hover-source-id";
@@ -820,8 +826,6 @@ const attachPmtilesHexInteraction = (
       sourceLayer: layer.sourceLayer,
       hitSource,
       lngLat: e.lngLat,
-      tapPoint: e.point,
-      project: (lngLat) => map.project(lngLat),
     });
     if (!feature) return { feature: undefined, total: 0 };
     const index = withCounts.indexOf(feature);
@@ -884,7 +888,9 @@ const attachPmtilesHexInteraction = (
     if (feature.id === undefined || feature.id === hoveredId) return;
     hoveredId = feature.id;
     if (feature.id !== selectedId) {
-      setHoverOutline(feature.geometry);
+      setHoverOutline(
+        h3CellPolygon(featureH3CellId(feature)) ?? feature.geometry
+      );
     }
   };
 
@@ -911,9 +917,11 @@ const attachPmtilesHexInteraction = (
     }
 
     const ctx = hoverCtxRef.current;
+    const cellId = featureH3CellId(feature);
+    const cellGeometry = h3CellPolygon(cellId) ?? feature.geometry;
     selectedId = feature.id;
-    selectedGeometry = feature.geometry;
-    setHoverOutline(feature.geometry);
+    selectedGeometry = cellGeometry;
+    setHoverOutline(cellGeometry);
 
     if (!popupRef.current) {
       popupRef.current = new Popup(MapDefaultConfig.DEFAULT_POPUP);
@@ -927,7 +935,7 @@ const attachPmtilesHexInteraction = (
         ctx.hasTime
       )
     );
-    popupRef.current.setLngLat(e.lngLat);
+    popupRef.current.setLngLat(h3CellLngLat(cellId) ?? e.lngLat);
     if (!popupRef.current.isOpen()) {
       popupRef.current.addTo(map);
     }
