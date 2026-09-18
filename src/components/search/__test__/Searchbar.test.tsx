@@ -22,7 +22,7 @@ import {
   fetchMarineParkOptions,
   BoundaryName,
 } from "../../map/mapbox/layers/staticLayerOptions";
-import { server } from "../../../__mocks__/server";
+import { server } from "@/__mocks__/server";
 import { ThemeProvider } from "@mui/material/styles";
 import AppTheme from "@/styles/theme";
 
@@ -59,18 +59,38 @@ vi.mock(import("react-router-dom"), async (importOriginal) => {
 import { BrowserRouter as Router } from "react-router-dom";
 import * as useRedirectSearchModule from "../../../hooks/useRedirectSearch";
 import Searchbar from "../Searchbar";
-import { PARAMETER_VOCABS } from "../../../__mocks__/data/PARAMETER_VOCABS";
-import { encodeParam } from "../../../utils/UrlUtils";
+import { PARAMETER_VOCABS } from "@/__mocks__/data/PARAMETER_VOCABS";
+import { encodeParam } from "@/utils/UrlUtils";
 import { SearchKeys } from "../constants";
 
+const FILTER_CHUNK_TIMEOUT_MS = 5000;
+
+const openParameterFilters = async () => {
+  await userEvent.click(screen.getByTestId("filtersBtn"));
+  // Popper mounts first; Filters is a lazy chunk (Suspense fallback is null).
+  const popup = await screen.findByTestId(
+    "searchbar-popup",
+    {},
+    { timeout: FILTER_CHUNK_TIMEOUT_MS }
+  );
+  const parameterPanel = await within(popup).findByTestId(
+    "tab-panel-Parameters",
+    {},
+    { timeout: FILTER_CHUNK_TIMEOUT_MS }
+  );
+  return { popup, parameterPanel };
+};
+
 describe("Searchbar", () => {
-  beforeAll(() => {
+  beforeAll(async () => {
     // Mock scrollIntoView
     window.HTMLElement.prototype.scrollIntoView = vi.fn();
 
     // Mock window.scrollTo
     window.scrollTo = vi.fn();
     server.listen();
+    // Warm the lazy Filters chunk so Suspense does not race findBy timeouts.
+    await import("../../filter/Filters");
   });
 
   beforeEach(() => {
@@ -122,13 +142,7 @@ describe("Searchbar", () => {
       </Provider>
     );
 
-    // User click on the filter button
-    const filterButton = screen.getByTestId("filtersBtn");
-    await userEvent.click(filterButton);
-
-    // Filters is lazy: the panel resolving is what proves the chunk landed.
-    const parameterPanel = await screen.findByTestId("tab-panel-Parameters");
-    const popup = screen.getByTestId("searchbar-popup");
+    const { popup, parameterPanel } = await openParameterFilters();
 
     // Check if the first tab - "Parameters" is present in the popup
     expect(screen.getByText("Parameters")).toBeInTheDocument();
@@ -157,12 +171,7 @@ describe("Searchbar", () => {
       </Provider>
     );
 
-    // User click on the filter button
-    const filterButton = screen.getByTestId("filtersBtn");
-    await userEvent.click(filterButton);
-
-    // Filters is lazy: the panel resolving is what proves the chunk landed.
-    const parameterPanel = await screen.findByTestId("tab-panel-Parameters");
+    const { parameterPanel } = await openParameterFilters();
 
     // User click on two parameter buttons "Acoustics" and "Air-Sea Fluxes"
     const parameterButton1 = await within(parameterPanel).findByRole("button", {
@@ -216,12 +225,7 @@ describe("Searchbar", () => {
     // Check if the filter button badge is updated with the correct number of selected parameters
     await waitFor(() => expect(filterButtonBadge).toHaveTextContent("2"));
 
-    // User click on the filter button
-    const filterButton = screen.getByTestId("filtersBtn");
-    await userEvent.click(filterButton);
-
-    // Filters is lazy: the panel resolving is what proves the chunk landed.
-    const parameterPanel = await screen.findByTestId("tab-panel-Parameters");
+    const { parameterPanel } = await openParameterFilters();
 
     // Get the parameter buttons "Air pressure" and "Visibility" which are selected
     const parameterButton1 = await within(parameterPanel).findByRole("button", {
