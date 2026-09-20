@@ -145,10 +145,11 @@ export default ({ mode }: ConfigEnv) => {
           // (react-redux and react-router-dom need react) or used nowhere
           // else. Ignoring that put a megabyte-scale chunk on the landing
           // page twice: @mui/x-charts via @mui/material internals, and
-          // @mapbox/mapbox-gl-draw via @turf/helpers.
+          // @mapbox/mapbox-gl-draw via @turf/helpers. mapbox-gl is not listed
+          // for the same reason: its ESM build uses Vite's preload helper,
+          // which the router also needs, so every page preloaded mapbox.
           manualChunks: {
             react: ["react", "react-dom", "react-router-dom", "react-redux"],
-            mapbox: ["mapbox-gl"],
           },
         },
       },
@@ -171,7 +172,24 @@ export default ({ mode }: ConfigEnv) => {
     },
     publicDir: "public",
     resolve: {
-      alias: [{ find: "@", replacement: path.resolve(__dirname, "src") }],
+      alias: [
+        { find: "@", replacement: path.resolve(__dirname, "src") },
+        // Point every "mapbox-gl" import at the one ESM copy the maps are built
+        // from; otherwise the UMD build is bundled as well and mapbox-gl ships
+        // twice. See src/components/map/mapbox/mapboxgl.ts. Skipped in tests,
+        // whose vi.mock("mapbox-gl") calls expect the real package.
+        ...(mode !== "test"
+          ? [
+              {
+                find: /^mapbox-gl$/,
+                replacement: path.resolve(
+                  __dirname,
+                  "src/components/map/mapbox/mapboxgl.ts"
+                ),
+              },
+            ]
+          : []),
+      ],
     },
     // Use absolute paths when building
     base: "/",

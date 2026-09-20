@@ -26,7 +26,6 @@ import { openInNewTab } from "@/utils/LinkUtils";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { pageDefault } from "@/components/common/constants";
 import { useNavigate } from "react-router-dom";
-import { isDownloadStatusTrackingEnabled } from "@/utils/downloadFeatureFlags";
 
 export enum HeaderMenuStyle {
   DROPDOWN_MENU = "DROPDOWN",
@@ -82,19 +81,9 @@ const DisclaimerDialog: FC<{ open: boolean; onClose: () => void }> = ({
 const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const navigate = useNavigate();
+
   const HEADER_MENUS: Menu[] = useMemo(
     () => [
-      ...(isDownloadStatusTrackingEnabled
-        ? [
-            {
-              menu: {
-                name: "Downloads",
-                handler: () => navigate(pageDefault.downloads),
-              },
-              items: [],
-            },
-          ]
-        : []),
       {
         menu: {
           name: "IMOS Home",
@@ -104,29 +93,8 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
       },
       {
         menu: {
-          name: "About Us",
-        },
-        items: [
-          {
-            name: "About AODN",
-            handler: () =>
-              openInNewTab(
-                `${pageDefault.url.IMOS}/data/about-the-australian-ocean-data-network`
-              ),
-          },
-          {
-            name: "Contact Us",
-            handler: () => openInNewTab("mailto:info@aodn.org.au"),
-          },
-        ],
-      },
-      {
-        menu: {
-          name: "Subscribe",
-          handler: () =>
-            openInNewTab(
-              `${pageDefault.url.IMOS}/news/marine-matters-newsletter`
-            ),
+          name: "Downloads",
+          handler: () => navigate(pageDefault.downloads),
         },
         items: [],
       },
@@ -155,6 +123,34 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
               openInNewTab(
                 `${pageDefault.url.IMOS}/data/about-the-australian-ocean-data-network/contributing-data-to-the-aodn`
               ),
+          },
+        ],
+      },
+      {
+        menu: {
+          name: "Subscribe",
+          handler: () =>
+            openInNewTab(
+              `${pageDefault.url.IMOS}/news/marine-matters-newsletter`
+            ),
+        },
+        items: [],
+      },
+      {
+        menu: {
+          name: "About Us",
+        },
+        items: [
+          {
+            name: "About AODN",
+            handler: () =>
+              openInNewTab(
+                `${pageDefault.url.IMOS}/data/about-the-australian-ocean-data-network`
+              ),
+          },
+          {
+            name: "Contact Us",
+            handler: () => openInNewTab("mailto:info@aodn.org.au"),
           },
         ],
       },
