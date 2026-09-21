@@ -395,17 +395,18 @@ describe("DownloadCloudOptimisedCard", () => {
       expect(await screen.findByText(SUBSETTING_INFO_TEXT)).toBeInTheDocument();
     });
 
-    it("should open the download dialog when the estimate is not blocking", () => {
+    it("should open the download dialog when the estimate is not blocking", async () => {
       estimateState.estimatedSizeBytes = LARGE_DOWNLOAD_BYTES;
+      const user = userEvent.setup();
 
       renderComponent();
 
-      userEvent.click(screen.getByTestId(DOWNLOAD_BUTTON_TEST_ID));
+      await user.click(screen.getByTestId(DOWNLOAD_BUTTON_TEST_ID));
 
-      return waitFor(() => screen.findByTestId("download-dialog"));
+      expect(await screen.findByTestId("download-dialog")).toBeInTheDocument();
     });
 
-    it("should not open the download dialog when the download is blocked", () => {
+    it("should not open the download dialog when the download is blocked", async () => {
       estimateState.estimatedSizeBytes = EXTRA_LARGE_DOWNLOAD_BYTES;
 
       // pointerEventsCheck is skipped because the disabled button intentionally
@@ -413,11 +414,9 @@ describe("DownloadCloudOptimisedCard", () => {
       const user = userEvent.setup({ pointerEventsCheck: 0 });
       renderComponent();
 
-      user.click(screen.getByTestId(DOWNLOAD_BUTTON_TEST_ID));
+      await user.click(screen.getByTestId(DOWNLOAD_BUTTON_TEST_ID));
 
-      return waitFor(() => {
-        expect(screen.queryByTestId("download-dialog")).not.toBeInTheDocument();
-      });
+      expect(screen.queryByTestId("download-dialog")).not.toBeInTheDocument();
     });
   });
 
