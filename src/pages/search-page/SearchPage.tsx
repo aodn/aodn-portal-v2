@@ -6,10 +6,12 @@ import {
   useRef,
   useState,
   startTransition,
+  lazy,
+  Suspense,
 } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { LngLatBounds, MapEvent } from "mapbox-gl";
-import { Box } from "@mui/material";
+import type { MapEvent } from "mapbox-gl";
+import { Box, LinearProgress } from "@mui/material";
 import { bboxPolygon } from "@turf/bbox-polygon";
 import { booleanEqual } from "@turf/boolean-equal";
 import store, {
@@ -39,10 +41,9 @@ import {
   setExpandedItem,
   setTemporaryItem,
 } from "@/app/store/bookmarkListReducer";
-import ResultSection from "./layout/ResultSection";
-import MapSection from "./layout/MapSection";
-import { SearchResultLayoutEnum } from "../../components/common/buttons/ResultListLayoutButton";
-import { SortResultEnum } from "../../components/common/buttons/ResultListSortButton";
+import ResultSection from "@/pages/search-page/layout/ResultSection";
+import { SearchResultLayoutEnum } from "@/components/common/buttons/ResultListLayoutButton";
+import { SortResultEnum } from "@/components/common/buttons/ResultListSortButton";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { pageDefault, pageReferer } from "@/components/common/constants";
@@ -50,7 +51,7 @@ import { color } from "@/styles/constants";
 import {
   BookmarkEvent,
   EVENT_BOOKMARK,
-} from "../../components/map/mapbox/controls/menu/Definition";
+} from "@/components/map/mapbox/controls/menu/Definition";
 import {
   SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_ABOVE_LAPTOP,
   SEARCH_PAGE_CONTENT_CONTAINER_HEIGHT_UNDER_LAPTOP,
@@ -58,19 +59,21 @@ import {
   SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_MOBILE,
   SEARCH_PAGE_MAP_CONTAINER_HEIGHT_FULL_MAP_TABLET,
   SEARCH_PAGE_MAP_CONTAINER_HEIGHT_UNDER_LAPTOP,
-} from "./constants";
-import useBreakpoint from "../../hooks/useBreakpoint";
-import useRedirectSearch from "../../hooks/useRedirectSearch";
+} from "@/pages/search-page/constants";
+import useBreakpoint from "@/hooks/useBreakpoint";
+import useRedirectSearch from "@/hooks/useRedirectSearch";
 import {
   MapDefaultConfig,
   MapEventEnum,
 } from "@/components/map/mapbox/constants";
 import debounce from "lodash/debounce";
 import type { DebouncedFunc } from "lodash";
-import useFetchData from "../../hooks/useFetchData";
-import { ProgressType } from "../../components/map/mapbox/MapContext";
-import AdminScreenContext from "../../components/admin/AdminScreenContext";
+import useFetchData from "@/hooks/useFetchData";
+import { ProgressType } from "@/components/map/mapbox/MapContext";
+import AdminScreenContext from "@/components/admin/AdminScreenContext";
 import { useDocumentTitle } from "@/seo/useDocumentTitle";
+
+const MapSection = lazy(() => import("@/pages/search-page/layout/MapSection"));
 
 const SearchPage = () => {
   useDocumentTitle("Search");
@@ -81,7 +84,20 @@ const SearchPage = () => {
   const { isUnderLaptop, isMobile } = useBreakpoint();
   const redirectSearch = useRedirectSearch();
   const { fetchRecord } = useFetchData();
-  const layout = useAppSelector((state) => state.paramReducer.layout);
+  const urlParamState: ParameterState | undefined = useMemo(() => {
+    const param = location.search.substring(1);
+    return param ? unFlattenToParameterState(param) : undefined;
+  }, [location.search]);
+  const selectedLayout = useAppSelector((state) => state.paramReducer.layout);
+  const requestedLayout = urlParamState?.layout ?? selectedLayout;
+  // Apply the mobile default before effects run, so a list-only visit never
+  // starts downloading or mounting the map. Explicit map links remain valid.
+  const layout =
+    isUnderLaptop && requestedLayout !== SearchResultLayoutEnum.FULL_MAP
+      ? SearchResultLayoutEnum.FULL_LIST
+      : requestedLayout;
+  const showMap = layout !== SearchResultLayoutEnum.FULL_LIST;
+  const [hasShownMap, setHasShownMap] = useState(showMap);
   const currentSort = useAppSelector((state) => state.paramReducer.sort);
   // Layers contain record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
@@ -91,14 +107,14 @@ const SearchPage = () => {
   >(undefined);
   //State to store the uuid of a selected dataset
   const [selectedUuids, setSelectedUuids] = useState<Array<string>>([]);
-  const [bbox, setBbox] = useState<LngLatBounds | undefined>(() => {
+  const [bbox, setBbox] = useState<
+    [number, number, number, number] | undefined
+  >(() => {
     const param = location?.search?.substring(1);
     if (param && param.length > 0) {
       const urlState = unFlattenToParameterState(param);
       if (urlState.bbox?.bbox) {
-        return new LngLatBounds(
-          urlState.bbox.bbox as [number, number, number, number]
-        );
+        return urlState.bbox.bbox as [number, number, number, number];
       }
     }
     return undefined;
@@ -146,15 +162,6 @@ const SearchPage = () => {
       }
     }, 200)
   );
-
-  const urlParamState: ParameterState | undefined = useMemo(() => {
-    // The first char is ? in the search string, so we need to remove it.
-    const param = location?.search?.substring(1);
-    if (param && param.length > 0) {
-      return unFlattenToParameterState(param);
-    }
-    return undefined;
-  }, [location.search]);
 
   const doMapSearch = useCallback(
     async (needNavigate: boolean = false) => {
@@ -377,6 +384,7 @@ const SearchPage = () => {
   const onChangeLayout = useCallback(
     (layout: SearchResultLayoutEnum) => {
       dispatch(updateLayout(layout));
+      if (layout !== SearchResultLayoutEnum.FULL_LIST) setHasShownMap(true);
       // Form param to url without navigate
       redirectSearch(pageReferer.SEARCH_PAGE_REFERER, true, false);
 
@@ -574,9 +582,9 @@ const SearchPage = () => {
     startTransition(() => {
       if (urlParamState) {
         setBbox(
-          new LngLatBounds(
-            urlParamState.bbox?.bbox as [number, number, number, number]
-          )
+          urlParamState.bbox?.bbox as
+            | [number, number, number, number]
+            | undefined
         );
         setZoom(urlParamState.zoom);
       }
@@ -647,19 +655,23 @@ const SearchPage = () => {
             : undefined,
         }}
       >
-        <MapSection
-          showFullMap={layout === SearchResultLayoutEnum.FULL_MAP}
-          showFullList={layout === SearchResultLayoutEnum.FULL_LIST}
-          collections={layers}
-          bbox={bbox}
-          zoom={zoom}
-          selectedUuids={selectedUuids}
-          onMapZoomOrMove={onMapZoomOrMove}
-          onToggleClicked={onToggleDisplay}
-          onClickMapPoint={onClickMapPoint}
-          progress={progress}
-          onDeselectDataset={onDeselectDataset}
-        />
+        {hasShownMap && (
+          <Suspense fallback={<LinearProgress aria-label="Loading map" />}>
+            <MapSection
+              showFullMap={layout === SearchResultLayoutEnum.FULL_MAP}
+              showFullList={!showMap}
+              collections={layers}
+              bbox={bbox}
+              zoom={zoom}
+              selectedUuids={selectedUuids}
+              onMapZoomOrMove={onMapZoomOrMove}
+              onToggleClicked={onToggleDisplay}
+              onClickMapPoint={onClickMapPoint}
+              progress={progress}
+              onDeselectDataset={onDeselectDataset}
+            />
+          </Suspense>
+        )}
       </Box>
     </Box>
   );

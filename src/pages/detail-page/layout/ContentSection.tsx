@@ -1,10 +1,10 @@
 import { FC, useCallback, useMemo } from "react";
-import DataAccessPanel from "../features/DataAccessPanel";
-import AdditionalInfoPanel from "../features/AdditionalInfoPanel";
-import CitationPanel from "../features/CitationPanel";
-import SummaryAndDownloadPanel from "../features/SummaryAndDownloadPanel";
-import AssociatedRecordsPanel from "../features/AssociatedRecordsPanel";
-import MapPanel from "../features/MapPanel";
+import DataAccessPanel from "@/pages/detail-page/features/DataAccessPanel";
+import AdditionalInfoPanel from "@/pages/detail-page/features/AdditionalInfoPanel";
+import CitationPanel from "@/pages/detail-page/features/CitationPanel";
+import SummaryAndDownloadPanel from "@/pages/detail-page/features/SummaryAndDownloadPanel";
+import AssociatedRecordsPanel from "@/pages/detail-page/features/AssociatedRecordsPanel";
+import MapPanel from "@/pages/detail-page/features/MapPanel";
 import { IconSummary } from "@/components/icon/tabs/IconSummary";
 import { IconDataAccess } from "@/components/icon/tabs/IconDataAccess";
 import { IconCitation } from "@/components/icon/tabs/IconCitation";
@@ -13,15 +13,15 @@ import { IconRelatedResources } from "@/components/icon/tabs/IconRelatedResource
 import { IconMap } from "@/components/icon/tabs/IconMap";
 import { Box, Card } from "@mui/material";
 import { borderRadius } from "@/styles/constants";
-import { useDetailPageContext } from "../context/detail-page-context";
+import { useDetailPageContext } from "@/pages/detail-page/context/detail-page-context";
 import TabsPanelContainer, {
   Tab,
-} from "../../../components/common/tab/TabsPanelContainer";
+} from "@/components/common/tab/TabsPanelContainer";
 import { useLocation, useParams } from "react-router-dom";
 import { LngLatBounds, MapEvent } from "mapbox-gl";
 import { detailPageDefault, pageReferer } from "@/components/common/constants";
-import useTabNavigation from "../../../hooks/useTabNavigation";
-import useBreakpoint from "../../../hooks/useBreakpoint";
+import useTabNavigation from "@/hooks/useTabNavigation";
+import useBreakpoint from "@/hooks/useBreakpoint";
 import notMatchingRecordImage from "@/assets/images/no_matching_record.webp";
 
 interface ContentSectionProps {
@@ -159,6 +159,8 @@ const ContentSection: FC<ContentSectionProps> = ({
         }}
       >
         <TabsPanelContainer
+          key={uuid}
+          lazyMount
           tabs={TABS}
           tabValue={findTabIndex(params, TABS)}
           handleTabChange={handleTabChange}

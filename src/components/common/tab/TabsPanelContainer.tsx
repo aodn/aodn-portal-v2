@@ -1,17 +1,10 @@
-import React, {
-  FC,
-  startTransition,
-  SyntheticEvent,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import React, { FC, SyntheticEvent, useCallback, useState } from "react";
 import Box from "@mui/material/Box";
-import { padding } from "../../../styles/constants";
-import StyledTabs from "./StyledTabs";
-import StyledTab from "./StyledTab";
+import { padding } from "@/styles/constants";
+import StyledTabs from "@/components/common/tab/StyledTabs";
+import StyledTab from "@/components/common/tab/StyledTab";
 import { SxProps } from "@mui/system";
-import useBreakpoint from "../../../hooks/useBreakpoint";
+import useBreakpoint from "@/hooks/useBreakpoint";
 
 export interface Tab {
   label: string;
@@ -25,6 +18,7 @@ interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
   value: number;
+  mounted: boolean;
 }
 
 interface TabsPanelContainerProps {
@@ -32,13 +26,19 @@ interface TabsPanelContainerProps {
   tabValue?: number;
   handleTabChange?: (newValue: number) => void;
   sx?: SxProps;
+  lazyMount?: boolean;
 }
 /**
- * DO NOT unmount children here, we need to keep child status, the way we do it is use zIndex instead of hidden
- * the reason if one of the component contains map, when it is visible, map renders again and causes unnecessary
- * api call. Use zIndex to hide it at back avoid this issue.
+ * Once mounted, keep children alive while hidden to preserve their state.
+ * Lazy panels skip their first mount until selected, including direct links.
  */
-const TabPanel = ({ children, value, index, ...other }: TabPanelProps) => {
+const TabPanel: FC<TabPanelProps> = ({
+  children,
+  value,
+  index,
+  mounted,
+  ...other
+}) => {
   return (
     <Box
       role="tabpanel"
@@ -50,7 +50,7 @@ const TabPanel = ({ children, value, index, ...other }: TabPanelProps) => {
       }}
       {...other}
     >
-      {children}
+      {mounted ? children : null}
     </Box>
   );
 };
@@ -65,21 +65,30 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
   tabValue = undefined,
   handleTabChange,
   sx,
+  lazyMount = false,
 }) => {
   const { isAboveDesktop, isMobile } = useBreakpoint();
-  const [value, setValue] = useState(tabValue ?? 0);
+  const [selectedValue, setSelectedValue] = useState(
+    tabs[tabValue ?? 0]?.value
+  );
+  const [visitedValues, setVisitedValues] = useState(
+    () => new Set([tabs[tabValue ?? 0]?.value])
+  );
+  const value =
+    tabValue ??
+    Math.max(
+      0,
+      tabs.findIndex((tab) => tab.value === selectedValue)
+    );
 
   const handleChange = useCallback(
     (_: SyntheticEvent, newValue: number) => {
-      setValue(newValue);
+      setSelectedValue(tabs[newValue].value);
+      setVisitedValues((visited) => new Set(visited).add(tabs[newValue].value));
       handleTabChange?.(newValue);
     },
-    [handleTabChange]
+    [handleTabChange, tabs]
   );
-
-  useEffect(() => {
-    if (tabValue) startTransition(() => setValue(tabValue));
-  }, [tabValue]);
 
   if (!tabs?.length) return;
 
@@ -97,7 +106,7 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
           const showIconOnly = isMobile && !isSelected && !!tab.icon;
           return (
             <StyledTab
-              key={index}
+              key={tab.value}
               label={showIconOnly ? undefined : tab.label}
               icon={showIconOnly ? (tab.icon as React.ReactElement) : undefined}
               aria-label={showIconOnly ? tab.label : undefined}
@@ -112,9 +121,12 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
       <Box sx={sx}>
         {tabs.map((tab, index) => (
           <TabPanel
-            key={index}
+            key={tab.value}
             value={value}
             index={index}
+            mounted={
+              !lazyMount || value === index || visitedValues.has(tab.value)
+            }
             data-testid={`tab-panel-${tab.label}`}
           >
             {tab.component}

@@ -77,7 +77,9 @@ export const lighthouseRoutes = (
     id: "details",
     path: `${pageDefault.details}/${uuid}`,
     label: "Details",
-    minDomElements: 400,
+    // Lazy detail tabs intentionally mount only the selected panel. The
+    // rendered summary shell is still substantially larger than an error page.
+    minDomElements: 200,
     requiredRequests: [`/api/v1/ogc/collections/${uuid}`],
   },
 ];

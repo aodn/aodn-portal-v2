@@ -1,22 +1,25 @@
-import { FC, useState } from "react";
-import { Box, Paper, Popper, SxProps } from "@mui/material";
+import { FC, lazy, Suspense, useState } from "react";
+import { Box, LinearProgress, Paper, Popper, SxProps } from "@mui/material";
 import store from "@/app/store/store";
 import {
   removeAllItems,
   selectBookmarkItems,
 } from "@/app/store/bookmarkListReducer";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "@/app/store/hooks";
 import useElementSize from "@/hooks/useElementSize";
-import BookmarkListAccordionGroup from "@/components/bookmark/BookmarkListAccordionGroup";
 import { ExpandLess } from "@/assets/icons/details/expandLess";
 import { ExpandMore } from "@/assets/icons/details/expendMore";
 import {
   BOOKMARK_LIST_RESULTS_MAX_HEIGHT,
   BOOKMARK_LIST_WIDTH_RESULTS,
-} from "./constants";
+} from "@/components/result/constants";
 import useTabNavigation from "@/hooks/useTabNavigation";
 import BookmarkListHead from "@/components/bookmark/BookmarkListHead";
 import { portalTheme } from "@/styles";
+
+const BookmarkListAccordionGroup = lazy(
+  () => import("@/components/bookmark/BookmarkListAccordionGroup")
+);
 
 export interface BookmarkListButtonBasicType {
   onDeselectDataset?: () => void;
@@ -32,7 +35,7 @@ const BookmarkListButton: FC<BookmarkListButtonProps> = ({
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const bookmarkItems = useSelector(selectBookmarkItems);
+  const bookmarkItems = useAppSelector(selectBookmarkItems);
 
   const tabNavigation = useTabNavigation();
 
@@ -123,7 +126,16 @@ const BookmarkListButton: FC<BookmarkListButtonProps> = ({
             overflow: "hidden",
           }}
         >
-          <BookmarkListAccordionGroup tabNavigation={tabNavigation} hideHead />
+          {anchorEl && (
+            <Suspense
+              fallback={<LinearProgress aria-label="Loading bookmarks" />}
+            >
+              <BookmarkListAccordionGroup
+                tabNavigation={tabNavigation}
+                hideHead
+              />
+            </Suspense>
+          )}
         </Paper>
       </Popper>
     </Box>

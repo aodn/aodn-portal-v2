@@ -1,14 +1,18 @@
-import { Box } from "@mui/material";
-import SideCardContainer from "../layout/SideCardContainer";
-import Map from "../../../components/map/mapbox/Map";
-import { useDetailPageContext } from "../context/detail-page-context";
-import Layers from "../../../components/map/mapbox/layers/Layers";
-import GeojsonLayer from "../../../components/map/mapbox/layers/GeojsonLayer";
-import { FC, useCallback } from "react";
+import { Box, Skeleton } from "@mui/material";
+import SideCardContainer from "@/pages/detail-page/layout/SideCardContainer";
+import Map from "@/components/map/mapbox/Map";
+import { useDetailPageContext } from "@/pages/detail-page/context/detail-page-context";
+import Layers from "@/components/map/mapbox/layers/Layers";
+import GeojsonLayer from "@/components/map/mapbox/layers/GeojsonLayer";
+import { FC, useCallback, useEffect, useState } from "react";
 import { Popup, MapMouseEvent, LngLatBounds } from "mapbox-gl";
-import FitToSpatialExtentsLayer from "../../../components/map/mapbox/layers/FitToSpatialExtentsLayer";
+import FitToSpatialExtentsLayer from "@/components/map/mapbox/layers/FitToSpatialExtentsLayer";
 import DisplayCoordinate from "@/components/map/mapbox/controls/DisplayCoordinate";
 import Controls from "@/components/map/mapbox/controls/Controls";
+import { portalTheme } from "@/styles";
+
+const MAP_HEIGHT = 200;
+const MAP_PRELOAD_MARGIN = "200px 0px";
 
 export interface SpatialCoverageCardProps {
   onSpatialCoverageLayerClick?: (bounds: LngLatBounds) => void;
@@ -24,6 +28,25 @@ const SpatialCoverageCard: FC<SpatialCoverageCardProps> = ({
 }) => {
   const { collection } = useDetailPageContext();
   const mapContainerId = "map-spatial-extent-container-id";
+  const [container, setContainer] = useState<HTMLDivElement | null>(null);
+  const [isMapVisible, setIsMapVisible] = useState(
+    () => typeof IntersectionObserver === "undefined"
+  );
+
+  useEffect(() => {
+    if (!container || isMapVisible) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setIsMapVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: MAP_PRELOAD_MARGIN }
+    );
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [container, isMapVisible]);
 
   const onMouseEnterHandler = useCallback((event: MapMouseEvent) => {
     event.target.getCanvas().style.cursor = "pointer";
@@ -46,31 +69,43 @@ const SpatialCoverageCard: FC<SpatialCoverageCardProps> = ({
     collection?.getBBox() && (
       <SideCardContainer title="Spatial Coverage" px={0} py={0}>
         <Box
+          ref={setContainer}
           aria-label="map"
           id={mapContainerId}
           sx={{
             width: "100%",
-            height: "200px",
+            height: MAP_HEIGHT,
           }}
         >
-          <Map panelId={mapContainerId} zoom={0} minZoom={0}>
-            <Controls>
-              <DisplayCoordinate />
-            </Controls>
-            <Layers>
-              <FitToSpatialExtentsLayer collection={collection} />
-              <GeojsonLayer
-                collection={collection}
-                onLayerClick={onSpatialCoverageLayerClick}
-                onMouseEnter={onMouseEnterHandler}
-                onMouseLeave={onMouseLeaveHandler}
-                onMouseMove={onMouseMoveHandler}
-                animate={false}
-                visible={true}
-                showExtentPopup
-              />
-            </Layers>
-          </Map>
+          {isMapVisible ? (
+            <Map panelId={mapContainerId} zoom={0} minZoom={0}>
+              <Controls>
+                <DisplayCoordinate />
+              </Controls>
+              <Layers>
+                <FitToSpatialExtentsLayer collection={collection} />
+                <GeojsonLayer
+                  collection={collection}
+                  onLayerClick={onSpatialCoverageLayerClick}
+                  onMouseEnter={onMouseEnterHandler}
+                  onMouseLeave={onMouseLeaveHandler}
+                  onMouseMove={onMouseMoveHandler}
+                  animate={false}
+                  visible={true}
+                  showExtentPopup
+                />
+              </Layers>
+            </Map>
+          ) : (
+            <Skeleton
+              variant="rectangular"
+              animation={false}
+              width="100%"
+              height="100%"
+              aria-label="Spatial coverage map loading"
+              sx={{ bgcolor: portalTheme.palette.action.hover }}
+            />
+          )}
         </Box>
       </SideCardContainer>
     )
