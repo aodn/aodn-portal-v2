@@ -5,9 +5,16 @@ WORKDIR /app
 
 COPY pyproject.toml poetry.lock /app/
 
+# Install into the system Python, where entrypoint.sh runs `python3 -m pytest`.
+# Poetry is only used to install; it's pinned to the version that generated
+# poetry.lock so a new release can't change where dependencies land.
+ENV POETRY_VIRTUALENVS_CREATE=false
+
 RUN \
-    python3 -m pip install poetry \
-    && python3 -m poetry install --no-root --no-interaction --no-ansi
+    python3 -m pip install "poetry==2.4.3" \
+    && python3 -m poetry install --no-root --no-interaction --no-ansi \
+    # Fail the build, not the test run, if pytest didn't land in system Python.
+    && python3 -m pytest --version
 
 # Kept in its own layer so editing the entrypoint does not invalidate the
 # dependency install above.
