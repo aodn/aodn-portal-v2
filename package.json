@@ -25,6 +25,7 @@
     "postinstall": "husky",
     "test": "vitest",
     "test:debug": "vitest --run --reporter=verbose --watch=false",
+    "verify": "yarn lint && yarn typecheck && vitest run --reporter=dot --silent=passed-only",
     "playwright": "docker compose -f playwright/docker-compose.yml up --abort-on-container-exit --exit-code-from tests",
     "playwright-local": "vitest run && vite --mode playwright-local --host 0.0.0.0",
     "playwright:no-vitest": "vite --mode playwright-local --host 0.0.0.0",
