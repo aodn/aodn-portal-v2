@@ -5,9 +5,20 @@ WORKDIR /app
 
 COPY pyproject.toml poetry.lock /app/
 
+# Test dependencies live in their own venv at a fixed path, first on PATH, so
+# entrypoint.sh can run `python3 -m pytest` without Poetry. Poetry stays in the
+# system Python: installing the lockfile there would downgrade Poetry's own
+# dependencies mid-install and break it. Poetry installs into the active venv
+# (VIRTUAL_ENV) and is pinned to the version that generated poetry.lock.
+ENV VIRTUAL_ENV=/opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
 RUN \
-    python3 -m pip install poetry \
-    && python3 -m poetry install --no-root --no-interaction --no-ansi
+    /usr/bin/python3 -m pip install "poetry==2.4.3" \
+    && /usr/bin/python3 -m virtualenv "$VIRTUAL_ENV" \
+    && /usr/bin/python3 -m poetry install --no-root --no-interaction --no-ansi \
+    # Fail the build, not the test run, if pytest didn't land in the venv.
+    && python3 -m pytest --version
 
 # Kept in its own layer so editing the entrypoint does not invalidate the
 # dependency install above.

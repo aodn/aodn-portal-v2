@@ -16,7 +16,7 @@ if [ -n "$PYTEST_SPLITS" ] && [ -n "$PYTEST_GROUP" ]; then
     split_args="--splits $PYTEST_SPLITS --group $PYTEST_GROUP"
 fi
 
-exec python3 -m poetry run pytest \
+exec python3 -m pytest \
     --numprocesses "${PYTEST_WORKERS:-2}" \
     --tracing retain-on-failure \
     $split_args
