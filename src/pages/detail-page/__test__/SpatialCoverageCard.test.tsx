@@ -79,7 +79,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-it("reserves space and mounts only once when the viewport approaches", () => {
+it("reserves space and mounts only once when the viewport approaches", async () => {
   const { unmount } = render(view());
   expect(screen.queryByTestId("coverage-map")).not.toBeInTheDocument();
   expect(screen.getByLabelText("map")).toHaveStyle({ height: "200px" });
@@ -93,7 +93,8 @@ it("reserves space and mounts only once when the viewport approaches", () => {
   enter(false);
   expect(mocks.mounted).not.toHaveBeenCalled();
   enter(true);
-  expect(screen.getByTestId("coverage-map")).toBeInTheDocument();
+  // The map itself is lazily loaded, so it arrives a tick after the intersection.
+  expect(await screen.findByTestId("coverage-map")).toBeInTheDocument();
   expect(disconnect).toHaveBeenCalled();
   enter(false);
   expect(mocks.mounted).toHaveBeenCalledTimes(1);
@@ -114,8 +115,8 @@ it("starts observing when spatial data arrives after the initial render", () => 
   expect(disconnect).toHaveBeenCalled();
 });
 
-it("mounts immediately when IntersectionObserver is unavailable", () => {
+it("mounts immediately when IntersectionObserver is unavailable", async () => {
   vi.stubGlobal("IntersectionObserver", undefined);
   render(view());
-  expect(screen.getByTestId("coverage-map")).toBeInTheDocument();
+  expect(await screen.findByTestId("coverage-map")).toBeInTheDocument();
 });

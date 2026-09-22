@@ -4,6 +4,7 @@ import {
   Box,
   Grid,
   Paper,
+  Skeleton,
   Stack,
   SxProps,
   Tooltip,
@@ -267,6 +268,12 @@ const renderSubTitle = (
   </Stack>
 );
 
+const LOGO_HEIGHT = "80px";
+const LOGO_HEIGHT_MOBILE = "56px";
+// Collection titles usually wrap to a few lines on a phone and fit about one
+// on wider screens.
+const TITLE_SKELETON_LINES = (isMobile: boolean) => (isMobile ? 2 : 1);
+
 const HeaderSection = () => {
   const location = useLocation();
   const { isUnderLaptop, isTablet, isMobile, isSmallMobile } = useBreakpoint();
@@ -386,7 +393,20 @@ const HeaderSection = () => {
                   p: 0,
                 }}
               >
-                {title}
+                {collection
+                  ? title
+                  : // Hold the title's space until the record arrives; an empty
+                    // h1 that then grows pushed the whole page down (CLS).
+                    Array.from({ length: TITLE_SKELETON_LINES(isMobile) }).map(
+                      (_, i) => (
+                        <Skeleton
+                          key={i}
+                          variant="text"
+                          width={i === 0 ? "100%" : "60%"}
+                          aria-hidden
+                        />
+                      )
+                    )}
               </Typography>
               {!isMobile &&
                 renderSubTitle(
@@ -408,11 +428,17 @@ const HeaderSection = () => {
                 sm: 2,
               }}
             >
+              {!collection && (
+                <Box
+                  aria-hidden
+                  sx={{ height: isMobile ? LOGO_HEIGHT_MOBILE : LOGO_HEIGHT }}
+                />
+              )}
               {collection && (
                 <OrganizationLogo
                   logo={collection.findIcon()}
                   sx={{
-                    height: isMobile ? "56px" : "80px",
+                    height: isMobile ? LOGO_HEIGHT_MOBILE : LOGO_HEIGHT,
                     paddingX: padding.extraSmall,
                   }}
                   defaultImageSrc={imosLogoWithTitle}
