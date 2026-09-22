@@ -2,8 +2,9 @@
 
 Python (3.10, Poetry) + pytest + `pytest-playwright` (sync API), run against
 the app in `playwright-local` mode. The root `../AGENTS.md` working rules
-(no Git mutations, stay in scope, reuse before creating) still apply; its
-Vitest/React/dayjs conventions do not. Setup details: `README.md`.
+(no Git mutations, stay in scope, reuse before creating) and its "Keeping
+AGENTS.md current" section still apply; its Vitest/React/dayjs conventions do
+not. Setup details: `README.md`.
 
 ## Where code goes
 
@@ -55,6 +56,9 @@ Vitest/React/dayjs conventions do not. Setup details: `README.md`.
 - The app behaves differently in `playwright-local` mode: no `HealthChecker`,
   a map test mode, and other `import.meta.env.MODE === "playwright-local"`
   branches in `src/`. Check those before assuming prod behaviour.
+- In the Docker image, test deps live in `/opt/venv` (first on `PATH`) and run
+  as `python3 -m pytest`. Poetry (pinned in `Dockerfile.test`) only installs;
+  don't install into the system Python, where it breaks Poetry itself.
 - Map tests render mapbox-gl on SwiftShader (CPU-bound). Launch flags live in
   `tests/conftest.py`. Don't raise `PYTEST_WORKERS` without measuring.
 - CI shards the suite in two (`PYTEST_SPLITS`/`PYTEST_GROUP`, pytest-split,

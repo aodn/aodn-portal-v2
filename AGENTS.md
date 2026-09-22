@@ -174,3 +174,17 @@ Read the relevant file before working in these areas:
   `src/assets/README.md`.
 - Structural debt and refactor targets: `src/app/TECH_DEBT.md`.
 - CI workflows: `.github/workflows/`.
+
+## Keeping AGENTS.md current
+
+When a change makes an `AGENTS.md` wrong or incomplete, update the nearest one
+(root or `playwright/`) in the same change. Examples: a new or changed command,
+convention, pinned tool version, or how tests run.
+
+- Add only what would change an agent's decision and isn't obvious from the
+  code. One line where possible.
+- Edit or replace the existing line instead of appending a new one. Delete
+  rules that no longer hold.
+- If it needs more than a few lines, write it in that area's README and link
+  it here.
+- Mention the `AGENTS.md` edit in your summary so the reviewer can check it.
