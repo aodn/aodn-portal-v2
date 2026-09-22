@@ -6,8 +6,7 @@ To set up this project locally, follow these steps using Yarn and Vite for a smo
 
 ## Prerequisites
 
-- Node.js installed on your system with version 18.x || >=20.0.0 (you can use [nvm](https://github.com/nvm-sh/nvm) for changing the node version).
-- Current work node is 18.19.1
+- Node.js 20 (the required version is defined in `.nvmrc`; you can use [nvm](https://github.com/nvm-sh/nvm) to manage it).
 - Npm installed on your system with version >=8.0.0
 
 ## Installation
@@ -30,8 +29,9 @@ cd <project-name>
 # Install nvm (you may want a later version)
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 
-nvm install 18.20.5
-nvm use 18.20.5
+# Install and use the Node.js version defined in .nvmrc
+nvm install
+nvm use
 
 npm install -g corepack
 yarn install
