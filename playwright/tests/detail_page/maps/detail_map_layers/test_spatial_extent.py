@@ -74,7 +74,7 @@ def test_map_shows_only_spatial_extent_layer(
 @pytest.mark.parametrize(
     'uuid',
     [
-        '27cc65c0-d453-4ba3-a0d6-55e4449fee8c',  # Zarr data, has bbox, Geoserver, and Gridded Data
+        '27cc65c0-d453-4ba3-a0d6-55e4449fee8c',  # Zarr data, has bbox, WMS link, and Gridded Data
     ],
 )
 def test_map_hides_spatial_extent_when_gridded_data_is_available(
@@ -82,15 +82,15 @@ def test_map_hides_spatial_extent_when_gridded_data_is_available(
 ) -> None:
     """
     This test uses a ZARR dataset with a WMS link, bounding box coordinates,
-    and gridded raster products. It verifies that Gridded Data takes priority
-    over Spatial Extent: the record otherwise qualifies for Spatial Extent
-    (zarr + bbox), but that option must not be offered once gridded products
-    are available.
+    and gridded raster products. Gridded Data takes priority over the other
+    two layers. The bbox would allow Spatial Extent and the WMS link would
+    allow GeoServer, but neither is offered once gridded products exist.
 
     This test ensures that:
-    1. GeoServer and Gridded Data are both offered in the layers menu
+    1. Gridded Data is offered in the layers menu
     2. Spatial Extent is not offered
-    3. The GeoServer layer is present and visible on the map
+    3. GeoServer is not offered
+    4. The Gridded Data layer is present and visible on the map
     """
     detail_page = DetailPage(responsive_page)
 
@@ -108,10 +108,15 @@ def test_map_hides_spatial_extent_when_gridded_data_is_available(
     detail_page.detail_map.open_layers_menu_until_visible(
         detail_page.detail_map.gridded_data_layer
     )
-    expect(detail_page.detail_map.geoserver_layer).to_be_visible()
     expect(detail_page.detail_map.spatial_extent_layer).to_have_count(0)
+    expect(detail_page.detail_map.geoserver_layer).to_have_count(0)
 
-    layer_id = layer_factory.get_layer_id(LayerStyle.GEO_SERVER)
+    # Gridded Data is the only layer left, so it is selected by default.
+    expect(detail_page.detail_map.gridded_data_layer).to_be_checked()
+    detail_page.detail_map.layers_menu.click()
+    detail_page.detail_map.wait_for_map_idle()
+
+    layer_id = layer_factory.get_layer_id(LayerStyle.GRIDDED_RASTER)
     detail_page.detail_map.wait_until_map_layer_visible(
         layer_id, timeout_ms=_UI_TIMEOUT_MS
     )

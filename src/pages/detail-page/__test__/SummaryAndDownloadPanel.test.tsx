@@ -160,10 +160,12 @@ describe("buildMapLayerConfig", () => {
         getBBox: () => bbox,
       });
 
-    it("appends Gridded Data last without changing the PMTiles default", () => {
+    // Gridded products only exist on a zarr record. A mixed zarr + parquet
+    // record is the one that can also have PMTiles density.
+    it("drops Geoserver and appends Gridded Data without changing the PMTiles default", () => {
       const result = buildMapLayerConfig(
         createMockCollection({
-          getDatasetType: () => [DatasetType.PARQUET],
+          getDatasetType: () => [DatasetType.ZARR, DatasetType.PARQUET],
           getBBox: () => [0, 0, 1, 1],
         }),
         true, // isWMSAvailable
@@ -175,13 +177,14 @@ describe("buildMapLayerConfig", () => {
 
       expect(result.map((l) => l.id)).toEqual([
         LayerName.PMTiles,
-        LayerName.GeoServer,
         LayerName.GriddedRaster,
       ]);
       expect(result.find((l) => l.selected)?.id).toBe(LayerName.PMTiles);
     });
 
-    it("leaves a WMS record defaulting to Geoserver", () => {
+    // On a CO zarr record, Gridded Data replaces Geoserver. The record
+    // still has a WMS link, but the Geoserver layer is not offered.
+    it("replaces Geoserver with Gridded Data on a WMS zarr record", () => {
       const result = buildMapLayerConfig(
         createMockCollection({
           getDatasetType: () => [DatasetType.ZARR],
@@ -194,11 +197,8 @@ describe("buildMapLayerConfig", () => {
         true // hasGriddedProducts
       );
 
-      expect(result.map((l) => l.id)).toEqual([
-        LayerName.GeoServer,
-        LayerName.GriddedRaster,
-      ]);
-      expect(result.find((l) => l.selected)?.id).toBe(LayerName.GeoServer);
+      expect(result.map((l) => l.id)).toEqual([LayerName.GriddedRaster]);
+      expect(result.find((l) => l.selected)?.id).toBe(LayerName.GriddedRaster);
     });
 
     // Gridded Data takes priority: a zarr record with a bbox would otherwise
@@ -249,6 +249,44 @@ describe("buildMapLayerConfig", () => {
 
       expect(result.map((l) => l.id)).toEqual([LayerName.SpatialExtent]);
       expect(result.find((l) => l.selected)?.id).toBe(LayerName.SpatialExtent);
+    });
+
+    // On first render the product listing is still loading, so Geoserver is
+    // held back until it finishes. Without this, Geoserver would show up,
+    // become the default layer and draw WMS tiles, then disappear as soon as
+    // the products arrive.
+    it("holds Geoserver back while the product listing is in flight", () => {
+      const result = buildMapLayerConfig(
+        zarrCollection([0, 0, 1, 1]),
+        true, // isWMSAvailable
+        true, // hasSpatialExtent
+        false, // isSupportPMTiles
+        null,
+        false, // hasGriddedProducts — discovery has not returned yet
+        true // isGriddedProductsLoading
+      );
+
+      expect(result.map((l) => l.id)).toEqual([LayerName.SpatialExtent]);
+    });
+
+    // If the listing fails or comes back empty, there is no Gridded Data
+    // layer. Geoserver comes back first, then Spatial Extent.
+    it("falls back to Geoserver, then Spatial Extent, once discovery settles with no products", () => {
+      const result = buildMapLayerConfig(
+        zarrCollection([0, 0, 1, 1]),
+        true, // isWMSAvailable
+        true, // hasSpatialExtent
+        false, // isSupportPMTiles
+        null,
+        false, // hasGriddedProducts
+        false // isGriddedProductsLoading — discovery has settled
+      );
+
+      expect(result.map((l) => l.id)).toEqual([
+        LayerName.GeoServer,
+        LayerName.SpatialExtent,
+      ]);
+      expect(result.find((l) => l.selected)?.id).toBe(LayerName.GeoServer);
     });
 
     it("honours a sticky Gridded Data selection over PMTiles", () => {

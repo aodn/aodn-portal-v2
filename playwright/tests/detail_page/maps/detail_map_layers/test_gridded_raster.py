@@ -276,12 +276,15 @@ def test_switching_product_does_not_retain_a_shared_non_latest_date(
     )
 
 
-def test_gridded_layer_survives_a_basemap_switch_and_hides_on_layer_change(
+def test_gridded_layer_survives_a_basemap_switch(
     responsive_page: Page,
 ) -> None:
     """
-    Assertions 9 and 10: switching base map style keeps the raster, and
-    switching to another map layer hides both the raster and its dropdown.
+    Assertion 9: switching base map style keeps the raster on the map.
+
+    Assertion 10 (switching to another layer hides the raster) is dropped.
+    Gridded Data now hides both GeoServer and Spatial Extent, so it is the
+    only layer in the switcher and there is nothing to switch to.
     """
     detail_page = DetailPage(responsive_page)
     layer_factory = LayerFactory(detail_page.detail_map)
@@ -305,27 +308,14 @@ def test_gridded_layer_survives_a_basemap_switch_and_hides_on_layer_change(
         is True
     )
 
-    # Switch away: the raster is hidden via setLayoutProperty, not removed, and
-    # the dropdown goes with it. Switch to GeoServer — Spatial Extent is no
-    # longer an option once Gridded Data is available (it is suppressed
-    # whenever gridded products exist). GeoServer renders its own
-    # MapLayerSelect under the same test id as gridded's, so instead of
-    # asserting the dropdown is gone we assert gridded's own product label is
-    # no longer shown — GeoServer's dropdown reflects its own WMS layers.
-    detail_page.detail_map.layers_menu.click()
-    detail_page.detail_map.geoserver_layer.check()
-    detail_page.detail_map.layers_menu.click()
-    detail_page.detail_map.wait_for_map_idle()
-
-    assert (
-        detail_page.detail_map.is_map_layer_visible(
-            layer_id, is_map_loading=False
-        )
-        is False
+    # Gridded Data is the only layer for this record. It replaces GeoServer
+    # and hides Spatial Extent.
+    detail_page.detail_map.open_layers_menu_until_visible(
+        detail_page.detail_map.gridded_data_layer
     )
-    # "CHL_OC3" is product one's variable (mocks/api/gridded_tiles.py) and the
-    # default-selected product's label — unique to gridded's own dropdown.
-    expect(responsive_page.get_by_text('CHL_OC3', exact=True)).to_have_count(0)
+    expect(detail_page.detail_map.geoserver_layer).to_have_count(0)
+    expect(detail_page.detail_map.spatial_extent_layer).to_have_count(0)
+    expect(detail_page.detail_map.gridded_data_layer).to_be_checked()
 
 
 @pytest.mark.parametrize('uuid', [SUPPORTED_UUID])

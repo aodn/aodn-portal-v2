@@ -1,6 +1,9 @@
 import pytest
 from playwright.sync_api import Page, expect
 
+from mocks.api.gridded_tiles import handle_gridded_tile_products_empty
+from mocks.api_router import ApiRouter
+from mocks.routes import Routes
 from pages.detail_page import DetailPage
 
 # PMTiles .metadata sidecar probe and WMS layer list can lag under CI load.
@@ -66,6 +69,12 @@ def test_map_popup_from_feature(
     - Perform map click at current view center
     - Check that popup appears and contains the expected text
     """
+    
+    desktop_page.unroute(Routes.GRIDDED_TILE_PRODUCTS)
+    ApiRouter(desktop_page).route_gridded_tile_products(
+        handle_gridded_tile_products_empty
+    )
+
     detail_page = DetailPage(desktop_page)
     detail_page.load(uuid)
 
