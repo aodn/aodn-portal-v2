@@ -1,15 +1,15 @@
 import { Box, Skeleton } from "@mui/material";
 import SideCardContainer from "@/pages/detail-page/layout/SideCardContainer";
-import Map from "@/components/map/mapbox/Map";
 import { useDetailPageContext } from "@/pages/detail-page/context/detail-page-context";
-import Layers from "@/components/map/mapbox/layers/Layers";
-import GeojsonLayer from "@/components/map/mapbox/layers/GeojsonLayer";
-import { FC, useCallback, useEffect, useState } from "react";
-import { Popup, MapMouseEvent, LngLatBounds } from "mapbox-gl";
-import FitToSpatialExtentsLayer from "@/components/map/mapbox/layers/FitToSpatialExtentsLayer";
-import DisplayCoordinate from "@/components/map/mapbox/controls/DisplayCoordinate";
-import Controls from "@/components/map/mapbox/controls/Controls";
+import { FC, lazy, Suspense, useEffect, useState } from "react";
+import type { LngLatBounds } from "mapbox-gl";
 import { portalTheme } from "@/styles";
+
+// Loaded only once the card nears the viewport, so mapbox-gl stays off the
+// details page's initial load (on mobile this card sits far below the fold).
+const SpatialCoverageMap = lazy(
+  () => import("@/pages/detail-page/features/SpatialCoverageMap")
+);
 
 const MAP_HEIGHT = 200;
 const MAP_PRELOAD_MARGIN = "200px 0px";
@@ -17,11 +17,6 @@ const MAP_PRELOAD_MARGIN = "200px 0px";
 export interface SpatialCoverageCardProps {
   onSpatialCoverageLayerClick?: (bounds: LngLatBounds) => void;
 }
-
-const popup = new Popup({
-  closeButton: false,
-  closeOnClick: false,
-});
 
 const SpatialCoverageCard: FC<SpatialCoverageCardProps> = ({
   onSpatialCoverageLayerClick,
@@ -48,22 +43,16 @@ const SpatialCoverageCard: FC<SpatialCoverageCardProps> = ({
     return () => observer.disconnect();
   }, [container, isMapVisible]);
 
-  const onMouseEnterHandler = useCallback((event: MapMouseEvent) => {
-    event.target.getCanvas().style.cursor = "pointer";
-    popup
-      .setLngLat(event.lngLat)
-      .setText("Click to navigate main map")
-      .addTo(event.target);
-  }, []);
-
-  const onMouseLeaveHandler = useCallback((event: MapMouseEvent) => {
-    event.target.getCanvas().style.cursor = "";
-    popup.remove();
-  }, []);
-
-  const onMouseMoveHandler = useCallback((event: MapMouseEvent) => {
-    popup.setLngLat(event.lngLat);
-  }, []);
+  const skeleton = (
+    <Skeleton
+      variant="rectangular"
+      animation={false}
+      width="100%"
+      height="100%"
+      aria-label="Spatial coverage map loading"
+      sx={{ bgcolor: portalTheme.palette.action.hover }}
+    />
+  );
 
   return (
     collection?.getBBox() && (
@@ -78,33 +67,15 @@ const SpatialCoverageCard: FC<SpatialCoverageCardProps> = ({
           }}
         >
           {isMapVisible ? (
-            <Map panelId={mapContainerId} zoom={0} minZoom={0}>
-              <Controls>
-                <DisplayCoordinate />
-              </Controls>
-              <Layers>
-                <FitToSpatialExtentsLayer collection={collection} />
-                <GeojsonLayer
-                  collection={collection}
-                  onLayerClick={onSpatialCoverageLayerClick}
-                  onMouseEnter={onMouseEnterHandler}
-                  onMouseLeave={onMouseLeaveHandler}
-                  onMouseMove={onMouseMoveHandler}
-                  animate={false}
-                  visible={true}
-                  showExtentPopup
-                />
-              </Layers>
-            </Map>
+            <Suspense fallback={skeleton}>
+              <SpatialCoverageMap
+                panelId={mapContainerId}
+                collection={collection}
+                onSpatialCoverageLayerClick={onSpatialCoverageLayerClick}
+              />
+            </Suspense>
           ) : (
-            <Skeleton
-              variant="rectangular"
-              animation={false}
-              width="100%"
-              height="100%"
-              aria-label="Spatial coverage map loading"
-              sx={{ bgcolor: portalTheme.palette.action.hover }}
-            />
+            skeleton
           )}
         </Box>
       </SideCardContainer>

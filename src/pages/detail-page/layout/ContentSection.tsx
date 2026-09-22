@@ -1,28 +1,36 @@
-import { FC, useCallback, useMemo } from "react";
+import { FC, lazy, Suspense, useCallback, useMemo, useState } from "react";
 import DataAccessPanel from "@/pages/detail-page/features/DataAccessPanel";
 import AdditionalInfoPanel from "@/pages/detail-page/features/AdditionalInfoPanel";
 import CitationPanel from "@/pages/detail-page/features/CitationPanel";
 import SummaryAndDownloadPanel from "@/pages/detail-page/features/SummaryAndDownloadPanel";
 import AssociatedRecordsPanel from "@/pages/detail-page/features/AssociatedRecordsPanel";
-import MapPanel from "@/pages/detail-page/features/MapPanel";
 import { IconSummary } from "@/components/icon/tabs/IconSummary";
 import { IconDataAccess } from "@/components/icon/tabs/IconDataAccess";
 import { IconCitation } from "@/components/icon/tabs/IconCitation";
 import { IconInformation } from "@/components/icon/tabs/IconInformation3";
 import { IconRelatedResources } from "@/components/icon/tabs/IconRelatedResources";
 import { IconMap } from "@/components/icon/tabs/IconMap";
-import { Box, Card } from "@mui/material";
-import { borderRadius } from "@/styles/constants";
+import { Box, Card, Skeleton } from "@mui/material";
+import { borderRadius, padding } from "@/styles/constants";
 import { useDetailPageContext } from "@/pages/detail-page/context/detail-page-context";
 import TabsPanelContainer, {
   Tab,
 } from "@/components/common/tab/TabsPanelContainer";
 import { useLocation, useParams } from "react-router-dom";
-import { LngLatBounds, MapEvent } from "mapbox-gl";
+import type { LngLatBounds, MapEvent } from "mapbox-gl";
 import { detailPageDefault, pageReferer } from "@/components/common/constants";
 import useTabNavigation from "@/hooks/useTabNavigation";
 import useBreakpoint from "@/hooks/useBreakpoint";
 import notMatchingRecordImage from "@/assets/images/no_matching_record.webp";
+
+// MapPanel pulls in mapbox-gl and, for gridded (zarr) records, fetches and
+// parses the tile product listing. On mobile it lives behind the Map tab, so
+// loading it eagerly put all of that on the Summary tab's critical path.
+const MapPanel = lazy(() => import("@/pages/detail-page/features/MapPanel"));
+
+// Same height as MapPanel's map container, so the fallback does not shift
+// the page when the panel arrives.
+const MAP_PANEL_MIN_HEIGHT = "588px";
 
 interface ContentSectionProps {
   mapFocusArea?: LngLatBounds;
@@ -108,6 +116,9 @@ const ContentSection: FC<ContentSectionProps> = ({
 
   const location = useLocation();
   const { isCollectionNotFound } = useDetailPageContext();
+  // Once shown, the map stays mounted (just hidden) so switching tabs keeps
+  // its state, the same way TabsPanelContainer keeps visited tabs.
+  const [hasShownMapPane, setHasShownMapPane] = useState(false);
 
   const params: URLSearchParams = useMemo(
     () => new URLSearchParams(location.search),
@@ -149,6 +160,9 @@ const ContentSection: FC<ContentSectionProps> = ({
   const showMapPane = isMobile
     ? selectedTabValue === detailPageDefault.MAP
     : selectedTabValue === detailPageDefault.SUMMARY;
+  if (showMapPane && !hasShownMapPane) {
+    setHasShownMapPane(true);
+  }
 
   return (
     <>
@@ -171,7 +185,25 @@ const ContentSection: FC<ContentSectionProps> = ({
           display: showMapPane ? "block" : "none",
         }}
       >
-        <MapPanel mapFocusArea={mapFocusArea} onMapMoveEnd={onMapMoveEnd} />
+        {(showMapPane || hasShownMapPane) && (
+          <Suspense
+            fallback={
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height={MAP_PANEL_MIN_HEIGHT}
+                aria-label="Map loading"
+                sx={{
+                  mt: padding.large,
+                  mb: padding.large,
+                  borderRadius: borderRadius.small,
+                }}
+              />
+            }
+          >
+            <MapPanel mapFocusArea={mapFocusArea} onMapMoveEnd={onMapMoveEnd} />
+          </Suspense>
+        )}
       </Box>
     </>
   );

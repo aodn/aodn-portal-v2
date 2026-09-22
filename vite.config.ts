@@ -1,4 +1,4 @@
-import { loadEnv, type ConfigEnv } from "vite";
+import { loadEnv, transformWithEsbuild, type ConfigEnv } from "vite";
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react-swc";
 import eslint from "vite-plugin-eslint2";
@@ -60,15 +60,23 @@ export default ({ mode }: ConfigEnv) => {
     // https://docs.newrelic.com/docs/browser/new-relic-browser/page-load-timing-resources/instrumentation-browser-monitoring/#javascript-placement
     return {
       name: "inline-javascript",
-      transformIndexHtml(html: string) {
-        const inlineJs = fs.readFileSync(
-          path.resolve(__dirname, "public/relic_script.js"),
-          "utf8"
-        );
+      async transformIndexHtml(html: string) {
         // Skip GA in test mode
         if (mode === "test") {
           return html.replace("<!-- new-relic-js -->", "");
         }
+
+        const source = fs.readFileSync(
+          path.resolve(__dirname, "public/relic_script.js"),
+          "utf8"
+        );
+        // The snippet is ~120 kB and inlined into every HTML response, half of
+        // it unminified config and loader code, so minify it on the way in.
+        const { code: inlineJs } = await transformWithEsbuild(
+          source,
+          "relic_script.js",
+          { minify: true }
+        );
 
         return html.replace(
           "<!-- new-relic-js -->",
