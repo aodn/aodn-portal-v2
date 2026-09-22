@@ -69,7 +69,7 @@ def test_map_popup_from_feature(
     - Perform map click at current view center
     - Check that popup appears and contains the expected text
     """
-    
+
     desktop_page.unroute(Routes.GRIDDED_TILE_PRODUCTS)
     ApiRouter(desktop_page).route_gridded_tile_products(
         handle_gridded_tile_products_empty
