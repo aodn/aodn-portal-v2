@@ -14,6 +14,7 @@ export interface GriddedRasterDateSliderProps {
 
 export interface GriddedRasterLayerState {
   hasProducts: boolean;
+  loading: boolean;
   hasDates: boolean;
   layerProps: GriddedRasterLayerControls;
   dateSliderKey: string;
@@ -23,7 +24,8 @@ export interface GriddedRasterLayerState {
 const useGriddedRasterLayer = (
   collection?: OGCCollection | null
 ): GriddedRasterLayerState => {
-  const { products, error, retry } = useGriddedRasterProducts(collection);
+  const { products, loading, error, retry } =
+    useGriddedRasterProducts(collection);
 
   const [productOverride, setProductOverride] = useState<string>("");
   const selectedProduct = useMemo(
@@ -73,6 +75,7 @@ const useGriddedRasterLayer = (
   return useMemo(
     () => ({
       hasProducts: products.length > 0,
+      loading,
       hasDates: marks.values.length > 0,
       layerProps: {
         products,
@@ -91,6 +94,7 @@ const useGriddedRasterLayer = (
     }),
     [
       products,
+      loading,
       marks,
       selectedProduct,
       selectedDate,
