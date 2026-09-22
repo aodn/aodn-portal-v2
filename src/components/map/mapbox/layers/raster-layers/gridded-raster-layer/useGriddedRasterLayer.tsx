@@ -5,6 +5,7 @@ import { buildTileDateMarks, GriddedRasterLayerControls } from "./Common";
 
 export interface GriddedRasterDateSliderProps {
   valid_points: number[];
+  value?: number;
   formatLabel: (value: number) => string;
   onDatePointChange: (
     event: Event | SyntheticEvent<Element, Event> | undefined,
@@ -38,27 +39,39 @@ const useGriddedRasterLayer = (
 
   const [dateOverride, setDateOverride] = useState<{
     productId: string;
-    date: string;
+    value: number;
   } | null>(null);
 
-  const selectedDate = useMemo(() => {
+  // The mark (slider value) currently selected, kept as a plain number so it
+  // can seed the slider's own state directly — the slider unmounts/remounts
+  // whenever the user switches away from and back to this layer, and without
+  // an explicit `value` to re-seed from it would forget the pick and fall
+  // back to its own "latest mark" default.
+  const selectedValue = useMemo(() => {
     const override =
       selectedProduct && dateOverride?.productId === selectedProduct.id
-        ? dateOverride.date
+        ? dateOverride.value
         : undefined;
-    return override && marks.dates.includes(override) ? override : marks.latest;
+    return override !== undefined && marks.byValue.has(override)
+      ? override
+      : marks.values[marks.values.length - 1];
   }, [dateOverride, marks, selectedProduct]);
+
+  const selectedDate = useMemo(
+    () => marks.byValue.get(selectedValue) ?? marks.latest,
+    [marks, selectedValue]
+  );
 
   const onDatePointChange = useCallback(
     (
       _event: Event | SyntheticEvent<Element, Event> | undefined,
       value: number | number[]
     ) => {
-      // Always recovered from the map — never re-derived from the timestamp,
-      // which would be off by a day in a browser west of UTC.
-      const dayKey = marks.byValue.get(value as number);
-      if (dayKey && selectedProduct) {
-        setDateOverride({ productId: selectedProduct.id, date: dayKey });
+      if (selectedProduct && marks.byValue.has(value as number)) {
+        setDateOverride({
+          productId: selectedProduct.id,
+          value: value as number,
+        });
       }
     },
     [marks, selectedProduct]
@@ -85,6 +98,7 @@ const useGriddedRasterLayer = (
       dateSliderKey: `gridded-date-${selectedProduct?.id ?? ""}`,
       dateSliderProps: {
         valid_points: marks.values,
+        value: selectedValue,
         formatLabel,
         onDatePointChange,
       },
@@ -93,6 +107,7 @@ const useGriddedRasterLayer = (
       products,
       marks,
       selectedProduct,
+      selectedValue,
       selectedDate,
       error,
       retry,

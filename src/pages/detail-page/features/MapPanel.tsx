@@ -527,6 +527,10 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       return (
         <DateSliderPoint
           valid_points={discreteTimeSliderValues?.get(selectedWmsLayer)}
+          // Re-seed on mount: this slider unmounts whenever the user switches
+          // to the Gridded Data layer and back, since it and the gridded
+          // slider are mutually-exclusive branches of this same ternary.
+          value={datePointValue}
           onDatePointChange={handleSliderPointChange}
           sx={additionalSliderSx}
           thumbType={ThumbType.DIAMOND}
@@ -539,6 +543,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     griddedDateSliderKey,
     griddedDateSliderProps,
     hasGriddedDates,
+    datePointValue,
     handleSliderPointChange,
     selectedMapLayerId,
     selectedWmsLayer,

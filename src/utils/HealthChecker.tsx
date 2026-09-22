@@ -55,7 +55,7 @@ const HealthChecker: React.FC<HealthCheckerProps> = ({ children }) => {
       }
     };
 
-    performCheck();
+    // performCheck();
 
     return () => {
       isMounted = false;

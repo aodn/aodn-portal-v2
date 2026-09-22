@@ -43,6 +43,12 @@ interface DateSliderRangeProps {
 
 interface DateSliderPointProps {
   valid_points?: Array<number>;
+  /**
+   * Initial thumb position, for callers that track the selected value outside
+   * this component (e.g. across a remount when the parent conditionally
+   * renders the slider). Only read on mount — this is not a controlled value.
+   */
+  value?: number;
   onDatePointChange?: (
     event: Event | React.SyntheticEvent<Element, Event> | undefined,
     value: number | number[]
@@ -129,6 +135,7 @@ const stepMarkValue = (
 
 const DateSliderPoint: React.FC<DateSliderPointProps> = ({
   valid_points,
+  value,
   onDatePointChange = () => {},
   sx,
   thumbType = ThumbType.CIRCLE,
@@ -144,7 +151,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
     [sorted_marks]
   );
 
-  const [pickedStamp, setPickedStamp] = useState<number | undefined>(undefined);
+  const [pickedStamp, setPickedStamp] = useState<number | undefined>(value);
 
   const datePointStamp =
     pickedStamp !== undefined && includesMark(markValues, pickedStamp)
