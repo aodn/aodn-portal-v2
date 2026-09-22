@@ -86,7 +86,8 @@ export const buildMapLayerConfig = (
   hasSpatialExtent: boolean,
   isSupportPMTiles: boolean,
   lastSelectedLayer: LayerSwitcherLayer<LayerName> | null = null,
-  hasGriddedProducts: boolean = false
+  hasGriddedProducts: boolean = false,
+  isGriddedProductsLoading: boolean = false
 ): LayerSwitcherLayer<LayerName>[] => {
   const layers: LayerSwitcherLayer<LayerName>[] = [];
 
@@ -108,6 +109,13 @@ export const buildMapLayerConfig = (
       (zarrOnlyDataset ||
         (!isWMSAvailable && !hasCoDensity && !isSupportPMTiles));
 
+    // Gridded Data replaces Geoserver on a cloud optimised zarr record. The
+    // listing is still in flight on first render, so Geoserver is held back
+    // while it loads too. If the listing comes back empty or failed,
+    // Geoserver returns as the fallback.
+    const isSupportGeoServer =
+      isWMSAvailable && !hasGriddedProducts && !isGriddedProductsLoading;
+
     if (isSupportPMTiles) {
       const pmtiles: LayerSwitcherLayer<LayerName> = {
         id: LayerName.PMTiles,
@@ -117,7 +125,7 @@ export const buildMapLayerConfig = (
       layers.push(pmtiles);
     }
 
-    if (isWMSAvailable) {
+    if (isSupportGeoServer) {
       const l: LayerSwitcherLayer<LayerName> = {
         id: LayerName.GeoServer,
         name: "Geoserver",
@@ -227,6 +235,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
 
   const {
     hasProducts: hasGriddedProducts,
+    loading: isGriddedProductsLoading,
     hasDates: hasGriddedDates,
     layerProps: griddedLayerProps,
     dateSliderKey: griddedDateSliderKey,
@@ -297,7 +306,8 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
           hasSpatialExtent,
           isSupportPMTiles,
           lastSelectedMapLayer,
-          hasGriddedProducts
+          hasGriddedProducts,
+          isGriddedProductsLoading
         )
       );
     });
@@ -308,6 +318,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     isSupportPMTiles,
     lastSelectedMapLayer,
     hasGriddedProducts,
+    isGriddedProductsLoading,
   ]);
 
   const [filterStartDate, filterEndDate] = useMemo(() => {
