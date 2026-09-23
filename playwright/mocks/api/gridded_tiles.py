@@ -100,6 +100,12 @@ def handle_gridded_tile_products_api(route: Route) -> None:
     route.fulfill(json=_products_payload(uuid))
 
 
+def handle_gridded_tile_products_empty(route: Route) -> None:
+    """A catalogued collection with no products — a normal, empty 200."""
+    print('[MOCK API] handle_gridded_tile_products_empty called')
+    route.fulfill(json={'products': []})
+
+
 def handle_gridded_tile_products_failure(route: Route) -> None:
     """Simulates a backend outage behind the discovery endpoint."""
     print('[MOCK API] handle_gridded_tile_products_failure called')
