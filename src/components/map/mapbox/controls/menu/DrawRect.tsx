@@ -208,8 +208,15 @@ const DrawRect: React.FC<DrawControlProps> = ({
 
   // MapboxDraw only wires Delete/Backspace when controls.trash is true.
   // We hide the stock trash control and use our own button, so re-bind the
-  // keys to the same delete behaviour.
+  // keys to the same delete behaviour. Like MapboxDraw's own keybindings, only
+  // react when focus is inside the map, so Backspace elsewhere on the page
+  // (e.g. after clicking the Download button) does not wipe the selection.
   useEffect(() => {
+    if (!map) return;
+
+    const isWithinMap = (target: EventTarget | null) =>
+      target instanceof Node && map.getContainer().contains(target);
+
     const isEditableTarget = (target: EventTarget | null) => {
       if (!(target instanceof HTMLElement)) return false;
       const tag = target.tagName;
@@ -224,6 +231,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Delete" && event.key !== "Backspace") return;
       if (!hasFeatures) return;
+      if (!isWithinMap(event.target)) return;
       if (isEditableTarget(event.target)) return;
 
       event.preventDefault();
@@ -232,7 +240,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
 
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [hasFeatures, deleteSelectedOrAllFeatures]);
+  }, [map, hasFeatures, deleteSelectedOrAllFeatures]);
 
   useEffect(() => {
     if (isDrawingMode) {
