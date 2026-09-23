@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 #
-# publish.sh — write the result to the job summary and a sticky PR comment.
-# Tool-agnostic.
+# publish.sh — write the result to the job summary and a new PR comment,
+# collapsing earlier review comments as outdated. Tool-agnostic.
 #
 #   In:  STATUS              ok | empty | skipped | failed
 #        AI_REVIEW_WORK_DIR  holds review.md (for ok)
 #        PR_NUMBER, HEAD_SHA, CREDITS (optional), GH_TOKEN
 #
+# shellcheck disable=SC2016 # $owner, $id etc. in queries are GraphQL variables
 set -euo pipefail
 
 marker="<!-- ai-code-review -->"
@@ -36,13 +37,27 @@ body="$AI_REVIEW_WORK_DIR/comment.md"
 cat "$body" >>"$GITHUB_STEP_SUMMARY"
 [[ "$STATUS" == failed ]] && echo "::warning title=AI review did not complete::See the step logs."
 
-# Update our previous comment if there is one, else create it. Best effort:
-# fork PRs get a read-only token, and the summary already has the result.
-api="repos/${GITHUB_REPOSITORY}/issues"
-id="$(gh api --paginate "$api/$PR_NUMBER/comments" --jq ".[]
-  | select(.user.login == \"github-actions[bot]\" and (.body | startswith(\"$marker\"))) | .id" | head -n 1)" || id=""
-if [[ "$id" =~ ^[0-9]+$ ]]; then
-  gh api -X PATCH "$api/comments/$id" -F body=@"$body" >/dev/null
-else
-  gh api -X POST "$api/$PR_NUMBER/comments" -F body=@"$body" >/dev/null
-fi || echo "::warning title=Could not post the AI review comment::The review is in the job summary."
+# Post a new comment for every run, so reviewers are notified and it sits next
+# to the commit it reviewed, then collapse our earlier reviews as "Outdated".
+# They stay one click away for comparing runs. Best effort throughout: fork
+# PRs get a read-only token, and the job summary already has the result.
+
+# Our earlier, still-visible reviews. Listed before posting, so the new comment
+# is never collapsed; the marker keeps other bots' comments out.
+previous="$(gh api graphql -f owner="${GITHUB_REPOSITORY%/*}" -f name="${GITHUB_REPOSITORY#*/}" -F pr="$PR_NUMBER" \
+  -f query='query($owner: String!, $name: String!, $pr: Int!) {
+    repository(owner: $owner, name: $name) { pullRequest(number: $pr) {
+      comments(last: 100) { nodes { id isMinimized viewerDidAuthor body } } } } }' \
+  --jq ".data.repository.pullRequest.comments.nodes[]
+    | select(.viewerDidAuthor and (.isMinimized | not) and (.body | startswith(\"$marker\"))) | .id")" || previous=""
+
+if ! gh api -X POST "repos/${GITHUB_REPOSITORY}/issues/$PR_NUMBER/comments" -F body=@"$body" >/dev/null; then
+  echo "::warning title=Could not post the AI review comment::The review is in the job summary."
+  exit 0
+fi
+
+for id in $previous; do
+  gh api graphql -f id="$id" -f query='mutation($id: ID!) {
+    minimizeComment(input: {subjectId: $id, classifier: OUTDATED}) { minimizedComment { isMinimized } } }' >/dev/null ||
+    echo "::warning title=Could not collapse an earlier AI review comment::${id}"
+done

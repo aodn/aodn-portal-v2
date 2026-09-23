@@ -3,8 +3,9 @@
 Advisory AI code review for pull requests, trialled on `aodn-portal-v2`
 ([aodn/backlog#9311](https://github.com/aodn/backlog/issues/9311)). An AI agent
 reviews the diff, reading surrounding code in a read-only checkout, for bugs,
-regressions, security issues and missing tests. It posts one PR comment, which
-is updated on every push. It complements human review and never blocks merging.
+regressions, security issues and missing tests. Each push gets a new PR
+comment, and earlier reviews are collapsed as "Outdated" (one click to expand,
+for comparing runs). It complements human review and never blocks merging.
 
 ## Files
 
@@ -16,7 +17,7 @@ is updated on every push. It complements human review and never blocks merging.
 | `ai-review/review.sh` | Runs the step: prepare context → engine → credential check. |
 | `ai-review/test.sh` | Tests for `prepare-context.sh` and `review.sh`, with throwaway repos and fake engines (no credits). |
 | `ai-review/kiro.sh` | **Kiro engine**: install, sandbox, run, extract the review. |
-| `ai-review/publish.sh` | Job summary and the sticky PR comment. |
+| `ai-review/publish.sh` | Job summary, a new PR comment, and collapsing earlier reviews. |
 | `ai-review/prompt.md` | What to review and the output format (shared). |
 | `ai-review/instructions.md` | Guidance specific to this repository, read from the PR's base branch. |
 

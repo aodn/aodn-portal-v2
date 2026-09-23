@@ -3,7 +3,7 @@ name: AI code review
 # Shareable, advisory AI code review for pull requests (aodn/backlog#9311).
 # Tool-agnostic: callers own the triggers, choose the engine and pass its
 # credential (see kiro-code-review.yml). This workflow reviews one PR and posts
-# a sticky comment. See .github/ai-review/README.md.
+# a PR comment. See .github/ai-review/README.md.
 #
 # The scripts are checked out from the commit that defines THIS workflow
 # (job.workflow_sha), never from the pull request, so a PR cannot change how it

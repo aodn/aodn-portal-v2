@@ -144,6 +144,42 @@ AI_REVIEW_EXCLUDE_PATHS="**/*.lock" review "$repo" "touch \"\$AI_REVIEW_WORK_DIR
 check "an empty diff is empty" has "$repo.review/stdout" "status=empty"
 check "the engine is not called for an empty diff" test ! -e "$repo.review/engine-ran"
 
+# publish <status> <previous-ids> [post-exit-code]: runs publish.sh with a stub
+# gh that records its calls; the list query "returns" <previous-ids>.
+publish() {
+  local out="$tmp/publish"
+  rm -rf "$out" && mkdir -p "$out/bin"
+  printf '%s\n' "Looks good." >"$out/review.md"
+  cat >"$out/bin/gh" <<STUB
+#!/usr/bin/env bash
+args="\$*"
+case "\$args" in
+  *minimizeComment*) [[ "\$args" =~ id=([A-Za-z0-9_]+) ]] && echo "minimize \${BASH_REMATCH[1]}" >>"$out/calls" ;;
+  *"graphql"*) echo list >>"$out/calls"; printf '%s\\n' $2 ;;
+  *"-X POST"*) echo post >>"$out/calls"; exit ${3:-0} ;;
+esac
+STUB
+  chmod +x "$out/bin/gh"
+  PATH="$out/bin:$PATH" STATUS="$1" AI_REVIEW_WORK_DIR="$out" PR_NUMBER=7 HEAD_SHA=abcdef1234 \
+    GITHUB_SERVER_URL=https://github.com GITHUB_REPOSITORY=o/r GITHUB_RUN_ID=1 GITHUB_STEP_SUMMARY="$out/summary" \
+    "$here/publish.sh" >"$out/log" 2>&1
+}
+calls() { tr '\n' ' ' <"$tmp/publish/calls" | sed 's/ $//'; }
+
+echo "publish.sh: a new comment per run, earlier ones collapsed"
+publish ok "IC_1 IC_2"
+check "lists, posts, then collapses the earlier reviews" \
+  test "$(calls)" = "list post minimize IC_1 minimize IC_2"
+check "the comment carries the marker" has "$tmp/publish/comment.md" "<!-- ai-code-review -->"
+check "the summary gets the review" has "$tmp/publish/summary" "Looks good."
+
+publish ok ""
+check "first review: nothing to collapse" test "$(calls)" = "list post"
+
+publish ok "IC_1" 1
+check "a failed post collapses nothing (last review stays visible)" test "$(calls)" = "list post"
+check "a failed post is only a warning" has "$tmp/publish/log" "Could not post the AI review comment"
+
 echo
 if (( failures )); then echo "$failures check(s) failed"; exit 1; fi
 echo "all checks passed"
