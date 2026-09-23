@@ -143,7 +143,8 @@ describe("DrawRect keyboard delete", () => {
       ],
     });
 
-    render(<DrawRect map={createMockMap()} />);
+    const map = createMockMap();
+    render(<DrawRect map={map} />);
 
     // Let the 100ms mode-polling interval flip hasFeatures to true
     act(() => {
@@ -155,13 +156,53 @@ describe("DrawRect keyboard delete", () => {
     mocks.draw.deleteAll.mockClear();
     mocks.draw.delete.mockClear();
 
-    fireEvent.keyDown(document, { key: "Delete" });
+    fireEvent.keyDown(map.getContainer(), { key: "Delete" });
 
     expect(mocks.draw.deleteAll).toHaveBeenCalledTimes(1);
     expect(mocks.draw.delete).not.toHaveBeenCalled();
   });
 
   it("Backspace key deletes only the selected features", () => {
+    vi.useFakeTimers();
+    mocks.draw.getAll.mockReturnValue({
+      features: [
+        {
+          id: "feature-1",
+          type: "Feature",
+          geometry: {
+            type: "Polygon",
+            coordinates: [
+              [
+                [0, 0],
+                [1, 0],
+                [1, 1],
+                [0, 1],
+              ],
+            ],
+          },
+          properties: {},
+        },
+      ],
+    });
+    mocks.draw.getSelectedIds.mockReturnValue(["feature-1"]);
+
+    const map = createMockMap();
+    render(<DrawRect map={map} />);
+
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+
+    mocks.draw.deleteAll.mockClear();
+    mocks.draw.delete.mockClear();
+
+    fireEvent.keyDown(map.getContainer(), { key: "Backspace" });
+
+    expect(mocks.draw.delete).toHaveBeenCalledWith(["feature-1"]);
+    expect(mocks.draw.deleteAll).not.toHaveBeenCalled();
+  });
+
+  it("ignores Backspace when focus is outside the map", () => {
     vi.useFakeTimers();
     mocks.draw.getAll.mockReturnValue({
       features: [
@@ -194,15 +235,21 @@ describe("DrawRect keyboard delete", () => {
     mocks.draw.deleteAll.mockClear();
     mocks.draw.delete.mockClear();
 
-    fireEvent.keyDown(document, { key: "Backspace" });
+    // e.g. focus left on the Download button after clicking it
+    const outsideButton = document.createElement("button");
+    document.body.appendChild(outsideButton);
+    fireEvent.keyDown(outsideButton, { key: "Backspace" });
+    fireEvent.keyDown(document, { key: "Delete" });
 
-    expect(mocks.draw.delete).toHaveBeenCalledWith(["feature-1"]);
+    expect(mocks.draw.delete).not.toHaveBeenCalled();
     expect(mocks.draw.deleteAll).not.toHaveBeenCalled();
+    outsideButton.remove();
   });
 
   it("ignores Delete when no features exist", () => {
     vi.useFakeTimers();
-    render(<DrawRect map={createMockMap()} />);
+    const map = createMockMap();
+    render(<DrawRect map={map} />);
 
     act(() => {
       vi.advanceTimersByTime(100);
@@ -211,7 +258,7 @@ describe("DrawRect keyboard delete", () => {
     mocks.draw.deleteAll.mockClear();
     mocks.draw.delete.mockClear();
 
-    fireEvent.keyDown(document, { key: "Delete" });
+    fireEvent.keyDown(map.getContainer(), { key: "Delete" });
 
     expect(mocks.draw.deleteAll).not.toHaveBeenCalled();
     expect(mocks.draw.delete).not.toHaveBeenCalled();
