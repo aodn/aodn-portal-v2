@@ -4,7 +4,7 @@
 # collapsing earlier review comments as outdated. Tool-agnostic.
 #
 #   In:  STATUS              ok | empty | skipped | failed
-#        AI_REVIEW_WORK_DIR  holds review.md (for ok)
+#        KIRO_REVIEW_WORK_DIR  holds review.md (for ok)
 #        PR_NUMBER, HEAD_SHA, CREDITS (optional), GH_TOKEN
 #
 # shellcheck disable=SC2016 # $owner, $id etc. in queries are GraphQL variables
@@ -12,14 +12,14 @@ set -euo pipefail
 
 marker="<!-- ai-code-review -->"
 run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
-body="$AI_REVIEW_WORK_DIR/comment.md"
+body="$KIRO_REVIEW_WORK_DIR/comment.md"
 
 {
   echo "$marker"
   echo "## 🤖 AI code review"
   echo
   case "$STATUS" in
-    ok) head -c 60000 "$AI_REVIEW_WORK_DIR/review.md" ;;
+    ok) head -c 60000 "$KIRO_REVIEW_WORK_DIR/review.md" ;;
     empty) echo "Nothing to review: only excluded files (lockfiles, generated files, images) changed." ;;
     skipped)
       echo "Skipped: the AI review credential is not available to this run. Pull requests from forks and"

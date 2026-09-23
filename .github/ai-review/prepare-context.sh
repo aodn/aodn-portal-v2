@@ -2,20 +2,18 @@
 #
 # prepare-context.sh — build the review prompt for a pull request. Tool-agnostic.
 #
-#   In:   AI_REVIEW_REPO_DIR       PR head checkout, with base history
-#         AI_REVIEW_PR_JSON        PR from the GitHub REST API (file)
-#         AI_REVIEW_WORK_DIR       where to write prompt.md
-#         AI_REVIEW_EXCLUDE_PATHS  optional newline-separated globs to leave out
-#   Out:  $AI_REVIEW_WORK_DIR/prompt.md, and "empty=true|false" on stdout
+#   In:   KIRO_REVIEW_REPO_DIR       PR head checkout, with base history
+#         KIRO_REVIEW_WORK_DIR       holds pr.json; receives prompt.md
+#   Out:  $KIRO_REVIEW_WORK_DIR/prompt.md, and "empty=true|false" on stdout
 #
 set -euo pipefail
 
-: "${AI_REVIEW_REPO_DIR:?}" "${AI_REVIEW_PR_JSON:?}" "${AI_REVIEW_WORK_DIR:?}"
+: "${KIRO_REVIEW_REPO_DIR:?}" "${KIRO_REVIEW_WORK_DIR:?}"
 
 max_diff_bytes=150000
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-pr() { jq -r "$1 // empty" "$AI_REVIEW_PR_JSON"; }
-repo_git() { git -C "$AI_REVIEW_REPO_DIR" -c core.quotepath=false "$@"; }
+pr() { jq -r "$1 // empty" "$KIRO_REVIEW_WORK_DIR/pr.json"; }
+repo_git() { git -C "$KIRO_REVIEW_REPO_DIR" -c core.quotepath=false "$@"; }
 
 repository="$(pr .base.repo.full_name)"
 base_sha="$(pr .base.sha)"
@@ -26,10 +24,18 @@ merge_base="$(repo_git merge-base "$base_sha" "$head_sha")" || {
   exit 1
 }
 
-excludes=()
-while read -r pattern; do
-  [[ -n "$pattern" ]] && excludes+=(":(exclude,glob)${pattern}")
-done <<<"${AI_REVIEW_EXCLUDE_PATHS:-}"
+excludes=(
+  ':(exclude,glob)**/*.lock'
+  ':(exclude,glob)**/package-lock.json'
+  ':(exclude,glob)**/pnpm-lock.yaml'
+  ':(exclude,glob)**/dist/**'
+  ':(exclude,glob)**/*.min.js'
+  ':(exclude,glob)**/*.map'
+  ':(exclude,glob)**/*.snap'
+  ':(exclude,glob)**/*.png'
+  ':(exclude,glob)**/*.jpg'
+  ':(exclude,glob)**/*.svg'
+)
 
 diff="$(repo_git diff --no-color -M "$merge_base" "$head_sha" -- . "${excludes[@]}")"
 if (( ${#diff} > max_diff_bytes )); then
@@ -45,10 +51,10 @@ tag="untrusted-pr-content-$(od -An -N8 -tx1 /dev/urandom | tr -d ' \n')"
 
 prompt="$(cat "$here/prompt.md")"
 prompt="${prompt//\{\{REPOSITORY\}\}/$repository}"
-prompt="${prompt//\{\{REPO_DIR\}\}/$AI_REVIEW_REPO_DIR}"
+prompt="${prompt//\{\{REPO_DIR\}\}/$KIRO_REVIEW_REPO_DIR}"
 prompt="${prompt//\{\{HEAD_SHA\}\}/$head_sha}"
 
-cat >"$AI_REVIEW_WORK_DIR/prompt.md" <<EOF
+cat >"$KIRO_REVIEW_WORK_DIR/prompt.md" <<EOF
 $prompt
 
 ## Repository-specific guidance
