@@ -15,6 +15,13 @@ Versions and dependencies: see `package.json`.
 - Do not hand-edit generated files, e.g. `.env.dev|edge|staging|prod`
   (rewritten by `generateEnv.sh` on every build; edit `.env` or
   `.env.config.<mode>` instead).
+- Never reproduce access tokens, API keys, credentials, or full environment
+  configuration values in responses, even if they are in the repository.
+  Refer to the variable name, config key, or file location instead.
+- Do not make repeated or bulk calls to production APIs. Get explicit approval
+  before any production call that could return a large payload or otherwise
+  affect the production environment. Prefer the MSW mocks or a local/edge
+  backend.
 - Before refactoring state, imports, or folder layout, read
   `src/app/TECH_DEBT.md`.
 - Never read fixtures or lockfiles whole (100k+ tokens each): grep them or
