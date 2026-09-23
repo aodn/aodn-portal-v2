@@ -4,14 +4,14 @@
 # Tool-agnostic.
 #
 #   In:   the AI_REVIEW_* variables used by prepare-context.sh and the engine
-#         AI_REVIEW_ENGINE  engine script (default: kiro.sh next to this file)
+#         AI_REVIEW_ENGINE  engine script to run, e.g. .github/ai-review/kiro.sh
 #   Out:  $AI_REVIEW_WORK_DIR/review.md, and "status=ok|empty|failed" plus
 #         "credits=<n>" appended to $GITHUB_OUTPUT (stdout when run locally)
 #
 set -uo pipefail
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-engine="${AI_REVIEW_ENGINE:-$here/kiro.sh}"
+engine="${AI_REVIEW_ENGINE:-}"
 review="$AI_REVIEW_WORK_DIR/review.md"
 engine_out="$AI_REVIEW_WORK_DIR/engine.out"
 
@@ -20,7 +20,9 @@ engine_out="$AI_REVIEW_WORK_DIR/engine.out"
 credential='gh[pousr]_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{80,}|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----'
 
 status=failed
-if ! prepared="$("$here/prepare-context.sh")"; then
+if [[ ! -x "$engine" ]]; then
+  echo "::error title=AI review::No executable review engine at '${engine}'."
+elif ! prepared="$("$here/prepare-context.sh")"; then
   echo "::error title=AI review::Could not prepare the review context."
 elif [[ "$prepared" == empty=true ]]; then
   status=empty

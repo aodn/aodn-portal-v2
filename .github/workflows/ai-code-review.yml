@@ -1,42 +1,124 @@
 name: AI code review
 
-# Advisory AI code review for pull requests (trial, aodn/backlog#9311).
-# The review itself is the shareable workflow ai-code-review-reusable.yml;
-# this file only decides when it runs. See .github/ai-review/README.md.
+# Shareable, advisory AI code review for pull requests (aodn/backlog#9311).
+# Tool-agnostic: callers own the triggers, choose the engine and pass its
+# credential (see kiro-code-review.yml). This workflow reviews one PR and posts
+# a sticky comment. See .github/ai-review/README.md.
+#
+# The scripts are checked out from the commit that defines THIS workflow
+# (job.workflow_sha), never from the pull request, so a PR cannot change how it
+# is reviewed. Only the engine script (.github/ai-review/<engine>.sh) is
+# specific to an AI tool.
 
 on:
-  pull_request:
-    branches: ["main"]
-    types: [opened, synchronize, reopened, ready_for_review]
-  # Manual run, e.g. to review a fork PR (forks never receive secrets on
-  # pull_request) or to re-run after the credential is added.
-  workflow_dispatch:
+  workflow_call:
     inputs:
       pr-number:
-        description: Pull request number to review
         type: number
         required: true
+      engine:
+        description: Engine script in .github/ai-review, without ".sh" (e.g. kiro).
+        type: string
+        required: true
+      model:
+        description: Model id. Empty uses the account default.
+        type: string
+        default: ""
+      exclude-paths:
+        description: Newline-separated globs left out of the reviewed diff.
+        type: string
+        default: |
+          **/*.lock
+          **/package-lock.json
+          **/pnpm-lock.yaml
+          **/dist/**
+          **/*.min.js
+          **/*.map
+          **/*.snap
+          **/*.png
+          **/*.jpg
+          **/*.svg
+    secrets:
+      AI_REVIEW_API_KEY:
+        description: The engine's credential (e.g. KIRO_API_KEY). When absent the review is skipped.
+        required: false
 
 permissions: {}
 
-# One review per PR; a new push cancels the review of the previous commit.
-concurrency:
-  group: ai-code-review-${{ github.event.pull_request.number || inputs.pr-number }}
-  cancel-in-progress: true
-
 jobs:
   review:
-    # Skip drafts, and PRs labelled skip-ai-review, to save credits.
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (!github.event.pull_request.draft &&
-       !contains(github.event.pull_request.labels.*.name, 'skip-ai-review'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: read
       pull-requests: write
-    uses: ./.github/workflows/ai-code-review-reusable.yml
-    with:
-      pr-number: ${{ github.event.pull_request.number || inputs.pr-number }}
-      model: ${{ vars.AI_REVIEW_MODEL }}
-    secrets:
-      AI_REVIEW_API_KEY: ${{ secrets.KIRO_API_KEY }}
+    env:
+      TOOLS: ${{ github.workspace }}/.ai-review/tools/.github/ai-review
+      AI_REVIEW_REPO_DIR: ${{ github.workspace }}/.ai-review/pr
+
+    steps:
+      - name: Check out review scripts
+        uses: actions/checkout@v5
+        with:
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
+          path: .ai-review/tools
+          sparse-checkout: .github/ai-review
+          persist-credentials: false
+
+      # PR fields are only read from pr.json by scripts, never interpolated
+      # with ${{ }}, so a crafted title or body cannot inject shell.
+      - name: Resolve pull request
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ inputs.pr-number }}
+          HAS_KEY: ${{ secrets.AI_REVIEW_API_KEY != '' }}
+        run: |
+          work="$RUNNER_TEMP/ai-review"
+          mkdir -p "$work"
+          {
+            echo "AI_REVIEW_WORK_DIR=$work"
+            echo "AI_REVIEW_PR_JSON=$work/pr.json"
+            echo "AI_REVIEW_PROMPT_FILE=$work/prompt.md"
+          } >>"$GITHUB_ENV"
+          AI_REVIEW_PR_JSON="$work/pr.json"
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" >"$AI_REVIEW_PR_JSON"
+          if [[ "$(jq -r .state "$AI_REVIEW_PR_JSON")" != open ]]; then
+            echo "::error::PR #$PR_NUMBER is not open."
+            exit 1
+          fi
+          echo "head_sha=$(jq -r .head.sha "$AI_REVIEW_PR_JSON")" >>"$GITHUB_OUTPUT"
+          echo "has_key=$HAS_KEY" >>"$GITHUB_OUTPUT"
+
+      # Credentials are not persisted, so the agent cannot find a token on disk.
+      - name: Check out pull request head
+        if: steps.pr.outputs.has_key == 'true'
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ steps.pr.outputs.head_sha }}
+          path: .ai-review/pr
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Run review
+        id: review
+        if: steps.pr.outputs.has_key == 'true'
+        env:
+          AI_REVIEW_API_KEY: ${{ secrets.AI_REVIEW_API_KEY }}
+          AI_REVIEW_ENGINE: ${{ github.workspace }}/.ai-review/tools/.github/ai-review/${{ inputs.engine }}.sh
+          AI_REVIEW_MODEL: ${{ inputs.model }}
+          AI_REVIEW_EXCLUDE_PATHS: ${{ inputs.exclude-paths }}
+        run: |
+          "$TOOLS/review.sh"
+
+      - name: Publish review
+        if: ${{ !cancelled() && steps.pr.outputs.head_sha != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ inputs.pr-number }}
+          HEAD_SHA: ${{ steps.pr.outputs.head_sha }}
+          CREDITS: ${{ steps.review.outputs.credits }}
+          STATUS: ${{ steps.pr.outputs.has_key != 'true' && 'skipped' || steps.review.outputs.status || 'failed' }}
+        run: |
+          "$TOOLS/publish.sh"

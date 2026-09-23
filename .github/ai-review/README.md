@@ -10,12 +10,12 @@ is updated on every push. It complements human review and never blocks merging.
 
 | File | Role |
 | --- | --- |
-| `workflows/ai-code-review.yml` | This repo's triggers. |
-| `workflows/ai-code-review-reusable.yml` | The shared pipeline: resolve PR → check out head → review → publish. |
+| `workflows/kiro-code-review.yml` | **Kiro-specific** trigger for this repo: when to run, `engine: kiro`, the `KIRO_API_KEY` secret. |
+| `workflows/ai-code-review.yml` | The shareable, tool-agnostic pipeline: resolve PR → check out head → review → publish. |
 | `ai-review/prepare-context.sh` | Builds the prompt from `prompt.md`, `instructions.md` and the PR diff. |
 | `ai-review/review.sh` | Runs the step: prepare context → engine → credential check. |
 | `ai-review/test.sh` | Tests for `prepare-context.sh` and `review.sh`, with throwaway repos and fake engines (no credits). |
-| `ai-review/kiro.sh` | **The only Kiro-specific file**: install, sandbox, run, extract the review. |
+| `ai-review/kiro.sh` | **Kiro engine**: install, sandbox, run, extract the review. |
 | `ai-review/publish.sh` | Job summary and the sticky PR comment. |
 | `ai-review/prompt.md` | What to review and the output format (shared). |
 | `ai-review/instructions.md` | Guidance specific to this repository, read from the PR's base branch. |
@@ -27,7 +27,7 @@ is updated on every push. It complements human review and never blocks merging.
   in-flight review.
 - **No credential** (fork PRs, Dependabot, or secret not set): skipped, with an
   explanatory comment or summary. Maintainers can run it manually from
-  *Actions → AI code review → Run workflow* with the PR number.
+  *Actions → AI code review (Kiro) → Run workflow* with the PR number.
 - Only lockfiles, generated files or images changed: "nothing to review".
 - Diffs over 150 KB are truncated and the review says it is partial.
 - Errors or timeouts (15 min): a comment links to the run. The check stays green.
@@ -38,7 +38,7 @@ is updated on every push. It complements human review and never blocks merging.
   ([docs](https://kiro.dev/docs/getting-started/authentication/#api-key-authentication-cli)),
   which needs a Kiro Pro or higher subscription. A ~20 KB diff cost 1–3
   credits in testing; each comment shows its cost.
-- `AI_REVIEW_MODEL` **variable** (optional): model id. Unset uses the account default.
+- `KIRO_MODEL` **variable** (optional): model id. Unset uses the account default.
 
 **Pilot credential:** the trial may use a personal key. Temporary owner:
 _<name, date>_. Replace it with the team key once Kiro/AWS confirm the
@@ -65,15 +65,16 @@ leak a credential into the public comment, or to run code with one.
 
 ## Adopting in another repository
 
-Copy `workflows/ai-code-review.yml`, change `uses:` to
-`aodn/aodn-portal-v2/.github/workflows/ai-code-review-reusable.yml@<commit-sha>`,
+Copy `workflows/kiro-code-review.yml`, change `uses:` to
+`aodn/aodn-portal-v2/.github/workflows/ai-code-review.yml@<commit-sha>`,
 optionally pass `exclude-paths`, add `.github/ai-review/instructions.md`, and
-add the `KIRO_API_KEY` secret. After the trial, the reusable workflow and
+add the `KIRO_API_KEY` secret. After the trial, `ai-code-review.yml` and the
 scripts should move to [`aodn/common-workflow`](https://github.com/aodn/common-workflow).
 
-**Swapping the AI tool:** write a script that honours the contract in the
-header of `kiro.sh` (read the prompt, write `review.md`), and set
-`AI_REVIEW_ENGINE` to it in the "Run review" step.
+**Swapping the AI tool:** add `.github/ai-review/<name>.sh` honouring the
+contract in the header of `kiro.sh` (read the prompt, write `review.md`), then
+add a `<name>-code-review.yml` trigger passing `engine: <name>` and that tool's
+secret. `ai-code-review.yml` does not change.
 
 ## Upgrading kiro-cli
 
@@ -108,5 +109,5 @@ base and head commits, and not under `/tmp`:
 export AI_REVIEW_WORK_DIR=$(mktemp -d) AI_REVIEW_REPO_DIR=$PWD
 export AI_REVIEW_PR_JSON=$AI_REVIEW_WORK_DIR/pr.json AI_REVIEW_PROMPT_FILE=$AI_REVIEW_WORK_DIR/prompt.md
 gh api repos/aodn/aodn-portal-v2/pulls/<N> >"$AI_REVIEW_PR_JSON"
-.github/ai-review/review.sh && cat "$AI_REVIEW_WORK_DIR/review.md"
+AI_REVIEW_ENGINE=.github/ai-review/kiro.sh .github/ai-review/review.sh && cat "$AI_REVIEW_WORK_DIR/review.md"
 ```

@@ -101,7 +101,7 @@ review() {
   printf '#!/usr/bin/env bash\n%s\n' "$2" >"$out/engine.sh"
   chmod +x "$out/engine.sh"
   AI_REVIEW_REPO_DIR="$1" AI_REVIEW_PR_JSON="$out/pr.json" AI_REVIEW_WORK_DIR="$out" \
-    AI_REVIEW_ENGINE="$out/engine.sh" AI_REVIEW_API_KEY="${3:-}" GITHUB_OUTPUT="$out/stdout" \
+    AI_REVIEW_ENGINE="${AI_REVIEW_ENGINE_OVERRIDE:-$out/engine.sh}" AI_REVIEW_API_KEY="${3:-}" GITHUB_OUTPUT="$out/stdout" \
     "$here/review.sh" >"$out/log" 2>&1
 }
 # writes <text>: an engine body that writes <text> as the review.
@@ -132,6 +132,10 @@ check "the engine API key is withheld" has "$repo.review/stdout" "status=failed"
 
 review "$repo" "exit 3"
 check "an engine failure is failed" has "$repo.review/stdout" "status=failed"
+
+AI_REVIEW_ENGINE_OVERRIDE=/nonexistent review "$repo" "true"
+check "a missing engine is failed" has "$repo.review/stdout" "status=failed"
+check "a missing engine is reported" has "$repo.review/log" "No executable review engine"
 
 repo="$(new_repo only-excluded)"
 git -C "$repo" checkout -q -b pr

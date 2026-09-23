@@ -23,7 +23,7 @@ body="$AI_REVIEW_WORK_DIR/comment.md"
     skipped)
       echo "Skipped: the AI review credential is not available to this run. Pull requests from forks and"
       echo "Dependabot do not receive Actions secrets; otherwise the \`KIRO_API_KEY\` secret is not configured."
-      echo "A maintainer can run the review from **Actions → AI code review → Run workflow**."
+      echo "A maintainer can run it manually from this repository's code review workflow (**Actions → Run workflow**)."
       ;;
     *) echo "The review could not be completed. See the [workflow run](${run_url})." ;;
   esac

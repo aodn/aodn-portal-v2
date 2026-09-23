@@ -2,8 +2,9 @@
 #
 # kiro.sh — run the review with the Kiro headless CLI.
 #
-# The only Kiro-specific file. To use another AI tool, write a script that
-# honours the same contract and point AI_REVIEW_ENGINE (see review.sh) at it.
+# The only Kiro-specific script. To use another AI tool, add <name>.sh next to
+# it that honours the same contract, and pass `engine: <name>` to the
+# ai-code-review.yml workflow.
 #
 #   In:   AI_REVIEW_PROMPT_FILE  review prompt
 #         AI_REVIEW_REPO_DIR     PR checkout the agent may read
