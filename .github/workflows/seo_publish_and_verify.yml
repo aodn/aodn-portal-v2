@@ -1,0 +1,129 @@
+name: Publish and Verify SEO Artifacts
+
+# seo.yml calls this once for each environment. Publishing and checking are
+# two jobs, so a failed run shows which of the two went wrong.
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: GitHub environment with the AWS role, bucket and distribution
+        required: true
+        type: string
+      site:
+        description: Public site URL for this environment
+        required: true
+        type: string
+
+jobs:
+  publish:
+    name: Publish SEO Artifacts
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup node
+        uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+
+      - name: Yarn install
+        run: |
+          yarn install --immutable
+
+      - name: Fetch the deployed index.html as the pre-render template
+        run: |
+          # Take the template from the live site, not from a new build: the pages
+          # must link to the same JavaScript files the site is serving now
+          mkdir -p dist
+          curl -sf "${{ inputs.site }}/index.html" -o dist/index.html
+          grep -q '<div id="root"' dist/index.html \
+            || { echo "::error title=unusable template::${{ inputs.site }}/index.html is not the deployed app shell"; exit 1; }
+          # Print which JavaScript file the pages will load, so an old run is easy to spot
+          echo "Template from ${{ inputs.site }} references $(grep -o '/assets/index-[^"]*' dist/index.html | head -1)"
+
+      - name: Generate sitemap.xml and pre-rendered detail pages
+        env:
+          # Each site sends /api to its own backend, so this reads the right records
+          VITE_API_HOST: ${{ inputs.site }}
+        run: |
+          # vite-node lets the script reuse the app's own fetch helper
+          yarn seo:artifacts
+          # Checks the files we just built; a bad batch stops here and never reaches S3
+          yarn seo:verify
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          audience: sts.amazonaws.com
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+
+      - name: Copy the artifacts to S3
+        run: |
+          echo "Publishing $(grep -c '<loc>' dist/sitemap.xml) URLs and $(find dist/prerender -type f | wc -l) pages to s3://${{ vars.BUCKET }}"
+          aws s3 cp dist/sitemap.xml s3://${{ vars.BUCKET }}/sitemap.xml --region ${{ vars.AWS_REGION }}
+          aws s3 sync --delete dist/prerender s3://${{ vars.BUCKET }}/prerender --region ${{ vars.AWS_REGION }}
+
+      - name: Clear cloudfront cache for the SEO paths
+        id: invalidation
+        run: |
+          # CloudFront rewrites crawler requests before it looks in the cache,
+          # so these pages are cached under /prerender/, not under /details/
+          invalidation_id=$(aws cloudfront create-invalidation \
+          --distribution-id ${{ vars.DISTRIBUTION_ID }} \
+          --paths "/sitemap.xml" "/prerender/*" \
+          --region ${{ vars.AWS_REGION }} \
+          --query Invalidation.Id --output text)
+          echo "id=$invalidation_id" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for the CloudFront cache to clear
+        run: |
+          # The files are already published. This only waits until Google and the
+          # verify job can see the new ones. Needs cloudfront:GetInvalidation.
+          aws cloudfront wait invalidation-completed --distribution-id ${{ vars.DISTRIBUTION_ID }} --id ${{ steps.invalidation.outputs.id }} --region ${{ vars.AWS_REGION }} \
+            || { echo "::error title=could not confirm the invalidation::the artifacts ARE published (see the step above); only this wait failed — see the AWS error above"; exit 1; }
+
+      # Publishing does not make Google index the pages. This reports how many
+      # are indexed, so we notice when the number stops growing.
+      - name: Submit sitemap and report index coverage in Search Console
+        if: inputs.environment == 'production'
+        env:
+          GSC_SERVICE_ACCOUNT_KEY: ${{ secrets.GSC_SERVICE_ACCOUNT_KEY }}
+        run: |
+          yarn seo:gsc submit
+          yarn seo:gsc inspect 50
+
+  # A separate job: when it fails, publishing still worked and only the CloudFront
+  # routing (owned by appdeploy) is broken. It only reads public pages, so it needs
+  # no environment, and "needs" skips it when nothing was published.
+  verify:
+    name: Verify SEO on CloudFront
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup node
+        uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+
+      - name: Yarn install
+        run: |
+          yarn install --immutable
+
+      - name: Smoke check the SEO pages are live on CloudFront
+        run: |
+          # A missing file still returns 200 with index.html, so check what the page
+          # actually contains, not the status code
+          yarn seo:verify "${{ inputs.site }}"
