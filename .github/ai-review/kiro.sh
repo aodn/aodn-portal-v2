@@ -53,22 +53,22 @@ denied=(
 mkdir -p "$KIRO_HOME/agents"
 # Load the versioned agent definition and append runner-specific denied paths.
 printf '%s\n' "${denied[@]}" | jq -R . | jq -s \
-  --slurpfile agent "$(dirname "${BASH_SOURCE[0]}")/ai-code-reviewer.json" '
+  --slurpfile agent "$(dirname "${BASH_SOURCE[0]}")/code-reviewer.json" '
   . as $denied | $agent[0]
   | .toolsSettings.read.deniedPaths += $denied
   | .toolsSettings.glob.deniedPaths += $denied
   | .toolsSettings.grep.deniedPaths += $denied
-' >"$KIRO_HOME/agents/ai-code-reviewer.json"
+' >"$KIRO_HOME/agents/code-reviewer.json"
 
 # 4. Run headless, streaming JSON Lines events.
-args=(chat --no-interactive --agent-engine v2 --output-format stream-json --agent ai-code-reviewer)
+args=(chat --no-interactive --agent-engine v2 --output-format stream-json --agent code-reviewer)
 [[ -n "${KIRO_MODEL:-}" ]] && args+=(--model "$KIRO_MODEL")
 echo "kiro-cli ${kiro_version}, model ${KIRO_MODEL:-default}" >&2
 (cd "$work/cwd" && kiro-cli "${args[@]}") <"$KIRO_REVIEW_WORK_DIR/prompt.md" >"$work/events.jsonl" 2>"$work/stderr.log" ||
   { tail -n 20 "$work/stderr.log" >&2; exit 1; }
 
-# 5. Extract the review: the text between our <review> tags, taken from the
-#    final event, or from the standard ACP message chunks if that is missing.
+# 5. Read the final response, falling back to ACP chunks. Strip only outer
+#    review tags: literal tags inside findings must remain untouched.
 events="$work/events.jsonl"
 if jq -se 'any(.[]; .type == "runError")' "$events" >/dev/null; then
   jq -r 'select(.type == "runError") | .data.message' "$events" >&2
@@ -79,7 +79,8 @@ jq -se 'any(.[]; .type == "runFinished")' "$events" >/dev/null ||
 jq -rs '
   ((map(select(.type == "runFinished")) | last | .data.finalText)
    // (map(select(.data.update.sessionUpdate? == "agent_message_chunk") | .data.update.content.text) | join("")))
-  | ([scan("<review>\\s*([\\s\\S]*?)\\s*</review>")] | last | .[0]?) // .' \
+  | sub("^\\s*<review>\\s*"; "")
+  | sub("\\s*</review>\\s*$"; "")' \
   "$events" >"$KIRO_REVIEW_WORK_DIR/review.md"
 grep -q '[^[:space:]]' "$KIRO_REVIEW_WORK_DIR/review.md" || { echo "Empty review" >&2; exit 1; }
 

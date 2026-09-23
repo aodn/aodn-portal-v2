@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   review:
-    name: Review
+    name: Code Review
     # Skip drafts, and PRs labelled skip-ai-review, to save credits.
     if: >-
       github.event_name == 'workflow_dispatch' ||
@@ -35,7 +35,6 @@ jobs:
       pull-requests: write
     env:
       TOOLS: ${{ github.workspace }}/.ai-review/tools/.github/ai-review
-      KIRO_REVIEW_WORK_DIR: ${{ runner.temp }}/ai-review
       KIRO_REVIEW_REPO_DIR: ${{ github.workspace }}/.ai-review/pr
 
     steps:
@@ -57,6 +56,8 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr-number }}
           HAS_KEY: ${{ secrets.KIRO_API_KEY != '' }}
         run: |
+          export KIRO_REVIEW_WORK_DIR="$RUNNER_TEMP/ai-review"
+          echo "KIRO_REVIEW_WORK_DIR=$KIRO_REVIEW_WORK_DIR" >>"$GITHUB_ENV"
           "$TOOLS/resolve-pr.sh"
 
       # Credentials are not persisted, so the agent cannot find a token on disk.

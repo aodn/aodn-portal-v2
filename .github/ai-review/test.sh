@@ -209,6 +209,48 @@ publish ok "IC_1" 1
 check "a failed post collapses nothing (last review stays visible)" test "$(calls)" = "list post"
 check "a failed post is only a warning" has "$tmp/publish/log" "Could not post the AI review comment"
 
+# Exercise kiro.sh itself with a fake CLI archive; no network or AI calls.
+echo "kiro.sh: preserve review content when stripping outer tags"
+kiro_test="$tmp/kiro-parser"
+mkdir -p "$kiro_test/bin" "$kiro_test/archive/kirocli/bin" "$kiro_test/repo"
+cat >"$kiro_test/archive/kirocli/bin/kiro-cli" <<'STUB'
+#!/usr/bin/env bash
+[[ "$1" == settings ]] && exit 0
+cat "$KIRO_TEST_EVENTS"
+STUB
+cat >"$kiro_test/bin/curl" <<'STUB'
+#!/usr/bin/env bash
+while (( $# )); do
+  if [[ "$1" == -o ]]; then cp "$KIRO_TEST_ARCHIVE" "$2"; exit; fi
+  shift
+done
+exit 1
+STUB
+chmod +x "$kiro_test/archive/kirocli/bin/kiro-cli" "$kiro_test/bin/curl"
+tar -czf "$kiro_test/cli.tar.gz" -C "$kiro_test/archive" kirocli
+kiro_parse() {
+  local work="$kiro_test/work"
+  rm -rf "$work" && mkdir -p "$work"
+  echo "Review this PR" >"$work/prompt.md"
+  PATH="$kiro_test/bin:$PATH" KIRO_TEST_ARCHIVE="$kiro_test/cli.tar.gz" \
+    KIRO_TEST_EVENTS="$kiro_test/events.jsonl" KIRO_REVIEW_WORK_DIR="$work" \
+    KIRO_REVIEW_REPO_DIR="$kiro_test/repo" "$here/kiro.sh" >"$kiro_test/log" 2>&1
+}
+review_text=$'### Summary\nImportant summary.\n### Findings\nThe parser treats `</review>` and `<review>` in code as boundaries.\n### Tests\nAdd coverage.'
+wrapped=$'<review>\n'"$review_text"$'\n</review>'
+jq -n --arg text "$wrapped" '{type:"runFinished",data:{finalText:$text}}' >"$kiro_test/events.jsonl"
+kiro_parse
+check "keeps the full summary and literal tags" test "$(cat "$kiro_test/work/review.md")" = "$review_text"
+jq -n --arg text "$review_text" '{type:"runFinished",data:{finalText:$text}}' >"$kiro_test/events.jsonl"
+kiro_parse
+check "keeps unwrapped output unchanged" test "$(cat "$kiro_test/work/review.md")" = "$review_text"
+jq -n --arg text "$wrapped" '{data:{update:{sessionUpdate:"agent_message_chunk",content:{text:$text}}}}' >"$kiro_test/events.jsonl"
+kiro_parse
+check "ACP fallback also preserves literal tags" test "$(cat "$kiro_test/work/review.md")" = "$review_text"
+jq -n '{type:"runFinished",data:{finalText:"<review> \n </review>"}}' >"$kiro_test/events.jsonl"
+if kiro_parse; then result=0; else result=$?; fi
+check "empty wrapped output fails" test "$result" -ne 0
+
 echo
 if (( failures )); then echo "$failures check(s) failed"; exit 1; fi
 echo "all checks passed"

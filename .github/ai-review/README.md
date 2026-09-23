@@ -9,18 +9,18 @@ for comparing runs). It complements human review and never blocks merging.
 
 ## Files
 
-| File                              | Role                                                                                                                 |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `workflows/ai-code-review.yml`    | Kiro trial workflow: triggers, resolve PR → check out head → review → publish.                                       |
-| `ai-review/resolve-pr.sh`         | Fetches PR metadata, checks it is open, and outputs the head SHA and credential availability.                        |
-| `ai-review/prepare-context.sh`    | Builds the prompt from `prompt.md`, `instructions.md` and the PR diff.                                               |
-| `ai-review/review.sh`             | Runs the step: prepare context → engine → credential check.                                                          |
-| `ai-review/test.sh`               | Tests for `prepare-context.sh` and `review.sh`, with throwaway repos and fake engines (no credits).                  |
-| `ai-review/ai-code-reviewer.json` | Versioned Kiro agent definition; `kiro.sh` appends runtime denied paths and installs it in the isolated `KIRO_HOME`. |
-| `ai-review/kiro.sh`               | **Kiro engine**: install, sandbox, run, extract the review.                                                          |
-| `ai-review/publish.sh`            | Job summary, a new PR comment, and collapsing earlier reviews.                                                       |
-| `ai-review/prompt.md`             | What to review and the output format (shared).                                                                       |
-| `ai-review/instructions.md`       | Guidance specific to this repository, read from the PR's base branch.                                                |
+| File                           | Role                                                                                                                 |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| `workflows/ai-code-review.yml` | Kiro trial workflow: triggers, resolve PR → check out head → review → publish.                                       |
+| `ai-review/resolve-pr.sh`      | Fetches PR metadata, checks it is open, and outputs the head SHA and credential availability.                        |
+| `ai-review/prepare-context.sh` | Builds the prompt from `prompt.md`, `instructions.md` and the PR diff.                                               |
+| `ai-review/review.sh`          | Runs the step: prepare context → engine → credential check.                                                          |
+| `ai-review/test.sh`            | Tests for `prepare-context.sh` and `review.sh`, with throwaway repos and fake engines (no credits).                  |
+| `ai-review/code-reviewer.json` | Versioned Kiro agent definition; `kiro.sh` appends runtime denied paths and installs it in the isolated `KIRO_HOME`. |
+| `ai-review/kiro.sh`            | **Kiro engine**: install, sandbox, run, extract the review.                                                          |
+| `ai-review/publish.sh`         | Job summary, a new PR comment, and collapsing earlier reviews.                                                       |
+| `ai-review/prompt.md`          | What to review and the output format (shared).                                                                       |
+| `ai-review/instructions.md`    | Guidance specific to this repository, read from the PR's base branch.                                                |
 
 The workflow calls `resolve-pr.sh`, checks out the PR head, runs `review.sh`,
 and calls `publish.sh`. Inside `review.sh`, `prepare-context.sh` builds the
