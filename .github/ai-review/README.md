@@ -13,7 +13,8 @@ is updated on every push. It complements human review and never blocks merging.
 | `workflows/ai-code-review.yml` | This repo's triggers. |
 | `workflows/ai-code-review-reusable.yml` | The shared pipeline: resolve PR → check out head → review → publish. |
 | `ai-review/prepare-context.sh` | Builds the prompt from `prompt.md`, `instructions.md` and the PR diff. |
-| `ai-review/prepare-context.test.sh` | Tests for the diff logic, using throwaway git repos. |
+| `ai-review/review.sh` | Runs the step: prepare context → engine → credential check. |
+| `ai-review/test.sh` | Tests for `prepare-context.sh` and `review.sh`, with throwaway repos and fake engines (no credits). |
 | `ai-review/kiro.sh` | **The only Kiro-specific file**: install, sandbox, run, extract the review. |
 | `ai-review/publish.sh` | Job summary and the sticky PR comment. |
 | `ai-review/prompt.md` | What to review and the output format (shared). |
@@ -70,9 +71,9 @@ optionally pass `exclude-paths`, add `.github/ai-review/instructions.md`, and
 add the `KIRO_API_KEY` secret. After the trial, the reusable workflow and
 scripts should move to [`aodn/common-workflow`](https://github.com/aodn/common-workflow).
 
-**Swapping the AI tool:** replace `kiro.sh` with a script that honours the
-contract in its header (read the prompt, write `review.md`), and point the
-"Run review" step at it.
+**Swapping the AI tool:** write a script that honours the contract in the
+header of `kiro.sh` (read the prompt, write `review.md`), and set
+`AI_REVIEW_ENGINE` to it in the "Run review" step.
 
 ## Upgrading kiro-cli
 
@@ -93,10 +94,11 @@ Client Protocol message chunks and prints a warning.
 ## Testing locally
 
 The diff logic (merge-base diff, base-branch guidance, exclusions, truncation)
-has tests that need only git and jq:
+and the review outcomes (including the credential check) have tests that need
+only git and jq, and use no credits:
 
 ```bash
-.github/ai-review/prepare-context.test.sh
+.github/ai-review/test.sh
 ```
 
 For a full review, with `kiro-cli` logged in (no API key needed), from a repo that has the PR's
@@ -106,5 +108,5 @@ base and head commits, and not under `/tmp`:
 export AI_REVIEW_WORK_DIR=$(mktemp -d) AI_REVIEW_REPO_DIR=$PWD
 export AI_REVIEW_PR_JSON=$AI_REVIEW_WORK_DIR/pr.json AI_REVIEW_PROMPT_FILE=$AI_REVIEW_WORK_DIR/prompt.md
 gh api repos/aodn/aodn-portal-v2/pulls/<N> >"$AI_REVIEW_PR_JSON"
-.github/ai-review/prepare-context.sh && .github/ai-review/kiro.sh && cat "$AI_REVIEW_WORK_DIR/review.md"
+.github/ai-review/review.sh && cat "$AI_REVIEW_WORK_DIR/review.md"
 ```

@@ -103,23 +103,7 @@ jobs:
           AI_REVIEW_MODEL: ${{ inputs.model }}
           AI_REVIEW_EXCLUDE_PATHS: ${{ inputs.exclude-paths }}
         run: |
-          set -uo pipefail
-          review="$AI_REVIEW_WORK_DIR/review.md"
-          if ! prepared="$("$TOOLS/prepare-context.sh")"; then
-            status=failed
-          elif [[ "$prepared" == empty=true ]]; then
-            status=empty
-          elif ! timeout 15m "$TOOLS/kiro.sh" | tee "$AI_REVIEW_WORK_DIR/kiro.out"; then
-            status=failed
-          elif grep -qF -- "$AI_REVIEW_API_KEY" "$review" ||
-               grep -qE 'gh[pousr]_[A-Za-z0-9]{30,}|github_pat_|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY' "$review"; then
-            echo "::error::The review looked like it contained a credential and was withheld."
-            status=failed
-          else
-            status=ok
-          fi
-          grep '^credits=' "$AI_REVIEW_WORK_DIR/kiro.out" >>"$GITHUB_OUTPUT" 2>/dev/null
-          echo "status=$status" >>"$GITHUB_OUTPUT"
+          "$TOOLS/review.sh"
 
       - name: Publish review
         if: ${{ !cancelled() && steps.pr.outputs.head_sha != '' }}

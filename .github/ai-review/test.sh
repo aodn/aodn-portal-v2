@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 #
-# prepare-context.test.sh — tests for prepare-context.sh, using throwaway git
-# repositories. Run: .github/ai-review/prepare-context.test.sh
+# test.sh — tests for prepare-context.sh and review.sh, using throwaway git
+# repositories and fake review engines, so no AI credits are used.
+# Run: .github/ai-review/test.sh
 #
 set -euo pipefail
 
-prepare="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/prepare-context.sh"
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+prepare="$here/prepare-context.sh"
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 failures=0
@@ -87,6 +89,56 @@ git -C "$repo" checkout -q --orphan other
 commit "$repo" x.ts "x"
 rc=0; prepare "$repo" main other 2>/dev/null || rc=$?
 check "exits non-zero without a merge base" test "$rc" -ne 0
+
+# review <repo> <engine-body> [api-key]: runs review.sh with a fake engine whose
+# body is given as shell; output lands in <repo>.review/stdout.
+review() {
+  local out="$1.review"
+  rm -rf "$out" && mkdir -p "$out" # review.sh appends to GITHUB_OUTPUT
+  jq -n --arg base "$(git -C "$1" rev-parse main)" --arg head "$(git -C "$1" rev-parse pr)" \
+    '{number: 7, title: "T", body: "", base: {sha: $base, repo: {full_name: "o/r"}}, head: {sha: $head}}' \
+    >"$out/pr.json"
+  printf '#!/usr/bin/env bash\n%s\n' "$2" >"$out/engine.sh"
+  chmod +x "$out/engine.sh"
+  AI_REVIEW_REPO_DIR="$1" AI_REVIEW_PR_JSON="$out/pr.json" AI_REVIEW_WORK_DIR="$out" \
+    AI_REVIEW_ENGINE="$out/engine.sh" AI_REVIEW_API_KEY="${3:-}" GITHUB_OUTPUT="$out/stdout" \
+    "$here/review.sh" >"$out/log" 2>&1
+}
+# writes <text>: an engine body that writes <text> as the review.
+writes() { printf "printf '%%s\\\\n' '%s' >\"\$AI_REVIEW_WORK_DIR/review.md\"; echo credits=0.5" "$1"; }
+
+echo "review.sh: outcomes and the credential check"
+repo="$(new_repo reviewed)"
+git -C "$repo" checkout -q -b pr
+commit "$repo" src/a.ts "export const a = 1;"
+
+review "$repo" "$(writes "Looks good.")"
+check "clean review is ok" has "$repo.review/stdout" "status=ok"
+check "credits are passed through" has "$repo.review/stdout" "credits=0.5"
+
+review "$repo" "$(writes "Looks good.")" ""
+check "no API key set (local run) is still ok" has "$repo.review/stdout" "status=ok"
+
+review "$repo" "$(writes "The guard greps for github_pat_ and gh[pousr]_[A-Za-z0-9]{36}.")" "secret-key"
+check "naming token prefixes is not withheld (CI false positive)" has "$repo.review/stdout" "status=ok"
+
+token="ghp_$(printf 'A%.0s' {1..36})"
+review "$repo" "$(writes "leaked $token")" "secret-key"
+check "a real token shape is withheld" has "$repo.review/stdout" "status=failed"
+check "the log does not repeat the token" lacks "$repo.review/log" "$token"
+
+review "$repo" "$(writes "leaked secret-key-123")" "secret-key-123"
+check "the engine API key is withheld" has "$repo.review/stdout" "status=failed"
+
+review "$repo" "exit 3"
+check "an engine failure is failed" has "$repo.review/stdout" "status=failed"
+
+repo="$(new_repo only-excluded)"
+git -C "$repo" checkout -q -b pr
+commit "$repo" yarn.lock "lockfile"
+AI_REVIEW_EXCLUDE_PATHS="**/*.lock" review "$repo" "touch \"\$AI_REVIEW_WORK_DIR/engine-ran\""
+check "an empty diff is empty" has "$repo.review/stdout" "status=empty"
+check "the engine is not called for an empty diff" test ! -e "$repo.review/engine-ran"
 
 echo
 if (( failures )); then echo "$failures check(s) failed"; exit 1; fi
