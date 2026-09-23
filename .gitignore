@@ -45,7 +45,3 @@ tsconfig.node.tsbuildinfo
 
 # Lighthouse CI working directory: build reports, recorded API responses
 .lighthouse/
-
-CLAUDE.md
-.claude
-.agents
