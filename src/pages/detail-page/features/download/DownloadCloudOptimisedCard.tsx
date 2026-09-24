@@ -287,7 +287,6 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
         getAndSetDownloadConditions={getAndSetDownloadConditions}
         removeDownloadCondition={removeDownloadCondition}
         hideInfoMessage={showSizeWarning}
-        isExternal={!isImosOnly}
       />
       <DownloadDialog
         isOpen={downloadDialogOpen}
