@@ -642,13 +642,16 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
 
   if (!collection) return null;
 
+  const showWmsLegend =
+    mapLayerConfig.filter((m) => m?.selected)?.[0]?.id === LayerName.GeoServer;
+
   return (
     <>
       <Box
         sx={{
           width: "100%",
           mt: padding.large,
-          mb: padding.large,
+          mb: showWmsLegend ? 0 : padding.large,
           borderRadius: borderRadius.small,
           boxShadow: theme.shadows[1],
           // Visible so the date-slider value label can extend past the rail.
@@ -797,8 +800,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       </Box>
       {/* Show the legend exactly when the GeoServer (WMS) layer is the selected
           map layer - same gate as the GeoServerLayer's own `visible` prop */}
-      {mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
-        LayerName.GeoServer && (
+      {showWmsLegend && (
         <Box sx={{ mb: 1 }}>
           <WmsLegend uuid={collection.id} layerName={selectedWmsLayer} />
         </Box>
