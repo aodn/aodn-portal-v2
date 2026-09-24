@@ -1,9 +1,9 @@
 name: Publish SEO Artifacts
 
-# Builds sitemap.xml and the pre-rendered detail pages from the live records
-# and publishes them straight to S3 (under prerender/, where CloudFront routes
-# crawler requests for /details/<uuid>), independently of app deploys.
-# What the artifacts are and the commands this workflow runs: src/seo/README.md
+# Builds sitemap.xml and one pre-rendered page per record, then publishes them
+# to S3 under prerender/, where CloudFront sends crawler requests for
+# /details/<uuid>. It runs on its own, separate from app deploys.
+# What the files are and which commands build them: src/seo/README.md
 
 on:
   schedule:
@@ -17,12 +17,14 @@ permissions:
 
 concurrency:
   group: seo-artifacts
-  # Every run rebuilds everything, so a superseded run is safe to cancel
+  # Every run rebuilds everything, so cancelling an older run loses nothing
   cancel-in-progress: true
 
 jobs:
-  publish:
-    runs-on: ubuntu-latest
+  # Each environment gets its own publish and verify jobs, so it is checked as
+  # soon as it is published, not after all three are done
+  seo:
+    name: ${{ matrix.environment }}
     strategy:
       max-parallel: 1
       fail-fast: false
@@ -34,120 +36,8 @@ jobs:
             site: https://portal-staging.aodn.org.au
           - environment: production
             site: https://portal-beta.aodn.org.au
-    environment: ${{ matrix.environment }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Setup node
-        uses: actions/setup-node@v5
-        with:
-          node-version: "20"
-
-      - name: Yarn install
-        run: |
-          yarn install --immutable
-
-      - name: Fetch the deployed index.html as the pre-render template
-        run: |
-          # Pre-rendered pages inherit the live bundle's hashed asset URLs, so the
-          # template must come from the site rather than from a fresh build
-          mkdir -p dist
-          curl -sf "${{ matrix.site }}/index.html" -o dist/index.html
-          grep -q '<div id="root"' dist/index.html \
-            || { echo "::error title=unusable template::${{ matrix.site }}/index.html is not the deployed app shell"; exit 1; }
-          # Names the bundle these pages will boot, so a stale run is obvious in the log
-          echo "Template from ${{ matrix.site }} references $(grep -o '/assets/index-[^"]*' dist/index.html | head -1)"
-
-      - name: Generate sitemap.xml and pre-rendered detail pages
-        env:
-          # Each site's CloudFront proxies /api to its own environment's backend
-          VITE_API_HOST: ${{ matrix.site }}
-        run: |
-          # seo:artifacts runs under vite-node so it can reuse fetchResultNoStore
-          yarn seo:artifacts
-          # Same checks a developer runs locally; refuses to publish a bad batch
-          yarn seo:verify
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v6
-        with:
-          audience: sts.amazonaws.com
-          aws-region: ${{ vars.AWS_REGION }}
-          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
-
-      - name: Copy the artifacts to S3
-        run: |
-          echo "Publishing $(grep -c '<loc>' dist/sitemap.xml) URLs and $(find dist/prerender -type f | wc -l) pages to s3://${{ vars.BUCKET }}"
-          aws s3 cp dist/sitemap.xml s3://${{ vars.BUCKET }}/sitemap.xml --region ${{ vars.AWS_REGION }}
-          aws s3 sync --delete dist/prerender s3://${{ vars.BUCKET }}/prerender --region ${{ vars.AWS_REGION }}
-
-      - name: Clear cloudfront cache for the SEO paths
-        id: invalidation
-        run: |
-          # Crawler requests are rewritten before the cache lookup, so the
-          # cached keys for these pages live under /prerender/
-          invalidation_id=$(aws cloudfront create-invalidation \
-          --distribution-id ${{ vars.DISTRIBUTION_ID }} \
-          --paths "/sitemap.xml" "/prerender/*" \
-          --region ${{ vars.AWS_REGION }} \
-          --query Invalidation.Id --output text)
-          echo "id=$invalidation_id" >> "$GITHUB_OUTPUT"
-
-      - name: Wait for the CloudFront cache to clear
-        run: |
-          # The artifacts ARE published by now; this only makes sure Google and
-          # the verify job below see the new files. Needs cloudfront:GetInvalidation.
-          aws cloudfront wait invalidation-completed --distribution-id ${{ vars.DISTRIBUTION_ID }} --id ${{ steps.invalidation.outputs.id }} --region ${{ vars.AWS_REGION }} \
-            || { echo "::error title=could not confirm the invalidation::the artifacts ARE published (see the step above); only this wait failed — see the AWS error above"; exit 1; }
-
-      # Publishing does not make Google index the pages — this reports coverage
-      # so an indexing stall is noticed
-      - name: Submit sitemap and report index coverage in Search Console
-        if: matrix.environment == 'production'
-        env:
-          GSC_SERVICE_ACCOUNT_KEY: ${{ secrets.GSC_SERVICE_ACCOUNT_KEY }}
-        run: |
-          yarn seo:gsc submit
-          yarn seo:gsc inspect 50
-
-  # Separate job so a CloudFront routing problem (owned by appdeploy) fails
-  # the check, not the publish. Public fetches only, so no environment needed.
-  verify:
-    needs: publish
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        # Same legs as publish
-        include:
-          - environment: edge
-            site: https://portal-edge.aodn.org.au
-          - environment: staging
-            site: https://portal-staging.aodn.org.au
-          - environment: production
-            site: https://portal-beta.aodn.org.au
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Setup node
-        uses: actions/setup-node@v5
-        with:
-          node-version: "20"
-
-      - name: Yarn install
-        run: |
-          yarn install --immutable
-
-      - name: Smoke check the SEO pages are live on CloudFront
-        run: |
-          # CloudFront answers 200 with index.html for a missing file, so verify
-          # the served content, not status codes — same checks as seo:verify locally
-          yarn seo:verify "${{ matrix.site }}"
+    uses: ./.github/workflows/seo_publish_and_verify.yml
+    with:
+      environment: ${{ matrix.environment }}
+      site: ${{ matrix.site }}
+    secrets: inherit
