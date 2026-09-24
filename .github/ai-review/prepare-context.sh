@@ -38,10 +38,21 @@ excludes=(
 )
 
 diff="$(repo_git diff --no-color -M "$merge_base" "$head_sha" -- . "${excludes[@]}")"
-if (( ${#diff} > max_diff_bytes )); then
-  diff="${diff:0:max_diff_bytes}"
-  diff="${diff%$'\n'*}"$'\n[... diff truncated: the review is partial; say so in the Summary ...]'
-fi
+# Limit bytes in a subshell so the rest of the script keeps its locale.
+diff="$(
+  export LC_ALL=C
+  if (( ${#diff} > max_diff_bytes )); then
+    diff="${diff:0:max_diff_bytes}"
+    # Discard the partial final line, including any split UTF-8 character.
+    if [[ "$diff" == *$'\n'* ]]; then
+      diff="${diff%$'\n'*}"
+    else
+      diff=""
+    fi
+    diff+=$'\n[... diff truncated: the review is partial; say so in the Summary ...]'
+  fi
+  printf '%s' "$diff"
+)"
 
 # Maintainer guidance comes from the BASE commit, so a PR cannot rewrite it.
 instructions="$(repo_git show "${base_sha}:.github/ai-review/instructions.md" 2>/dev/null || true)"

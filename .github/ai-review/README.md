@@ -100,17 +100,8 @@ and every push to `main`. A failing shell test fails the build job.
 
 The diff logic (merge-base diff, base-branch guidance, exclusions, truncation)
 and the review outcomes (including the credential check) have tests that need
-only git and jq, and use no credits:
+Bash, git, jq, tar, awk and iconv, and use no credits:
 
 ```bash
 .github/ai-review/test.sh
-```
-
-For a full review, with `kiro-cli` logged in (no API key needed), from a repo that has the PR's
-base and head commits, and not under `/tmp`:
-
-```bash
-export KIRO_REVIEW_WORK_DIR=$(mktemp -d) KIRO_REVIEW_REPO_DIR=$PWD
-gh api repos/aodn/aodn-portal-v2/pulls/<N> >"$KIRO_REVIEW_WORK_DIR/pr.json"
-.github/ai-review/review.sh && cat "$KIRO_REVIEW_WORK_DIR/review.md"
 ```

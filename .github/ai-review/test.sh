@@ -112,6 +112,24 @@ prepare "$repo" main pr
 check "marks the diff as truncated" has "$repo.out/prompt.md" "diff truncated"
 check "keeps the prompt under ~160 KB" test "$(wc -c <"$repo.out/prompt.md")" -lt 160000
 
+echo "multibyte diffs respect the byte limit under a UTF-8 locale"
+repo="$(new_repo multibyte)"
+git -C "$repo" checkout -q -b pr
+commit "$repo" unicode.txt "$(awk 'BEGIN { for (i = 0; i < 20000; i++) print "€€€€" }')"
+LC_ALL=C.UTF-8 prepare "$repo" main pr
+check "multibyte diff is truncated" has "$repo.out/prompt.md" "diff truncated"
+check "multibyte prompt stays under ~160 KB" test "$(wc -c <"$repo.out/prompt.md")" -lt 160000
+check "truncated prompt remains valid UTF-8" iconv -f UTF-8 -t UTF-8 "$repo.out/prompt.md" -o /dev/null
+check "retains complete diff lines" has "$repo.out/prompt.md" "+€€€€"
+
+repo="$(new_repo multibyte-long-line)"
+git -C "$repo" checkout -q -b pr
+commit "$repo" unicode.txt "$(awk 'BEGIN { for (i = 0; i < 60000; i++) printf "€" }')"
+LC_ALL=C.UTF-8 prepare "$repo" main pr
+check "oversized Unicode line is truncated" has "$repo.out/prompt.md" "diff truncated"
+check "drops the incomplete Unicode line" lacks "$repo.out/prompt.md" "€"
+check "long-line prompt remains valid UTF-8" iconv -f UTF-8 -t UTF-8 "$repo.out/prompt.md" -o /dev/null
+
 echo "missing base history fails clearly"
 repo="$(new_repo orphan)"
 git -C "$repo" checkout -q --orphan other
@@ -236,12 +254,12 @@ kiro_parse() {
     KIRO_TEST_EVENTS="$kiro_test/events.jsonl" KIRO_REVIEW_WORK_DIR="$work" \
     KIRO_REVIEW_REPO_DIR="$kiro_test/repo" "$here/kiro.sh" >"$kiro_test/log" 2>&1
 }
-review_text=$'### Summary\n🤖 审查摘要 — Important summary.\n### Findings\nThe parser treats `</review>` and `<review>` in code as boundaries.\n### Tests\nAdd coverage.'
+review_text=$'### Summary\n🤖 Review summary — Important summary.\n### Findings\nThe parser treats `</review>` and `<review>` in code as boundaries.\n### Tests\nAdd coverage.'
 wrapped=$'<review>\n'"$review_text"$'\n</review>'
 jq -n --arg text "$wrapped" '{type:"runFinished",data:{finalText:$text}}' >"$kiro_test/events.jsonl"
 kiro_parse
 check "keeps the full summary and literal tags" test "$(cat "$kiro_test/work/review.md")" = "$review_text"
-narrated=$'🤖 我会检查代码 — I will examine the changes.\n'"$wrapped"$'\nReview complete.'
+narrated=$'🤖 Review progress — I will examine the changes.\n'"$wrapped"$'\nReview complete.'
 jq -n --arg text "$narrated" '{type:"runFinished",data:{finalText:$text}}' >"$kiro_test/events.jsonl"
 kiro_parse
 check "removes Unicode narration without losing the summary or literal tags" test "$(cat "$kiro_test/work/review.md")" = "$review_text"
