@@ -8,6 +8,9 @@ import { AnalyticsEvent } from "../../../../../analytics/analyticsEvents";
 import { resolveSuggestedCitation } from "@/utils/CitationUtils";
 import { MediaType, RelationType } from "@/app/store/OGCCollectionDefinitions";
 
+const normalizeConstraint = (constraint: string) =>
+  constraint.trim().replace(/\s+/g, " ").toLowerCase();
+
 const LicenseStep = () => {
   const context = useDetailPageContext();
 
@@ -24,15 +27,26 @@ const LicenseStep = () => {
 
   const usageConstraints = useMemo(() => {
     const citation = collection?.getCitation();
+    const normalizedLicense = license ? normalizeConstraint(license) : "";
     const metadataConstraints = [
       ...(citation?.useLimitations ?? []),
-      ...(citation?.otherConstraints ?? []).filter(
-        (constraint) =>
-          constraint.toLowerCase().trim() !== license?.toLowerCase().trim()
-      ),
-    ].filter(Boolean);
+      ...(citation?.otherConstraints ?? []),
+    ].filter(
+      (constraint) =>
+        constraint && normalizeConstraint(constraint) !== normalizedLicense
+    );
+    const uniqueConstraints = new Set<string>();
 
-    return Array.from(new Set(metadataConstraints));
+    return metadataConstraints.filter((constraint) => {
+      const normalizedConstraint = normalizeConstraint(constraint);
+
+      if (uniqueConstraints.has(normalizedConstraint)) {
+        return false;
+      }
+
+      uniqueConstraints.add(normalizedConstraint);
+      return true;
+    });
   }, [collection, license]);
 
   const citationText = useMemo(() => {

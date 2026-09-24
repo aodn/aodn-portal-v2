@@ -119,6 +119,31 @@ describe("LicenseStep", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("excludes licence text and de-duplicates equivalent constraints", () => {
+    vi.mocked(useDetailPageContext).mockReturnValue({
+      collection: createCollection({
+        isImosOnly: false,
+        license: "Creative Commons Attribution 4.0",
+        useLimitations: [
+          "  creative commons attribution 4.0  ",
+          "Dataset constraint",
+        ],
+        otherConstraints: [
+          "DATASET   CONSTRAINT",
+          "Creative Commons Attribution 4.0",
+        ],
+      }),
+    } as ReturnType<typeof useDetailPageContext>);
+
+    render(<LicenseStep />);
+
+    expect(screen.getByText("Dataset constraint")).toBeInTheDocument();
+    expect(screen.queryByText("DATASET   CONSTRAINT")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("  creative commons attribution 4.0  ")
+    ).not.toBeInTheDocument();
+  });
+
   it("shows standard unavailable messages for incomplete metadata", () => {
     vi.mocked(useDetailPageContext).mockReturnValue({
       collection: createCollection({ isImosOnly: false }),
