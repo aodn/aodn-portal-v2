@@ -68,14 +68,19 @@ One to three sentences: what the change does and your overall assessment.
 
 ### Findings
 
-| # | Severity | Location | Finding |
-| - | -------- | -------- | ------- |
-| 1 | 🔴 High | [path/to/file.ts:42](https://github.com/{{REPOSITORY}}/blob/{{HEAD_SHA}}/path/to/file.ts#L42) | One-line description |
+| #   | Severity | Location                                                                                      | Finding              |
+| --- | -------- | --------------------------------------------------------------------------------------------- | -------------------- |
+| 1   | 🔴 High  | [path/to/file.ts:42](https://github.com/{{REPOSITORY}}/blob/{{HEAD_SHA}}/path/to/file.ts#L42) | One-line description |
 
 Severity is one of `🔴 High` (likely bug, regression or security issue),
 `🟠 Medium` (plausible problem or significant test gap) or `🟡 Low` (minor,
 worth considering). Order findings by severity. If there are no findings,
 replace the table with: _No issues found in the changed code._
+
+Table cells are split on `|` before Markdown is rendered, even inside a
+backtick code span. If a one-line description must quote code containing a
+`|` (a shell pipeline, an OR pattern), escape it as `\|` or reword to avoid
+it, or the table row will render truncated.
 
 Then, for each High and Medium finding, a `#### 1. <short title>` subsection
 explaining why it is a problem and a concrete fix (a small code snippet where
