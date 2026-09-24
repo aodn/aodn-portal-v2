@@ -79,7 +79,7 @@ describe("LicenseStep", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("keeps IMOS-specific constraints for an IMOS-only dataset", () => {
+  it("does not add generic constraints for an IMOS-only dataset", () => {
     vi.mocked(useDetailPageContext).mockReturnValue({
       collection: createCollection({
         isImosOnly: true,
@@ -89,8 +89,15 @@ describe("LicenseStep", () => {
 
     render(<LicenseStep />);
 
-    expect(screen.getByText(/Any users of IMOS data/)).toBeInTheDocument();
-    expect(screen.getByText(/IMOS \d{4}, Test Dataset/)).toBeInTheDocument();
+    expect(
+      screen.getByText("Suggested Citation not available")
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Usage Constraints not available")
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/Any users of IMOS data/)
+    ).not.toBeInTheDocument();
   });
 
   it("prefers IMOS metadata constraints over generic fallback text", () => {
@@ -112,22 +119,19 @@ describe("LicenseStep", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("does not claim an IMOS citation when external metadata is incomplete", () => {
+  it("shows standard unavailable messages for incomplete metadata", () => {
     vi.mocked(useDetailPageContext).mockReturnValue({
       collection: createCollection({ isImosOnly: false }),
     } as ReturnType<typeof useDetailPageContext>);
 
     render(<LicenseStep />);
 
+    expect(screen.getByText("License not available")).toBeInTheDocument();
     expect(
-      screen.getByText(
-        "No licence information is provided in this dataset's metadata."
-      )
+      screen.getByText("Usage Constraints not available")
     ).toBeInTheDocument();
     expect(
-      screen.getByText(
-        "No usage constraints are provided in this dataset's metadata."
-      )
+      screen.getByText("Suggested Citation not available")
     ).toBeInTheDocument();
     expect(screen.queryByText(/IMOS \d{4}/)).not.toBeInTheDocument();
   });
