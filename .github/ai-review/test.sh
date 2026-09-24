@@ -241,10 +241,14 @@ wrapped=$'<review>\n'"$review_text"$'\n</review>'
 jq -n --arg text "$wrapped" '{type:"runFinished",data:{finalText:$text}}' >"$kiro_test/events.jsonl"
 kiro_parse
 check "keeps the full summary and literal tags" test "$(cat "$kiro_test/work/review.md")" = "$review_text"
+narrated=$'I will examine the changes.\n'"$wrapped"$'\nReview complete.'
+jq -n --arg text "$narrated" '{type:"runFinished",data:{finalText:$text}}' >"$kiro_test/events.jsonl"
+kiro_parse
+check "removes narration around the review without losing literal tags" test "$(cat "$kiro_test/work/review.md")" = "$review_text"
 jq -n --arg text "$review_text" '{type:"runFinished",data:{finalText:$text}}' >"$kiro_test/events.jsonl"
 kiro_parse
 check "keeps unwrapped output unchanged" test "$(cat "$kiro_test/work/review.md")" = "$review_text"
-jq -n --arg text "$wrapped" '{data:{update:{sessionUpdate:"agent_message_chunk",content:{text:$text}}}}' >"$kiro_test/events.jsonl"
+jq -n --arg text "$narrated" '{data:{update:{sessionUpdate:"agent_message_chunk",content:{text:$text}}}}' >"$kiro_test/events.jsonl"
 kiro_parse
 check "ACP fallback also preserves literal tags" test "$(cat "$kiro_test/work/review.md")" = "$review_text"
 jq -n '{type:"runFinished",data:{finalText:"<review> \n </review>"}}' >"$kiro_test/events.jsonl"

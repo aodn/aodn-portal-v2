@@ -41,8 +41,8 @@ jobs:
       - name: Check out review scripts
         uses: actions/checkout@v5
         with:
-          repository: ${{ job.workflow_repository }}
-          ref: ${{ job.workflow_sha }}
+          repository: ${{ github.repository }}
+          ref: ${{ github.sha }}
           path: .ai-review/tools
           sparse-checkout: .github/ai-review
           persist-credentials: false

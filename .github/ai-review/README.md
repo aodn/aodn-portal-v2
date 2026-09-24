@@ -93,7 +93,10 @@ The published review is whatever the model writes inside `<review>` tags. If
 Kiro's final event disappears, `kiro.sh` falls back to the standard Agent
 Client Protocol message chunks and prints a warning.
 
-## Testing locally
+## Testing
+
+CI runs `test.sh` in `.github/workflows/lint-test.yml` for every PR to `main`
+and every push to `main`. A failing shell test fails the build job.
 
 The diff logic (merge-base diff, base-branch guidance, exclusions, truncation)
 and the review outcomes (including the credential check) have tests that need

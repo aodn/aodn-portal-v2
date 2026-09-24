@@ -67,8 +67,8 @@ echo "kiro-cli ${kiro_version}, model ${KIRO_MODEL:-default}" >&2
 (cd "$work/cwd" && kiro-cli "${args[@]}") <"$KIRO_REVIEW_WORK_DIR/prompt.md" >"$work/events.jsonl" 2>"$work/stderr.log" ||
   { tail -n 20 "$work/stderr.log" >&2; exit 1; }
 
-# 5. Read the final response, falling back to ACP chunks. Strip only outer
-#    review tags: literal tags inside findings must remain untouched.
+# 5. Read the final response, falling back to ACP chunks. Extract from the
+#    first opening tag to the last closing tag, preserving tags in findings.
 events="$work/events.jsonl"
 if jq -se 'any(.[]; .type == "runError")' "$events" >/dev/null; then
   jq -r 'select(.type == "runError") | .data.message' "$events" >&2
@@ -79,8 +79,11 @@ jq -se 'any(.[]; .type == "runFinished")' "$events" >/dev/null ||
 jq -rs '
   ((map(select(.type == "runFinished")) | last | .data.finalText)
    // (map(select(.data.update.sessionUpdate? == "agent_message_chunk") | .data.update.content.text) | join("")))
-  | sub("^\\s*<review>\\s*"; "")
-  | sub("\\s*</review>\\s*$"; "")' \
+  | index("<review>") as $start
+  | rindex("</review>") as $end
+  | if $start != null and $end != null and $end >= ($start + 8) then
+      .[$start + 8:$end] | sub("^\\s*"; "") | sub("\\s*$"; "")
+    else . end' \
   "$events" >"$KIRO_REVIEW_WORK_DIR/review.md"
 grep -q '[^[:space:]]' "$KIRO_REVIEW_WORK_DIR/review.md" || { echo "Empty review" >&2; exit 1; }
 
