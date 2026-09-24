@@ -17,7 +17,6 @@ interface WmsLegendProps {
 }
 
 // TODO: short-term solution — replace with the final design once it is scheduled
-const HORIZONTAL_PADDING = "8px";
 const COLLAPSED_BAR_HEIGHT = "38px";
 const EXPANDED_MAX_HEIGHT = "320px";
 const COLLAPSE_BUTTON_RIGHT = "3px";
@@ -39,7 +38,6 @@ const CollapsedLegendBar: FC<{ onExpand: () => void }> = ({ onExpand }) => {
         width: "100%",
         justifyContent: "space-between",
         height: COLLAPSED_BAR_HEIGHT,
-        px: HORIZONTAL_PADDING,
       }}
     >
       <Typography variant="body1Medium" color={theme.palette.text1}>
@@ -86,7 +84,6 @@ const ExpandedLegendPanel: FC<
             display: "flex",
             alignItems: "center",
             height: COLLAPSED_BAR_HEIGHT,
-            px: HORIZONTAL_PADDING,
           }}
         >
           No legend available for this layer
@@ -97,7 +94,6 @@ const ExpandedLegendPanel: FC<
             maxHeight: EXPANDED_MAX_HEIGHT,
             overflow: "auto",
             py: "8px",
-            px: HORIZONTAL_PADDING,
           }}
         >
           <img
