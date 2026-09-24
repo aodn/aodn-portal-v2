@@ -79,10 +79,10 @@ jq -se 'any(.[]; .type == "runFinished")' "$events" >/dev/null ||
 jq -rs '
   ((map(select(.type == "runFinished")) | last | .data.finalText)
    // (map(select(.data.update.sessionUpdate? == "agent_message_chunk") | .data.update.content.text) | join("")))
-  | index("<review>") as $start
-  | rindex("</review>") as $end
-  | if $start != null and $end != null and $end >= ($start + 8) then
-      .[$start + 8:$end] | sub("^\\s*"; "") | sub("\\s*$"; "")
+  # Capture text directly: index/rindex byte offsets cannot safely slice Unicode.
+  | ([capture("<review>(?<review>[\\s\\S]*)</review>")] | first) as $match
+  | if $match != null then
+      $match.review | sub("^\\s*"; "") | sub("\\s*$"; "")
     else . end' \
   "$events" >"$KIRO_REVIEW_WORK_DIR/review.md"
 grep -q '[^[:space:]]' "$KIRO_REVIEW_WORK_DIR/review.md" || { echo "Empty review" >&2; exit 1; }

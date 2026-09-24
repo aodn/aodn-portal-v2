@@ -236,15 +236,15 @@ kiro_parse() {
     KIRO_TEST_EVENTS="$kiro_test/events.jsonl" KIRO_REVIEW_WORK_DIR="$work" \
     KIRO_REVIEW_REPO_DIR="$kiro_test/repo" "$here/kiro.sh" >"$kiro_test/log" 2>&1
 }
-review_text=$'### Summary\nImportant summary.\n### Findings\nThe parser treats `</review>` and `<review>` in code as boundaries.\n### Tests\nAdd coverage.'
+review_text=$'### Summary\n🤖 审查摘要 — Important summary.\n### Findings\nThe parser treats `</review>` and `<review>` in code as boundaries.\n### Tests\nAdd coverage.'
 wrapped=$'<review>\n'"$review_text"$'\n</review>'
 jq -n --arg text "$wrapped" '{type:"runFinished",data:{finalText:$text}}' >"$kiro_test/events.jsonl"
 kiro_parse
 check "keeps the full summary and literal tags" test "$(cat "$kiro_test/work/review.md")" = "$review_text"
-narrated=$'I will examine the changes.\n'"$wrapped"$'\nReview complete.'
+narrated=$'🤖 我会检查代码 — I will examine the changes.\n'"$wrapped"$'\nReview complete.'
 jq -n --arg text "$narrated" '{type:"runFinished",data:{finalText:$text}}' >"$kiro_test/events.jsonl"
 kiro_parse
-check "removes narration around the review without losing literal tags" test "$(cat "$kiro_test/work/review.md")" = "$review_text"
+check "removes Unicode narration without losing the summary or literal tags" test "$(cat "$kiro_test/work/review.md")" = "$review_text"
 jq -n --arg text "$review_text" '{type:"runFinished",data:{finalText:$text}}' >"$kiro_test/events.jsonl"
 kiro_parse
 check "keeps unwrapped output unchanged" test "$(cat "$kiro_test/work/review.md")" = "$review_text"
