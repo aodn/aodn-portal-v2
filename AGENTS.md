@@ -115,6 +115,7 @@ Page layout: `<Page>.tsx` composes; `layout/` = where things render;
 
 ## Testing and validation
 
+- AI review scripts: `.github/ai-review/test.sh` runs in `lint-test.yml` on PRs/pushes to `main`, using mocks without AI credits.
 - Unit tests: Vitest + jsdom + Testing Library, in a `__test__/` folder next to
   the code.
 - Mock HTTP with MSW, not by mocking axios. Handlers are in
