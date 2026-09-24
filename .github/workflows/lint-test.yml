@@ -1,4 +1,4 @@
-name: lint and test
+name: Lint, Test and Build
 
 on:
   push:
@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  lint-test-build:
     runs-on: ubuntu-latest
 
     strategy:
@@ -24,6 +24,8 @@ jobs:
         run: corepack enable
 
       - uses: actions/checkout@v5
+      - name: Test AI code review scripts
+        run: bash .github/ai-review/test.sh
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v5
         with:
