@@ -54,6 +54,8 @@ const WARNING_TEST_ID = "download-size-warning";
 const DOWNLOAD_BUTTON_TEST_ID = "download-button";
 const SUBSETTING_INFO_TEXT =
   "To download data directly please use the selections below, or utilise the map tools to make your selection.";
+const EXTERNAL_SERVICE_WARNING =
+  "This download uses external services that are not managed by IMOS. Download speed, formats and availability depend on the external providers.";
 
 // Assertions target data-warning-level rather than the message copy, which is a
 // first-pass wording still to be reviewed by the designer
@@ -393,6 +395,17 @@ describe("DownloadCloudOptimisedCard", () => {
       );
 
       expect(await screen.findByText(SUBSETTING_INFO_TEXT)).toBeInTheDocument();
+    });
+
+    it("should not describe an external dataset as an external download service", async () => {
+      estimateState.estimatedSizeBytes = 1024;
+
+      renderComponent();
+
+      expect(await screen.findByText(SUBSETTING_INFO_TEXT)).toBeInTheDocument();
+      expect(
+        screen.queryByText(EXTERNAL_SERVICE_WARNING)
+      ).not.toBeInTheDocument();
     });
 
     it("should open the download dialog when the estimate is not blocking", async () => {
