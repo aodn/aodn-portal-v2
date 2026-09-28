@@ -24,13 +24,19 @@ untrusted-content rules and output format around them.
   cancels the in-flight review.
 - **No credential** (Dependabot, or secret not set): a "skipped" comment.
   Maintainers can run it manually from _Actions → AI code review (Kiro) → Run
-  workflow_ with the PR number (fork PRs are still skipped).
+  workflow_ with the PR number. The shared workflow still skips fork PRs on
+  manual runs.
 - Errors or timeouts: a comment links to the run. The check stays green.
 
 ## Configuration
 
 - `KIRO_API_KEY` **secret**: a Kiro API key (needs Kiro Pro or higher).
 - `KIRO_MODEL` **variable** (optional): model id. Unset uses the account default.
+- **Version**: the caller uses the floating `ai-code-review-v1` tag, so each
+  compatible release of the shared workflow is picked up automatically. That
+  includes changes to its fork and credential handling, which this repository
+  relies on. The shared workflow is maintained in the same AODN organisation
+  as this repository, so we trust its releases.
 
 **Pilot credential:** the trial may use a personal key. Temporary owner:
 _<name, date>_. Replace it with the team key once Kiro/AWS confirm the
