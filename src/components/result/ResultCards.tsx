@@ -291,11 +291,22 @@ const ResultCards: FC<ResultCardsProps> = ({
       ([entry]) => {
         if (entry.isIntersecting) loadMoreResults();
       },
-      { root: scrollRootRef?.current, rootMargin: "200px 0px" }
+      {
+        root: isUnderLaptop ? null : scrollRootRef?.current,
+        rootMargin: "200px 0px",
+      }
     );
     observer.observe(loadMoreNode);
     return () => observer.disconnect();
-  }, [count, total, layout, loadMoreResults, loadMoreNode, scrollRootRef]);
+  }, [
+    count,
+    total,
+    layout,
+    loadMoreResults,
+    loadMoreNode,
+    scrollRootRef,
+    isUnderLaptop,
+  ]);
 
   if (!contents) return;
 
