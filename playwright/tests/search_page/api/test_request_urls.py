@@ -89,6 +89,7 @@ def test_search_api_request_urls_across_page(
     search_page.validate_search_parameters_in_url(
         api_url_collection, expected_filters
     )
+    assert api_url_centroid is not None
     search_page.validate_search_parameters_in_url(
         api_url_centroid, expected_filters
     )
@@ -115,6 +116,7 @@ def test_search_api_request_urls_across_page(
     search_page.validate_search_parameters_in_url(
         api_url_collection, expected_filters_reset
     )
+    assert api_url_centroid is not None
     search_page.validate_search_parameters_in_url(
         api_url_centroid, expected_filters_reset
     )
@@ -163,7 +165,9 @@ def test_search_api_request_urls_after_map_state_change(
     """
     landing_page = LandingPage(responsive_page)
     search_page = SearchPage(responsive_page)
-    expect_centroid = responsive_page.viewport_size['width'] >= 1024
+    viewport = responsive_page.viewport_size
+    assert viewport is not None
+    expect_centroid = viewport['width'] >= 1024
 
     landing_page.load()
 
@@ -265,6 +269,7 @@ def test_search_api_request_urls_after_map_state_change(
     search_page.validate_search_parameters_in_url(
         api_url_collection, expected_filters_reset
     )
+    assert api_url_centroid is not None
     search_page.validate_search_parameters_in_url(
         api_url_centroid, expected_filters_reset
     )
@@ -319,7 +324,9 @@ def test_search_api_request_urls_reflect_parameter_updates(
     """
     landing_page = LandingPage(responsive_page)
     search_page = SearchPage(responsive_page)
-    expect_centroid = responsive_page.viewport_size['width'] >= 1024
+    viewport = responsive_page.viewport_size
+    assert viewport is not None
+    expect_centroid = viewport['width'] >= 1024
 
     landing_page.load()
 

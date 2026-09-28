@@ -204,16 +204,13 @@ class BasePage:
 
             collections_request = collections_request_info.value
             if not expect_centroid:
-                assert not centroid_requests, (
-                    'List-only search unexpectedly requested map centroids'
-                )
+                assert not centroid_requests, 'Unexpected centroid request'
 
-            return (
-                unquote_plus(collections_request.url),
-                unquote_plus(centroid_request_info.value.url)
-                if expect_centroid
-                else None,
-            )
+            centroid_url: str | None = None
+            if expect_centroid:
+                centroid_url = unquote_plus(centroid_request_info.value.url)
+
+            return (unquote_plus(collections_request.url), centroid_url)
         except TimeoutError:
             pytest.fail(
                 'API URL not found within the timeout, search did not trigger successfully.'
