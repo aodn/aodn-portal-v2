@@ -58,6 +58,10 @@ vi.mock("../../../components/map/mapbox/Map", () => {
   };
 });
 
+vi.mock("@/analytics/searchParamsEvent", () => ({
+  trackSearchResultParameters: vi.fn(),
+}));
+
 const renderSearchPage = () =>
   render(
     <Provider store={store}>
