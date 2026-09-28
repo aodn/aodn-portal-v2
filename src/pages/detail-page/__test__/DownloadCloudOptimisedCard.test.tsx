@@ -56,6 +56,8 @@ const SUBSETTING_INFO_TEXT =
   "To download data directly please use the selections below, or utilise the map tools to make your selection.";
 const EXTERNAL_SERVICE_WARNING =
   "This download uses external services that are not managed by IMOS. Download speed, formats and availability depend on the external providers.";
+const INTEGRATED_SOURCE_WARNING =
+  "This dataset is hosted by an external provider. Whilst IMOS manages the download service, data access and availability may be affected by the external provider's systems";
 
 // Assertions target data-warning-level rather than the message copy, which is a
 // first-pass wording still to be reviewed by the designer
@@ -124,7 +126,8 @@ describe("DownloadCloudOptimisedCard", () => {
     downloadConditions: any[] = [],
     selectedCoKey?: string,
     setSelectedCoKey = mockSetSelectedCoKey,
-    isImosOnly?: boolean
+    isImosOnly?: boolean,
+    isIntegrated?: boolean
   ) => {
     return render(
       <Provider store={store}>
@@ -139,6 +142,7 @@ describe("DownloadCloudOptimisedCard", () => {
                 selectedCoKey={selectedCoKey}
                 setSelectedCoKey={setSelectedCoKey}
                 isImosOnly={isImosOnly}
+                isIntegrated={isIntegrated}
               />
             </AppLocalizationProvider>
           </ThemeProvider>
@@ -374,13 +378,20 @@ describe("DownloadCloudOptimisedCard", () => {
       expect(screen.getByTestId(DOWNLOAD_BUTTON_TEST_ID)).toBeEnabled();
     });
 
-    it("should hide the subsetting info message while a size warning is showing", async () => {
+    it("should show the integrated provider message alongside a size warning", async () => {
       estimateState.estimatedSizeBytes = LARGE_DOWNLOAD_BYTES;
 
-      renderComponent();
+      renderComponent(
+        createMockCollection(DatasetType.ZARR),
+        [],
+        undefined,
+        mockSetSelectedCoKey,
+        false,
+        true
+      );
 
       await waitFor(() => expectWarningLevel(DownloadSizeWarningLevel.LARGE));
-      expect(screen.queryByText(SUBSETTING_INFO_TEXT)).not.toBeInTheDocument();
+      expect(screen.getByText(INTEGRATED_SOURCE_WARNING)).toBeInTheDocument();
     });
 
     it("should keep the subsetting info message when there is no size warning", async () => {
@@ -397,12 +408,21 @@ describe("DownloadCloudOptimisedCard", () => {
       expect(await screen.findByText(SUBSETTING_INFO_TEXT)).toBeInTheDocument();
     });
 
-    it("should not describe an external dataset as an external download service", async () => {
+    it("should show the integrated provider message instead of the generic external-service warning", async () => {
       estimateState.estimatedSizeBytes = 1024;
 
-      renderComponent();
+      renderComponent(
+        createMockCollection(DatasetType.ZARR),
+        [],
+        undefined,
+        mockSetSelectedCoKey,
+        false,
+        true
+      );
 
-      expect(await screen.findByText(SUBSETTING_INFO_TEXT)).toBeInTheDocument();
+      expect(
+        await screen.findByText(INTEGRATED_SOURCE_WARNING)
+      ).toBeInTheDocument();
       expect(
         screen.queryByText(EXTERNAL_SERVICE_WARNING)
       ).not.toBeInTheDocument();

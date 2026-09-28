@@ -1,9 +1,9 @@
 from pathlib import Path
 from typing import Any, Callable, Tuple
-from urllib.parse import unquote_plus
+from urllib.parse import parse_qs, unquote_plus, urlsplit
 
 import pytest
-from playwright.sync_api import Locator, Page, TimeoutError
+from playwright.sync_api import Locator, Page, Request, TimeoutError
 
 from mocks.routes import Routes
 from pages.js_scripts.js_utils import (
@@ -164,8 +164,8 @@ class BasePage:
             pass
 
     def perform_action_and_get_api_url(
-        self, action: Callable[[], None]
-    ) -> Tuple[str, str]:
+        self, action: Callable[[], None], expect_centroid: bool = True
+    ) -> Tuple[str, str | None]:
         """
         Perform an action (e.g., click search, zoom/drag map) and return the API URLs
         used for the request.
@@ -174,31 +174,50 @@ class BasePage:
             action: A callable function that performs the desired action
 
         Returns:
-            Tuple containing the collections URL and centroid URL
+            Tuple containing the collections URL and, when the map is shown,
+            the centroid URL
         """
+        centroid_requests: list[str] = []
+
+        def record_centroid_request(request: Request) -> None:
+            if parse_qs(urlsplit(request.url).query).get('properties') == [
+                'id,centroid'
+            ]:
+                centroid_requests.append(request.url)
+
+        if not expect_centroid:
+            self.page.on('request', record_centroid_request)
+
         try:
-            with (
-                self.page.expect_request(
-                    Routes.COLLECTION_ALL
-                ) as collections_request_info,
-                self.page.expect_request(
-                    Routes.COLLECTION_CENTROID
-                ) as centroid_request_info,
-            ):
-                action()  # Execute the passed function
-                self.wait_for_url_update()
+            with self.page.expect_request(
+                Routes.COLLECTION_ALL
+            ) as collections_request_info:
+                if expect_centroid:
+                    with self.page.expect_request(
+                        Routes.COLLECTION_CENTROID
+                    ) as centroid_request_info:
+                        action()
+                        self.wait_for_url_update()
+                else:
+                    action()
+                    self.wait_for_url_update()
 
             collections_request = collections_request_info.value
-            centroid_request = centroid_request_info.value
+            if not expect_centroid:
+                assert not centroid_requests, 'Unexpected centroid request'
 
-            return (
-                unquote_plus(collections_request.url),
-                unquote_plus(centroid_request.url),
-            )
+            centroid_url: str | None = None
+            if expect_centroid:
+                centroid_url = unquote_plus(centroid_request_info.value.url)
+
+            return (unquote_plus(collections_request.url), centroid_url)
         except TimeoutError:
             pytest.fail(
                 'API URL not found within the timeout, search did not trigger successfully.'
             )
+        finally:
+            if not expect_centroid:
+                self.page.remove_listener('request', record_centroid_request)
 
     def download_file(
         self,
