@@ -90,11 +90,9 @@ def test_search_result_sort(
 
     search_page.result_sort_button.click()
     search_page.click_menu_item(sort_type.test_id)
-    search_page.wait_for_timeout(1000)  # Wait for the results to update
-
-    updated_first_title = search_page.first_result_title.inner_text()
-
-    assert initial_first_title != updated_first_title
+    expect(search_page.first_result_title).not_to_have_text(
+        initial_first_title, timeout=10000
+    )
 
 
 @pytest.mark.parametrize(
