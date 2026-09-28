@@ -98,7 +98,7 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
         <InfoMessage
           infoText={infoText}
           iconColor={iconColor}
-          sx={{ pl: "8px", pr: "16px" }}
+          sx={{ pl: "16px", pr: "16px" }}
         />
       )}
 

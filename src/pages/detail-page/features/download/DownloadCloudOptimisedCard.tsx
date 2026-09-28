@@ -21,10 +21,7 @@ import {
 import DownloadButton from "../../../../components/common/buttons/DownloadButton";
 import DownloadSubsetting from "./DownloadSubsetting";
 import DownloadSelect from "./DownloadSelect";
-import DownloadSizeWarning, {
-  hasDownloadSizeWarning,
-  isDownloadBlocked,
-} from "./DownloadSizeWarning";
+import DownloadSizeWarning, { isDownloadBlocked } from "./DownloadSizeWarning";
 import useEstimateSize from "../../../../hooks/useEstimateSize";
 import { processCoEstimateSize } from "@/app/store/searchReducer";
 import DownloadSourceChip from "./DownloadSourceChip";
@@ -74,7 +71,6 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
     estimateFailed,
   };
 
-  const showSizeWarning = hasDownloadSizeWarning(estimateState);
   const downloadBlocked = isDownloadBlocked(estimateState);
 
   // add datasetselection option
@@ -272,7 +268,8 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
         downloadConditions={downloadConditions}
         getAndSetDownloadConditions={getAndSetDownloadConditions}
         removeDownloadCondition={removeDownloadCondition}
-        hideInfoMessage={showSizeWarning}
+        isExternal={!isImosOnly && !isIntegrated}
+        isIntegrated={isIntegrated}
       />
       <DownloadDialog
         isOpen={downloadDialogOpen}

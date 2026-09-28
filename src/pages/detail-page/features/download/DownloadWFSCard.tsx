@@ -20,10 +20,7 @@ import InfoMessage from "./InfoMessage";
 import DownloadButton from "@/components/common/buttons/DownloadButton";
 import DownloadSubsetting from "./DownloadSubsetting";
 import DownloadSelect from "./DownloadSelect";
-import DownloadSizeWarning, {
-  hasDownloadSizeWarning,
-  isDownloadBlocked,
-} from "./DownloadSizeWarning";
+import DownloadSizeWarning, { isDownloadBlocked } from "./DownloadSizeWarning";
 import { trackCustomEvent } from "@/analytics/customEventTracker";
 import { AnalyticsEvent } from "@/analytics/analyticsEvents";
 import {
@@ -121,7 +118,6 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
     estimateFailed,
   };
 
-  const showSizeWarning = hasDownloadSizeWarning(estimateState);
   const downloadBlocked = isDownloadBlocked(estimateState);
   const dispatch = useAppDispatch();
   const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
@@ -339,7 +335,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
         downloadConditions={downloadConditions}
         getAndSetDownloadConditions={getAndSetDownloadConditions}
         removeDownloadCondition={removeDownloadCondition}
-        hideInfoMessage={isDownloading || showSizeWarning}
+        hideInfoMessage={isDownloading}
         disable={isDownloading}
         isExternal={!isImosOnly && !isIntegrated}
         isIntegrated={isIntegrated}
