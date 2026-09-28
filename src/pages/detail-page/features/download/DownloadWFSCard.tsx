@@ -38,8 +38,8 @@ import {
 } from "@/app/store/searchReducer";
 import AdminScreenContext from "@/components/admin/AdminScreenContext";
 import { formatBytes } from "@/utils/Helpers";
-import LabelChip from "@/components/common/label/LabelChip";
 import { buildDownloadFileName } from "@/utils/DownloadFileNameUtils";
+import DownloadSourceChip from "./DownloadSourceChip";
 
 // Currently only CSV is supported for WFS downloading
 // TODO:the format options will be fetched from the backend in the future
@@ -53,6 +53,7 @@ interface DownloadWFSCardProps extends DownloadCondition {
   collectionTitle?: string;
   onWFSAvailabilityChange?: (isWFSAvailable: boolean) => void;
   isImosOnly?: boolean;
+  isIntegrated?: boolean;
 }
 
 const formWfsDataOptions = (
@@ -95,6 +96,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
   removeDownloadCondition,
   onWFSAvailabilityChange,
   isImosOnly,
+  isIntegrated,
 }) => {
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const {
@@ -297,25 +299,10 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
         <DownloadSelect
           label="Data Selection"
           labelAdornment={
-            isImosOnly ? (
-              <LabelChip
-                text={["IMOS"]}
-                color={portalTheme.palette.tag3}
-                sx={{
-                  padding: "2px 8px",
-                  ...portalTheme.typography.body3Small,
-                }}
-              />
-            ) : (
-              <LabelChip
-                text={["External"]}
-                color={portalTheme.palette.warning.light}
-                sx={{
-                  padding: "2px 8px",
-                  ...portalTheme.typography.body3Small,
-                }}
-              />
-            )
+            <DownloadSourceChip
+              isImosOnly={isImosOnly}
+              isIntegrated={isIntegrated}
+            />
           }
           disabled={isDownloading}
           items={dataSelectOptions}
@@ -354,7 +341,8 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
         removeDownloadCondition={removeDownloadCondition}
         hideInfoMessage={isDownloading || showSizeWarning}
         disable={isDownloading}
-        isExternal={!isImosOnly}
+        isExternal={!isImosOnly && !isIntegrated}
+        isIntegrated={isIntegrated}
         sx={{ px: "16px" }}
       />
       <Snackbar

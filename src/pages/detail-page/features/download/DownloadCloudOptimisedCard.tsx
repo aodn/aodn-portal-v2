@@ -27,8 +27,7 @@ import DownloadSizeWarning, {
 } from "./DownloadSizeWarning";
 import useEstimateSize from "../../../../hooks/useEstimateSize";
 import { processCoEstimateSize } from "@/app/store/searchReducer";
-import LabelChip from "@/components/common/label/LabelChip";
-import { portalTheme } from "../../../../styles";
+import DownloadSourceChip from "./DownloadSourceChip";
 
 const downloadFormats = [
   { label: "NetCDFs", value: "netcdf" },
@@ -47,6 +46,7 @@ interface DownloadCardProps extends DownloadCondition {
   selectedCoKey?: string;
   setSelectedCoKey?: (value: string) => void;
   isImosOnly?: boolean;
+  isIntegrated?: boolean;
 }
 
 const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
@@ -57,6 +57,7 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
   selectedCoKey,
   setSelectedCoKey,
   isImosOnly,
+  isIntegrated,
 }) => {
   const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
   const {
@@ -239,25 +240,10 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
         <DownloadSelect
           label="Data Selection"
           labelAdornment={
-            isImosOnly ? (
-              <LabelChip
-                text={["IMOS"]}
-                color={portalTheme.palette.tag3}
-                sx={{
-                  padding: "2px 8px",
-                  ...portalTheme.typography.body3Small,
-                }}
-              />
-            ) : (
-              <LabelChip
-                text={["External"]}
-                color={portalTheme.palette.warning.light}
-                sx={{
-                  padding: "2px 8px",
-                  ...portalTheme.typography.body3Small,
-                }}
-              />
-            )
+            <DownloadSourceChip
+              isImosOnly={isImosOnly}
+              isIntegrated={isIntegrated}
+            />
           }
           items={dataSelectOptions}
           value={selectedDataItem}
