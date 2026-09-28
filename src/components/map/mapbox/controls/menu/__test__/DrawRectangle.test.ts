@@ -9,7 +9,10 @@ describe("DrawRectangle custom MapboxDraw mode", () => {
       clearSelectedFeatures: vi.fn(),
       updateUIClasses: vi.fn(),
       setActionableState: vi.fn(),
-      map: { doubleClickZoom: { disable: vi.fn(), enable: vi.fn() } },
+      map: {
+        doubleClickZoom: { disable: vi.fn(), enable: vi.fn() },
+        dragPan: { disable: vi.fn(), enable: vi.fn() },
+      },
     };
 
     const state = DrawRectangle.onSetup.call(mockCtx, {});
@@ -23,6 +26,39 @@ describe("DrawRectangle custom MapboxDraw mode", () => {
       },
     });
     expect(mockCtx.addFeature).toHaveBeenCalled();
+    expect(mockCtx.map.dragPan.disable).toHaveBeenCalled();
+  });
+
+  it("should keep rectangle drawn with press, drag and release", () => {
+    const mockRectangle = { id: "rect1", setCoordinates: vi.fn() };
+    const mockCtx = {
+      onMouseMove: DrawRectangle.onMouseMove,
+      onClick: DrawRectangle.onClick,
+      updateUIClasses: vi.fn(),
+      deleteFeature: vi.fn(),
+      changeMode: vi.fn(),
+    };
+    const state = { rectangle: mockRectangle };
+
+    DrawRectangle.onMouseDown.call(mockCtx, state, {
+      lngLat: { lng: 140, lat: -35 },
+    });
+    DrawRectangle.onDrag.call(mockCtx, state, {
+      lngLat: { lng: 145, lat: -30 },
+    });
+    DrawRectangle.onMouseUp.call(mockCtx, state, {
+      lngLat: { lng: 145, lat: -30 },
+    });
+
+    expect(mockRectangle.setCoordinates).toHaveBeenLastCalledWith([
+      [
+        [140, -35],
+        [145, -35],
+        [145, -30],
+        [140, -30],
+      ],
+    ]);
+    expect(mockCtx.deleteFeature).not.toHaveBeenCalled();
   });
 
   it("should set 4-corner ring once onMouseMove (no closing vertex)", () => {
@@ -91,6 +127,7 @@ describe("DrawRectangle custom MapboxDraw mode", () => {
     const mockMap = {
       fire: vi.fn(),
       doubleClickZoom: { enable: vi.fn() },
+      dragPan: { enable: vi.fn() },
     };
     const mockRectangle = {
       id: "rect1",
@@ -134,6 +171,7 @@ describe("DrawRectangle custom MapboxDraw mode", () => {
     DrawRectangle.onStop.call(mockCtx, state);
 
     expect(mockRectangle.removeCoordinate).not.toHaveBeenCalled();
+    expect(mockMap.dragPan.enable).toHaveBeenCalled();
     expect(mockMap.fire).toHaveBeenCalledWith(
       "draw.create",
       expect.objectContaining({

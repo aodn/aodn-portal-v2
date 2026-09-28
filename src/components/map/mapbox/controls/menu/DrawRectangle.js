@@ -46,6 +46,8 @@ const DrawRectangle = {
     this.addFeature(rectangle);
     this.clearSelectedFeatures();
     doubleClickZoom.disable(this);
+    // Press-and-drag draws the box, so the map must not pan while dragging
+    this.map.dragPan.disable();
     this.updateUIClasses({ mouse: "add" });
     this.setActionableState({
       trash: true,
@@ -53,6 +55,22 @@ const DrawRectangle = {
     return {
       rectangle,
     };
+  },
+  // Press sets the first corner, drag resizes, release sets the opposite corner
+  onMouseDown: function (state, e) {
+    state.startPoint = [e.lngLat.lng, e.lngLat.lat];
+  },
+  onDrag: function (state, e) {
+    this.onMouseMove(state, e);
+  },
+  onMouseUp: function (state, e) {
+    this.onClick(state, e);
+  },
+  onTouchStart: function (state, e) {
+    this.onMouseDown(state, e);
+  },
+  onTouchEnd: function (state, e) {
+    this.onMouseUp(state, e);
   },
   // support mobile taps
   onTap: function (state, e) {
@@ -126,6 +144,7 @@ const DrawRectangle = {
   },
   onStop: function (state) {
     doubleClickZoom.enable(this);
+    this.map.dragPan.enable();
     this.updateUIClasses({ mouse: "none" });
     this.activateUIButton();
 
