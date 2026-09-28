@@ -17,6 +17,8 @@ import { mergeWithDefaults } from "@/utils/ObjectUtils";
 import { generateFeatureCollectionFrom } from "@/utils/GeoJsonUtils";
 import CardPopup from "../component/CardPopup";
 import { addDataLayer } from "../layerOrder";
+import theme from "@/styles/themeRC8";
+import { cssFontFamilyToMapboxTextFont } from "@/utils/MapUtils";
 
 interface ClusterSize {
   default?: number | string;
@@ -73,8 +75,8 @@ const defaultClusterLayerConfig: ClusterLayerConfig = {
   clusterCircleOpacity: 0.8,
   clusterCircleStrokeWidth: 1,
   clusterCircleStrokeColor: "#fff",
-  clusterCircleTextSize: 12,
-  unclusterPointColor: "#51bbd6",
+  clusterCircleTextSize: parseFloat(String(theme.typography.heading4.fontSize)),
+  unclusterPointColor: "#56B4E9",
   unclusterPointOpacity: 1,
   unclusterPointStrokeWidth: 1,
   unclusterPointStrokeColor: "#fff",
@@ -187,7 +189,9 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
           filter: ["has", "point_count"],
           layout: {
             "text-field": ["concat", ["get", "point_count_abbreviated"], " +"],
-            "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+            "text-font": cssFontFamilyToMapboxTextFont(
+              theme.typography.fontFamily
+            ),
             "text-size": config.clusterCircleTextSize,
           },
         });
