@@ -272,15 +272,20 @@ const SearchPage = () => {
       }
       // The return implicit contains a AbortController due to use of signal in
       // axios call
-      listSearchAbortRef.current = fetchRecord(true);
+      const listSearch = fetchRecord(true);
+      listSearchAbortRef.current = listSearch;
       if (showMapRef.current) {
         doMapSearch(needNavigate).finally(() => {});
       } else if (needNavigate) {
-        debounceHistoryUpdateRef.current?.(
-          pageDefault.search +
-            "?" +
-            formatToUrlParam(getComponentState(store.getState()))
-        );
+        listSearch.then(() => {
+          if (listSearchAbortRef.current === listSearch) {
+            debounceHistoryUpdateRef.current?.(
+              pageDefault.search +
+                "?" +
+                formatToUrlParam(getComponentState(store.getState()))
+            );
+          }
+        });
       }
     },
     [doMapSearch, fetchRecord]
