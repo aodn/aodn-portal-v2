@@ -1,11 +1,13 @@
 name: AI code review (Kiro)
 
+# Advisory AI review from the shared aodn/common-workflow workflow. This repo
+# owns the triggers, skip rules, engine choice and credential, and the review
+# direction in .github/ai-code-review/prompt.md and instructions.md.
 on:
   pull_request:
     branches: ["main"]
     types: [opened, synchronize, reopened, ready_for_review]
-  # Manual run, e.g. to review a fork PR (forks never receive secrets on
-  # pull_request) or to re-run after the credential is added.
+  # Manual run, e.g. to re-run after the credential is added.
   workflow_dispatch:
     inputs:
       pr-number:
@@ -23,69 +25,24 @@ concurrency:
 jobs:
   review:
     name: Code Review
-    # Skip drafts, and PRs labelled skip-ai-review, to save credits.
+    # Skip fork PRs (the review config comes from the PR head, so it must be
+    # trusted), drafts, and PRs labelled skip-ai-review, to save credits.
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      (!github.event.pull_request.draft &&
+      (github.event.pull_request.head.repo.full_name == github.repository &&
+       !github.event.pull_request.draft &&
        !contains(github.event.pull_request.labels.*.name, 'skip-ai-review'))
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
     permissions:
       contents: read
       pull-requests: write
-    env:
-      TOOLS: ${{ github.workspace }}/.ai-review/tools/.github/ai-review
-      KIRO_REVIEW_REPO_DIR: ${{ github.workspace }}/.ai-review/pr
-
-    steps:
-      - name: Check out review scripts
-        uses: actions/checkout@v5
-        with:
-          repository: ${{ github.repository }}
-          ref: ${{ github.sha }}
-          path: .ai-review/tools
-          sparse-checkout: .github/ai-review
-          persist-credentials: false
-
-      # PR fields are only read from pr.json by scripts, never interpolated
-      # with ${{ }}, so a crafted title or body cannot inject shell.
-      - name: Resolve pull request
-        id: pr
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr-number }}
-          HAS_KEY: ${{ secrets.KIRO_API_KEY != '' }}
-        run: |
-          export KIRO_REVIEW_WORK_DIR="$RUNNER_TEMP/ai-review"
-          echo "KIRO_REVIEW_WORK_DIR=$KIRO_REVIEW_WORK_DIR" >>"$GITHUB_ENV"
-          "$TOOLS/resolve-pr.sh"
-
-      # Credentials are not persisted, so the agent cannot find a token on disk.
-      - name: Check out pull request head
-        if: steps.pr.outputs.has_key == 'true'
-        uses: actions/checkout@v5
-        with:
-          ref: ${{ steps.pr.outputs.head_sha }}
-          path: .ai-review/pr
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Run review
-        id: review
-        if: steps.pr.outputs.has_key == 'true'
-        env:
-          KIRO_API_KEY: ${{ secrets.KIRO_API_KEY }}
-          KIRO_MODEL: ${{ vars.KIRO_MODEL }}
-        run: |
-          "$TOOLS/review.sh"
-
-      - name: Publish review
-        if: ${{ !cancelled() && steps.pr.outputs.head_sha != '' }}
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr-number }}
-          HEAD_SHA: ${{ steps.pr.outputs.head_sha }}
-          CREDITS: ${{ steps.review.outputs.credits }}
-          STATUS: ${{ steps.pr.outputs.has_key != 'true' && 'skipped' || steps.review.outputs.status || 'failed' }}
-        run: |
-          "$TOOLS/publish.sh"
+    # Floating major tag: gets every compatible ai-code-review-v1.x.x release.
+    uses: aodn/common-workflow/.github/workflows/ai-code-review.yaml@ai-code-review-v1
+    with:
+      pr-number: ${{ github.event.pull_request.number || inputs.pr-number }}
+      engine: kiro
+      model: ${{ vars.KIRO_MODEL }}
+      prompt-file: .github/ai-code-review/prompt.md
+      instruction-files: |
+        .github/ai-code-review/instructions.md
+    secrets:
+      ai-code-review-api-key: ${{ secrets.KIRO_API_KEY }}
