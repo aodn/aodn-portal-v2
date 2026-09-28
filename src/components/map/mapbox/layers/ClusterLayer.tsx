@@ -65,12 +65,12 @@ const defaultClusterLayerConfig: ClusterLayerConfig = {
   },
   //cluster circle colors define the colors used for the circles representing clusters of different sizes.
   clusterCircleColor: {
-    default: "#51bbd6",
-    medium: "#f1f075",
-    large: "#f28cb1",
-    extra_large: "#fe8cf1",
+    default: "#00B080",
+    medium: "#F0E442",
+    large: "#E69F00",
+    extra_large: "#D083AE",
   },
-  clusterCircleOpacity: 0.6,
+  clusterCircleOpacity: 0.8,
   clusterCircleStrokeWidth: 1,
   clusterCircleStrokeColor: "#fff",
   clusterCircleTextSize: 12,
