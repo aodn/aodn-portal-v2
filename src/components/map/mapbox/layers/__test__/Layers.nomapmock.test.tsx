@@ -1,7 +1,28 @@
 import { describe, it, expect } from "vitest";
 import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson";
 import { findSuitableVisiblePoint, isFeatureVisible } from "../Layers";
-import { LngLatBounds } from "mapbox-gl";
+import { LngLatBounds, Map as Mapbox } from "mapbox-gl";
+
+const pointFeature = (
+  uuid: string,
+  coordinates: [number, number]
+): Feature<Point> => ({
+  type: "Feature",
+  geometry: { type: "Point", coordinates },
+  properties: { uuid },
+});
+
+// Bounds cover x in [0, 5]. getSouthWest/getNorthEast return LngLats so
+// splitLngLatBounds keeps this object and uses contains.
+const mapWithVisibleRange = (): Mapbox =>
+  ({
+    getBounds: () => ({
+      getSouthWest: () => ({ lng: 0, lat: -10 }),
+      getNorthEast: () => ({ lng: 5, lat: 10 }),
+      contains: (coord: [number, number]) => coord[0] >= 0 && coord[0] <= 5,
+    }),
+    getCenter: () => ({ lng: 0, lat: 0 }),
+  }) as unknown as Mapbox;
 
 // Define the test where we do not need to mock the Map
 describe("Test case where no map mock needed", () => {
@@ -37,5 +58,75 @@ describe("Test case where no map mock needed", () => {
     ]);
     // We set a LngLat where x is < -180 to create anti-meridian
     expect(isFeatureVisible(target, bounds)).toBeTruthy();
+  });
+
+  it("keeps the previous centroid when it is still visible", () => {
+    const closer = pointFeature("abc123", [1, 1]);
+    const farther = pointFeature("abc123", [2, 2]);
+    const previous = pointFeature("abc123", [4, 4]);
+    const other = pointFeature("xyz456", [3, 3]);
+    const featureCollection: FeatureCollection<Point> = {
+      type: "FeatureCollection",
+      features: [closer, farther, other],
+    };
+    const currentVisible: FeatureCollection<Point> = {
+      type: "FeatureCollection",
+      features: [previous],
+    };
+
+    const result = findSuitableVisiblePoint(
+      featureCollection,
+      mapWithVisibleRange(),
+      currentVisible,
+      true
+    );
+
+    expect(result.features).toEqual([previous, other]);
+  });
+
+  it("picks the closest point when the previous centroid is off screen", () => {
+    const closer = pointFeature("abc123", [1, 1]);
+    const farther = pointFeature("abc123", [2, 2]);
+    const previous = pointFeature("abc123", [9, 9]);
+    const featureCollection: FeatureCollection<Point> = {
+      type: "FeatureCollection",
+      features: [farther, closer],
+    };
+    const currentVisible: FeatureCollection<Point> = {
+      type: "FeatureCollection",
+      features: [previous],
+    };
+
+    const result = findSuitableVisiblePoint(
+      featureCollection,
+      mapWithVisibleRange(),
+      currentVisible,
+      true
+    );
+
+    expect(result.features).toEqual([closer]);
+  });
+
+  it("picks the closest point when preferCurrentCentroid is false", () => {
+    const closer = pointFeature("abc123", [1, 1]);
+    const farther = pointFeature("abc123", [2, 2]);
+    const previous = pointFeature("abc123", [4, 4]);
+    const featureCollection: FeatureCollection<Point> = {
+      type: "FeatureCollection",
+      features: [farther, closer],
+    };
+    const currentVisible: FeatureCollection<Point> = {
+      type: "FeatureCollection",
+      features: [previous],
+    };
+
+    const result = findSuitableVisiblePoint(
+      featureCollection,
+      mapWithVisibleRange(),
+      currentVisible,
+      false
+    );
+
+    expect(result.features).toEqual([closer]);
   });
 });
