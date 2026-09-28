@@ -78,7 +78,8 @@ const defaultClusterLayerConfig: ClusterLayerConfig = {
   clusterCircleStrokeColor: "#fff",
   clusterCircleTextSize: parseFloat(String(theme.typography.heading4.fontSize)),
   clusterCircleFontFamily: cssFontFamilyToMapboxTextFont(
-    theme.typography.heading4.fontFamily
+    theme.typography.heading4.fontFamily,
+    { fontWeight: theme.typography.heading4.fontWeight }
   ),
   unclusterPointColor: "#56B4E9",
   unclusterPointOpacity: 1,
