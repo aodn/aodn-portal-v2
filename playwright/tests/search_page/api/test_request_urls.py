@@ -89,6 +89,7 @@ def test_search_api_request_urls_across_page(
     search_page.validate_search_parameters_in_url(
         api_url_collection, expected_filters
     )
+    assert api_url_centroid is not None
     search_page.validate_search_parameters_in_url(
         api_url_centroid, expected_filters
     )
@@ -115,6 +116,7 @@ def test_search_api_request_urls_across_page(
     search_page.validate_search_parameters_in_url(
         api_url_collection, expected_filters_reset
     )
+    assert api_url_centroid is not None
     search_page.validate_search_parameters_in_url(
         api_url_centroid, expected_filters_reset
     )
@@ -163,6 +165,9 @@ def test_search_api_request_urls_after_map_state_change(
     """
     landing_page = LandingPage(responsive_page)
     search_page = SearchPage(responsive_page)
+    viewport = responsive_page.viewport_size
+    assert viewport is not None
+    expect_centroid = viewport['width'] >= 1024
 
     landing_page.load()
 
@@ -194,16 +199,17 @@ def test_search_api_request_urls_after_map_state_change(
             search_page.map.wait_for_map_idle()
 
     api_url_result = landing_page.perform_action_and_get_api_url(
-        action=search_and_wait
+        action=search_and_wait, expect_centroid=expect_centroid
     )
     api_url_collection, api_url_centroid = api_url_result
 
     search_page.validate_search_parameters_in_url(
         api_url_collection, expected_filters
     )
-    search_page.validate_search_parameters_in_url(
-        api_url_centroid, expected_filters
-    )
+    if api_url_centroid:
+        search_page.validate_search_parameters_in_url(
+            api_url_centroid, expected_filters
+        )
 
     # Reset filters
     search_page.search.clear_all_button.click()
@@ -220,16 +226,17 @@ def test_search_api_request_urls_after_map_state_change(
 
     # Perform search again to capture the API URL after reset
     api_url_result = search_page.perform_action_and_get_api_url(
-        action=search_and_wait
+        action=search_and_wait, expect_centroid=expect_centroid
     )
     api_url_collection, api_url_centroid = api_url_result
 
     search_page.validate_search_parameters_in_url(
         api_url_collection, expected_filters_reset
     )
-    search_page.validate_search_parameters_in_url(
-        api_url_centroid, expected_filters_reset
-    )
+    if api_url_centroid:
+        search_page.validate_search_parameters_in_url(
+            api_url_centroid, expected_filters_reset
+        )
 
     # Change map state
     if not search_page.main_map.is_visible():
@@ -262,6 +269,7 @@ def test_search_api_request_urls_after_map_state_change(
     search_page.validate_search_parameters_in_url(
         api_url_collection, expected_filters_reset
     )
+    assert api_url_centroid is not None
     search_page.validate_search_parameters_in_url(
         api_url_centroid, expected_filters_reset
     )
@@ -316,6 +324,9 @@ def test_search_api_request_urls_reflect_parameter_updates(
     """
     landing_page = LandingPage(responsive_page)
     search_page = SearchPage(responsive_page)
+    viewport = responsive_page.viewport_size
+    assert viewport is not None
+    expect_centroid = viewport['width'] >= 1024
 
     landing_page.load()
 
@@ -348,16 +359,17 @@ def test_search_api_request_urls_reflect_parameter_updates(
             search_page.map.wait_for_map_idle()
 
     api_url_result = landing_page.perform_action_and_get_api_url(
-        action=search_and_wait
+        action=search_and_wait, expect_centroid=expect_centroid
     )
     api_url_collection, api_url_centroid = api_url_result
 
     search_page.validate_search_parameters_in_url(
         api_url_collection, expected_filters
     )
-    search_page.validate_search_parameters_in_url(
-        api_url_centroid, expected_filters
-    )
+    if api_url_centroid:
+        search_page.validate_search_parameters_in_url(
+            api_url_centroid, expected_filters
+        )
 
     # Update search state
     search_page.search.clear_all_button.click()  # Reset before update
@@ -385,13 +397,14 @@ def test_search_api_request_urls_reflect_parameter_updates(
 
     # Perform search and capture the API URL
     api_url_result = search_page.perform_action_and_get_api_url(
-        action=search_and_wait
+        action=search_and_wait, expect_centroid=expect_centroid
     )
     api_url_collection, api_url_centroid = api_url_result
 
     search_page.validate_search_parameters_in_url(
         api_url_collection, expected_updated_filters
     )
-    search_page.validate_search_parameters_in_url(
-        api_url_centroid, expected_updated_filters
-    )
+    if api_url_centroid:
+        search_page.validate_search_parameters_in_url(
+            api_url_centroid, expected_updated_filters
+        )

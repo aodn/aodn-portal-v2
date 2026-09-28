@@ -90,11 +90,9 @@ def test_search_result_sort(
 
     search_page.result_sort_button.click()
     search_page.click_menu_item(sort_type.test_id)
-    search_page.wait_for_timeout(1000)  # Wait for the results to update
-
-    updated_first_title = search_page.first_result_title.inner_text()
-
-    assert initial_first_title != updated_first_title
+    expect(search_page.first_result_title).not_to_have_text(
+        initial_first_title, timeout=10000
+    )
 
 
 @pytest.mark.parametrize(
@@ -344,6 +342,7 @@ def test_repeated_search_action(
     search_page.result_view_button.click()
     search_page.click_menu_item(view_type.test_id)
     # search_page.wait_for_page_stabilization()
+    expect_centroid = view_type != SearchViewLayouts.FULL_LIST
 
     def search_and_wait() -> None:
         search_page.search.click_search_button()
@@ -354,22 +353,30 @@ def test_repeated_search_action(
     # Perform first search
     search_page.search.location_button.click()
     search_page.get_by_label(location_a).check()
-    api_url = search_page.perform_action_and_get_api_url(action=search_and_wait)
+    api_url = search_page.perform_action_and_get_api_url(
+        action=search_and_wait, expect_centroid=expect_centroid
+    )
     assert api_url is not None
 
     # Perform repeated searches with different locations
     # Second Search
     search_page.search.location_button.click()
     search_page.get_by_label(location_b).check()
-    api_url = search_page.perform_action_and_get_api_url(action=search_and_wait)
+    api_url = search_page.perform_action_and_get_api_url(
+        action=search_and_wait, expect_centroid=expect_centroid
+    )
     assert api_url is not None
     # Third search
     search_page.search.location_button.click()
     search_page.get_by_label(location_c).check()
-    api_url = search_page.perform_action_and_get_api_url(action=search_and_wait)
+    api_url = search_page.perform_action_and_get_api_url(
+        action=search_and_wait, expect_centroid=expect_centroid
+    )
     assert api_url is not None
     # Fourth search
     search_page.search.location_button.click()
     search_page.get_by_label(location_d).check()
-    api_url = search_page.perform_action_and_get_api_url(action=search_and_wait)
+    api_url = search_page.perform_action_and_get_api_url(
+        action=search_and_wait, expect_centroid=expect_centroid
+    )
     assert api_url is not None
