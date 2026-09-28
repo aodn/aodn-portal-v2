@@ -98,6 +98,11 @@ const SearchPage = () => {
       : requestedLayout;
   const showMap = layout !== SearchResultLayoutEnum.FULL_LIST;
   const [hasShownMap, setHasShownMap] = useState(showMap);
+  const showMapRef = useRef(showMap);
+  const previousShowMapRef = useRef(showMap);
+  useEffect(() => {
+    showMapRef.current = showMap;
+  }, [showMap]);
   const currentSort = useAppSelector((state) => state.paramReducer.sort);
   // Layers contain record with uuid and bbox only
   const [layers, setLayers] = useState<Array<OGCCollection>>([]);
@@ -258,7 +263,15 @@ const SearchPage = () => {
       // The return implicit contains a AbortController due to use of signal in
       // axios call
       listSearchAbortRef.current = fetchRecord(true);
-      doMapSearch(needNavigate).finally(() => {});
+      if (showMapRef.current) {
+        doMapSearch(needNavigate).finally(() => {});
+      } else if (needNavigate) {
+        debounceHistoryUpdateRef.current?.(
+          pageDefault.search +
+            "?" +
+            formatToUrlParam(getComponentState(store.getState()))
+        );
+      }
     },
     [doMapSearch, fetchRecord]
   );
@@ -512,7 +525,7 @@ const SearchPage = () => {
         location.state?.requireSearch === false
       ) {
         if (reduxContents.result.total > 0) {
-          doMapSearch()?.finally(() => {});
+          if (showMapRef.current) doMapSearch()?.finally(() => {});
         } else {
           doListSearch();
         }
@@ -530,6 +543,13 @@ const SearchPage = () => {
     // Must use location.state as the value inside can be the same reference, and hence will not trigger execution
     // the state object will be different each time.
   }, [cancelAllSearch, doListSearch, doMapSearch, location.state]);
+
+  useEffect(() => {
+    if (showMap && !previousShowMapRef.current) {
+      doMapSearch().finally(() => {});
+    }
+    previousShowMapRef.current = showMap;
+  }, [doMapSearch, showMap]);
 
   useEffect(() => {
     const bookmarkSelected = (event: BookmarkEvent) => {
