@@ -461,6 +461,13 @@ export class OGCCollection {
     const group = this.getDatasetGroup();
     return group?.length === 1 && group[0]?.toLowerCase() === SearchKeys.IMOS;
   };
+  isIntegrated = (): boolean => {
+    const group = this.getDatasetGroup();
+    return (
+      group?.some((value) => value.toLowerCase() === SearchKeys.IMOS) ===
+        true && group.some((value) => value.toLowerCase() !== SearchKeys.IMOS)
+    );
+  };
   getMetadataUrl = (): string | undefined =>
     this.links?.filter(
       (link) =>

@@ -33,7 +33,8 @@ vi.mock("@/pages/detail-page/features/download/DownloadSelect", () => ({
 }));
 
 // Stubbed out to keep the card isolated from the subsetting tree, and to expose
-// hideInfoMessage (which the size warning suppresses) as an assertable attribute
+// hideInfoMessage (which only hides the source message during downloads) as an
+// assertable attribute
 vi.mock("@/pages/detail-page/features/download/DownloadSubsetting", () => ({
   default: ({ hideInfoMessage }: any) => (
     <div
@@ -284,7 +285,7 @@ describe("DownloadWFSCard", () => {
     expect(screen.queryByTestId(WARNING_TEST_ID)).not.toBeInTheDocument();
   });
 
-  it("should hide the subsetting info message while a size warning is showing", async () => {
+  it("should keep the source message visible while a size warning is showing", async () => {
     estimateState.estimatedSizeBytes = LARGE_DOWNLOAD_BYTES;
 
     renderComponent();
@@ -292,7 +293,7 @@ describe("DownloadWFSCard", () => {
     await waitFor(() => expectWarningLevel(DownloadSizeWarningLevel.LARGE));
     expect(screen.getByTestId("download-subsetting")).toHaveAttribute(
       "data-hide-info-message",
-      "true"
+      "false"
     );
   });
 

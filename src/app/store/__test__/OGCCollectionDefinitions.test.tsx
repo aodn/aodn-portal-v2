@@ -491,4 +491,23 @@ describe("OGCCollection", () => {
       }
     );
   });
+
+  describe("isIntegrated", () => {
+    it.each([
+      [["imos"], false],
+      [["aims"], false],
+      [["imos", "aims"], true],
+      [["IMOS", "csiro"], true],
+      [[], false],
+      [undefined, false],
+    ])(
+      "treats dataset_group %s as isIntegrated = %s",
+      (datasetGroup, expected) => {
+        const collection = new OGCCollection();
+        collection.properties = { dataset_group: datasetGroup };
+
+        expect(collection.isIntegrated()).toBe(expected);
+      }
+    );
+  });
 });
