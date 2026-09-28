@@ -36,6 +36,7 @@ interface ClusterLayerConfig {
   clusterCircleOpacity: number;
   clusterCircleStrokeWidth: number;
   clusterCircleStrokeColor: string;
+  clusterCircleFontFamily: string[];
   clusterCircleTextSize: number;
   unclusterPointColor: string;
   unclusterPointOpacity: number;
@@ -76,6 +77,9 @@ const defaultClusterLayerConfig: ClusterLayerConfig = {
   clusterCircleStrokeWidth: 1,
   clusterCircleStrokeColor: "#fff",
   clusterCircleTextSize: parseFloat(String(theme.typography.heading4.fontSize)),
+  clusterCircleFontFamily: cssFontFamilyToMapboxTextFont(
+    theme.typography.heading4.fontFamily
+  ),
   unclusterPointColor: "#56B4E9",
   unclusterPointOpacity: 1,
   unclusterPointStrokeWidth: 1,
@@ -189,9 +193,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
           filter: ["has", "point_count"],
           layout: {
             "text-field": ["concat", ["get", "point_count_abbreviated"], " +"],
-            "text-font": cssFontFamilyToMapboxTextFont(
-              theme.typography.fontFamily
-            ),
+            "text-font": config.clusterCircleFontFamily,
             "text-size": config.clusterCircleTextSize,
           },
         });
