@@ -4,6 +4,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 // Tests for CoordInput:
 // - Enter calls onSubmit and stops native form submission
 // - Escape calls onCancel
+// - pasted zero-width spaces are removed from the value
 // - error wires aria-invalid + aria-errormessage for screen readers
 
 import CoordInput from "../features/download/subset-conditions/CoordInput";
@@ -30,6 +31,17 @@ describe("CoordInput", () => {
       fireEvent.keyDown(getInput(), { key: "Escape" });
 
       expect(onCancel).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("paste", () => {
+    it("removes zero-width spaces from the value", () => {
+      const onChange = vi.fn();
+      render(<CoordInput value="" onChange={onChange} />);
+
+      fireEvent.change(getInput(), { target: { value: "-35.66843\u200B" } });
+
+      expect(onChange).toHaveBeenCalledWith("-35.66843");
     });
   });
 

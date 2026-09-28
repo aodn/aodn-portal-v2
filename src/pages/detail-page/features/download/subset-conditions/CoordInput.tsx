@@ -4,6 +4,9 @@ import { portalTheme } from "../../../../../styles";
 
 const SOFT_SHADOW = "1px 1px 4px 0 rgba(0, 0, 0, 0.10)";
 const ERROR_BORDER = `0 0 0 1px ${portalTheme.palette.error.main}`;
+// Invisible character (U+200B) often copied along with pasted numbers.
+// trim() does not remove it, so Number() fails to parse the value.
+const ZERO_WIDTH_SPACE = /\u200B/g;
 
 // Static styles hoisted so the object identity is stable across renders.
 const ROOT_SX = {
@@ -70,7 +73,8 @@ const CoordInput = forwardRef<HTMLInputElement, CoordInputProps>(
     ref
   ) {
     const handleChange = useCallback(
-      (e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value),
+      (e: React.ChangeEvent<HTMLInputElement>) =>
+        onChange(e.target.value.replace(ZERO_WIDTH_SPACE, "")),
       [onChange]
     );
 
