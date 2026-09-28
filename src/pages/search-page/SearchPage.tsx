@@ -144,6 +144,7 @@ const SearchPage = () => {
     abort: (reason?: string) => void;
   } | null>(null);
   const mapSearchAbortRef = useRef<AbortController | null>(null);
+  const mapSearchSignatureRef = useRef<string | null>(null);
   // This is use to avoid update called too many times in short period that
   // hurt the performace
   const debounceHistoryUpdateRef = useRef<DebouncedFunc<
@@ -182,19 +183,28 @@ const SearchPage = () => {
       // and by default we will include record without spatial extents so that BBOX
       // will not exclude record without spatial extents however for map search
       // it is ok to exclude it because it isn't show on map anyway
-      // Abort any ongoing search if exists
-      if (mapSearchAbortRef.current) {
-        mapSearchAbortRef.current.abort();
-      }
-      const controller = new AbortController();
-      mapSearchAbortRef.current = controller;
-
       const paramNonPaged: SearchParameters = createSearchParamFrom(
         componentParam,
         {
           pagesize: getMaxMapCentroids?.(),
         }
       );
+      const searchSignature = JSON.stringify(paramNonPaged);
+      if (
+        !needNavigate &&
+        mapSearchAbortRef.current &&
+        mapSearchSignatureRef.current === searchSignature
+      ) {
+        return;
+      }
+
+      // A map search for the same filters may already have started while the
+      // list and map effects ran for the same layout change.
+      mapSearchAbortRef.current?.abort();
+      const controller = new AbortController();
+      mapSearchAbortRef.current = controller;
+      mapSearchSignatureRef.current = searchSignature;
+
       // Make sure no other code abort the search
       if (mapSearchAbortRef.current) {
         setProgress(ProgressType.LINEAR);

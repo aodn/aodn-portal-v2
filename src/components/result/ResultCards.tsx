@@ -1,4 +1,12 @@
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  FC,
+  RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Box, Grid, SxProps } from "@mui/material";
 import {
   CollectionsQueryType,
@@ -31,6 +39,7 @@ interface ResultCardsListType extends ResultCardBasicType {
 }
 
 export interface ResultCardsType {
+  scrollRootRef?: RefObject<HTMLDivElement>;
   layout:
     | Exclude<SearchResultLayoutEnum, SearchResultLayoutEnum.FULL_MAP>
     | undefined;
@@ -172,6 +181,7 @@ const renderGridCards: FC<ResultCardsListType> = ({
 };
 
 const ResultCards: FC<ResultCardsProps> = ({
+  scrollRootRef,
   layout,
   contents,
   onClickCard,
@@ -281,11 +291,11 @@ const ResultCards: FC<ResultCardsProps> = ({
       ([entry]) => {
         if (entry.isIntersecting) loadMoreResults();
       },
-      { rootMargin: "200px 0px" }
+      { root: scrollRootRef?.current, rootMargin: "200px 0px" }
     );
     observer.observe(loadMoreNode);
     return () => observer.disconnect();
-  }, [count, total, layout, loadMoreResults, loadMoreNode]);
+  }, [count, total, layout, loadMoreResults, loadMoreNode, scrollRootRef]);
 
   if (!contents) return;
 
