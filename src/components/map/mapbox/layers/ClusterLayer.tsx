@@ -111,6 +111,17 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   const lastVisiblePointRef = useRef<FeatureCollection<Point> | undefined>(
     undefined
   );
+  // Bumped each time the GeoJSON source is created. A style event that does
+  // not recreate the source can skip setData when the input collection is the
+  // same reference already pushed.
+  const sourceGenerationRef = useRef(0);
+  const appliedSourceRef = useRef<
+    | {
+        generation: number;
+        collection: FeatureCollection<Point>;
+      }
+    | undefined
+  >(undefined);
 
   const [layerId, clusterSourceId, clusterLayer, unclusterPointLayer] =
     useMemo(() => {
@@ -140,6 +151,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
       map?.setMaxZoom(config.clusterMaxZoom);
 
+      sourceGenerationRef.current += 1;
       map?.addSource(clusterSourceId, {
         type: "geojson",
         data: findSuitableVisiblePoint(
@@ -266,17 +278,26 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   }, [map]);
 
   const updateSource = useCallback(() => {
-    if (map?.getSource(clusterSourceId)) {
-      const newData = findSuitableVisiblePoint(
-        featureCollection,
-        map,
-        lastVisiblePointRef.current,
-        preferCurrentCentroid
-      );
+    if (!map?.getSource(clusterSourceId)) return;
 
-      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(newData);
-      lastVisiblePointRef.current = newData;
+    const generation = sourceGenerationRef.current;
+    if (
+      appliedSourceRef.current?.generation === generation &&
+      appliedSourceRef.current.collection === featureCollection
+    ) {
+      return;
     }
+
+    const newData = findSuitableVisiblePoint(
+      featureCollection,
+      map,
+      lastVisiblePointRef.current,
+      preferCurrentCentroid
+    );
+
+    (map.getSource(clusterSourceId) as GeoJSONSource).setData(newData);
+    lastVisiblePointRef.current = newData;
+    appliedSourceRef.current = { generation, collection: featureCollection };
   }, [map, clusterSourceId, featureCollection, preferCurrentCentroid]);
 
   useEffect(() => {

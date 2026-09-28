@@ -75,67 +75,79 @@ const isFeatureVisible = (
   );
 };
 
-// Function to determine the most "visible" point
+// One visible point per dataset. Keep the previous centroid when it is still
+// on screen; otherwise keep the candidate closest to the map centre.
+// Distance is computed only when a uuid has more than one candidate.
 const findSuitableVisiblePoint = (
   featureCollection: FeatureCollection<Point>,
   map: Mapbox | null | undefined = undefined,
   currentVisibleCollection: FeatureCollection<Point> | undefined = undefined,
   preferCurrentCentroid: boolean = true
 ): FeatureCollection<Point> => {
-  const featureCollections: FeatureCollection<Point> = {
-    type: "FeatureCollection",
-    features: new Array<Feature<Point>>(),
-  };
   if (!map) return featureCollection;
 
-  const bounds: LngLatBounds | null = map.getBounds();
-
-  // Filter the points that are visible
-  const visibleFeatures = featureCollection.features.filter((feature) =>
-    isFeatureVisible(feature, bounds!)
-  );
-  // After map move some currentVisible point no longer visible.
-  const currentVisible = currentVisibleCollection?.features.filter((feature) =>
-    isFeatureVisible(feature, bounds!)
-  );
-
-  if (visibleFeatures.length === 0) return featureCollections;
-
-  // If more than one point is visible, we select one (e.g., based on proximity to the center)
-  // This part can be adjusted based on criteria (distance from center, zoom, etc.)
-  const mapCenter = point([map.getCenter().lng, map.getCenter().lat]);
-  visibleFeatures.sort((a, b) => {
-    const distA = distance(mapCenter, a.geometry.coordinates, {
-      units: "kilometers",
-    });
-    const distB = distance(mapCenter, b.geometry.coordinates, {
-      units: "kilometers",
-    });
-    return distA - distB; // Sort by proximity to the map center
-  });
-  // Since it is sorted by distance, we just need to add a feature once
-  // based on uuid. So each uuid appear once with the visible area and
-  // it is as close to center as it can.
-  const uniqueFeatures = new Map<string, Feature<Point, GeoJsonProperties>>();
-
-  for (const feature of visibleFeatures) {
-    const id = feature.properties?.uuid;
-    if (!uniqueFeatures.has(id)) {
-      // Is this point visible in previous search? If yes then we prefer this
-      // point over the most center point, this helps to reduce point change
-      // for the same visible record if preferCurrentCentroid is true
-      const f = preferCurrentCentroid
-        ? currentVisible?.find((o) => o.properties?.uuid === id)
-        : feature;
-      uniqueFeatures.set(feature.properties?.uuid, f ? f : feature);
+  const bounds = map.getBounds();
+  if (!bounds) {
+    return { type: "FeatureCollection", features: [] };
+  }
+  const currentByUuid = new Map<string, Feature<Point, GeoJsonProperties>>();
+  if (preferCurrentCentroid) {
+    for (const feature of currentVisibleCollection?.features ?? []) {
+      if (!isFeatureVisible(feature, bounds)) continue;
+      const id = feature.properties?.uuid;
+      if (id !== undefined && !currentByUuid.has(id)) {
+        currentByUuid.set(id, feature);
+      }
     }
   }
-  // Get all values and sort by uuid because cluster map require
-  // consistance sorting order. Used map and get values() destroy order
-  featureCollections.features = [...uniqueFeatures.values()].sort((a, b) =>
-    a.properties?.uuid.localeCompare(b.properties?.uuid)
-  );
-  return featureCollections; // Return the most visible point (closest to center)
+
+  const chosen = new Map<
+    string,
+    { feature: Feature<Point, GeoJsonProperties>; distanceKm: number }
+  >();
+  let mapCenter: ReturnType<typeof point> | undefined;
+  const distanceToCenter = (feature: Feature<Point, GeoJsonProperties>) => {
+    mapCenter ??= point([map.getCenter().lng, map.getCenter().lat]);
+    return distance(mapCenter, feature.geometry.coordinates, {
+      units: "kilometers",
+    });
+  };
+
+  for (const feature of featureCollection.features) {
+    if (!isFeatureVisible(feature, bounds)) continue;
+    const id = feature.properties?.uuid;
+    if (id === undefined) continue;
+
+    const previous = currentByUuid.get(id);
+    if (previous) {
+      if (!chosen.has(id)) {
+        chosen.set(id, { feature: previous, distanceKm: 0 });
+      }
+      continue;
+    }
+
+    const existing = chosen.get(id);
+    if (!existing) {
+      chosen.set(id, { feature, distanceKm: Number.NaN });
+      continue;
+    }
+
+    const nextDistance = distanceToCenter(feature);
+    const currentDistance = Number.isNaN(existing.distanceKm)
+      ? distanceToCenter(existing.feature)
+      : existing.distanceKm;
+    existing.distanceKm = currentDistance;
+    if (nextDistance < currentDistance) {
+      chosen.set(id, { feature, distanceKm: nextDistance });
+    }
+  }
+
+  return {
+    type: "FeatureCollection",
+    features: [...chosen.values()]
+      .map((entry) => entry.feature)
+      .sort((a, b) => a.properties?.uuid.localeCompare(b.properties?.uuid)),
+  };
 };
 
 const defaultMouseEnterEventHandler = (ev: MapMouseEvent): void => {
