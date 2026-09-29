@@ -201,11 +201,13 @@ describe("renderCrawlerPage", () => {
     expect(html).toContain('<div id="root">');
   });
 
-  test("removes the Google Analytics scripts", () => {
+  test("removes the deferred Google Analytics script", () => {
     const templateWithAnalytics = TEMPLATE.replace(
       "</head>",
-      '<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXX"></script>' +
-        "<script>window.dataLayer = [];</script></head>"
+      '<script id="google-analytics">window.dataLayer = [];' +
+        "window.addEventListener('load', function() {" +
+        "document.createElement('script').src = 'https://www.googletagmanager.com/gtag/js?id=G-XXX';" +
+        "});</script></head>"
     );
 
     const html = renderCrawlerPage(templateWithAnalytics, collection);
