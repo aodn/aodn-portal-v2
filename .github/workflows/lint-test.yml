@@ -1,4 +1,4 @@
-name: lint and test
+name: Lint, Test and Build
 
 on:
   push:
@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  lint-test-build:
     runs-on: ubuntu-latest
 
     strategy:

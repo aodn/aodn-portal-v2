@@ -3,6 +3,9 @@ import { trackSearchResultParameters } from "../searchParamsEvent";
 import { trackCustomEvent } from "../customEventTracker";
 import { SearchParameters } from "@/app/store/searchTypes";
 
+// Test the real implementation, globally mocked in setupTests
+vi.unmock("../searchParamsEvent");
+
 // Mock external dependencies
 vi.mock("../customEventTracker");
 vi.mock("../analyticsEvents", () => ({

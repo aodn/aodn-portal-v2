@@ -28,14 +28,15 @@ const DEFAULT_INFO_TEXT =
   "To download data directly please use the selections below, or utilise the map tools to make your selection.";
 const EXTERNAL_INFO_TEXT =
   "This download uses external services that are not managed by IMOS. Download speed, formats and availability depend on the external providers.";
+const INTEGRATED_INFO_TEXT =
+  "This dataset is hosted by an external provider. Whilst IMOS manages the download service, data access and availability may be affected by the external provider's systems";
 
 interface DownloadSubsettingProps extends DownloadCondition {
   hideInfoMessage?: boolean;
   sx?: SxProps;
   disable?: boolean;
-  // Served by an external (non-AODN-managed) service, e.g. WFS/Geoserver for
-  // a non-IMOS provider — swaps the info message to the external-source warning.
   isExternal?: boolean;
+  isIntegrated?: boolean;
 }
 
 const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
@@ -45,6 +46,7 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
   removeDownloadCondition,
   disable,
   isExternal = false,
+  isIntegrated = false,
 }) => {
   const { isSubsettingSupported, mapSubsettingCapabilities } =
     useDetailPageContext();
@@ -77,17 +79,26 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
     startTransition(() => setAccordionExpanded(subsettingSelectionCount > 0));
   }, [subsettingSelectionCount]);
 
+  let infoText = DEFAULT_INFO_TEXT;
+  let iconColor = portalTheme.palette.info.main;
+
+  if (isIntegrated) {
+    infoText = INTEGRATED_INFO_TEXT;
+  } else if (isExternal) {
+    infoText = EXTERNAL_INFO_TEXT;
+  }
+
+  if (isIntegrated || isExternal) {
+    iconColor = portalTheme.palette.warning.main;
+  }
+
   return (
     <Stack direction="column">
       {!hideInfoMessage && subsettingSelectionCount === 0 && (
         <InfoMessage
-          infoText={isExternal ? EXTERNAL_INFO_TEXT : DEFAULT_INFO_TEXT}
-          iconColor={
-            isExternal
-              ? portalTheme.palette.warning.main
-              : portalTheme.palette.info.main
-          }
-          sx={{ pl: "8px", pr: "16px" }}
+          infoText={infoText}
+          iconColor={iconColor}
+          sx={{ pl: "16px", pr: "16px" }}
         />
       )}
 

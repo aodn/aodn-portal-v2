@@ -17,12 +17,15 @@ const DownloadCard: FC = () => {
     setSelectedCoKey,
   } = useDetailPageContext();
 
-  const [wfsLinks, hasCloudOptimisedData, isImosOnly] = useMemo(() => {
-    const wfsLinks = collection?.getWFSLinks() || [];
-    const hasCloudOptimisedData = collection?.hasCloudOptimisedData() || false;
-    const isImosOnly = collection?.isImosOnly() ?? false;
-    return [wfsLinks, hasCloudOptimisedData, isImosOnly];
-  }, [collection]);
+  const [wfsLinks, hasCloudOptimisedData, isImosOnly, isIntegrated] =
+    useMemo(() => {
+      const wfsLinks = collection?.getWFSLinks() || [];
+      const hasCloudOptimisedData =
+        collection?.hasCloudOptimisedData() || false;
+      const isImosOnly = collection?.isImosOnly() ?? false;
+      const isIntegrated = collection?.isIntegrated() ?? false;
+      return [wfsLinks, hasCloudOptimisedData, isImosOnly, isIntegrated];
+    }, [collection]);
 
   const onWFSAvailabilityChange = useCallback(
     (isWFSAvailable: boolean) => {
@@ -66,6 +69,7 @@ const DownloadCard: FC = () => {
             getAndSetDownloadConditions={getAndSetDownloadConditions}
             removeDownloadCondition={removeDownloadCondition}
             isImosOnly={isImosOnly}
+            isIntegrated={isIntegrated}
           />
         );
       case DownloadServiceType.WFS:
@@ -78,6 +82,7 @@ const DownloadCard: FC = () => {
             removeDownloadCondition={removeDownloadCondition}
             onWFSAvailabilityChange={onWFSAvailabilityChange}
             isImosOnly={isImosOnly}
+            isIntegrated={isIntegrated}
           />
         );
       // hide download card if no CO download or WFS download
@@ -90,6 +95,7 @@ const DownloadCard: FC = () => {
     downloadService,
     getAndSetDownloadConditions,
     isImosOnly,
+    isIntegrated,
     onWFSAvailabilityChange,
     removeDownloadCondition,
     selectedCoKey,
