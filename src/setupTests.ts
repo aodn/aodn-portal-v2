@@ -50,6 +50,13 @@ vi.mock("./analytics/customEventTracker", () => ({
   trackCustomEvent: vi.fn(),
 }));
 
+// searchReducer calls this in an uncancelled setTimeout; if it fires after
+// jsdom teardown, sessionStorage is undefined and vitest fails the run.
+// Use vi.unmock in the test file to test the real implementation.
+vi.mock("./analytics/searchParamsEvent", () => ({
+  trackSearchResultParameters: vi.fn(),
+}));
+
 // A global mock to avoid real layer fetch calls, if you need different return value
 // you can override in the test file
 // Mock the leaf module, not StaticLayer: StaticLayer re-exports these fetchers,

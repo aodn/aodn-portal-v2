@@ -1,4 +1,12 @@
-import { FC, useCallback, useEffect, useMemo } from "react";
+import {
+  FC,
+  RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Box, Grid, SxProps } from "@mui/material";
 import {
   CollectionsQueryType,
@@ -24,12 +32,14 @@ interface ResultCardsListType extends ResultCardBasicType {
   total: number;
   contents: CollectionsQueryType;
   renderLoadMoreButton: () => JSX.Element;
+  loadMoreRef?: (node: HTMLDivElement | null) => void;
   layout?:
     | Exclude<SearchResultLayoutEnum, SearchResultLayoutEnum.FULL_MAP>
     | undefined;
 }
 
 export interface ResultCardsType {
+  scrollRootRef?: RefObject<HTMLDivElement>;
   layout:
     | Exclude<SearchResultLayoutEnum, SearchResultLayoutEnum.FULL_MAP>
     | undefined;
@@ -50,6 +60,7 @@ const renderListCards: FC<ResultCardsListType> = ({
   count,
   total,
   renderLoadMoreButton,
+  loadMoreRef,
   onClickCard,
   onClickDetail,
   onClickLinks,
@@ -99,6 +110,9 @@ const renderListCards: FC<ResultCardsListType> = ({
         )}
         {renderLoadMoreButton && count < total && (
           <Grid sx={{ display: "flex", justifyContent: "center" }} size={12}>
+            {isFullListView && (
+              <Box ref={loadMoreRef} aria-hidden sx={{ height: 1 }} />
+            )}
             {renderLoadMoreButton()}
           </Grid>
         )}
@@ -167,6 +181,7 @@ const renderGridCards: FC<ResultCardsListType> = ({
 };
 
 const ResultCards: FC<ResultCardsProps> = ({
+  scrollRootRef,
   layout,
   contents,
   onClickCard,
@@ -179,6 +194,8 @@ const ResultCards: FC<ResultCardsProps> = ({
   const { isUnderLaptop } = useBreakpoint();
   const tabNavigation = useTabNavigation();
   const { fetchRecord } = useFetchData();
+  const [loadMoreNode, setLoadMoreNode] = useState<HTMLDivElement | null>(null);
+  const isLoadingMoreRef = useRef(false);
 
   const [count, total] = useMemo(() => {
     const count = contents.result.collections.length;
@@ -188,19 +205,20 @@ const ResultCards: FC<ResultCardsProps> = ({
 
   const selectedUuid = useMemo(() => selectedUuids?.[0], [selectedUuids]);
 
-  const loadMoreResults = useCallback(
-    // Must use async here to make sure load done before return
-    // which block any action on new search message with the append
-    // action in the fetchRecord.
-    async () =>
+  const loadMoreResults = useCallback(async () => {
+    if (isLoadingMoreRef.current) return;
+    isLoadingMoreRef.current = true;
+    try {
       await fetchRecord(
         false,
         layout === SearchResultLayoutEnum.FULL_LIST
           ? FULL_LIST_PAGE_SIZE
           : DEFAULT_SEARCH_PAGE_SIZE
-      ),
-    [fetchRecord, layout]
-  );
+      );
+    } finally {
+      isLoadingMoreRef.current = false;
+    }
+  }, [fetchRecord, layout]);
 
   const onClickBtnCard = useCallback(
     (item: OGCCollection | undefined) => onClickCard?.(item),
@@ -259,22 +277,36 @@ const ResultCards: FC<ResultCardsProps> = ({
     );
   }, [loadMoreResults]);
 
-  // Fetching more data for full list view if the initial records less than 20
+  // Request the next page only when the end of the list approaches the viewport.
   useEffect(() => {
-    // Must use async here to make sure load done before return
-    // which block any action on new search message with the append
-    // action in the fetchRecord.
-    const loadRecords = async () => {
-      if (
-        layout === SearchResultLayoutEnum.FULL_LIST &&
-        count < total &&
-        count < 20
-      ) {
-        await fetchRecord(false, FULL_LIST_PAGE_SIZE);
+    if (
+      layout !== SearchResultLayoutEnum.FULL_LIST ||
+      count >= total ||
+      !loadMoreNode ||
+      typeof IntersectionObserver === "undefined"
+    )
+      return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) loadMoreResults();
+      },
+      {
+        root: isUnderLaptop ? null : scrollRootRef?.current,
+        rootMargin: "200px 0px",
       }
-    };
-    loadRecords();
-  }, [count, fetchRecord, layout, total]);
+    );
+    observer.observe(loadMoreNode);
+    return () => observer.disconnect();
+  }, [
+    count,
+    total,
+    layout,
+    loadMoreResults,
+    loadMoreNode,
+    scrollRootRef,
+    isUnderLaptop,
+  ]);
 
   if (!contents) return;
 
@@ -286,6 +318,7 @@ const ResultCards: FC<ResultCardsProps> = ({
       count,
       total,
       renderLoadMoreButton,
+      loadMoreRef: setLoadMoreNode,
       onClickCard: onClickBtnCard,
       onClickDetail: onClickBtnDetail,
       onClickLinks: onClickBtnLinks,

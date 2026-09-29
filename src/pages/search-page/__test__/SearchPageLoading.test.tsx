@@ -10,9 +10,13 @@ import {
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { ThemeProvider } from "@mui/material/styles";
 import { Provider } from "react-redux";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, useLocation } from "react-router-dom";
+import { http, HttpResponse, delay } from "msw";
 import SearchPage from "@/pages/search-page/SearchPage";
-import store from "@/app/store/store";
+import store, { getSearchQueryResult } from "@/app/store/store";
+import { useAppSelector } from "@/app/store/hooks";
+import { SortResultEnum } from "@/components/common/buttons/ResultListSortButton";
+import { pageDefault } from "@/components/common/constants";
 import { clearComponentParam } from "@/app/store/componentParamReducer";
 import { SearchResultLayoutEnum } from "@/components/common/buttons/ResultListLayoutButton";
 import { server } from "@/__mocks__/server";
@@ -45,11 +49,16 @@ vi.mock("@/pages/search-page/layout/MapSection", async () => {
 vi.mock("@/pages/search-page/layout/ResultSection", () => ({
   default: ({
     onChangeLayout,
+    onChangeSorting,
   }: {
     onChangeLayout: (layout: SearchResultLayoutEnum) => void;
+    onChangeSorting: (sort: SortResultEnum) => void;
   }) => (
     <div>
       Results
+      <button onClick={() => onChangeSorting(SortResultEnum.TITLE)}>
+        Sort by title
+      </button>
       <button onClick={() => onChangeLayout(SearchResultLayoutEnum.FULL_MAP)}>
         Show map
       </button>
@@ -60,12 +69,23 @@ vi.mock("@/pages/search-page/layout/ResultSection", () => ({
   ),
 }));
 
+const SearchState = () => {
+  const result = useAppSelector(getSearchQueryResult);
+  const location = useLocation();
+  return (
+    <output data-testid="search-state">
+      {result.result.collections[0]?.title} {location.search}
+    </output>
+  );
+};
+
 const renderPage = (url = "/search") =>
   render(
     <Provider store={store}>
       <ThemeProvider theme={portalTheme}>
         <MemoryRouter initialEntries={[url]}>
           <SearchPage />
+          <SearchState />
         </MemoryRouter>
       </ThemeProvider>
     </Provider>
@@ -114,4 +134,29 @@ it("loads the map alongside the results for the default desktop layout", async (
   renderPage();
   expect(screen.getByText("Results")).toBeVisible();
   expect(await screen.findByTestId("search-map")).toBeInTheDocument();
+});
+
+it("keeps a slow mobile sort request alive until results and URL update", async () => {
+  const originalUrl = window.location.href;
+  window.history.replaceState({}, "", pageDefault.search);
+  server.use(
+    http.get("*/api/v1/ogc/collections", async ({ request }) => {
+      const sorted = new URL(request.url).searchParams.has("sortby");
+      if (sorted) await delay(500);
+      return HttpResponse.json({
+        collections: [{ id: "test", title: sorted ? "Sorted" : "Original" }],
+        links: [],
+        total: 1,
+        search_after: [],
+      });
+    })
+  );
+  try {
+    renderPage(`${pageDefault.search}?layout=FULL_LIST`);
+    await screen.findByText("Original", { exact: false });
+    fireEvent.click(screen.getByText("Sort by title"));
+    await screen.findByText(/Sorted.*sort=TITLE/);
+  } finally {
+    window.history.replaceState({}, "", originalUrl);
+  }
 });

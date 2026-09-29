@@ -675,8 +675,6 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
             width: "100%",
             minHeight: "588px",
             overflow: "hidden",
-            borderBottomLeftRadius: borderRadius.small,
-            borderBottomRightRadius: borderRadius.small,
           }}
         >
           <MapBox
@@ -801,7 +799,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       {/* Show the legend exactly when the GeoServer (WMS) layer is the selected
           map layer - same gate as the GeoServerLayer's own `visible` prop */}
       {showWmsLegend && (
-        <Box sx={{ mb: 1 }}>
+        <Box sx={{ mb: 1, backgroundColor: "white" }}>
           <WmsLegend uuid={collection.id} layerName={selectedWmsLayer} />
         </Box>
       )}

@@ -17,6 +17,8 @@ import { mergeWithDefaults } from "@/utils/ObjectUtils";
 import { generateFeatureCollectionFrom } from "@/utils/GeoJsonUtils";
 import CardPopup from "../component/CardPopup";
 import { addDataLayer } from "../layerOrder";
+import theme from "@/styles/themeRC8";
+import { cssFontFamilyToMapboxTextFont } from "@/utils/MapUtils";
 
 interface ClusterSize {
   default?: number | string;
@@ -34,6 +36,7 @@ interface ClusterLayerConfig {
   clusterCircleOpacity: number;
   clusterCircleStrokeWidth: number;
   clusterCircleStrokeColor: string;
+  clusterCircleFontFamily: string[];
   clusterCircleTextSize: number;
   unclusterPointColor: string;
   unclusterPointOpacity: number;
@@ -65,16 +68,20 @@ const defaultClusterLayerConfig: ClusterLayerConfig = {
   },
   //cluster circle colors define the colors used for the circles representing clusters of different sizes.
   clusterCircleColor: {
-    default: "#51bbd6",
-    medium: "#f1f075",
-    large: "#f28cb1",
-    extra_large: "#fe8cf1",
+    default: "#00B080",
+    medium: "#F0E442",
+    large: "#E69F00",
+    extra_large: "#D083AE",
   },
-  clusterCircleOpacity: 0.6,
+  clusterCircleOpacity: 0.8,
   clusterCircleStrokeWidth: 1,
   clusterCircleStrokeColor: "#fff",
-  clusterCircleTextSize: 12,
-  unclusterPointColor: "#51bbd6",
+  clusterCircleTextSize: parseFloat(String(theme.typography.heading4.fontSize)),
+  clusterCircleFontFamily: cssFontFamilyToMapboxTextFont(
+    theme.typography.heading4.fontFamily,
+    { fontWeight: theme.typography.heading4.fontWeight }
+  ),
+  unclusterPointColor: "#56B4E9",
   unclusterPointOpacity: 1,
   unclusterPointStrokeWidth: 1,
   unclusterPointStrokeColor: "#fff",
@@ -104,6 +111,17 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   const lastVisiblePointRef = useRef<FeatureCollection<Point> | undefined>(
     undefined
   );
+  // Bumped each time the GeoJSON source is created. A style event that does
+  // not recreate the source can skip setData when the input collection is the
+  // same reference already pushed.
+  const sourceGenerationRef = useRef(0);
+  const appliedSourceRef = useRef<
+    | {
+        generation: number;
+        collection: FeatureCollection<Point>;
+      }
+    | undefined
+  >(undefined);
 
   const [layerId, clusterSourceId, clusterLayer, unclusterPointLayer] =
     useMemo(() => {
@@ -133,6 +151,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
 
       map?.setMaxZoom(config.clusterMaxZoom);
 
+      sourceGenerationRef.current += 1;
       map?.addSource(clusterSourceId, {
         type: "geojson",
         data: findSuitableVisiblePoint(
@@ -186,8 +205,8 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
           source: clusterSourceId,
           filter: ["has", "point_count"],
           layout: {
-            "text-field": "{point_count_abbreviated}",
-            "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+            "text-field": ["concat", ["get", "point_count_abbreviated"], " +"],
+            "text-font": config.clusterCircleFontFamily,
             "text-size": config.clusterCircleTextSize,
           },
         });
@@ -259,17 +278,26 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
   }, [map]);
 
   const updateSource = useCallback(() => {
-    if (map?.getSource(clusterSourceId)) {
-      const newData = findSuitableVisiblePoint(
-        featureCollection,
-        map,
-        lastVisiblePointRef.current,
-        preferCurrentCentroid
-      );
+    if (!map?.getSource(clusterSourceId)) return;
 
-      (map?.getSource(clusterSourceId) as GeoJSONSource).setData(newData);
-      lastVisiblePointRef.current = newData;
+    const generation = sourceGenerationRef.current;
+    if (
+      appliedSourceRef.current?.generation === generation &&
+      appliedSourceRef.current.collection === featureCollection
+    ) {
+      return;
     }
+
+    const newData = findSuitableVisiblePoint(
+      featureCollection,
+      map,
+      lastVisiblePointRef.current,
+      preferCurrentCentroid
+    );
+
+    (map.getSource(clusterSourceId) as GeoJSONSource).setData(newData);
+    lastVisiblePointRef.current = newData;
+    appliedSourceRef.current = { generation, collection: featureCollection };
   }, [map, clusterSourceId, featureCollection, preferCurrentCentroid]);
 
   useEffect(() => {

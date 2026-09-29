@@ -99,13 +99,26 @@ export default ({ mode }: ConfigEnv) => {
           "new URLSearchParams(window.location.search).get('nr_synthetic') === 'true'";
 
         const gaScript = `
-          <script async src="https://www.googletagmanager.com/gtag/js?id=${process.env.VITE_GA_MEASUREMENT_ID}"></script>
-          <script>
+          <script id="google-analytics">
             if (!(${isNewRelic})) {
               window.dataLayer = window.dataLayer || [];
-              window.gtag = function(){dataLayer.push(arguments);};
+              window.gtag = function(){window.dataLayer.push(arguments);};
               gtag('js', new Date());
               gtag('config', '${process.env.VITE_GA_MEASUREMENT_ID}');
+
+              window.addEventListener('load', function() {
+                var loadAnalytics = function() {
+                  var script = document.createElement('script');
+                  script.async = true;
+                  script.src = 'https://www.googletagmanager.com/gtag/js?id=${process.env.VITE_GA_MEASUREMENT_ID}';
+                  document.head.appendChild(script);
+                };
+                if (window.requestIdleCallback) {
+                  window.requestIdleCallback(loadAnalytics, { timeout: 2000 });
+                } else {
+                  window.setTimeout(loadAnalytics, 2000);
+                }
+              });
             }
           </script>
         `;

@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useRef } from "react";
 import { useSelector } from "react-redux";
 import { Box, SxProps } from "@mui/material";
 import { CollectionsQueryType } from "@/app/store/searchReducer";
@@ -44,6 +44,7 @@ const ResultSection: FC<ResultSectionProps> = ({
   onClickCard,
   onDeselectDataset,
 }) => {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { isUnderLaptop, isLaptop } = useBreakpoint();
   const reduxContents = useSelector<RootState, CollectionsQueryType>(
     getSearchQueryResult
@@ -95,6 +96,7 @@ const ResultSection: FC<ResultSectionProps> = ({
         )}
       </Box>
       <Box
+        ref={scrollContainerRef}
         sx={{
           flex: 1,
           minHeight: 0,
@@ -103,6 +105,7 @@ const ResultSection: FC<ResultSectionProps> = ({
         }}
       >
         <ResultCards
+          scrollRootRef={scrollContainerRef}
           layout={currentLayout}
           contents={reduxContents}
           onClickCard={onClickCard}

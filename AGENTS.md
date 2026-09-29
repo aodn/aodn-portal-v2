@@ -115,13 +115,17 @@ Page layout: `<Page>.tsx` composes; `layout/` = where things render;
 
 ## Testing and validation
 
+- AI code review: `.github/workflows/ai-code-review.yml` calls the shared
+  `aodn/common-workflow` workflow (scripts and tests live there); only
+  `.github/ai-code-review/prompt.md` and `instructions.md` are local.
 - Unit tests: Vitest + jsdom + Testing Library, in a `__test__/` folder next to
   the code.
 - Mock HTTP with MSW, not by mocking axios. Handlers are in
   `src/__mocks__/handlers.ts`, fixtures in `src/__mocks__/data/`, and helpers in
   `src/__mocks__/utils/`. New API behaviour needs a handler there.
 - `src/setupTests.ts` stubs `ResizeObserver`/`IntersectionObserver` and
-  globally mocks `analytics/customEventTracker` (`trackCustomEvent`) and the
+  globally mocks `analytics/customEventTracker` (`trackCustomEvent`),
+  `analytics/searchParamsEvent` (`trackSearchResultParameters`), and the
   static layer fetches (`fetchMarineParkOptions`,
   `fetchMarineEcoregionOptions`, `fetchAllenCoralAtlasOptions`). Override
   per file when a test needs real behaviour.

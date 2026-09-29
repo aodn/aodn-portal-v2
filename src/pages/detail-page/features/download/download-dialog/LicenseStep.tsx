@@ -6,20 +6,59 @@ import { portalTheme } from "../../../../../styles";
 import { trackCustomEvent } from "../../../../../analytics/customEventTracker";
 import { AnalyticsEvent } from "../../../../../analytics/analyticsEvents";
 import { resolveSuggestedCitation } from "@/utils/CitationUtils";
+import { MediaType, RelationType } from "@/app/store/OGCCollectionDefinitions";
+
+const normalizeConstraint = (constraint: string) =>
+  constraint.trim().replace(/\s+/g, " ").toLowerCase();
 
 const LicenseStep = () => {
   const context = useDetailPageContext();
 
-  const citationText = useMemo(
-    () =>
-      resolveSuggestedCitation(
-        context.collection?.getCitation()?.suggestedCitation ||
-          "IMOS [year-of-data-downloaded], [Title], [data-access-url], accessed [date-of-access]",
-        context.collection?.id,
-        context.collection?.title
-      ),
-    [context.collection]
-  );
+  const collection = context.collection;
+  const license = collection?.getLicense();
+  const licenseUrl = collection?.links?.find(
+    (link) =>
+      link.rel === RelationType.LICENSE && link.type === MediaType.TEXT_HTML
+  )?.href;
+  const licenseGraphic = collection?.links?.find(
+    (link) =>
+      link.rel === RelationType.LICENSE && link.type === MediaType.IMAGE_PNG
+  )?.href;
+
+  const usageConstraints = useMemo(() => {
+    const citation = collection?.getCitation();
+    const normalizedLicense = license ? normalizeConstraint(license) : "";
+    const metadataConstraints = [
+      ...(citation?.useLimitations ?? []),
+      ...(citation?.otherConstraints ?? []),
+    ].filter(
+      (constraint) =>
+        constraint && normalizeConstraint(constraint) !== normalizedLicense
+    );
+    const uniqueConstraints = new Set<string>();
+
+    return metadataConstraints.filter((constraint) => {
+      const normalizedConstraint = normalizeConstraint(constraint);
+
+      if (uniqueConstraints.has(normalizedConstraint)) {
+        return false;
+      }
+
+      uniqueConstraints.add(normalizedConstraint);
+      return true;
+    });
+  }, [collection, license]);
+
+  const citationText = useMemo(() => {
+    const suggestedCitation = collection?.getCitation()?.suggestedCitation;
+    return suggestedCitation
+      ? resolveSuggestedCitation(
+          suggestedCitation,
+          collection?.id,
+          collection?.title
+        )
+      : "";
+  }, [collection]);
 
   const commonBodyStyles = {
     color: portalTheme.palette.text2,
@@ -58,39 +97,43 @@ const LicenseStep = () => {
           }}
         >
           <Typography variant="body2Regular" sx={commonBodyStyles}>
-            Creative Commons Attribution 4.0 International License
+            {license || "License not available"}
           </Typography>
-          <Box
-            component="a"
-            href="https://creativecommons.org/licenses/by/4.0/"
-            target="_blank"
-            rel="noopener noreferrer"
-            sx={{
-              ...commonBodyStyles,
-              color: portalTheme.palette.primary1,
-              textDecoration: "none",
-              display: "block",
-              whiteSpace: "normal",
-              wordBreak: "break-all",
-              overflowWrap: "anywhere",
-              "&:hover": {
-                textDecoration: "underline",
-              },
-            }}
-          >
-            http://creativecommons.org/licenses/by/4.0/
-          </Box>
+          {licenseUrl && (
+            <Box
+              component="a"
+              href={licenseUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                ...commonBodyStyles,
+                color: portalTheme.palette.primary1,
+                textDecoration: "none",
+                display: "block",
+                whiteSpace: "normal",
+                wordBreak: "break-all",
+                overflowWrap: "anywhere",
+                "&:hover": {
+                  textDecoration: "underline",
+                },
+              }}
+            >
+              {licenseUrl}
+            </Box>
+          )}
         </Box>
-        <Box
-          component="img"
-          src="https://licensebuttons.net/l/by/4.0/88x31.png"
-          alt="Creative Commons License"
-          sx={{
-            width: "120px",
-            height: "42px",
-            alignSelf: { xs: "flex-start", sm: "auto" },
-          }}
-        />
+        {licenseGraphic && (
+          <Box
+            component="img"
+            src={licenseGraphic}
+            alt="Licence graphic"
+            sx={{
+              maxWidth: "120px",
+              height: "auto",
+              alignSelf: { xs: "flex-start", sm: "auto" },
+            }}
+          />
+        )}
       </Box>
 
       <Box
@@ -112,13 +155,16 @@ const LicenseStep = () => {
           Suggested Citation
         </Typography>
 
-        <CopyButton
-          copyText={citationText}
-          copyButtonConfig={{
-            // Track copy citation button click
-            onCopy: () => trackCustomEvent(AnalyticsEvent.COPY_CITATION_CLICK),
-          }}
-        />
+        {citationText && (
+          <CopyButton
+            copyText={citationText}
+            copyButtonConfig={{
+              // Track copy citation button click
+              onCopy: () =>
+                trackCustomEvent(AnalyticsEvent.COPY_CITATION_CLICK),
+            }}
+          />
+        )}
       </Box>
 
       <Box>
@@ -126,7 +172,7 @@ const LicenseStep = () => {
           variant="body2Regular"
           sx={{ color: portalTheme.palette.text1 }}
         >
-          {citationText}
+          {citationText || "Suggested Citation not available"}
         </Typography>
       </Box>
 
@@ -141,44 +187,21 @@ const LicenseStep = () => {
         Usage Constraints
       </Typography>
 
-      <Typography
-        variant="body2Regular"
-        sx={{
-          ...commonBodyStyles,
-          mb: "22px",
-        }}
-      >
-        Any users of IMOS data are required to clearly acknowledge the source of
-        the material derived from IMOS in the format: &quot;Data was sourced
-        from Australia&apos;s Integrated Marine Observing System (IMOS) - IMOS
-        is enabled by the National Collaborative Research Infrastructure
-        strategy (NCRIS).&quot; If relevant, also credit other organisations
-        involved in collection of this particular datastream (as listed in
-        &apos;credit&apos; in the metadata record).
-      </Typography>
-
-      <Typography variant="body2Regular" sx={commonBodyStyles}>
-        If using data from the Ningaloo (TAN100) mooring, please add to the
-        citation - &quot;Department of Jobs, Tourism, Science and Innovation
-        (DJTSI), Western Australian Government&quot;.
-      </Typography>
-
-      <Typography variant="body2Regular" sx={commonBodyStyles}>
-        If using data from the Ocean Reference Station 65m (ORS065) mooring,
-        please add to the citation - &quot;Sydney Water Corporation&quot;.
-      </Typography>
-
-      <Typography variant="body2Regular" sx={commonBodyStyles}>
-        Data, products and services from IMOS are provided &quot;as is&quot;
-        without any warranty as to fitness for a particular purpose.
-      </Typography>
-
-      <Typography variant="body2Regular" sx={commonBodyStyles}>
-        By using this data you are accepting the license agreement and terms
-        specified above. You accept all risks and responsibility for losses,
-        damages, costs and other consequences resulting directly or indirectly
-        from using this site and any information or material available from it.
-      </Typography>
+      {usageConstraints.length > 0 ? (
+        usageConstraints.map((constraint) => (
+          <Typography
+            key={constraint}
+            variant="body2Regular"
+            sx={{ ...commonBodyStyles, mb: "12px" }}
+          >
+            {constraint}
+          </Typography>
+        ))
+      ) : (
+        <Typography variant="body2Regular" sx={commonBodyStyles}>
+          Usage Constraints not available
+        </Typography>
+      )}
     </Box>
   );
 };
