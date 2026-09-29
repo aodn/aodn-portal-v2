@@ -699,7 +699,8 @@ const LocationFilter: FC<LocationFilterProps> = () => {
             id={MAP_ID}
             sx={{ flex: 1, minHeight: "400px", position: "relative" }}
           >
-            <ReactMap panelId={MAP_ID} zoom={0}>
+            {/* Mercator draws polygon edges as straight lines */}
+            <ReactMap panelId={MAP_ID} zoom={0} projection="mercator">
               <Controls>
                 <SelectedAreaLayer areas={staticAreaHighlightCollection} />
                 <NavigationControl
