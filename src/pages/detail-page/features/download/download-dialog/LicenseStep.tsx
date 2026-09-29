@@ -170,7 +170,7 @@ const LicenseStep = () => {
       <Box>
         <Typography
           variant="body2Regular"
-          sx={{ color: portalTheme.palette.text1 }}
+          sx={{ color: portalTheme.palette.text2 }}
         >
           {citationText || "Suggested Citation not available"}
         </Typography>
