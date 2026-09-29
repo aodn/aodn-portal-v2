@@ -10,7 +10,7 @@ This repository only holds its configuration.
 | File                                     | Role                                                                                        |
 | ---------------------------------------- | ------------------------------------------------------------------------------------------- |
 | `.github/workflows/ai-code-review.yml`   | Caller: triggers, skip rules (forks, drafts, `skip-ai-review` label), engine and credential |
-| `.github/ai-code-review/prompt.md`       | The portal's review direction: what to review and how to judge                              |
+| `.github/ai-code-review/prompt.md`       | Portal-specific review direction added to the shared baseline                               |
 | `.github/ai-code-review/instructions.md` | Repository context and conventions                                                          |
 
 Both files are read from the PR head, so a PR that edits them is reviewed
