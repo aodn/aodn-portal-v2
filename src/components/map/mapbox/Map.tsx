@@ -35,6 +35,7 @@ export interface MapBasicType {
   progress?: ProgressType | undefined;
   minZoom?: number;
   maxZoom?: number;
+  onLoad?: () => void;
   onZoomEvent?: (event: MapEvent | undefined) => void;
   onMoveEvent?: (event: MapEvent | undefined) => void;
   panelId: string;
@@ -127,6 +128,7 @@ const ReactMap = memo(
     maxZoom = MapDefaultConfig.MAX_ZOOM,
     panelId,
     projection = MapDefaultConfig.PROJECTION,
+    onLoad,
     onZoomEvent,
     onMoveEvent,
     zoom = MapDefaultConfig.ZOOM,
@@ -180,7 +182,8 @@ const ReactMap = memo(
             "'Open Sans', 'Open Sans CJK SC', sans-serif",
         });
 
-        newMap.once(MapEventEnum.LOAD, () =>
+        newMap.once(MapEventEnum.LOAD, () => {
+          onLoad?.();
           // Make sure map draw complete before changing the controls
           setTimeout(() => {
             // Remove scale control if it exists
@@ -190,14 +193,14 @@ const ReactMap = memo(
             if (scaleElement) {
               (scaleElement as HTMLElement).style.display = "none";
             }
-          }, 0)
-        );
+          }, 0);
+        });
 
         return newMap;
       } catch (err) {
         console.error("Map initialization failed:", err);
       }
-    }, [panelId, minZoom, maxZoom]);
+    }, [panelId, minZoom, maxZoom, onLoad]);
 
     useEffect(() => {
       const setupMap = () => {
