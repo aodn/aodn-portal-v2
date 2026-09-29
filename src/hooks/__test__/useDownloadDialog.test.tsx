@@ -60,10 +60,11 @@ const respondWith = (payload: Record<string, unknown>) =>
 
 // Reject the next execute call, as errorHandling()/rejectWithValue() does for
 // a genuine HTTP error status (statusCode), not the 200-with-embedded-status
-// shape the OGC endpoint otherwise uses for domain errors.
-const rejectWith = (statusCode: number) =>
+// shape the OGC endpoint otherwise uses for domain errors. errorHandling()
+// puts the server message in details.
+const rejectWith = (statusCode: number, details?: string) =>
   mockDispatch.mockReturnValue({
-    unwrap: () => Promise.reject({ statusCode }),
+    unwrap: () => Promise.reject({ statusCode, details }),
   });
 
 const executionResponse = (extra: Record<string, unknown> = {}) => ({
@@ -162,6 +163,9 @@ describe("useDownloadDialog per-user download limit", () => {
     expect(result.current.getProcessStatusText()).toBe(
       "You already have 10 downloads in progress. Please wait for one to finish before starting another."
     );
+    // 429 keeps its old behaviour: no toast, retry allowed.
+    expect(result.current.errorToastMessage).toBe("");
+    expect(result.current.isDownloadBlocked).toBe(false);
   });
 
   it("still reports plain success when the request is accepted", async () => {
@@ -174,5 +178,60 @@ describe("useDownloadDialog per-user download limit", () => {
     expect(result.current.getProcessStatusText()).toBe(
       "Download email will be sent shortly."
     );
+  });
+});
+
+describe("useDownloadDialog download size limit", () => {
+  const SERVER_MESSAGE =
+    "The selected data is too large to download (estimated 250.3 GB, limit 180 GB). Please reduce the date range or area and try again.";
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    localStorage.clear();
+  });
+
+  afterEach(() => vi.restoreAllMocks());
+
+  it("shows the server message and blocks the download on 422", async () => {
+    rejectWith(422, SERVER_MESSAGE);
+    const { result } = renderHook(() => useDownloadDialog(true, vi.fn()));
+
+    submit(result);
+
+    await waitFor(() => expect(result.current.processingStatus).toBe("422"));
+    expect(result.current.errorToastMessage).toBe(SERVER_MESSAGE);
+    expect(result.current.isDownloadBlocked).toBe(true);
+    expect(result.current.isSuccess).toBe(false);
+    expect(result.current.createdJobID).toBeUndefined();
+    expect(result.current.getProcessStatusText()).toBe(
+      "Selected data is too large to download"
+    );
+  });
+
+  it("uses a default message when the 422 reply has none", async () => {
+    rejectWith(422);
+    const { result } = renderHook(() => useDownloadDialog(true, vi.fn()));
+
+    submit(result);
+
+    await waitFor(() => expect(result.current.processingStatus).toBe("422"));
+    expect(result.current.errorToastMessage).toBe(
+      "The selected data is too large to download. Please reduce the date range or area and try again."
+    );
+  });
+
+  it("hides the toast when it is closed", async () => {
+    rejectWith(422, SERVER_MESSAGE);
+    const { result } = renderHook(() => useDownloadDialog(true, vi.fn()));
+
+    submit(result);
+
+    await waitFor(() =>
+      expect(result.current.errorToastMessage).toBe(SERVER_MESSAGE)
+    );
+    act(() => result.current.handleCloseErrorToast());
+    expect(result.current.errorToastMessage).toBe("");
+    // Closing the toast does not unblock the download.
+    expect(result.current.isDownloadBlocked).toBe(true);
   });
 });
