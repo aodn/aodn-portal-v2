@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
@@ -55,7 +55,7 @@ describe("Location filter loading", () => {
 
     const popup = await screen.findByTestId("searchbar-popup");
     const loadingStatus = within(popup).getByRole("status", {
-      name: "Loading map",
+      name: "Loading filter",
     });
     expect(loadingStatus).toBeVisible();
     expect(
@@ -68,7 +68,10 @@ describe("Location filter loading", () => {
     await userEvent.click(screen.getByTestId("date-range-button"));
     expect(await within(popup).findByText("Date filter loaded")).toBeVisible();
 
-    locationImport.resolve();
+    await act(async () => {
+      locationImport.resolve();
+    });
+    expect(within(popup).getByText("Date filter loaded")).toBeVisible();
     expect(within(popup).queryByText("Location filter loaded")).toBeNull();
 
     await userEvent.click(screen.getByTestId("location-button"));
@@ -77,7 +80,7 @@ describe("Location filter loading", () => {
     ).toBeVisible();
     expect(
       within(popup).queryByRole("status", {
-        name: "Loading map",
+        name: "Loading filter",
       })
     ).not.toBeInTheDocument();
   });

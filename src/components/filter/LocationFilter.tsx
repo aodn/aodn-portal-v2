@@ -286,6 +286,10 @@ const LocationFilter: FC<LocationFilterProps> = () => {
   const removeFeatureRef = useRef<((id: string) => void) | null>(null);
 
   const { isMobile } = useBreakpoint();
+
+  if (isMobile && mapReady) {
+    setMapReady(false);
+  }
   useEffect(() => {
     let cancelled = false;
     fetchMarineParkOptions(false)

@@ -244,7 +244,7 @@ const Searchbar: FC<SearchbarProps> = ({
                       fallback={
                         <Box
                           role="status"
-                          aria-label={"Loading map"}
+                          aria-label="Loading filter"
                           sx={{
                             minHeight: 160,
                             display: "flex",
