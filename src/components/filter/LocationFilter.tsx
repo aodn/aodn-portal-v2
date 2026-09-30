@@ -11,6 +11,7 @@ import React, {
 import {
   Box,
   Checkbox,
+  CircularProgress,
   FormControlLabel,
   FormGroup,
   alpha,
@@ -233,6 +234,8 @@ const LocationFilter: FC<LocationFilterProps> = () => {
   const componentParam: ParameterState = useAppSelector((s) => s.paramReducer);
   const [filterMode, setFilterMode] =
     useState<LocationFilterMode>("marinePark");
+  const [mapReady, setMapReady] = useState(false);
+  const handleMapReady = useCallback(() => setMapReady(true), []);
 
   const [marineParkOptions, setMarineParkOptions] = useState<
     LocationOptionType[]
@@ -283,6 +286,10 @@ const LocationFilter: FC<LocationFilterProps> = () => {
   const removeFeatureRef = useRef<((id: string) => void) | null>(null);
 
   const { isMobile } = useBreakpoint();
+
+  if (isMobile && mapReady) {
+    setMapReady(false);
+  }
   useEffect(() => {
     let cancelled = false;
     fetchMarineParkOptions(false)
@@ -614,7 +621,24 @@ const LocationFilter: FC<LocationFilterProps> = () => {
     });
   }, [componentParam.staticAreas, componentParam.polygon]);
 
-  if (marineParkOptions.length === 0) return null;
+  if (marineParkOptions.length === 0) {
+    return (
+      <Box
+        role="status"
+        aria-label="Loading location filter…"
+        sx={{
+          minHeight: 160,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          gap: 2,
+        }}
+      >
+        <CircularProgress aria-hidden="true" />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ position: "relative", width: "100%" }}>
@@ -699,7 +723,26 @@ const LocationFilter: FC<LocationFilterProps> = () => {
             id={MAP_ID}
             sx={{ flex: 1, minHeight: "400px", position: "relative" }}
           >
-            <ReactMap panelId={MAP_ID} zoom={0}>
+            {!mapReady && (
+              <Box
+                role="status"
+                aria-label="Loading map…"
+                sx={{
+                  position: "absolute",
+                  inset: 0,
+                  zIndex: 1,
+                  bgcolor: alpha(theme.palette.background.paper, 0.85),
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  gap: 2,
+                }}
+              >
+                <CircularProgress aria-hidden="true" />
+              </Box>
+            )}
+            <ReactMap panelId={MAP_ID} zoom={0} onLoad={handleMapReady}>
               <Controls>
                 <SelectedAreaLayer areas={staticAreaHighlightCollection} />
                 <NavigationControl
