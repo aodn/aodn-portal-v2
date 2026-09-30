@@ -87,7 +87,8 @@ export const buildMapLayerConfig = (
   isSupportPMTiles: boolean,
   lastSelectedLayer: LayerSwitcherLayer<LayerName> | null = null,
   hasGriddedProducts: boolean = false,
-  isGriddedProductsLoading: boolean = false
+  isGriddedProductsLoading: boolean = false,
+  isPMTilesLoading: boolean = false
 ): LayerSwitcherLayer<LayerName>[] => {
   const layers: LayerSwitcherLayer<LayerName>[] = [];
 
@@ -109,12 +110,16 @@ export const buildMapLayerConfig = (
       (zarrOnlyDataset ||
         (!isWMSAvailable && !hasCoDensity && !isSupportPMTiles));
 
-    // Gridded Data replaces Geoserver on a cloud optimised zarr record. The
-    // listing is still in flight on first render, so Geoserver is held back
-    // while it loads too. If the listing comes back empty or failed,
-    // Geoserver returns as the fallback.
+    // Gridded Data replaces Geoserver on a cloud optimised zarr record, and
+    // Data Density replaces it on a parquet record. Both are still loading
+    // on first render, so Geoserver is held back while they load too. If
+    // neither is available, Geoserver returns as the fallback.
     const isSupportGeoServer =
-      isWMSAvailable && !hasGriddedProducts && !isGriddedProductsLoading;
+      isWMSAvailable &&
+      !hasGriddedProducts &&
+      !isGriddedProductsLoading &&
+      !isSupportPMTiles &&
+      !isPMTilesLoading;
 
     if (isSupportPMTiles) {
       const pmtiles: LayerSwitcherLayer<LayerName> = {
@@ -129,7 +134,7 @@ export const buildMapLayerConfig = (
       const l: LayerSwitcherLayer<LayerName> = {
         id: LayerName.GeoServer,
         name: "Geoserver",
-        selected: !isSupportPMTiles,
+        selected: true,
       };
       layers.push(l);
     }
@@ -189,7 +194,12 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     isSubsettingSupported,
   } = useDetailPageContext();
 
-  const [isSupportPMTiles, setIsSupportPMTiles] = useState(false);
+  // `undefined` = the PMTiles metadata probe has not finished yet
+  const [pmtilesSupport, setPmtilesSupport] = useState<boolean | undefined>(
+    undefined
+  );
+  const isSupportPMTiles = pmtilesSupport ?? false;
+  const isPMTilesLoading = pmtilesSupport === undefined;
 
   const [mapLayerConfig, setMapLayerConfig] = useState<
     LayerSwitcherLayer<LayerName>[]
@@ -307,7 +317,8 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
           isSupportPMTiles,
           lastSelectedMapLayer,
           hasGriddedProducts,
-          isGriddedProductsLoading
+          isGriddedProductsLoading,
+          isPMTilesLoading
         )
       );
     });
@@ -319,6 +330,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     lastSelectedMapLayer,
     hasGriddedProducts,
     isGriddedProductsLoading,
+    isPMTilesLoading,
   ]);
 
   const [filterStartDate, filterEndDate] = useMemo(() => {
@@ -768,7 +780,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
                 layerConfig={selectedCoKey}
                 onLayerChange={setSelectedCoKey}
                 onMetadataPeriodChange={handlePmtilesMetadataPeriodChange}
-                onSupportChange={setIsSupportPMTiles}
+                onSupportChange={setPmtilesSupport}
               />
               <GeoServerLayer
                 layerConfig={geoServerLayerConfig}

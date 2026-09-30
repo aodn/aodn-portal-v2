@@ -15,14 +15,13 @@ from pages.detail_page import DetailPage
 def test_map_shows_data_density_layer(responsive_page: Page, uuid: str) -> None:
     """
     This test uses a non-ZARR dataset with PMTiles density and WMS links.
-    It verifies that both the Data Density (PMTiles) layer and the GeoServer
-    layer appear on the map.
+    Data Density replaces GeoServer, so only the Data Density (PMTiles)
+    layer appears on the map.
 
     This test ensures that:
     1. The Data Density layer option is displayed in the layers menu
     2. The Data Density layer is selected / visible by default
-    3. The GeoServer layer option is displayed in the layers menu
-    4. The GeoServer layer can be selected and is visible on the map
+    3. The GeoServer layer option is not displayed in the layers menu
     """
     detail_page = DetailPage(responsive_page)
     layer_factory = LayerFactory(detail_page.detail_map)
@@ -38,18 +37,8 @@ def test_map_shows_data_density_layer(responsive_page: Page, uuid: str) -> None:
     detail_page.detail_map.open_layers_menu_until_visible(
         detail_page.detail_map.data_density_layer
     )
-    expect(detail_page.detail_map.geoserver_layer).to_be_visible()
+    expect(detail_page.detail_map.geoserver_layer).to_have_count(0)
 
     # Verify that Data Density is present and visible on the map by default
     layer_id = layer_factory.get_layer_id(LayerStyle.DATA_DENSITY)
     assert detail_page.detail_map.is_map_layer_visible(layer_id) is True
-    # Verify that the Geoserver layer is present and visible on the map
-    detail_page.detail_map.geoserver_layer.check()
-    detail_page.detail_map.wait_for_map_idle()
-    layer_id = layer_factory.get_layer_id(LayerStyle.GEO_SERVER)
-    assert (
-        detail_page.detail_map.is_map_layer_visible(
-            layer_id, is_map_loading=False
-        )
-        is True
-    )

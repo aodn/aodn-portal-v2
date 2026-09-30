@@ -53,18 +53,15 @@ describe("buildMapLayerConfig", () => {
       true // isSupportPMTiles
     );
 
-    // Density is PMTiles only
-    expect(result).toHaveLength(2);
-    expect(result[0]).toEqual({
-      id: LayerName.PMTiles,
-      name: "Data Density",
-      selected: true,
-    } as LayerSwitcherLayer<LayerName>);
-    expect(result[1]).toEqual({
-      id: LayerName.GeoServer,
-      name: "Geoserver",
-      selected: false,
-    } as LayerSwitcherLayer<LayerName>);
+    // Data Density replaces Geoserver. The record still has a WMS link,
+    // but the Geoserver layer is not offered.
+    expect(result).toEqual([
+      {
+        id: LayerName.PMTiles,
+        name: "Data Density",
+        selected: true,
+      } as LayerSwitcherLayer<LayerName>,
+    ]);
   });
 
   it("builds correct layer config for zarr dataset with spatial extent", () => {
@@ -109,7 +106,10 @@ describe("buildMapLayerConfig", () => {
     } as LayerSwitcherLayer<LayerName>);
   });
 
-  it("builds layer config with PMTiles and GeoServer defaults", () => {
+  // On first render the PMTiles probe is still running. Without this,
+  // Geoserver would show up, become the default layer and draw WMS tiles,
+  // then disappear as soon as the probe finds Data Density.
+  it("holds Geoserver back while the PMTiles probe is in flight", () => {
     const mockCollection = createMockCollection({
       getDatasetType: () => [DatasetType.PARQUET],
       getBBox: () => [0, 0, 1, 1],
@@ -119,20 +119,41 @@ describe("buildMapLayerConfig", () => {
       mockCollection,
       true, // isWMSAvailable
       true, // hasSpatialExtent
-      true // isSupportPMTiles
+      false, // isSupportPMTiles — probe has not returned yet
+      null,
+      false, // hasGriddedProducts
+      false, // isGriddedProductsLoading
+      true // isPMTilesLoading
     );
 
-    expect(result).toHaveLength(2);
-    expect(result[0]).toEqual({
-      id: LayerName.PMTiles,
-      name: "Data Density",
-      selected: true,
-    } as LayerSwitcherLayer<LayerName>);
-    expect(result[1]).toEqual({
-      id: LayerName.GeoServer,
-      name: "Geoserver",
-      selected: false, // Not default because PMTiles is available
-    } as LayerSwitcherLayer<LayerName>);
+    expect(result).toEqual([]);
+  });
+
+  // If the probe finds no PMTiles, Geoserver comes back as the fallback.
+  it("falls back to Geoserver once the PMTiles probe finds nothing", () => {
+    const mockCollection = createMockCollection({
+      getDatasetType: () => [DatasetType.PARQUET],
+      getBBox: () => [0, 0, 1, 1],
+    });
+
+    const result = buildMapLayerConfig(
+      mockCollection,
+      true, // isWMSAvailable
+      true, // hasSpatialExtent
+      false, // isSupportPMTiles
+      null,
+      false, // hasGriddedProducts
+      false, // isGriddedProductsLoading
+      false // isPMTilesLoading — probe has settled
+    );
+
+    expect(result).toEqual([
+      {
+        id: LayerName.GeoServer,
+        name: "Geoserver",
+        selected: true,
+      } as LayerSwitcherLayer<LayerName>,
+    ]);
   });
 
   it("returns empty array when no layers are available (no preview mode)", () => {
