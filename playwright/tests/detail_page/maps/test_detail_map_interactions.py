@@ -72,12 +72,12 @@ def test_drawing_shape_adds_download_filter(
     # Draw a rectangle on the map
     detail_page.detail_map.draw_rect_menu_button.click()
     detail_page.detail_map.hover_map()
-    detail_page.detail_map.click_map()
+    detail_page.mouse.down()
     x, y = detail_page.detail_map.calculate_mouse_coordinates(
         right=100, down=100
     )
     detail_page.mouse.move(x, y)
-    detail_page.detail_map.click_map()
+    detail_page.mouse.up()
     expect(detail_page.bbox_condition_box.first).to_have_css(
         'visibility', 'visible', timeout=5000
     )
@@ -109,12 +109,12 @@ def test_reset_selections_clears_bbox_and_date_range_together(
     # Draw a rectangle on the map
     detail_page.detail_map.draw_rect_menu_button.click()
     detail_page.detail_map.hover_map()
-    detail_page.detail_map.click_map()
+    detail_page.mouse.down()
     x, y = detail_page.detail_map.calculate_mouse_coordinates(
         right=100, down=100
     )
     detail_page.mouse.move(x, y)
-    detail_page.detail_map.click_map()
+    detail_page.mouse.up()
     expect(detail_page.bbox_condition_remove_button).to_be_visible()
 
     # Select a date range using the slider. Wait for the condition itself: the
