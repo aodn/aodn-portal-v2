@@ -90,7 +90,7 @@ const DATA_SETTINGS: DataSettingsFilterType = {
   dataStatus: [
     {
       value: "onGoing",
-      label: "On Going",
+      label: "Ongoing",
     },
     {
       value: "completed",

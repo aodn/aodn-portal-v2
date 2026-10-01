@@ -120,7 +120,7 @@ const ResultCardButton: FC<ResultCardButtonProps> = ({
         <Typography
           pt={0}
           whiteSpace="nowrap"
-          // Label tracks the icon colour, so status buttons (e.g. "On going")
+          // Label tracks the icon colour, so status buttons (e.g. "Ongoing")
           // read as one unit rather than a green icon beside a blue label
           sx={{
             ...buttonStyles,

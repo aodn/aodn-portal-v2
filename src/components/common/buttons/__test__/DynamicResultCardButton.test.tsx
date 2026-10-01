@@ -32,7 +32,7 @@ describe("DynamicResultCardButton", async () => {
     const statusButton = screen.getByRole("button");
     const color = rgbToHex(getComputedStyle(statusButton).color);
     expect(color).to.equal(theme.palette.success.main.toLowerCase());
-    expect(statusButton.textContent).to.equal("On Going");
+    expect(statusButton.textContent).to.equal("Ongoing");
   });
 
   test("Button color and text should be shown properly when status is completed", async () => {
