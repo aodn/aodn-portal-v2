@@ -5,6 +5,9 @@ from playwright.sync_api import Locator, Page, expect
 
 from core.enums.map_layers.layer_style import LayerStyle
 from core.factories.layer import LayerFactory
+from mocks.api.gridded_tiles import handle_gridded_tile_products_empty
+from mocks.api_router import ApiRouter
+from mocks.routes import Routes
 from pages.detail_page import DetailPage
 from utils.map_utils import (
     are_coordinates_equal,
@@ -245,7 +248,8 @@ def test_map_state_persists_after_tab_navigation(
 @pytest.mark.parametrize(
     'uuid',
     [
-        '0015db7e-e684-7548-e053-08114f8cd4ad',
+        # Zarr data with a WMS link and a bbox
+        '27cc65c0-d453-4ba3-a0d6-55e4449fee8c',
     ],
 )
 def test_map_layer_persists_after_tab_navigation(
@@ -257,25 +261,30 @@ def test_map_layer_persists_after_tab_navigation(
     The test loads a detail page, selects a map layer, navigates to another tab and back,
     and then verifies that the selected map layer remains active and visible.
     """
+    # No gridded products, so the record offers GeoServer and Spatial Extent.
+    desktop_page.unroute(Routes.GRIDDED_TILE_PRODUCTS)
+    ApiRouter(desktop_page).route_gridded_tile_products(
+        handle_gridded_tile_products_empty
+    )
+
     detail_page = DetailPage(desktop_page)
     layer_factory = LayerFactory(detail_page.detail_map)
 
     detail_page.load(uuid)
-    # GeoServer layer-select and the PMTiles .metadata sidecar probe can lag under CI load.
+    # GeoServer layer-select can lag under CI load.
     detail_page.detail_map.wait_for_layer_select_loading()
     detail_page.detail_map.wait_for_map_idle()
 
-    # Ensure that Data Density (PMTiles) and GeoServer options are in the layers menu.
-    # Data Density mounts only after the PMTiles .metadata sidecar exists.
+    # Ensure that GeoServer and Spatial Extent options are in the layers menu.
     _open_layers_menu_until_visible(
-        detail_page, detail_page.detail_map.data_density_layer
+        detail_page, detail_page.detail_map.geoserver_layer
     )
-    expect(detail_page.detail_map.geoserver_layer).to_be_visible(
+    expect(detail_page.detail_map.spatial_extent_layer).to_be_visible(
         timeout=_UI_TIMEOUT_MS
     )
 
-    # Select Geoserver layer
-    detail_page.detail_map.geoserver_layer.check()
+    # Select Spatial Extent, which is not the default layer
+    detail_page.detail_map.spatial_extent_layer.check()
     detail_page.detail_map.wait_for_map_idle()
 
     # Navigate to the "Data Access" tab and back
@@ -284,15 +293,15 @@ def test_map_layer_persists_after_tab_navigation(
     detail_page.tabs.summary.tab.click()
     expect(detail_page.tabs.summary.description.first).to_be_visible()
 
-    # Verify that the Geoserver layer is present and visible on the map
+    # Verify that the Spatial Extent layer is present and visible on the map
     detail_page.detail_map.wait_for_map_idle()
     _open_layers_menu_until_visible(
-        detail_page, detail_page.detail_map.geoserver_layer
+        detail_page, detail_page.detail_map.spatial_extent_layer
     )
-    expect(detail_page.detail_map.geoserver_layer).to_be_checked(
+    expect(detail_page.detail_map.spatial_extent_layer).to_be_checked(
         timeout=_UI_TIMEOUT_MS
     )
-    layer_id = layer_factory.get_layer_id(LayerStyle.GEO_SERVER)
+    layer_id = layer_factory.get_layer_id(LayerStyle.SPATIAL_EXTENT)
     assert (
         detail_page.detail_map.is_map_layer_visible(
             layer_id, is_map_loading=False

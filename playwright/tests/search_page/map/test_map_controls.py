@@ -134,14 +134,14 @@ def test_map_buttons(desktop_page: Page, data_title: str) -> None:
     expect(detail_page.detail_map.draw_rect_menu_button).to_be_visible()
     expect(detail_page.detail_map.reset_selections_button).to_be_visible()
 
-    # Data Density is default once the `.metadata` probe succeeds; map idle
-    # can close the layer menu before GeoServer is clickable.
+    # Data Density replaces GeoServer on this parquet record, so it is the
+    # only layer. Map idle can close the layer menu, so re-open until visible.
     detail_page.detail_map.open_layers_menu_until_visible(
-        detail_page.detail_map.geoserver_layer
+        detail_page.detail_map.data_density_layer
     )
-    detail_page.detail_map.geoserver_layer.click()
+    expect(detail_page.detail_map.data_density_layer).to_be_checked()
 
-    # users now should be able to draw a rectangle and select a date range in any layers
+    # Users can draw a rectangle and select a date range on the Data Density layer
     expect(
         detail_page.detail_map.daterange_show_hide_menu_button
     ).to_be_visible()
