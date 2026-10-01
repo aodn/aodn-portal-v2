@@ -6,7 +6,7 @@ name: AI code review (Kiro)
 on:
   pull_request:
     branches: ["main"]
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened]
   # Manual run, e.g. to re-run after the credential is added.
   workflow_dispatch:
     inputs:
@@ -26,11 +26,11 @@ jobs:
   review:
     name: Code Review
     # Skip fork PRs (the review config comes from the PR head, so it must be
-    # trusted), drafts, and PRs labelled skip-ai-review, to save credits.
+    # trusted) and PRs labelled skip-ai-review, to save credits. Drafts are
+    # reviewed too.
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (github.event.pull_request.head.repo.full_name == github.repository &&
-       !github.event.pull_request.draft &&
        !contains(github.event.pull_request.labels.*.name, 'skip-ai-review'))
     permissions:
       contents: read
