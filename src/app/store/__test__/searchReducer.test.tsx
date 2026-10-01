@@ -3,6 +3,7 @@ import default_thumbnail from "@/assets/images/default-thumbnail.webp";
 import { OGCCollection } from "../OGCCollectionDefinitions";
 import { DateTimeFilterRange, ParameterState } from "../componentParamReducer";
 import { createSearchParamFrom, SearchParameters } from "../searchReducer";
+import { SearchControl } from "../searchTypes";
 import dayjs from "@/utils/DayjsUtils";
 
 describe("Search Reducer Function Test", () => {
@@ -183,6 +184,17 @@ describe("Search Reducer Function Test", () => {
     expect(result.filter).toContain("temporal AFTER 1992-01-17T00:00:00Z");
     expect(result.filter).not.toContain("temporal BEFORE");
     expect(result.filter).not.toContain("temporal DURING");
+  });
+
+  it("encodes apostrophes in search_after as %27", () => {
+    const result = createSearchParamFrom(
+      {} as ParameterState,
+      {
+        searchafter: ["O'Brien", "it's"],
+      } as SearchControl
+    );
+
+    expect(result.filter).toEqual("search_after='O%27Brien||it%27s'");
   });
 
   it("expands an end epoch at UTC midnight to end of that calendar day", () => {

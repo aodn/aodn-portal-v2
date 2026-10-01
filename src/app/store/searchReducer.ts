@@ -729,9 +729,10 @@ const createSearchParamFrom = (
   }
 
   if (c.searchafter) {
+    // Make sure string with ' do not mess up with the close quote
     p.filter = appendFilter(
       p.filter,
-      `search_after='${c.searchafter.join("||")}'`
+      `search_after='${c.searchafter.join("||").replace(/'/g, "%27")}'`
     );
   }
 
