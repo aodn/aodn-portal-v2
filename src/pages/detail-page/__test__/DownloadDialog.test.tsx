@@ -15,6 +15,8 @@ const mockUseDownloadDialog = {
   isSuccess: false,
   createdJobID: undefined as string | undefined,
   processingStatus: "",
+  errorToastMessage: "",
+  isDownloadBlocked: false,
   emailError: "",
   email: "",
   dataUsage: { purposes: [], sectors: [], allow_contact: null },
@@ -22,6 +24,7 @@ const mockUseDownloadDialog = {
   hasDownloadConditions: false,
   subsettingSelectionCount: 0,
   handleIsClose: vi.fn(),
+  handleCloseErrorToast: vi.fn(),
   handleStepClick: vi.fn(),
   handleStepperButtonClick: vi.fn(),
   handleDataUsageChange: vi.fn(),
@@ -254,6 +257,37 @@ describe("DownloadDialog", () => {
 
     mockUseDownloadDialog.isSuccess = false;
     mockUseDownloadDialog.createdJobID = undefined;
+  });
+
+  it("shows the error toast and blocks resubmit when the download is too large", () => {
+    const message =
+      "The selected data is too large to download (estimated 250.3 GB, limit 180 GB).";
+    mockUseDownloadDialog.errorToastMessage = message;
+    mockUseDownloadDialog.isDownloadBlocked = true;
+
+    render(
+      <TestWrapper>
+        <DownloadDialog {...mockProps} />
+      </TestWrapper>
+    );
+
+    expect(screen.getByTestId("download-error-toast")).toHaveTextContent(
+      message
+    );
+    expect(screen.getByTestId("stepper-button")).toBeDisabled();
+
+    mockUseDownloadDialog.errorToastMessage = "";
+    mockUseDownloadDialog.isDownloadBlocked = false;
+  });
+
+  it("does not show the error toast when there is no error message", () => {
+    render(
+      <TestWrapper>
+        <DownloadDialog {...mockProps} />
+      </TestWrapper>
+    );
+
+    expect(screen.queryByTestId("download-error-toast")).toBeNull();
   });
 
   it("should display data selection when hasDownloadConditions is true", () => {

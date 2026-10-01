@@ -1,11 +1,227 @@
+from typing import Literal
+
 import pytest
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Locator, Page, expect
 
 from core.enums.map_layers.reference_layer import ReferenceLayer
 from core.factories.layer import LayerFactory
+from pages.components.map import Map
 from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
+
+_TRANSPARENT = 'rgba(0, 0, 0, 0)'
+_DROP_SHADOW = 'rgba(0, 0, 0, 0.1) 4px 4px 4px 0px'
+_KEYBOARD_RING = 'rgb(0, 150, 255) 0px 0px 2px 2px'
+_DETAIL_UUID = '0015db7e-e684-7548-e053-08114f8cd4ad'
+
+
+def _assert_control_order_invariant(
+    map_component: Map,
+    button: Locator,
+    expected: dict[str, str],
+    order: Literal['before', 'after'],
+) -> None:
+    """Check intended styling, then compare it with the opposite CSS order."""
+    snapshots = []
+    opposite: Literal['before', 'after'] = (
+        'after' if order == 'before' else 'before'
+    )
+    for position in (order, opposite):
+        map_component.set_vendor_stylesheet_order(position)
+        for property_name, value in expected.items():
+            expect(button).to_have_css(property_name, value)
+        snapshots.append(map_component.control_styles(button))
+    assert snapshots[0] == snapshots[1]
+
+
+def _assert_menu_styles(
+    map_component: Map, order: Literal['before', 'after']
+) -> None:
+    expect(map_component.menu_buttons.first).to_be_visible()
+    map_component.close_bookmark_menu()
+    map_component.hover_map()
+    for button in map_component.menu_buttons.all():
+        _assert_control_order_invariant(
+            map_component,
+            button,
+            {
+                'display': 'flex',
+                'width': '38px',
+                'height': '38px',
+                'padding': '2px',
+                'border-radius': '6px',
+                'background-color': _TRANSPARENT,
+            },
+            order,
+        )
+        styles = map_component.control_styles(button)
+        assert styles['groupBackground'] == _TRANSPARENT
+        assert styles['groupShadow'] == 'none'
+        assert styles['groupMargin'] == '0px'
+
+    basemap = map_component.container.get_by_test_id(
+        'basemap-show-hide-menu-button'
+    )
+    basemap.hover()
+    _assert_control_order_invariant(
+        map_component,
+        basemap,
+        {'background-color': 'rgb(197, 216, 231)'},
+        order,
+    )
+    basemap.click()
+    _assert_control_order_invariant(
+        map_component,
+        basemap,
+        {'background-color': 'rgb(59, 110, 143)'},
+        order,
+    )
+    _assert_control_order_invariant(
+        map_component,
+        map_component.basemap_close_button,
+        {'width': '26px', 'height': '26px', 'border-radius': '50%'},
+        order,
+    )
+    map_component.basemap_close_button.click()
+
+
+def _assert_draw_styles(
+    map_component: Map, order: Literal['before', 'after']
+) -> None:
+    reset = map_component.reset_button
+    expect(reset).to_be_disabled()
+    _assert_control_order_invariant(
+        map_component,
+        reset,
+        {
+            'width': '42px',
+            'height': '42px',
+            'border-radius': '50%',
+            'box-shadow': _DROP_SHADOW,
+            'cursor': 'not-allowed',
+        },
+        order,
+    )
+    map_component.rectangle_menu_button.click()
+    _assert_control_order_invariant(
+        map_component,
+        map_component.rectangle_menu_button,
+        {'background-color': 'rgb(59, 110, 143)'},
+        order,
+    )
+    map_component.draw_rectangle()
+    expect(reset).to_be_enabled()
+
+    # Tab establishes keyboard modality; focus targets this map's reset even
+    # when another map or the searchbar is also mounted.
+    map_component.page.keyboard.press('Tab')
+    reset.focus()
+    _assert_control_order_invariant(
+        map_component,
+        reset,
+        {'box-shadow': _KEYBOARD_RING},
+        order,
+    )
+
+    map_component.click_map_center()
+    reset.hover()
+    # Mousedown focuses without invoking reset yet. The mouseup below then
+    # exercises the real reset handler, which disables the button.
+    map_component.page.mouse.down()
+    try:
+        _assert_control_order_invariant(
+            map_component,
+            reset,
+            {'box-shadow': _DROP_SHADOW},
+            order,
+        )
+    finally:
+        map_component.page.mouse.up()
+    expect(reset).to_be_disabled()
+
+    map_component.polygon_menu_button.click()
+    _assert_control_order_invariant(
+        map_component,
+        map_component.polygon_menu_button,
+        {'background-color': 'rgb(59, 110, 143)'},
+        order,
+    )
+    expect(map_component.canvas).to_have_css('cursor', 'crosshair')
+    map_component.polygon_menu_button.click()
+
+
+@pytest.mark.parametrize('order', ['before', 'after'])
+def test_search_map_stylesheet_order(
+    desktop_page: Page, order: Literal['before', 'after']
+) -> None:
+    """Cold search keeps menu geometry and fullscreen layout in either order."""
+    search_page = SearchPage(desktop_page)
+    search_page.load()
+    search_page.map.wait_for_map_loading()
+    _assert_menu_styles(search_page.map, order)
+    _assert_control_order_invariant(
+        search_page.map,
+        search_page.map.full_screen_toggle_button,
+        {
+            'display': 'flex',
+            'width': '30px',
+            'height': '30px',
+            'background-color': _TRANSPARENT,
+        },
+        order,
+    )
+    expect(search_page.map.attribution).to_be_visible()
+    expect(search_page.map.scale).to_be_hidden()
+
+
+@pytest.mark.parametrize('order', ['before', 'after'])
+def test_detail_map_stylesheet_order(
+    responsive_page: Page, order: Literal['before', 'after']
+) -> None:
+    """Cold detail preserves draw states, mouse shadow and keyboard focus ring."""
+    detail_page = DetailPage(responsive_page)
+    detail_page.load(_DETAIL_UUID)
+    detail_page.go_to_map_tab()
+    detail_page.detail_map.wait_for_map_loading()
+    detail_page.detail_map.wait_for_layer_select_loading()
+    _assert_menu_styles(detail_page.detail_map, order)
+    _assert_draw_styles(detail_page.detail_map, order)
+
+
+@pytest.mark.parametrize('order', ['before', 'after'])
+def test_location_map_stylesheet_order(
+    desktop_page: Page, order: Literal['before', 'after']
+) -> None:
+    """Opening location on landing keeps controls stable in either CSS order."""
+    landing_page = LandingPage(desktop_page)
+    location_map = Map(desktop_page, 'location-filter-map')
+    landing_page.load()
+    landing_page.search.location_button.click()
+    location_map.wait_for_map_loading()
+    _assert_menu_styles(location_map, order)
+    _assert_draw_styles(location_map, order)
+
+
+def test_map_stylesheet_order_after_navigation(desktop_page: Page) -> None:
+    """Search/detail/back and later location loading preserve map styling."""
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
+    detail_page = DetailPage(desktop_page)
+    location_map = Map(desktop_page, 'location-filter-map')
+    landing_page.load()
+    landing_page.search.click_search_button()
+    search_page.wait_for_search_to_complete()
+    _assert_menu_styles(search_page.map, 'after')
+    search_page.first_result_title.click()
+    detail_page.detail_map.wait_for_map_loading()
+    _assert_menu_styles(detail_page.detail_map, 'after')
+    detail_page.return_button.click()
+    search_page.map.wait_for_map_loading()
+    _assert_menu_styles(search_page.map, 'after')
+    search_page.search.location_button.click()
+    location_map.wait_for_map_loading()
+    _assert_menu_styles(location_map, 'after')
 
 
 @pytest.mark.parametrize(
@@ -134,14 +350,14 @@ def test_map_buttons(desktop_page: Page, data_title: str) -> None:
     expect(detail_page.detail_map.draw_rect_menu_button).to_be_visible()
     expect(detail_page.detail_map.reset_selections_button).to_be_visible()
 
-    # Data Density is default once the `.metadata` probe succeeds; map idle
-    # can close the layer menu before GeoServer is clickable.
+    # Data Density replaces GeoServer on this parquet record, so it is the
+    # only layer. Map idle can close the layer menu, so re-open until visible.
     detail_page.detail_map.open_layers_menu_until_visible(
-        detail_page.detail_map.geoserver_layer
+        detail_page.detail_map.data_density_layer
     )
-    detail_page.detail_map.geoserver_layer.click()
+    expect(detail_page.detail_map.data_density_layer).to_be_checked()
 
-    # users now should be able to draw a rectangle and select a date range in any layers
+    # Users can draw a rectangle and select a date range on the Data Density layer
     expect(
         detail_page.detail_map.daterange_show_hide_menu_button
     ).to_be_visible()

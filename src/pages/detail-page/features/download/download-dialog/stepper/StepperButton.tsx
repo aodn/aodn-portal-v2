@@ -118,7 +118,7 @@ const StepperButton = ({
       startIcon: createStatusIcons().errorCross(),
       endIcon: null,
       styles: createNonDefaultStateStyles(),
-      shouldDisableButton: false,
+      shouldDisableButton: disabled,
     },
 
     default: {

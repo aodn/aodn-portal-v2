@@ -46,6 +46,7 @@ const STATUS_CODES = {
   TIMEOUT: "408",
   SERVER_ERROR: "500",
   SUCCESS: "200",
+  TOO_LARGE: "422",
 } as const;
 
 const STATUS_MESSAGES = {
@@ -57,6 +58,10 @@ const STATUS_MESSAGES = {
   // queue - the request has no jobID and must be retried later by the user.
   LIMIT_REACHED:
     "You already have 10 downloads in progress. Please wait for one to finish before starting another.",
+  TOO_LARGE: "Selected data is too large to download",
+  // Toast text when the 422 reply has no message of its own.
+  TOO_LARGE_DETAIL:
+    "The selected data is too large to download. Please reduce the date range or area and try again.",
 } as const;
 
 const TIMEOUT_LIMIT = 8000;
@@ -77,6 +82,7 @@ export const useDownloadDialog = (
   const [isSuccess, setIsSuccess] = useState(false);
   const [createdJobID, setCreatedJobID] = useState<string | undefined>();
   const [processingStatus, setProcessingStatus] = useState<string>("");
+  const [errorToastMessage, setErrorToastMessage] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [dataUsage, setDataUsage] = useState<DataUsageInformation>({
     purposes: [],
@@ -150,6 +156,7 @@ export const useDownloadDialog = (
       // Reset all state when dialog opens
       setActiveStep(0);
       setProcessingStatus("");
+      setErrorToastMessage("");
       setIsSuccess(false);
       setCreatedJobID(undefined);
       setIsProcessing(false);
@@ -225,6 +232,7 @@ export const useDownloadDialog = (
     setIsSuccess(false);
     setCreatedJobID(undefined);
     setProcessingStatus("");
+    setErrorToastMessage("");
     setActiveStep(0);
     setEmail("");
     setEmailError("");
@@ -399,10 +407,16 @@ export const useDownloadDialog = (
           }
           setIsProcessing(false);
         })
-        .catch((error: { statusCode?: number }) => {
+        .catch((error: { statusCode?: number; details?: string }) => {
           // Rejected via ErrorBoundary's errorHandling()/rejectWithValue(),
           // which carries the real HTTP status as statusCode - e.g. 429 when
           // the recipient is already at the per-user concurrency limit.
+          if (error?.statusCode?.toString() === STATUS_CODES.TOO_LARGE) {
+            // errorHandling() puts the server's message in details.
+            setErrorToastMessage(
+              error.details || STATUS_MESSAGES.TOO_LARGE_DETAIL
+            );
+          }
           if (error?.statusCode) {
             setProcessingStatus(error.statusCode.toString());
           } else {
@@ -526,6 +540,9 @@ export const useDownloadDialog = (
     if (processingStatus === "429") {
       return STATUS_MESSAGES.LIMIT_REACHED;
     }
+    if (processingStatus === STATUS_CODES.TOO_LARGE) {
+      return STATUS_MESSAGES.TOO_LARGE;
+    }
     if (/^4\d{2}$/.test(processingStatus)) {
       return processingStatus === "400"
         ? STATUS_MESSAGES.DATASET_ERROR
@@ -533,6 +550,14 @@ export const useDownloadDialog = (
     }
     return "Something went wrong";
   }, [processingStatus]);
+
+  const handleCloseErrorToast = useCallback(() => {
+    setErrorToastMessage("");
+  }, []);
+
+  // A too-large download fails the same way every time, so block resubmit
+  // until the dialog is reopened with a smaller selection.
+  const isDownloadBlocked = processingStatus === STATUS_CODES.TOO_LARGE;
 
   const getStepperButtonTitle = useCallback(() => {
     if (activeStep === 0) {
@@ -548,12 +573,15 @@ export const useDownloadDialog = (
     isSuccess,
     createdJobID,
     processingStatus,
+    errorToastMessage,
+    isDownloadBlocked,
     email,
     emailError,
     dataUsage,
     hasDownloadConditions,
     subsettingSelectionCount,
     handleIsClose,
+    handleCloseErrorToast,
     handleStepClick,
     handleStepperButtonClick,
     handleDataUsageChange,

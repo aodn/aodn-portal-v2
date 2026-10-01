@@ -12,6 +12,7 @@ interface ResetSelectionsProps extends ControlProps {
 }
 
 const RESET_ID = "map-reset-selections-button";
+const RESET_BUTTON_SHADOW = "4px 4px 4px 0px rgba(0, 0, 0, 0.10)";
 
 // Standalone control rendered below the MenuControlGroup, not inside it
 const resetSelectionsButtonSx = (disabled: boolean) => ({
@@ -25,8 +26,13 @@ const resetSelectionsButtonSx = (disabled: boolean) => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    boxShadow: "4px 4px 4px 0px rgba(0, 0, 0, 0.10)",
+    boxShadow: RESET_BUTTON_SHADOW,
     cursor: disabled ? "not-allowed" : "pointer",
+    // Keep the drop shadow after a pointer click without replacing Mapbox's
+    // keyboard focus ring (:focus-visible).
+    "&:focus:not(:focus-visible)": {
+      boxShadow: RESET_BUTTON_SHADOW,
+    },
     "& svg": {
       width: "26px",
       height: "26px",

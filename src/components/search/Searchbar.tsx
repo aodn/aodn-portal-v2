@@ -10,7 +10,14 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Box, Fade, Paper, Popper, ClickAwayListener } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Fade,
+  Paper,
+  Popper,
+  ClickAwayListener,
+} from "@mui/material";
 import InputWithSuggester from "./InputWithSuggester";
 import { border, borderRadius, color, gap } from "../../styles/constants";
 import SearchbarButtonGroup, {
@@ -233,7 +240,24 @@ const Searchbar: FC<SearchbarProps> = ({
               >
                 <Fade in={true} key={activeButton} timeout={200}>
                   <Box>
-                    <Suspense fallback={null}>
+                    <Suspense
+                      fallback={
+                        <Box
+                          role="status"
+                          aria-label="Loading filter"
+                          sx={{
+                            minHeight: 160,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexDirection: "column",
+                            gap: 2,
+                          }}
+                        >
+                          <CircularProgress aria-hidden="true" />
+                        </Box>
+                      }
+                    >
                       {activeButton === SearchbarButtonNames.Date && (
                         <DateRangeFilter />
                       )}

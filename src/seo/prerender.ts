@@ -93,7 +93,10 @@ export const renderCrawlerPage = (
       // New Relic is ~97% of the shell and useless on a crawler-only page
       .replace(/\s*<!-- Tracking code -.*?<\/script>/s, "")
       // Google Analytics: crawler-only pages have no visitors worth counting
-      .replace(/\s*<script id="google-analytics">.*?<\/script>/s, "")
+      .replace(
+        /\s*<script async src="https:\/\/www\.googletagmanager\.com\/gtag\/js[^"]*"><\/script>\s*<script>.*?<\/script>/s,
+        ""
+      )
       // The shell's #root is empty; the record body goes in its place
       .replace(
         /<div id="root">.*?<\/div>/s,

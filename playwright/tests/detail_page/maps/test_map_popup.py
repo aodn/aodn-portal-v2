@@ -21,8 +21,10 @@ def test_map_data_density_layer_from_summary(
 ) -> None:
     """
     Parquet summary collections expose PMTiles Data Density as the default
-    map layer. Tile-backed hover popups need S3 tiles and are not asserted
-    here. This test verifies the layer switcher instead.
+    map layer. Data Density replaces GeoServer, so GeoServer is not offered
+    even though the record has a WMS link. Tile-backed hover popups need S3
+    tiles and are not asserted here. This test verifies the layer switcher
+    instead.
     """
     detail_page = DetailPage(desktop_page)
     detail_page.load(uuid)
@@ -43,9 +45,7 @@ def test_map_data_density_layer_from_summary(
     expect(detail_page.detail_map.data_density_layer).to_be_checked(
         timeout=_UI_TIMEOUT_MS
     )
-    expect(detail_page.detail_map.geoserver_layer).to_be_visible(
-        timeout=_UI_TIMEOUT_MS
-    )
+    expect(detail_page.detail_map.geoserver_layer).to_have_count(0)
 
 
 @pytest.mark.parametrize(
