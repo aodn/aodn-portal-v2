@@ -139,7 +139,7 @@ describe("DirectSelect custom MapboxDraw mode", () => {
     expect(metas).not.toContain("midpoint");
   });
 
-  it("shows corner handles and midpoints for a polygon", () => {
+  it("shows corner handles but no midpoints for a polygon", () => {
     const push = vi.fn();
     const state = {
       featureId: "poly1",
@@ -171,6 +171,6 @@ describe("DirectSelect custom MapboxDraw mode", () => {
 
     const metas = push.mock.calls.map(([feature]) => feature.properties.meta);
     expect(metas.filter((meta) => meta === "vertex")).toHaveLength(3);
-    expect(metas.filter((meta) => meta === "midpoint")).toHaveLength(3);
+    expect(metas).not.toContain("midpoint");
   });
 });

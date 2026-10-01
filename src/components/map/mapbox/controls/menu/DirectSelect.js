@@ -24,7 +24,7 @@ const moveBoundingBoxCorner = (corners, cornerIndex, newPosition) => {
 
 /**
  * Replaces MapboxDraw's direct_select mode so a bounding box can be resized
- * from its corners but never edited into a polygon. Polygons are unchanged.
+ * from its corners but never edited into a polygon. No shape shows midpoints.
  */
 const DirectSelect = {
   ...defaultDirectSelect,
@@ -50,16 +50,16 @@ const DirectSelect = {
     ]);
   },
   // Called to draw the shape and its handles; push adds one item to the map.
-  // A bounding box shows no midpoints, since dragging one would add a fifth
-  // point and turn the box into a polygon.
+  // Midpoints are hidden, so a shape can only be edited by dragging its corners.
   toDisplayFeatures: function (state, geojson, push) {
-    const pushUnlessMidpoint = (feature) =>
-      feature.properties.meta !== "midpoint" && push(feature);
+    const pushUnlessMidpoint = (feature) => {
+      if (feature.properties.meta !== "midpoint") push(feature);
+    };
     return defaultDirectSelect.toDisplayFeatures.call(
       this,
       state,
       geojson,
-      isBoundingBox(state.feature) ? pushUnlessMidpoint : push
+      pushUnlessMidpoint
     );
   },
 };
