@@ -1,5 +1,6 @@
 from playwright.sync_api import Locator, Page
 
+from config import settings
 from core.dataclasses.search_filter import SearchFilterConfig
 from core.factories.search_filter_validator_factory import (
     SearchFilterValidatorFactory,
@@ -118,6 +119,12 @@ class SearchPage(BasePage):
         )
         for param_name, is_valid in validation_results.items():
             assert is_valid, f"Parameter '{param_name}' is not correctly reflected in Request URL: {url}"
+
+    def load(self) -> None:
+        """Load search directly so lazy map CSS starts from a cold document."""
+        self.page.goto(
+            f'{settings.baseURL}/search', wait_until='domcontentloaded'
+        )
 
     def wait_for_page_stabilization(self) -> None:
         """
