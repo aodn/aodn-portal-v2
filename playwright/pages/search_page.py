@@ -118,9 +118,7 @@ class SearchPage(BasePage):
             url, expected_filters
         )
         for param_name, is_valid in validation_results.items():
-            assert is_valid, (
-                f"Parameter '{param_name}' is not correctly reflected in Request URL: {url}"
-            )
+            assert is_valid, f"Parameter '{param_name}' is not correctly reflected in Request URL: {url}"
 
     def load(self) -> None:
         """Load search directly so lazy map CSS starts from a cold document."""

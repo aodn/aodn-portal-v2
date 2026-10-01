@@ -1,3 +1,5 @@
+from typing import Literal
+
 import pytest
 from playwright.sync_api import Locator, Page, expect
 
@@ -18,11 +20,13 @@ def _assert_control_order_invariant(
     map_component: Map,
     button: Locator,
     expected: dict[str, str],
-    order: str,
+    order: Literal['before', 'after'],
 ) -> None:
     """Check intended styling, then compare it with the opposite CSS order."""
     snapshots = []
-    opposite = 'after' if order == 'before' else 'before'
+    opposite: Literal['before', 'after'] = (
+        'after' if order == 'before' else 'before'
+    )
     for position in (order, opposite):
         map_component.set_vendor_stylesheet_order(position)
         for property_name, value in expected.items():
@@ -31,7 +35,9 @@ def _assert_control_order_invariant(
     assert snapshots[0] == snapshots[1]
 
 
-def _assert_menu_styles(map_component: Map, order: str) -> None:
+def _assert_menu_styles(
+    map_component: Map, order: Literal['before', 'after']
+) -> None:
     expect(map_component.menu_buttons.first).to_be_visible()
     map_component.close_bookmark_menu()
     map_component.hover_map()
@@ -80,7 +86,9 @@ def _assert_menu_styles(map_component: Map, order: str) -> None:
     map_component.basemap_close_button.click()
 
 
-def _assert_draw_styles(map_component: Map, order: str) -> None:
+def _assert_draw_styles(
+    map_component: Map, order: Literal['before', 'after']
+) -> None:
     reset = map_component.reset_button
     expect(reset).to_be_disabled()
     _assert_control_order_invariant(
@@ -144,7 +152,9 @@ def _assert_draw_styles(map_component: Map, order: str) -> None:
 
 
 @pytest.mark.parametrize('order', ['before', 'after'])
-def test_search_map_stylesheet_order(desktop_page: Page, order: str) -> None:
+def test_search_map_stylesheet_order(
+    desktop_page: Page, order: Literal['before', 'after']
+) -> None:
     """Cold search keeps menu geometry and fullscreen layout in either order."""
     search_page = SearchPage(desktop_page)
     search_page.load()
@@ -166,7 +176,9 @@ def test_search_map_stylesheet_order(desktop_page: Page, order: str) -> None:
 
 
 @pytest.mark.parametrize('order', ['before', 'after'])
-def test_detail_map_stylesheet_order(responsive_page: Page, order: str) -> None:
+def test_detail_map_stylesheet_order(
+    responsive_page: Page, order: Literal['before', 'after']
+) -> None:
     """Cold detail preserves draw states, mouse shadow and keyboard focus ring."""
     detail_page = DetailPage(responsive_page)
     detail_page.load(_DETAIL_UUID)
@@ -178,7 +190,9 @@ def test_detail_map_stylesheet_order(responsive_page: Page, order: str) -> None:
 
 
 @pytest.mark.parametrize('order', ['before', 'after'])
-def test_location_map_stylesheet_order(desktop_page: Page, order: str) -> None:
+def test_location_map_stylesheet_order(
+    desktop_page: Page, order: Literal['before', 'after']
+) -> None:
     """Opening location on landing keeps controls stable in either CSS order."""
     landing_page = LandingPage(desktop_page)
     location_map = Map(desktop_page, 'location-filter-map')
