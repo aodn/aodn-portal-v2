@@ -79,7 +79,7 @@ const renderStatusButton = (
         isSvgIcon
         iconSize={iconSize[size].onGoing}
         isInteractive={false}
-        text="On going"
+        text="Ongoing"
         resultCardButtonConfig={{
           ...resultCardButtonConfig,
           color: color.success.main,

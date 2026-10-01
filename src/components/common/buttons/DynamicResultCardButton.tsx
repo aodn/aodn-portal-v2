@@ -30,7 +30,7 @@ const DynamicResultCardButton: React.FC<DynamicResultCardButtonProps> = ({
     (status: string | undefined): ToolKit => {
       const STATUS_MAP: Record<string, ToolKit> = {
         onGoing: {
-          text: "On Going",
+          text: "Ongoing",
           color: theme.palette.success.main,
           icon: <DoubleArrowIcon />,
         },

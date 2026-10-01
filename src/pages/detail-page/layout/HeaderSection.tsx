@@ -121,7 +121,7 @@ const renderOnGoingStatus = () => (
       fontSize={fontSize.label}
       color={color.success.main}
     >
-      On Going
+      Ongoing
     </Typography>
   </RoundCard>
 );
