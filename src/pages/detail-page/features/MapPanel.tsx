@@ -677,6 +677,10 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
             overflow: "hidden",
             borderTopLeftRadius: borderRadius.small,
             borderTopRightRadius: borderRadius.small,
+            "&:empty + *": {
+              borderTopLeftRadius: borderRadius.small,
+              borderTopRightRadius: borderRadius.small,
+            },
           }}
         />
         {additionalSlider}
