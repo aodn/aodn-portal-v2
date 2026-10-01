@@ -1,9 +1,11 @@
 import { useEffect, useMemo } from "react";
 import {
+  Alert,
   Box,
   Dialog,
   DialogActions,
   DialogContent,
+  Snackbar,
   Typography,
   useTheme,
   Divider,
@@ -66,12 +68,15 @@ const DownloadDialog = ({
     isSuccess,
     createdJobID,
     processingStatus,
+    errorToastMessage,
+    isDownloadBlocked,
     email,
     emailError,
     dataUsage,
     hasDownloadConditions,
     subsettingSelectionCount,
     handleIsClose,
+    handleCloseErrorToast,
     handleStepClick,
     handleStepperButtonClick,
     handleDataUsageChange,
@@ -276,10 +281,33 @@ const DownloadDialog = ({
           title={getStepperButtonTitle()}
           statusText={getDisplayText()}
           onClick={handleStepperButtonClick}
-          disabled={isProcessing || !!emailError || isSuccess}
+          disabled={
+            isProcessing || !!emailError || isSuccess || isDownloadBlocked
+          }
           status={getButtonStatus()}
         />
       </DialogActions>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={!!errorToastMessage}
+        autoHideDuration={6000}
+        onClose={(_, reason) => {
+          // Keep the toast when the user clicks inside the dialog
+          if (reason !== "clickaway") {
+            handleCloseErrorToast();
+          }
+        }}
+      >
+        <Alert
+          onClose={handleCloseErrorToast}
+          severity="error"
+          variant="filled"
+          sx={{ width: "100%" }}
+          data-testid="download-error-toast"
+        >
+          {errorToastMessage}
+        </Alert>
+      </Snackbar>
     </Dialog>
   );
 };
