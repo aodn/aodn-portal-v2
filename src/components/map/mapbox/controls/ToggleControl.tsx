@@ -28,12 +28,12 @@ const ToggleButton: React.FC<ToggleControlProps> = ({
       <IconButton
         id="map-toggle-control-button"
         sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "none",
           // Repeated class beats mapbox's default button rules
           "&.MuiIconButton-root.MuiIconButton-root": {
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "transparent",
             width: "30px",
             height: "30px",
             borderRadius: borderRadius.small,

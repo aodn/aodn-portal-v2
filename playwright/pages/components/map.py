@@ -1,6 +1,6 @@
 import random
 import time
-from typing import Any
+from typing import Any, Literal
 
 from playwright.sync_api import Error, Locator, Page, TimeoutError, expect
 
@@ -55,6 +55,123 @@ class Map(BasePage):
             'dateslider-daterange-menu-button'
         )
         self.date_slider_rail = self.date_slider.locator('.MuiSlider-root')
+
+        # Scoped locators also work when the location-filter map is open
+        # alongside the search map.
+        self.container = self.get_by_id(map_id)
+        self.menu_buttons = self.container.locator(
+            '.menu-control-group button.MuiIconButton-root'
+        )
+        self.polygon_menu_button = self.container.get_by_test_id(
+            'draw-polygon-menu-button'
+        )
+        self.rectangle_menu_button = self.container.get_by_test_id(
+            'draw-rect-menu-button'
+        )
+        self.reset_button = self.container.get_by_test_id(
+            'map-reset-selections-button'
+        )
+        self.basemap_close_button = (
+            self.container.get_by_text('Map Base Layers', exact=True)
+            .locator('..')
+            .get_by_role('button')
+        )
+        self.canvas = self.container.locator('.mapboxgl-canvas')
+        self.attribution = self.container.locator(
+            '.mapboxgl-ctrl-attrib:not(.mapboxgl-attrib-empty)'
+        )
+        self.scale = self.container.locator('.mapboxgl-ctrl-scale')
+
+    def set_vendor_stylesheet_order(
+        self, position: Literal['before', 'after']
+    ) -> None:
+        """Move loaded vendor CSS around Emotion without relying on filenames."""
+        self.page.evaluate(
+            r"""async (position) => {
+                const hasVendorRule = (rules) => Array.from(rules).some(
+                    rule => /\.mapboxgl-|\.mapbox-gl-draw/.test(
+                        rule.selectorText || ''
+                    ) || (rule.cssRules && hasVendorRule(rule.cssRules))
+                );
+                const vendors = Array.from(document.styleSheets).filter(
+                    sheet => {
+                        if (!sheet.ownerNode ||
+                            sheet.ownerNode.hasAttribute('data-emotion')) {
+                            return false;
+                        }
+                        try { return hasVendorRule(sheet.cssRules); }
+                        catch (error) {
+                            if (error.name === 'SecurityError') return false;
+                            throw error;
+                        }
+                    }
+                );
+                if (!vendors.length) {
+                    throw new Error('No loaded Mapbox stylesheets found');
+                }
+                // A fragment keeps Mapbox before Draw, including on repeated
+                // moves when a vendor node is already first in the head.
+                const fragment = document.createDocumentFragment();
+                vendors.forEach(sheet => fragment.appendChild(sheet.ownerNode));
+                if (position === 'before') document.head.prepend(fragment);
+                else document.head.append(fragment);
+                await new Promise(requestAnimationFrame);
+            }""",
+            position,
+        )
+
+    def control_styles(self, button: Locator) -> dict[str, str]:
+        """Read control geometry and decoration for cascade-order comparisons."""
+        return button.evaluate(
+            """async button => {
+                // Focus/hover can start a background transition after React
+                // updates. Compare settled styles rather than animation frames.
+                await new Promise(requestAnimationFrame);
+                await Promise.all(button.getAnimations().map(
+                    animation => animation.finished.catch(() => {})
+                ));
+                const style = getComputedStyle(button);
+                const group = getComputedStyle(
+                    button.closest('.mapboxgl-ctrl-group')
+                );
+                return {
+                    display: style.display,
+                    width: style.width,
+                    height: style.height,
+                    padding: style.padding,
+                    background: style.backgroundColor,
+                    border: style.border,
+                    radius: style.borderRadius,
+                    margin: style.margin,
+                    shadow: style.boxShadow,
+                    cursor: style.cursor,
+                    groupBackground: group.backgroundColor,
+                    groupShadow: group.boxShadow,
+                    groupMargin: group.margin,
+                };
+            }"""
+        )
+
+    def draw_rectangle(self) -> None:
+        """Finish an active rectangle tool using two points inside the canvas."""
+        # On mobile the instructions cover the drawing area. Closing them
+        # leaves the tool active and lets the two clicks reach the canvas.
+        self.container.get_by_test_id('menu-tooltip').get_by_role(
+            'button'
+        ).click()
+        self.hover_map()
+        self.click_map()
+        x, y = self.calculate_mouse_coordinates(right=40, down=40)
+        self.page.mouse.move(x, y)
+        self.click_map()
+
+    def close_bookmark_menu(self) -> None:
+        """Close the auto-open desktop bookmarks before checking idle controls."""
+        button = self.container.get_by_role(
+            'button', name='bookmark-list-button'
+        )
+        if button.count() and self.page.locator('#bookmark-list').is_visible():
+            button.click()
 
     def wait_for_search_loading(self) -> None:
         """
