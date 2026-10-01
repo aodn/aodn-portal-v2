@@ -211,6 +211,12 @@ const ListResultCard: FC<ListResultCardProps> = ({
                       maxWidth: "200px",
                       height: LIST_CARD_TITLE_HEIGHT,
                       pl: "10px",
+                      // Size the image from its aspect ratio rather than an
+                      // auto-width parent (Safari can reserve extra space).
+                      "& .MuiCardMedia-root": {
+                        width: "auto",
+                        maxWidth: "100%",
+                      },
                     }}
                   />
                 )}
