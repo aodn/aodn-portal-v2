@@ -186,7 +186,7 @@ describe("Search Reducer Function Test", () => {
     expect(result.filter).not.toContain("temporal DURING");
   });
 
-  it("encodes apostrophes in search_after as %27", () => {
+  it("escapes apostrophes in search_after as doubled quotes", () => {
     const result = createSearchParamFrom(
       {} as ParameterState,
       {
@@ -194,7 +194,7 @@ describe("Search Reducer Function Test", () => {
       } as SearchControl
     );
 
-    expect(result.filter).toEqual("search_after='O%27Brien||it%27s'");
+    expect(result.filter).toEqual("search_after='O''Brien||it''s'");
   });
 
   it("expands an end epoch at UTC midnight to end of that calendar day", () => {
