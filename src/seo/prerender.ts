@@ -37,7 +37,7 @@ const renderDateLine = (collection: OGCCollection) => {
 };
 
 // Static body for crawlers: title, date, abstract and related-record links —
-// crawlers only follow <a href>. The SPA replaces it on mount.
+// crawlers only follow <a href>. stripAppBundle keeps it from being replaced.
 const renderBody = (collection: OGCCollection, related: RelatedLink[]) => {
   const relatedItems = related
     .map(
@@ -55,6 +55,27 @@ const renderBody = (collection: OGCCollection, related: RelatedLink[]) => {
     ${relatedNav}
   </main>`;
 };
+
+const MODULE_SCRIPT = /\s*<script[^>]*type="module"[^>]*>\s*<\/script>/g;
+const MODULE_PRELOAD = /\s*<link[^>]*rel="modulepreload"[^>]*\/?>/g;
+
+/**
+ * Drops the app bundle so the page renders the same with or without JS.
+ * Otherwise React empties #root on render and every record is indexed as the
+ * same empty shell. Only crawlers get these pages; the JSON-LD is not a
+ * module, so it survives. Each pattern repeats until nothing changes: one
+ * pass can rejoin interleaved tags into a working script.
+ */
+const stripAppBundle = (html: string) =>
+  [MODULE_SCRIPT, MODULE_PRELOAD].reduce((current, pattern) => {
+    let stripped = current;
+    let previous = "";
+    do {
+      previous = stripped;
+      stripped = stripped.replace(pattern, "");
+    } while (stripped !== previous);
+    return stripped;
+  }, html);
 
 // Renders what crawlers read for one record — in Google terms: the title link,
 // snippet, canonical and Dataset structured data, plus Open Graph / Twitter
@@ -83,7 +104,7 @@ export const renderCrawlerPage = (
     // JSON.stringify drops undefined-valued fields
     `<script type="application/ld+json">${JSON.stringify(buildJsonLd(collection)).replace(/</g, "\\u003c")}</script>`,
   ].join("\n    ");
-  return (
+  return stripAppBundle(
     template
       .replace(/<title>.*?<\/title>/s, `<title>${title} | ${SITE_NAME}</title>`)
       // The template carries site-wide description and social tags; the record's replace them

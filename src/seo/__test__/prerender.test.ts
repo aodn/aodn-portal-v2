@@ -188,6 +188,46 @@ describe("renderCrawlerPage", () => {
     expect(html).toContain('<nav aria-label="Related records">');
   });
 
+  test("removes the app bundle so rendering cannot erase the body", () => {
+    // Shaped like the built shell: Vite's hashed entry plus legacy_portal.js
+    const builtShell =
+      '<!doctype html><html lang="en"><head><title>AODN Portal</title>' +
+      '<link rel="modulepreload" crossorigin href="/assets/vendor-xyz.js" />' +
+      '<link rel="stylesheet" crossorigin href="/assets/index-abc.css" />' +
+      '<script type="module" src="/legacy_portal.js"></script>' +
+      '</head><body><div id="root"></div>' +
+      '<script type="module" crossorigin src="/assets/index-abc.js"></script>' +
+      "</body></html>";
+
+    const html = renderCrawlerPage(builtShell, collection);
+
+    expect(html).not.toContain('type="module"');
+    expect(html).not.toContain("/assets/index-abc.js");
+    expect(html).not.toContain("legacy_portal.js");
+    expect(html).not.toContain("modulepreload");
+    // The record content and its structured data survive
+    expect(html).toContain("<h1>Sea Surface Temperature</h1>");
+    expect(extractJsonLd(html).name).toBe("Sea Surface Temperature");
+    // Stylesheets are left alone — only executable code erases the body
+    expect(html).toContain('<link rel="stylesheet"');
+  });
+
+  test("strips interleaved module scripts a single pass would rejoin", () => {
+    // Removing the inner match once would splice "<scr" onto "ipt ..." and
+    // leave a working module script behind
+    const interleaved =
+      '<!doctype html><html lang="en"><head><title>AODN Portal</title></head>' +
+      '<body><div id="root"></div>' +
+      '<scr<script type="module" src="/a.js"></script>' +
+      'ipt type="module" src="/b.js"></script>' +
+      "</body></html>";
+
+    const html = renderCrawlerPage(interleaved, collection);
+
+    expect(html).not.toContain('type="module"');
+    expect(html).not.toContain("/b.js");
+  });
+
   test("removes the New Relic tracking script", () => {
     const templateWithNewRelic = TEMPLATE.replace(
       "</head>",
