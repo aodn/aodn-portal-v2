@@ -215,6 +215,55 @@ describe("AssociatedRecordsPanel", async () => {
     );
   });
 
+  it("should link a record not exist in the portal to its GeoNetwork record", async () => {
+    vi.mocked(useLocation).mockReturnValue({
+      state: null,
+      hash: "111",
+      key: "default",
+      pathname: "/details/5fc91100-4ade-11dc-8f56-00008a07204e",
+      search: "",
+    });
+
+    vi.mocked(useParams).mockReturnValue({
+      uuid: "5fc91100-4ade-11dc-8f56-00008a07204e",
+    });
+
+    render(
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <DetailPageProvider>
+            <AssociatedRecordsPanel />
+          </DetailPageProvider>
+        </ThemeProvider>
+      </Provider>
+    );
+
+    const geonetworkUrl =
+      "https://catalogue-imos.aodn.org.au/geonetwork/srv/eng/catalog.search#/metadata/0f65b7ae-1f6f-4a55-b804-1c991f791e1a";
+
+    const linkCard = await screen.findByTestId(
+      `link-card-${geonetworkUrl}`,
+      {},
+      { timeout: 10000 }
+    );
+    expect(linkCard).to.exist;
+    // Not a details page link
+    expect(
+      screen.queryByTestId(
+        `link-card-${window.location.origin}/details/0f65b7ae-1f6f-4a55-b804-1c991f791e1a`
+      )
+    ).to.not.exist;
+
+    await userEvent.click(
+      screen.getByText("IMOS - Autonomous Underwater Vehicles - AUV Iver")
+    );
+    expect(openSpy).toHaveBeenCalledWith(
+      geonetworkUrl,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  });
+
   it("should be able to show / hide more records", async () => {
     vi.mocked(useLocation).mockReturnValue({
       state: null,
