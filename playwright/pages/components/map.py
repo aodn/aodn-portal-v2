@@ -153,17 +153,21 @@ class Map(BasePage):
         )
 
     def draw_rectangle(self) -> None:
-        """Finish an active rectangle tool using two points inside the canvas."""
+        """Finish an active rectangle tool by pressing, dragging and releasing.
+
+        DrawRectangle draws on press-and-drag: a plain click sets both corners
+        at the same point, which the mode treats as zero area and discards.
+        """
         # On mobile the instructions cover the drawing area. Closing them
-        # leaves the tool active and lets the two clicks reach the canvas.
+        # leaves the tool active and lets the drag reach the canvas.
         self.container.get_by_test_id('menu-tooltip').get_by_role(
             'button'
         ).click()
         self.hover_map()
-        self.click_map()
+        self.page.mouse.down()
         x, y = self.calculate_mouse_coordinates(right=40, down=40)
         self.page.mouse.move(x, y)
-        self.click_map()
+        self.page.mouse.up()
 
     def close_bookmark_menu(self) -> None:
         """Close the auto-open desktop bookmarks before checking idle controls."""
