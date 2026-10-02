@@ -105,6 +105,21 @@ describe("DownloadSubsetting time range", () => {
     expect(screen.getByTestId("minimum-date")).toHaveTextContent("2006-10-01");
     expect(screen.getByTestId("maximum-date")).toHaveTextContent("2024-12-31");
   });
+
+  // jsdom has no layout, so this pins the styles that keep the selection count
+  // a fixed circle that does not shrink on narrow screens
+  it("shows the selection count in a fixed round circle", () => {
+    renderComponent([
+      new DateRangeCondition("slider-selection", "2008-03-03", "2020-06-30"),
+    ]);
+
+    expect(screen.getByText("1")).toHaveStyle({
+      width: "20px",
+      height: "20px",
+      flexShrink: "0",
+      borderRadius: "50%",
+    });
+  });
 });
 
 describe("DownloadSubsetting info message", () => {
