@@ -103,6 +103,11 @@ export const checkDetailPage = (html: string, uuid: string): string[] => {
   if (!/<h1>[^<]/.test(html)) {
     problems.push("body is missing the visible record content (h1)");
   }
+  // Without it the detail pages link only to each other, and Google sees 15k
+  // pages that nothing links to
+  if (!html.includes('<a href="/">')) {
+    problems.push("body does not link back to the home page");
+  }
   if (!html.includes('<div id="root"')) {
     problems.push("page is missing the content container");
   }

@@ -12,7 +12,7 @@ import { readFile, writeFile, mkdir } from "fs/promises";
 import path from "path";
 import type { OGCCollection } from "./fetchCollections";
 import { fetchCollections } from "./fetchCollections";
-import { buildJsonLd } from "./jsonLd";
+import { buildBreadcrumbJsonLd, buildJsonLd } from "./jsonLd";
 import { buildRelatedLinks, RelatedLink } from "./relatedRecords";
 import { isSeoCli, runCli, seoDistDir } from "./cli";
 import {
@@ -48,7 +48,10 @@ const renderBody = (collection: OGCCollection, related: RelatedLink[]) => {
   const relatedNav = relatedItems
     ? `<nav aria-label="Related records"><h2>Related records</h2><ul>${relatedItems}</ul></nav>`
     : "";
-  return `<main>
+  // Without this link the 15k detail pages are an island: they point at each
+  // other but never back to "/", so Google sees pages nothing links to.
+  return `<nav aria-label="Breadcrumb"><a href="/">${SITE_NAME}</a></nav>
+  <main>
     <h1>${escapeEntities(collection.title ?? "")}</h1>
     ${renderDateLine(collection)}
     <p>${escapeEntities(collection.description ?? "")}</p>
@@ -77,6 +80,11 @@ const stripAppBundle = (html: string) =>
     return stripped;
   }, html);
 
+// \u003c-escape keeps a "</script>" inside the JSON from closing the tag early;
+// JSON.stringify drops undefined-valued fields
+const toJsonLdScript = (data: unknown) =>
+  `<script type="application/ld+json">${JSON.stringify(data).replace(/</g, "\\u003c")}</script>`;
+
 // Renders what crawlers read for one record — in Google terms: the title link,
 // snippet, canonical and Dataset structured data, plus Open Graph / Twitter
 // social preview tags, and a static body (see renderBody).
@@ -100,9 +108,8 @@ export const renderCrawlerPage = (
     `<meta property="og:url" content="${pageUrl}" />`,
     `<meta property="og:image" content="${SHARE_IMAGE_URL}" />`,
     '<meta name="twitter:card" content="summary" />',
-    // \u003c-escape keeps a "</script>" inside the JSON from closing the tag early;
-    // JSON.stringify drops undefined-valued fields
-    `<script type="application/ld+json">${JSON.stringify(buildJsonLd(collection)).replace(/</g, "\\u003c")}</script>`,
+    toJsonLdScript(buildJsonLd(collection)),
+    toJsonLdScript(buildBreadcrumbJsonLd(collection)),
   ].join("\n    ");
   return stripAppBundle(
     template

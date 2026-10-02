@@ -70,7 +70,9 @@ describe("renderCrawlerPage", () => {
   test("injects the record's title and abstract into the body", () => {
     const html = renderCrawlerPage(TEMPLATE, collection);
 
-    expect(html).toContain('<div id="root"><main>');
+    expect(html).toContain(
+      '<div id="root"><nav aria-label="Breadcrumb"><a href="/">AODN Portal</a></nav>'
+    );
     expect(html).toContain("<h1>Sea Surface Temperature</h1>");
     expect(html).toContain("<p>Daily SST observations around Australia.</p>");
     // No related records given — no nav
@@ -136,7 +138,9 @@ describe("renderCrawlerPage", () => {
     // Body: visible content plus the internal links crawlers follow,
     // exactly as a non-JS crawler receives it
     const body = html.match(/<div id="root">(.*?)<\/div><\/body>/s)?.[1];
-    expect(body).toBe(`<main>
+    expect(body)
+      .toBe(`<nav aria-label="Breadcrumb"><a href="/">AODN Portal</a></nav>
+  <main>
     <h1>Sea Surface Temperature</h1>
     <p>Updated: 2026-08-12</p>
     <p>Daily SST observations around Australia.</p>
@@ -228,6 +232,40 @@ describe("renderCrawlerPage", () => {
     expect(html).not.toContain("/b.js");
   });
 
+  test("links back to the home page so the pages are not an island", () => {
+    const html = renderCrawlerPage(TEMPLATE, collection);
+
+    expect(html).toContain('<a href="/">AODN Portal</a>');
+  });
+
+  test("carries BreadcrumbList JSON-LD alongside the Dataset", () => {
+    const html = renderCrawlerPage(TEMPLATE, collection);
+    const blocks = [
+      ...html.matchAll(
+        /<script type="application\/ld\+json">(.*?)<\/script>/gs
+      ),
+    ].map((match) => JSON.parse(match[1]));
+
+    expect(blocks.map((block) => block["@type"])).toEqual([
+      "Dataset",
+      "BreadcrumbList",
+    ]);
+    expect(blocks[1].itemListElement).toEqual([
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "AODN Portal",
+        item: `${BASE_URL}/`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Sea Surface Temperature",
+        item: `${BASE_URL}/details/abc-123`,
+      },
+    ]);
+  });
+
   test("removes the New Relic tracking script", () => {
     const templateWithNewRelic = TEMPLATE.replace(
       "</head>",
@@ -286,8 +324,9 @@ describe("renderCrawlerPage", () => {
       })
     );
 
-    // Still exactly one script open/close pair, and the payload parses back intact
-    expect(html.match(/<\/script>/g)).toHaveLength(1);
+    // Still one open/close pair per JSON-LD block (Dataset + BreadcrumbList),
+    // and the payload parses back intact
+    expect(html.match(/<\/script>/g)).toHaveLength(2);
     expect(extractJsonLd(html).description).toBe(
       'Contains </script><script>alert("x")</script> inline.'
     );

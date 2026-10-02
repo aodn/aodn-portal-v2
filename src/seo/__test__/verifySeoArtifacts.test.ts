@@ -114,6 +114,16 @@ describe("checkDetailPage", () => {
     );
   });
 
+  test("flags a page that does not link back to the home page", () => {
+    const page = renderCrawlerPage(template, collection).replace(
+      '<a href="/">',
+      "<span>"
+    );
+    expect(checkDetailPage(page, "abc-123")).toContain(
+      "body does not link back to the home page"
+    );
+  });
+
   test("flags a page that still ships the app bundle", () => {
     const page = renderCrawlerPage(template, collection).replace(
       "</body>",
