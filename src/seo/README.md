@@ -4,17 +4,25 @@ Makes the portal visible to search engines. The app is a JavaScript-only SPA —
 a crawler fetching a page gets an empty shell — so this folder adds what
 crawlers need, delivered two ways:
 
-- **With the app bundle** (wired in `vite.config.ts`): head tags, robots.txt,
-  a live canonical link, per-page titles and a noindex hook for pages crawlers
-  must skip — `headTags.ts`, `vitePlugins.ts`, `canonicalUrl.ts`,
-  `useDocumentTitle.ts`, `useRobotsNoIndex.ts`
+- **In the app build** (wired in `vite.config.ts`): `vitePlugins.ts` bakes the
+  site-wide head tags from `headTags.ts` into `index.html` and picks the
+  per-environment `robots.txt`. At runtime `canonicalUrl.ts` keeps the
+  canonical link in step with the route, `useDocumentTitle.ts` sets the
+  per-page title, and `useRobotsNoIndex.ts` adds `noindex` to pages that must
+  stay out of the index.
 - **Weekly to S3** (the [Publish SEO Artifacts workflow](../../.github/workflows/seo.yml)):
-  `sitemap.xml` plus ~15k pre-rendered detail pages under
-  `prerender/details/<uuid>/index.html` —
-  `fetchCollections.ts` feeds `sitemap.ts` and `prerender.ts` (which embeds
-  `jsonLd.ts`, plus a static body of title, abstract and `relatedRecords.ts`
-  links so pages link to each other — crawlers only discover pages through
-  `<a href>`); `fetchCollections.ts` is the only module importing app-store code
+  `fetchCollections.ts` pulls every record — the only module here that imports
+  app-store code — and feeds two builders. `sitemap.ts` writes `sitemap.xml`.
+  `prerender.ts` writes ~15k pages at `prerender/details/<uuid>/index.html`,
+  each carrying `jsonLd.ts` structured data and a static body of title,
+  abstract, a breadcrumb link home and `relatedRecords.ts` links — crawlers
+  discover pages only through `<a href>`.
+
+The pre-rendered pages ship **without the app bundle**. Google indexes a page
+after running its JavaScript, so if the bundle is left in, React mounts, empties
+`#root` and throws the static body away — every record then looks like the same
+unresolved shell, which Search Console reports as "Duplicate, Google chose a
+different canonical than user". `seo:verify` fails if the bundle comes back.
 
 A CloudFront function (in `artifacts/`) rewrites crawler requests for
 `/details/<uuid>` to the pre-rendered pages; real users always get the latest

@@ -104,13 +104,33 @@ describe("checkDetailPage", () => {
     );
   });
 
-  test("flags a page that lost the app shell", () => {
+  test("flags a page that lost the content container", () => {
     const page = renderCrawlerPage(template, collection).replace(
       '<div id="root">',
       "<div>"
     );
     expect(checkDetailPage(page, "abc-123")).toContain(
-      "page no longer boots the app shell"
+      "page is missing the content container"
+    );
+  });
+
+  test("flags a page that does not link back to the home page", () => {
+    const page = renderCrawlerPage(template, collection).replace(
+      '<a href="/">',
+      "<span>"
+    );
+    expect(checkDetailPage(page, "abc-123")).toContain(
+      "body does not link back to the home page"
+    );
+  });
+
+  test("flags a page that still ships the app bundle", () => {
+    const page = renderCrawlerPage(template, collection).replace(
+      "</body>",
+      '<script type="module" crossorigin src="/assets/index-abc.js"></script></body>'
+    );
+    expect(checkDetailPage(page, "abc-123")).toContain(
+      "ships the app bundle, which erases the body on render"
     );
   });
 });
