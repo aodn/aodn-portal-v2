@@ -104,7 +104,12 @@ export const checkDetailPage = (html: string, uuid: string): string[] => {
     problems.push("body is missing the visible record content (h1)");
   }
   if (!html.includes('<div id="root"')) {
-    problems.push("page no longer boots the app shell");
+    problems.push("page is missing the content container");
+  }
+  // If the bundle is back, React empties #root on render and every record is
+  // indexed as the same empty shell — see stripAppBundle in prerender.ts.
+  if (/<script[^>]*type="module"/.test(html)) {
+    problems.push("ships the app bundle, which erases the body on render");
   }
   return problems;
 };
