@@ -16,6 +16,12 @@ crawlers need, delivered two ways:
   links so pages link to each other — crawlers only discover pages through
   `<a href>`); `fetchCollections.ts` is the only module importing app-store code
 
+The pre-rendered pages ship **without the app bundle**. Google indexes a page
+after running its JavaScript, so if the bundle is left in, React mounts, empties
+`#root` and throws the static body away — every record then looks like the same
+unresolved shell, which Search Console reports as "Duplicate, Google chose a
+different canonical than user". `seo:verify` fails if the bundle comes back.
+
 A CloudFront function (in `artifacts/`) rewrites crawler requests for
 `/details/<uuid>` to the pre-rendered pages; real users always get the latest
 SPA shell. The `prerender/` folder never appears in a public URL, sitemap or
