@@ -48,8 +48,8 @@ const renderBody = (collection: OGCCollection, related: RelatedLink[]) => {
   const relatedNav = relatedItems
     ? `<nav aria-label="Related records"><h2>Related records</h2><ul>${relatedItems}</ul></nav>`
     : "";
-  // Without this link the 15k detail pages are an island: they point at each
-  // other but never back to "/", so Google sees pages nothing links to.
+  // Without this link the 15k detail pages are an island: the SPA's own
+  // "Back to Home" is a Box with an onClick, which a crawler cannot follow.
   return `<nav aria-label="Breadcrumb"><a href="/">${SITE_NAME}</a></nav>
   <main>
     <h1>${escapeEntities(collection.title ?? "")}</h1>
