@@ -163,6 +163,11 @@ pytest --tracing retain-on-failure
 
 In CI runs, traces are automatically saved for failed tests.
 
+The required `ui_test` check combines both shards' existing
+`html-reports/final_report.json` results. Its annotations, logs and job summary
+show failing test names and recorded error details from either shard, without
+rerunning tests. Missing reports are flagged with a pointer to the shard logs.
+
 `retain-on-failure` only controls whether the trace is _saved_, not what it
 contains: [`tests/conftest.py`](./tests/conftest.py) starts tracing with
 `screenshots=True, snapshots=True, sources=True` for every test, so a saved
@@ -174,7 +179,7 @@ during the run — it's just discarded instead of written to disk.
 - Scroll down to the **Artifacts** section.
 - Download the artifact named `test-report-1` or `test-report-2` (one per shard).
 - After extracting the zip file:
-  - `reports/`: Contains the HTML test report.
+  - `html-reports/`: Contains the HTML test report and structured JSON results.
   - `test-results/`: Contains trace files for failed tests, structured by folder just like the [`tests/`](./tests/) directory.
 
 ### How to Investigate Failed Tests
