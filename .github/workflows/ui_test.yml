@@ -53,6 +53,16 @@ jobs:
             playwright/test-results/
           retention-days: 7
 
+      # Reuse the HTML reporter's structured results without downloading videos
+      # and traces into the aggregate job.
+      - name: Upload shard results
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: shard-results-${{ matrix.shard }}
+          path: playwright/html-reports/final_report.json
+          retention-days: 7
+
   # Branch protection requires a check named "ui_test", but matrix jobs report
   # as "ui_test shard N". This job reports the combined shard result under that
   # name. always() keeps it from being skipped, which would count as passing.
@@ -61,7 +71,17 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - name: Check shard results
-        run: |
-          echo "Shard result: ${{ needs.ui_test_shard.result }}"
-          test "${{ needs.ui_test_shard.result }}" = "success"
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Download shard results
+        uses: actions/download-artifact@v8
+        with:
+          pattern: shard-results-*
+          path: shard-reports
+
+      - name: Report shard results
+        if: always()
+        env:
+          SHARD_RESULT: ${{ needs.ui_test_shard.result }}
+        run: python3 .github/scripts/report_ui_test.py
