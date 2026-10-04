@@ -102,7 +102,11 @@ new data is what the pages render.
 `main` publishes; PRs consume.
 
 1. A push to `main` builds, measures and uploads `.lighthouse/report.json` as the
-   `lighthouse-baseline` artifact.
+   `lighthouse-baseline` artifact whenever the measurement succeeds and the run
+   is not cancelled, even if the performance gate or another later step fails.
+   The job still fails when the gate detects a blocking regression, but its
+   baseline is refreshed so subsequent PRs compare with the latest measurement.
+   A failed build or measurement does not publish a baseline.
 2. A PR run asks the Actions API for the newest non-expired `lighthouse-baseline`
    from `main`, unpacks it and compares.
 3. No baseline yet (first run, or the artifact expired) → the comment reports the
