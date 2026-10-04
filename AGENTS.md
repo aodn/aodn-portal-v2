@@ -120,6 +120,7 @@ Page layout: `<Page>.tsx` composes; `layout/` = where things render;
   `.github/ai-code-review/prompt.md` and `instructions.md` are local.
 - Unit tests: Vitest + jsdom + Testing Library, in a `__test__/` folder next to
   the code.
+- Python files anywhere in the repo also need `(cd playwright && pre-commit run --all-files)` (Ruff + mypy); files outside `playwright/` do not inherit its `ruff.toml`.
 - Mock HTTP with MSW, not by mocking axios. Handlers are in
   `src/__mocks__/handlers.ts`, fixtures in `src/__mocks__/data/`, and helpers in
   `src/__mocks__/utils/`. New API behaviour needs a handler there.
