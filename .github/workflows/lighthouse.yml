@@ -70,6 +70,7 @@ jobs:
       # src/lighthouse/fixtures/api (refreshed with `yarn lh:record`), so an
       # unavailable environment cannot fail this job.
       - name: Measure the routes
+        id: measure
         env:
           # On pull_request GITHUB_SHA is the merge commit; report the PR's own
           # commit instead
@@ -77,8 +78,9 @@ jobs:
           LH_FORM_FACTOR: ${{ inputs.form-factor || 'both' }}
         run: yarn lh:measure
 
-      # The baseline is whatever the latest successful main run published. Also
-      # downloaded on main, where it compares this merge with the one before.
+      # The baseline is the latest valid measurement published by main, even
+      # when its gate failed. Also downloaded on main to compare with the
+      # previous published measurement.
       - name: Download the main baseline
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -115,8 +117,14 @@ jobs:
 
       # What a PR compares itself against next time. Kept for the default
       # artifact retention, so a quiet week still has a baseline to use.
+      # Publish a valid measurement even if a later step (including the gate)
+      # failed, so a high baseline cannot stay frozen across main pushes.
       - name: Publish the baseline
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: >-
+          ${{ !cancelled() &&
+              github.event_name == 'push' &&
+              github.ref == 'refs/heads/main' &&
+              steps.measure.outcome == 'success' }}
         uses: actions/upload-artifact@v6
         with:
           name: lighthouse-baseline
