@@ -31,6 +31,7 @@ import type {
   FormFactor,
   LighthouseReport,
   MetricKey,
+  MeasurementTarget,
   RouteReport,
 } from "./types";
 
@@ -98,6 +99,66 @@ const findBaselineRoute = (
   // The path can change without the route changing — a different
   // /details/<uuid>, for instance.
   return Object.values(baseline.routes).find((entry) => entry.id === route.id);
+};
+
+/** Only blocking route/form-factor pairs need another baseline measurement. */
+export const confirmationTargets = (
+  current: LighthouseReport,
+  baseline: LighthouseReport | undefined,
+  blockingDrop = blockingPerformanceDrop()
+): MeasurementTarget[] => {
+  if (blockingDrop === 0) return [];
+  return Object.entries(current.routes).flatMap(([routePath, route]) => {
+    const before = findBaselineRoute(baseline, routePath, route);
+    return ALL_FORM_FACTORS.flatMap((formFactor) => {
+      const mainScore = before?.metrics[formFactor]?.performance;
+      const prScore = route.metrics[formFactor]?.performance;
+      return mainScore !== undefined &&
+        prScore !== undefined &&
+        mainScore - prScore >= blockingDrop - 1e-9
+        ? [{ path: routePath, formFactor }]
+        : [];
+    });
+  });
+};
+
+/** Replace only the measurements that initially blocked, keeping other history. */
+export const confirmedBaseline = (
+  current: LighthouseReport,
+  baseline: LighthouseReport,
+  confirmation: LighthouseReport
+): LighthouseReport => {
+  if (confirmation.commit !== baseline.commit) {
+    throw new Error("confirmation must measure the archived baseline commit");
+  }
+  if (confirmation.runs !== current.runs) {
+    throw new Error("confirmation must use the same run count as the PR");
+  }
+  const result = structuredClone(baseline);
+  for (const target of confirmationTargets(current, baseline)) {
+    const route = confirmation.routes[target.path];
+    const metrics = route?.metrics[target.formFactor];
+    if (!metrics || route.id !== current.routes[target.path].id) {
+      throw new Error(
+        `missing confirmation for ${target.path} ${target.formFactor}`
+      );
+    }
+    if (metricOrder.some((metric) => !Number.isFinite(metrics[metric]))) {
+      throw new Error(
+        `invalid confirmation metrics for ${target.path} ${target.formFactor}`
+      );
+    }
+    const before = findBaselineRoute(
+      result,
+      target.path,
+      current.routes[target.path]
+    );
+    result.routes[target.path] = {
+      id: route.id,
+      metrics: { ...before?.metrics, [target.formFactor]: metrics },
+    };
+  }
+  return result;
 };
 
 /** A metric's baseline and PR cells for one form factor, plus any regression it hit. */
@@ -201,10 +262,12 @@ export const buildMarkdown = ({
   current,
   baseline,
   blockingDrop = blockingPerformanceDrop(),
+  confirmed = [],
 }: {
   current: LighthouseReport;
   baseline?: LighthouseReport;
   blockingDrop?: number;
+  confirmed?: MeasurementTarget[];
 }): { markdown: string; warnings: string[]; blocking: string[] } => {
   const baselineLabel = "main";
   const lines: string[] = [COMMENT_MARKER, "", "## 🔦 Lighthouse Report", ""];
@@ -218,6 +281,20 @@ export const buildMarkdown = ({
     lines.push(
       `No \`${baselineLabel}\` baseline is available yet, so this run only records the PR values. ` +
         "The next successful run on `main` publishes one.",
+      ""
+    );
+  }
+
+  if (confirmed.length > 0) {
+    lines.push(
+      "Same-runner baseline confirmation: " +
+        confirmed
+          .map(
+            ({ path, formFactor }) =>
+              `\`${path}\` (${formFactorLabels[formFactor]})`
+          )
+          .join(", ") +
+        ". These main values were re-measured on this PR's runner; other values use the archived baseline.",
       ""
     );
   }
@@ -264,14 +341,29 @@ export const compare = async () => {
   const gatePath = argValue("--gate-out") || gateJsonPath();
 
   const current = readReport(currentPath);
-  const baseline = fs.existsSync(baselinePath)
+  let baseline = fs.existsSync(baselinePath)
     ? readReport(baselinePath)
     : undefined;
   if (!baseline) {
     console.warn(`no baseline at ${baselinePath}; reporting PR values only`);
   }
 
-  const { markdown, warnings, blocking } = buildMarkdown({ current, baseline });
+  const targets = confirmationTargets(current, baseline);
+  const confirmationPath = argValue("--confirmation");
+  if (confirmationPath) {
+    if (!baseline)
+      throw new Error("confirmation requires an archived baseline");
+    baseline = confirmedBaseline(
+      current,
+      baseline,
+      readReport(confirmationPath)
+    );
+  }
+  const { markdown, warnings, blocking } = buildMarkdown({
+    current,
+    baseline,
+    confirmed: confirmationPath ? targets : [],
+  });
 
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
   fs.writeFileSync(outputPath, markdown, "utf8");
@@ -284,7 +376,7 @@ export const compare = async () => {
   fs.mkdirSync(path.dirname(gatePath), { recursive: true });
   fs.writeFileSync(
     gatePath,
-    `${JSON.stringify({ blocking }, null, 2)}\n`,
+    `${JSON.stringify({ blocking, targets }, null, 2)}\n`,
     "utf8"
   );
 

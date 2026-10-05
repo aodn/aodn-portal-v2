@@ -1,7 +1,8 @@
 /**
  * `yarn lh:gate` — the only Lighthouse result that can fail a pull request: a
- * performance score far enough below the `main` baseline that it cannot be
- * run-to-run variability (see blockingPerformanceDrop in constants.ts).
+ * performance score below the `main` baseline by the blocking threshold
+ * (see blockingPerformanceDrop in constants.ts). CI confirms PR threshold
+ * hits against a baseline measured on the same runner first.
  *
  * A separate step on purpose, running after the report has been commented, so a
  * failing PR still carries the numbers that explain why. Node-only.

@@ -41,7 +41,8 @@ jobs:
     # Three routes x 2 form factors (mobile, desktop) x (1 warm-up + 3 measured
     # runs) takes ~8 min; the rest is install and build. A hang should not sit
     # here for an hour.
-    timeout-minutes: 20
+    # A blocking PR additionally builds main and measures only affected pairs.
+    timeout-minutes: 30
 
     steps:
       - name: Enable Corepack
@@ -98,8 +99,58 @@ jobs:
           unzip -o baseline.zip -d .lighthouse/baseline
           echo "baseline commit: $(jq -r .commit .lighthouse/baseline/report.json)"
 
-      - name: Build the report
+      - name: Build the initial report
         run: yarn lh:compare
+
+      # A slower shared runner can make an unchanged page cross the gate.
+      # Only pay for a local baseline build/measurement when a PR would fail.
+      - name: Select baseline measurements to confirm
+        id: confirmation
+        if: github.event_name == 'pull_request'
+        run: |
+          if jq -e '.targets | length > 0' .lighthouse/gate.json > /dev/null; then
+            commit=$(jq -r .commit .lighthouse/baseline/report.json)
+            if [[ ! "$commit" =~ ^[0-9a-f]{40}$ ]]; then
+              echo "::error::baseline commit must be a full SHA"
+              exit 1
+            fi
+            echo "commit=$commit" >> "$GITHUB_OUTPUT"
+            echo "runs=$(jq -r .runs .lighthouse/report.json)" >> "$GITHUB_OUTPUT"
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check out the archived main commit
+        if: steps.confirmation.outputs.needed == 'true'
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ steps.confirmation.outputs.commit }}
+          path: .lighthouse/main
+          persist-credentials: false
+
+      - name: Build main for confirmation
+        if: steps.confirmation.outputs.needed == 'true'
+        working-directory: .lighthouse/main
+        run: |
+          yarn install --immutable
+          yarn lh:build
+
+      # Use the PR's measurement tooling, Chrome and API fixtures for both builds.
+      # Keep the PR report and full results intact for troubleshooting.
+      - name: Confirm the blocking routes on this runner
+        if: steps.confirmation.outputs.needed == 'true'
+        env:
+          LH_COMMIT: ${{ steps.confirmation.outputs.commit }}
+          LH_RUNS: ${{ steps.confirmation.outputs.runs }}
+          LH_FORM_FACTOR: ${{ inputs.form-factor || 'both' }}
+        run: >-
+          yarn lh:measure --targets .lighthouse/gate.json
+          --dist .lighthouse/main/dist
+          --out .lighthouse/confirmation.json
+          --lhr-dir .lighthouse/confirmation-lhr
+
+      - name: Rebuild the report with the confirmed baseline
+        if: steps.confirmation.outputs.needed == 'true'
+        run: yarn lh:compare --confirmation .lighthouse/confirmation.json
 
       - name: Add the report to the job summary
         run: cat .lighthouse/report.md >> "$GITHUB_STEP_SUMMARY"
@@ -140,4 +191,8 @@ jobs:
             .lighthouse/report.json
             .lighthouse/report.md
             .lighthouse/lhr/
+            .lighthouse/baseline/report.json
+            .lighthouse/gate.json
+            .lighthouse/confirmation.json
+            .lighthouse/confirmation-lhr/
           retention-days: 7

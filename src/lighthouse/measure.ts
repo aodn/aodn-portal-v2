@@ -42,6 +42,7 @@ import { runLighthouse } from "./runLighthouse";
 import type {
   FormFactor,
   LighthouseReport,
+  MeasurementTarget,
   RouteMetrics,
   RouteReport,
 } from "./types";
@@ -108,6 +109,7 @@ const measureRoute = async ({
   formFactor,
   keepLhr,
   api,
+  resultsDir,
 }: {
   route: LighthouseRoute;
   origin: string;
@@ -115,6 +117,7 @@ const measureRoute = async ({
   formFactor: FormFactor;
   keepLhr: boolean;
   api: ApiReplayer;
+  resultsDir: string;
 }): Promise<RouteMetrics> => {
   const url = `${origin}${route.path}`;
 
@@ -144,7 +147,7 @@ const measureRoute = async ({
 
     if (keepLhr) {
       fs.writeFileSync(
-        path.join(lhrDir(), `${formFactor}-${route.id}-${run}.json`),
+        path.join(resultsDir, `${formFactor}-${route.id}-${run}.json`),
         JSON.stringify(lhr),
         "utf8"
       );
@@ -163,6 +166,40 @@ const measureRoute = async ({
   return medians;
 };
 
+export const selectMeasurements = (
+  routes: LighthouseRoute[],
+  formFactors: FormFactor[],
+  targets?: MeasurementTarget[]
+) => {
+  if (targets && targets.length === 0) {
+    throw new Error("measurement targets must not be empty");
+  }
+  if (targets) {
+    for (const target of targets) {
+      if (
+        !routes.some((route) => route.path === target.path) ||
+        !formFactors.includes(target.formFactor)
+      ) {
+        throw new Error(
+          `unknown measurement target: ${target.path} ${target.formFactor}`
+        );
+      }
+    }
+  }
+  return routes.flatMap((route) =>
+    formFactors
+      .filter(
+        (formFactor) =>
+          !targets ||
+          targets.some(
+            (target) =>
+              target.path === route.path && target.formFactor === formFactor
+          )
+      )
+      .map((formFactor) => ({ route, formFactor }))
+  );
+};
+
 export const measure = async () => {
   const formFactors = formFactorsArg();
   const runs = positiveInt(
@@ -176,16 +213,34 @@ export const measure = async () => {
   const uuid = argValue("--uuid") || detailsUuid();
   const outputPath = argValue("--out") || reportJsonPath();
   const fixturesDir = argValue("--fixtures") || apiFixturesDir();
+  const buildDir = argValue("--dist") || distDir();
+  const resultsDir = argValue("--lhr-dir") || lhrDir();
+  const targetsPath = argValue("--targets");
+  const targets = targetsPath
+    ? (
+        JSON.parse(fs.readFileSync(targetsPath, "utf8")) as {
+          targets: MeasurementTarget[];
+        }
+      ).targets
+    : undefined;
+  if (targetsPath && !Array.isArray(targets)) {
+    throw new Error("--targets must contain a targets array");
+  }
+  const measurements = selectMeasurements(
+    lighthouseRoutes(uuid),
+    formFactors,
+    targets
+  );
   const keepLhr = !process.argv.includes("--no-keep-lhr");
 
   fs.mkdirSync(workDir(), { recursive: true });
-  if (keepLhr) fs.mkdirSync(lhrDir(), { recursive: true });
+  if (keepLhr) fs.mkdirSync(resultsDir, { recursive: true });
   // The OGC API is mocked: only the committed fixtures are served, so a
   // missing or slow environment can never fail or skew the run.
   const api = createApiReplayer({ fixturesDir });
-  const server = await startAppServer({ distDir: distDir(), port, api });
+  const server = await startAppServer({ distDir: buildDir, port, api });
   console.log(
-    `serving ${distDir()} on ${server.url}, /api replayed from ` +
+    `serving ${buildDir} on ${server.url}, /api replayed from ` +
       `${api.manifest.fixtures.length} fixtures recorded from ` +
       `${api.manifest.recordedFrom} on ${api.manifest.recordedAt}`
   );
@@ -199,19 +254,18 @@ export const measure = async () => {
 
   const routes: Record<string, RouteReport> = {};
   try {
-    for (const route of lighthouseRoutes(uuid)) {
-      const metrics: RouteReport["metrics"] = {};
-      for (const formFactor of formFactors) {
-        metrics[formFactor] = await measureRoute({
-          route,
-          origin: server.url,
-          runs,
-          formFactor,
-          keepLhr,
-          api,
-        });
-      }
-      routes[route.path] = { id: route.id, metrics };
+    for (const { route, formFactor } of measurements) {
+      const entry = routes[route.path] ?? { id: route.id, metrics: {} };
+      entry.metrics[formFactor] = await measureRoute({
+        route,
+        origin: server.url,
+        runs,
+        formFactor,
+        keepLhr,
+        api,
+        resultsDir,
+      });
+      routes[route.path] = entry;
     }
   } finally {
     await server.close();

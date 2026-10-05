@@ -104,8 +104,8 @@ export const warnThresholds: Record<MetricKey, number | null> = {
 
 /**
  * The one number that fails the check: a performance score this far below the
- * `main` baseline on any route. Far outside run-to-run variability (which is a
- * few points), so hitting it means the PR really did make a page slower.
+ * `main` baseline on any route. PRs confirm an initial threshold hit by
+ * measuring that baseline commit on the same runner before failing.
  * Everything else in the report is informational.
  *
  * LH_FAIL_PERFORMANCE_DROP tunes it; 0 turns the gate off.

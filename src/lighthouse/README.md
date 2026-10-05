@@ -3,7 +3,9 @@
 Detects performance regressions on pull requests. Every PR measures `/`,
 `/search` and `/details/<uuid>` with Lighthouse, on both mobile and desktop
 emulation, and reports how they moved against the latest run on `main`, as a
-single comment that is updated on each push.
+single comment that is updated on each push. An initial blocking PR result
+is confirmed by measuring the archived `main` commit on the same runner,
+only for the affected route/form-factor pairs.
 
 **Small score movements never fail a PR.** The job goes red when a run could not
 be trusted — no build, Chrome or Lighthouse erroring, or a page that did not
@@ -61,13 +63,16 @@ cat .lighthouse/report.md
 
 Useful flags on `yarn lh:measure`:
 
-| flag                   | for                                                        |
-| ---------------------- | ---------------------------------------------------------- |
-| `--runs 1`             | a quick check while changing this tooling                  |
-| `--form-factor mobile` | measure only mobile (or only `desktop`); default is both   |
-| `--uuid <uuid>`        | measure a different record on `/details` (record it first) |
-| `--serve-only`         | just serve the build + mocked API, to open in a browser    |
-| `--no-keep-lhr`        | skip writing the full results to `.lighthouse/lhr/`        |
+| flag                    | for                                                        |
+| ----------------------- | ---------------------------------------------------------- |
+| `--targets <file>`      | measure only the `targets` pairs in a gate JSON file       |
+| `--dist <directory>`    | serve another build (default: `dist/`)                     |
+| `--lhr-dir <directory>` | store full results separately for baseline confirmation    |
+| `--runs 1`              | a quick check while changing this tooling                  |
+| `--form-factor mobile`  | measure only mobile (or only `desktop`); default is both   |
+| `--uuid <uuid>`         | measure a different record on `/details` (record it first) |
+| `--serve-only`          | just serve the build + mocked API, to open in a browser    |
+| `--no-keep-lhr`         | skip writing the full results to `.lighthouse/lhr/`        |
 
 `LH_RUNS`, `LH_FORM_FACTOR` (`mobile`, `desktop` or `both`), `LH_DETAILS_UUID`,
 `LH_PORT` and `LH_COMMIT` do the same as their flags, for the workflow.
@@ -108,7 +113,14 @@ new data is what the pages render.
    baseline is refreshed so subsequent PRs compare with the latest measurement.
    A failed build or measurement does not publish a baseline.
 2. A PR run asks the Actions API for the newest non-expired `lighthouse-baseline`
-   from `main`, unpacks it and compares.
+   from `main`, unpacks it and compares. If any route/form-factor pair crosses
+   the blocking threshold, it checks out and builds the exact archived commit,
+   then measures only those pairs on the PR runner. It uses the PR's measurement
+   tooling, Chrome, API fixtures and run count (including a discarded warm-up).
+   The final comparison replaces only those baseline measurements; other pairs
+   still use the archived values. The comment names the confirmed pairs, and
+   artifacts retain both baselines and full Lighthouse results. Normal passing
+   PRs do no extra build or measurement. Confirmation errors fail the job.
 3. No baseline yet (first run, or the artifact expired) → the comment reports the
    PR's own values and says a baseline is coming. Never a failure.
 
@@ -136,12 +148,19 @@ FCP moves with LCP, so warning on both would report one regression twice.
 
 Everything above is informational. The one exception: **a Performance score 15
 points or more below `main`, on any route, on either mobile or desktop, fails
-the job.** That is far outside normal run-to-run variability, so it means the
-PR actually made a page slower, not noise.
+the job.** On PRs, the drop must persist against the baseline commit measured
+on the same runner. Shared runners can otherwise cross even this threshold
+without a code regression. Sequential measurements still have some variability;
+this confirmation reduces machine differences rather than eliminating all noise.
+Its extra time includes an install/build plus one warm-up and three measured
+runs per affected pair; it is not a guaranteed one-minute retry.
 
-- `yarn lh:compare` writes the routes that hit this into `.lighthouse/gate.json`;
+- `yarn lh:compare` writes the route/form-factor targets and blocking messages that hit this into `.lighthouse/gate.json`;
   `yarn lh:gate` reads it and fails (after the PR comment has already been
   posted, so a failing PR still shows the numbers).
+- `yarn lh:compare --confirmation <report.json>` validates the baseline commit,
+  run count and coverage of every initially blocking pair before replacing its
+  values. Missing confirmation cannot silently clear a regression.
 - Only Performance can block. Accessibility, Best Practices, SEO and the web
   metrics only ever warn — see the table above.
 - `LH_FAIL_PERFORMANCE_DROP` overrides the 15-point threshold; `0` turns the

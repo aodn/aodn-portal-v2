@@ -1,5 +1,11 @@
 import { describe, expect, test } from "vitest";
-import { buildMarkdown, formatDelta, formatValue } from "../compare";
+import {
+  buildMarkdown,
+  confirmedBaseline,
+  confirmationTargets,
+  formatDelta,
+  formatValue,
+} from "@/lighthouse/compare";
 import { COMMENT_MARKER } from "../constants";
 import type { LighthouseReport, RouteMetrics, RouteReport } from "../types";
 
@@ -227,5 +233,101 @@ describe("buildMarkdown", () => {
       blockingDrop: 0,
     });
     expect(blocking).toEqual([]);
+  });
+});
+
+describe("same-runner confirmation", () => {
+  const baseline = report({
+    "/": route("landing", { performance: 80 }),
+    "/search": route("search", { performance: 90 }, { performance: 95 }),
+    "/details/old": route("details", { performance: 90 }),
+  });
+  const current = report({
+    "/": route("landing", { performance: 75 }),
+    "/search": route("search", { performance: 75 }, { performance: 79 }),
+    "/details/new": route("details", { performance: 60 }),
+  });
+  const confirmation = report({
+    "/search": route("search", { performance: 80 }, { performance: 90 }),
+    "/details/new": route("details", { performance: 80 }),
+  });
+
+  test("selects only blocking pairs, including desktop and renamed paths", () => {
+    expect(confirmationTargets(current, baseline)).toEqual([
+      { path: "/search", formFactor: "mobile" },
+      { path: "/search", formFactor: "desktop" },
+      { path: "/details/new", formFactor: "mobile" },
+    ]);
+    expect(confirmationTargets(current, undefined)).toEqual([]);
+    expect(confirmationTargets(current, baseline, 0)).toEqual([]);
+    expect(confirmationTargets(baseline, baseline)).toEqual([]);
+  });
+
+  test("clears machine differences but still blocks a confirmed regression", () => {
+    const before = structuredClone(baseline);
+    const confirmed = confirmedBaseline(current, baseline, confirmation);
+    const { blocking, markdown } = buildMarkdown({
+      current,
+      baseline: confirmed,
+      confirmed: confirmationTargets(current, baseline),
+    });
+    expect(blocking).toHaveLength(1);
+    expect(blocking[0]).toContain("`/details/new` dropped by 20 points");
+    expect(markdown).toContain("Same-runner baseline confirmation:");
+    expect(markdown).toContain("`/search` (Desktop)");
+    expect(confirmed.routes["/"]).toEqual(baseline.routes["/"]);
+    expect(baseline).toEqual(before);
+  });
+
+  test("preserves the unconfirmed form factor on a renamed route", () => {
+    const base = report({
+      "/details/old": route(
+        "details",
+        { performance: 90 },
+        { performance: 95 }
+      ),
+    });
+    const pr = report({
+      "/details/new": route(
+        "details",
+        { performance: 60 },
+        { performance: 94 }
+      ),
+    });
+    const confirmed = confirmedBaseline(pr, base, confirmation);
+    expect(confirmed.routes["/details/new"].metrics.desktop?.performance).toBe(
+      95
+    );
+  });
+
+  test("rejects a wrong commit or different run count", () => {
+    expect(() =>
+      confirmedBaseline(current, baseline, {
+        ...confirmation,
+        commit: "wrong",
+      })
+    ).toThrow("archived baseline commit");
+    expect(() =>
+      confirmedBaseline(current, baseline, {
+        ...confirmation,
+        runs: 1,
+      })
+    ).toThrow("same run count");
+  });
+
+  test("missing or invalid confirmation cannot clear the gate", () => {
+    expect(() => confirmedBaseline(current, baseline, report({}))).toThrow(
+      "missing confirmation for /search mobile"
+    );
+    const missingDesktop = structuredClone(confirmation);
+    delete missingDesktop.routes["/search"].metrics.desktop;
+    expect(() => confirmedBaseline(current, baseline, missingDesktop)).toThrow(
+      "missing confirmation for /search desktop"
+    );
+    const invalid = structuredClone(confirmation);
+    invalid.routes["/search"].metrics.mobile!.performance = NaN;
+    expect(() => confirmedBaseline(current, baseline, invalid)).toThrow(
+      "invalid confirmation metrics"
+    );
   });
 });

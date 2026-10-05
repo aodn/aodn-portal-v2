@@ -65,3 +65,9 @@ export interface Lhr {
     }
   >;
 }
+
+/** A route and emulation whose archived comparison needs confirmation. */
+export interface MeasurementTarget {
+  path: string;
+  formFactor: FormFactor;
+}
