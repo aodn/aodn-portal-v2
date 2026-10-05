@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
-import type { Geometry } from "geojson";
+import type { Geometry, Polygon } from "geojson";
+import { cellToBoundary } from "h3-js";
 import {
   featureH3CellId,
+  h3CellPolygon,
   h3ResolutionFromSourceLayer,
   pickHexAmongFeatures,
   pointInPolygonGeometry,
@@ -117,6 +119,33 @@ describe("hexHit", () => {
       lngLat: { lng: 147, lat: -42 },
     });
     expect(picked).toBeUndefined();
+  });
+
+  it("unwraps the longitudes of a cell straddling the antimeridian", () => {
+    // A real res-4 hex on the antimeridian; exact values checked in MapUtils
+    vi.mocked(cellToBoundary).mockReturnValueOnce([
+      [-179.8, -59.94],
+      [-179.87, -59.74],
+      [179.74, -59.7],
+      [179.42, -59.85],
+      [179.49, -60.05],
+      [179.88, -60.09],
+      [-179.8, -59.94],
+    ]);
+    const ring = (h3CellPolygon("cell-from-h3") as Polygon).coordinates[0];
+    const lngs = ring.map(([lng]) => lng);
+    expect(Math.max(...lngs) - Math.min(...lngs)).toBeLessThan(1);
+  });
+
+  it("closes the ring of a cell h3-js returns open", () => {
+    const ring = (h3CellPolygon("cell-from-h3") as Polygon).coordinates[0];
+    expect(ring).toEqual([
+      [147, -42],
+      [147.1, -42],
+      [147.1, -42.1],
+      [147, -42.1],
+      [147, -42],
+    ]);
   });
 
   it("detects a point inside a polygon", () => {

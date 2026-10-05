@@ -6,6 +6,7 @@ import {
   latLngToCell,
 } from "h3-js";
 import type { Geometry, Position } from "geojson";
+import { unwrapRingLongitudes } from "@/utils/MapUtils";
 
 export type HexHitSource = "point" | "box";
 
@@ -75,7 +76,7 @@ export const h3CellLngLat = (
 export const h3CellPolygon = (cellId: string): Geometry | undefined => {
   try {
     if (!isValidCell(cellId)) return undefined;
-    const ring = cellToBoundary(cellId, true);
+    const ring = unwrapRingLongitudes(cellToBoundary(cellId, true));
     if (ring.length < 3) return undefined;
     const first = ring[0];
     const last = ring[ring.length - 1];
