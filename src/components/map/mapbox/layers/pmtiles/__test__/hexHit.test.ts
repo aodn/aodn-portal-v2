@@ -121,8 +121,8 @@ describe("hexHit", () => {
     expect(picked).toBeUndefined();
   });
 
-  it("keeps a cell straddling the antimeridian in one piece", () => {
-    // A real res-4 hex on the antimeridian, as H3 returns it
+  it("unwraps the longitudes of a cell straddling the antimeridian", () => {
+    // A real res-4 hex on the antimeridian; exact values checked in MapUtils
     vi.mocked(cellToBoundary).mockReturnValueOnce([
       [-179.8, -59.94],
       [-179.87, -59.74],
@@ -135,14 +135,9 @@ describe("hexHit", () => {
     const ring = (h3CellPolygon("cell-from-h3") as Polygon).coordinates[0];
     const lngs = ring.map(([lng]) => lng);
     expect(Math.max(...lngs) - Math.min(...lngs)).toBeLessThan(1);
-    expect(ring).toHaveLength(7);
-    expect(ring[0]).toEqual(ring[ring.length - 1]);
-    expect(ring.map(([, lat]) => lat)).toEqual([
-      -59.94, -59.74, -59.7, -59.85, -60.05, -60.09, -59.94,
-    ]);
   });
 
-  it("leaves a cell away from the antimeridian untouched", () => {
+  it("closes the ring of a cell h3-js returns open", () => {
     const ring = (h3CellPolygon("cell-from-h3") as Polygon).coordinates[0];
     expect(ring).toEqual([
       [147, -42],

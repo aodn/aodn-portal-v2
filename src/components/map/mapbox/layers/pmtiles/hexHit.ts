@@ -6,6 +6,7 @@ import {
   latLngToCell,
 } from "h3-js";
 import type { Geometry, Position } from "geojson";
+import { unwrapRingLongitudes } from "@/utils/MapUtils";
 
 export type HexHitSource = "point" | "box";
 
@@ -70,23 +71,6 @@ export const h3CellLngLat = (
   } catch {
     return undefined;
   }
-};
-
-/**
- * H3 gives every vertex a longitude between -180 and 180. A cell on the
- * antimeridian therefore jumps about 360 degrees in the middle of its ring,
- * and Mapbox draws that jump as a line across the whole map. Add or subtract
- * 360 from each vertex so it stays close to the one before it. Values outside
- * -180 to 180 are fine here: Mapbox moves them back.
- */
-const unwrapRingLongitudes = (ring: Position[]): Position[] => {
-  const unwrapped: Position[] = [];
-  for (const [lng, lat] of ring) {
-    const previous = unwrapped[unwrapped.length - 1];
-    const shift = previous ? Math.round((previous[0] - lng) / 360) * 360 : 0;
-    unwrapped.push([lng + shift, lat]);
-  }
-  return unwrapped;
 };
 
 export const h3CellPolygon = (cellId: string): Geometry | undefined => {

@@ -9,6 +9,7 @@ import {
   MAP_DRAW_INTERACTION_FLAG,
   overallBoundingBox,
   setMapDrawInteractionActive,
+  unwrapRingLongitudes,
 } from "../MapUtils";
 import { FONT_FAMILIES } from "@/styles/fontsRC8";
 import { Map as MapboxMap } from "mapbox-gl";
@@ -412,6 +413,79 @@ describe("MapUtils", () => {
 
       setMapDrawInteractionActive(map, false);
       expect(isMapDrawModeActive(map)).toBe(false);
+    });
+  });
+  describe("unwrapRingLongitudes", () => {
+    it("pulls a ring crossing the antimeridian past -180 so it stays in one piece", () => {
+      // A real res-4 H3 cell on the antimeridian, as h3-js returns it
+      expect(
+        unwrapRingLongitudes([
+          [-179.8, -59.94],
+          [-179.87, -59.74],
+          [179.74, -59.7],
+          [179.42, -59.85],
+          [179.49, -60.05],
+          [179.88, -60.09],
+          [-179.8, -59.94],
+        ])
+      ).toEqual([
+        [-179.8, -59.94],
+        [-179.87, -59.74],
+        // deliberately outside -180; clamping here would restore the jump
+        [-180.26, -59.7],
+        [-180.58, -59.85],
+        [-180.51, -60.05],
+        [-180.12, -60.09],
+        [-179.8, -59.94],
+      ]);
+    });
+
+    it("pushes a ring crossing the other way past 180", () => {
+      expect(
+        unwrapRingLongitudes([
+          [179.9, 0],
+          [-179.9, 0.1],
+          [-179.5, 0.2],
+        ])
+      ).toEqual([
+        [179.9, 0],
+        [180.1, 0.1],
+        [180.5, 0.2],
+      ]);
+    });
+
+    it("leaves a ring that is already unwrapped past 180 alone", () => {
+      expect(
+        unwrapRingLongitudes([
+          [179.9, 0],
+          [180.1, 0.1],
+          [180.4, 0.2],
+        ])
+      ).toEqual([
+        [179.9, 0],
+        [180.1, 0.1],
+        [180.4, 0.2],
+      ]);
+    });
+
+    it("leaves a ring away from the antimeridian untouched", () => {
+      expect(
+        unwrapRingLongitudes([
+          [147, -42],
+          [147.1, -42],
+          [147.1, -42.1],
+          [147, -42.1],
+        ])
+      ).toEqual([
+        [147, -42],
+        [147.1, -42],
+        [147.1, -42.1],
+        [147, -42.1],
+      ]);
+    });
+
+    it("handles an empty ring", () => {
+      expect(unwrapRingLongitudes([])).toEqual([]);
     });
   });
 });

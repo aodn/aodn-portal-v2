@@ -245,6 +245,22 @@ export const overallBoundingBox = (
   }
   return bbox[0];
 };
+
+// Shift each vertex of a polygon ring by ±360 so it stays near the one
+// before it, otherwise a ring crossing the antimeridian jumps 360 degrees
+// and Mapbox draws that across the whole map. Longitudes may end up
+// outside ±180 on purpose; Mapbox wraps them back.
+// Rings only: a bbox may span 180+ degrees, use ensureEastGreaterThanWest.
+export const unwrapRingLongitudes = (ring: Position[]): Position[] => {
+  const unwrapped: Position[] = [];
+  for (const [lng, lat] of ring) {
+    const previous = unwrapped[unwrapped.length - 1];
+    const shift = previous ? Math.round((previous[0] - lng) / 360) * 360 : 0;
+    unwrapped.push([lng + shift, lat]);
+  }
+  return unwrapped;
+};
+
 const DRAW_INTERACTION_MODES = new Set([
   DRAW_RECTANGLE_MODE,
   DRAW_POLYGON_MODE,
