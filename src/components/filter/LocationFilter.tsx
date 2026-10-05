@@ -742,7 +742,13 @@ const LocationFilter: FC<LocationFilterProps> = () => {
                 <CircularProgress aria-hidden="true" />
               </Box>
             )}
-            <ReactMap panelId={MAP_ID} zoom={0} onLoad={handleMapReady}>
+            {/* Mercator draws polygon edges as straight lines */}
+            <ReactMap
+              panelId={MAP_ID}
+              zoom={0}
+              projection="mercator"
+              onLoad={handleMapReady}
+            >
               <Controls>
                 <SelectedAreaLayer areas={staticAreaHighlightCollection} />
                 <NavigationControl
