@@ -5,7 +5,8 @@
 
 import * as chromeLauncher from "chrome-launcher";
 import lighthouse, { desktopConfig } from "lighthouse";
-import type { FormFactor, Lhr } from "./types";
+import fs from "fs";
+import type { FormFactor, Lhr } from "@/lighthouse/types";
 
 /**
  * A fresh profile per run, so nothing carries over between runs, plus the
@@ -33,12 +34,15 @@ export interface LighthouseRunOptions {
    * performance-only, so it costs a fraction of a measured run.
    */
   warmup?: boolean;
+  /** Save full JSON and HTML reports before the caller validates the page. */
+  reportPath?: string;
 }
 
 export const runLighthouse = async ({
   url,
   formFactor,
   warmup = false,
+  reportPath,
 }: LighthouseRunOptions): Promise<Lhr> => {
   const chrome = await chromeLauncher.launch({
     chromeFlags: CHROME_FLAGS,
@@ -50,7 +54,7 @@ export const runLighthouse = async ({
       url,
       {
         port: chrome.port,
-        output: "json",
+        output: reportPath ? ["json", "html"] : "json",
         logLevel: "error",
         ...(warmup
           ? {
@@ -74,6 +78,17 @@ export const runLighthouse = async ({
 
     if (!result?.lhr)
       throw new Error(`Lighthouse returned no result for ${url}`);
+    if (reportPath) {
+      fs.writeFileSync(
+        `${reportPath}.json`,
+        JSON.stringify(result.lhr),
+        "utf8"
+      );
+      if (!Array.isArray(result.report)) {
+        throw new Error("Lighthouse did not return the requested HTML report");
+      }
+      fs.writeFileSync(`${reportPath}.html`, result.report[1], "utf8");
+    }
     return result.lhr as unknown as Lhr;
   } finally {
     await chrome.kill();

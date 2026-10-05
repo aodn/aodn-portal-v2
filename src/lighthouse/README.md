@@ -50,11 +50,30 @@ dispatching Lighthouse. Edge keeps its dispatch-only behavior and never triggers
 the release audit.
 
 The release workflow runs separately on the same branch or tag as the deployment,
-audits only the deployed homepage, and uploads HTML and JSON reports for seven
-days. It uses the same staging and production URLs as the SEO workflow. There are
-no score thresholds, comparisons or notifications, and audit results do not gate
-production promotion. The release workflow must be present on the default branch
-and the deployed ref before it can be dispatched.
+and uses `yarn lh:measure` against the actual deployed site and its real backend.
+It measures landing, search and details in mobile emulation: one discarded
+warm-up followed by three measured runs per page (12 runs total). Each reported
+metric is the median of those three runs. Every page's median Performance score
+must be **at least 70/100**; a lower score fails the audit after all three pages
+have been measured and the results saved. Invalid pages (including degraded
+shells, failed dataset requests and redirects) fail the measurement checks.
+
+Configuration is shared with PR measurements: `constants.ts` defines the routes
+using the app's route constants and the stable detail UUID
+`0015db7e-e684-7548-e053-08114f8cd4ad` (IMOS BA SOOP). Set the repository variable
+`LH_DETAILS_UUID` to replace that dataset if it is retired. The workflow defines
+the staging/production site origins (matching SEO), emulation and run count;
+To change the score minimum, edit `MINIMUM_RELEASE_PERFORMANCE` in
+`src/lighthouse/releaseReport.ts` (currently `70`). This single constant controls
+both the pass/fail checks and the minimum displayed in the release summary.
+
+The job summary shows median scores and pass/fail results. The seven-day artifact
+contains `.lighthouse/report.json`, `report.md`, and HTML/JSON reports for every
+measured run in `lhr/`. Individual reports are saved before rendering checks, so
+an invalid page can still be debugged. Warm-ups are excluded from the results.
+Audit results do not gate production promotion. There are no historical release
+comparisons or notifications. The release workflow must be present on the default
+branch and the deployed ref before it can be dispatched.
 
 The existing deployment GitHub App needs Actions write access to both
 `aodn/appdeploy` and this repository: it dispatches workflows in both and reads
@@ -86,13 +105,22 @@ Useful flags on `yarn lh:measure`:
 | flag                   | for                                                        |
 | ---------------------- | ---------------------------------------------------------- |
 | `--runs 1`             | a quick check while changing this tooling                  |
+| `--url <site>`         | measure a deployed site with its real API; enforce 70/100  |
 | `--form-factor mobile` | measure only mobile (or only `desktop`); default is both   |
 | `--uuid <uuid>`        | measure a different record on `/details` (record it first) |
 | `--serve-only`         | just serve the build + mocked API, to open in a browser    |
 | `--no-keep-lhr`        | skip writing the full results to `.lighthouse/lhr/`        |
 
 `LH_RUNS`, `LH_FORM_FACTOR` (`mobile`, `desktop` or `both`), `LH_DETAILS_UUID`,
-`LH_PORT` and `LH_COMMIT` do the same as their flags, for the workflow.
+`LH_URL`, `LH_PORT` and `LH_COMMIT` do the same as their flags, for the workflow.
+`--url` uses the site's origin and the shared route paths; it does not start a
+local server or load API fixtures. It writes the release summary and applies the
+release minimum only in this mode. The default local mode keeps the existing PR
+measurement behavior. For a deployed audit, no local build is needed:
+
+```bash
+yarn lh:measure --url https://portal-staging.aodn.org.au --form-factor mobile --runs 3
+```
 
 ## Refreshing the API fixtures
 
@@ -169,7 +197,7 @@ PR actually made a page slower, not noise.
 - `LH_FAIL_PERFORMANCE_DROP` overrides the 15-point threshold; `0` turns the
   gate off entirely.
 
-## What it does not tell you
+## What the mocked PR measurements do not tell you
 
 - **These are not production numbers.** No CloudFront, no real network, no real
   device; the API is mocked from committed fixtures. The number is comparable with other runs

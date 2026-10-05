@@ -36,14 +36,14 @@ export interface RouteReport {
   metrics: Partial<Record<FormFactor, RouteMetrics>>;
 }
 
-/** What gets uploaded as the `lighthouse-baseline` artifact. */
+/** Median measurements for local PR builds or deployed release sites. */
 export interface LighthouseReport {
   commit: string;
   branch: string;
   generatedAt: string;
   /** Lighthouse runs per route/form factor; every value above is their median. */
   runs: number;
-  /** Upstream the recorded API responses came from. */
+  /** Recorded API upstream, or the actual site origin for deployed audits. */
   apiHost: string;
   routes: Record<string, RouteReport>;
 }

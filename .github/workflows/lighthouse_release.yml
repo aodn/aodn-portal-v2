@@ -19,9 +19,12 @@ jobs:
   lighthouse:
     if: inputs.environment == 'staging' || inputs.environment == 'production'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     env:
       LH_URL: ${{ inputs.environment == 'staging' && 'https://portal-staging.aodn.org.au/' || 'https://portal-beta.aodn.org.au/' }}
+      LH_FORM_FACTOR: mobile
+      LH_RUNS: "3"
+      LH_DETAILS_UUID: ${{ vars.LH_DETAILS_UUID }}
     steps:
       - uses: actions/checkout@v5
 
@@ -36,13 +39,15 @@ jobs:
 
       - run: yarn install --immutable
 
-      - name: Audit the deployed homepage
+      - name: Audit the deployed pages and enforce Performance minimum
+        run: yarn lh:measure
+
+      - name: Add the report to the job summary
+        if: always()
         run: |
-          mkdir -p .lighthouse
-          yarn exec lighthouse "$LH_URL" \
-            --chrome-flags="--headless=new --no-sandbox --disable-dev-shm-usage" \
-            --output=html --output=json --output-path=.lighthouse/homepage \
-            --quiet
+          if [ -f .lighthouse/report.md ]; then
+            cat .lighthouse/report.md >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Upload Lighthouse reports
         if: always()
