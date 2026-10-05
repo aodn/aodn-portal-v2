@@ -57,6 +57,33 @@ describe("generateSitemap", () => {
     expect(xml).toContain(`<loc>${BASE_URL}/</loc></url>`);
   });
 
+  test("falls back to the creation date when there is no revision", async () => {
+    const xml = await generate([
+      toCollection({
+        id: "abc-123",
+        properties: { creation: "2017-04-27T00:00:00" },
+      }),
+    ]);
+
+    expect(xml).toContain(
+      `<loc>${BASE_URL}/details/abc-123</loc><lastmod>2017-04-27</lastmod>`
+    );
+  });
+
+  test("prefers the revision over the creation date", async () => {
+    const xml = await generate([
+      toCollection({
+        id: "abc-123",
+        properties: {
+          creation: "2017-04-27T00:00:00",
+          revision: "2026-08-12T15:24:43",
+        },
+      }),
+    ]);
+
+    expect(xml).toContain("<lastmod>2026-08-12</lastmod>");
+  });
+
   test("omits lastmod when the revision is missing or not a date", async () => {
     const xml = await generate([
       toCollection({ id: "def-456" }),
