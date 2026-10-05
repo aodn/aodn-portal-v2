@@ -12,7 +12,11 @@ import SpatialExtents from "../component/SpatialExtents";
 import SpiderDiagram from "../component/SpiderDiagram";
 import { TestHelper } from "../../../common/test/helper";
 import { FeatureCollection, Point } from "geojson";
-import { MapDefaultConfig, MapEventEnum } from "../constants";
+import {
+  MapDefaultConfig,
+  MapEventEnum,
+  SINGLE_POINT_SYMBOLOGY,
+} from "../constants";
 import { mergeWithDefaults } from "@/utils/ObjectUtils";
 import { generateFeatureCollectionFrom } from "@/utils/GeoJsonUtils";
 import CardPopup from "../component/CardPopup";
@@ -81,11 +85,11 @@ const defaultClusterLayerConfig: ClusterLayerConfig = {
     theme.typography.heading4.fontFamily,
     { fontWeight: theme.typography.heading4.fontWeight }
   ),
-  unclusterPointColor: "#56B4E9",
-  unclusterPointOpacity: 1,
-  unclusterPointStrokeWidth: 1,
-  unclusterPointStrokeColor: "#fff",
-  unclusterPointRadius: 8,
+  unclusterPointColor: SINGLE_POINT_SYMBOLOGY.COLOR,
+  unclusterPointOpacity: SINGLE_POINT_SYMBOLOGY.OPACITY,
+  unclusterPointStrokeWidth: SINGLE_POINT_SYMBOLOGY.STROKE_WIDTH,
+  unclusterPointStrokeColor: SINGLE_POINT_SYMBOLOGY.STROKE_COLOR,
+  unclusterPointRadius: SINGLE_POINT_SYMBOLOGY.RADIUS,
 };
 
 // These function help to get the correct id and reduce the need to set those id in the
