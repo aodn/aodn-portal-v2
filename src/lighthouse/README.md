@@ -39,6 +39,28 @@ the run measure `DegradedPage`. The server gzips text, marks `/assets/*`
 immutable and answers any unknown path with `index.html`, which is what
 CloudFront does for the app.
 
+## Post-deployment release audits
+
+`trigger_build_deploy.yml` dispatches `aodn/appdeploy` for the final Terragrunt
+deployment. For staging and production it requests the exact workflow run ID
+(`return_run_details: true`) and polls that run for up to 30 minutes. Only a
+completed run with conclusion `success` triggers `lighthouse_release.yml`.
+Failures, cancellations and timeouts stop the portal deployment job without
+dispatching Lighthouse. Edge keeps its dispatch-only behavior and never triggers
+the release audit.
+
+The release workflow runs separately on the same branch or tag as the deployment,
+audits only the deployed homepage, and uploads HTML and JSON reports for seven
+days. It uses the same staging and production URLs as the SEO workflow. There are
+no score thresholds, comparisons or notifications, and audit results do not gate
+production promotion. The release workflow must be present on the default branch
+and the deployed ref before it can be dispatched.
+
+The existing deployment GitHub App needs Actions write access to both
+`aodn/appdeploy` and this repository: it dispatches workflows in both and reads
+the deployment run's status. No callback or workflow change in `appdeploy` is
+needed. The PR workflow and its mocked measurements remain unchanged.
+
 ## Commands
 
 | command           | does                                                       |

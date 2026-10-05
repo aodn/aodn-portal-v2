@@ -1,0 +1,54 @@
+name: Release Lighthouse
+run-name: Lighthouse after deployment to ${{ inputs.environment }}
+
+# Dispatched by trigger_build_deploy.yml after appdeploy completes successfully.
+# The PR workflow remains independent and uses its existing mocked backend.
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Successfully deployed environment to audit
+        required: true
+        type: choice
+        options: [staging, production]
+
+permissions:
+  contents: read
+
+jobs:
+  lighthouse:
+    if: inputs.environment == 'staging' || inputs.environment == 'production'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      LH_URL: ${{ inputs.environment == 'staging' && 'https://portal-staging.aodn.org.au/' || 'https://portal-beta.aodn.org.au/' }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+          cache: yarn
+
+      - run: yarn install --immutable
+
+      - name: Audit the deployed homepage
+        run: |
+          mkdir -p .lighthouse
+          yarn exec lighthouse "$LH_URL" \
+            --chrome-flags="--headless=new --no-sandbox --disable-dev-shm-usage" \
+            --output=html --output=json --output-path=.lighthouse/homepage \
+            --quiet
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: lighthouse-${{ inputs.environment }}-${{ github.run_attempt }}
+          path: .lighthouse/
+          if-no-files-found: error
+          retention-days: 7
