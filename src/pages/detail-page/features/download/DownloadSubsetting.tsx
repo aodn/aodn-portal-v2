@@ -2,7 +2,6 @@ import { FC, startTransition, useEffect, useMemo, useState } from "react";
 import {
   AccordionDetails,
   AccordionSummary,
-  Badge,
   Box,
   Divider,
   Stack,
@@ -112,7 +111,7 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
         onChange={() => setAccordionExpanded((prevState) => !prevState)}
       >
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Box display="flex" alignItems="center" gap={3}>
+          <Box display="flex" alignItems="center" gap={1.5}>
             <Typography
               typography="title1Medium"
               color={portalTheme.palette.text1}
@@ -120,17 +119,25 @@ const DownloadSubsetting: FC<DownloadSubsettingProps> = ({
             >
               Download Selection
             </Typography>
-            <Badge
-              sx={{
-                "& .MuiBadge-badge": {
+            {subsettingSelectionCount > 0 && (
+              <Box
+                sx={{
+                  width: 20,
+                  height: 20,
+                  flexShrink: 0,
+                  borderRadius: "50%",
+                  display: "grid",
+                  placeItems: "center",
                   backgroundColor: portalTheme.palette.primary1,
                   ...portalTheme.typography.title2Regular,
+                  lineHeight: 1,
                   color: portalTheme.palette.text3,
                   pb: "1px",
-                },
-              }}
-              badgeContent={subsettingSelectionCount}
-            />
+                }}
+              >
+                {subsettingSelectionCount}
+              </Box>
+            )}
           </Box>
         </AccordionSummary>
         <AccordionDetails sx={{ pt: "4px" }}>

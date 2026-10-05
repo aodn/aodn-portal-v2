@@ -150,9 +150,6 @@ const BBoxRow: React.FC<BBoxRowProps> = ({
     <Stack
       direction="row"
       alignItems="center"
-      // The coordinates sit centred in a flex:1 box, so a tight gap here barely
-      // shows when there is room but leaves them somewhere to go when there isn't
-      spacing={1}
       sx={{
         pl: 1.5,
         pr: 1.25,
@@ -182,6 +179,9 @@ const BBoxRow: React.FC<BBoxRowProps> = ({
         sx={{
           flex: 1,
           minWidth: 0,
+          // Offsets the blank space around the close icon, so the text sits
+          // midway between the number box and the visible X
+          pl: 2,
           display: "flex",
           justifyContent: "center",
         }}
@@ -190,8 +190,10 @@ const BBoxRow: React.FC<BBoxRowProps> = ({
           sx={{
             display: "grid",
             // auto-fit drops to a single column exactly when two no longer fit;
-            // min() lets that last column shrink instead of overflowing
-            gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, ${COORD_COL_MIN}px), 1fr))`,
+            // min() lets that last column shrink instead of overflowing;
+            // max-content + justifyContent keeps a single column centred
+            gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, ${COORD_COL_MIN}px), max-content))`,
+            justifyContent: "center",
             columnGap: `${COORD_COL_GAP}px`,
             rowGap: 0.25,
             // Grid is centred as a block by the parent; values line up on their
