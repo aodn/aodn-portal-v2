@@ -67,3 +67,18 @@ jobs:
           include-hidden-files: true
           if-no-files-found: warn
           retention-days: 90
+
+      # Fail only this independent audit, after preserving the QA reports.
+      - name: Check release performance thresholds
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const results = JSON.parse(fs.readFileSync('.lighthouse/release-results.json', 'utf8'));
+          if (results.executionStatus !== 'SUCCESS') {
+            throw new Error('Lighthouse execution did not complete successfully; see the job summary.');
+          }
+          if (results.performanceStatus !== 'PASS') {
+            console.error('::error title=Lighthouse performance thresholds::Performance thresholds were not met; see the job summary and report artifacts. Deployment and release are independent of this audit.');
+            process.exitCode = 1;
+          }
+          NODE

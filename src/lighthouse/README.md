@@ -56,8 +56,11 @@ one discarded warm-up followed by three measured runs per page and form factor
 (24 runs total). The job timeout is 40 minutes to allow for this broader coverage.
 Each reported metric is the median of those three runs. Every page and form
 factor's median Performance score is checked against **75/100**. A lower score is clearly reported as **FAIL** and
-emits a workflow warning, while the measurement step and release audit still
-succeed. A valid score below the minimum never blocks deployment or release.
+emits a workflow warning during measurement. After publishing the summary and
+artifacts, a separate threshold check makes the **Release Lighthouse workflow
+red** if Performance or any configured metric fails. The measurement step still
+completes all pages. A valid score below the minimum never blocks deployment or
+release: the deployment workflow dispatches the audit without waiting for its result.
 Lighthouse/Chrome errors and invalid pages (including degraded shells, failed
 dataset requests and redirects) still fail the audit job as execution errors.
 The audit runs independently of deployment and does not gate promotion.
