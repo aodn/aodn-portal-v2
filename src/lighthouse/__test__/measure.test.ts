@@ -41,10 +41,10 @@ const result = (url: string, performance: number): Lhr => ({
   },
   audits: {
     "dom-size": { numericValue: 500 },
-    "largest-contentful-paint": { numericValue: 2000 },
-    "total-blocking-time": { numericValue: 100 },
-    "cumulative-layout-shift": { numericValue: 0.01 },
-    "first-contentful-paint": { numericValue: 1000 },
+    "largest-contentful-paint": { score: 1, numericValue: 2000 },
+    "total-blocking-time": { score: 1, numericValue: 100 },
+    "cumulative-layout-shift": { score: 1, numericValue: 0.01 },
+    "first-contentful-paint": { score: 1, numericValue: 1000 },
     "network-requests": {
       details: {
         items: [

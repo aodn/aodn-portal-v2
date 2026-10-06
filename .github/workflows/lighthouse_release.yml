@@ -64,5 +64,6 @@ jobs:
         with:
           name: lighthouse-${{ inputs.environment }}-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: .lighthouse/
+          include-hidden-files: true
           if-no-files-found: warn
-          retention-days: 7
+          retention-days: 90

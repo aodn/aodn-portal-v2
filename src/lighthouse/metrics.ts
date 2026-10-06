@@ -37,7 +37,30 @@ const numeric = (lhr: Lhr, audit: string) => {
   return value;
 };
 
-export const extractMetrics = (lhr: Lhr): RouteMetrics => ({
+export const extractMetrics = (
+  lhr: Lhr,
+  includeScores = false
+): RouteMetrics => ({
+  ...(includeScores
+    ? {
+        metricScores: Object.fromEntries(
+          Object.entries({
+            lcp: "largest-contentful-paint",
+            tbt: "total-blocking-time",
+            cls: "cumulative-layout-shift",
+            fcp: "first-contentful-paint",
+          }).map(([metric, audit]) => {
+            const raw = lhr.audits?.[audit]?.score;
+            if (typeof raw !== "number" || !Number.isFinite(raw)) {
+              throw new Error(
+                `Lighthouse returned no valid score for ${audit}`
+              );
+            }
+            return [metric, Math.round(raw * 100)];
+          })
+        ) as NonNullable<RouteMetrics["metricScores"]>,
+      }
+    : {}),
   performance: score(lhr, "performance"),
   accessibility: score(lhr, "accessibility"),
   bestPractices: score(lhr, "best-practices"),
@@ -67,12 +90,21 @@ const METRIC_DECIMALS: Record<MetricKey, number> = {
 export const medianMetrics = (runs: RouteMetrics[]): RouteMetrics => {
   if (runs.length === 0) throw new Error("no runs to take the median of");
   const keys = Object.keys(METRIC_DECIMALS) as MetricKey[];
-  return Object.fromEntries(
+  const metrics = Object.fromEntries(
     keys.map((key) => [
       key,
       round(median(runs.map((run) => run[key])), METRIC_DECIMALS[key]),
     ])
   ) as unknown as RouteMetrics;
+  if (runs.every((run) => run.metricScores)) {
+    metrics.metricScores = Object.fromEntries(
+      (["lcp", "tbt", "cls", "fcp"] as const).map((key) => [
+        key,
+        round(median(runs.map((run) => run.metricScores![key]))),
+      ])
+    ) as NonNullable<RouteMetrics["metricScores"]>;
+  }
+  return metrics;
 };
 
 const requestStatus = (lhr: Lhr, urlFragment: string) => {

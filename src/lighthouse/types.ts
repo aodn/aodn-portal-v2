@@ -5,6 +5,8 @@
 
 /** Category scores (0-100) and web metrics collected for one route. */
 export interface RouteMetrics {
+  /** Individual Lighthouse audit scores (0–100), used by release reports. */
+  metricScores?: Record<"lcp" | "tbt" | "cls" | "fcp", number>;
   performance: number;
   accessibility: number;
   bestPractices: number;
@@ -19,7 +21,7 @@ export interface RouteMetrics {
   fcp: number;
 }
 
-export type MetricKey = keyof RouteMetrics;
+export type MetricKey = Exclude<keyof RouteMetrics, "metricScores">;
 
 export type FormFactor = "mobile" | "desktop";
 

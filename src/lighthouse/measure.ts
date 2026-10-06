@@ -170,7 +170,7 @@ const measureRoute = async ({
       );
     }
 
-    const metrics = extractMetrics(lhr);
+    const metrics = extractMetrics(lhr, !api);
     collected.push(metrics);
     console.log(
       `[${route.id}] run ${run}/${runs} ${formatMetrics(metrics)}` +

@@ -82,15 +82,43 @@ To change the score minimum, edit `MINIMUM_RELEASE_PERFORMANCE` in
 `src/lighthouse/releaseReport.ts` (currently `75`). This single constant controls
 both the pass/fail checks and the minimum displayed in the release summary.
 
+Release audits also validate the individual Lighthouse **LCP, TBT, CLS and FCP
+scores (0–100)**. Their configurable minima are in `RELEASE_METRIC_MINIMUMS`
+in `releaseReport.ts`, separately for each page and form factor. The initial
+values come from an edge audit on 7 October 2026 (one warm-up and three measured
+runs), rounded down to multiples of five: 78 → 75, 82 → 80. They are fixed
+configuration, never recalculated automatically on a release, so regressions
+cannot lower their own minimum. Performance keeps its agreed minimum of 75.
+These are lab score baselines, not field Core Web Vitals thresholds; TBT is not
+INP. The summary also shows actual timings in milliseconds and unitless CLS.
+A page is **PASS** only when Performance and all four metric scores meet their
+respective minima. Valid threshold failures remain non-blocking.
+
+| Page    | Emulation | LCP min | TBT min | CLS min | FCP min |
+| ------- | --------- | ------- | ------- | ------- | ------- |
+| Landing | Mobile    | 55      | 80      | 100     | 55      |
+| Landing | Desktop   | 95      | 75      | 95      | 95      |
+| Search  | Mobile    | 60      | 65      | 100     | 55      |
+| Search  | Desktop   | 85      | 100     | 100     | 95      |
+| Details | Mobile    | 50      | 70      | 100     | 50      |
+| Details | Desktop   | 85      | 100     | 100     | 95      |
+
+These numbers are starting points from local lab measurements and can vary on
+GitHub-hosted runners. A minimum of 100 intentionally allows no score drop, per
+the rounding rule. Recalibrate deliberately if representative runs justify it.
+
 The QA job summary includes the environment, release/ref, SHA, tested page URL,
-emulation, all three measured scores, median, threshold and **PASS/FAIL**. It
+emulation, all three measured scores, median, threshold and **PASS/FAIL** for
+Performance and each of LCP, TBT, CLS and FCP. It
 shows separate mobile and desktop rows for every page, and execution status
 separately from performance status. Execution errors
 include the error and any pages already measured; setup failures before a report
 exists produce an explicit error summary pointing to the failed step logs.
 
 Artifacts are named `lighthouse-<environment>-<SHA>-<run-id>-<attempt>` and retained
-for seven days. They contain `.lighthouse/report.json`, `report.md`,
+for 90 days (subject to the repository/organization retention policy). Hidden
+files are included explicitly because the output directory is `.lighthouse/`.
+They contain `.lighthouse/report.json`, `report.md`,
 `release-results.json`, and HTML/JSON reports for every measured run in `lhr/`.
 Individual reports are saved before rendering checks, so an invalid page can
 still be debugged. Warm-ups are excluded from the results. Uploads also run
@@ -99,7 +127,8 @@ after execution failures when any reports exist.
 `release-results.json` is the structured input for future QA/Slack integrations:
 it includes environment/ref/SHA, separate `executionStatus` and
 `performanceStatus`, any execution error, and per-page URLs, scores, measured
-runs, threshold and status. `executionStatus` is `SUCCESS` or `ERROR`;
+runs, threshold and status, plus `metricChecks` with metric values, scores,
+measured values/scores, minima and status. `executionStatus` is `SUCCESS` or `ERROR`;
 `performanceStatus` is `PASS`, `FAIL`, or `INCOMPLETE` when execution stopped
 without a completed below-threshold result. Only completed measurements get a
 final page score. There are no historical release comparisons or notifications.
