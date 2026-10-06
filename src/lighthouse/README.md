@@ -51,10 +51,11 @@ the release audit.
 
 The release workflow runs separately on the same branch or tag as the deployment,
 and uses `yarn lh:measure` against the actual deployed site and its real backend.
-It measures landing, search and details in mobile emulation: one discarded
-warm-up followed by three measured runs per page (12 runs total). Each reported
-metric is the median of those three runs. Every page's median Performance score
-is checked against **75/100**. A lower score is clearly reported as **FAIL** and
+It measures landing, search and details in both mobile and desktop emulation:
+one discarded warm-up followed by three measured runs per page and form factor
+(24 runs total). The job timeout is 40 minutes to allow for this broader coverage.
+Each reported metric is the median of those three runs. Every page and form
+factor's median Performance score is checked against **75/100**. A lower score is clearly reported as **FAIL** and
 emits a workflow warning, while the measurement step and release audit still
 succeed. A valid score below the minimum never blocks deployment or release.
 Lighthouse/Chrome errors and invalid pages (including degraded shells, failed
@@ -62,11 +63,12 @@ dataset requests and redirects) still fail the audit job as execution errors.
 The audit runs independently of deployment and does not gate promotion.
 
 Release measurements use Lighthouse `13.4.1`, matching the uploaded DevTools
-reports. They keep Lighthouse's mobile form factor, mobile user agent and the
-same simulated mobile CPU/network profile, and explicitly emulate the effective
+reports. Mobile measurements keep Lighthouse's mobile form factor, user agent
+and the same simulated mobile CPU/network profile, and explicitly emulate the effective
 `412 × 823` viewport at device scale `1.75` from the reports. DevTools had
 already applied that emulation outside Lighthouse; a standalone Chrome run must
-enable it explicitly. The default Lighthouse dependency stays at `12.8.2` for
+enable it explicitly. Desktop measurements use Lighthouse's built-in desktop
+configuration. The default Lighthouse dependency stays at `12.8.2` for
 the PR workflow, preserving its scoring engine and baseline comparisons.
 Lighthouse 13.4.1 requires Node `22.19` or later, so
 the release workflow uses that runtime while the PR workflow remains on Node 20.
@@ -82,7 +84,8 @@ both the pass/fail checks and the minimum displayed in the release summary.
 
 The QA job summary includes the environment, release/ref, SHA, tested page URL,
 emulation, all three measured scores, median, threshold and **PASS/FAIL**. It
-shows execution status separately from performance status. Execution errors
+shows separate mobile and desktop rows for every page, and execution status
+separately from performance status. Execution errors
 include the error and any pages already measured; setup failures before a report
 exists produce an explicit error summary pointing to the failed step logs.
 
@@ -147,7 +150,7 @@ release minimum only in this mode. The default local mode keeps the existing PR
 measurement behavior. For a deployed audit, no local build is needed:
 
 ```bash
-yarn lh:measure --url https://portal-staging.aodn.org.au --form-factor mobile --runs 3
+yarn lh:measure --url https://portal-staging.aodn.org.au --form-factor both --runs 3
 ```
 
 ## Refreshing the API fixtures

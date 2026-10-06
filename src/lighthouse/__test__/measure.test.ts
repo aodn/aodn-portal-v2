@@ -6,7 +6,9 @@ import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { createApiReplayer } from "@/lighthouse/apiFixtures";
 import { startAppServer } from "@/lighthouse/appServer";
 import {
+  ALL_FORM_FACTORS,
   DEFAULT_DETAILS_UUID,
+  formFactorLabels,
   HEALTH_REQUEST,
   lighthouseRoutes,
 } from "@/lighthouse/constants";
@@ -97,35 +99,78 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 
-test("audits the three deployed pages with one warm-up and three measured runs each", async () => {
+test("audits both form factors on all deployed pages with separate medians and summaries", async () => {
+  process.argv = ["node", "test"];
+  vi.stubEnv("LH_URL", origin);
+  vi.stubEnv("LH_FORM_FACTOR", "both");
+  vi.stubEnv("LH_RUNS", "3");
   const report = await measure();
 
   expect(createApiReplayer).not.toHaveBeenCalled();
   expect(startAppServer).not.toHaveBeenCalled();
-  expect(runLighthouse).toHaveBeenCalledTimes(12);
+  expect(runLighthouse).toHaveBeenCalledTimes(24);
   for (const [index, route] of lighthouseRoutes().entries()) {
-    const calls = vi
-      .mocked(runLighthouse)
-      .mock.calls.slice(index * 4, index * 4 + 4);
-    expect(calls[0][0]).toEqual({
-      url: `${origin}${route.path}`,
-      formFactor: "mobile",
-      warmup: true,
-      matchDevToolsSettings: true,
-    });
-    expect(calls.slice(1).map(([options]) => options.url)).toEqual(
-      Array(3).fill(`${origin}${route.path}`)
-    );
-    expect(report.routes[route.path].metrics.mobile?.performance).toBe(75);
-    expect(
-      report.routes[route.path].measuredRuns?.mobile?.map(
-        (run) => run.performance
-      )
-    ).toEqual([80, 40, 75]);
+    for (const [factorIndex, formFactor] of ALL_FORM_FACTORS.entries()) {
+      const offset = index * 8 + factorIndex * 4;
+      const calls = vi
+        .mocked(runLighthouse)
+        .mock.calls.slice(offset, offset + 4);
+      expect(calls[0][0]).toEqual({
+        url: `${origin}${route.path}`,
+        formFactor,
+        warmup: true,
+        matchDevToolsSettings: true,
+      });
+      expect(calls.slice(1).map(([options]) => options)).toEqual(
+        [1, 2, 3].map((run) => ({
+          url: `${origin}${route.path}`,
+          formFactor,
+          matchDevToolsSettings: true,
+          reportPath: path.join(
+            directory.path,
+            "lhr",
+            `${formFactor}-${route.id}-${run}`
+          ),
+        }))
+      );
+      expect(report.routes[route.path].metrics[formFactor]?.performance).toBe(
+        75
+      );
+      expect(
+        report.routes[route.path].measuredRuns?.[formFactor]?.map(
+          (run) => run.performance
+        )
+      ).toEqual([80, 40, 75]);
+      const summary = fs.readFileSync(
+        path.join(directory.path, "report.md"),
+        "utf8"
+      );
+      expect(summary).toContain(
+        `| [${route.id}](${origin}${route.path}) | ${formFactorLabels[formFactor]} | 80, 40, 75 | 75 | 75 | **PASS** |`
+      );
+    }
+  }
+  const results = JSON.parse(
+    fs.readFileSync(path.join(directory.path, "release-results.json"), "utf8")
+  );
+  expect(results.pages).toHaveLength(6);
+  for (const route of lighthouseRoutes()) {
+    for (const formFactor of ALL_FORM_FACTORS) {
+      expect(results.pages).toContainEqual(
+        expect.objectContaining({
+          id: route.id,
+          url: `${origin}${route.path}`,
+          formFactor,
+          performance: 75,
+          measuredScores: [80, 40, 75],
+          status: "PASS",
+        })
+      );
+    }
   }
   expect(report.apiHost).toBe(origin);
   expect(report.runs).toBe(3);
-  expect(fs.readdirSync(path.join(directory.path, "lhr"))).toHaveLength(18);
+  expect(fs.readdirSync(path.join(directory.path, "lhr"))).toHaveLength(36);
   expect(
     fs.readFileSync(path.join(directory.path, "report.md"), "utf8")
   ).toContain("75 | 75 | **PASS**");
@@ -139,44 +184,56 @@ test("audits the three deployed pages with one warm-up and three measured runs e
   expect(summary).toContain("80, 40, 75");
 });
 
-test("reports a median below 75 as FAIL without rejecting valid measurements", async () => {
-  vi.mocked(runLighthouse).mockImplementation(async ({ url }) =>
-    result(url, url.endsWith("/search") ? 0.74 : 0.9)
-  );
+test.each(ALL_FORM_FACTORS)(
+  "reports a low %s median as FAIL without rejecting either form factor",
+  async (failingFactor) => {
+    process.argv[process.argv.indexOf("mobile")] = "both";
+    vi.mocked(runLighthouse).mockImplementation(async ({ url, formFactor }) =>
+      result(
+        url,
+        url.endsWith("/search") && formFactor === failingFactor ? 0.74 : 0.9
+      )
+    );
 
-  const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-  await expect(measure()).resolves.toBeDefined();
-  expect(warn).toHaveBeenCalledWith(
-    expect.stringContaining(
-      "Performance on /search is 74, below the minimum 75"
-    )
-  );
-  expect(runLighthouse).toHaveBeenCalledTimes(12);
-  const report = JSON.parse(
-    fs.readFileSync(path.join(directory.path, "report.json"), "utf8")
-  );
-  expect(Object.keys(report.routes)).toHaveLength(3);
-  expect(
-    fs.readFileSync(path.join(directory.path, "report.md"), "utf8")
-  ).toContain("74 | 75 | **FAIL**");
-  const results = JSON.parse(
-    fs.readFileSync(path.join(directory.path, "release-results.json"), "utf8")
-  );
-  expect(results).toMatchObject({
-    environment: "staging",
-    ref: "v1.2.3",
-    commit: "test-sha",
-    threshold: 75,
-    executionStatus: "SUCCESS",
-    performanceStatus: "FAIL",
-  });
-  expect(results.pages).toHaveLength(3);
-  expect(results.pages[1]).toMatchObject({
-    status: "FAIL",
-    performance: 74,
-    measuredScores: [74, 74, 74],
-  });
-});
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    await expect(measure()).resolves.toBeDefined();
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining(
+        "Performance on /search is 74, below the minimum 75"
+      )
+    );
+    expect(runLighthouse).toHaveBeenCalledTimes(24);
+    const report = JSON.parse(
+      fs.readFileSync(path.join(directory.path, "report.json"), "utf8")
+    );
+    expect(Object.keys(report.routes)).toHaveLength(3);
+    expect(
+      fs.readFileSync(path.join(directory.path, "report.md"), "utf8")
+    ).toContain("74 | 75 | **FAIL**");
+    const results = JSON.parse(
+      fs.readFileSync(path.join(directory.path, "release-results.json"), "utf8")
+    );
+    expect(results).toMatchObject({
+      environment: "staging",
+      ref: "v1.2.3",
+      commit: "test-sha",
+      threshold: 75,
+      executionStatus: "SUCCESS",
+      performanceStatus: "FAIL",
+    });
+    expect(results.pages).toHaveLength(6);
+    expect(
+      results.pages.find(
+        (page: { id: string; formFactor: string }) =>
+          page.id === "search" && page.formFactor === failingFactor
+      )
+    ).toMatchObject({
+      status: "FAIL",
+      performance: 74,
+      measuredScores: [74, 74, 74],
+    });
+  }
+);
 
 test("keeps a genuine Lighthouse execution error fatal and reports completed pages", async () => {
   vi.mocked(runLighthouse).mockImplementation(async ({ url }) => {
