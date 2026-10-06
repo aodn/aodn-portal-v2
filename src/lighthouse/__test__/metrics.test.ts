@@ -194,32 +194,32 @@ describe("lcpElement", () => {
   });
 });
 
-test("release measurements preserve audit scores and reject missing scores", () => {
+test("release measurements preserve actual values without requiring audit scores", () => {
   const lhr = lhrFixture();
-  for (const audit of [
-    "largest-contentful-paint",
-    "total-blocking-time",
-    "cumulative-layout-shift",
-    "first-contentful-paint",
-  ]) {
-    lhr.audits[audit].score = 0.82;
-  }
-  const extracted = extractMetrics(lhr, true);
-  expect(extracted.metricScores).toEqual({
-    lcp: 82,
-    tbt: 82,
-    cls: 82,
-    fcp: 82,
-  });
-  expect(
-    medianMetrics([
-      { ...extracted, metricScores: { lcp: 10, tbt: 90, cls: 100, fcp: 10 } },
-      extracted,
-      { ...extracted, metricScores: { lcp: 90, tbt: 10, cls: 10, fcp: 100 } },
-    ]).metricScores
-  ).toEqual(extracted.metricScores);
+  lhr.audits["largest-contentful-paint"].numericValue = 6500.1;
+  lhr.audits["cumulative-layout-shift"].numericValue = 0.1001;
   lhr.audits["total-blocking-time"].score = null;
-  expect(() => extractMetrics(lhr, true)).toThrow(
-    /valid score.*total-blocking-time/
-  );
+  const extracted = extractMetrics(lhr, true);
+  expect(extracted.lcp).toBe(6500.1);
+  expect(extracted.cls).toBe(0.1001);
+  expect(extracted.tbt).toBe(180.4);
+  expect(
+    medianMetrics(
+      [
+        { ...extracted, lcp: 5000, cls: 0.05 },
+        extracted,
+        { ...extracted, lcp: 10000, cls: 1 },
+      ],
+      true
+    )
+  ).toMatchObject({ lcp: 6500.1, cls: 0.1001 });
 });
+
+test.each([NaN, Infinity])(
+  "invalid metric value %s is an execution error",
+  (value) => {
+    const lhr = lhrFixture();
+    lhr.audits["total-blocking-time"].numericValue = value;
+    expect(() => extractMetrics(lhr, true)).toThrow(/total-blocking-time/);
+  }
+);

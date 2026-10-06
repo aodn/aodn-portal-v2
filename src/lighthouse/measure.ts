@@ -178,7 +178,7 @@ const measureRoute = async ({
     );
   }
 
-  const medians = medianMetrics(collected);
+  const medians = medianMetrics(collected, !api);
   console.log(`[${route.id}] median ${formatMetrics(medians)}`);
   return { metrics: medians, measuredRuns: collected };
 };

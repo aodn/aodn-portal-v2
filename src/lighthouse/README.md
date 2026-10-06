@@ -85,34 +85,42 @@ To change the score minimum, edit `MINIMUM_RELEASE_PERFORMANCE` in
 `src/lighthouse/releaseReport.ts` (currently `75`). This single constant controls
 both the pass/fail checks and the minimum displayed in the release summary.
 
-Release audits also validate the individual Lighthouse **LCP, TBT, CLS and FCP
-scores (0–100)**. Their configurable minima are in `RELEASE_METRIC_MINIMUMS`
-in `releaseReport.ts`, separately for each page and form factor. The initial
-values come from an edge audit on 7 October 2026 (one warm-up and three measured
-runs), rounded down to multiples of five: 78 → 75, 82 → 80. They are fixed
-configuration, never recalculated automatically on a release, so regressions
-cannot lower their own minimum. Performance keeps its agreed minimum of 75.
-These are lab score baselines, not field Core Web Vitals thresholds; TBT is not
-INP. The summary also shows actual timings in milliseconds and unitless CLS.
-A page is **PASS** only when Performance and all four metric scores meet their
-respective minima. Valid threshold failures remain non-blocking.
+**Performance >= 75/100 is the agreed QA requirement** and remains the main
+release performance threshold. LCP, TBT, CLS and FCP use their **actual median
+values**, with lower values being better, rather than Lighthouse audit scores.
+Their limits are initial regression guardrails based on current observed portal
+performance plus tolerance for normal Lighthouse variability. They are **not
+official Core Web Vitals targets or product SLAs**; TBT is not INP.
 
-| Page    | Emulation | LCP min | TBT min | CLS min | FCP min |
-| ------- | --------- | ------- | ------- | ------- | ------- |
-| Landing | Mobile    | 55      | 80      | 100     | 55      |
-| Landing | Desktop   | 95      | 75      | 95      | 95      |
-| Search  | Mobile    | 60      | 65      | 100     | 55      |
-| Search  | Desktop   | 85      | 100     | 100     | 95      |
-| Details | Mobile    | 50      | 70      | 100     | 50      |
-| Details | Desktop   | 85      | 100     | 100     | 95      |
+All metric-value limits are configured in `RELEASE_METRIC_LIMITS` in
+`src/lighthouse/releaseReport.ts`, separately for each page and form factor.
+LCP, TBT and FCP are in milliseconds; CLS is unitless. Each limit is inclusive:
+exactly matching it passes, exceeding it fails. A page/form-factor is **PASS**
+only when its median Performance score is >= 75 and all four median metric
+values are within their limits. Each median is calculated independently over
+three measured runs after one discarded warm-up, protecting against a single
+outlier. Release measurements retain actual numeric precision for these checks;
+display rounding cannot turn a value just above the limit into a pass.
 
-These numbers are starting points from local lab measurements and can vary on
-GitHub-hosted runners. A minimum of 100 intentionally allows no score drop, per
-the rounding rule. Recalibrate deliberately if representative runs justify it.
+| Page    | Emulation | LCP maximum | TBT maximum | CLS maximum | FCP maximum |
+| ------- | --------- | ----------- | ----------- | ----------- | ----------- |
+| Landing | Mobile    | 6500 ms     | 400 ms      | 0.10        | 4200 ms     |
+| Search  | Mobile    | 5500 ms     | 700 ms      | 0.10        | 4200 ms     |
+| Details | Mobile    | 6500 ms     | 700 ms      | 0.10        | 4200 ms     |
+| Landing | Desktop   | 2000 ms     | 150 ms      | 0.10        | 1000 ms     |
+| Search  | Desktop   | 2500 ms     | 150 ms      | 0.10        | 1000 ms     |
+| Details | Desktop   | 2500 ms     | 150 ms      | 0.10        | 1000 ms     |
+
+Review and recalibrate these starting guardrails after enough staging/production
+release data has been collected to understand normal variation. Limits remain
+fixed configuration; a release never lowers its own requirements automatically.
+Threshold failures make the independent Lighthouse workflow red after report
+publication but remain non-blocking for deployment/release.
 
 The QA job summary includes the environment, release/ref, SHA, tested page URL,
-emulation, all three measured scores, median, threshold and **PASS/FAIL** for
-Performance and each of LCP, TBT, CLS and FCP. It
+emulation, all three measured Performance scores and metric values, medians,
+thresholds with explicit units, and **PASS/FAIL** for Performance and each of
+LCP, TBT, CLS and FCP. It
 shows separate mobile and desktop rows for every page, and execution status
 separately from performance status. Execution errors
 include the error and any pages already measured; setup failures before a report
@@ -130,8 +138,9 @@ after execution failures when any reports exist.
 `release-results.json` is the structured input for future QA/Slack integrations:
 it includes environment/ref/SHA, separate `executionStatus` and
 `performanceStatus`, any execution error, and per-page URLs, scores, measured
-runs, threshold and status, plus `metricChecks` with metric values, scores,
-measured values/scores, minima and status. `executionStatus` is `SUCCESS` or `ERROR`;
+runs, threshold and status, plus `metricChecks` with median metric values,
+measured values, maximum thresholds, units, comparison operator (`<=`) and status.
+`metricLimits` contains the configuration used for validation. `executionStatus` is `SUCCESS` or `ERROR`;
 `performanceStatus` is `PASS`, `FAIL`, or `INCOMPLETE` when execution stopped
 without a completed below-threshold result. Only completed measurements get a
 final page score. There are no historical release comparisons or notifications.

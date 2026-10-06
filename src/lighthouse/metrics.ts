@@ -31,7 +31,7 @@ const score = (lhr: Lhr, category: string) => {
 
 const numeric = (lhr: Lhr, audit: string) => {
   const value = lhr.audits?.[audit]?.numericValue;
-  if (typeof value !== "number") {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
     throw new Error(`Lighthouse returned no value for ${audit}`);
   }
   return value;
@@ -39,36 +39,24 @@ const numeric = (lhr: Lhr, audit: string) => {
 
 export const extractMetrics = (
   lhr: Lhr,
-  includeScores = false
+  preserveValues = false
 ): RouteMetrics => ({
-  ...(includeScores
-    ? {
-        metricScores: Object.fromEntries(
-          Object.entries({
-            lcp: "largest-contentful-paint",
-            tbt: "total-blocking-time",
-            cls: "cumulative-layout-shift",
-            fcp: "first-contentful-paint",
-          }).map(([metric, audit]) => {
-            const raw = lhr.audits?.[audit]?.score;
-            if (typeof raw !== "number" || !Number.isFinite(raw)) {
-              throw new Error(
-                `Lighthouse returned no valid score for ${audit}`
-              );
-            }
-            return [metric, Math.round(raw * 100)];
-          })
-        ) as NonNullable<RouteMetrics["metricScores"]>,
-      }
-    : {}),
   performance: score(lhr, "performance"),
   accessibility: score(lhr, "accessibility"),
   bestPractices: score(lhr, "best-practices"),
   seo: score(lhr, "seo"),
-  lcp: round(numeric(lhr, "largest-contentful-paint")),
-  cls: round(numeric(lhr, "cumulative-layout-shift"), 3),
-  tbt: round(numeric(lhr, "total-blocking-time")),
-  fcp: round(numeric(lhr, "first-contentful-paint")),
+  lcp: preserveValues
+    ? numeric(lhr, "largest-contentful-paint")
+    : round(numeric(lhr, "largest-contentful-paint")),
+  cls: preserveValues
+    ? numeric(lhr, "cumulative-layout-shift")
+    : round(numeric(lhr, "cumulative-layout-shift"), 3),
+  tbt: preserveValues
+    ? numeric(lhr, "total-blocking-time")
+    : round(numeric(lhr, "total-blocking-time")),
+  fcp: preserveValues
+    ? numeric(lhr, "first-contentful-paint")
+    : round(numeric(lhr, "first-contentful-paint")),
 });
 
 const METRIC_DECIMALS: Record<MetricKey, number> = {
@@ -87,23 +75,20 @@ const METRIC_DECIMALS: Record<MetricKey, number> = {
  * middle of what was actually observed for that metric, which is what the
  * comparison needs.
  */
-export const medianMetrics = (runs: RouteMetrics[]): RouteMetrics => {
+export const medianMetrics = (
+  runs: RouteMetrics[],
+  preserveValues = false
+): RouteMetrics => {
   if (runs.length === 0) throw new Error("no runs to take the median of");
   const keys = Object.keys(METRIC_DECIMALS) as MetricKey[];
   const metrics = Object.fromEntries(
     keys.map((key) => [
       key,
-      round(median(runs.map((run) => run[key])), METRIC_DECIMALS[key]),
+      preserveValues && ["lcp", "tbt", "cls", "fcp"].includes(key)
+        ? median(runs.map((run) => run[key]))
+        : round(median(runs.map((run) => run[key])), METRIC_DECIMALS[key]),
     ])
   ) as unknown as RouteMetrics;
-  if (runs.every((run) => run.metricScores)) {
-    metrics.metricScores = Object.fromEntries(
-      (["lcp", "tbt", "cls", "fcp"] as const).map((key) => [
-        key,
-        round(median(runs.map((run) => run.metricScores![key]))),
-      ])
-    ) as NonNullable<RouteMetrics["metricScores"]>;
-  }
   return metrics;
 };
 

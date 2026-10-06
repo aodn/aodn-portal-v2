@@ -4,19 +4,19 @@ import type { FormFactor, LighthouseReport } from "@/lighthouse/types";
 /** Informational release minimum; independent of the PR's baseline gate. */
 export const MINIMUM_RELEASE_PERFORMANCE = 75;
 
-/** Initial audit score minima, rounded down to multiples of five from edge. */
-export const RELEASE_METRIC_MINIMUMS = {
+/** Initial regression guardrails: milliseconds except unitless CLS; not SLAs. */
+export const RELEASE_METRIC_LIMITS = {
   landing: {
-    mobile: { lcp: 55, tbt: 80, cls: 100, fcp: 55 },
-    desktop: { lcp: 95, tbt: 75, cls: 95, fcp: 95 },
+    mobile: { lcp: 6500, tbt: 400, cls: 0.1, fcp: 4200 },
+    desktop: { lcp: 2000, tbt: 150, cls: 0.1, fcp: 1000 },
   },
   search: {
-    mobile: { lcp: 60, tbt: 65, cls: 100, fcp: 55 },
-    desktop: { lcp: 85, tbt: 100, cls: 100, fcp: 95 },
+    mobile: { lcp: 5500, tbt: 700, cls: 0.1, fcp: 4200 },
+    desktop: { lcp: 2500, tbt: 150, cls: 0.1, fcp: 1000 },
   },
   details: {
-    mobile: { lcp: 50, tbt: 70, cls: 100, fcp: 50 },
-    desktop: { lcp: 85, tbt: 100, cls: 100, fcp: 95 },
+    mobile: { lcp: 6500, tbt: 700, cls: 0.1, fcp: 4200 },
+    desktop: { lcp: 2500, tbt: 150, cls: 0.1, fcp: 1000 },
   },
 } satisfies Record<
   string,
@@ -38,40 +38,34 @@ export const buildReleaseReport = (report: LighthouseReport) => {
       if (!result) continue;
       const metricChecks = RELEASE_METRICS.map((metric) => {
         const value = result[metric];
-        const minima =
-          RELEASE_METRIC_MINIMUMS[id as keyof typeof RELEASE_METRIC_MINIMUMS];
-        const threshold = minima?.[formFactor][metric];
-        const score = result.metricScores?.[metric];
-        if (
-          threshold === undefined ||
-          score === undefined ||
-          !Number.isFinite(score)
-        ) {
+        const limits =
+          RELEASE_METRIC_LIMITS[id as keyof typeof RELEASE_METRIC_LIMITS];
+        const threshold = limits?.[formFactor][metric];
+        if (threshold === undefined || !Number.isFinite(value)) {
           throw new Error(
-            `Missing release metric configuration or score for ${id}/${formFactor}/${metric}`
+            `Missing release metric configuration or valid value for ${id}/${formFactor}/${metric}`
           );
         }
-        const status = score >= threshold ? "PASS" : "FAIL";
-        const runs =
-          measuredRuns?.[formFactor]?.map(
-            (run) => run.metricScores?.[metric]
-          ) || [];
+        const unit = metric === "cls" ? "unitless" : "ms";
+        const thresholdLabel = `${metric.toUpperCase()} <= ${metric === "cls" ? threshold.toFixed(2) : threshold}${unit === "ms" ? " ms" : ""}`;
+        const status = value <= threshold ? "PASS" : "FAIL";
+        const measuredValues =
+          measuredRuns?.[formFactor]?.map((run) => run[metric]) || [];
         metricRows.push(
-          `| [${id}](${report.apiHost}${route}) | ${formFactorLabels[formFactor]} | ${metric.toUpperCase()}${metric === "cls" ? "" : " (ms)"} | ${runs.join(", ") || "Unavailable"} | ${value} | ${score} | ≥ ${threshold} | **${status}** |`
+          `| [${id}](${report.apiHost}${route}) | ${formFactorLabels[formFactor]} | ${metric.toUpperCase()} (${unit}) | ${measuredValues.join(", ") || "Unavailable"} | ${value} | ${thresholdLabel} | **${status}** |`
         );
         if (status === "FAIL") {
           failures.push(
-            `${formFactorLabels[formFactor]} ${metric.toUpperCase()} on ${route} score is ${score}, below the minimum ${threshold}`
+            `${formFactorLabels[formFactor]} ${metric.toUpperCase()} on ${route} is ${value}${unit === "ms" ? " ms" : ""}, above the limit ${thresholdLabel}`
           );
         }
         return {
           metric,
           value,
-          score,
           threshold,
-          measuredScores: runs,
-          measuredValues:
-            measuredRuns?.[formFactor]?.map((run) => run[metric]) || [],
+          unit,
+          comparison: "<=",
+          measuredValues,
           status,
         };
       });
@@ -126,10 +120,10 @@ export const buildReleaseReport = (report: LighthouseReport) => {
     "",
     "## Timing and layout metrics",
     "",
-    "Each metric is validated independently using its median Lighthouse score (0–100). A page passes only if Performance and all four metric checks pass. These are initial lab score minima, not field Core Web Vitals targets; TBT is not INP.",
+    "Each metric is validated independently using its median actual value; lower is better. A page passes only if Performance >= 75 and all four metric values meet their limits. These are initial regression guardrails, not official Core Web Vitals targets or SLAs; TBT is not INP.",
     "",
-    "| Tested page | Emulation | Metric | Measured scores | Median value | Median score | Minimum score | PASS/FAIL |",
-    "| --- | --- | --- | --- | --- | --- | --- | --- |",
+    "| Tested page | Emulation | Metric | Measured values | Median value | Maximum value | PASS/FAIL |",
+    "| --- | --- | --- | --- | --- | --- | --- |",
     ...metricRows,
   ];
   if (report.executionError) {
@@ -154,7 +148,7 @@ export const buildReleaseReport = (report: LighthouseReport) => {
       generatedAt: report.generatedAt,
       site: report.apiHost,
       threshold: MINIMUM_RELEASE_PERFORMANCE,
-      metricMinimums: RELEASE_METRIC_MINIMUMS,
+      metricLimits: RELEASE_METRIC_LIMITS,
       executionStatus,
       performanceStatus,
       executionError: report.executionError,
