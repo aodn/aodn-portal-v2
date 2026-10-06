@@ -129,7 +129,6 @@ const measureRoute = async ({
     url,
     formFactor,
     warmup: true,
-    matchDevToolsSettings: !api,
   });
 
   const collected: RouteMetrics[] = [];
@@ -137,8 +136,6 @@ const measureRoute = async ({
     const lhr = await runLighthouse({
       url,
       formFactor,
-      // DevTools settings apply to live release audits, not PR baselines.
-      matchDevToolsSettings: !api,
       // Deployed runs preserve HTML as well as JSON, including invalid pages.
       ...(!api && keepLhr
         ? {

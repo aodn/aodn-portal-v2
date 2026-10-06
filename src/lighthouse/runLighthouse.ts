@@ -25,15 +25,6 @@ const CHROME_FLAGS = [
   "--mute-audio",
 ];
 
-/** Matches the effective device viewport shown in the uploaded manual reports. */
-const DEVTOOLS_MOBILE_SCREEN_SETTINGS = {
-  mobile: true,
-  width: 412,
-  height: 823,
-  deviceScaleFactor: 1.75,
-  disabled: false,
-};
-
 export interface LighthouseRunOptions {
   url: string;
   formFactor: FormFactor;
@@ -45,8 +36,6 @@ export interface LighthouseRunOptions {
   warmup?: boolean;
   /** Save full JSON and HTML reports before the caller validates the page. */
   reportPath?: string;
-  /** Keep the mobile UA/network profile without forcing a mobile viewport. */
-  matchDevToolsSettings?: boolean;
 }
 
 export const runLighthouse = async ({
@@ -54,7 +43,6 @@ export const runLighthouse = async ({
   formFactor,
   warmup = false,
   reportPath,
-  matchDevToolsSettings = false,
 }: LighthouseRunOptions): Promise<Lhr> => {
   const chrome = await chromeLauncher.launch({
     chromeFlags: CHROME_FLAGS,
@@ -62,24 +50,13 @@ export const runLighthouse = async ({
   });
 
   try {
-    // Keep PR baseline runs on the pinned v12 engine. Release audits load v13,
-    // matching the version in the manually generated DevTools reports.
-    const manualLighthouse = matchDevToolsSettings
-      ? await import("lighthouse-devtools")
-      : undefined;
-    const lighthouseRunner = (manualLighthouse?.default ??
-      lighthouse) as typeof lighthouse;
-    const runnerDesktopConfig = (manualLighthouse?.desktopConfig ??
-      desktopConfig) as typeof desktopConfig;
-    const result = await lighthouseRunner(
+    // PR and release audits share the pinned Lighthouse 12.8.2 engine.
+    const result = await lighthouse(
       url,
       {
         port: chrome.port,
         output: reportPath ? ["json", "html"] : "json",
         logLevel: "error",
-        ...(matchDevToolsSettings && formFactor === "mobile"
-          ? { screenEmulation: DEVTOOLS_MOBILE_SCREEN_SETTINGS }
-          : {}),
         ...(warmup
           ? {
               throttlingMethod: "provided" as const,
@@ -97,7 +74,7 @@ export const runLighthouse = async ({
       },
       // Mobile is Lighthouse's default config (slow 4G, 4x CPU); desktop needs
       // the config that ships with it.
-      formFactor === "desktop" ? runnerDesktopConfig : undefined
+      formFactor === "desktop" ? desktopConfig : undefined
     );
 
     if (!result?.lhr)

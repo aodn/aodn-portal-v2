@@ -119,13 +119,11 @@ test("audits both form factors on all deployed pages with separate medians and s
         url: `${origin}${route.path}`,
         formFactor,
         warmup: true,
-        matchDevToolsSettings: true,
       });
       expect(calls.slice(1).map(([options]) => options)).toEqual(
         [1, 2, 3].map((run) => ({
           url: `${origin}${route.path}`,
           formFactor,
-          matchDevToolsSettings: true,
           reportPath: path.join(
             directory.path,
             "lhr",

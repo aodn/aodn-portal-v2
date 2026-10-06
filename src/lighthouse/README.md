@@ -65,16 +65,12 @@ Lighthouse/Chrome errors and invalid pages (including degraded shells, failed
 dataset requests and redirects) still fail the audit job as execution errors.
 The audit runs independently of deployment and does not gate promotion.
 
-Release measurements use Lighthouse `13.4.1`, matching the uploaded DevTools
-reports. Mobile measurements keep Lighthouse's mobile form factor, user agent
-and the same simulated mobile CPU/network profile, and explicitly emulate the effective
-`412 × 823` viewport at device scale `1.75` from the reports. DevTools had
-already applied that emulation outside Lighthouse; a standalone Chrome run must
-enable it explicitly. Desktop measurements use Lighthouse's built-in desktop
-configuration. The default Lighthouse dependency stays at `12.8.2` for
-the PR workflow, preserving its scoring engine and baseline comparisons.
-Lighthouse 13.4.1 requires Node `22.19` or later, so
-the release workflow uses that runtime while the PR workflow remains on Node 20.
+PR and release audits intentionally use the same pinned Lighthouse `12.8.2`
+engine and its built-in mobile and desktop configurations for consistency and
+reproducibility. Both workflows run on Node 20; the release workflow reads the
+version from `.nvmrc`. The release audit provides repeatable post-deployment
+measurements rather than reproducing a manual Chrome DevTools run. The PR
+scoring engine and baseline comparisons remain unchanged.
 
 Configuration is shared with PR measurements: `constants.ts` defines the routes
 using the app's route constants and the stable detail UUID
