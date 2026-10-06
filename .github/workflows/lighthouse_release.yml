@@ -23,7 +23,7 @@ jobs:
     timeout-minutes: 40
     env:
       LH_ENVIRONMENT: ${{ inputs.environment }}
-      LH_URL: ${{ inputs.environment == 'staging' && 'https://portal-staging.aodn.org.au/' || 'https://portal-beta.aodn.org.au/' }}
+      LH_URL: ${{ inputs.environment == 'staging' && 'https://portal.staging.aodn.org.au/' || 'https://portal.production.aodn.org.au/' }}
       LH_FORM_FACTOR: both
       LH_RUNS: "3"
       LH_DETAILS_UUID: ${{ vars.LH_DETAILS_UUID }}
