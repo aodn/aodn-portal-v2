@@ -125,13 +125,20 @@ const measureRoute = async ({
   // Discarded: warms Chrome and the OS caches so the first measured run is
   // not the odd one out.
   console.log(`[${route.id}] warm-up run`);
-  await runLighthouse({ url, formFactor, warmup: true });
+  await runLighthouse({
+    url,
+    formFactor,
+    warmup: true,
+    matchDevToolsSettings: !api,
+  });
 
   const collected: RouteMetrics[] = [];
   for (let run = 1; run <= runs; run += 1) {
     const lhr = await runLighthouse({
       url,
       formFactor,
+      // DevTools settings apply to live release audits, not PR baselines.
+      matchDevToolsSettings: !api,
       // Deployed runs preserve HTML as well as JSON, including invalid pages.
       ...(!api && keepLhr
         ? {

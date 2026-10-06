@@ -81,7 +81,9 @@ const requestStatus = (lhr: Lhr, urlFragment: string) => {
   return match ? Number(match.statusCode) : undefined;
 };
 
-const domElements = (lhr: Lhr) => lhr.audits?.["dom-size"]?.numericValue;
+const domElements = (lhr: Lhr) =>
+  lhr.audits?.["dom-size"]?.numericValue ??
+  lhr.audits?.["dom-size-insight"]?.numericValue;
 
 /**
  * Everything that means "this run did not measure the page we asked for": a
