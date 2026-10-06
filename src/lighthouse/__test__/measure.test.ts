@@ -78,7 +78,7 @@ beforeEach(() => {
       // A low outlier must not fail a page whose median meets the minimum.
       const performance = warmup
         ? 0.99
-        : [0.8, 0.4, 0.7][Number(reportPath?.slice(-1)) - 1];
+        : [0.8, 0.4, 0.75][Number(reportPath?.slice(-1)) - 1];
       const lhr = result(url, performance);
       if (reportPath) {
         fs.writeFileSync(`${reportPath}.json`, JSON.stringify(lhr));
@@ -116,19 +116,19 @@ test("audits the three deployed pages with one warm-up and three measured runs e
     expect(calls.slice(1).map(([options]) => options.url)).toEqual(
       Array(3).fill(`${origin}${route.path}`)
     );
-    expect(report.routes[route.path].metrics.mobile?.performance).toBe(70);
+    expect(report.routes[route.path].metrics.mobile?.performance).toBe(75);
     expect(
       report.routes[route.path].measuredRuns?.mobile?.map(
         (run) => run.performance
       )
-    ).toEqual([80, 40, 70]);
+    ).toEqual([80, 40, 75]);
   }
   expect(report.apiHost).toBe(origin);
   expect(report.runs).toBe(3);
   expect(fs.readdirSync(path.join(directory.path, "lhr"))).toHaveLength(18);
   expect(
     fs.readFileSync(path.join(directory.path, "report.md"), "utf8")
-  ).toContain("70 | 70 | **PASS**");
+  ).toContain("75 | 75 | **PASS**");
   const summary = fs.readFileSync(
     path.join(directory.path, "report.md"),
     "utf8"
@@ -136,19 +136,19 @@ test("audits the three deployed pages with one warm-up and three measured runs e
   expect(summary).toContain("Environment: **staging**");
   expect(summary).toContain("v1.2.3");
   expect(summary).toContain("test-sha");
-  expect(summary).toContain("80, 40, 70");
+  expect(summary).toContain("80, 40, 75");
 });
 
-test("reports a median below 70 as FAIL without rejecting valid measurements", async () => {
+test("reports a median below 75 as FAIL without rejecting valid measurements", async () => {
   vi.mocked(runLighthouse).mockImplementation(async ({ url }) =>
-    result(url, url.endsWith("/search") ? 0.69 : 0.9)
+    result(url, url.endsWith("/search") ? 0.74 : 0.9)
   );
 
   const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
   await expect(measure()).resolves.toBeDefined();
   expect(warn).toHaveBeenCalledWith(
     expect.stringContaining(
-      "Performance on /search is 69, below the minimum 70"
+      "Performance on /search is 74, below the minimum 75"
     )
   );
   expect(runLighthouse).toHaveBeenCalledTimes(12);
@@ -158,7 +158,7 @@ test("reports a median below 70 as FAIL without rejecting valid measurements", a
   expect(Object.keys(report.routes)).toHaveLength(3);
   expect(
     fs.readFileSync(path.join(directory.path, "report.md"), "utf8")
-  ).toContain("69 | 70 | **FAIL**");
+  ).toContain("74 | 75 | **FAIL**");
   const results = JSON.parse(
     fs.readFileSync(path.join(directory.path, "release-results.json"), "utf8")
   );
@@ -166,15 +166,15 @@ test("reports a median below 70 as FAIL without rejecting valid measurements", a
     environment: "staging",
     ref: "v1.2.3",
     commit: "test-sha",
-    threshold: 70,
+    threshold: 75,
     executionStatus: "SUCCESS",
     performanceStatus: "FAIL",
   });
   expect(results.pages).toHaveLength(3);
   expect(results.pages[1]).toMatchObject({
     status: "FAIL",
-    performance: 69,
-    measuredScores: [69, 69, 69],
+    performance: 74,
+    measuredScores: [74, 74, 74],
   });
 });
 

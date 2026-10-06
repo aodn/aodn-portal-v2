@@ -2,7 +2,7 @@ import { ALL_FORM_FACTORS, formFactorLabels } from "@/lighthouse/constants";
 import type { LighthouseReport } from "@/lighthouse/types";
 
 /** Informational release minimum; independent of the PR's baseline gate. */
-export const MINIMUM_RELEASE_PERFORMANCE = 70;
+export const MINIMUM_RELEASE_PERFORMANCE = 75;
 
 export const buildReleaseReport = (report: LighthouseReport) => {
   const rows: string[] = [];

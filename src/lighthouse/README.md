@@ -54,7 +54,7 @@ and uses `yarn lh:measure` against the actual deployed site and its real backend
 It measures landing, search and details in mobile emulation: one discarded
 warm-up followed by three measured runs per page (12 runs total). Each reported
 metric is the median of those three runs. Every page's median Performance score
-is checked against **70/100**. A lower score is clearly reported as **FAIL** and
+is checked against **75/100**. A lower score is clearly reported as **FAIL** and
 emits a workflow warning, while the measurement step and release audit still
 succeed. A valid score below the minimum never blocks deployment or release.
 Lighthouse/Chrome errors and invalid pages (including degraded shells, failed
@@ -77,7 +77,7 @@ using the app's route constants and the stable detail UUID
 `LH_DETAILS_UUID` to replace that dataset if it is retired. The workflow defines
 the staging/production site origins (matching SEO), emulation and run count.
 To change the score minimum, edit `MINIMUM_RELEASE_PERFORMANCE` in
-`src/lighthouse/releaseReport.ts` (currently `70`). This single constant controls
+`src/lighthouse/releaseReport.ts` (currently `75`). This single constant controls
 both the pass/fail checks and the minimum displayed in the release summary.
 
 The QA job summary includes the environment, release/ref, SHA, tested page URL,
@@ -133,7 +133,7 @@ Useful flags on `yarn lh:measure`:
 | flag                   | for                                                            |
 | ---------------------- | -------------------------------------------------------------- |
 | `--runs 1`             | a quick check while changing this tooling                      |
-| `--url <site>`         | measure a deployed site with its real API; report a 70 minimum |
+| `--url <site>`         | measure a deployed site with its real API; report a 75 minimum |
 | `--form-factor mobile` | measure only mobile (or only `desktop`); default is both       |
 | `--uuid <uuid>`        | measure a different record on `/details` (record it first)     |
 | `--serve-only`         | just serve the build + mocked API, to open in a browser        |
