@@ -25,15 +25,14 @@ const CHROME_FLAGS = [
   "--mute-audio",
 ];
 
-/** Matches the mobile Device Tools settings in the uploaded manual reports. */
+/** Matches the effective device viewport shown in the uploaded manual reports. */
 const DEVTOOLS_MOBILE_SCREEN_SETTINGS = {
   mobile: true,
   width: 412,
   height: 823,
   deviceScaleFactor: 1.75,
-  disabled: true,
+  disabled: false,
 };
-const DEVTOOLS_CHROME_VIEWPORT = { width: 1353, height: 943 };
 
 export interface LighthouseRunOptions {
   url: string;
@@ -58,12 +57,7 @@ export const runLighthouse = async ({
   matchDevToolsSettings = false,
 }: LighthouseRunOptions): Promise<Lhr> => {
   const chrome = await chromeLauncher.launch({
-    chromeFlags: matchDevToolsSettings
-      ? [
-          ...CHROME_FLAGS,
-          `--window-size=${DEVTOOLS_CHROME_VIEWPORT.width},${DEVTOOLS_CHROME_VIEWPORT.height}`,
-        ]
-      : CHROME_FLAGS,
+    chromeFlags: CHROME_FLAGS,
     chromePath: process.env.CHROME_PATH,
   });
 

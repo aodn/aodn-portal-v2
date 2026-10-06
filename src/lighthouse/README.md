@@ -63,10 +63,12 @@ The audit runs independently of deployment and does not gate promotion.
 
 Release measurements use Lighthouse `13.4.1`, matching the uploaded DevTools
 reports. They keep Lighthouse's mobile form factor, mobile user agent and the
-same simulated mobile CPU/network profile, disable screen emulation as in the
-reports, and set Chrome's viewport to `1353 × 943`. The default Lighthouse
-dependency stays at `12.8.2` for the PR workflow, preserving its scoring engine
-and baseline comparisons. Lighthouse 13.4.1 requires Node `22.19` or later, so
+same simulated mobile CPU/network profile, and explicitly emulate the effective
+`412 × 823` viewport at device scale `1.75` from the reports. DevTools had
+already applied that emulation outside Lighthouse; a standalone Chrome run must
+enable it explicitly. The default Lighthouse dependency stays at `12.8.2` for
+the PR workflow, preserving its scoring engine and baseline comparisons.
+Lighthouse 13.4.1 requires Node `22.19` or later, so
 the release workflow uses that runtime while the PR workflow remains on Node 20.
 
 Configuration is shared with PR measurements: `constants.ts` defines the routes
