@@ -4,8 +4,9 @@
  *
  * Local measurements fail when a run could not be trusted: no build, Chrome or Lighthouse
  * erroring, or a page that did not actually render (wrong URL, degraded shell,
- * failed API call). --url measures a deployed site instead, and also checks
- * the release minimum Performance score. Local PR comparisons stay in
+ * failed API call). --url measures a deployed site and reports the release
+ * minimum Performance score without failing valid measurements below it.
+ * Local PR comparisons stay in
  * compare.ts. Node-only.
  */
 
@@ -118,7 +119,7 @@ const measureRoute = async ({
   formFactor: FormFactor;
   keepLhr: boolean;
   api?: ApiReplayer;
-}): Promise<RouteMetrics> => {
+}): Promise<{ metrics: RouteMetrics; measuredRuns: RouteMetrics[] }> => {
   const url = `${origin}${route.path}`;
 
   // Discarded: warms Chrome and the OS caches so the first measured run is
@@ -172,7 +173,7 @@ const measureRoute = async ({
 
   const medians = medianMetrics(collected);
   console.log(`[${route.id}] median ${formatMetrics(medians)}`);
-  return medians;
+  return { metrics: medians, measuredRuns: collected };
 };
 
 export const measure = async () => {
@@ -224,11 +225,50 @@ export const measure = async () => {
   }
 
   const routes: Record<string, RouteReport> = {};
+  const report: LighthouseReport = {
+    commit: commitSha(),
+    branch: branchName(),
+    generatedAt: new Date().toISOString(),
+    runs,
+    apiHost: origin ?? api!.manifest.recordedFrom,
+    routes,
+    ...(origin ? { environment: process.env.LH_ENVIRONMENT } : {}),
+  };
+  const saveReport = () => {
+    fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+    fs.writeFileSync(
+      outputPath,
+      `${JSON.stringify(report, null, 2)}\n`,
+      "utf8"
+    );
+    if (origin) {
+      const { markdown, failures, results } = buildReleaseReport(report);
+      fs.writeFileSync(reportMarkdownPath(), markdown, "utf8");
+      fs.writeFileSync(
+        path.join(workDir(), "release-results.json"),
+        `${JSON.stringify(results, null, 2)}\n`,
+        "utf8"
+      );
+      for (const failure of failures) {
+        console.warn(
+          `::warning title=Lighthouse performance threshold::${failure}`
+        );
+      }
+    }
+  };
+  let activePage = "";
   try {
     for (const route of lighthouseRoutes(uuid)) {
+      activePage = route.path;
       const metrics: RouteReport["metrics"] = {};
+      const measuredRuns: NonNullable<RouteReport["measuredRuns"]> = {};
+      routes[route.path] = {
+        id: route.id,
+        metrics,
+        ...(origin ? { measuredRuns } : {}),
+      };
       for (const formFactor of formFactors) {
-        metrics[formFactor] = await measureRoute({
+        const measurement = await measureRoute({
           route,
           origin: origin ?? server!.url,
           runs,
@@ -236,9 +276,16 @@ export const measure = async () => {
           keepLhr,
           api,
         });
+        metrics[formFactor] = measurement.metrics;
+        measuredRuns[formFactor] = measurement.measuredRuns;
       }
-      routes[route.path] = { id: route.id, metrics };
     }
+  } catch (error) {
+    if (origin) {
+      report.executionError = `${activePage}: ${error instanceof Error ? error.message : String(error)}`;
+      saveReport();
+    }
+    throw error;
   } finally {
     await server?.close();
   }
@@ -252,23 +299,8 @@ export const measure = async () => {
     );
   }
 
-  const report: LighthouseReport = {
-    commit: commitSha(),
-    branch: branchName(),
-    generatedAt: new Date().toISOString(),
-    runs,
-    apiHost: origin ?? api!.manifest.recordedFrom,
-    routes,
-  };
-
-  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-  fs.writeFileSync(outputPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  saveReport();
   console.log(`wrote ${outputPath}`);
-  if (origin) {
-    const { markdown, failures } = buildReleaseReport(report);
-    fs.writeFileSync(reportMarkdownPath(), markdown, "utf8");
-    if (failures.length > 0) throw new Error(failures.join("\n"));
-  }
   return report;
 };
 

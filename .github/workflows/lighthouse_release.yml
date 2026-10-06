@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
+      LH_ENVIRONMENT: ${{ inputs.environment }}
       LH_URL: ${{ inputs.environment == 'staging' && 'https://portal-staging.aodn.org.au/' || 'https://portal-beta.aodn.org.au/' }}
       LH_FORM_FACTOR: mobile
       LH_RUNS: "3"
@@ -39,7 +40,8 @@ jobs:
 
       - run: yarn install --immutable
 
-      - name: Audit the deployed pages and enforce Performance minimum
+      # Low scores are report failures; execution errors still fail this step.
+      - name: Audit the deployed pages and report Performance results
         run: yarn lh:measure
 
       - name: Add the report to the job summary
@@ -47,13 +49,19 @@ jobs:
         run: |
           if [ -f .lighthouse/report.md ]; then
             cat .lighthouse/report.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            printf '%s\n' '# Release Lighthouse' '' \
+              "Environment: **$LH_ENVIRONMENT**" \
+              "Release/ref: $GITHUB_REF_NAME · SHA: $GITHUB_SHA" \
+              'Execution status: **ERROR** — no valid measurement report was produced. See the failed step logs.' \
+              >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Upload Lighthouse reports
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: lighthouse-${{ inputs.environment }}-${{ github.run_attempt }}
+          name: lighthouse-${{ inputs.environment }}-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: .lighthouse/
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 7

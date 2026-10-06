@@ -54,26 +54,44 @@ and uses `yarn lh:measure` against the actual deployed site and its real backend
 It measures landing, search and details in mobile emulation: one discarded
 warm-up followed by three measured runs per page (12 runs total). Each reported
 metric is the median of those three runs. Every page's median Performance score
-must be **at least 70/100**; a lower score fails the audit after all three pages
-have been measured and the results saved. Invalid pages (including degraded
-shells, failed dataset requests and redirects) fail the measurement checks.
+is checked against **70/100**. A lower score is clearly reported as **FAIL** and
+emits a workflow warning, while the measurement step and release audit still
+succeed. A valid score below the minimum never blocks deployment or release.
+Lighthouse/Chrome errors and invalid pages (including degraded shells, failed
+dataset requests and redirects) still fail the audit job as execution errors.
+The audit runs independently of deployment and does not gate promotion.
 
 Configuration is shared with PR measurements: `constants.ts` defines the routes
 using the app's route constants and the stable detail UUID
 `0015db7e-e684-7548-e053-08114f8cd4ad` (IMOS BA SOOP). Set the repository variable
 `LH_DETAILS_UUID` to replace that dataset if it is retired. The workflow defines
-the staging/production site origins (matching SEO), emulation and run count;
+the staging/production site origins (matching SEO), emulation and run count.
 To change the score minimum, edit `MINIMUM_RELEASE_PERFORMANCE` in
 `src/lighthouse/releaseReport.ts` (currently `70`). This single constant controls
 both the pass/fail checks and the minimum displayed in the release summary.
 
-The job summary shows median scores and pass/fail results. The seven-day artifact
-contains `.lighthouse/report.json`, `report.md`, and HTML/JSON reports for every
-measured run in `lhr/`. Individual reports are saved before rendering checks, so
-an invalid page can still be debugged. Warm-ups are excluded from the results.
-Audit results do not gate production promotion. There are no historical release
-comparisons or notifications. The release workflow must be present on the default
-branch and the deployed ref before it can be dispatched.
+The QA job summary includes the environment, release/ref, SHA, tested page URL,
+emulation, all three measured scores, median, threshold and **PASS/FAIL**. It
+shows execution status separately from performance status. Execution errors
+include the error and any pages already measured; setup failures before a report
+exists produce an explicit error summary pointing to the failed step logs.
+
+Artifacts are named `lighthouse-<environment>-<SHA>-<run-id>-<attempt>` and retained
+for seven days. They contain `.lighthouse/report.json`, `report.md`,
+`release-results.json`, and HTML/JSON reports for every measured run in `lhr/`.
+Individual reports are saved before rendering checks, so an invalid page can
+still be debugged. Warm-ups are excluded from the results. Uploads also run
+after execution failures when any reports exist.
+
+`release-results.json` is the structured input for future QA/Slack integrations:
+it includes environment/ref/SHA, separate `executionStatus` and
+`performanceStatus`, any execution error, and per-page URLs, scores, measured
+runs, threshold and status. `executionStatus` is `SUCCESS` or `ERROR`;
+`performanceStatus` is `PASS`, `FAIL`, or `INCOMPLETE` when execution stopped
+without a completed below-threshold result. Only completed measurements get a
+final page score. There are no historical release comparisons or notifications.
+The release workflow must be present on the default branch and the deployed ref
+before it can be dispatched.
 
 The existing deployment GitHub App needs Actions write access to both
 `aodn/appdeploy` and this repository: it dispatches workflows in both and reads
@@ -102,14 +120,14 @@ cat .lighthouse/report.md
 
 Useful flags on `yarn lh:measure`:
 
-| flag                   | for                                                        |
-| ---------------------- | ---------------------------------------------------------- |
-| `--runs 1`             | a quick check while changing this tooling                  |
-| `--url <site>`         | measure a deployed site with its real API; enforce 70/100  |
-| `--form-factor mobile` | measure only mobile (or only `desktop`); default is both   |
-| `--uuid <uuid>`        | measure a different record on `/details` (record it first) |
-| `--serve-only`         | just serve the build + mocked API, to open in a browser    |
-| `--no-keep-lhr`        | skip writing the full results to `.lighthouse/lhr/`        |
+| flag                   | for                                                            |
+| ---------------------- | -------------------------------------------------------------- |
+| `--runs 1`             | a quick check while changing this tooling                      |
+| `--url <site>`         | measure a deployed site with its real API; report a 70 minimum |
+| `--form-factor mobile` | measure only mobile (or only `desktop`); default is both       |
+| `--uuid <uuid>`        | measure a different record on `/details` (record it first)     |
+| `--serve-only`         | just serve the build + mocked API, to open in a browser        |
+| `--no-keep-lhr`        | skip writing the full results to `.lighthouse/lhr/`            |
 
 `LH_RUNS`, `LH_FORM_FACTOR` (`mobile`, `desktop` or `both`), `LH_DETAILS_UUID`,
 `LH_URL`, `LH_PORT` and `LH_COMMIT` do the same as their flags, for the workflow.

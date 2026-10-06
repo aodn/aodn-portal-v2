@@ -68,6 +68,9 @@ beforeEach(() => {
   ];
   vi.stubEnv("LH_URL", "");
   vi.stubEnv("LH_DETAILS_UUID", "");
+  vi.stubEnv("LH_ENVIRONMENT", "staging");
+  vi.stubEnv("LH_COMMIT", "test-sha");
+  vi.stubEnv("GITHUB_REF_NAME", "v1.2.3");
   vi.spyOn(console, "log").mockImplementation(() => {});
   vi.mocked(runLighthouse).mockImplementation(
     async ({ url, warmup, reportPath }) => {
@@ -112,22 +115,39 @@ test("audits the three deployed pages with one warm-up and three measured runs e
       Array(3).fill(`${origin}${route.path}`)
     );
     expect(report.routes[route.path].metrics.mobile?.performance).toBe(70);
+    expect(
+      report.routes[route.path].measuredRuns?.mobile?.map(
+        (run) => run.performance
+      )
+    ).toEqual([80, 40, 70]);
   }
   expect(report.apiHost).toBe(origin);
   expect(report.runs).toBe(3);
   expect(fs.readdirSync(path.join(directory.path, "lhr"))).toHaveLength(18);
   expect(
     fs.readFileSync(path.join(directory.path, "report.md"), "utf8")
-  ).toContain("70 | Pass");
+  ).toContain("70 | 70 | **PASS**");
+  const summary = fs.readFileSync(
+    path.join(directory.path, "report.md"),
+    "utf8"
+  );
+  expect(summary).toContain("Environment: **staging**");
+  expect(summary).toContain("v1.2.3");
+  expect(summary).toContain("test-sha");
+  expect(summary).toContain("80, 40, 70");
 });
 
-test("measures every page and saves results before failing a median below 70", async () => {
+test("reports a median below 70 as FAIL without rejecting valid measurements", async () => {
   vi.mocked(runLighthouse).mockImplementation(async ({ url }) =>
     result(url, url.endsWith("/search") ? 0.69 : 0.9)
   );
 
-  await expect(measure()).rejects.toThrow(
-    "Performance on /search is 69, below the minimum 70"
+  const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+  await expect(measure()).resolves.toBeDefined();
+  expect(warn).toHaveBeenCalledWith(
+    expect.stringContaining(
+      "Performance on /search is 69, below the minimum 70"
+    )
   );
   expect(runLighthouse).toHaveBeenCalledTimes(12);
   const report = JSON.parse(
@@ -136,7 +156,45 @@ test("measures every page and saves results before failing a median below 70", a
   expect(Object.keys(report.routes)).toHaveLength(3);
   expect(
     fs.readFileSync(path.join(directory.path, "report.md"), "utf8")
-  ).toContain("69 | Fail");
+  ).toContain("69 | 70 | **FAIL**");
+  const results = JSON.parse(
+    fs.readFileSync(path.join(directory.path, "release-results.json"), "utf8")
+  );
+  expect(results).toMatchObject({
+    environment: "staging",
+    ref: "v1.2.3",
+    commit: "test-sha",
+    threshold: 70,
+    executionStatus: "SUCCESS",
+    performanceStatus: "FAIL",
+  });
+  expect(results.pages).toHaveLength(3);
+  expect(results.pages[1]).toMatchObject({
+    status: "FAIL",
+    performance: 69,
+    measuredScores: [69, 69, 69],
+  });
+});
+
+test("keeps a genuine Lighthouse execution error fatal and reports completed pages", async () => {
+  vi.mocked(runLighthouse).mockImplementation(async ({ url }) => {
+    if (url.endsWith("/search")) throw new Error("Chrome failed to launch");
+    return result(url, 0.69);
+  });
+  await expect(measure()).rejects.toThrow("Chrome failed to launch");
+  const results = JSON.parse(
+    fs.readFileSync(path.join(directory.path, "release-results.json"), "utf8")
+  );
+  expect(results).toMatchObject({
+    executionStatus: "ERROR",
+    performanceStatus: "FAIL",
+    executionError: "/search: Chrome failed to launch",
+  });
+  expect(results.pages).toHaveLength(1);
+  expect(results.pages[0].performance).toBe(69);
+  expect(
+    fs.readFileSync(path.join(directory.path, "report.md"), "utf8")
+  ).toContain("Execution status: **ERROR**");
 });
 
 test("rejects a degraded or failed detail page instead of accepting its high score", async () => {
@@ -151,6 +209,33 @@ test("rejects a degraded or failed detail page instead of accepting its high sco
   expect(
     fs.existsSync(path.join(directory.path, "lhr", "mobile-details-1.json"))
   ).toBe(true);
+  const results = JSON.parse(
+    fs.readFileSync(path.join(directory.path, "release-results.json"), "utf8")
+  );
+  expect(results).toMatchObject({
+    executionStatus: "ERROR",
+    performanceStatus: "INCOMPLETE",
+  });
+  expect(results.pages).toHaveLength(2);
+});
+
+test("treats a missing Performance score as an execution error", async () => {
+  vi.mocked(runLighthouse).mockImplementation(async ({ url }) => {
+    const lhr = result(url, 0.9);
+    lhr.categories.performance.score = null;
+    return lhr;
+  });
+  await expect(measure()).rejects.toThrow(
+    "Lighthouse returned no performance score"
+  );
+  const results = JSON.parse(
+    fs.readFileSync(path.join(directory.path, "release-results.json"), "utf8")
+  );
+  expect(results).toMatchObject({
+    executionStatus: "ERROR",
+    performanceStatus: "INCOMPLETE",
+    pages: [],
+  });
 });
 
 test("uses the stable detail UUID and permits its existing override", async () => {
