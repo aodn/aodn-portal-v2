@@ -70,6 +70,7 @@ beforeEach(() => {
   vi.stubEnv("LH_DETAILS_UUID", "");
   vi.stubEnv("LH_ENVIRONMENT", "staging");
   vi.stubEnv("LH_COMMIT", "test-sha");
+  vi.stubEnv("GITHUB_HEAD_REF", "");
   vi.stubEnv("GITHUB_REF_NAME", "v1.2.3");
   vi.spyOn(console, "log").mockImplementation(() => {});
   vi.mocked(runLighthouse).mockImplementation(
@@ -110,6 +111,7 @@ test("audits the three deployed pages with one warm-up and three measured runs e
       url: `${origin}${route.path}`,
       formFactor: "mobile",
       warmup: true,
+      matchDevToolsSettings: true,
     });
     expect(calls.slice(1).map(([options]) => options.url)).toEqual(
       Array(3).fill(`${origin}${route.path}`)
