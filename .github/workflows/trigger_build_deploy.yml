@@ -137,19 +137,68 @@ jobs:
           owner: ${{ github.repository_owner }}
 
       - name: Trigger Deploy Workflow
+        timeout-minutes: 35
         uses: actions/github-script@v8
+        env:
+          APP_NAME: ${{ inputs.app_name }}
+          DEPLOY_ENVIRONMENT: ${{ inputs.environment }}
         with:
           github-token: ${{ steps.app-token.outputs.token }}
           retries: 3
           retry-exempt-status-codes: 204
           script: |
-            github.rest.actions.createWorkflowDispatch({
+            const environment = process.env.DEPLOY_ENVIRONMENT;
+            const waitForDeployment = ['staging', 'production'].includes(environment);
+            const { data } = await github.rest.actions.createWorkflowDispatch({
               owner: 'aodn',
               repo: 'appdeploy',
               workflow_id: 'deploy.yml',
               ref: 'main',
+              headers: { 'X-GitHub-Api-Version': '2022-11-28' },
+              return_run_details: waitForDeployment,
               inputs: {
-                app_name: '${{ inputs.app_name }}',
-                environment: '${{ inputs.environment }}',
+                app_name: process.env.APP_NAME,
+                environment,
               }
-            })
+            });
+
+            if (!waitForDeployment) return;
+            if (!data.workflow_run_id) {
+              throw new Error('Appdeploy dispatch did not return a workflow run ID');
+            }
+
+            core.info(`Waiting for deployment: ${data.html_url}`);
+            const deadline = Date.now() + 30 * 60 * 1000;
+            while (Date.now() < deadline) {
+              const { data: run } = await github.rest.actions.getWorkflowRun({
+                owner: 'aodn',
+                repo: 'appdeploy',
+                run_id: data.workflow_run_id,
+              });
+              if (run.status === 'completed') {
+                if (run.conclusion !== 'success') {
+                  throw new Error(`Deployment ${data.workflow_run_id} ended with ${run.conclusion}`);
+                }
+                core.info('Deployment succeeded');
+                return;
+              }
+              await new Promise(resolve => setTimeout(resolve, 15000));
+            }
+            throw new Error(`Timed out waiting for deployment ${data.workflow_run_id}`);
+
+      # This step is reached only after the exact appdeploy run succeeds.
+      # Dispatch separately so Lighthouse does not gate promotion to production.
+      - name: Trigger post-deployment Lighthouse
+        if: inputs.environment == 'staging' || inputs.environment == 'production'
+        uses: actions/github-script@v8
+        env:
+          DEPLOY_ENVIRONMENT: ${{ inputs.environment }}
+        with:
+          github-token: ${{ steps.app-token.outputs.token }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              ...context.repo,
+              workflow_id: 'lighthouse_release.yml',
+              ref: context.ref,
+              inputs: { environment: process.env.DEPLOY_ENVIRONMENT },
+            });

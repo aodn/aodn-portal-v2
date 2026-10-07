@@ -39,6 +39,116 @@ the run measure `DegradedPage`. The server gzips text, marks `/assets/*`
 immutable and answers any unknown path with `index.html`, which is what
 CloudFront does for the app.
 
+## Post-deployment release audits
+
+`trigger_build_deploy.yml` dispatches `aodn/appdeploy` for the final Terragrunt
+deployment. For staging and production it requests the exact workflow run ID
+(`return_run_details: true`) and polls that run for up to 30 minutes. Only a
+completed run with conclusion `success` triggers `lighthouse_release.yml`.
+Failures, cancellations and timeouts stop the portal deployment job without
+dispatching Lighthouse. Edge keeps its dispatch-only behavior and never triggers
+the release audit.
+
+The release workflow runs separately on the same branch or tag as the deployment,
+and uses `yarn lh:measure` against the actual deployed site and its real backend.
+It measures landing, search and details in both mobile and desktop emulation:
+one discarded warm-up followed by three measured runs per page and form factor
+(24 runs total). The job timeout is 40 minutes to allow for this broader coverage.
+Each reported metric is the median of those three runs. Every page and form
+factor's median Performance score is checked against **75/100**. A lower score is clearly reported as **FAIL** and
+emits a workflow warning during measurement. After publishing the summary and
+artifacts, a separate threshold check makes the **Release Lighthouse workflow
+red** if Performance or any configured metric fails. The measurement step still
+completes all pages. A valid score below the minimum never blocks deployment or
+release: the deployment workflow dispatches the audit without waiting for its result.
+Lighthouse/Chrome errors and invalid pages (including degraded shells, failed
+dataset requests and redirects) still fail the audit job as execution errors.
+The audit runs independently of deployment and does not gate promotion.
+
+PR and release audits intentionally use the same pinned Lighthouse `12.8.2`
+engine and its built-in mobile and desktop configurations for consistency and
+reproducibility. Both workflows run on Node 20; the release workflow reads the
+version from `.nvmrc`. The release audit provides repeatable post-deployment
+measurements rather than reproducing a manual Chrome DevTools run. The PR
+scoring engine and baseline comparisons remain unchanged.
+
+Configuration is shared with PR measurements: `constants.ts` defines the routes
+using the app's route constants and the stable detail UUID
+`0015db7e-e684-7548-e053-08114f8cd4ad` (IMOS BA SOOP). Set the repository variable
+`LH_DETAILS_UUID` to replace that dataset if it is retired. The workflow defines
+the deployed site origins (`https://portal.staging.aodn.org.au/` for staging and
+`https://portal.production.aodn.org.au/` for production), emulation and run count.
+To change the score minimum, edit `MINIMUM_RELEASE_PERFORMANCE` in
+`src/lighthouse/releaseReport.ts` (currently `75`). This single constant controls
+both the pass/fail checks and the minimum displayed in the release summary.
+
+**Performance >= 75/100 is the agreed QA requirement** and remains the main
+release performance threshold. LCP, TBT, CLS and FCP use their **actual median
+values**, with lower values being better, rather than Lighthouse audit scores.
+Their limits are initial regression guardrails based on current observed portal
+performance plus tolerance for normal Lighthouse variability. They are **not
+official Core Web Vitals targets or product SLAs**; TBT is not INP.
+
+All metric-value limits are configured in `RELEASE_METRIC_LIMITS` in
+`src/lighthouse/releaseReport.ts`, separately for each page and form factor.
+LCP, TBT and FCP are in milliseconds; CLS is unitless. Each limit is inclusive:
+exactly matching it passes, exceeding it fails. A page/form-factor is **PASS**
+only when its median Performance score is >= 75 and all four median metric
+values are within their limits. Each median is calculated independently over
+three measured runs after one discarded warm-up, protecting against a single
+outlier. Release measurements retain actual numeric precision for these checks;
+display rounding cannot turn a value just above the limit into a pass.
+
+| Page    | Emulation | LCP maximum | TBT maximum | CLS maximum | FCP maximum |
+| ------- | --------- | ----------- | ----------- | ----------- | ----------- |
+| Landing | Mobile    | 6500 ms     | 400 ms      | 0.10        | 4200 ms     |
+| Search  | Mobile    | 5500 ms     | 700 ms      | 0.10        | 4200 ms     |
+| Details | Mobile    | 6500 ms     | 700 ms      | 0.10        | 4200 ms     |
+| Landing | Desktop   | 2000 ms     | 150 ms      | 0.10        | 1000 ms     |
+| Search  | Desktop   | 2500 ms     | 150 ms      | 0.10        | 1000 ms     |
+| Details | Desktop   | 2500 ms     | 150 ms      | 0.10        | 1000 ms     |
+
+Review and recalibrate these starting guardrails after enough staging/production
+release data has been collected to understand normal variation. Limits remain
+fixed configuration; a release never lowers its own requirements automatically.
+Threshold failures make the independent Lighthouse workflow red after report
+publication but remain non-blocking for deployment/release.
+
+The QA job summary includes the environment, release/ref, SHA, tested page URL,
+emulation, all three measured Performance scores and metric values, medians,
+thresholds with explicit units, and **PASS/FAIL** for Performance and each of
+LCP, TBT, CLS and FCP. It
+shows separate mobile and desktop rows for every page, and execution status
+separately from performance status. Execution errors
+include the error and any pages already measured; setup failures before a report
+exists produce an explicit error summary pointing to the failed step logs.
+
+Artifacts are named `lighthouse-<environment>-<SHA>-<run-id>-<attempt>` and retained
+for 90 days (subject to the repository/organization retention policy). Hidden
+files are included explicitly because the output directory is `.lighthouse/`.
+They contain `.lighthouse/report.json`, `report.md`,
+`release-results.json`, and HTML/JSON reports for every measured run in `lhr/`.
+Individual reports are saved before rendering checks, so an invalid page can
+still be debugged. Warm-ups are excluded from the results. Uploads also run
+after execution failures when any reports exist.
+
+`release-results.json` is the structured input for future QA/Slack integrations:
+it includes environment/ref/SHA, separate `executionStatus` and
+`performanceStatus`, any execution error, and per-page URLs, scores, measured
+runs, threshold and status, plus `metricChecks` with median metric values,
+measured values, maximum thresholds, units, comparison operator (`<=`) and status.
+`metricLimits` contains the configuration used for validation. `executionStatus` is `SUCCESS` or `ERROR`;
+`performanceStatus` is `PASS`, `FAIL`, or `INCOMPLETE` when execution stopped
+without a completed below-threshold result. Only completed measurements get a
+final page score. There are no historical release comparisons or notifications.
+The release workflow must be present on the default branch and the deployed ref
+before it can be dispatched.
+
+The existing deployment GitHub App needs Actions write access to both
+`aodn/appdeploy` and this repository: it dispatches workflows in both and reads
+the deployment run's status. No callback or workflow change in `appdeploy` is
+needed. The PR workflow and its mocked measurements remain unchanged.
+
 ## Commands
 
 | command           | does                                                       |
@@ -61,16 +171,25 @@ cat .lighthouse/report.md
 
 Useful flags on `yarn lh:measure`:
 
-| flag                   | for                                                        |
-| ---------------------- | ---------------------------------------------------------- |
-| `--runs 1`             | a quick check while changing this tooling                  |
-| `--form-factor mobile` | measure only mobile (or only `desktop`); default is both   |
-| `--uuid <uuid>`        | measure a different record on `/details` (record it first) |
-| `--serve-only`         | just serve the build + mocked API, to open in a browser    |
-| `--no-keep-lhr`        | skip writing the full results to `.lighthouse/lhr/`        |
+| flag                   | for                                                            |
+| ---------------------- | -------------------------------------------------------------- |
+| `--runs 1`             | a quick check while changing this tooling                      |
+| `--url <site>`         | measure a deployed site with its real API; report a 75 minimum |
+| `--form-factor mobile` | measure only mobile (or only `desktop`); default is both       |
+| `--uuid <uuid>`        | measure a different record on `/details` (record it first)     |
+| `--serve-only`         | just serve the build + mocked API, to open in a browser        |
+| `--no-keep-lhr`        | skip writing the full results to `.lighthouse/lhr/`            |
 
 `LH_RUNS`, `LH_FORM_FACTOR` (`mobile`, `desktop` or `both`), `LH_DETAILS_UUID`,
-`LH_PORT` and `LH_COMMIT` do the same as their flags, for the workflow.
+`LH_URL`, `LH_PORT` and `LH_COMMIT` do the same as their flags, for the workflow.
+`--url` uses the site's origin and the shared route paths; it does not start a
+local server or load API fixtures. It writes the release summary and applies the
+release minimum only in this mode. The default local mode keeps the existing PR
+measurement behavior. For a deployed audit, no local build is needed:
+
+```bash
+yarn lh:measure --url https://portal.staging.aodn.org.au --form-factor both --runs 3
+```
 
 ## Refreshing the API fixtures
 
@@ -147,7 +266,7 @@ PR actually made a page slower, not noise.
 - `LH_FAIL_PERFORMANCE_DROP` overrides the 15-point threshold; `0` turns the
   gate off entirely.
 
-## What it does not tell you
+## What the mocked PR measurements do not tell you
 
 - **These are not production numbers.** No CloudFront, no real network, no real
   device; the API is mocked from committed fixtures. The number is comparable with other runs

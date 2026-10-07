@@ -31,21 +31,32 @@ const score = (lhr: Lhr, category: string) => {
 
 const numeric = (lhr: Lhr, audit: string) => {
   const value = lhr.audits?.[audit]?.numericValue;
-  if (typeof value !== "number") {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
     throw new Error(`Lighthouse returned no value for ${audit}`);
   }
   return value;
 };
 
-export const extractMetrics = (lhr: Lhr): RouteMetrics => ({
+export const extractMetrics = (
+  lhr: Lhr,
+  preserveValues = false
+): RouteMetrics => ({
   performance: score(lhr, "performance"),
   accessibility: score(lhr, "accessibility"),
   bestPractices: score(lhr, "best-practices"),
   seo: score(lhr, "seo"),
-  lcp: round(numeric(lhr, "largest-contentful-paint")),
-  cls: round(numeric(lhr, "cumulative-layout-shift"), 3),
-  tbt: round(numeric(lhr, "total-blocking-time")),
-  fcp: round(numeric(lhr, "first-contentful-paint")),
+  lcp: preserveValues
+    ? numeric(lhr, "largest-contentful-paint")
+    : round(numeric(lhr, "largest-contentful-paint")),
+  cls: preserveValues
+    ? numeric(lhr, "cumulative-layout-shift")
+    : round(numeric(lhr, "cumulative-layout-shift"), 3),
+  tbt: preserveValues
+    ? numeric(lhr, "total-blocking-time")
+    : round(numeric(lhr, "total-blocking-time")),
+  fcp: preserveValues
+    ? numeric(lhr, "first-contentful-paint")
+    : round(numeric(lhr, "first-contentful-paint")),
 });
 
 const METRIC_DECIMALS: Record<MetricKey, number> = {
@@ -64,15 +75,21 @@ const METRIC_DECIMALS: Record<MetricKey, number> = {
  * middle of what was actually observed for that metric, which is what the
  * comparison needs.
  */
-export const medianMetrics = (runs: RouteMetrics[]): RouteMetrics => {
+export const medianMetrics = (
+  runs: RouteMetrics[],
+  preserveValues = false
+): RouteMetrics => {
   if (runs.length === 0) throw new Error("no runs to take the median of");
   const keys = Object.keys(METRIC_DECIMALS) as MetricKey[];
-  return Object.fromEntries(
+  const metrics = Object.fromEntries(
     keys.map((key) => [
       key,
-      round(median(runs.map((run) => run[key])), METRIC_DECIMALS[key]),
+      preserveValues && ["lcp", "tbt", "cls", "fcp"].includes(key)
+        ? median(runs.map((run) => run[key]))
+        : round(median(runs.map((run) => run[key])), METRIC_DECIMALS[key]),
     ])
   ) as unknown as RouteMetrics;
+  return metrics;
 };
 
 const requestStatus = (lhr: Lhr, urlFragment: string) => {
@@ -81,7 +98,9 @@ const requestStatus = (lhr: Lhr, urlFragment: string) => {
   return match ? Number(match.statusCode) : undefined;
 };
 
-const domElements = (lhr: Lhr) => lhr.audits?.["dom-size"]?.numericValue;
+const domElements = (lhr: Lhr) =>
+  lhr.audits?.["dom-size"]?.numericValue ??
+  lhr.audits?.["dom-size-insight"]?.numericValue;
 
 /**
  * Everything that means "this run did not measure the page we asked for": a

@@ -1,0 +1,84 @@
+name: Release Lighthouse
+run-name: Lighthouse after deployment to ${{ inputs.environment }}
+
+# Dispatched by trigger_build_deploy.yml after appdeploy completes successfully.
+# The PR workflow remains independent and uses its existing mocked backend.
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Successfully deployed environment to audit
+        required: true
+        type: choice
+        options: [staging, production]
+
+permissions:
+  contents: read
+
+jobs:
+  lighthouse:
+    if: inputs.environment == 'staging' || inputs.environment == 'production'
+    runs-on: ubuntu-latest
+    # Three pages x two form factors x (one warm-up + three measured runs).
+    timeout-minutes: 40
+    env:
+      LH_ENVIRONMENT: ${{ inputs.environment }}
+      LH_URL: ${{ inputs.environment == 'staging' && 'https://portal.staging.aodn.org.au/' || 'https://portal.production.aodn.org.au/' }}
+      LH_FORM_FACTOR: both
+      LH_RUNS: "3"
+      LH_DETAILS_UUID: ${{ vars.LH_DETAILS_UUID }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+
+      - run: yarn install --immutable
+
+      # Low scores are report failures; execution errors still fail this step.
+      - name: Audit the deployed pages and report Performance results
+        run: yarn lh:measure
+
+      - name: Add the report to the job summary
+        if: always()
+        run: |
+          if [ -f .lighthouse/report.md ]; then
+            cat .lighthouse/report.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            printf '%s\n' '# Release Lighthouse' '' \
+              "Environment: **$LH_ENVIRONMENT**" \
+              "Release/ref: $GITHUB_REF_NAME · SHA: $GITHUB_SHA" \
+              'Execution status: **ERROR** — no valid measurement report was produced. See the failed step logs.' \
+              >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: lighthouse-${{ inputs.environment }}-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .lighthouse/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 90
+
+      # Fail only this independent audit, after preserving the QA reports.
+      - name: Check release performance thresholds
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const results = JSON.parse(fs.readFileSync('.lighthouse/release-results.json', 'utf8'));
+          if (results.executionStatus !== 'SUCCESS') {
+            throw new Error('Lighthouse execution did not complete successfully; see the job summary.');
+          }
+          if (results.performanceStatus !== 'PASS') {
+            console.error('::error title=Lighthouse performance thresholds::Performance thresholds were not met; see the job summary and report artifacts. Deployment and release are independent of this audit.');
+            process.exitCode = 1;
+          }
+          NODE
