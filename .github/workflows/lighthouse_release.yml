@@ -33,7 +33,7 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
 
-      - name: Use Node.js 20
+      - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
