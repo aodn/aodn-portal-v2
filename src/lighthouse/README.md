@@ -76,7 +76,8 @@ Configuration is shared with PR measurements: `constants.ts` defines the routes
 using the app's route constants and the stable detail UUID
 `0015db7e-e684-7548-e053-08114f8cd4ad` (IMOS BA SOOP). Set the repository variable
 `LH_DETAILS_UUID` to replace that dataset if it is retired. The workflow defines
-the staging/production site origins (matching SEO), emulation and run count.
+the deployed site origins (`https://portal.staging.aodn.org.au/` for staging and
+`https://portal.production.aodn.org.au/` for production), emulation and run count.
 To change the score minimum, edit `MINIMUM_RELEASE_PERFORMANCE` in
 `src/lighthouse/releaseReport.ts` (currently `75`). This single constant controls
 both the pass/fail checks and the minimum displayed in the release summary.
@@ -187,7 +188,7 @@ release minimum only in this mode. The default local mode keeps the existing PR
 measurement behavior. For a deployed audit, no local build is needed:
 
 ```bash
-yarn lh:measure --url https://portal-staging.aodn.org.au --form-factor both --runs 3
+yarn lh:measure --url https://portal.staging.aodn.org.au --form-factor both --runs 3
 ```
 
 ## Refreshing the API fixtures
