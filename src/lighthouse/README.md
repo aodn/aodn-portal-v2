@@ -67,8 +67,8 @@ The audit runs independently of deployment and does not gate promotion.
 
 PR and release audits intentionally use the same pinned Lighthouse `12.8.2`
 engine and its built-in mobile and desktop configurations for consistency and
-reproducibility. Both workflows run on Node 20; the release workflow reads the
-version from `.nvmrc`. The release audit provides repeatable post-deployment
+reproducibility. Both workflows run on Node 22, reading the version from
+`.nvmrc`. The release audit provides repeatable post-deployment
 measurements rather than reproducing a manual Chrome DevTools run. The PR
 scoring engine and baseline comparisons remain unchanged.
 

@@ -164,8 +164,9 @@ yarn verify   # lint (--max-warnings 0) → typecheck → unit tests; stops at f
   `console.warn`/`console.error` are allowed.
 - **Yarn 4 only.** Use `corepack yarn install`. System yarn 1 rewrites the
   whole `yarn.lock`.
-- **Node 20** (`.nvmrc`; run `nvm use` first). Other versions can fail tests
-  unrelated to your change. README's Node 18 reference is outdated.
+- **Node 22** (`.nvmrc` is the single source of truth for local and CI; run
+  `nvm use` first). Other versions can fail tests unrelated to your change.
+  `playwright/Dockerfile.web` pins `node:22` by hand: keep it on the same major.
 - Pages are wrapped in `HealthChecker` except when
   `import.meta.env.MODE === "playwright-local"`.
 - E2E page objects select by `data-testid`. Renaming or removing one in `src/`

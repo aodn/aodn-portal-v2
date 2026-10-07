@@ -30,7 +30,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v5
         with:
-          node-version: "20"
+          node-version-file: .nvmrc
 
       - name: Yarn install
         run: |
@@ -116,7 +116,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v5
         with:
-          node-version: "20"
+          node-version-file: .nvmrc
 
       - name: Yarn install
         run: |
