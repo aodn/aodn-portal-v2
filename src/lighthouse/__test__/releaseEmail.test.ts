@@ -2,6 +2,8 @@
 import { expect, test } from "vitest";
 import {
   buildReleaseEmail,
+  buildSesEmailPayload,
+  parseEmailRecipients,
   QA_EMAIL_RECIPIENTS,
 } from "@/lighthouse/releaseEmail";
 import { buildReleaseReport } from "@/lighthouse/releaseReport";
@@ -81,4 +83,64 @@ test("report content is escaped in HTML email", () => {
   expect(email.html).not.toContain("<script>");
   expect(email.html).toContain("&lt;script&gt;");
   expect(email.html).toContain("&amp;");
+});
+
+test("explicit recipients override the QA list without changing the preserved defaults", () => {
+  const email = buildReleaseEmail({
+    ...input,
+    recipients: parseEmailRecipients("test@example.org"),
+  });
+  expect(email.recipients).toEqual([
+    { name: "test@example.org", address: "test@example.org" },
+  ]);
+  expect(QA_EMAIL_RECIPIENTS).toHaveLength(5);
+  expect(
+    QA_EMAIL_RECIPIENTS.some(({ address }) => address === "test@example.org")
+  ).toBe(false);
+});
+
+test("recipient configuration accepts delimiters, trims and deduplicates addresses", () => {
+  expect(
+    parseEmailRecipients(" One@example.org, two@example.org;\nONE@example.org ")
+  ).toEqual([
+    { name: "one@example.org", address: "one@example.org" },
+    { name: "two@example.org", address: "two@example.org" },
+  ]);
+});
+
+test.each(["", " , ; ", "invalid", "a@example.org\rb@example.org"])(
+  "invalid recipient configuration %s cannot fall back to QA",
+  (configuration) => {
+    expect(() => parseEmailRecipients(configuration)).toThrow();
+  }
+);
+
+test("SES request preserves the email content and uses UTF-8 text and HTML", () => {
+  const email = buildReleaseEmail({
+    ...input,
+    recipients: parseEmailRecipients("test@example.org"),
+  });
+  expect(buildSesEmailPayload(email, "sender@example.org")).toEqual({
+    Source: "sender@example.org",
+    Destination: { ToAddresses: ["test@example.org"] },
+    Message: {
+      Subject: { Data: email.subject, Charset: "UTF-8" },
+      Body: {
+        Text: { Data: email.text, Charset: "UTF-8" },
+        Html: { Data: email.html, Charset: "UTF-8" },
+      },
+    },
+  });
+});
+
+test("SES rejects missing recipients and an invalid sender", () => {
+  expect(() =>
+    buildSesEmailPayload(
+      buildReleaseEmail({ ...input, recipients: [] }),
+      "sender@example.org"
+    )
+  ).toThrow(/recipient/);
+  expect(() =>
+    buildSesEmailPayload(buildReleaseEmail(input), "invalid")
+  ).toThrow(/valid plain email/);
 });

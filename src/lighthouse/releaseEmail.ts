@@ -19,7 +19,41 @@ interface ReleaseEmailInput {
   artifactUrl?: string;
   reportMarkdown?: string;
   results?: ReleaseResults;
+  recipients?: typeof QA_EMAIL_RECIPIENTS;
 }
+
+const validateAddress = (address: string) => {
+  if (!/^[^\s@<>,;]+@[^\s@<>,;]+\.[^\s@<>,;]+$/.test(address)) {
+    throw new Error("Email configuration requires valid plain email addresses");
+  }
+  return address;
+};
+
+/** Delivery requires an explicit override; never silently email the QA list. */
+export const parseEmailRecipients = (configuration: string) => {
+  const addresses = configuration
+    .split(/[,;\n]/)
+    .map((value) => value.trim())
+    .filter(Boolean);
+  if (!addresses.length) throw new Error("LH_EMAIL_RECIPIENTS is required");
+  return [
+    ...new Set(
+      addresses.map((address) => validateAddress(address).toLowerCase())
+    ),
+  ].map((address) => ({ name: address, address }));
+};
+
+const resultDetails = (results?: ReleaseResults) =>
+  results?.pages
+    .flatMap((page) => [
+      `${page.id} (${page.formFactor}): ${page.status} — ${page.url}`,
+      `Performance: ${page.performance}/100; minimum ${page.threshold}; measured runs: ${page.measuredScores.join(", ")}`,
+      ...page.metricChecks.map(
+        (check) =>
+          `${check.metric.toUpperCase()}: ${check.value} ${check.unit}; maximum ${check.threshold} ${check.unit}; ${check.status}; measured runs: ${check.measuredValues.join(", ")}`
+      ),
+    ])
+    .join("\n");
 
 const escapeHtml = (text: string) =>
   text.replace(/[&<>"']/g, (character) => {
@@ -41,6 +75,7 @@ export const buildReleaseEmail = ({
   artifactUrl,
   reportMarkdown,
   results,
+  recipients = QA_EMAIL_RECIPIENTS,
 }: ReleaseEmailInput) => {
   const status =
     !results || results.executionStatus === "ERROR"
@@ -65,10 +100,36 @@ export const buildReleaseEmail = ({
       : `Reports, when available, are listed under Artifacts: ${runUrl}`,
     "",
     reportMarkdown ||
+      resultDetails(results) ||
       "No measurement report was produced. See the failed step in the GitHub Actions logs.",
   ].join("\n");
   // Reuse the complete QA summary instead of duplicating metric validation or
   // hiding the measured runs. A monospace block preserves its tables in email.
   const html = `<p><a href="${escapeHtml(runUrl)}">GitHub Actions summary and logs</a>${artifactUrl ? ` · <a href="${escapeHtml(artifactUrl)}">Download reports</a>` : ""}</p><pre style="white-space:pre-wrap;font-family:monospace">${escapeHtml(text)}</pre>`;
-  return { recipients: QA_EMAIL_RECIPIENTS, subject, text, html };
+  return { recipients, subject, text, html };
+};
+
+/** AWS CLI SES SendEmail input. Generating this payload never sends an email. */
+export const buildSesEmailPayload = (
+  email: ReturnType<typeof buildReleaseEmail>,
+  sender: string
+) => {
+  const Source = validateAddress(sender.trim());
+  if (!email.recipients.length)
+    throw new Error("At least one email recipient is required");
+  return {
+    Source,
+    Destination: {
+      ToAddresses: email.recipients.map(({ address }) =>
+        validateAddress(address)
+      ),
+    },
+    Message: {
+      Subject: { Data: email.subject, Charset: "UTF-8" },
+      Body: {
+        Text: { Data: email.text, Charset: "UTF-8" },
+        Html: { Data: email.html, Charset: "UTF-8" },
+      },
+    },
+  };
 };
