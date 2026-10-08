@@ -5,6 +5,7 @@ import { createErrorResponse } from "@/utils/ErrorBoundary";
 import {
   describeFetchError,
   fetchCollections,
+  SEO_FILTERS,
   SEO_PROPERTIES,
 } from "../fetchCollections";
 import { BASE_URL, OGC_API_BASE } from "../constants";
@@ -68,7 +69,7 @@ describe("fetchCollections uses fetchResultNoStore", () => {
       expect.objectContaining({
         params: expect.objectContaining({
           properties: SEO_PROPERTIES,
-          filter: "page_size=1000",
+          filter: "page_size=1000 AND NOT (scope='document')",
         }),
       })
     );
@@ -194,5 +195,34 @@ describe("fetchCollections walks every page", () => {
     await expect(fetchCollections()).rejects.toThrow(
       /expected collections JSON but got string: \(empty body\)$/
     );
+  });
+});
+
+// SEO_FILTERS says which records to index. These tests run fetchCollections,
+// catch the request it sends to the backend, and check the "filter" query
+// param the backend will use to pick records.
+describe("fetchCollections turns SEO_FILTERS into a backend filter", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  // Run fetchCollections with the given filters and return the "filter" query
+  // param of the first request it made to the backend.
+  const sentFilter = async (filters: Partial<typeof SEO_FILTERS>) => {
+    const get = vi
+      .spyOn(ogcAxiosWithRetry, "get")
+      .mockResolvedValue({ data: singlePage } as never);
+    await fetchCollections(SEO_PROPERTIES, filters);
+    return get.mock.calls[0][1]?.params?.filter as string;
+  };
+
+  test("the default SEO_FILTERS tell the backend to skip document records", async () => {
+    // excludeDocument: true -> "NOT (scope='document')". Document records open
+    // GeoNetwork, not a details page, so indexing them makes dead links.
+    expect(await sentFilter(SEO_FILTERS)).toContain("NOT (scope='document')");
+  });
+
+  test("empty filters send only paging, so the backend returns every record", async () => {
+    expect(await sentFilter({})).toBe("page_size=1000");
   });
 });

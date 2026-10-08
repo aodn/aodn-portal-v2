@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { ParameterState } from "@/app/store/componentParamReducer";
 import {
   createSearchParamFrom,
   fetchResultNoStore,
@@ -15,6 +16,12 @@ export type { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 // Fields the bulk collections endpoint returns for the SEO artifacts
 export const SEO_PROPERTIES =
   "id,title,description,bbox,temporal,themes,creation,revision,citation,license,dataset_provider";
+
+// Which records to index. Each field becomes a CQL filter via
+// createSearchParamFrom, so SEO filters the same way the portal search does.
+// excludeDocument: a document-scope record opens GeoNetwork, not a details
+// page, so indexing /details/<uuid> for it would be a dead link.
+export const SEO_FILTERS: Partial<ParameterState> = { excludeDocument: true };
 
 // fetchResultNoStore returns one page; walk search_after until we have them all
 const API_URL = `${OGC_API_BASE}/api/v1/ogc/collections`;
@@ -85,7 +92,8 @@ const withOgcHost = async <T>(run: () => Promise<T>): Promise<T> => {
 };
 
 export const fetchCollections = async (
-  properties = SEO_PROPERTIES
+  properties = SEO_PROPERTIES,
+  filters: Partial<ParameterState> = SEO_FILTERS
 ): Promise<OGCCollection[]> => {
   console.log(`Fetching ${properties} from ${API_URL}`);
 
@@ -96,10 +104,10 @@ export const fetchCollections = async (
     const store = configureStore({ reducer: (state = {}) => state });
 
     for (;;) {
-      const params = createSearchParamFrom(
-        {},
-        { pagesize: PAGE_SIZE, searchafter: searchAfter }
-      );
+      const params = createSearchParamFrom(filters as ParameterState, {
+        pagesize: PAGE_SIZE,
+        searchafter: searchAfter,
+      });
       params.properties = properties;
 
       let payload: unknown;
