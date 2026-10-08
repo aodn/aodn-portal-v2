@@ -152,11 +152,14 @@ needed. The PR workflow and its mocked measurements remain unchanged.
 ## Previous-release Performance comparison
 
 After measuring a release, `compareRelease.ts` uses `GITHUB_TOKEN` with
-`actions: read` to list artifact metadata and download **only the most recent
-eligible previous release archive** for the same staging/production environment.
+`actions: read` to list artifact metadata and find the most recent valid distinct
+release for the same staging/production environment. At most **five eligible
+archives** are downloaded, newest first, stopping at the first valid baseline.
 The archive's `release-results.json` supplies the median Performance scores.
 Expired artifacts, every attempt of the current run, and newer workflow runs are
-excluded. A rerun therefore compares against an earlier release, never itself.
+excluded. Artifacts with the current SHA in their name or workflow metadata are
+skipped without downloading. The structured report must also have a different
+release ref and SHA: another run of the same release is never its own baseline.
 Previous workflows that failed performance thresholds remain valid baselines
 when `executionStatus` is `SUCCESS`; workflow conclusion is not used as a filter.
 
@@ -170,8 +173,8 @@ is retained in `report.md` and `release-comparison.md` in the normal artifact.
 
 The first release, unavailable/expired archives, missing or invalid previous
 results, and history API failures show **No previous release available** without
-failing the audit. An invalid newest eligible archive does not trigger bulk
-downloads of older archives. Fully executed reports are required as baselines;
+failing the audit. Missing, invalid, incomplete or same-release reports are skipped
+within the five-candidate limit. Fully executed reports are required as baselines;
 partial execution-error reports are not substituted for the previous release.
 
 Artifacts are retained for **90 days**, subject to repository/organization

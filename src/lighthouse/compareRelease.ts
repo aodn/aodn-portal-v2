@@ -23,7 +23,7 @@ export interface ReleaseArtifact {
   expired: boolean;
   expires_at?: string;
   created_at: string;
-  workflow_run?: { id: number };
+  workflow_run?: { id: number; head_sha?: string };
 }
 
 const pageKey = (page: ReleaseHistory["pages"][number]) => {
@@ -73,16 +73,19 @@ export const parseReleaseHistory = (
   }
 };
 
-export const selectPreviousArtifact = (
+const MAX_HISTORY_CANDIDATES = 5;
+
+export const selectPreviousArtifacts = (
   artifacts: ReleaseArtifact[],
   environment: string,
   currentRunId: number,
+  currentCommit: string,
   now = Date.now()
 ) =>
   artifacts
     .filter((artifact) => {
       const match =
-        /^lighthouse-(staging|production)-[a-f0-9]+-(\d+)-(\d+)$/.exec(
+        /^lighthouse-(staging|production)-([a-f0-9]+)-(\d+)-(\d+)$/.exec(
           artifact.name
         );
       const id = artifact.workflow_run?.id;
@@ -90,8 +93,11 @@ export const selectPreviousArtifact = (
         match &&
         match[1] === environment &&
         id &&
-        Number(match[2]) === id &&
+        Number(match[3]) === id &&
         id < currentRunId &&
+        match[2].toLowerCase() !== currentCommit.toLowerCase() &&
+        artifact.workflow_run?.head_sha?.toLowerCase() !==
+          currentCommit.toLowerCase() &&
         !artifact.expired &&
         (!artifact.expires_at || Date.parse(artifact.expires_at) > now)
       );
@@ -100,29 +106,40 @@ export const selectPreviousArtifact = (
       (a, b) =>
         b.workflow_run!.id - a.workflow_run!.id ||
         Date.parse(b.created_at) - Date.parse(a.created_at)
-    )[0];
+    )
+    .slice(0, MAX_HISTORY_CANDIDATES);
 
 export const findPreviousRelease = async (
   artifacts: ReleaseArtifact[],
-  environment: string,
+  current: ReleaseHistory,
   currentRunId: number,
   readArtifact: (artifact: ReleaseArtifact) => Promise<unknown>
 ) => {
-  const artifact = selectPreviousArtifact(artifacts, environment, currentRunId);
-  if (!artifact) return undefined;
-  try {
-    const report = parseReleaseHistory(
-      await readArtifact(artifact),
-      environment
-    );
-    // Threshold FAIL is usable; incomplete/errored executions are not a baseline.
-    return report?.executionStatus === "SUCCESS" &&
-      report.performanceStatus !== "INCOMPLETE"
-      ? { artifact, report }
-      : undefined;
-  } catch {
-    return undefined;
+  const candidates = selectPreviousArtifacts(
+    artifacts,
+    current.environment,
+    currentRunId,
+    current.commit
+  );
+  for (const artifact of candidates) {
+    try {
+      const report = parseReleaseHistory(
+        await readArtifact(artifact),
+        current.environment
+      );
+      // Threshold FAIL is usable; errors and the same release are not baselines.
+      if (
+        report?.executionStatus === "SUCCESS" &&
+        report.performanceStatus !== "INCOMPLETE" &&
+        report.ref !== current.ref &&
+        report.commit.toLowerCase() !== current.commit.toLowerCase()
+      )
+        return { artifact, report };
+    } catch {
+      // A missing/corrupt archive must not hide an older valid release.
+    }
   }
+  return undefined;
 };
 
 export const buildReleaseComparison = (
@@ -208,7 +225,7 @@ const compare = async () => {
       }
       previous = await findPreviousRelease(
         artifacts,
-        environment,
+        current,
         runId,
         async (artifact) => {
           const response = await fetch(

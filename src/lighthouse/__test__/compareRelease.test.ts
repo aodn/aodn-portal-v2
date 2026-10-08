@@ -4,7 +4,7 @@ import {
   buildReleaseComparison,
   findPreviousRelease,
   parseReleaseHistory,
-  selectPreviousArtifact,
+  selectPreviousArtifacts,
 } from "@/lighthouse/compareRelease";
 import type {
   ReleaseArtifact,
@@ -31,6 +31,11 @@ const report = (score = 80, environment = "staging"): ReleaseHistory => ({
       performance: 90,
     },
   ],
+});
+const currentReport = (environment = "staging"): ReleaseHistory => ({
+  ...report(80, environment),
+  ref: "v1.2.4",
+  commit: "def456",
 });
 const artifact = (
   runId: number,
@@ -67,7 +72,7 @@ test.each([
 
 test("first release works without a baseline", async () => {
   const read = vi.fn();
-  const previous = await findPreviousRelease([], "staging", 30, read);
+  const previous = await findPreviousRelease([], currentReport(), 30, read);
   expect(read).not.toHaveBeenCalled();
   const markdown = buildReleaseComparison(report(), previous?.report);
   expect(markdown).toContain("No previous release available");
@@ -80,7 +85,7 @@ test("failed performance thresholds with valid measurements are accepted", async
   const read = vi.fn().mockResolvedValue(report(65));
   const previous = await findPreviousRelease(
     [artifact(20)],
-    "staging",
+    currentReport(),
     30,
     read
   );
@@ -101,7 +106,7 @@ test.each(["staging", "production"])(
         artifact(25, other),
         artifact(20, environment),
       ],
-      environment,
+      currentReport(environment),
       30,
       read
     );
@@ -117,13 +122,13 @@ test("expired artifacts are not downloaded and an older retained artifact is usa
   const read = vi.fn().mockResolvedValue(report());
   const previous = await findPreviousRelease(
     [expired, expiredByDate, artifact(20)],
-    "staging",
+    currentReport(),
     30,
     read
   );
   expect(previous?.artifact.workflow_run?.id).toBe(20);
   expect(
-    await findPreviousRelease([expired], "staging", 30, read)
+    await findPreviousRelease([expired], currentReport(), 30, read)
   ).toBeUndefined();
   expect(read).toHaveBeenCalledTimes(1);
 });
@@ -131,7 +136,7 @@ test("expired artifacts are not downloaded and an older retained artifact is usa
 test("missing or expired archive at download time is non-fatal", async () => {
   const read = vi.fn().mockRejectedValue(new Error("HTTP 410"));
   await expect(
-    findPreviousRelease([artifact(20)], "staging", 30, read)
+    findPreviousRelease([artifact(20)], currentReport(), 30, read)
   ).resolves.toBeUndefined();
 });
 
@@ -150,7 +155,7 @@ test.each([
   async (value) => {
     const previous = await findPreviousRelease(
       [artifact(20)],
-      "staging",
+      currentReport(),
       30,
       vi.fn().mockResolvedValue(value)
     );
@@ -227,21 +232,24 @@ test("reruns exclude all attempts of the current run and later runs", () => {
     artifact(20),
     artifact(20, "staging", 2),
   ];
-  expect(selectPreviousArtifact(artifacts, "staging", 30)?.id).toBe(202);
+  expect(
+    selectPreviousArtifacts(artifacts, "staging", 30, "def456")[0]?.id
+  ).toBe(202);
 });
 
 test("PR artifacts and malformed release names or mismatched run identities are excluded", () => {
   expect(
-    selectPreviousArtifact(
+    selectPreviousArtifacts(
       [
         { ...artifact(20), name: "lighthouse-baseline" },
         { ...artifact(20), name: "lighthouse-run-1" },
         { ...artifact(20), name: "lighthouse-staging-abc123-19-1" },
       ],
       "staging",
-      30
+      30,
+      "def456"
     )
-  ).toBeUndefined();
+  ).toEqual([]);
 });
 
 test("invalid scores/URLs and duplicate page identities are rejected", () => {
@@ -251,4 +259,99 @@ test("invalid scores/URLs and duplicate page identities are rejected", () => {
   const invalid = report();
   invalid.pages[0].url = "javascript:alert(1)";
   expect(parseReleaseHistory(invalid, "staging")).toBeUndefined();
+});
+
+test("same SHA metadata excludes multiple runs without downloading", async () => {
+  const sameName = {
+    ...artifact(28),
+    name: "lighthouse-staging-def456-28-1",
+  };
+  const sameMetadata = {
+    ...artifact(27),
+    workflow_run: { id: 27, head_sha: "def456" },
+  };
+  const read = vi.fn().mockResolvedValue(report());
+  const previous = await findPreviousRelease(
+    [sameName, sameMetadata, artifact(20)],
+    currentReport(),
+    30,
+    read
+  );
+  expect(previous?.artifact.id).toBe(201);
+  expect(read).toHaveBeenCalledTimes(1);
+});
+
+test("different run IDs with identical refs or report SHAs are skipped", async () => {
+  const read = vi
+    .fn()
+    .mockResolvedValueOnce({ ...report(), ref: currentReport().ref })
+    .mockResolvedValueOnce({ ...report(), commit: currentReport().commit })
+    .mockResolvedValueOnce(report());
+  const previous = await findPreviousRelease(
+    [artifact(28), artifact(27), artifact(20)],
+    currentReport(),
+    30,
+    read
+  );
+  expect(previous?.artifact.id).toBe(201);
+  expect(read).toHaveBeenCalledTimes(3);
+});
+
+test.each([
+  undefined,
+  { ...report(), executionStatus: "ERROR" },
+  { ...report(), performanceStatus: "INCOMPLETE" },
+])(
+  "invalid newest artifact falls back to a valid older FAIL report %#",
+  async (value) => {
+    const read = vi
+      .fn()
+      .mockResolvedValueOnce(value)
+      .mockResolvedValueOnce(report(65));
+    const previous = await findPreviousRelease(
+      [artifact(28), artifact(20)],
+      currentReport(),
+      30,
+      read
+    );
+    expect(previous?.artifact.id).toBe(201);
+    expect(previous?.report.performanceStatus).toBe("FAIL");
+    expect(read).toHaveBeenCalledTimes(2);
+  }
+);
+
+test("archive download errors fall back to the next candidate", async () => {
+  const read = vi
+    .fn()
+    .mockRejectedValueOnce(new Error("HTTP 410"))
+    .mockResolvedValueOnce(report());
+  const previous = await findPreviousRelease(
+    [artifact(28), artifact(20)],
+    currentReport(),
+    30,
+    read
+  );
+  expect(previous?.artifact.id).toBe(201);
+});
+
+test("no valid history stops after five downloads and retains current threshold results", async () => {
+  const read = vi.fn().mockResolvedValue({});
+  const previous = await findPreviousRelease(
+    [28, 27, 26, 25, 24, 23].map((id) => artifact(id)),
+    currentReport(),
+    30,
+    read
+  );
+  expect(previous).toBeUndefined();
+  expect(read).toHaveBeenCalledTimes(5);
+  for (const [score, status] of [
+    [75, "PASS"],
+    [74, "FAIL"],
+  ] as const) {
+    const markdown = buildReleaseComparison(report(score), previous?.report);
+    expect(markdown).toContain("No previous release available");
+    expect(markdown).toContain(
+      `| mobile | Unavailable | ${score} | — | 75 | **${status}** |`
+    );
+  }
 });
