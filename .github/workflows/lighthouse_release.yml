@@ -17,6 +17,9 @@ permissions:
 
 jobs:
   lighthouse:
+    permissions:
+      contents: read
+      actions: read
     if: inputs.environment == 'staging' || inputs.environment == 'production'
     runs-on: ubuntu-latest
     # Three pages x two form factors x (one warm-up + three measured runs).
@@ -44,6 +47,20 @@ jobs:
       # Low scores are report failures; execution errors still fail this step.
       - name: Audit the deployed pages and report Performance results
         run: yarn lh:measure
+
+      - name: Compare with the previous release
+        if: always() && !cancelled()
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -f .lighthouse/release-results.json ]; then
+            yarn tsx src/lighthouse/compareRelease.ts
+          else
+            printf '%s\n' '## Performance compared with the previous release' '' \
+              'No previous release available — current measurements were not produced.' \
+              >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Add the report to the job summary
         if: always()

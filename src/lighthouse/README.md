@@ -140,7 +140,7 @@ measured values, maximum thresholds, units, comparison operator (`<=`) and statu
 `metricLimits` contains the configuration used for validation. `executionStatus` is `SUCCESS` or `ERROR`;
 `performanceStatus` is `PASS`, `FAIL`, or `INCOMPLETE` when execution stopped
 without a completed below-threshold result. Only completed measurements get a
-final page score. There are no historical release comparisons.
+final page score. Historical Performance comparisons are described below.
 The release workflow must be present on the default branch and the deployed ref
 before it can be dispatched.
 
@@ -148,6 +148,39 @@ The existing deployment GitHub App needs Actions write access to both
 `aodn/appdeploy` and this repository: it dispatches workflows in both and reads
 the deployment run's status. No callback or workflow change in `appdeploy` is
 needed. The PR workflow and its mocked measurements remain unchanged.
+
+## Previous-release Performance comparison
+
+After measuring a release, `compareRelease.ts` uses `GITHUB_TOKEN` with
+`actions: read` to list artifact metadata and find the most recent valid distinct
+release for the same staging/production environment. At most **five eligible
+archives** are downloaded, newest first, stopping at the first valid baseline.
+The archive's `release-results.json` supplies the median Performance scores.
+Expired artifacts, every attempt of the current run, and newer workflow runs are
+excluded. Artifacts with the current SHA in their name or workflow metadata are
+skipped without downloading. The structured report must also have a different
+release ref and SHA: another run of the same release is never its own baseline.
+Previous workflows that failed performance thresholds remain valid baselines
+when `executionStatus` is `SUCCESS`; workflow conclusion is not used as a filter.
+
+The existing summary gains previous/current scores, signed point differences,
+minimum **75**, and a Performance PASS/FAIL for each equivalent page and device.
+Page identity, URL path/query (including the detail dataset) and form factor must
+match; origins may differ within the same environment. A missing match is shown
+as **Unavailable**. Differences are informational: existing measurements,
+metric guardrails and deployment behavior remain unchanged. The same comparison
+is retained in `report.md` and `release-comparison.md` in the normal artifact.
+
+The first release, unavailable/expired archives, missing or invalid previous
+results, and history API failures show **No previous release available** without
+failing the audit. Missing, invalid, incomplete or same-release reports are skipped
+within the five-candidate limit. Fully executed reports are required as baselines;
+partial execution-error reports are not substituted for the previous release.
+
+Artifacts are retained for **90 days**, subject to repository/organization
+policy. Workflow-run history may still be visible after its artifacts expire;
+it cannot restore the measurements. No S3, AWS infrastructure or database is
+used, and the comparison has no dependency on notification functionality.
 
 ## Release email notifications (temporary Edge validation)
 
@@ -215,8 +248,7 @@ This is temporary validation using the existing Edge role, not the production
 architecture. After validation, Infrastructure will manage a dedicated
 least-privilege SES role and approved production sender through Terraform.
 This change does not modify IAM or Terraform. Once configured, notifications
-are sent for PASS as well as FAIL/ERROR; previous-release comparisons and
-failure-only notification filtering are not implemented.
+are sent for PASS as well as FAIL/ERROR; failure-only notification filtering is not implemented.
 
 ## Commands
 
