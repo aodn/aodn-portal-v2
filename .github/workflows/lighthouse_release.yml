@@ -82,3 +82,87 @@ jobs:
             process.exitCode = 1;
           }
           NODE
+
+  notify:
+    name: Email Lighthouse results (Edge SES validation)
+    needs: lighthouse
+    if: ${{ always() && !cancelled() && needs.lighthouse.result != 'skipped' }}
+    runs-on: ubuntu-latest
+    # Temporary: this is the environment trusted by the existing Edge OIDC role.
+    # It does not change which staging/production site the audit measures.
+    environment: edge
+    timeout-minutes: 10
+    continue-on-error: true
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+    env:
+      LH_ENVIRONMENT: ${{ inputs.environment }}
+      LH_EMAIL_ENABLED: ${{ vars.LH_EMAIL_ENABLED }}
+      LH_EMAIL_FROM: ${{ vars.LH_EMAIL_FROM }}
+      LH_EMAIL_RECIPIENTS: ${{ vars.LH_EMAIL_RECIPIENTS }}
+    steps:
+      - uses: actions/checkout@v5
+        if: env.LH_EMAIL_ENABLED == 'true'
+
+      - name: Enable Corepack
+        if: env.LH_EMAIL_ENABLED == 'true'
+        run: corepack enable
+
+      - uses: actions/setup-node@v5
+        if: env.LH_EMAIL_ENABLED == 'true'
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+
+      - name: Install notification tooling
+        if: env.LH_EMAIL_ENABLED == 'true'
+        run: yarn install --immutable
+
+      - name: Download Lighthouse reports
+        id: reports
+        if: env.LH_EMAIL_ENABLED == 'true'
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          name: lighthouse-${{ inputs.environment }}-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .lighthouse/
+
+      - name: Prepare the SES email
+        if: env.LH_EMAIL_ENABLED == 'true'
+        env:
+          LH_EMAIL_REPORTS_AVAILABLE: ${{ steps.reports.outcome == 'success' }}
+        run: yarn tsx src/lighthouse/prepareReleaseEmail.ts
+
+      - name: Authenticate with AWS through OIDC
+        if: env.LH_EMAIL_ENABLED == 'true'
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          audience: sts.amazonaws.com
+          aws-region: ${{ vars.LH_EMAIL_AWS_REGION }}
+          role-to-assume: ${{ vars.LH_EMAIL_AWS_ROLE_ARN }}
+          role-session-name: lighthouse-email-${{ github.run_id }}
+
+      - name: Send the Lighthouse email through SES
+        id: send
+        if: env.LH_EMAIL_ENABLED == 'true'
+        run: >-
+          aws ses send-email
+          --cli-input-json file://.lighthouse/email-ses.json
+          --query MessageId --output text --no-cli-pager
+
+      - name: Report email delivery status
+        if: always()
+        env:
+          DELIVERY_STATUS: ${{ steps.send.outcome }}
+        run: |
+          if [ "$LH_EMAIL_ENABLED" != 'true' ]; then
+            status='DISABLED — set LH_EMAIL_ENABLED=true in the edge environment to enable delivery.'
+          elif [ "$DELIVERY_STATUS" = 'success' ]; then
+            status='ACCEPTED by Amazon SES — check the recipient inbox to confirm delivery.'
+          else
+            status='ERROR — email was not accepted by SES. See the notification job logs.'
+            echo '::warning title=Lighthouse email notification::Email notification failed; deployment and release are unaffected.'
+          fi
+          printf '%s\n' '## Lighthouse email notification' '' "$status" >> "$GITHUB_STEP_SUMMARY"

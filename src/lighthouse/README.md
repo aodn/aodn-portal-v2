@@ -140,7 +140,7 @@ measured values, maximum thresholds, units, comparison operator (`<=`) and statu
 `metricLimits` contains the configuration used for validation. `executionStatus` is `SUCCESS` or `ERROR`;
 `performanceStatus` is `PASS`, `FAIL`, or `INCOMPLETE` when execution stopped
 without a completed below-threshold result. Only completed measurements get a
-final page score. There are no historical release comparisons or notifications.
+final page score. There are no historical release comparisons.
 The release workflow must be present on the default branch and the deployed ref
 before it can be dispatched.
 
@@ -148,6 +148,75 @@ The existing deployment GitHub App needs Actions write access to both
 `aodn/appdeploy` and this repository: it dispatches workflows in both and reads
 the deployment run's status. No callback or workflow change in `appdeploy` is
 needed. The PR workflow and its mocked measurements remain unchanged.
+
+## Release email notifications (temporary Edge validation)
+
+The release workflow has a separate `notify` job with `needs: lighthouse` and
+`always()`. It runs after a completed audit, including performance failures and
+execution errors; cancelled or skipped audits do not send email. It uses GitHub
+**environment `edge` for AWS authentication only**. The audited site and the
+email's environment label remain staging or production. Edge application
+deployments still do not trigger release Lighthouse.
+
+`buildReleaseEmail()` reuses the QA summary for text and HTML, with environment,
+release/ref, SHA, PASS/FAIL/ERROR, measured runs, metric thresholds and links to
+GitHub Actions and report artifacts. `prepareReleaseEmail.ts` writes an AWS SES
+request; this command does not send mail. AWS CLI sends that request using
+short-lived OIDC credentials via `aws-actions/configure-aws-credentials`.
+No static AWS credentials, SMTP passwords or new dependencies are needed.
+
+Configure these **GitHub environment variables in `edge`** (Settings →
+Environments → edge → Environment variables):
+
+| Variable                | Purpose / initial validation setting                                                                                   |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `LH_EMAIL_ENABLED`      | Set to `true` to enable delivery; unset/false disables it.                                                             |
+| `LH_EMAIL_AWS_ROLE_ARN` | ARN of the manually approved Edge `AodnGitHubActionsRole`.                                                             |
+| `LH_EMAIL_AWS_REGION`   | SES region: `ap-southeast-2`.                                                                                          |
+| `LH_EMAIL_FROM`         | Verified test sender: `german.rodriguez@utas.edu.au`.                                                                  |
+| `LH_EMAIL_RECIPIENTS`   | Sole test recipient: `german.rodriguez@utas.edu.au`. Later supports comma/semicolon/newline-separated plain addresses. |
+
+The Edge role already trusts this repository's `environment:edge` OIDC subject.
+Only the notification job receives `id-token: write`. Delivery requires explicit
+sender and recipient configuration and **never falls back to the full QA list**.
+The existing `QA_EMAIL_RECIPIENTS` remains available for the eventual approved QA
+setup. SES is currently in sandbox mode, so both sender and recipients must be
+verified in the configured region. Keep only the approved test recipient during
+validation.
+
+Missing artifacts or structured results produce an **ERROR** notification with
+an Actions logs link. Missing Markdown with valid structured results uses the
+measured values and statuses from those results. Notification delivery errors
+appear in a separate job summary and workflow warning; the notification job is
+non-blocking. The existing audit still turns red on failed thresholds or
+execution errors, independently of deployment.
+
+### Safe manual validation
+
+1. Set the five variables above in `edge`, checking that the recipient override
+   contains **only the verified test address** before enabling delivery.
+2. Push this branch yourself, then dispatch **Release Lighthouse** on
+   `feature/9467-notify-qa-lighthouse-results` with `environment=staging`:
+   `gh workflow run lighthouse_release.yml --ref feature/9467-notify-qa-lighthouse-results -f environment=staging`.
+   The workflow must already be dispatchable from the default branch. This
+   audits the deployed staging site; it does not perform a deployment or audit
+   the edge application.
+3. Check the audit summary/artifacts, then the separate notification job's OIDC
+   and SES steps. Confirm that the email reaches only the verified test inbox
+   and that its links and PASS/FAIL/ERROR agree with the audit. SES acceptance
+   is not proof of inbox delivery.
+4. Re-run **all jobs** when retrying delivery: artifacts include the run attempt,
+   so retrying only the notification job may not find the previous attempt's
+   reports and will send the missing-report ERROR fallback.
+5. Disable `LH_EMAIL_ENABLED` when validation is finished. Tests generate
+   payloads only and never call AWS or send real emails.
+
+This is temporary validation using the existing Edge role, not the production
+architecture. After validation, Infrastructure will manage a dedicated
+least-privilege SES role and approved production sender through Terraform.
+This change does not modify IAM or Terraform. Once configured, notifications
+are sent for PASS as well as FAIL/ERROR; previous-release comparisons and
+failure-only notification filtering are not implemented.
 
 ## Commands
 
