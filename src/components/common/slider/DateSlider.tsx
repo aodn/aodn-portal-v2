@@ -300,7 +300,7 @@ const DateSliderPoint: React.FC<DateSliderPointProps> = ({
   );
 };
 
-/** Epoch ms for {@link dateDefault.min} (1 Jan 1970 UTC). Slider floor. */
+/** Epoch ms for {@link dateDefault.min} (1 Jan 1900 UTC). Slider floor. */
 const SLIDER_MIN_FLOOR = dayjsToUnixMs(dateDefault.min);
 
 /**
@@ -335,7 +335,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
   maxDate,
   onDateRangeChange,
 }) => {
-  // Floor dataset min at 1 Jan 1970 so the rail/thumbs never open earlier.
+  // Floor dataset min at 1 Jan 1900 so the rail/thumbs never open earlier.
   const minValue = useMemo(
     () => dateStringToSliderMinValue(minDate),
     [minDate]

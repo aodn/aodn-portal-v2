@@ -48,7 +48,7 @@ describe("DateSliderRange keyboard", () => {
 });
 
 describe("DateSliderRange min floor", () => {
-  it("defaults the min thumb to 1 Jan 1970 when dataset min is earlier", () => {
+  it("defaults the min thumb to 1 Jan 1900 when dataset min is earlier", () => {
     const onDateRangeChange = vi.fn();
     const floorValue = dayjsToUnixMs(dateDefault.min);
 
@@ -56,7 +56,7 @@ describe("DateSliderRange min floor", () => {
       <DateSliderRange
         currentMinDate={undefined}
         currentMaxDate={undefined}
-        minDate="1950-06-15"
+        minDate="1880-06-15"
         maxDate="2020-01-31"
         onDateRangeChange={onDateRangeChange}
       />
@@ -67,10 +67,10 @@ describe("DateSliderRange min floor", () => {
     expect(Number(startThumb.getAttribute("aria-valuenow"))).toBe(floorValue);
     expect(Number(startThumb.getAttribute("aria-valuemin"))).toBe(floorValue);
     // Bottom rail label shows the floored min (value labels may also render it)
-    expect(screen.getAllByText("01 Jan 1970").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("01 Jan 1900").length).toBeGreaterThan(0);
   });
 
-  it("keeps the dataset min when it is on or after 1 Jan 1970", () => {
+  it("keeps the dataset min when it is on or after 1 Jan 1900", () => {
     const onDateRangeChange = vi.fn();
     const minDate = "1980-03-01";
     const expected = dayjsToUnixMs(
