@@ -1199,17 +1199,14 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     if (map.isStyleLoaded()) {
       addSourceAndLayers();
     } else {
-      map.once("load", addSourceAndLayers);
+      map.once("idle", addSourceAndLayers);
     }
 
-    const onStyleData = () => {
-      addSourceAndLayers();
-    };
-    map.on("styledata", onStyleData);
+    map.on("styledata", addSourceAndLayers);
 
     return () => {
-      map.off("styledata", onStyleData);
-      map.off("load", addSourceAndLayers);
+      map.off("styledata", addSourceAndLayers);
+      map.off("idle", addSourceAndLayers);
       try {
         map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
         clearPmtilesFeatureState(map);
