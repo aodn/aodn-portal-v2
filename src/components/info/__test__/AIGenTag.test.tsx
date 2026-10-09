@@ -12,6 +12,8 @@ describe("AIGenTag", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // jsdom does not implement scrollTo; enableScroll calls it on close.
+    window.scrollTo = vi.fn();
   });
 
   it("renders the AI icon button", () => {
@@ -21,39 +23,31 @@ describe("AIGenTag", () => {
     expect(iconButton).toBeInTheDocument();
   });
 
-  it("opens popover when icon button is clicked", () => {
+  it("opens popover when icon button is clicked", async () => {
     render(<AIGenTag infoContent={mockInfoContent} />);
 
     const iconButton = screen.getByTestId("AIGenTag-icon");
-    userEvent.click(iconButton);
+    await userEvent.click(iconButton);
 
-    return waitFor(() => {
-      expect(screen.getByTestId("AIGenTag-popup")).toBeInTheDocument();
-    }).then(() => {
-      expect(
-        screen.getByText(mockInfoContent.title as string)
-      ).toBeInTheDocument();
-      expect(screen.getByText(mockInfoContent.body)).toBeInTheDocument();
-    });
+    expect(await screen.findByTestId("AIGenTag-popup")).toBeInTheDocument();
+    expect(
+      screen.getByText(mockInfoContent.title as string)
+    ).toBeInTheDocument();
+    expect(screen.getByText(mockInfoContent.body)).toBeInTheDocument();
   });
 
-  it("closes popover when close button is clicked", () => {
+  it("closes popover when close button is clicked", async () => {
     render(<AIGenTag infoContent={mockInfoContent} />);
 
-    // Open the popover
     const iconButton = screen.getByTestId("AIGenTag-icon");
-    userEvent.click(iconButton);
+    await userEvent.click(iconButton);
+    expect(await screen.findByTestId("AIGenTag-popup")).toBeInTheDocument();
 
-    return waitFor(() => {
-      expect(screen.getByTestId("AIGenTag-popup")).toBeInTheDocument();
-    }).then(() => {
-      // Close the popover
-      const closeButton = screen.getByTestId("AIGenTag-close-button");
-      userEvent.click(closeButton);
+    const closeButton = screen.getByTestId("AIGenTag-close-button");
+    await userEvent.click(closeButton);
 
-      return waitFor(() => {
-        expect(screen.queryByTestId("AIGenTag-popup")).not.toBeInTheDocument();
-      });
+    await waitFor(() => {
+      expect(screen.queryByTestId("AIGenTag-popup")).not.toBeInTheDocument();
     });
   });
 });
