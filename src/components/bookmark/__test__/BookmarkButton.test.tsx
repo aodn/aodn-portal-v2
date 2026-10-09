@@ -47,7 +47,7 @@ describe("BookmarkButton", () => {
     vi.restoreAllMocks();
   });
 
-  it("Bookmark click and store update correct", () => {
+  it("Bookmark click and store update correct", async () => {
     const item = {
       id: "ba9110f1-072c-4d15-8328-2091be983991",
       index: "1",
@@ -58,53 +58,44 @@ describe("BookmarkButton", () => {
     const collection: OGCCollection = Object.assign(new OGCCollection(), item);
 
     render(<BookmarkButton dataset={collection} />);
-    return waitFor(() =>
-      screen.findByTestId("ba9110f1-072c-4d15-8328-2091be983991-iconbutton")
-    ).then(() => {
-      // Should not find this icon before click
+    const button = await screen.findByTestId(
+      "ba9110f1-072c-4d15-8328-2091be983991-iconbutton"
+    );
+
+    // Should not find this icon before click
+    expect(
+      store.getState().bookmarkList.items.find((i) => i.id === item.id)
+    ).toBeFalsy();
+    expect(
+      screen.queryByTestId("ba9110f1-072c-4d15-8328-2091be983991-bookmarkicon")
+    ).toBeNull();
+
+    // Click the button should trigger the bookmark state change
+    await userEvent.click(button);
+    expect(
+      await screen.findByTestId(
+        "ba9110f1-072c-4d15-8328-2091be983991-bookmarkicon"
+      )
+    ).toBeInTheDocument();
+
+    // The store should store the id of this item
+    await waitFor(() =>
       expect(
         store.getState().bookmarkList.items.find((i) => i.id === item.id)
-      ).toBeFalsy();
+      ).toBeTruthy()
+    );
+
+    // Click button again reset the status
+    await userEvent.click(button);
+
+    await waitFor(() =>
       expect(
-        screen.queryByTestId(
-          "ba9110f1-072c-4d15-8328-2091be983991-bookmarkicon"
-        )
-      ).toBeNull();
-
-      // Click the button should trigger the bookmark state change
-      const button = screen.getByTestId(
-        "ba9110f1-072c-4d15-8328-2091be983991-iconbutton"
-      );
-      userEvent.click(button);
-      // Icon changed
-      expect(
-        screen.getByTestId(
-          "ba9110f1-072c-4d15-8328-2091be983991-bookmarkbordericon"
-        )
-      ).toBeInTheDocument();
-
-      // The store should store the id of this item
-      return waitFor(() =>
-        expect(
-          store.getState().bookmarkList.items.find((i) => i.id === item.id)
-        ).toBeTruthy()
-      ).then(() => {
-        // Click button again reset the status
-        userEvent.click(button);
-
-        return waitFor(() =>
-          expect(
-            store.getState().bookmarkList.items.find((i) => i.id === item.id)
-          ).toBeFalsy()
-        ).then(() => {
-          expect(
-            screen.queryByTestId(
-              "ba9110f1-072c-4d15-8328-2091be983991-bookmarkicon"
-            )
-          ).toBeNull();
-        });
-      });
-    });
+        store.getState().bookmarkList.items.find((i) => i.id === item.id)
+      ).toBeFalsy()
+    );
+    expect(
+      screen.queryByTestId("ba9110f1-072c-4d15-8328-2091be983991-bookmarkicon")
+    ).toBeNull();
   });
 
   it("Verify remove_all event", async () => {
@@ -140,64 +131,50 @@ describe("BookmarkButton", () => {
       </>
     );
 
-    await waitFor(() => screen.getByTestId("item1-iconbutton"))
-      // item1
-      .then((item1BookmarkButton) => {
-        const item2BookmarkButton = screen.getByTestId("item2-iconbutton");
+    const item1BookmarkButton = await screen.findByTestId("item1-iconbutton");
+    const item2BookmarkButton = screen.getByTestId("item2-iconbutton");
 
-        // Should render the bookmark border icon for both items
-        expect(
-          screen.getByTestId("item1-bookmarkbordericon")
-        ).toBeInTheDocument();
-        expect(
-          screen.getByTestId("item2-bookmarkbordericon")
-        ).toBeInTheDocument();
+    // Should render the bookmark border icon for both items
+    expect(screen.getByTestId("item1-bookmarkbordericon")).toBeInTheDocument();
+    expect(screen.getByTestId("item2-bookmarkbordericon")).toBeInTheDocument();
 
-        // Should not find both items in the store before click
-        expect(
-          store.getState().bookmarkList.items.find((i) => i.id === item1.id)
-        ).toBeFalsy();
-        expect(
-          store.getState().bookmarkList.items.find((i) => i.id === item2.id)
-        ).toBeFalsy();
+    // Should not find both items in the store before click
+    expect(
+      store.getState().bookmarkList.items.find((i) => i.id === item1.id)
+    ).toBeFalsy();
+    expect(
+      store.getState().bookmarkList.items.find((i) => i.id === item2.id)
+    ).toBeFalsy();
 
-        // Click the both bookmark buttons
-        userEvent.click(item1BookmarkButton);
-        userEvent.click(item2BookmarkButton);
+    // Click the both bookmark buttons
+    await userEvent.click(item1BookmarkButton);
+    await userEvent.click(item2BookmarkButton);
 
-        // Wait for icon change
-        return waitFor(() => screen.getByTestId("item1-bookmarkicon")).then(
-          () => {
-            // The store should store the ids of both items
-            expect(
-              store.getState().bookmarkList.items.find((i) => i.id === item1.id)
-            ).toBeTruthy();
-            expect(
-              store.getState().bookmarkList.items.find((i) => i.id === item2.id)
-            ).toBeTruthy();
+    // Wait for icon change
+    await screen.findByTestId("item1-bookmarkicon");
 
-            store.dispatch(removeAllItems());
+    // The store should store the ids of both items
+    expect(
+      store.getState().bookmarkList.items.find((i) => i.id === item1.id)
+    ).toBeTruthy();
+    expect(
+      store.getState().bookmarkList.items.find((i) => i.id === item2.id)
+    ).toBeTruthy();
 
-            // Wait for bookmark button icon change to the border icon
-            return waitFor(() =>
-              screen.getByTestId("item1-bookmarkbordericon")
-            ).then(() => {
-              expect(
-                screen.getByTestId("item2-bookmarkbordericon")
-              ).toBeInTheDocument();
+    store.dispatch(removeAllItems());
 
-              // After remove_all event, both items should be removed from the store
-              expect(
-                store
-                  .getState()
-                  .bookmarkList.items.find(
-                    (i) => i.id === (item1.id || item2.id)
-                  )
-              ).toBeFalsy();
-            });
-          }
-        );
-      });
+    // Wait for bookmark button icon change to the border icon
+    expect(
+      await screen.findByTestId("item1-bookmarkbordericon")
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("item2-bookmarkbordericon")).toBeInTheDocument();
+
+    // After remove_all event, both items should be removed from the store
+    expect(
+      store
+        .getState()
+        .bookmarkList.items.find((i) => i.id === (item1.id || item2.id))
+    ).toBeFalsy();
   });
 
   it("Renders with correct initial bookmark state when store is pre-populated ", async () => {
