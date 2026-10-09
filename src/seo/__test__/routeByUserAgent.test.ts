@@ -31,10 +31,23 @@ const request = (uri: string, userAgent?: string): Request => ({
 
 const GOOGLEBOT =
   "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
+const GOOGLE_INSPECTION_TOOL =
+  "Mozilla/5.0 (compatible; Google-InspectionTool/1.0;)";
 const CHROME =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
 
 describe("route by user agent", () => {
+  test.each([
+    "Google-InspectionTool/1.0",
+    GOOGLE_INSPECTION_TOOL,
+    "google-inspectiontool/1.0",
+    "GOOGLE-INSPECTIONTOOL/1.0",
+  ])("sends Google InspectionTool to the pre-rendered page: %s", (ua) => {
+    expect(handler({ request: request("/details/abc-123", ua) }).uri).toBe(
+      `/${PRERENDER_DETAILS_DIR}/abc-123/index.html`
+    );
+  });
+
   test("sends crawlers to the pre-rendered page", () => {
     const crawlers = [
       CRAWLER_UA,
@@ -73,6 +86,10 @@ describe("route by user agent", () => {
 
   test("accepts a trailing slash", () => {
     expect(
+      handler({ request: request("/details/abc-123/", GOOGLE_INSPECTION_TOOL) })
+        .uri
+    ).toBe(`/${PRERENDER_DETAILS_DIR}/abc-123/index.html`);
+    expect(
       handler({ request: request("/details/abc-123/", GOOGLEBOT) }).uri
     ).toBe(`/${PRERENDER_DETAILS_DIR}/abc-123/index.html`);
     expect(handler({ request: request("/details/abc-123/", CHROME) }).uri).toBe(
@@ -101,6 +118,9 @@ describe("route by user agent", () => {
       `/${PRERENDER_DETAILS_DIR}/abc-123/index.html`,
     ];
     for (const uri of untouched) {
+      expect(
+        handler({ request: request(uri, GOOGLE_INSPECTION_TOOL) }).uri
+      ).toBe(uri);
       expect(handler({ request: request(uri, GOOGLEBOT) }).uri).toBe(uri);
       expect(handler({ request: request(uri, CHROME) }).uri).toBe(uri);
     }
