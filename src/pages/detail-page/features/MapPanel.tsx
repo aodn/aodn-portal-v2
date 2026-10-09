@@ -172,6 +172,19 @@ export const buildMapLayerConfig = (
   return layers;
 };
 
+/** GeoServer is the fallback layer. Mount it only after Data Density and
+ *  Gridded Data have finished probing and neither one is available. */
+export const shouldMountGeoServerLayer = (
+  isPMTilesLoading: boolean,
+  isSupportPMTiles: boolean,
+  isGriddedProductsLoading: boolean,
+  hasGriddedProducts: boolean
+): boolean =>
+  !isPMTilesLoading &&
+  !isSupportPMTiles &&
+  !isGriddedProductsLoading &&
+  !hasGriddedProducts;
+
 interface MapPanelProps {
   mapFocusArea?: LngLatBounds;
   onMapMoveEnd?: (evt: MapEvent) => void;
@@ -802,22 +815,24 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
               )}
               {/* Mount only after Data Density and Gridded Data have
                   finished probing, so a losing WMS load is never started. */}
-              {!isPMTilesLoading &&
-                !isSupportPMTiles &&
-                !isGriddedProductsLoading &&
-                !hasGriddedProducts && (
-                  <GeoServerLayer
-                    layerConfig={geoServerLayerConfig}
-                    onLayerChange={onWmsLayerChange}
-                    onWMSAvailabilityChange={onWMSAvailabilityChange}
-                    setWmsFields={setWMSFields}
-                    setTimeSliderSupport={setTimeSliderSupport}
-                    setDiscreteTimeSliderValues={setDiscreteTimeSliderValues}
-                    setDrawRectSupportSupport={setDrawRectSupportSupport}
-                    collection={collection}
-                    visible={selectedMapLayerId === LayerName.GeoServer}
-                  />
-                )}
+              {shouldMountGeoServerLayer(
+                isPMTilesLoading,
+                isSupportPMTiles,
+                isGriddedProductsLoading,
+                hasGriddedProducts
+              ) && (
+                <GeoServerLayer
+                  layerConfig={geoServerLayerConfig}
+                  onLayerChange={onWmsLayerChange}
+                  onWMSAvailabilityChange={onWMSAvailabilityChange}
+                  setWmsFields={setWMSFields}
+                  setTimeSliderSupport={setTimeSliderSupport}
+                  setDiscreteTimeSliderValues={setDiscreteTimeSliderValues}
+                  setDrawRectSupportSupport={setDrawRectSupportSupport}
+                  collection={collection}
+                  visible={selectedMapLayerId === LayerName.GeoServer}
+                />
+              )}
             </Layers>
           </MapBox>
         </Box>
