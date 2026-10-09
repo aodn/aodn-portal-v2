@@ -15,7 +15,7 @@ const dateDefault = {
   LOCAL_TIME_DISPLAY_FORMAT: "HH:mm:ss",
   // Metadata Dates panel only, keeps the GeoNetwork GMT+0000 hack — see formatMetadataDate().
   METADATA_DISPLAY_FORMAT: "ddd DD MMM YYYY HH:mm:ss [GMT+0000]",
-  min: dayjs.tz("1960-01-01"),
+  min: dayjs.tz("1930-01-01"),
   get max() {
     return dayjs.tz();
   },

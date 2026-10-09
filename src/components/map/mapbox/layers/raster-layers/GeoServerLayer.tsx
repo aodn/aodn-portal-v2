@@ -284,7 +284,7 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
     const layerName = config.urlParams.LAYERS?.join(",") || "";
     const timeMode = config.urlParams.MODE ?? resolvedTimeMode;
     // Wait until single-vs-range time is known. ncWMS layers reject a
-    // datetime range, so a default 1960/now request would 500.
+    // datetime range, so a default 1930/now request would 500.
     if (!config.uuid || !layerName || timeMode === undefined) {
       return [];
     }
