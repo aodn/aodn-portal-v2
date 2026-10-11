@@ -1196,16 +1196,23 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       }
     };
 
+    // `once("idle")` never runs if the map has already idled (style often
+    // finishes that way after BaseMapSwitcher setStyle). style.load and
+    // styledata cover that; idle is only for a map that is still working.
     if (map.isStyleLoaded()) {
       addSourceAndLayers();
     } else {
-      map.once("idle", addSourceAndLayers);
+      map.once("style.load", addSourceAndLayers);
+      if (!map.idle()) {
+        map.once("idle", addSourceAndLayers);
+      }
     }
 
     map.on("styledata", addSourceAndLayers);
 
     return () => {
       map.off("styledata", addSourceAndLayers);
+      map.off("style.load", addSourceAndLayers);
       map.off("idle", addSourceAndLayers);
       try {
         map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
@@ -1242,8 +1249,8 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
    *
    * No session / generation / dirty-ref machine. Effect-local flags only:
    * - `needsRefresh` is set by tile/viewport/filter events
-   * - cleared when a pass runs against a fully loaded source (all queryable
-   *   hexes were just written), so setFeatureState → idle does not loop
+   * - cleared at the start of a pass, so setFeatureState → idle does not loop
+   *   unless a sourcedata/moveend event re-arms it during the write
    */
   useEffect(() => {
     if (!map) return;
@@ -1284,19 +1291,10 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         if (seen > 0) {
           setDensityReady(true);
         }
-
-        let sourceLoaded;
-        try {
-          sourceLoaded = map.isSourceLoaded(SOURCE_ID);
-        } catch {
-          sourceLoaded = false;
-        }
-        // More tiles may still arrive — keep refreshing on the next idle.
-        // Do not force needsRefresh=false here: a concurrent sourcedata may have
-        // already set it true for tiles that arrived mid-pass.
-        if (!sourceLoaded) {
-          needsRefresh = true;
-        }
+        // Leave needsRefresh as sourcedata/moveend set it during this pass.
+        // Forcing it true while the source is still loading retriggers
+        // setFeatureState on every idle, so the map never stays idle and
+        // clicks (detail-page return) race a permanent style update.
       } catch {
         // Source/layers may not exist yet — try again on idle/sourcedata
         needsRefresh = true;
