@@ -112,8 +112,14 @@ describe("fetchCollections walks every page", () => {
     expect(collections.map((item) => item.id)).toEqual(["a", "b", "c"]);
     expect(get).toHaveBeenCalledTimes(2);
     // the second request must carry the first page's cursor
-    expect(get.mock.calls[1][1]?.params?.filter).toContain(
-      "search_after='cursor-1'"
+    expect(get).toHaveBeenNthCalledWith(
+      2,
+      "/ogc/collections",
+      expect.objectContaining({
+        params: expect.objectContaining({
+          filter: expect.stringContaining("search_after='cursor-1'"),
+        }),
+      })
     );
   });
 
@@ -171,7 +177,7 @@ describe("fetchCollections walks every page", () => {
   });
 
   test("shows a 2xx body that is not the collections JSON, such as a WAF challenge page", async () => {
-    const challengePage = `<!DOCTYPE html><html><head><title>Checking your browser</title></head><body>${"x".repeat(5000)}</body></html>`;
+    const challengePage = `<!DOCTYPE html><html lang=""><head><title>Checking your browser</title></head><body>${"x".repeat(5000)}</body></html>`;
     vi.spyOn(ogcAxiosWithRetry, "get").mockResolvedValue({
       data: challengePage,
     } as never);
