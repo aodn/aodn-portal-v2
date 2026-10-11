@@ -177,7 +177,7 @@ describe("fetchCollections walks every page", () => {
   });
 
   test("shows a 2xx body that is not the collections JSON, such as a WAF challenge page", async () => {
-    const challengePage = `<!DOCTYPE html><html lang=""><head><title>Checking your browser</title></head><body>${"x".repeat(5000)}</body></html>`;
+    const challengePage = `<!DOCTYPE html><html><head><title>Checking your browser</title></head><body>${"x".repeat(5000)}</body></html>`;
     vi.spyOn(ogcAxiosWithRetry, "get").mockResolvedValue({
       data: challengePage,
     } as never);
