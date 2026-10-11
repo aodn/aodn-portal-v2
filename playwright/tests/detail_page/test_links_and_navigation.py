@@ -84,5 +84,8 @@ def test_detail_page_return_button(
     expect(detail_page.page_title).to_have_text(title)
 
     detail_page.click_tab(tab)
+    # PMTiles attaches on style.load / idle. Wait until Return is painted
+    # and stable before leaving, or the click is lost on mobile Summary.
+    expect(detail_page.return_button).to_be_visible()
     detail_page.return_button.click()
     expect(search_page.result_list).to_be_visible()
