@@ -17,8 +17,8 @@ permissions:
 
 concurrency:
   group: seo-artifacts
-  # Every run rebuilds everything, so cancelling an older run loses nothing
-  cancel-in-progress: true
+  # An active run may be uploading pages: let it finish before the next run.
+  cancel-in-progress: false
 
 jobs:
   # Each environment gets its own publish and verify jobs, so it is checked as
