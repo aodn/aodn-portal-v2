@@ -151,6 +151,8 @@ yarn verify   # lint (--max-warnings 0) → typecheck → unit tests; stops at f
 
 ## Critical gotchas
 
+- **SEO deployment metadata:** application uploads must preserve the revision
+  contract on `index.html`; see [src/seo/README.md](src/seo/README.md).
 - **Dev API proxy is an allowlist.** `vite.config.ts` proxies a fixed list of
   `/api/v1/ogc/*` paths. A new backend endpoint needs an entry there or it 404s
   locally while working in production.
