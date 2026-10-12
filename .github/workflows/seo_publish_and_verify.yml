@@ -20,9 +20,81 @@ jobs:
     name: Publish SEO Artifacts
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
+    concurrency:
+      group: portal-site-${{ inputs.environment }}
+      cancel-in-progress: false
+      queue: max
+    outputs:
+      commit_sha: ${{ steps.revision.outputs.sha }}
     steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          audience: sts.amazonaws.com
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+
+      # This must work before checkout, including when the deployed source is old.
+      - name: Resolve the deployed application revision
+        id: revision
+        uses: actions/github-script@v8
+        env:
+          DEPLOY_ENVIRONMENT: ${{ inputs.environment }}
+          DEPLOY_BUCKET: ${{ vars.BUCKET }}
+        with:
+          script: |
+            const environment = process.env.DEPLOY_ENVIRONMENT;
+            if (!['edge', 'staging', 'production'].includes(environment)) {
+              throw new Error(`Unsupported deployment environment: ${environment}`);
+            }
+            let head;
+            try {
+              const { stdout } = await exec.getExecOutput('aws', [
+                's3api', 'head-object', '--bucket', process.env.DEPLOY_BUCKET,
+                '--key', 'index.html', '--output', 'json',
+              ], { silent: true });
+              head = JSON.parse(stdout);
+            } catch (error) {
+              throw new Error(`Cannot read the deployed index.html metadata for ${environment}: ${error.message}`);
+            }
+            const metadata = head.Metadata || {};
+            const repository = 'aodn/aodn-portal-v2';
+            const sha = metadata['commit-sha'];
+            if (metadata.repository !== repository ||
+                metadata.repository !== `${context.repo.owner}/${context.repo.repo}` ||
+                metadata.environment !== environment ||
+                !/^[0-9a-f]{40}$/.test(sha || '') ||
+                !/^[0-9a-f]{64}$/.test(metadata['index-sha256'] || '') ||
+                !/^[1-9][0-9]*-[1-9][0-9]*$/.test(metadata['deployment-id'] || '')) {
+              throw new Error(`Missing or invalid deployment metadata for ${environment}; deploy through the updated portal workflow before publishing SEO artifacts`);
+            }
+            try {
+              const { data } = await github.rest.repos.getCommit({ ...context.repo, ref: sha });
+              if (data.sha !== sha) throw new Error('GitHub returned a different commit');
+            } catch (error) {
+              throw new Error(`Cannot resolve deployed commit ${sha} in ${repository}: ${error.message}`);
+            }
+            const keys = ['repository', 'environment', 'commit-sha', 'index-sha256', 'deployment-id'];
+            const versionId = head.VersionId && head.VersionId !== 'null' ? head.VersionId : null;
+            core.setOutput('snapshot', JSON.stringify([
+              ...keys.map(key => metadata[key]), versionId,
+              head.ETag, head.LastModified, head.ContentLength,
+            ]));
+            core.setOutput('sha', sha);
+            core.setOutput('index_sha256', metadata['index-sha256']);
+            core.info(`Using deployed ${environment} commit ${sha}`);
+
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          ref: ${{ steps.revision.outputs.sha }}
+
+      - name: Confirm the checked-out source revision
+        env:
+          DEPLOYED_COMMIT_SHA: ${{ steps.revision.outputs.sha }}
+        run: |
+          [ "$(git rev-parse HEAD)" = "$DEPLOYED_COMMIT_SHA" ] \
+            || { echo "::error::Checkout does not match the deployed application revision"; exit 1; }
 
       - name: Enable Corepack
         run: corepack enable
@@ -37,15 +109,20 @@ jobs:
           yarn install --immutable
 
       - name: Fetch the deployed index.html as the pre-render template
+        env:
+          SITE_URL: ${{ inputs.site }}
+          DEPLOYED_INDEX_SHA256: ${{ steps.revision.outputs.index_sha256 }}
         run: |
           # Take the template from the live site, not from a new build: the pages
           # must link to the same JavaScript files the site is serving now
           mkdir -p dist
-          curl -sf "${{ inputs.site }}/index.html" -o dist/index.html
+          curl -sf "$SITE_URL/index.html" -o dist/index.html
           grep -q '<div id="root"' dist/index.html \
-            || { echo "::error title=unusable template::${{ inputs.site }}/index.html is not the deployed app shell"; exit 1; }
+            || { echo "::error title=unusable template::$SITE_URL/index.html is not the deployed app shell"; exit 1; }
+          [ "$(sha256sum dist/index.html | cut -d ' ' -f1)" = "$DEPLOYED_INDEX_SHA256" ] \
+            || { echo "::error title=deployed template changed::The live index.html does not match the resolved deployment; no SEO artifacts will be published"; exit 1; }
           # Print which JavaScript file the pages will load, so an old run is easy to spot
-          echo "Template from ${{ inputs.site }} references $(grep -o '/assets/index-[^"]*' dist/index.html | head -1)"
+          echo "Template from $SITE_URL references $(grep -o '/assets/index-[^"]*' dist/index.html | head -1)"
 
       - name: Generate sitemap.xml and pre-rendered detail pages
         env:
@@ -57,12 +134,28 @@ jobs:
           # Checks the files we just built; a bad batch stops here and never reaches S3
           yarn seo:verify
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v6
+      - name: Confirm the deployment has not changed before publishing
+        uses: actions/github-script@v8
+        env:
+          DEPLOY_BUCKET: ${{ vars.BUCKET }}
+          DEPLOYED_INDEX_SNAPSHOT: ${{ steps.revision.outputs.snapshot }}
         with:
-          audience: sts.amazonaws.com
-          aws-region: ${{ vars.AWS_REGION }}
-          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          script: |
+            const { stdout } = await exec.getExecOutput('aws', [
+              's3api', 'head-object', '--bucket', process.env.DEPLOY_BUCKET,
+              '--key', 'index.html', '--output', 'json',
+            ], { silent: true });
+            const head = JSON.parse(stdout);
+            const metadata = head.Metadata || {};
+            const keys = ['repository', 'environment', 'commit-sha', 'index-sha256', 'deployment-id'];
+            const versionId = head.VersionId && head.VersionId !== 'null' ? head.VersionId : null;
+            const snapshot = JSON.stringify([
+              ...keys.map(key => metadata[key]), versionId,
+              head.ETag, head.LastModified, head.ContentLength,
+            ]);
+            if (snapshot !== process.env.DEPLOYED_INDEX_SNAPSHOT) {
+              throw new Error('The deployed application changed during SEO generation; no SEO artifacts will be published');
+            }
 
       - name: Copy the artifacts to S3
         run: |
@@ -109,6 +202,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          ref: ${{ needs.publish.outputs.commit_sha }}
 
       - name: Enable Corepack
         run: corepack enable

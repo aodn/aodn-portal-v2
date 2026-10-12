@@ -33,12 +33,22 @@ jobs:
   trigger_deploy:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
+    # Coordinate application uploads with SEO publishing in this repository.
+    # appdeploy applies infrastructure; it does not upload the application shell.
+    concurrency:
+      group: portal-site-${{ inputs.environment }}
+      cancel-in-progress: false
+      queue: max
     env:
       DIST: ./dist
     steps:
 
       - name: Checkout
         uses: actions/checkout@v5
+
+      - name: Record the application source revision
+        id: source
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Enable Corepack
         run: corepack enable
@@ -78,22 +88,28 @@ jobs:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
 
       - name: Deploy Website to S3
+        env:
+          DEPLOY_REPOSITORY: ${{ github.repository }}
+          DEPLOY_ENVIRONMENT: ${{ inputs.environment }}
+          SOURCE_SHA: ${{ steps.source.outputs.sha }}
         run: |
           # sitemap.xml and prerender/ are owned by the Publish SEO Artifacts workflow.
           # assets/ uses cp, not sync: every deploy re-stamps the live build's files,
           # so the prune step below can treat old timestamps as unreferenced.
-          # Everything outside assets/ keeps a non-immutable default: index.html
-          # is re-uploaded with no-cache below so a cached HTML can never keep
-          # pointing at a bundle the next deploy pruned.
-          aws s3 sync --delete ${{ env.DIST }} s3://${{ vars.BUCKET }} --region ${{ vars.AWS_REGION }} --exclude "prerender/*" --exclude "sitemap.xml" --exclude "assets/*" \
+          # Keep the previous shell until the new assets are uploaded. Excluding
+          # index.html also protects its revision metadata from sync --delete.
+          aws s3 sync --delete ${{ env.DIST }} s3://${{ vars.BUCKET }} --region ${{ vars.AWS_REGION }} --exclude "prerender/*" --exclude "sitemap.xml" --exclude "assets/*" --exclude "index.html" \
             --cache-control "public,max-age=300"
           # assets/ filenames carry a content hash, so they can be cached forever.
           aws s3 cp ${{ env.DIST }}/assets s3://${{ vars.BUCKET }}/assets --recursive --region ${{ vars.AWS_REGION }} \
             --cache-control "public,max-age=31536000,immutable"
           # index.html must always be revalidated: it is the file that names the
-          # hashed bundles.
+          # hashed bundles. Content and revision metadata change in one S3 PUT.
+          # The run/attempt identifies same-SHA redeployments without versioning.
+          index_sha256=$(sha256sum ${{ env.DIST }}/index.html | cut -d ' ' -f1)
           aws s3 cp ${{ env.DIST }}/index.html s3://${{ vars.BUCKET }}/index.html --region ${{ vars.AWS_REGION }} \
-            --cache-control "no-cache" --content-type "text/html"
+            --cache-control "no-cache" --content-type "text/html" \
+            --metadata "repository=$DEPLOY_REPOSITORY,environment=$DEPLOY_ENVIRONMENT,commit-sha=$SOURCE_SHA,index-sha256=$index_sha256,deployment-id=$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
           # Seed the fallback sitemap only when the bucket has none
           aws s3api head-object --bucket ${{ vars.BUCKET }} --key sitemap.xml --region ${{ vars.AWS_REGION }} >/dev/null 2>&1 \
             || aws s3 cp ${{ env.DIST }}/sitemap.xml s3://${{ vars.BUCKET }}/sitemap.xml --region ${{ vars.AWS_REGION }}
