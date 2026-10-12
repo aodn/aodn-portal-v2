@@ -35,6 +35,9 @@ class Map(BasePage):
         self.reference_layer_menu = page.get_by_test_id(
             'reference-show-hide-menu-button'
         )
+        # Menu copy such as "Australian Marine Parks" also appears in
+        # result titles, so layer toggles must stay inside this popper.
+        self.reference_layer_popper = page.locator('#reference-popper-id')
         self.layers_menu = self.get_by_id('layer-show-hide-menu-button')
         self.data_density_layer = page.get_by_role('radio', name='Data Density')
         self.geoserver_layer = page.get_by_role('radio', name='GeoServer')
@@ -188,6 +191,17 @@ class Map(BasePage):
             # assume the search is complete and ignore the exception.
             pass
         self.progress_indicator.wait_for(state='hidden', timeout=30 * 1000)
+
+    def click_reference_layer(self, name: str) -> None:
+        """Toggle a reference layer by its menu label.
+
+        Opens the menu when it is closed. The label is matched only inside
+        the reference-layer popper so result text with the same words is
+        not clicked.
+        """
+        if not self.reference_layer_popper.is_visible():
+            self.reference_layer_menu.click()
+        self.reference_layer_popper.get_by_text(name, exact=True).click()
 
     def open_layers_menu_until_visible(
         self, locator: Locator, timeout_ms: int = 30_000
