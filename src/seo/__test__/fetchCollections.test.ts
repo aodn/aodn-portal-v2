@@ -112,8 +112,14 @@ describe("fetchCollections walks every page", () => {
     expect(collections.map((item) => item.id)).toEqual(["a", "b", "c"]);
     expect(get).toHaveBeenCalledTimes(2);
     // the second request must carry the first page's cursor
-    expect(get.mock.calls[1][1]?.params?.filter).toContain(
-      "search_after='cursor-1'"
+    expect(get).toHaveBeenNthCalledWith(
+      2,
+      "/ogc/collections",
+      expect.objectContaining({
+        params: expect.objectContaining({
+          filter: expect.stringContaining("search_after='cursor-1'"),
+        }),
+      })
     );
   });
 
