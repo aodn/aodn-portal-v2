@@ -91,7 +91,10 @@ describe("the artifacts pipeline on controlled data", () => {
     vi.restoreAllMocks();
     const server = setupServer(
       http.get("*/api/v1/ogc/collections", () =>
-        HttpResponse.json({ total: 3, collections: page.collections })
+        HttpResponse.json({
+          total: 3,
+          collections: page.collections.slice(0, 2),
+        })
       )
     );
     server.listen({ onUnhandledRequest: "error" });

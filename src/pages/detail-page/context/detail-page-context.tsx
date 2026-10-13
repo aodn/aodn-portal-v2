@@ -17,6 +17,7 @@ export interface DetailPageContextType {
   collection: OGCCollection | undefined;
   setCollection: Dispatch<SetStateAction<OGCCollection | undefined>>;
   isCollectionNotFound: boolean;
+  isTemporaryError: boolean;
   downloadConditions: IDownloadCondition[];
   getAndSetDownloadConditions: (
     type: DownloadConditionType,
@@ -47,6 +48,7 @@ const DetailPageContextDefault: DetailPageContextType = {
   collection: {} as OGCCollection | undefined,
   setCollection: () => {},
   isCollectionNotFound: false,
+  isTemporaryError: false,
   downloadConditions: [],
   getAndSetDownloadConditions: () => [],
   removeDownloadCondition: () => {},

@@ -11,13 +11,15 @@ import {
 } from "vitest";
 import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
-import { useParams } from "react-router-dom";
+import { MemoryRouter, useParams } from "react-router-dom";
 import { http, HttpResponse } from "msw";
 import { server } from "@/__mocks__/server";
 import store from "@/app/store/store";
 import { ogcAxiosWithRetry } from "@/app/store/searchReducer";
 import { DetailPageProvider } from "@/pages/detail-page/context/detail-page-provider";
 import { useDetailPageContext } from "@/pages/detail-page/context/detail-page-context";
+import DetailPageSeo from "@/pages/detail-page/features/DetailPageSeo";
+import DetailsPage from "@/pages/detail-page/DetailsPage";
 
 vi.mock("react-router-dom", async () => ({
   ...(await vi.importActual("react-router-dom")),
@@ -29,7 +31,9 @@ const robotsMeta = () =>
   document.head.querySelector('meta[name="robots"][content="noindex"]');
 
 const Consumer: FC = () => {
-  const { collection, isCollectionNotFound } = useDetailPageContext();
+  const { collection, isCollectionNotFound, isTemporaryError } =
+    useDetailPageContext();
+  if (isTemporaryError) return <div role="alert">Temporary error</div>;
   return (
     <div>
       {isCollectionNotFound
@@ -39,9 +43,10 @@ const Consumer: FC = () => {
   );
 };
 
-const page = () => (
+const page = (withSeo = true) => (
   <Provider store={store}>
     <DetailPageProvider>
+      {withSeo && <DetailPageSeo />}
       <Consumer />
     </DetailPageProvider>
   </Provider>
@@ -107,6 +112,35 @@ describe("dataset fetch errors and robots", () => {
     await screen.findByText("Record not found");
     expect(document.title).toBe("Record not found | AODN Portal");
     expect(robotsMeta()).not.toBeNull();
+  });
+
+  it("keeps provider error classification independent of SEO", async () => {
+    server.use(
+      http.get(ENDPOINT, () => HttpResponse.json({}, { status: 404 }))
+    );
+    const previousTitle = document.title;
+    render(page(false));
+    await screen.findByText("Record not found");
+    expect(document.title).toBe(previousTitle);
+    expect(robotsMeta()).toBeNull();
+  });
+
+  it("keeps page SEO mounted alongside the temporary-error UI", async () => {
+    server.use(
+      http.get(ENDPOINT, () => HttpResponse.json({}, { status: 503 }))
+    );
+    render(
+      <Provider store={store}>
+        <MemoryRouter>
+          <DetailsPage />
+        </MemoryRouter>
+      </Provider>
+    );
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Unable to load this dataset at the moment. Please try again later."
+    );
+    expect(document.title).toBe("Service unavailable | AODN Portal");
+    expect(robotsMeta()).toBeNull();
   });
 
   it.each([429, 500, 503])(
