@@ -557,6 +557,13 @@ const NORMAL_COLLECTION = {
         '{"title":"Davies Reef Salinity From 09 Dec 2009 To 29 Jan 2016","recordAbstract":"The \'Wireless Sensor Networks Facility\' (formerly known as Facility for The Automated Intelligent Monitoring of Marine Systems (FAIMMS)), part of the Great Barrier Reef Ocean Observing System project (GBROOS), is a facility of the Australian \'Integrated Marine Observing System\' (IMOS) project. This data set was collected by the Great Barrier Reef Wireless Sensor Network."}',
     },
     {
+      href: "https://catalogue-imos.aodn.org.au/geonetwork/srv/eng/catalog.search#/metadata/0f65b7ae-1f6f-4a55-b804-1c991f791e1a",
+      rel: "child",
+      type: "application/json",
+      title:
+        '{"title":"IMOS - Autonomous Underwater Vehicles - AUV Iver","recordAbstract":"A record not exist in the portal, it links to its GeoNetwork record."}',
+    },
+    {
       href: "uuid:43a67f6f-849f-4392-ad3d-7607b4bd6447",
       rel: "child",
       type: "application/json",

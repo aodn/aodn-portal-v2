@@ -95,6 +95,8 @@ export interface IAssociatedRecord {
   uuid: string;
   title: string;
   abstract: string;
+  // Link to the source GeoNetwork record, set when the record does not exist in the portal
+  url?: string;
 }
 
 // Enums
