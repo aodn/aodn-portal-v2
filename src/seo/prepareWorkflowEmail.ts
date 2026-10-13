@@ -7,6 +7,7 @@ import {
   parseSeoEnvironmentReport,
   SEO_ENVIRONMENTS,
   type JobResult,
+  type StepResult,
   type SeoEnvironmentReport,
 } from "@/seo/workflowReport";
 import { buildSesEmailPayload, parseEmailRecipients } from "@/utils/EmailUtils";
@@ -26,7 +27,7 @@ const escapeHtml = (text: string) =>
   text.replace(/[&<>"']/g, (character) => `&#${character.charCodeAt(0)};`);
 const count = (value: number | null | undefined) =>
   value == null ? "N/A" : value.toLocaleString("en-AU");
-const status = (value?: JobResult) =>
+const status = (value?: StepResult) =>
   value === "success"
     ? "PASS"
     : value === "failure"

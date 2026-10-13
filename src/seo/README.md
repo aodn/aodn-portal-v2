@@ -145,6 +145,66 @@ deployment changes, upload ordering/failures, public template validation and
 checkout/concurrency wiring without contacting AWS or the live API. Existing
 pipeline and CloudFront tests cover sitemap/prerender output and crawler routing.
 
+## Workflow email reporting
+
+The weekly/manual workflow sends one consolidated SES email after the Edge,
+Staging and Production matrix finishes. It uses the same Edge GitHub environment,
+OIDC role, AWS region, sender and explicit recipients as Release Lighthouse:
+`LH_EMAIL_ENABLED`, `LH_EMAIL_AWS_ROLE_ARN`, `LH_EMAIL_AWS_REGION`,
+`LH_EMAIL_FROM` and `LH_EMAIL_RECIPIENTS`. No additional AWS resources or recipient
+list are required. `LH_EMAIL_ENABLED=true` enables both notifications; disabling
+it skips email tooling, authentication and delivery. Existing Edge environment
+approval rules also apply to the notification job.
+
+The publish and live verification jobs preserve their original failure results.
+Reporting steps and each environment's final report job run with `always()`;
+the independent notification job also runs after failures or skipped jobs and
+uses `continue-on-error`, following Lighthouse. A report/upload/SES failure
+cannot turn a failed SEO job into a success or make a successful SEO execution
+fail. The delivery summary distinguishes disabled, SES-accepted and failed
+notifications. SES acceptance does not confirm inbox delivery.
+
+Reports are small JSON artifacts named
+`seo-report-<environment>-<run-id>-<run-attempt>` and retained for 90 days.
+They include the actual publish/verify job conclusions, generation, local
+validation and upload outcomes, failed step identifiers and workflow logs links.
+Generation and verification still run from the deployed source revision;
+report collection lives in the workflow so older deployed versions need no
+reporting scripts. The email preparer runs from the triggering workflow checkout.
+
+Counts have distinct meanings:
+
+- **Generated:** sitemap `<loc>` entries and existing detail `index.html` files,
+  counted after generation completes, even if local validation subsequently fails.
+- **Published:** generated counts recorded only after the corresponding S3 copy
+  or sync command completes. A partial upload failure leaves that upload's count
+  unavailable; a successful sitemap copy remains recorded if page sync fails.
+  These are completed-upload counts, not an independent S3 inventory audit.
+- **Verified:** sitemap URLs and sampled detail pages from the existing live
+  verifier's success summary. Live verification samples pages; it does not check
+  every generated page. Failed verification has no confirmed batch counts.
+
+Missing counts are `N/A`, never inferred as zero. Missing internal step reports
+show `UNKNOWN` while retaining the actual job conclusion. Missing, malformed or
+previous-attempt environment artifacts cannot produce a SUCCESS email. SUCCESS
+requires all environments and the matrix to succeed; PARTIAL FAILURE means at
+least one environment succeeded but the full execution did not; otherwise the
+status is FAILURE. Follow-up failures such as invalidation or Search Console
+remain failures even when S3 uploads completed.
+
+A changed summary format in an older deployed verifier leaves verified counts
+`N/A` while preserving its actual exit status. Re-running jobs sends a new email
+for that attempt; reports are never silently reused from a previous attempt.
+A partial re-run may therefore show N/A for environments not rerun. GitHub runner
+outages, environment approvals, or cancellation can prevent notification itself
+from executing; `always()` cannot guarantee delivery in those cases.
+
+Local tests execute the actual reporting JavaScript and shell blocks with local
+fixtures and mocked GitHub/AWS interfaces. No live credentials or emails are
+required. After merging, use the next normal approved SEO execution to confirm
+OIDC authentication, report artifact downloads, failure/skipped-job scheduling,
+and SES/inbox delivery. No extra production scan is needed for validation.
+
 ## Commands
 
 | command                      | does                                                   |

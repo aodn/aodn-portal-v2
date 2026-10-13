@@ -41,3 +41,104 @@ jobs:
       environment: ${{ matrix.environment }}
       site: ${{ matrix.site }}
     secrets: inherit
+
+  notify:
+    name: Email consolidated SEO results
+    needs: seo
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    # Reuse the environment trusted by Lighthouse's existing SES OIDC role.
+    environment: edge
+    timeout-minutes: 10
+    continue-on-error: true
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+    env:
+      LH_EMAIL_ENABLED: ${{ vars.LH_EMAIL_ENABLED }}
+      LH_EMAIL_FROM: ${{ vars.LH_EMAIL_FROM }}
+      LH_EMAIL_RECIPIENTS: ${{ vars.LH_EMAIL_RECIPIENTS }}
+    steps:
+      - name: Read workflow execution date
+        id: metadata
+        if: env.LH_EMAIL_ENABLED == 'true'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            try {
+              const { data } = await github.rest.actions.getWorkflowRunAttempt({
+                ...context.repo, run_id: context.runId,
+                attempt_number: Number(process.env.GITHUB_RUN_ATTEMPT),
+              });
+              core.setOutput('date', data.run_started_at || data.created_at);
+            } catch {
+              core.warning('Execution date unavailable; see the workflow run metadata.');
+              core.setOutput('date', 'N/A (run metadata unavailable)');
+            }
+
+      - uses: actions/checkout@v5
+        if: env.LH_EMAIL_ENABLED == 'true'
+
+      - name: Enable Corepack
+        if: env.LH_EMAIL_ENABLED == 'true'
+        run: corepack enable
+
+      - uses: actions/setup-node@v5
+        if: env.LH_EMAIL_ENABLED == 'true'
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+
+      - name: Install notification tooling
+        if: env.LH_EMAIL_ENABLED == 'true'
+        run: yarn install --immutable
+
+      - name: Download SEO reports
+        id: reports
+        if: env.LH_EMAIL_ENABLED == 'true'
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          pattern: seo-report-*-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .seo-reports/
+          merge-multiple: true
+
+      - name: Prepare the SES email
+        if: env.LH_EMAIL_ENABLED == 'true'
+        env:
+          SEO_WORKFLOW_RESULT: ${{ needs.seo.result }}
+          SEO_EXECUTION_DATE: ${{ steps.metadata.outputs.date }}
+        run: yarn tsx src/seo/prepareWorkflowEmail.ts
+
+      - name: Authenticate with AWS through OIDC
+        if: env.LH_EMAIL_ENABLED == 'true'
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          audience: sts.amazonaws.com
+          aws-region: ${{ vars.LH_EMAIL_AWS_REGION }}
+          role-to-assume: ${{ vars.LH_EMAIL_AWS_ROLE_ARN }}
+          role-session-name: seo-email-${{ github.run_id }}
+
+      - name: Send the SEO email through SES
+        id: send
+        if: env.LH_EMAIL_ENABLED == 'true'
+        run: >-
+          aws ses send-email
+          --cli-input-json file://.seo-reports/email-ses.json
+          --query MessageId --output text --no-cli-pager
+
+      - name: Report email delivery status
+        if: always()
+        env:
+          DELIVERY_STATUS: ${{ steps.send.outcome }}
+        run: |
+          if [ "$LH_EMAIL_ENABLED" != 'true' ]; then
+            status='DISABLED — set LH_EMAIL_ENABLED=true in the edge environment to enable delivery.'
+          elif [ "$DELIVERY_STATUS" = 'success' ]; then
+            status='ACCEPTED by Amazon SES — check the recipient inbox to confirm delivery.'
+          else
+            status='ERROR — email was not accepted by SES. See the notification job logs.'
+            echo '::warning title=SEO email notification::Email notification failed; SEO execution results are unaffected.'
+          fi
+          printf '%s\n' '## SEO email notification' '' "$status" >> "$GITHUB_STEP_SUMMARY"

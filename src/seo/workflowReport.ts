@@ -2,7 +2,7 @@
 export const SEO_ENVIRONMENTS = ["edge", "staging", "production"] as const;
 export type SeoEnvironment = (typeof SEO_ENVIRONMENTS)[number];
 export type JobResult = "success" | "failure" | "cancelled" | "skipped";
-export type StepResult = JobResult;
+export type StepResult = JobResult | "unknown";
 
 export interface SeoCounts {
   sitemapUrls: number | null;
@@ -27,7 +27,8 @@ export interface SeoEnvironmentReport {
 }
 
 const isResult = (value: unknown): value is JobResult =>
-  ["success", "failure", "cancelled", "skipped"].includes(String(value));
+  typeof value === "string" &&
+  ["success", "failure", "cancelled", "skipped"].includes(value);
 
 const isCounts = (value: unknown): value is SeoCounts => {
   if (!value || typeof value !== "object") return false;
@@ -50,14 +51,13 @@ export const parseSeoEnvironmentReport = (
     report.environment !== environment ||
     report.runId !== runId ||
     report.runAttempt !== runAttempt ||
+    ![report.publishJob, report.verifyJob].every(isResult) ||
     ![
-      report.publishJob,
-      report.verifyJob,
       report.generation,
       report.localVerification,
       report.publishing,
       report.verification,
-    ].every(isResult) ||
+    ].every((result) => isResult(result) || result === "unknown") ||
     ![report.generated, report.published, report.verified].every(isCounts) ||
     !Array.isArray(report.errors) ||
     !report.errors.every((error) => typeof error === "string") ||

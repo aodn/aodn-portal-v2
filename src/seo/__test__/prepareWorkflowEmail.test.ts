@@ -236,3 +236,16 @@ test("missing delivery configuration fails locally and leaves SEO reports untouc
     before
   );
 });
+
+test("malformed status values are rejected instead of breaking email formatting", () => {
+  saveAll();
+  fs.writeFileSync(
+    path.join(directory, "edge.json"),
+    JSON.stringify({ ...report("edge"), generation: ["success"] })
+  );
+  const payload = prepareWorkflowEmail(input());
+  expect(payload.Message.Subject.Data).toContain("PARTIAL FAILURE");
+  expect(payload.Message.Body.Text.Data).toContain(
+    "edge: missing or invalid report"
+  );
+});
