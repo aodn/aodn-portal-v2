@@ -6,21 +6,17 @@
 
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
+import { isSeoEligibleCollection } from "@/seo/collectionEligibility";
 import type { OGCCollection } from "./fetchCollections";
 import { isSeoCli, runCli, seoDistDir } from "./cli";
-import {
-  BASE_URL,
-  detailsUrl,
-  escapeEntities,
-  isSafeCollectionId,
-} from "./constants";
+import { BASE_URL, detailsUrl, escapeEntities } from "./constants";
 
 export const generateSitemap = async (
   outDir: string,
   collections: OGCCollection[]
 ) => {
   const entries = collections
-    .filter((collection) => isSafeCollectionId(collection.id))
+    .filter(isSeoEligibleCollection)
     .map((collection) => ({
       id: collection.id,
       lastmod: toLastmod(collection),
@@ -81,7 +77,9 @@ export const toSitemapXml = (
 if (isSeoCli("sitemap.ts")) {
   runCli(
     import("./fetchCollections")
-      .then(({ fetchCollections }) => fetchCollections("id,revision,creation"))
+      .then(({ fetchCollections }) =>
+        fetchCollections("id,title,description,revision,creation")
+      )
       .then((collections) => generateSitemap(seoDistDir(), collections))
   );
 }

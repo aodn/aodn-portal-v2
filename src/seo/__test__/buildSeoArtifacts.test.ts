@@ -22,7 +22,7 @@ const TEMPLATE =
   '<!doctype html><html lang="en"><head><title>AODN Portal</title></head><body><div id="root"></div></body></html>';
 
 const page = {
-  total: 2,
+  total: 6,
   collections: [
     {
       id: "rec-1",
@@ -30,8 +30,12 @@ const page = {
       description: "Daily SST observations around Australia.",
       properties: { revision: "2026-08-12T15:24:43" },
     },
-    // no description: sitemap lists it, prerender skips it
+    // no description: both generators skip it
     { id: "rec-2", title: "Half-filled record" },
+    { id: "rec-3", description: "Missing title" },
+    { id: "../invalid", title: "Invalid", description: "Invalid ID" },
+    { id: "undefined", title: "Invalid", description: "Default ID" },
+    { id: "blank", title: " ", description: "Whitespace title" },
   ],
   search_after: [],
 };
@@ -61,8 +65,8 @@ describe("the artifacts pipeline on controlled data", () => {
     expect(sitemap).toContain(
       `<loc>${BASE_URL}/details/rec-1</loc><lastmod>2026-08-12</lastmod>`
     );
-    expect(sitemap).toContain(`<loc>${BASE_URL}/details/rec-2</loc></url>`);
-    expect(sitemap.match(/<loc>/g)).toHaveLength(3);
+    expect(sitemap).not.toContain(`${BASE_URL}/details/rec-2`);
+    expect(sitemap.match(/<loc>/g)).toHaveLength(2);
 
     // only the record with id, title and description becomes a page
     const detailsDir = path.join(outDir, "prerender", "details");

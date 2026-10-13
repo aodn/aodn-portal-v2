@@ -10,6 +10,7 @@
 
 import { readFile, writeFile, mkdir } from "fs/promises";
 import path from "path";
+import { isSeoEligibleCollection } from "@/seo/collectionEligibility";
 import type { OGCCollection } from "./fetchCollections";
 import { fetchCollections } from "./fetchCollections";
 import { buildBreadcrumbJsonLd, buildJsonLd } from "./jsonLd";
@@ -18,7 +19,6 @@ import { isSeoCli, runCli, seoDistDir } from "./cli";
 import {
   detailsUrl,
   escapeEntities,
-  isSafeCollectionId,
   PRERENDER_DETAILS_DIR,
   SHARE_IMAGE_URL,
   SITE_NAME,
@@ -133,10 +133,6 @@ export const renderCrawlerPage = (
   );
 };
 
-const hasSeoFields = (collection: OGCCollection) =>
-  isSafeCollectionId(collection.id) &&
-  Boolean(collection.title && collection.description);
-
 export const prerenderDetailPages = async (
   outDir: string,
   prefetched?: OGCCollection[]
@@ -147,7 +143,7 @@ export const prerenderDetailPages = async (
   const detailsDir = path.join(outDir, PRERENDER_DETAILS_DIR);
   await mkdir(detailsDir, { recursive: true });
 
-  const pages = collections.filter(hasSeoFields);
+  const pages = collections.filter(isSeoEligibleCollection);
   const skipped = collections.length - pages.length;
   // Built over pages only, so related links never point at a skipped record
   const related = buildRelatedLinks(pages);

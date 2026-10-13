@@ -33,7 +33,11 @@ describe("toSitemapXml", () => {
 });
 
 const toCollection = (data: Record<string, unknown>) =>
-  Object.assign(new OGCCollection(), data);
+  Object.assign(
+    new OGCCollection(),
+    { title: "Title", description: "Description" },
+    data
+  );
 
 const generate = async (collections: OGCCollection[]) => {
   const outDir = await mkdtemp(path.join(os.tmpdir(), "sitemap-"));
