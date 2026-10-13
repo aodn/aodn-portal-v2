@@ -1,3 +1,5 @@
+import { Alert } from "@mui/material";
+import { ErrorResponse } from "@/utils/ErrorBoundary";
 import { useParams } from "react-router-dom";
 import { FC, ReactNode, useCallback, useEffect, useState } from "react";
 import { fetchResultByUuidNoStore } from "@/app/store/searchReducer";
@@ -36,8 +38,19 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   const [collection, setCollection] = useState<OGCCollection | undefined>(
     undefined
   );
-  const [isCollectionNotFound, setIsCollectionNotFound] =
-    useState<boolean>(false);
+  const [fetchError, setFetchError] = useState<{
+    uuid: string;
+    notFound: boolean;
+  }>();
+  const [collectionUuid, setCollectionUuid] = useState(uuid);
+  if (collectionUuid !== uuid) {
+    setCollectionUuid(uuid);
+    setCollection(undefined);
+    setFetchError(undefined);
+  }
+  const currentError = fetchError?.uuid === uuid ? fetchError : undefined;
+  const isCollectionNotFound = currentError?.notFound === true;
+  const isTemporaryError = currentError?.notFound === false;
   const [downloadConditions, _setDownloadConditions] = useState<
     IDownloadCondition[]
   >([]);
@@ -95,16 +108,19 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       .then((collection) => {
         if (cancelled) return;
         if (!collection) {
-          setIsCollectionNotFound(true);
+          setFetchError({ uuid, notFound: false });
           return;
         }
         setCollection(collection);
-        setIsCollectionNotFound(false);
+        setFetchError(undefined);
 
         // Track analytics when user views a dataset details page
         trackCustomEvent(AnalyticsEvent.DETAILS_PAGE_DATASET, {
-          details_page_dataset_group:
-            collection.properties?.dataset_group?.join(","),
+          details_page_dataset_group: Array.isArray(
+            collection.properties?.dataset_group
+          )
+            ? collection.properties.dataset_group.join(",")
+            : undefined,
           details_page_dataset_id: uuid,
           details_page_dataset_title: collection.title,
         });
@@ -112,7 +128,10 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       .catch((error) => {
         if (cancelled) return;
         console.error("Error fetching collection by UUID:", error);
-        setIsCollectionNotFound(true);
+        setFetchError({
+          uuid,
+          notFound: error instanceof ErrorResponse && error.statusCode === 404,
+        });
       });
     return () => {
       cancelled = true;
@@ -122,7 +141,11 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   // Keep this even though crawlers get the pre-rendered <title>: SPA navigation
   // never reloads the HTML, so without it the tab would keep showing the previously loaded record's title on this record's page.
   useDocumentTitle(
-    isCollectionNotFound ? "Record not found" : collection?.title
+    isCollectionNotFound
+      ? "Record not found"
+      : isTemporaryError
+        ? "Service unavailable"
+        : collection?.title
   );
   // A bad uuid still answers HTTP 200, so tell crawlers not to index it
   useRobotsNoIndex(isCollectionNotFound);
@@ -161,7 +184,13 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         isSubsettingSupported,
       }}
     >
-      {children}
+      {isTemporaryError ? (
+        <Alert severity="error">
+          Unable to load this dataset at the moment. Please try again later.
+        </Alert>
+      ) : (
+        children
+      )}
     </DetailPageContext.Provider>
   );
 };
