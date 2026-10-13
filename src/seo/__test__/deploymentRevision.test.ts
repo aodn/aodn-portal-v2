@@ -496,6 +496,15 @@ test("workflow wiring pins both checkouts and stops publishing on failed checks"
   expect(PUBLISH.indexOf("- name: Fetch the deployed index.html")).toBeLessThan(
     PUBLISH.indexOf("- name: Generate sitemap.xml")
   );
+  expect(
+    step(PUBLISH, "Generate sitemap.xml and pre-rendered detail pages")
+  ).toContain("yarn seo:verify");
+  expect(PUBLISH.indexOf("yarn seo:verify")).toBeLessThan(
+    PUBLISH.indexOf("- name: Copy the artifacts to S3")
+  );
+  expect(
+    step(PUBLISH, "Generate sitemap.xml and pre-rendered detail pages")
+  ).not.toMatch(/continue-on-error:/);
   expect(PUBLISH.indexOf(`- name: ${GUARD_NAME}`)).toBeLessThan(
     PUBLISH.indexOf("- name: Copy the artifacts to S3")
   );
