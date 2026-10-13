@@ -1,4 +1,3 @@
-import { Alert } from "@mui/material";
 import { ErrorResponse } from "@/utils/ErrorBoundary";
 import { useParams } from "react-router-dom";
 import { FC, ReactNode, useCallback, useEffect, useState } from "react";
@@ -23,8 +22,6 @@ import {
   LayerName,
   LayerSwitcherLayer,
 } from "@/components/map/mapbox/controls/menu/MapLayerSwitcher";
-import { useDocumentTitle } from "@/seo/useDocumentTitle";
-import { useRobotsNoIndex } from "@/seo/useRobotsNoIndex";
 
 interface DetailPageProviderProps {
   children: ReactNode;
@@ -138,18 +135,6 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
     };
   }, [dispatch, uuid]);
 
-  // Keep this even though crawlers get the pre-rendered <title>: SPA navigation
-  // never reloads the HTML, so without it the tab would keep showing the previously loaded record's title on this record's page.
-  useDocumentTitle(
-    isCollectionNotFound
-      ? "Record not found"
-      : isTemporaryError
-        ? "Service unavailable"
-        : collection?.title
-  );
-  // A bad uuid still answers HTTP 200, so tell crawlers not to index it
-  useRobotsNoIndex(isCollectionNotFound);
-
   // Layer-aware: GeoServer time support does not imply PMTiles time (and vice versa).
   const isSubsettingSupported = useCallback(
     (type: SubsettingType) =>
@@ -167,6 +152,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         collection,
         setCollection,
         isCollectionNotFound,
+        isTemporaryError,
         downloadConditions,
         getAndSetDownloadConditions,
         removeDownloadCondition,
@@ -184,13 +170,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         isSubsettingSupported,
       }}
     >
-      {isTemporaryError ? (
-        <Alert severity="error">
-          Unable to load this dataset at the moment. Please try again later.
-        </Alert>
-      ) : (
-        children
-      )}
+      {children}
     </DetailPageContext.Provider>
   );
 };
