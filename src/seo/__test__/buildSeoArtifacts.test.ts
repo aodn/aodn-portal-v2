@@ -9,6 +9,8 @@ import { mkdtemp, readFile, readdir, writeFile } from "fs/promises";
 import { tmpdir } from "os";
 import path from "path";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { http, HttpResponse } from "msw";
+import { setupServer } from "msw/node";
 import { ogcAxiosWithRetry } from "@/app/store/searchReducer";
 import { fetchCollections } from "../fetchCollections";
 import { generateSitemap } from "../sitemap";
@@ -79,5 +81,34 @@ describe("the artifacts pipeline on controlled data", () => {
     // the same checks the publish gate runs, against this controlled output
     expect(checkSitemap(sitemap, 2).problems).toEqual([]);
     expect(checkDetailPage(detailPage, "rec-1")).toEqual([]);
+  });
+
+  test("the build entry point writes no artifacts when fetching is incomplete", async () => {
+    vi.restoreAllMocks();
+    const server = setupServer(
+      http.get("*/api/v1/ogc/collections", () =>
+        HttpResponse.json({ total: 3, collections: page.collections })
+      )
+    );
+    server.listen({ onUnhandledRequest: "error" });
+    vi.doMock("@/seo/cli", () => ({ seoDistDir: () => outDir }));
+    vi.doMock("@/seo/constants", async () => ({
+      ...(await vi.importActual("@/seo/constants")),
+      OGC_API_BASE: "http://localhost",
+    }));
+
+    try {
+      await expect(import("@/seo/buildSeoArtifacts")).rejects.toThrow(
+        /missing required search_after cursor; fetched 2\/3/
+      );
+      expect(await readdir(outDir)).toEqual(["index.html"]);
+      expect(await readFile(path.join(outDir, "index.html"), "utf8")).toBe(
+        TEMPLATE
+      );
+    } finally {
+      server.close();
+      vi.doUnmock("@/seo/cli");
+      vi.doUnmock("@/seo/constants");
+    }
   });
 });

@@ -48,7 +48,11 @@ export const describeFetchError = (error: unknown) => {
 
 const isCollectionsPage = (
   payload: unknown
-): payload is { collections: unknown[] } =>
+): payload is {
+  collections: unknown[];
+  total?: unknown;
+  search_after?: unknown;
+} =>
   typeof payload === "object" &&
   payload !== null &&
   Array.isArray((payload as { collections?: unknown }).collections);
@@ -93,9 +97,17 @@ export const fetchCollections = async (
     const collections: OGCCollection[] = [];
     let searchAfter: string[] | undefined;
     let total: number | undefined;
+    const seenCursors = new Set<string>();
+    const seenIds = new Set<string>();
+    let page = 0;
     const store = configureStore({ reducer: (state = {}) => state });
 
     for (;;) {
+      page++;
+      const paginationError = (reason: string) =>
+        new Error(
+          `Incomplete collection pagination from ${API_URL} on page ${page}: ${reason}; fetched ${collections.length}/${total ?? "unknown"} collections. No SEO artifacts will be generated.`
+        );
       const params = createSearchParamFrom(
         {},
         { pagesize: PAGE_SIZE, searchafter: searchAfter }
@@ -117,26 +129,61 @@ export const fetchCollections = async (
         );
       }
 
+      if (
+        typeof payload.total !== "number" ||
+        !Number.isSafeInteger(payload.total) ||
+        payload.total < 0
+      ) {
+        throw paginationError("missing or invalid reported total");
+      }
+      if (total !== undefined && payload.total !== total) {
+        throw paginationError(
+          `reported total changed from ${total} to ${payload.total}`
+        );
+      }
+      total = payload.total;
+      if (
+        payload.search_after !== undefined &&
+        (!Array.isArray(payload.search_after) ||
+          !payload.search_after.every(
+            (value) => typeof value === "string" && value.length > 0
+          ))
+      ) {
+        throw paginationError("invalid search_after cursor");
+      }
+
       const pageResult = jsonToOGCCollections(payload);
-      total = pageResult.total;
-      if (pageResult.collections.length === 0) break;
+      if (pageResult.collections.length === 0 && collections.length < total) {
+        throw paginationError(
+          "pagination ended prematurely with an empty page"
+        );
+      }
+      for (const collection of pageResult.collections) {
+        if (seenIds.has(collection.id)) {
+          throw paginationError(
+            `pagination is not making progress: repeated collection ID ${collection.id}`
+          );
+        }
+        seenIds.add(collection.id);
+      }
       collections.push(...pageResult.collections);
       console.log(`Fetched ${collections.length}/${total} collections`);
 
-      if (
-        pageResult.search_after.length === 0 ||
-        collections.length >= (total ?? 0)
-      ) {
-        break;
+      if (collections.length > total) {
+        throw paginationError("fetched count exceeds the reported total");
       }
+      const cursor = JSON.stringify(pageResult.search_after);
+      if (pageResult.search_after.length > 0 && seenCursors.has(cursor)) {
+        throw paginationError("repeated search_after cursor");
+      }
+      if (collections.length === total) break;
+      if (pageResult.search_after.length === 0) {
+        throw paginationError("missing required search_after cursor");
+      }
+      seenCursors.add(cursor);
       searchAfter = pageResult.search_after;
     }
 
-    if (collections.length !== total) {
-      console.warn(
-        `Expected ${total} collections but got ${collections.length}`
-      );
-    }
     return collections;
   });
 };

@@ -1,4 +1,14 @@
-import { afterEach, describe, expect, test, vi } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  test,
+  vi,
+} from "vitest";
+import { http, HttpResponse } from "msw";
+import { setupServer } from "msw/node";
 import { AxiosError } from "axios";
 import { ogcAxiosWithRetry } from "@/app/store/searchReducer";
 import { createErrorResponse } from "@/utils/ErrorBoundary";
@@ -123,8 +133,7 @@ describe("fetchCollections walks every page", () => {
     );
   });
 
-  test("stops on an empty page and warns when total was not reached", async () => {
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+  test("rejects an empty page before the total is reached", async () => {
     const pages = [
       { total: 5, collections: [{ id: "a" }], search_after: ["cursor-1"] },
       { total: 5, collections: [], search_after: [] },
@@ -133,11 +142,10 @@ describe("fetchCollections walks every page", () => {
       .spyOn(ogcAxiosWithRetry, "get")
       .mockImplementation(async () => ({ data: pages.shift() }) as never);
 
-    const collections = await fetchCollections("id");
-
-    expect(collections.map((item) => item.id)).toEqual(["a"]);
+    await expect(fetchCollections("id")).rejects.toThrow(
+      /page 2: pagination ended prematurely with an empty page; fetched 1\/5/
+    );
     expect(get).toHaveBeenCalledTimes(2);
-    expect(warn).toHaveBeenCalledWith("Expected 5 collections but got 1");
   });
 
   test("wraps a failed request with the API URL for the CI log", async () => {
@@ -200,5 +208,101 @@ describe("fetchCollections walks every page", () => {
     await expect(fetchCollections()).rejects.toThrow(
       /expected collections JSON but got string: \(empty body\)$/
     );
+  });
+});
+
+describe("fetchCollections rejects unsafe pagination", () => {
+  const server = setupServer();
+  beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
+  afterEach(() => server.resetHandlers());
+  afterAll(() => server.close());
+
+  const servePages = (pages: Parameters<typeof HttpResponse.json>[0][]) => {
+    const requests: URL[] = [];
+    server.use(
+      http.get("*/api/v1/ogc/collections", ({ request }) => {
+        requests.push(new URL(request.url));
+        return HttpResponse.json(pages.shift());
+      })
+    );
+    return requests;
+  };
+
+  test.each([
+    ["omitted", undefined],
+    ["empty", []],
+  ])(
+    "rejects an %s cursor when fewer records were fetched",
+    async (_, cursor) => {
+      const requests = servePages([
+        { total: 2, collections: [{ id: "a" }], search_after: cursor },
+      ]);
+      await expect(fetchCollections()).rejects.toThrow(
+        /page 1: missing required search_after cursor; fetched 1\/2/
+      );
+      expect(requests).toHaveLength(1);
+    }
+  );
+
+  test.each([2, 4])("rejects a changed total of %i", async (total) => {
+    const requests = servePages([
+      { total: 3, collections: [{ id: "a" }], search_after: ["first"] },
+      { total, collections: [{ id: "b" }], search_after: ["second"] },
+    ]);
+    await expect(fetchCollections()).rejects.toThrow(
+      `reported total changed from 3 to ${total}`
+    );
+    expect(requests).toHaveLength(2);
+  });
+
+  test.each([
+    ["immediately", ["first", "first"]],
+    ["after a cycle", ["first", "second", "first"]],
+  ])("rejects a cursor repeated %s", async (_, cursors) => {
+    const requests = servePages(
+      cursors.map((cursor, index) => ({
+        total: cursors.length,
+        collections: [{ id: `record-${index}` }],
+        search_after: [cursor],
+      }))
+    );
+    // Even an exact count cannot make a repeated cursor safe.
+    await expect(fetchCollections()).rejects.toThrow(
+      "repeated search_after cursor"
+    );
+    expect(requests).toHaveLength(cursors.length);
+  });
+
+  test("rejects repeated records even when the cursor changes", async () => {
+    const requests = servePages([
+      { total: 2, collections: [{ id: "a" }], search_after: ["first"] },
+      { total: 2, collections: [{ id: "a" }], search_after: ["second"] },
+    ]);
+    await expect(fetchCollections()).rejects.toThrow(
+      "pagination is not making progress: repeated collection ID a"
+    );
+    expect(requests).toHaveLength(2);
+  });
+
+  test("rejects more records than the reported total", async () => {
+    servePages([{ total: 1, collections: [{ id: "a" }, { id: "b" }] }]);
+    await expect(fetchCollections()).rejects.toThrow(
+      /fetched count exceeds the reported total; fetched 2\/1/
+    );
+  });
+
+  test.each([undefined, -1, 1.5, "2"])(
+    "rejects an invalid total of %s",
+    async (total) => {
+      servePages([{ total, collections: [] }]);
+      await expect(fetchCollections()).rejects.toThrow(
+        "missing or invalid reported total"
+      );
+    }
+  );
+
+  test("accepts a genuinely empty result", async () => {
+    servePages([{ total: 0, collections: [] }]);
+    await expect(fetchCollections()).resolves.toEqual([]);
   });
 });
