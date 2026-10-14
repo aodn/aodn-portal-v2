@@ -1,3 +1,4 @@
+import { formatMetricValue } from "@/lighthouse/metrics";
 import { ALL_FORM_FACTORS, formFactorLabels } from "@/lighthouse/constants";
 import type { FormFactor, LighthouseReport } from "@/lighthouse/types";
 
@@ -52,11 +53,11 @@ export const buildReleaseReport = (report: LighthouseReport) => {
         const measuredValues =
           measuredRuns?.[formFactor]?.map((run) => run[metric]) || [];
         metricRows.push(
-          `| [${id}](${report.apiHost}${route}) | ${formFactorLabels[formFactor]} | ${metric.toUpperCase()} (${unit}) | ${measuredValues.join(", ") || "Unavailable"} | ${value} | ${thresholdLabel} | **${status}** |`
+          `| [${id}](${report.apiHost}${route}) | ${formFactorLabels[formFactor]} | ${metric.toUpperCase()} (${unit}) | ${measuredValues.map(formatMetricValue).join(", ") || "Unavailable"} | ${formatMetricValue(value)} | ${thresholdLabel} | **${status}** |`
         );
         if (status === "FAIL") {
           failures.push(
-            `${formFactorLabels[formFactor]} ${metric.toUpperCase()} on ${route} is ${value}${unit === "ms" ? " ms" : ""}, above the limit ${thresholdLabel}`
+            `${formFactorLabels[formFactor]} ${metric.toUpperCase()} on ${route} is ${formatMetricValue(value)}${unit === "ms" ? " ms" : ""}, above the limit ${thresholdLabel}`
           );
         }
         return {
@@ -88,11 +89,11 @@ export const buildReleaseReport = (report: LighthouseReport) => {
         status,
       });
       rows.push(
-        `| [${id}](${report.apiHost}${route}) | ${formFactorLabels[formFactor]} | ${measuredScores.join(", ") || "Unavailable"} | ${result.performance} | ${MINIMUM_RELEASE_PERFORMANCE} | **${status}** |`
+        `| [${id}](${report.apiHost}${route}) | ${formFactorLabels[formFactor]} | ${measuredScores.map(formatMetricValue).join(", ") || "Unavailable"} | ${formatMetricValue(result.performance)} | ${MINIMUM_RELEASE_PERFORMANCE} | **${status}** |`
       );
       if (!performancePassed) {
         failures.push(
-          `${formFactorLabels[formFactor]} Performance on ${route} is ${result.performance}, below the minimum ${MINIMUM_RELEASE_PERFORMANCE}`
+          `${formFactorLabels[formFactor]} Performance on ${route} is ${formatMetricValue(result.performance)}, below the minimum ${MINIMUM_RELEASE_PERFORMANCE}`
         );
       }
     }

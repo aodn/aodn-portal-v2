@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { expect, test } from "vitest";
-import { medianMetrics } from "@/lighthouse/metrics";
+import { formatMetricValue, medianMetrics } from "@/lighthouse/metrics";
 import {
   buildReleaseReport,
   RELEASE_METRIC_LIMITS,
@@ -158,4 +158,32 @@ test("an error before any measurements reports INCOMPLETE, not PASS", () => {
     performanceStatus: "INCOMPLETE",
     pages: [],
   });
+});
+
+test.each([
+  [12.345678, "12.346"],
+  [0.123456, "0.123"],
+  [80, "80"],
+  [0.1, "0.1"],
+  [-0.00001, "0"],
+])("formats %s with at most three decimals", (value, expected) => {
+  expect(formatMetricValue(value as number)).toBe(expected);
+});
+
+test("display rounding preserves precise JSON values and threshold failures", () => {
+  const input = report();
+  const metrics = input.routes["/"].metrics.mobile!;
+  metrics.cls = 0.1000001;
+  metrics.lcp = 1234.567891;
+  const output = buildReleaseReport(input);
+  expect(output.markdown).toContain("1234.568");
+  expect(output.markdown).not.toContain("1234.567891");
+  expect(output.markdown).not.toContain("0.1000001");
+  const check = output.results.pages[0].metricChecks.find(
+    (check) => check.metric === "cls"
+  )!;
+  expect(check.value).toBe(0.1000001);
+  expect(check.measuredValues).toEqual([0.1000001, 0.1000001, 0.1000001]);
+  expect(check.status).toBe("FAIL");
+  expect(output.results.performanceStatus).toBe("FAIL");
 });

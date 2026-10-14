@@ -1,4 +1,5 @@
 /** Email content shared by the release notification and its delivery provider. */
+import { formatMetricValue } from "@/lighthouse/metrics";
 import type { buildReleaseReport } from "@/lighthouse/releaseReport";
 
 // Preserve existing imports for Lighthouse callers.
@@ -29,10 +30,10 @@ const resultDetails = (results?: ReleaseResults) =>
   results?.pages
     .flatMap((page) => [
       `${page.id} (${page.formFactor}): ${page.status} — ${page.url}`,
-      `Performance: ${page.performance}/100; minimum ${page.threshold}; measured runs: ${page.measuredScores.join(", ")}`,
+      `Performance: ${formatMetricValue(page.performance)}/100; minimum ${page.threshold}; measured runs: ${page.measuredScores.map(formatMetricValue).join(", ")}`,
       ...page.metricChecks.map(
         (check) =>
-          `${check.metric.toUpperCase()}: ${check.value} ${check.unit}; maximum ${check.threshold} ${check.unit}; ${check.status}; measured runs: ${check.measuredValues.join(", ")}`
+          `${check.metric.toUpperCase()}: ${formatMetricValue(check.value)} ${check.unit}; maximum ${formatMetricValue(check.threshold)} ${check.unit}; ${check.status}; measured runs: ${check.measuredValues.map(formatMetricValue).join(", ")}`
       ),
     ])
     .join("\n");

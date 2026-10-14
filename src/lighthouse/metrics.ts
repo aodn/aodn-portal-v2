@@ -6,6 +6,10 @@
 import { HEALTH_REQUEST, type LighthouseRoute } from "./constants";
 import type { Lhr, MetricKey, RouteMetrics } from "./types";
 
+/** Display at most three decimals; validation and stored measurements stay exact. */
+export const formatMetricValue = (value: number): string =>
+  String(Number(value.toFixed(3)));
+
 /** Middle value; for an even count, the mean of the two middle ones. */
 export const median = (values: number[]): number => {
   if (values.length === 0) throw new Error("median of no values");

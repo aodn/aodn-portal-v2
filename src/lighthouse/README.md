@@ -98,6 +98,9 @@ values are within their limits. Each median is calculated independently over
 three measured runs after one discarded warm-up, protecting against a single
 outlier. Release measurements retain actual numeric precision for these checks;
 display rounding cannot turn a value just above the limit into a pass.
+Human-readable reports, summaries and emails show at most **three decimal
+places**, without trailing zeros. JSON results and raw Lighthouse HTML/JSON
+artifacts preserve the original precision for debugging and comparisons.
 
 | Page    | Emulation | LCP maximum | TBT maximum | CLS maximum | FCP maximum |
 | ------- | --------- | ----------- | ----------- | ----------- | ----------- |
