@@ -7,20 +7,11 @@
  * @type {{enable: doubleClickZoom.enable, disable(*): void}}
  */
 const doubleClickZoom = {
-  enable: (ctx) => {
+  enable: (ctx, enabled) => {
     setTimeout(() => {
-      // First check we've got a map and some context.
-      if (
-        !ctx.map ||
-        !ctx.map.doubleClickZoom ||
-        !ctx._ctx ||
-        !ctx._ctx.store ||
-        !ctx._ctx.store.getInitialConfigValue
-      )
-        return;
-      // Now check initial state wasn't false (we leave it disabled if so)
-      if (!ctx._ctx.store.getInitialConfigValue("doubleClickZoom")) return;
-      ctx.map.doubleClickZoom.enable();
+      if (!ctx.map || !ctx.map.doubleClickZoom) return;
+      if (enabled) ctx.map.doubleClickZoom.enable();
+      else ctx.map.doubleClickZoom.disable();
     }, 0);
   },
   disable(ctx) {
@@ -45,6 +36,11 @@ const DrawRectangle = {
     });
     this.addFeature(rectangle);
     this.clearSelectedFeatures();
+    const dragPanEnabled = this.map.dragPan.isEnabled();
+    // enable() resets inertia options unless the existing options are passed.
+    // Mapbox exposes no public getter for these options.
+    const dragPanOptions = this.map.dragPan._inertiaOptions;
+    const doubleClickZoomEnabled = this.map.doubleClickZoom.isEnabled();
     doubleClickZoom.disable(this);
     // Press-and-drag draws the box, so the map must not pan while dragging
     this.map.dragPan.disable();
@@ -54,6 +50,9 @@ const DrawRectangle = {
     });
     return {
       rectangle,
+      dragPanEnabled,
+      dragPanOptions,
+      doubleClickZoomEnabled,
     };
   },
   // Press sets the first corner, drag resizes, release sets the opposite corner
@@ -61,26 +60,33 @@ const DrawRectangle = {
     state.startPoint = [e.lngLat.lng, e.lngLat.lat];
   },
   onDrag: function (state, e) {
-    this.onMouseMove(state, e);
+    // Draw also dispatches touch moves to onDrag after onTouchMove.
+    if (!e.originalEvent?.touches) this.onMouseMove(state, e);
   },
   onMouseUp: function (state, e) {
     this.onClick(state, e);
   },
   onTouchStart: function (state, e) {
+    // Claim the Mapbox event, not just the DOM event: this also blocks
+    // tap-drag zoom and other camera gestures while drawing a BBOX.
+    e.preventDefault();
     this.onMouseDown(state, e);
+  },
+  onTouchMove: function (state, e) {
+    // dragPan is disabled, so Mapbox no longer prevents native page scroll.
+    if (e.originalEvent.cancelable) e.originalEvent.preventDefault();
+    this.onMouseMove(state, e);
   },
   onTouchEnd: function (state, e) {
     this.onMouseUp(state, e);
   },
   // support mobile taps
   onTap: function (state, e) {
-    // emulate 'move mouse' to update feature coords
-    if (state.startPoint) this.onMouseMove(state, e);
-    // emulate onClick
     this.onClick(state, e);
   },
   // Whenever a user clicks on the map, Draw will call `onClick`
   onClick: function (state, e) {
+    if (state.endPoint) return;
     if (state.startPoint) {
       // Second click: update final rectangle coordinates
       this.onMouseMove(state, e);
@@ -94,14 +100,16 @@ const DrawRectangle = {
       if (isZeroArea) {
         // Single-click without dragging or zero width/height rectangle -> delete feature
         this.deleteFeature([state.rectangle.id], { silent: true });
-        setTimeout(() => {
+        state.finishTimeout = setTimeout(() => {
           this.changeMode("simple_select");
         }, 0);
       } else {
         // Defer mode change to allow other click handlers to see we're still in draw mode
         // This prevents accidental popups on the second click
-        setTimeout(() => {
-          this.changeMode("simple_select", { featuresId: state.rectangle.id });
+        state.finishTimeout = setTimeout(() => {
+          this.changeMode("simple_select", {
+            featureIds: [state.rectangle.id],
+          });
         }, 0);
       }
       return;
@@ -143,8 +151,9 @@ const DrawRectangle = {
     }
   },
   onStop: function (state) {
-    doubleClickZoom.enable(this);
-    this.map.dragPan.enable();
+    clearTimeout(state.finishTimeout);
+    doubleClickZoom.enable(this, state.doubleClickZoomEnabled);
+    if (state.dragPanEnabled) this.map.dragPan.enable(state.dragPanOptions);
     this.updateUIClasses({ mouse: "none" });
     this.activateUIButton();
 
@@ -160,7 +169,7 @@ const DrawRectangle = {
       coords[0][0] !== coords[2][0] &&
       coords[0][1] !== coords[2][1];
 
-    if (isValidRectangle && state.rectangle.isValid()) {
+    if (state.endPoint && isValidRectangle && state.rectangle.isValid()) {
       this.map.fire("draw.create", {
         features: [state.rectangle.toGeoJSON()],
       });

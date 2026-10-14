@@ -55,6 +55,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
   const [showPolygonTooltip, setShowPolygonTooltip] = useState(false);
   const [hasFeatures, setHasFeatures] = useState<boolean>(false);
   const [hasSelectedFeatures, setHasSelectedFeatures] = useState(false);
+  const rectangleInteractionRef = useRef(false);
   const activeToolRef = useRef<SelectionTool>("bbox");
   const [selections, setSelections] = useState<
     Feature<Polygon | MultiPolygon>[]
@@ -79,6 +80,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
 
   const disableDrawingMode = useCallback(() => {
     mapDraw.changeMode("simple_select");
+    rectangleInteractionRef.current = false;
     setMapDrawInteractionActive(map, false);
     setIsDrawingMode(false);
   }, [map, mapDraw]);
@@ -90,6 +92,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
     } else {
       // Suppress data-layer popups immediately (PMTiles hover etc.)
       setMapDrawInteractionActive(map, true);
+      rectangleInteractionRef.current = true;
       mapDraw.changeMode(DRAW_RECTANGLE_MODE);
       setShowTooltip(true);
     }
@@ -108,6 +111,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
       setShowPolygonTooltip(false);
     } else {
       setMapDrawInteractionActive(map, true);
+      rectangleInteractionRef.current = false;
       mapDraw.changeMode(DRAW_POLYGON_MODE);
       setShowPolygonTooltip(true);
     }
@@ -346,11 +350,15 @@ const DrawRect: React.FC<DrawControlProps> = ({
       const onModeChanged = (e: { mode: string }) => {
         const isDrawing =
           e.mode === DRAW_RECTANGLE_MODE || e.mode === DRAW_POLYGON_MODE;
-        if (isDrawing) {
-          map.dragPan.disable(); // Optional: prevent accidental pan
-        } else {
-          map.dragPan.enable();
+        // Rectangle mode owns its interaction snapshot and restoration.
+        if (e.mode !== DRAW_RECTANGLE_MODE) {
+          if (isDrawing) {
+            map.dragPan.disable(); // Optional: prevent accidental pan
+          } else if (!rectangleInteractionRef.current) {
+            map.dragPan.enable();
+          }
         }
+        rectangleInteractionRef.current = e.mode === DRAW_RECTANGLE_MODE;
         // Immediate flag update (do not wait for the 100ms poll) so PMTiles
         // hover / other popups suppress as soon as draw mode starts.
         publishDrawInteractionFromControl();
