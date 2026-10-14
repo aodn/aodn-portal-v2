@@ -114,14 +114,16 @@ fixed configuration; a release never lowers its own requirements automatically.
 Threshold failures make the independent Lighthouse workflow red after report
 publication but remain non-blocking for deployment/release.
 
-The QA job summary includes the environment, release/ref, SHA, tested page URL,
-emulation, all three measured Performance scores and metric values, medians,
-thresholds with explicit units, and **PASS/FAIL** for Performance and each of
-LCP, TBT, CLS and FCP. It
-shows separate mobile and desktop rows for every page, and execution status
-separately from performance status. Execution errors
-include the error and any pages already measured; setup failures before a report
-exists produce an explicit error summary pointing to the failed step logs.
+The GitHub Actions job summary uses a separate `.lighthouse/job-summary.md`,
+generated after historical baseline lookup. It shows execution and performance
+status, completed/passed/failed audit counts, failed check counts, a compact
+page/device overview, failed checks with signed differences, and informational
+previous-release score changes. Timing values retain milliseconds and existing
+numeric precision. Complete measured values, medians, thresholds and statuses
+remain accessible under “View all metric results”. Execution errors include
+completed measurements; setup failures without a summary point to failed step
+logs. The detailed `report.md` (including its existing comparison), JSON reports,
+and QA email content remain unchanged.
 
 Artifacts are named `lighthouse-<environment>-<SHA>-<run-id>-<attempt>` and retained
 for 90 days (subject to the repository/organization retention policy). Hidden

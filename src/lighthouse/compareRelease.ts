@@ -1,5 +1,9 @@
 /** Compare release measurements using retained Actions artifacts, not run status. */
 import fs from "fs";
+import {
+  buildReleaseJobSummary,
+  pageKey,
+} from "@/lighthouse/releaseJobSummary";
 import os from "os";
 import path from "path";
 import { execFileSync } from "child_process";
@@ -25,15 +29,6 @@ export interface ReleaseArtifact {
   created_at: string;
   workflow_run?: { id: number; head_sha?: string };
 }
-
-const pageKey = (page: ReleaseHistory["pages"][number]) => {
-  const url = new URL(page.url);
-  if (!["http:", "https:"].includes(url.protocol))
-    throw new Error("Invalid page URL");
-  url.searchParams.sort();
-  // Origins may change within an environment; datasets, states and devices must match.
-  return `${page.id}:${page.formFactor}:${url.pathname}${url.search}${url.hash}`;
-};
 
 export const parseReleaseHistory = (
   value: unknown,
@@ -189,6 +184,15 @@ const compare = async () => {
   let markdown =
     "## Performance compared with the previous release\n\nNo previous release available\n";
   try {
+    const results = JSON.parse(
+      fs.readFileSync(path.join(directory, "release-results.json"), "utf8")
+    ) as Results;
+    const detailedMarkdown = fs.readFileSync(reportPath, "utf8");
+    fs.writeFileSync(
+      path.join(directory, "job-summary.md"),
+      buildReleaseJobSummary(results, detailedMarkdown),
+      "utf8"
+    );
     const current = parseReleaseHistory(
       JSON.parse(
         fs.readFileSync(path.join(directory, "release-results.json"), "utf8")
@@ -265,6 +269,19 @@ const compare = async () => {
         "::warning title=Lighthouse history::Previous artifacts unavailable; continuing without a comparison baseline."
       );
     }
+    const previousRunUrl = previous
+      ? `${process.env.GITHUB_SERVER_URL || "https://github.com"}/${repo}/actions/runs/${previous.artifact.workflow_run!.id}`
+      : undefined;
+    fs.writeFileSync(
+      path.join(directory, "job-summary.md"),
+      buildReleaseJobSummary(
+        results,
+        detailedMarkdown,
+        previous?.report,
+        previousRunUrl
+      ),
+      "utf8"
+    );
     markdown = buildReleaseComparison(
       current,
       previous?.report,
