@@ -1,4 +1,5 @@
 /** Compare release measurements using retained Actions artifacts, not run status. */
+import { formatMetricValue } from "@/lighthouse/metrics";
 import fs from "fs";
 import os from "os";
 import path from "path";
@@ -172,7 +173,7 @@ export const buildReleaseComparison = (
       ? page.performance - baseline.performance
       : undefined;
     lines.push(
-      `| [${page.id}](${page.url}) | ${page.formFactor} | ${baseline?.performance ?? "Unavailable"} | ${page.performance} | ${difference === undefined ? "—" : `${difference > 0 ? "+" : ""}${difference}`} | ${MINIMUM_RELEASE_PERFORMANCE} | **${page.performance >= MINIMUM_RELEASE_PERFORMANCE ? "PASS" : "FAIL"}** |`
+      `| [${page.id}](${page.url}) | ${page.formFactor} | ${baseline ? formatMetricValue(baseline.performance) : "Unavailable"} | ${formatMetricValue(page.performance)} | ${difference === undefined ? "—" : `${difference > 0 ? "+" : ""}${formatMetricValue(difference)}`} | ${MINIMUM_RELEASE_PERFORMANCE} | **${page.performance >= MINIMUM_RELEASE_PERFORMANCE ? "PASS" : "FAIL"}** |`
     );
   }
   lines.push(

@@ -6,6 +6,7 @@
  * Node-only.
  */
 
+import { formatMetricValue } from "@/lighthouse/metrics";
 import fs from "fs";
 import path from "path";
 import {
@@ -37,12 +38,9 @@ import type {
 /** Lower is better for the web metrics, higher is better for the categories. */
 const higherIsBetter = (metric: MetricKey) => isScoreMetric(metric);
 
-/** 0.032 stays 0.032, 0.100 becomes 0.1, 0.000 becomes 0. */
-const shortDecimal = (value: number) => String(Number(value.toFixed(3)));
-
 export const formatValue = (metric: MetricKey, value: number): string => {
   if (isScoreMetric(metric)) return String(Math.round(value));
-  if (metric === "cls") return shortDecimal(value);
+  if (metric === "cls") return formatMetricValue(value);
   if (metric === "tbt") return `${Math.round(value)}ms`;
   // LCP and FCP read better in seconds, like the Lighthouse UI.
   return `${(value / 1000).toFixed(1)}s`;
@@ -52,7 +50,7 @@ export const formatDelta = (metric: MetricKey, delta: number): string => {
   const sign = delta > 0 ? "+" : "-";
   const magnitude = Math.abs(delta);
   if (isScoreMetric(metric)) return `${sign}${Math.round(magnitude)}`;
-  if (metric === "cls") return `${sign}${shortDecimal(magnitude)}`;
+  if (metric === "cls") return `${sign}${formatMetricValue(magnitude)}`;
   if (metric === "tbt") return `${sign}${Math.round(magnitude)}ms`;
   return `${sign}${(magnitude / 1000).toFixed(1)}s`;
 };
