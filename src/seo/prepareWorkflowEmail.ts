@@ -2,6 +2,7 @@
 import fs from "fs";
 import path from "path";
 import { isSeoCli, runCli } from "@/seo/cli";
+import { escapeEntities } from "@/seo/constants";
 import {
   isSeoEnvironmentSuccessful,
   parseSeoEnvironmentReport,
@@ -23,8 +24,6 @@ interface WorkflowEmailInput {
   recipientConfiguration: string;
 }
 
-const escapeHtml = (text: string) =>
-  text.replace(/[&<>"']/g, (character) => `&#${character.charCodeAt(0)};`);
 const count = (value: number | null | undefined) =>
   value == null ? "N/A" : value.toLocaleString("en-AU");
 const status = (value?: StepResult) =>
@@ -109,7 +108,7 @@ export const prepareWorkflowEmail = (input: WorkflowEmailInput) => {
       ? [`Available environment reports: ${input.runUrl}#artifacts`]
       : []),
   ].join("\n");
-  const html = `<p><a href="${escapeHtml(input.runUrl)}">GitHub Actions summary and logs</a>${links.length ? ` · <a href="${escapeHtml(input.runUrl)}#artifacts">Environment reports</a>` : ""}</p><pre style="white-space:pre-wrap;font-family:monospace">${escapeHtml(text)}</pre>`;
+  const html = `<p><a href="${escapeEntities(input.runUrl)}">GitHub Actions summary and logs</a>${links.length ? ` · <a href="${escapeEntities(input.runUrl)}#artifacts">Environment reports</a>` : ""}</p><pre style="white-space:pre-wrap;font-family:monospace">${escapeEntities(text)}</pre>`;
   return buildSesEmailPayload(
     {
       recipients: parseEmailRecipients(input.recipientConfiguration),
