@@ -4,6 +4,7 @@ import os from "os";
 import path from "path";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { prepareReleaseEmail } from "@/lighthouse/prepareReleaseEmail";
+import { QA_EMAIL_RECIPIENTS } from "@/lighthouse/releaseEmail";
 import { buildReleaseReport } from "@/lighthouse/releaseReport";
 
 let directory: string;
@@ -156,4 +157,31 @@ test("delivery configuration is mandatory even when artifacts are missing", () =
   expect(() => prepareReleaseEmail({ ...input(), sender: "" })).toThrow(
     /valid plain email/
   );
+});
+
+test.each(["qa", " qa "])(
+  "recipient configuration %s uses the saved QA list",
+  (recipientConfiguration) => {
+    const payload = prepareReleaseEmail({ ...input(), recipientConfiguration });
+    expect(payload.Destination.ToAddresses).toEqual(
+      QA_EMAIL_RECIPIENTS.map(({ address }) => address)
+    );
+  }
+);
+
+test("explicit recipients override the QA list", () => {
+  const payload = prepareReleaseEmail({
+    ...input(),
+    recipientConfiguration: "first@example.org;second@example.org",
+  });
+  expect(payload.Destination.ToAddresses).toEqual([
+    "first@example.org",
+    "second@example.org",
+  ]);
+});
+
+test("whitespace-only recipients do not fall back to QA", () => {
+  expect(() =>
+    prepareReleaseEmail({ ...input(), recipientConfiguration: "   " })
+  ).toThrow(/LH_EMAIL_RECIPIENTS/);
 });

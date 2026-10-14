@@ -3,7 +3,10 @@ import fs from "fs";
 import path from "path";
 import { isLighthouseCli, runCli, workDir } from "@/lighthouse/cli";
 import { buildSesEmailPayload, parseEmailRecipients } from "@/utils/EmailUtils";
-import { buildReleaseEmail } from "@/lighthouse/releaseEmail";
+import {
+  buildReleaseEmail,
+  QA_EMAIL_RECIPIENTS,
+} from "@/lighthouse/releaseEmail";
 
 type EmailInput = Parameters<typeof buildReleaseEmail>[0];
 
@@ -57,7 +60,10 @@ export const prepareReleaseEmail = (
     ...input,
     results,
     reportMarkdown: readOptional(path.join(input.directory, "report.md")),
-    recipients: parseEmailRecipients(input.recipientConfiguration),
+    recipients:
+      input.recipientConfiguration.trim() === "qa"
+        ? QA_EMAIL_RECIPIENTS
+        : parseEmailRecipients(input.recipientConfiguration),
   });
   return buildSesEmailPayload(email, input.sender);
 };
