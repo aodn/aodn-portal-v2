@@ -201,17 +201,19 @@ No static AWS credentials, SMTP passwords or new dependencies are needed.
 Configure these **GitHub environment variables in `edge`** (Settings →
 Environments → edge → Environment variables):
 
-| Variable                | Purpose / initial validation setting                                                                                   |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `LH_EMAIL_ENABLED`      | Set to `true` to enable delivery; unset/false disables it.                                                             |
-| `LH_EMAIL_AWS_ROLE_ARN` | ARN of the manually approved Edge `AodnGitHubActionsRole`.                                                             |
-| `LH_EMAIL_AWS_REGION`   | SES region: `ap-southeast-2`.                                                                                          |
-| `LH_EMAIL_FROM`         | Verified test sender: `german.rodriguez@utas.edu.au`.                                                                  |
-| `LH_EMAIL_RECIPIENTS`   | Sole test recipient: `german.rodriguez@utas.edu.au`. Later supports comma/semicolon/newline-separated plain addresses. |
+| Variable                | Purpose / initial validation setting                                                                                                                                          |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `LH_EMAIL_ENABLED`      | Set to `true` to enable delivery; unset/false disables it.                                                                                                                    |
+| `LH_EMAIL_AWS_ROLE_ARN` | ARN of the manually approved Edge `AodnGitHubActionsRole`.                                                                                                                    |
+| `LH_EMAIL_AWS_REGION`   | SES region: `ap-southeast-2`.                                                                                                                                                 |
+| `LH_EMAIL_FROM`         | Verified test sender: `german.rodriguez@utas.edu.au`.                                                                                                                         |
+| `LH_EMAIL_RECIPIENTS`   | Sole test recipient: `german.rodriguez@utas.edu.au`. Supports comma/semicolon/newline-separated plain addresses, or `qa` to use `QA_EMAIL_RECIPIENTS` from `releaseEmail.ts`. |
 
 The Edge role already trusts this repository's `environment:edge` OIDC subject.
 Only the notification job receives `id-token: write`. Delivery requires explicit
-sender and recipient configuration and **never falls back to the full QA list**.
+sender and recipient configuration. Set `LH_EMAIL_RECIPIENTS=qa` explicitly to
+use the saved QA list; empty configuration remains an error and never falls back
+to QA. Explicit email addresses continue to override that list.
 The existing `QA_EMAIL_RECIPIENTS` remains available for the eventual approved QA
 setup. SES is currently in sandbox mode, so both sender and recipients must be
 verified in the configured region. Keep only the approved test recipient during
