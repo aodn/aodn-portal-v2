@@ -56,22 +56,20 @@ jobs:
         run: |
           if [ -f .lighthouse/release-results.json ]; then
             yarn tsx src/lighthouse/compareRelease.ts
-          else
-            printf '%s\n' '## Performance compared with the previous release' '' \
-              'No previous release available — current measurements were not produced.' \
-              >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Add the report to the job summary
         if: always()
         run: |
-          if [ -f .lighthouse/report.md ]; then
-            cat .lighthouse/report.md >> "$GITHUB_STEP_SUMMARY"
+          if [ -f .lighthouse/job-summary.md ]; then
+            cat .lighthouse/job-summary.md >> "$GITHUB_STEP_SUMMARY"
           else
             printf '%s\n' '# Release Lighthouse' '' \
               "Environment: **$LH_ENVIRONMENT**" \
               "Release/ref: $GITHUB_REF_NAME · SHA: $GITHUB_SHA" \
-              'Execution status: **ERROR** — no valid measurement report was produced. See the failed step logs.' \
+              'Execution status: **🔴 ERROR** — no valid job summary was produced. See the failed step logs.' \
+              'Performance status: **🔴 INCOMPLETE**' \
+              'Performance failures do not block deployment or release.' \
               >> "$GITHUB_STEP_SUMMARY"
           fi
 
