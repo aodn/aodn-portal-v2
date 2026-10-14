@@ -1,7 +1,10 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import type { Map as Mapbox } from "mapbox-gl";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import DrawRect, { DRAW_POLYGON_MODE, DRAW_RECTANGLE_MODE } from "../DrawRect";
+import DrawRect, {
+  DRAW_POLYGON_MODE,
+  DRAW_RECTANGLE_MODE,
+} from "@/components/map/mapbox/controls/menu/DrawRect";
 
 const mocks = vi.hoisted(() => ({
   currentMode: "simple_select",
@@ -88,6 +91,21 @@ describe("DrawRect selection tool toggles", () => {
 
     fireEvent.click(button);
     expect(mocks.draw.changeMode).toHaveBeenLastCalledWith("simple_select");
+  });
+
+  it("leaves interaction restoration to BBOX mode on completion", () => {
+    const map = createMockMap();
+    render(<DrawRect map={map} />);
+    fireEvent.click(screen.getByRole("button", { name: "draw-rect-menu" }));
+    // API changeMode is silent: only internal completion fires modechange.
+    const listener = vi
+      .mocked(map.on)
+      .mock.calls.find(
+        ([event]) => event === "draw.modechange"
+      )?.[1] as unknown as (event: { mode: string }) => void;
+    act(() => listener({ mode: "simple_select" }));
+    expect(map.dragPan.enable).not.toHaveBeenCalled();
+    expect(map.dragPan.disable).not.toHaveBeenCalled();
   });
 
   it("disables polygon drawing when the active tool is clicked again", () => {

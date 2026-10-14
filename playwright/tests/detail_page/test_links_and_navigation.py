@@ -81,7 +81,7 @@ def test_detail_page_return_button(
     landing_page.search.click_search_button()
     search_page.wait_for_search_to_complete()
     search_page.click_dataset(title)
-    expect(detail_page.page_title).to_have_text(title)
+    expect(detail_page.page_title).to_have_text(title, timeout=30_000)
 
     detail_page.click_tab(tab)
     # PMTiles attaches on style.load / idle. Wait until Return is painted

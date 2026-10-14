@@ -172,6 +172,120 @@ class Map(BasePage):
         self.page.mouse.move(x, y)
         self.page.mouse.up()
 
+    def bbox_snapshot(self) -> dict:
+        """Read BBOX geometry and camera through the existing map test hook."""
+        return dict(
+            self.page.evaluate(
+                """id => {
+                const map = window.__map_functions.getMap(id);
+                const draw = map._controls.find(control => control.getAll);
+                return {
+                    center: map.getCenter().toArray(), zoom: map.getZoom(),
+                    features: draw.getAll().features, mode: draw.getMode(),
+                    selected: draw.getSelectedIds(),
+                    doubleClickZoom: map.doubleClickZoom.isEnabled(),
+                    dragPan: map.dragPan.isEnabled(),
+                    canvas: (() => {
+                        const bounds = map.getCanvas().getBoundingClientRect();
+                        return [bounds.x, bounds.y, bounds.width, bounds.height];
+                    })(),
+                };
+            }""",
+                self.map_id,
+            )
+        )
+
+    def disable_bbox_navigation(self) -> None:
+        """Set pre-existing disabled controls to check BBOX restoration."""
+        self.page.evaluate(
+            """id => {
+                const map = window.__map_functions.getMap(id);
+                map.dragPan.disable();
+                map.doubleClickZoom.disable();
+            }""",
+            self.map_id,
+        )
+
+    def bbox_point(self, x: float, y: float) -> list:
+        """Get the expected geographic corner for a canvas position."""
+        return list(
+            self.page.evaluate(
+                """({id, x, y}) => {
+                const map = window.__map_functions.getMap(id);
+                const canvas = map.getCanvasContainer();
+                const bounds = canvas.getBoundingClientRect();
+                const scale = canvas.offsetWidth / bounds.width;
+                return map.unproject([
+                    (x - bounds.x) * scale, (y - bounds.y) * scale
+                ]).toArray();
+            }""",
+                {'id': self.map_id, 'x': x, 'y': y},
+            )
+        )
+
+    def bbox_drag(self, touch: bool = False) -> tuple[list, list]:
+        """Draw with native browser input, checking the camera on every move."""
+        x, y = self.calculate_mouse_coordinates(left=40, up=40)
+        x, y = int(x), int(y)
+        start = self.bbox_point(x, y)
+        end = self.bbox_point(x + 80, y + 80)
+        before = self.bbox_snapshot()
+        session = (
+            self.page.context.new_cdp_session(self.page) if touch else None
+        )
+        if session:
+            session.send(
+                'Input.dispatchTouchEvent',
+                {
+                    'type': 'touchStart',
+                    'touchPoints': [{'x': x, 'y': y}],
+                },
+            )
+        else:
+            self.page.mouse.move(x, y)
+            self.page.mouse.down()
+        for offset in (16, 20, 40, 80) if touch else (20, 40, 80):
+            if session:
+                session.send(
+                    'Input.dispatchTouchEvent',
+                    {
+                        'type': 'touchMove',
+                        'touchPoints': [{'x': x + offset, 'y': y + offset}],
+                    },
+                )
+            else:
+                self.page.mouse.move(x + offset, y + offset)
+            # Flush camera updates as well as Draw's store rendering.
+            self.page.evaluate('() => new Promise(requestAnimationFrame)')
+            during = self.bbox_snapshot()
+            assert during['center'] == before['center']
+            assert during['zoom'] == before['zoom']
+            assert during['canvas'] == before['canvas']
+            assert during['mode'] == 'draw_rectangle'
+            assert len(during['features'][0]['geometry']['coordinates'][0]) == 5
+        if session:
+            session.send(
+                'Input.dispatchTouchEvent',
+                {
+                    'type': 'touchEnd',
+                    'touchPoints': [],
+                },
+            )
+            session.detach()
+        else:
+            self.page.mouse.up()
+        self.page.wait_for_function(
+            """id => window.__map_functions.getMap(id)._controls
+                .find(control => control.getAll).getMode() === 'simple_select'
+            """,
+            arg=self.map_id,
+        )
+        after = self.bbox_snapshot()
+        assert after['center'] == before['center']
+        assert after['zoom'] == before['zoom']
+        assert after['canvas'] == before['canvas']
+        return start, end
+
     def close_bookmark_menu(self) -> None:
         """Close the auto-open desktop bookmarks before checking idle controls."""
         button = self.container.get_by_role(
