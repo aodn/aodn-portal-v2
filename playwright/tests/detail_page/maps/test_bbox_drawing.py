@@ -7,7 +7,7 @@ from pages.detail_page import DetailPage
 def test_bbox_drag(responsive_page: Page) -> None:
     """Mouse and native mobile touch draw a stationary, accurate, deletable BBOX."""
     detail = DetailPage(responsive_page)
-    detail.load("0015db7e-e684-7548-e053-08114f8cd4ad")
+    detail.load('0015db7e-e684-7548-e053-08114f8cd4ad')
     detail.go_to_map_tab()
     map_component = detail.detail_map
     map_component.wait_for_map_loading()
@@ -42,7 +42,7 @@ def test_bbox_drag(responsive_page: Page) -> None:
 def test_bbox_tap_and_cancel(mobile_page: Page) -> None:
     """A tap discards zero area; cancelling the next BBOX restores navigation."""
     detail = DetailPage(mobile_page)
-    detail.load("0015db7e-e684-7548-e053-08114f8cd4ad")
+    detail.load('0015db7e-e684-7548-e053-08114f8cd4ad')
     detail.go_to_map_tab()
     map_component = detail.detail_map
     map_component.wait_for_map_loading()
@@ -56,7 +56,8 @@ def test_bbox_tap_and_cancel(mobile_page: Page) -> None:
     mobile_page.wait_for_function(
         """id => window.__map_functions.getMap(id)._controls
             .find(control => control.getAll).getMode() === 'simple_select'
-        """, arg=map_component.map_id
+        """,
+        arg=map_component.map_id,
     )
     assert map_component.bbox_snapshot()['features'] == []
     assert map_component.bbox_snapshot()['dragPan']
@@ -65,15 +66,27 @@ def test_bbox_tap_and_cancel(mobile_page: Page) -> None:
     assert map_component.bbox_snapshot()['dragPan']
     before = map_component.get_map_center()
     session = mobile_page.context.new_cdp_session(mobile_page)
-    session.send('Input.dispatchTouchEvent', {
-        'type': 'touchStart', 'touchPoints': [{'x': x, 'y': y}],
-    })
-    session.send('Input.dispatchTouchEvent', {
-        'type': 'touchMove', 'touchPoints': [{'x': x + 60, 'y': y + 60}],
-    })
-    session.send('Input.dispatchTouchEvent', {
-        'type': 'touchEnd', 'touchPoints': [],
-    })
+    session.send(
+        'Input.dispatchTouchEvent',
+        {
+            'type': 'touchStart',
+            'touchPoints': [{'x': x, 'y': y}],
+        },
+    )
+    session.send(
+        'Input.dispatchTouchEvent',
+        {
+            'type': 'touchMove',
+            'touchPoints': [{'x': x + 60, 'y': y + 60}],
+        },
+    )
+    session.send(
+        'Input.dispatchTouchEvent',
+        {
+            'type': 'touchEnd',
+            'touchPoints': [],
+        },
+    )
     session.detach()
     mobile_page.evaluate('() => new Promise(requestAnimationFrame)')
     assert map_component.get_map_center() != before
