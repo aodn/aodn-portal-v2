@@ -26,8 +26,10 @@ jobs:
       queue: max
     outputs:
       commit_sha: ${{ steps.revision.outputs.sha }}
+      report: ${{ steps.report.outputs.report }}
     steps:
       - name: Configure AWS credentials
+        id: credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
           audience: sts.amazonaws.com
@@ -85,11 +87,13 @@ jobs:
             core.info(`Using deployed ${environment} commit ${sha}`);
 
       - name: Checkout
+        id: checkout
         uses: actions/checkout@v5
         with:
           ref: ${{ steps.revision.outputs.sha }}
 
       - name: Confirm the checked-out source revision
+        id: checkout_revision
         env:
           DEPLOYED_COMMIT_SHA: ${{ steps.revision.outputs.sha }}
         run: |
@@ -97,18 +101,22 @@ jobs:
             || { echo "::error::Checkout does not match the deployed application revision"; exit 1; }
 
       - name: Enable Corepack
+        id: corepack
         run: corepack enable
 
       - name: Setup node
+        id: node
         uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
 
       - name: Yarn install
+        id: install
         run: |
           yarn install --immutable
 
       - name: Fetch the deployed index.html as the pre-render template
+        id: template
         env:
           SITE_URL: ${{ inputs.site }}
           DEPLOYED_INDEX_SHA256: ${{ steps.revision.outputs.index_sha256 }}
@@ -125,16 +133,21 @@ jobs:
           echo "Template from $SITE_URL references $(grep -o '/assets/index-[^"]*' dist/index.html | head -1)"
 
       - name: Generate sitemap.xml and pre-rendered detail pages
+        id: generate
+        shell: bash
         env:
           # Each site sends /api to its own backend, so this reads the right records
           VITE_API_HOST: ${{ inputs.site }}
         run: |
           # vite-node lets the script reuse the app's own fetch helper
           yarn seo:artifacts
+          echo "generation=success" >> "$GITHUB_OUTPUT" || true
           # Checks the files we just built; a bad batch stops here and never reaches S3
           yarn seo:verify
+          echo "local_verification=success" >> "$GITHUB_OUTPUT" || true
 
       - name: Confirm the deployment has not changed before publishing
+        id: deployment_guard
         uses: actions/github-script@v8
         env:
           DEPLOY_BUCKET: ${{ vars.BUCKET }}
@@ -158,10 +171,13 @@ jobs:
             }
 
       - name: Copy the artifacts to S3
+        id: upload
         run: |
           echo "Publishing $(grep -c '<loc>' dist/sitemap.xml) URLs and $(find dist/prerender -type f | wc -l) pages to s3://${{ vars.BUCKET }}"
           aws s3 cp dist/sitemap.xml s3://${{ vars.BUCKET }}/sitemap.xml --region ${{ vars.AWS_REGION }}
+          echo "sitemap_uploaded=true" >> "$GITHUB_OUTPUT" || true
           aws s3 sync --delete dist/prerender s3://${{ vars.BUCKET }}/prerender --region ${{ vars.AWS_REGION }}
+          echo "pages_uploaded=true" >> "$GITHUB_OUTPUT" || true
 
       - name: Clear cloudfront cache for the SEO paths
         id: invalidation
@@ -176,6 +192,7 @@ jobs:
           echo "id=$invalidation_id" >> "$GITHUB_OUTPUT"
 
       - name: Wait for the CloudFront cache to clear
+        id: cache_wait
         run: |
           # The files are already published. This only waits until Google and the
           # verify job can see the new ones. Needs cloudfront:GetInvalidation.
@@ -185,12 +202,58 @@ jobs:
       # Publishing does not make Google index the pages. This reports how many
       # are indexed, so we notice when the number stops growing.
       - name: Submit sitemap and report index coverage in Search Console
+        id: search_console
         if: inputs.environment == 'production'
         env:
           GSC_SERVICE_ACCOUNT_KEY: ${{ secrets.GSC_SERVICE_ACCOUNT_KEY }}
         run: |
           yarn seo:gsc submit
           yarn seo:gsc inspect 50
+
+      # Reporting uses the workflow revision, never new scripts from the deployed
+      # checkout. It also runs when revision resolution or installation fails.
+      - name: Collect publication results
+        id: report
+        if: always()
+        continue-on-error: true
+        uses: actions/github-script@v8
+        env:
+          SEO_STEPS: ${{ toJSON(steps) }}
+        with:
+          script: |
+            const fs = require('node:fs');
+            const path = require('node:path');
+            const steps = JSON.parse(process.env.SEO_STEPS);
+            const generation = steps.generate?.outputs?.generation ||
+              (steps.generate?.outcome === 'success' ? 'success' : steps.generate?.outcome || 'skipped');
+            const localVerification = steps.generate?.outputs?.local_verification ||
+              (generation === 'success' ? steps.generate.outcome : 'skipped');
+            const generated = { sitemapUrls: null, pages: null };
+            const errors = Object.entries(steps)
+              .filter(([, step]) => ['failure', 'cancelled'].includes(step.outcome))
+              .map(([name, step]) => `${name}: ${step.outcome}; see the publication job logs`);
+            if (generation === 'success') {
+              try {
+                const xml = fs.readFileSync('dist/sitemap.xml', 'utf8');
+                generated.sitemapUrls = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].length;
+                const directory = 'dist/prerender/details';
+                generated.pages = fs.readdirSync(directory, { withFileTypes: true })
+                  .filter(entry => entry.isDirectory() &&
+                    fs.statSync(path.join(directory, entry.name, 'index.html'), { throwIfNoEntry: false })?.isFile()).length;
+              } catch {
+                errors.push('Artifact counts unavailable; see the publication job logs');
+              }
+            }
+            core.setOutput('report', JSON.stringify({
+              generation, localVerification,
+              publishing: steps.upload?.outcome || 'skipped',
+              generated,
+              published: {
+                sitemapUrls: steps.upload?.outputs?.sitemap_uploaded === 'true' ? generated.sitemapUrls : null,
+                pages: steps.upload?.outputs?.pages_uploaded === 'true' ? generated.pages : null,
+              },
+              errors,
+            }));
 
   # A separate job: when it fails, publishing still worked and only the CloudFront
   # routing (owned by appdeploy) is broken. It only reads public pages, so it needs
@@ -199,26 +262,131 @@ jobs:
     name: Verify SEO on CloudFront
     needs: publish
     runs-on: ubuntu-latest
+    outputs:
+      report: ${{ steps.report.outputs.report }}
     steps:
       - name: Checkout
+        id: checkout
         uses: actions/checkout@v5
         with:
           ref: ${{ needs.publish.outputs.commit_sha }}
 
       - name: Enable Corepack
+        id: corepack
         run: corepack enable
 
       - name: Setup node
+        id: node
         uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
 
       - name: Yarn install
+        id: install
         run: |
           yarn install --immutable
 
       - name: Smoke check the SEO pages are live on CloudFront
+        id: smoke
+        shell: bash
         run: |
           # A missing file still returns 200 with index.html, so check what the page
           # actually contains, not the status code
-          yarn seo:verify "${{ inputs.site }}"
+          # Preserve the verifier's exit status even if report log capture fails.
+          set +e
+          yarn seo:verify "${{ inputs.site }}" | tee "$RUNNER_TEMP/seo-live-verification.log"
+          verification_status=${PIPESTATUS[0]}
+          exit "$verification_status"
+
+      - name: Collect verification results
+        id: report
+        if: always()
+        continue-on-error: true
+        uses: actions/github-script@v8
+        env:
+          SEO_STEPS: ${{ toJSON(steps) }}
+        with:
+          script: |
+            const fs = require('node:fs');
+            const path = require('node:path');
+            const steps = JSON.parse(process.env.SEO_STEPS);
+            const verified = { sitemapUrls: null, pages: null };
+            const errors = Object.entries(steps)
+              .filter(([, step]) => ['failure', 'cancelled'].includes(step.outcome))
+              .map(([name, step]) => `${name}: ${step.outcome}; see the verification job logs`);
+            if (steps.smoke?.outcome === 'success') {
+              try {
+                const log = fs.readFileSync(path.join(process.env.RUNNER_TEMP, 'seo-live-verification.log'), 'utf8');
+                // Parse the verifier's actual success summary. Older deployed
+                // revisions with another format keep PASS but counts are N/A.
+                const match = log.match(/^OK: .* — home, robots\.txt, (\d+) sitemap URLs and (\d+) sampled detail pages all valid$/m);
+                if (match) {
+                  verified.sitemapUrls = Number(match[1]);
+                  verified.pages = Number(match[2]);
+                }
+              } catch {
+                errors.push('Live verification counts unavailable; see the verification job logs');
+              }
+            }
+            core.setOutput('report', JSON.stringify({
+              verification: steps.smoke?.outcome || 'skipped', verified, errors,
+            }));
+
+  report:
+    name: Collect ${{ inputs.environment }} SEO report
+    needs: [publish, verify]
+    if: always()
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Prepare environment report
+        uses: actions/github-script@v8
+        env:
+          SEO_ENVIRONMENT: ${{ inputs.environment }}
+          SEO_NEEDS: ${{ toJSON(needs) }}
+        with:
+          script: |
+            const fs = require('node:fs');
+            const needs = JSON.parse(process.env.SEO_NEEDS);
+            const errors = [];
+            const read = (job) => {
+              try {
+                const parsed = JSON.parse(job.outputs.report);
+                if (!parsed || typeof parsed !== 'object') throw new Error('Invalid report');
+                return parsed;
+              }
+              catch { errors.push(`Job ${job.result}: detailed report unavailable; see workflow logs`); return {}; }
+            };
+            const publish = read(needs.publish);
+            const verify = read(needs.verify);
+            const unavailable = () => ({ sitemapUrls: null, pages: null });
+            const report = {
+              environment: process.env.SEO_ENVIRONMENT,
+              runId: String(context.runId),
+              runAttempt: process.env.GITHUB_RUN_ATTEMPT,
+              publishJob: needs.publish.result,
+              verifyJob: needs.verify.result,
+              generation: publish.generation || 'unknown',
+              localVerification: publish.localVerification || 'unknown',
+              publishing: publish.publishing || 'unknown',
+              verification: verify.verification || (needs.verify.result === 'skipped' ? 'skipped' : 'unknown'),
+              generated: publish.generated || unavailable(),
+              published: publish.published || unavailable(),
+              verified: verify.verified || unavailable(),
+              errors: [...errors, ...(publish.errors || []), ...(verify.errors || [])],
+              logsUrl: `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}/attempts/${process.env.GITHUB_RUN_ATTEMPT}`,
+            };
+            fs.mkdirSync('.seo-reports', { recursive: true });
+            fs.writeFileSync(`.seo-reports/${report.environment}.json`, JSON.stringify(report, null, 2));
+            await core.summary.addHeading(`${report.environment} SEO execution`)
+              .addCodeBlock(JSON.stringify(report, null, 2), 'json').write();
+
+      - name: Upload environment report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: seo-report-${{ inputs.environment }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .seo-reports/${{ inputs.environment }}.json
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 90

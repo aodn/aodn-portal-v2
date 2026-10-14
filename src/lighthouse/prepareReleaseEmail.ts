@@ -2,11 +2,8 @@
 import fs from "fs";
 import path from "path";
 import { isLighthouseCli, runCli, workDir } from "@/lighthouse/cli";
-import {
-  buildReleaseEmail,
-  buildSesEmailPayload,
-  parseEmailRecipients,
-} from "@/lighthouse/releaseEmail";
+import { buildSesEmailPayload, parseEmailRecipients } from "@/utils/EmailUtils";
+import { buildReleaseEmail } from "@/lighthouse/releaseEmail";
 
 type EmailInput = Parameters<typeof buildReleaseEmail>[0];
 
