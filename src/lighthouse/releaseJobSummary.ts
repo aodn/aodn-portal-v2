@@ -1,4 +1,5 @@
 import { formFactorLabels } from "@/lighthouse/constants";
+import { formatMetricValue } from "@/lighthouse/metrics";
 import type { buildReleaseReport } from "@/lighthouse/releaseReport";
 
 export const pageKey = (page: {
@@ -18,7 +19,8 @@ type Results = ReturnType<typeof buildReleaseReport>["results"];
 const statusLabel = (status: string) =>
   `${status === "PASS" || status === "SUCCESS" ? "🟢" : "🔴"} ${status}`;
 const pageLabel = (id: string) => id.charAt(0).toUpperCase() + id.slice(1);
-const signed = (value: number) => `${value > 0 ? "+" : ""}${value}`;
+const signed = (value: number) =>
+  `${value > 0 ? "+" : ""}${formatMetricValue(value)}`;
 
 /** Presentation only: validation, medians and numeric precision belong to the report. */
 export const buildReleaseJobSummary = (
@@ -37,13 +39,13 @@ export const buildReleaseJobSummary = (
     const prefix = `| ${pageLabel(page.id)} | ${formFactorLabels[page.formFactor]} |`;
     if (page.performance < page.threshold) {
       failedRows.push(
-        `${prefix} Performance | ${page.performance} | >= ${page.threshold} | 🔴 ${signed(page.performance - page.threshold)} points |`
+        `${prefix} Performance | ${formatMetricValue(page.performance)} | >= ${formatMetricValue(page.threshold)} | 🔴 ${signed(page.performance - page.threshold)} points |`
       );
     }
     for (const check of page.metricChecks.filter((c) => c.status === "FAIL")) {
       const unit = check.unit === "ms" ? " ms" : "";
       failedRows.push(
-        `${prefix} ${check.metric.toUpperCase()}${unit ? "" : " (unitless)"} | ${check.value}${unit} | <= ${check.threshold}${unit} | 🔴 ${signed(check.value - check.threshold)}${unit} |`
+        `${prefix} ${check.metric.toUpperCase()}${unit ? "" : " (unitless)"} | ${formatMetricValue(check.value)}${unit} | <= ${formatMetricValue(check.threshold)}${unit} | 🔴 ${signed(check.value - check.threshold)}${unit} |`
       );
     }
   }
@@ -82,7 +84,7 @@ export const buildReleaseJobSummary = (
         (p) => p.id === id && p.formFactor === factor
       );
       return page
-        ? `${page.performance} · ${statusLabel(page.status)}`
+        ? `${formatMetricValue(page.performance)} · ${statusLabel(page.status)}`
         : "Unavailable";
     });
     lines.push(`| ${pageLabel(id)} | ${cells.join(" | ")} |`);
@@ -129,7 +131,7 @@ export const buildReleaseJobSummary = (
               ? `🔴 ${signed(difference)} points`
               : "0 points";
       lines.push(
-        `| ${pageLabel(page.id)} | ${formFactorLabels[page.formFactor]} | ${baseline?.performance ?? "Unavailable"} | ${page.performance} | ${label} |`
+        `| ${pageLabel(page.id)} | ${formFactorLabels[page.formFactor]} | ${baseline ? formatMetricValue(baseline.performance) : "Unavailable"} | ${formatMetricValue(page.performance)} | ${label} |`
       );
     }
     lines.push(
