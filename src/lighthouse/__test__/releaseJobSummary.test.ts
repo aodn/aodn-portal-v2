@@ -99,3 +99,66 @@ test.each([70, 90, 81])(
     expect(summary).not.toContain("No previous release available.");
   }
 );
+
+test.each([
+  [407.00000000000045, 400, "407", "400", "+7"],
+  [6115.0379999999996, 4200, "6115.038", "4200", "+1915.038"],
+  [4622.014499999999, 4200, "4622.014", "4200", "+422.014"],
+  [407.123456, 400.012345, "407.123", "400.012", "+7.111"],
+])(
+  "formats failed check values %s and limit %s",
+  (value, threshold, actual, limit, difference) => {
+    const { results, markdown } = buildReleaseReport(input());
+    const check = results.pages[0].metricChecks.find(
+      (c) => c.metric === "tbt"
+    )!;
+    Object.assign(check, { value, threshold, status: "FAIL" });
+    const summary = buildReleaseJobSummary(results, markdown);
+    expect(summary).toContain(
+      `TBT | ${actual} ms | <= ${limit} ms | 🔴 ${difference} ms`
+    );
+    expect(check.value).toBe(value);
+    expect(check.threshold).toBe(threshold);
+  }
+);
+
+test.each([
+  [74.123456, 70.00000000000001, "74.123", "70", "🟢 +4.123"],
+  [74.123456, 81.12345599999999, "74.123", "81.123", "🔴 -7"],
+])(
+  "formats overview, failed Performance and previous-release scores %s / %s",
+  (current, baseline, currentLabel, previousLabel, difference) => {
+    const report = input();
+    report.routes["/search"].metrics.mobile!.performance = current;
+    const { results, markdown } = buildReleaseReport(report);
+    const previous = {
+      ...results,
+      pages: results.pages.map((p) => ({ ...p, performance: baseline })),
+    };
+    const summary = buildReleaseJobSummary(results, markdown, previous);
+    expect(summary).toContain(`| Search | ${currentLabel} · 🔴 FAIL |`);
+    expect(summary).toContain(
+      `Performance | ${currentLabel} | >= 75 | 🔴 -0.877 points`
+    );
+    expect(summary).toContain(
+      `| ${previousLabel} | ${currentLabel} | ${difference} points |`
+    );
+  }
+);
+
+test("rounding to the threshold preserves full-precision failures", () => {
+  const report = input();
+  Object.assign(report.routes["/search"].metrics.mobile!, {
+    tbt: 700.0000000000005,
+    cls: 0.10000000000000002,
+  });
+  const { results, markdown } = buildReleaseReport(report);
+  const original = structuredClone(results);
+  const summary = buildReleaseJobSummary(results, markdown);
+  expect(summary).toContain("81 · 🔴 FAIL");
+  expect(summary).toContain("Failed checks: **2**");
+  expect(summary).toContain("TBT | 700 ms | <= 700 ms | 🔴 +0 ms");
+  expect(summary).toContain("CLS (unitless) | 0.1 | <= 0.1 | 🔴 +0");
+  expect(results).toEqual(original);
+  expect(results.performanceStatus).toBe("FAIL");
+});
