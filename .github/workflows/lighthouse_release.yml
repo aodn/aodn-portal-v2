@@ -1,5 +1,5 @@
-name: Release Lighthouse
-run-name: Lighthouse after deployment to ${{ inputs.environment }}
+name: Release Performance Audit (Lighthouse)
+run-name: Release Performance Audit (Lighthouse) — ${{ inputs.environment }} — ${{ github.ref_name }}
 
 # Dispatched by trigger_build_deploy.yml after appdeploy completes successfully.
 # The PR workflow remains independent and uses its existing mocked backend.
@@ -64,11 +64,12 @@ jobs:
           if [ -f .lighthouse/job-summary.md ]; then
             cat .lighthouse/job-summary.md >> "$GITHUB_STEP_SUMMARY"
           else
-            printf '%s\n' '# Release Lighthouse' '' \
-              "Environment: **$LH_ENVIRONMENT**" \
-              "Release/ref: $GITHUB_REF_NAME · SHA: $GITHUB_SHA" \
-              'Execution status: **🔴 ERROR** — no valid job summary was produced. See the failed step logs.' \
-              'Performance status: **🔴 INCOMPLETE**' \
+            printf '%s\n' '## Release Performance Audit (Lighthouse)' '' \
+              "Environment: **$LH_ENVIRONMENT**" '' \
+              "Release/ref: $GITHUB_REF_NAME · SHA: $GITHUB_SHA" '' \
+              '**Execution status: 🔴 ERROR** — no valid job summary was produced. See the failed step logs.' '' \
+              '**Performance status: 🔴 INCOMPLETE**' '' \
+              '**Mobile: 🔴 INCOMPLETE | Desktop: 🔴 INCOMPLETE**' '' \
               'Performance failures do not block deployment or release.' \
               >> "$GITHUB_STEP_SUMMARY"
           fi
@@ -83,18 +84,17 @@ jobs:
           if-no-files-found: warn
           retention-days: 90
 
-      # Fail only this independent audit, after preserving the QA reports.
-      - name: Check release performance thresholds
+      # Fail only on execution errors or incomplete audits, after preserving reports.
+      - name: Check release audit execution
         run: |
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
           const results = JSON.parse(fs.readFileSync('.lighthouse/release-results.json', 'utf8'));
-          if (results.executionStatus !== 'SUCCESS') {
+          if (results.executionStatus !== 'SUCCESS' || !['PASS', 'FAIL'].includes(results.performanceStatus)) {
             throw new Error('Lighthouse execution did not complete successfully; see the job summary.');
           }
-          if (results.performanceStatus !== 'PASS') {
-            console.error('::error title=Lighthouse performance thresholds::Performance thresholds were not met; see the job summary and report artifacts. Deployment and release are independent of this audit.');
-            process.exitCode = 1;
+          if (results.performanceStatus === 'FAIL') {
+            console.warn('::warning title=Lighthouse performance thresholds::Performance thresholds were not met; see the job summary and report artifacts. Performance failures do not fail this workflow or block deployment or release.');
           }
           NODE
 

@@ -37,6 +37,9 @@ test.each(["PASS", "FAIL"] as const)(
       results: { ...results(), performanceStatus },
     });
     expect(email.subject).toContain(`staging: ${performanceStatus} (v1.2.3)`);
+    expect(email.text).toContain(
+      `Release Performance Audit (Lighthouse): ${performanceStatus}`
+    );
     expect(email.text).toContain("Execution status: SUCCESS");
     expect(email.text).toContain(`Performance status: ${performanceStatus}`);
     expect(email.text).toContain(input.commit);

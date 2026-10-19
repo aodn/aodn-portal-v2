@@ -1,4 +1,8 @@
-import { formFactorLabels } from "@/lighthouse/constants";
+import {
+  ALL_FORM_FACTORS,
+  formFactorLabels,
+  lighthouseRoutes,
+} from "@/lighthouse/constants";
 import { formatMetricValue } from "@/lighthouse/metrics";
 import type { buildReleaseReport } from "@/lighthouse/releaseReport";
 
@@ -50,14 +54,35 @@ export const buildReleaseJobSummary = (
     }
   }
   const passed = results.pages.filter((page) => page.status === "PASS").length;
+  const deviceResults = ALL_FORM_FACTORS.map((factor) => {
+    const pages = results.pages.filter((page) => page.formFactor === factor);
+    const status = pages.some((page) => page.status === "FAIL")
+      ? "FAIL"
+      : results.executionStatus === "SUCCESS" &&
+          lighthouseRoutes().every(
+            (route) =>
+              pages.filter(
+                (page) => page.id === route.id && page.status === "PASS"
+              ).length === 1
+          )
+        ? "PASS"
+        : "INCOMPLETE";
+    return { factor, status };
+  });
   const lines = [
-    "# Release Lighthouse",
+    "## Release Performance Audit (Lighthouse)",
     "",
-    `Environment: **${results.environment}** · Release/ref: \`${results.ref}\` · SHA: \`${results.commit}\``,
+    `Environment: **${results.environment}**`,
     "",
-    `Execution status: **${statusLabel(results.executionStatus)}** · Performance status: **${statusLabel(results.performanceStatus)}**`,
+    `Release/ref: \`${results.ref}\` · SHA: \`${results.commit}\``,
     "",
-    "**Performance failures do not block deployment or release.**",
+    `**Execution status: ${statusLabel(results.executionStatus)}**`,
+    "",
+    `**Performance status: ${statusLabel(results.performanceStatus)}**`,
+    "",
+    `**${deviceResults.map(({ factor, status }) => `${formFactorLabels[factor]}: ${statusLabel(status)}`).join(" | ")}**`,
+    "",
+    "**Performance failures do not block deployment or release.** They do not fail this workflow; execution errors and incomplete audits do.",
     "",
     `Audits completed: **${results.pages.length}** · Passed: **${passed}** · Failed: **${results.pages.length - passed}** · Failed checks: **${failedRows.length}**`,
     ...(results.executionStatus === "ERROR"
@@ -73,7 +98,11 @@ export const buildReleaseJobSummary = (
     "",
     "## Performance Overview",
     "",
+    "Each result is the median of 3 measured runs after one warm-up. See below for full details.",
+    "",
     "PASS requires Performance >= 75 AND every configured metric threshold to pass. A score of 81 can still FAIL when LCP exceeds its limit.",
+    "",
+    "Performance scores may vary between runs even when no frontend changes have been made, due to API response times, network conditions, or infrastructure variability. Significant differences should still be investigated. A separate frontend-only measurement may be considered in the future.",
     "",
     "| Page | Mobile Performance / status | Desktop Performance / status |",
     "| --- | --- | --- |",
@@ -98,7 +127,7 @@ export const buildReleaseJobSummary = (
     );
   } else {
     lines.push(
-      results.executionStatus === "SUCCESS" && results.pages.length
+      deviceResults.every(({ status }) => status === "PASS")
         ? "🟢 All performance checks passed."
         : "No failed checks in completed measurements; performance validation is incomplete."
     );

@@ -105,7 +105,7 @@ export const buildReleaseReport = (report: LighthouseReport) => {
       ? "INCOMPLETE"
       : "PASS";
   const lines = [
-    "# Release Lighthouse",
+    "# Release Performance Audit (Lighthouse)",
     "",
     `Environment: **${report.environment || "unspecified"}**`,
     `Release/ref: \`${report.branch}\` · SHA: \`${report.commit}\``,

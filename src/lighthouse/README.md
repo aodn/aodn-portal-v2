@@ -41,6 +41,8 @@ CloudFront does for the app.
 
 ## Post-deployment release audits
 
+The workflow and report are named **Release Performance Audit (Lighthouse)**.
+
 `trigger_build_deploy.yml` dispatches `aodn/appdeploy` for the final Terragrunt
 deployment. For staging and production it requests the exact workflow run ID
 (`return_run_details: true`) and polls that run for up to 30 minutes. Only a
@@ -55,11 +57,14 @@ It measures landing, search and details in both mobile and desktop emulation:
 one discarded warm-up followed by three measured runs per page and form factor
 (24 runs total). The job timeout is 40 minutes to allow for this broader coverage.
 Each reported metric is the median of those three runs. Every page and form
-factor's median Performance score is checked against **75/100**. A lower score is clearly reported as **FAIL** and
-emits a workflow warning during measurement. After publishing the summary and
-artifacts, a separate threshold check makes the **Release Lighthouse workflow
-red** if Performance or any configured metric fails. The measurement step still
-completes all pages. A valid score below the minimum never blocks deployment or
+factor's median Performance score is checked against **75/100**. A lower score
+is clearly reported as **FAIL** and
+emits a workflow warning during measurement. Performance or configured metric
+threshold failures **do not fail the GitHub Actions job or workflow**. A completed
+audit with failing metrics shows **Execution status: SUCCESS** and
+**Performance status: FAIL**, while the Actions run remains successful. The
+measurement step still completes all pages. A valid score below the minimum
+never blocks deployment or
 release: the deployment workflow dispatches the audit without waiting for its result.
 Lighthouse/Chrome errors and invalid pages (including degraded shells, failed
 dataset requests and redirects) still fail the audit job as execution errors.
@@ -114,19 +119,33 @@ artifacts preserve the original precision for debugging and comparisons.
 Review and recalibrate these starting guardrails after enough staging/production
 release data has been collected to understand normal variation. Limits remain
 fixed configuration; a release never lowers its own requirements automatically.
-Threshold failures make the independent Lighthouse workflow red after report
-publication but remain non-blocking for deployment/release.
+Threshold failures remain visible in reports and emails without failing the
+workflow or blocking deployment/release. The final execution check rejects
+execution errors and incomplete audits, including missing or invalid results.
 
 The GitHub Actions job summary uses a separate `.lighthouse/job-summary.md`,
-generated after historical baseline lookup. It shows execution and performance
-status, completed/passed/failed audit counts, failed check counts, a compact
+generated after historical baseline lookup. It starts with a Markdown subheading,
+environment and release reference, then separate execution (**SUCCESS / ERROR**)
+and performance (**PASS / FAIL / INCOMPLETE**) status lines. Overall Mobile and
+Desktop results use page-level statuses, including all metric thresholds. A known
+page failure makes its device **FAIL**; otherwise **PASS** requires successful
+execution and every expected landing, search and details audit for that device.
+Missing measurements or execution errors show **INCOMPLETE** instead of PASS.
+Performance Overview
+explains that each result is the median of 3 measured runs after one warm-up,
+without requiring the detailed results to be expanded. A visible note explains
+that API response times, network conditions and infrastructure can vary scores
+even without frontend changes, and significant differences need investigation.
+A separate frontend-only measurement is a future consideration; release audits
+continue measuring the deployed site with its real backend. The summary also shows
+completed/passed/failed audit counts, failed check counts, a compact
 page/device overview, failed checks with signed differences, and informational
 previous-release score changes. Timing values retain milliseconds and existing
 numeric precision. Complete measured values, medians, thresholds and statuses
 remain accessible under “View all metric results”. Execution errors include
 completed measurements; setup failures without a summary point to failed step
 logs. The detailed `report.md` (including its existing comparison), JSON reports,
-and QA email content remain unchanged.
+and QA email measurements remain unchanged.
 
 Artifacts are named `lighthouse-<environment>-<SHA>-<run-id>-<attempt>` and retained
 for 90 days (subject to the repository/organization retention policy). Hidden
@@ -228,14 +247,16 @@ Missing artifacts or structured results produce an **ERROR** notification with
 an Actions logs link. Missing Markdown with valid structured results uses the
 measured values and statuses from those results. Notification delivery errors
 appear in a separate job summary and workflow warning; the notification job is
-non-blocking. The existing audit still turns red on failed thresholds or
-execution errors, independently of deployment.
+non-blocking. The audit turns red only for execution errors or incomplete audits.
+Email status
+comes from the structured report independently of the GitHub Actions conclusion:
+a successful Actions run with failing metrics still sends a **FAIL** email.
 
 ### Safe manual validation
 
 1. Set the five variables above in `edge`, checking that the recipient override
    contains **only the verified test address** before enabling delivery.
-2. Push this branch yourself, then dispatch **Release Lighthouse** on
+2. Push this branch yourself, then dispatch **Release Performance Audit (Lighthouse)** on
    `feature/9467-notify-qa-lighthouse-results` with `environment=staging`:
    `gh workflow run lighthouse_release.yml --ref feature/9467-notify-qa-lighthouse-results -f environment=staging`.
    The workflow must already be dispatchable from the default branch. This
