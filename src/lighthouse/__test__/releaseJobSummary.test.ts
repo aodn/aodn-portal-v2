@@ -5,6 +5,7 @@ import {
   RELEASE_METRIC_LIMITS,
 } from "@/lighthouse/releaseReport";
 import { buildReleaseJobSummary } from "@/lighthouse/releaseJobSummary";
+import { ALL_FORM_FACTORS, lighthouseRoutes } from "@/lighthouse/constants";
 import type { LighthouseReport } from "@/lighthouse/types";
 
 const input = (): LighthouseReport => ({
@@ -36,10 +37,25 @@ const render = (report: LighthouseReport) => {
 test("passing audits, missing baseline and detailed values", () => {
   const report = input();
   const summary = render(report);
+  expect(summary).toMatch(/^## Release Performance Audit \(Lighthouse\)\n/);
+  expect(summary).toContain("Environment: **staging**");
+  expect(summary).toContain("Release/ref: `v2` · SHA: `abc`");
+  expect(summary).toContain(
+    "**Execution status: 🟢 SUCCESS**\n\n**Performance status: 🟢 PASS**"
+  );
+  const overview = summary.split("<details>")[0];
+  expect(overview).toContain(
+    "## Performance Overview\n\nEach result is the median of 3 measured runs after one warm-up. See below for full details."
+  );
+  expect(overview).toContain(
+    "Performance scores may vary between runs even when no frontend changes have been made, due to API response times, network conditions, or infrastructure variability. Significant differences should still be investigated. A separate frontend-only measurement may be considered in the future."
+  );
   expect(summary).toContain(
     "Audits completed: **1** · Passed: **1** · Failed: **0** · Failed checks: **0**"
   );
-  expect(summary).toContain("🟢 All performance checks passed.");
+  expect(summary).toContain(
+    "No failed checks in completed measurements; performance validation is incomplete."
+  );
   expect(summary).toContain("No previous release available.");
   expect(summary).not.toContain("| Previous |");
   expect(summary).toContain(
@@ -57,6 +73,13 @@ test.each([62, 81])(
     });
     const summary = render(report);
     expect(summary).toContain(`${score} · 🔴 FAIL`);
+    expect(summary).toContain(
+      "**Execution status: 🟢 SUCCESS**\n\n**Performance status: 🔴 FAIL**"
+    );
+    expect(summary).toContain(
+      "Performance failures do not block deployment or release."
+    );
+    expect(summary).toContain("They do not fail this workflow");
     expect(summary).toContain(`Failed checks: **${score < 75 ? 3 : 2}**`);
     expect(summary).toContain("LCP | 6270 ms | <= 5500 ms | 🔴 +770 ms");
     expect(summary).toContain("TBT | 800 ms | <= 700 ms | 🔴 +100 ms");
@@ -161,4 +184,99 @@ test("rounding to the threshold preserves full-precision failures", () => {
   expect(summary).toContain("CLS (unitless) | 0.1 | <= 0.1 | 🔴 +0");
   expect(results).toEqual(original);
   expect(results.performanceStatus).toBe("FAIL");
+});
+
+const completeInput = (): LighthouseReport => ({
+  ...input(),
+  routes: Object.fromEntries(
+    lighthouseRoutes().map(({ id, path }) => [
+      path,
+      {
+        id,
+        metrics: Object.fromEntries(
+          ALL_FORM_FACTORS.map((factor) => [
+            factor,
+            {
+              ...input().routes["/search"].metrics.mobile!,
+              ...RELEASE_METRIC_LIMITS[
+                id as keyof typeof RELEASE_METRIC_LIMITS
+              ][factor],
+            },
+          ])
+        ),
+      },
+    ])
+  ),
+});
+
+test("all expected pages passing gives both devices PASS near the top", () => {
+  const summary = render(completeInput());
+  expect(summary).toContain("🟢 All performance checks passed.");
+  expect(summary.split("## Performance Overview")[0]).toContain(
+    "**Mobile: 🟢 PASS | Desktop: 🟢 PASS**"
+  );
+});
+
+test.each(
+  ALL_FORM_FACTORS.flatMap((factor) =>
+    lighthouseRoutes().flatMap(({ path }) =>
+      (["performance", "lcp", "tbt", "cls", "fcp"] as const).map((metric) => ({
+        factor,
+        path,
+        metric,
+      }))
+    )
+  )
+)(
+  "$factor $path $metric failure fails only that device",
+  ({ factor, path, metric }) => {
+    const report = completeInput();
+    const metrics = report.routes[path].metrics[factor]!;
+    metrics[metric] = metric === "performance" ? 74 : metrics[metric] + 1;
+    const summary = render(report);
+    expect(summary).toContain(
+      factor === "mobile"
+        ? "**Mobile: 🔴 FAIL | Desktop: 🟢 PASS**"
+        : "**Mobile: 🟢 PASS | Desktop: 🔴 FAIL**"
+    );
+    expect(summary).toContain("**Execution status: 🟢 SUCCESS**");
+    expect(summary).toContain("**Performance status: 🔴 FAIL**");
+  }
+);
+
+test.each(ALL_FORM_FACTORS)(
+  "missing %s page does not report PASS",
+  (factor) => {
+    const report = completeInput();
+    delete report.routes["/search"].metrics[factor];
+    expect(render(report)).toContain(
+      factor === "mobile"
+        ? "**Mobile: 🔴 INCOMPLETE | Desktop: 🟢 PASS**"
+        : "**Mobile: 🟢 PASS | Desktop: 🔴 INCOMPLETE**"
+    );
+  }
+);
+
+test("an entirely missing route or empty report cannot produce device PASS", () => {
+  const report = completeInput();
+  delete report.routes["/search"];
+  expect(render(report)).toContain(
+    "**Mobile: 🔴 INCOMPLETE | Desktop: 🔴 INCOMPLETE**"
+  );
+  report.routes = {};
+  expect(render(report)).toContain(
+    "**Mobile: 🔴 INCOMPLETE | Desktop: 🔴 INCOMPLETE**"
+  );
+});
+
+test("execution errors prevent device PASS even with all passing page results", () => {
+  const report = completeInput();
+  report.executionError = "Audit interrupted";
+  expect(render(report)).toContain(
+    "**Mobile: 🔴 INCOMPLETE | Desktop: 🔴 INCOMPLETE**"
+  );
+  report.routes["/search"].metrics.mobile!.tbt += 1;
+  expect(render(report)).toContain(
+    "**Mobile: 🔴 FAIL | Desktop: 🔴 INCOMPLETE**"
+  );
 });

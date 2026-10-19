@@ -66,7 +66,7 @@ export const buildReleaseEmail = ({
       : results.performanceStatus;
   const subject = `[AODN Portal] Lighthouse ${environment}: ${status} (${ref})`;
   const text = [
-    `Release Lighthouse: ${status}`,
+    `Release Performance Audit (Lighthouse): ${status}`,
     `Environment: ${environment}`,
     `Release/ref: ${ref}`,
     `SHA: ${commit}`,
