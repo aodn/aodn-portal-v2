@@ -3,9 +3,11 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import { afterEach, beforeEach, expect, test } from "vitest";
+import { writeWorkflowSummary } from "@/seo/prepareWorkflowSummary";
 import { prepareWorkflowEmail } from "@/seo/prepareWorkflowEmail";
 import {
   parseSeoEnvironmentReport,
+  prepareWorkflowReport,
   SEO_ENVIRONMENTS,
   type SeoEnvironment,
   type SeoEnvironmentReport,
@@ -247,5 +249,68 @@ test("malformed status values are rejected instead of breaking email formatting"
   expect(payload.Message.Subject.Data).toContain("PARTIAL FAILURE");
   expect(payload.Message.Body.Text.Data).toContain(
     "edge: missing or invalid report"
+  );
+});
+
+test("Actions summary survives invalid email configuration with independent SEO status", () => {
+  saveAll();
+  const summary = path.join(directory, "summary.md");
+  writeWorkflowSummary(input(), summary);
+  const before = fs.readFileSync(summary, "utf8");
+  expect(before).toBe(`${prepareWorkflowReport(input()).markdown}\n`);
+  expect(before).toContain("# SEO Workflow Report");
+  expect(before).toContain("Overall Status: SUCCESS");
+  expect(() =>
+    prepareWorkflowEmail({ ...input(), sender: "", recipientConfiguration: "" })
+  ).toThrow();
+  expect(fs.readFileSync(summary, "utf8")).toBe(before);
+});
+
+test("summary and email share counts, statuses and sampled Google coverage", () => {
+  saveAll();
+  save({
+    ...report("production"),
+    searchConsole: "success",
+    indexing: {
+      sampledUrls: 50,
+      coverage: {
+        "Submitted and indexed": 40,
+        "Crawled - currently not indexed": 10,
+      },
+    },
+    jobLinks: [
+      {
+        name: "production / Publish SEO Artifacts",
+        url: `${input().runUrl}/job/456`,
+      },
+    ],
+  });
+  const summary = path.join(directory, "summary.md");
+  writeWorkflowSummary(input(), summary);
+  const markdown = fs.readFileSync(summary, "utf8");
+  expect(markdown.trimEnd()).toBe(
+    prepareWorkflowEmail(input()).Message.Body.Text.Data
+  );
+  expect(markdown).toContain("Sampled URLs inspected: 50");
+  expect(markdown).toContain("| Submitted and indexed | 40 |");
+  expect(markdown).toContain("| Crawled - currently not indexed | 10 |");
+  expect(markdown).toContain("does not mean Google indexed");
+  expect(markdown).toContain(`${input().runUrl}/job/456`);
+});
+
+test("unknown internal statuses cannot produce a successful summary", () => {
+  saveAll();
+  save({
+    ...report("staging"),
+    generation: "unknown",
+    publishing: "unknown",
+    generated: { sitemapUrls: null, pages: null },
+  });
+  const summary = path.join(directory, "summary.md");
+  writeWorkflowSummary(input(), summary);
+  const markdown = fs.readFileSync(summary, "utf8");
+  expect(markdown).toContain("Overall Status: PARTIAL FAILURE");
+  expect(markdown).toContain(
+    "| staging | UNKNOWN | PASS | UNKNOWN | PASS | N/A / N/A |"
   );
 });

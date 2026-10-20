@@ -145,27 +145,37 @@ deployment changes, upload ordering/failures, public template validation and
 checkout/concurrency wiring without contacting AWS or the live API. Existing
 pipeline and CloudFront tests cover sitemap/prerender output and crawler routing.
 
-## Workflow email reporting
+## Workflow summary and email reporting
 
-The weekly/manual workflow sends one consolidated SES email after the Edge,
-Staging and Production matrix finishes. It uses the same Edge GitHub environment,
-OIDC role, AWS region, sender and explicit recipients as Release Lighthouse:
-`LH_EMAIL_ENABLED`, `LH_EMAIL_AWS_ROLE_ARN`, `LH_EMAIL_AWS_REGION`,
-`LH_EMAIL_FROM` and `LH_EMAIL_RECIPIENTS`. No additional AWS resources or recipient
-list are required. `LH_EMAIL_ENABLED=true` enables both notifications; disabling
-it skips email tooling, authentication and delivery. Existing Edge environment
-approval rules also apply to the notification job.
+The weekly/manual workflow writes a consolidated **SEO Workflow Report** to the
+GitHub Actions Summary after the Edge, Staging and Production matrix finishes.
+The summary job has no GitHub environment approval or SES configuration dependency.
+`workflowReport.ts` supplies the same Markdown and execution status to the Actions
+summary and the optional SES email; the summary is written before email preparation.
+Missing artifacts, statuses and counts are shown as unavailable, never assumed PASS.
+
+Email uses the same Edge GitHub environment, OIDC role, AWS region, sender and
+explicit recipients as Release Lighthouse: `LH_EMAIL_ENABLED`,
+`LH_EMAIL_AWS_ROLE_ARN`, `LH_EMAIL_AWS_REGION`, `LH_EMAIL_FROM` and
+`LH_EMAIL_RECIPIENTS`. `LH_EMAIL_ENABLED=true` enables delivery; disabling it skips
+email tooling, authentication and delivery. Existing Edge environment approval
+rules apply only to the notification job. Email configuration, authentication or
+delivery failures do not change the SEO execution status. A separate notification
+summary distinguishes disabled, SES-accepted and failed notifications. SES
+acceptance does not confirm inbox delivery.
 
 The publish and live verification jobs preserve their original failure results.
 Reporting steps and each environment's final report job run with `always()`;
 the independent notification job also runs after failures or skipped jobs and
-uses `continue-on-error`, following Lighthouse. A report/upload/SES failure
-cannot turn a failed SEO job into a success or make a successful SEO execution
-fail. The delivery summary distinguishes disabled, SES-accepted and failed
-notifications. SES acceptance does not confirm inbox delivery.
+uses `continue-on-error`, following Lighthouse. Reports transfer between jobs as
+artifacts rather than JSON job outputs, which GitHub secret detection can suppress
+when report values happen to match masked values. Only selected statuses, counts,
+step identifiers and job links are stored; credentials, environment settings and
+raw logs are excluded. Internal artifacts are scoped to environment, run and
+attempt, and their embedded identity is checked before aggregation.
 
 Reports are small JSON artifacts named
-`seo-report-<environment>-<run-id>-<run-attempt>` and retained for 90 days.
+`seo-report-<environment>-<run-id>-<run-attempt>` and retained for 7 days, matching the repository retention limit.
 They include the actual publish/verify job conclusions, generation, local
 validation and upload outcomes, failed step identifiers and workflow logs links.
 Generation and verification still run from the deployed source revision;
@@ -186,18 +196,25 @@ Counts have distinct meanings:
 
 Missing counts are `N/A`, never inferred as zero. Missing internal step reports
 show `UNKNOWN` while retaining the actual job conclusion. Missing, malformed or
-previous-attempt environment artifacts cannot produce a SUCCESS email. SUCCESS
+previous-attempt environment artifacts cannot produce a SUCCESS report. SUCCESS
 requires all environments and the matrix to succeed; PARTIAL FAILURE means at
 least one environment succeeded but the full execution did not; otherwise the
 status is FAILURE. Follow-up failures such as invalidation or Search Console
 remain failures even when S3 uploads completed.
 
+Production reports also include Google Search Console coverage counts from the
+existing inspection sample when available. Only known coverage labels and counts
+are retained; unrecognized labels are grouped as "Other coverage states". Publication,
+submission and live verification do not establish Google indexing, and coverage
+counts apply only to inspected URLs. No additional Google API calls are made.
+
 A changed summary format in an older deployed verifier leaves verified counts
 `N/A` while preserving its actual exit status. Re-running jobs sends a new email
 for that attempt; reports are never silently reused from a previous attempt.
 A partial re-run may therefore show N/A for environments not rerun. GitHub runner
-outages, environment approvals, or cancellation can prevent notification itself
-from executing; `always()` cannot guarantee delivery in those cases.
+outages, tooling installation failures or cancellation can prevent summary execution;
+`always()` cannot guarantee execution in those cases. Environment approvals or the
+same infrastructure failures can also prevent notification delivery.
 
 Local tests execute the actual reporting JavaScript and shell blocks with local
 fixtures and mocked GitHub/AWS interfaces. No live credentials or emails are

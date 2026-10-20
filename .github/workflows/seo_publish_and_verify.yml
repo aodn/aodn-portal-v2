@@ -26,7 +26,6 @@ jobs:
       queue: max
     outputs:
       commit_sha: ${{ steps.revision.outputs.sha }}
-      report: ${{ steps.report.outputs.report }}
     steps:
       - name: Configure AWS credentials
         id: credentials
@@ -208,7 +207,10 @@ jobs:
           GSC_SERVICE_ACCOUNT_KEY: ${{ secrets.GSC_SERVICE_ACCOUNT_KEY }}
         run: |
           yarn seo:gsc submit
-          yarn seo:gsc inspect 50
+          set +e
+          yarn seo:gsc inspect 50 | tee "$RUNNER_TEMP/seo-index-coverage.log"
+          inspection_status=${PIPESTATUS[0]}
+          exit "$inspection_status"
 
       # Reporting uses the workflow revision, never new scripts from the deployed
       # checkout. It also runs when revision resolution or installation fails.
@@ -219,6 +221,7 @@ jobs:
         uses: actions/github-script@v8
         env:
           SEO_STEPS: ${{ toJSON(steps) }}
+          SEO_ENVIRONMENT: ${{ inputs.environment }}
         with:
           script: |
             const fs = require('node:fs');
@@ -244,8 +247,31 @@ jobs:
                 errors.push('Artifact counts unavailable; see the publication job logs');
               }
             }
-            core.setOutput('report', JSON.stringify({
-              generation, localVerification,
+            let indexing = null;
+            if (process.env.SEO_ENVIRONMENT === 'production' && steps.search_console?.outcome === 'success') {
+              try {
+                const log = fs.readFileSync(path.join(process.env.RUNNER_TEMP, 'seo-index-coverage.log'), 'utf8');
+                const summary = log.match(/^Coverage of (\d+) sampled URLs from https:\/\/[^\s]+:\r?\n((?:  \d+  [^\r\n]+\r?\n?)+)/m);
+                if (summary) {
+                  // Store counts and known labels only, never arbitrary log content.
+                  const allowed = ['Submitted and indexed', 'Indexed, not submitted in sitemap', 'Crawled - currently not indexed', 'Discovered - currently not indexed', 'URL is unknown to Google', 'Unknown'];
+                  const coverage = {};
+                  for (const match of summary[2].matchAll(/^  (\d+)  ([^\r\n]+)/gm)) {
+                    const label = allowed.includes(match[2]) ? match[2] : 'Other coverage states';
+                    coverage[label] = (coverage[label] || 0) + Number(match[1]);
+                  }
+                  const sampledUrls = Number(summary[1]);
+                  if (Object.values(coverage).reduce((sum, count) => sum + count, 0) === sampledUrls) {
+                    indexing = { sampledUrls, coverage };
+                  }
+                }
+              } catch { /* Older deployed scripts may not provide coverage counts. */ }
+            }
+            fs.writeFileSync(path.join(process.env.RUNNER_TEMP, 'publication.json'), JSON.stringify({
+              environment: process.env.SEO_ENVIRONMENT,
+              runId: String(context.runId), runAttempt: process.env.GITHUB_RUN_ATTEMPT,
+              generation, localVerification, indexing,
+              searchConsole: steps.search_console?.outcome || 'skipped',
               publishing: steps.upload?.outcome || 'skipped',
               generated,
               published: {
@@ -255,6 +281,16 @@ jobs:
               errors,
             }));
 
+      - name: Upload publication results
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v6
+        with:
+          name: seo-job-report-${{ inputs.environment }}-${{ github.run_id }}-${{ github.run_attempt }}-publication
+          path: ${{ runner.temp }}/publication.json
+          if-no-files-found: warn
+          retention-days: 7
+
   # A separate job: when it fails, publishing still worked and only the CloudFront
   # routing (owned by appdeploy) is broken. It only reads public pages, so it needs
   # no environment, and "needs" skips it when nothing was published.
@@ -262,8 +298,6 @@ jobs:
     name: Verify SEO on CloudFront
     needs: publish
     runs-on: ubuntu-latest
-    outputs:
-      report: ${{ steps.report.outputs.report }}
     steps:
       - name: Checkout
         id: checkout
@@ -305,6 +339,7 @@ jobs:
         uses: actions/github-script@v8
         env:
           SEO_STEPS: ${{ toJSON(steps) }}
+          SEO_ENVIRONMENT: ${{ inputs.environment }}
         with:
           script: |
             const fs = require('node:fs');
@@ -328,9 +363,21 @@ jobs:
                 errors.push('Live verification counts unavailable; see the verification job logs');
               }
             }
-            core.setOutput('report', JSON.stringify({
+            fs.writeFileSync(path.join(process.env.RUNNER_TEMP, 'verification.json'), JSON.stringify({
+              environment: process.env.SEO_ENVIRONMENT,
+              runId: String(context.runId), runAttempt: process.env.GITHUB_RUN_ATTEMPT,
               verification: steps.smoke?.outcome || 'skipped', verified, errors,
             }));
+
+      - name: Upload verification results
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v6
+        with:
+          name: seo-job-report-${{ inputs.environment }}-${{ github.run_id }}-${{ github.run_attempt }}-verification
+          path: ${{ runner.temp }}/verification.json
+          if-no-files-found: warn
+          retention-days: 7
 
   report:
     name: Collect ${{ inputs.environment }} SEO report
@@ -338,7 +385,18 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     continue-on-error: true
+    permissions:
+      contents: read
+      actions: read
     steps:
+      - name: Download job reports
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          pattern: seo-job-report-${{ inputs.environment }}-${{ github.run_id }}-${{ github.run_attempt }}-*
+          path: .seo-job-reports/
+          merge-multiple: true
+
       - name: Prepare environment report
         uses: actions/github-script@v8
         env:
@@ -349,23 +407,40 @@ jobs:
             const fs = require('node:fs');
             const needs = JSON.parse(process.env.SEO_NEEDS);
             const errors = [];
-            const read = (job) => {
+            const read = (name, job) => {
               try {
-                const parsed = JSON.parse(job.outputs.report);
-                if (!parsed || typeof parsed !== 'object') throw new Error('Invalid report');
+                const parsed = JSON.parse(fs.readFileSync(`.seo-job-reports/${name}.json`, 'utf8'));
+                if (!parsed || parsed.environment !== process.env.SEO_ENVIRONMENT ||
+                    parsed.runId !== String(context.runId) || parsed.runAttempt !== process.env.GITHUB_RUN_ATTEMPT) throw new Error('Invalid report');
                 return parsed;
               }
-              catch { errors.push(`Job ${job.result}: detailed report unavailable; see workflow logs`); return {}; }
+              catch { errors.push(`${name} job ${job.result}: detailed report unavailable; see workflow logs`); return {}; }
             };
-            const publish = read(needs.publish);
-            const verify = read(needs.verify);
+            const publish = read('publication', needs.publish);
+            const verify = read('verification', needs.verify);
+            const jobLinks = [];
+            try {
+              const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRunAttempt, {
+                ...context.repo, run_id: context.runId,
+                attempt_number: Number(process.env.GITHUB_RUN_ATTEMPT), per_page: 100,
+              });
+              for (const job of jobs) {
+                if (job.name.startsWith(`${process.env.SEO_ENVIRONMENT} / `) &&
+                    ['Publish SEO Artifacts', 'Verify SEO on CloudFront'].includes(job.name.split(' / ').pop())) {
+                  jobLinks.push({ name: job.name, url: job.html_url });
+                }
+              }
+            } catch { core.warning('Job links unavailable; use the workflow attempt link.'); }
             const unavailable = () => ({ sitemapUrls: null, pages: null });
             const report = {
               environment: process.env.SEO_ENVIRONMENT,
               runId: String(context.runId),
               runAttempt: process.env.GITHUB_RUN_ATTEMPT,
+              jobLinks,
               publishJob: needs.publish.result,
               verifyJob: needs.verify.result,
+              searchConsole: publish.searchConsole || 'unknown',
+              indexing: publish.indexing || null,
               generation: publish.generation || 'unknown',
               localVerification: publish.localVerification || 'unknown',
               publishing: publish.publishing || 'unknown',
@@ -378,8 +453,6 @@ jobs:
             };
             fs.mkdirSync('.seo-reports', { recursive: true });
             fs.writeFileSync(`.seo-reports/${report.environment}.json`, JSON.stringify(report, null, 2));
-            await core.summary.addHeading(`${report.environment} SEO execution`)
-              .addCodeBlock(JSON.stringify(report, null, 2), 'json').write();
 
       - name: Upload environment report
         if: always()
@@ -389,4 +462,4 @@ jobs:
           path: .seo-reports/${{ inputs.environment }}.json
           include-hidden-files: true
           if-no-files-found: warn
-          retention-days: 90
+          retention-days: 7
