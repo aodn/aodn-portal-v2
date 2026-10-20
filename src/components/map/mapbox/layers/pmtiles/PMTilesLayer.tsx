@@ -748,16 +748,19 @@ type HexMapFeature = NonNullable<MapMouseEvent["features"]>[number];
  * - picks the H3 cell for the tap (`latLngToCell`) among query results, not a
  *   vertex-average centroid (clipped tiles make that centroid lie in a neighbour)
  * - only clears the popup when the hex zoom band actually changes
+ * - rewrites an open popup when the caller runs `refreshPopupRef` (time filter)
  */
 const attachPmtilesHexInteraction = (
   map: Map,
   hoverCtxRef: { current: PmtilesHexHoverCtx },
   popupRef: { current: Popup | null },
-  removePopup: () => void
+  removePopup: () => void,
+  refreshPopupRef?: { current: (() => void) | null }
 ): (() => void) => {
   let hoveredId: string | number | undefined;
   let selectedId: string | number | undefined;
   let selectedGeometry: Geometry | undefined;
+  let selectedProperties: Record<string, unknown> | undefined;
   let lastZoomBandId = getActivePmtilesLayers(map.getZoom())[0]?.id;
   let lastPointerAt = 0;
 
@@ -782,6 +785,7 @@ const attachPmtilesHexInteraction = (
     hoveredId = undefined;
     selectedId = undefined;
     selectedGeometry = undefined;
+    selectedProperties = undefined;
     setHoverOutline(undefined);
     removePopup();
   };
@@ -798,6 +802,34 @@ const attachPmtilesHexInteraction = (
       }
     );
     return total;
+  };
+
+  // Popup HTML is fixed at click time. Rewrite the open popup from the same
+  // cell after the time window changes, and close it when the total hits 0.
+  const refreshOpenPopup = () => {
+    const popup = popupRef.current;
+    const properties = selectedProperties;
+    if (!popup || !properties || !popup.isOpen()) return;
+
+    const ctx = hoverCtxRef.current;
+    if (
+      !ctx.visible ||
+      !ctx.densityReady ||
+      featureTotal({ properties } as HexMapFeature) <= 0
+    ) {
+      clearInteraction();
+      return;
+    }
+
+    popup.setHTML(
+      buildPopupHtml(
+        properties,
+        ctx.filterStartDate,
+        ctx.filterEndDate,
+        ctx.countFilterRange,
+        ctx.hasTime
+      )
+    );
   };
 
   const pickHex = (
@@ -916,19 +948,20 @@ const attachPmtilesHexInteraction = (
       return;
     }
 
-    const ctx = hoverCtxRef.current;
     const cellId = featureH3CellId(feature);
     const cellGeometry = h3CellPolygon(cellId) ?? feature.geometry;
     selectedId = feature.id;
     selectedGeometry = cellGeometry;
+    selectedProperties = (feature.properties ?? {}) as Record<string, unknown>;
     setHoverOutline(cellGeometry);
 
+    const ctx = hoverCtxRef.current;
     if (!popupRef.current) {
       popupRef.current = new Popup(MapDefaultConfig.DEFAULT_POPUP);
     }
     popupRef.current.setHTML(
       buildPopupHtml(
-        feature.properties ?? {},
+        selectedProperties,
         ctx.filterStartDate,
         ctx.filterEndDate,
         ctx.countFilterRange,
@@ -984,8 +1017,14 @@ const attachPmtilesHexInteraction = (
   map.on("zoomend", onZoomEnd);
   map.on("draw.modechange", onDrawInteractionChange);
   map.on("draw.selectionchange", onDrawInteractionChange);
+  if (refreshPopupRef) {
+    refreshPopupRef.current = refreshOpenPopup;
+  }
 
   return () => {
+    if (refreshPopupRef) {
+      refreshPopupRef.current = null;
+    }
     layerHandlers.forEach(({ layerId, onMouseMove }) => {
       map.off("mousemove", layerId, onMouseMove);
       map.off("mouseleave", layerId, onHexLeave);
@@ -1015,6 +1054,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
 }) => {
   const { map } = useContext(MapContext);
   const popupRef = useRef<Popup | null>(null);
+  const refreshPopupRef = useRef<(() => void) | null>(null);
 
   /** True after at least one density write against loaded tiles. */
   const [densityReady, setDensityReady] = useState(false);
@@ -1084,6 +1124,8 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       densityReady,
       visible,
     };
+    // Same deps as the context above: rewrite an open popup for the new window.
+    refreshPopupRef.current?.();
   }, [
     filterStartDate,
     filterEndDate,
@@ -1344,7 +1386,13 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   // Click popup + hover outline
   useEffect(() => {
     if (!map) return;
-    return attachPmtilesHexInteraction(map, hoverCtxRef, popupRef, removePopup);
+    return attachPmtilesHexInteraction(
+      map,
+      hoverCtxRef,
+      popupRef,
+      removePopup,
+      refreshPopupRef
+    );
   }, [map, removePopup]);
 
   // Visibility
