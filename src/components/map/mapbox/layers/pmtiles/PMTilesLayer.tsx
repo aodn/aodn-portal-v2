@@ -790,21 +790,10 @@ const attachPmtilesHexInteraction = (
     removePopup();
   };
 
-  // Open popup HTML is a snapshot. Recompute it from the same cell when the
-  // time window changes; drop it when that cell no longer has records.
-  const refreshOpenPopup = () => {
-    const popup = popupRef.current;
-    const properties = selectedProperties;
-    if (!popup || !properties || !popup.isOpen()) return;
-
+  const featureTotal = (feature: HexMapFeature): number => {
     const ctx = hoverCtxRef.current;
-    if (!ctx.visible || !ctx.densityReady) {
-      clearInteraction();
-      return;
-    }
-
     const { total } = sumSparseCountFromProperties(
-      properties,
+      (feature.properties ?? {}) as Record<string, unknown>,
       ctx.filterStartDate,
       ctx.filterEndDate,
       {
@@ -812,7 +801,22 @@ const attachPmtilesHexInteraction = (
         collectMatchedKeys: false,
       }
     );
-    if (total <= 0) {
+    return total;
+  };
+
+  // Popup HTML is fixed at click time. Rewrite the open popup from the same
+  // cell after the time window changes, and close it when the total hits 0.
+  const refreshOpenPopup = () => {
+    const popup = popupRef.current;
+    const properties = selectedProperties;
+    if (!popup || !properties || !popup.isOpen()) return;
+
+    const ctx = hoverCtxRef.current;
+    if (
+      !ctx.visible ||
+      !ctx.densityReady ||
+      featureTotal({ properties } as HexMapFeature) <= 0
+    ) {
       clearInteraction();
       return;
     }
@@ -826,20 +830,6 @@ const attachPmtilesHexInteraction = (
         ctx.hasTime
       )
     );
-  };
-
-  const featureTotal = (feature: HexMapFeature): number => {
-    const ctx = hoverCtxRef.current;
-    const { total } = sumSparseCountFromProperties(
-      (feature.properties ?? {}) as Record<string, unknown>,
-      ctx.filterStartDate,
-      ctx.filterEndDate,
-      {
-        range: ctx.countFilterRange,
-        collectMatchedKeys: false,
-      }
-    );
-    return total;
   };
 
   const pickHex = (
@@ -958,7 +948,6 @@ const attachPmtilesHexInteraction = (
       return;
     }
 
-    const ctx = hoverCtxRef.current;
     const cellId = featureH3CellId(feature);
     const cellGeometry = h3CellPolygon(cellId) ?? feature.geometry;
     selectedId = feature.id;
@@ -966,12 +955,13 @@ const attachPmtilesHexInteraction = (
     selectedProperties = (feature.properties ?? {}) as Record<string, unknown>;
     setHoverOutline(cellGeometry);
 
+    const ctx = hoverCtxRef.current;
     if (!popupRef.current) {
       popupRef.current = new Popup(MapDefaultConfig.DEFAULT_POPUP);
     }
     popupRef.current.setHTML(
       buildPopupHtml(
-        feature.properties ?? {},
+        selectedProperties,
         ctx.filterStartDate,
         ctx.filterEndDate,
         ctx.countFilterRange,
@@ -1134,6 +1124,8 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       densityReady,
       visible,
     };
+    // Same deps as the context above: rewrite an open popup for the new window.
+    refreshPopupRef.current?.();
   }, [
     filterStartDate,
     filterEndDate,
@@ -1402,19 +1394,6 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       refreshPopupRef
     );
   }, [map, removePopup]);
-
-  // Popup HTML is captured at click time. Rewrite it when the time window
-  // (or the metadata bounds that clamp that window) changes.
-  useEffect(() => {
-    refreshPopupRef.current?.();
-  }, [
-    filterStartDate,
-    filterEndDate,
-    countFilterRange,
-    periodBounds?.hasTime,
-    densityReady,
-    visible,
-  ]);
 
   // Visibility
   useEffect(() => {
