@@ -5,7 +5,10 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
-    "paths": { "@/*": ["./src/*"] },
+    "paths": {
+      "@/*": ["./src/*"],
+      "mapbox-gl": ["./src/components/map/mapbox/mapboxgl.ts"]
+    },
     "plugins": [{ "name": "typescript-plugin-css-modules" }],
     "types": ["vite/client", "@types/gtag.js", "node"],
     "esModuleInterop": true,

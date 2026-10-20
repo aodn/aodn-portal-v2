@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Map, LngLat } from "mapbox-gl";
+import { Map, LngLat, type MapMouseEvent } from "mapbox-gl";
 import { mergeWithDefaults } from "@/utils/ObjectUtils";
 
 interface TestProps {
@@ -47,7 +47,7 @@ const TestHelper: React.FC<TestProps> = (props) => {
       // Add click listener if getMap exists
       if (getMap) {
         const map = getMap();
-        const handleMapClick = (e: mapboxgl.MapMouseEvent) => {
+        const handleMapClick = (e: MapMouseEvent) => {
           // Update map click lnglat in testProps
           if (w.testProps[id]) {
             w.testProps[id].getMapClickLngLat = () => e.lngLat;
