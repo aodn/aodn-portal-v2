@@ -31,6 +31,13 @@ import { DataTestId } from "@/components/map/mapbox/constants";
 import useRedirectSearch from "@/hooks/useRedirectSearch";
 import useRedirectHome from "@/hooks/useRedirectHome";
 
+vi.mock("react-router-dom", () => ({
+  ...vi.importActual("react-router-dom"),
+  useLocation: vi.fn(),
+  useParams: vi.fn(),
+  useNavigate: vi.fn(),
+}));
+
 vi.mock("@/hooks/useRedirectSearch", () => ({
   default: vi.fn(),
 }));
@@ -69,13 +76,6 @@ describe("HeaderSection", async () => {
   });
 
   beforeEach(() => {
-    vi.mock("react-router-dom", () => ({
-      ...vi.importActual("react-router-dom"),
-      useLocation: vi.fn(),
-      useParams: vi.fn(),
-      useNavigate: vi.fn(),
-    }));
-
     vi.mocked(useParams).mockReturnValue({
       uuid: "5fc91100-4ade-11dc-8f56-00008a07204e",
     });

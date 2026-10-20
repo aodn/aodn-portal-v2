@@ -24,7 +24,9 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("@mapbox/mapbox-gl-draw", () => {
   const MapboxDraw = Object.assign(
-    vi.fn(() => mocks.draw),
+    vi.fn(function () {
+      return mocks.draw;
+    }),
     { modes: {} }
   );
   return { default: MapboxDraw };

@@ -10,6 +10,13 @@ import { Provider } from "react-redux";
 import { userEvent } from "@testing-library/user-event";
 import DataAccessPanel from "../features/DataAccessPanel";
 
+vi.mock("react-router-dom", () => ({
+  ...vi.importActual("react-router-dom"),
+  useLocation: vi.fn(),
+  useParams: vi.fn(),
+  useNavigate: vi.fn(),
+}));
+
 describe("DataAccessPanel", async () => {
   const theme = AppTheme;
   beforeAll(() => {
@@ -17,13 +24,6 @@ describe("DataAccessPanel", async () => {
   });
 
   beforeEach(() => {
-    vi.mock("react-router-dom", () => ({
-      ...vi.importActual("react-router-dom"),
-      useLocation: vi.fn(),
-      useParams: vi.fn(),
-      useNavigate: vi.fn(),
-    }));
-
     vi.mocked(useLocation).mockReturnValue({
       state: null,
       hash: "111",

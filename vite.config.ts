@@ -175,6 +175,12 @@ export default ({ mode }: ConfigEnv) => {
       setupFiles: "./src/setupTests.ts",
       coverage: {
         provider: "v8",
+        // Keep Vitest 3's coverage scope, including files no test imports.
+        include: [
+          "{src,public,playwright,artifacts}/**/*.{js,ts,tsx}",
+          "commitlint.config.cjs",
+        ],
+        exclude: ["**/*.d.ts", "**/*.{test,spec}.{ts,tsx}"],
         reporter: ["text", "json", "html"],
       },
     },

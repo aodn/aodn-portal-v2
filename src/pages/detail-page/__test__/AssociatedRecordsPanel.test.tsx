@@ -18,6 +18,12 @@ import store from "@/app/store/store";
 import { Provider } from "react-redux";
 import { userEvent } from "@testing-library/user-event";
 
+vi.mock("react-router-dom", () => ({
+  ...vi.importActual("react-router-dom"),
+  useLocation: vi.fn(),
+  useParams: vi.fn(),
+}));
+
 describe("AssociatedRecordsPanel", async () => {
   const theme = AppTheme;
   let openSpy: MockInstance<Window["open"]>;
@@ -39,12 +45,6 @@ describe("AssociatedRecordsPanel", async () => {
   });
 
   beforeEach(() => {
-    vi.mock("react-router-dom", () => ({
-      ...vi.importActual("react-router-dom"),
-      useLocation: vi.fn(),
-      useParams: vi.fn(),
-    }));
-
     openSpy = vi
       .spyOn(window, "open")
       .mockImplementation((url, target, features) => {

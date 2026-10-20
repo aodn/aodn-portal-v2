@@ -23,10 +23,10 @@ const popupMocks = vi.hoisted(() => {
     setLngLat: ReturnType<typeof vi.fn>;
     addTo: ReturnType<typeof vi.fn>;
     isOpen: ReturnType<typeof vi.fn>;
-    getElement: ReturnType<typeof vi.fn>;
+    getElement: ReturnType<typeof vi.fn<() => HTMLElement>>;
     remove: ReturnType<typeof vi.fn>;
   }> = [];
-  const Popup = vi.fn(() => {
+  const Popup = vi.fn(function () {
     const el = document.createElement("div");
     const instance = {
       setHTML: vi.fn().mockReturnThis(),
@@ -150,8 +150,10 @@ describe("PMTilesLayer - click popup", () => {
   let setData: ReturnType<typeof vi.fn>;
   let queryRenderedFeatures: ReturnType<typeof vi.fn>;
   let map: Map;
-  let popupRef: { current: { remove: ReturnType<typeof vi.fn> } | null };
-  let removePopup: ReturnType<typeof vi.fn>;
+  let popupRef: {
+    current: { remove: ReturnType<typeof vi.fn<() => void>> } | null;
+  };
+  let removePopup: ReturnType<typeof vi.fn<() => void>>;
 
   const listenerKey = (event: string, layerId?: string) =>
     layerId ? `${event}:${layerId}` : event;
