@@ -342,10 +342,20 @@ const ReactMap = memo(
           zoom: zoom,
         });
       }
-      map.on(MapEventEnum.IDLE, () => {
+      // Re-attach after the programmatic move. An already-idle map never emits
+      // idle again, so drag would not start a new search.
+      const attachMoveListeners = () => {
         map.on(MapEventEnum.ZOOM_END, debounceOnZoomEvent);
         map.on(MapEventEnum.MOVE_END, debounceOnMoveEvent);
-      });
+      };
+      if (map.idle()) {
+        attachMoveListeners();
+        return;
+      }
+      map.once(MapEventEnum.IDLE, attachMoveListeners);
+      return () => {
+        map.off(MapEventEnum.IDLE, attachMoveListeners);
+      };
     }, [
       bbox,
       zoom,
