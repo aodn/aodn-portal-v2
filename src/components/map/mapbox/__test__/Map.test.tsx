@@ -24,6 +24,8 @@ vi.mock("@/components/map/mapbox/mapboxgl", () => {
     once = vi.fn();
     jumpTo = vi.fn();
     easeTo = vi.fn();
+    // Real mapbox-gl Map.prototype.idle. The camera effect calls it.
+    idle = () => true;
     resize = vi.fn();
     remove = vi.fn();
   }
