@@ -343,18 +343,23 @@ const ReactMap = memo(
         });
       }
       // Re-attach after the programmatic move. An already-idle map never emits
-      // idle again, so drag would not start a new search.
-      const attachMoveListeners = () => {
+      // idle again, so drag would not start a new search. Register idle with
+      // map.on and this same function: map.once stores a wrapper, so map.off
+      // of the original callback does not remove it.
+      const onIdle = () => {
+        map.off(MapEventEnum.IDLE, onIdle);
         map.on(MapEventEnum.ZOOM_END, debounceOnZoomEvent);
         map.on(MapEventEnum.MOVE_END, debounceOnMoveEvent);
       };
       if (map.idle()) {
-        attachMoveListeners();
-        return;
+        onIdle();
+      } else {
+        map.on(MapEventEnum.IDLE, onIdle);
       }
-      map.once(MapEventEnum.IDLE, attachMoveListeners);
       return () => {
-        map.off(MapEventEnum.IDLE, attachMoveListeners);
+        map.off(MapEventEnum.IDLE, onIdle);
+        map.off(MapEventEnum.ZOOM_END, debounceOnZoomEvent);
+        map.off(MapEventEnum.MOVE_END, debounceOnMoveEvent);
       };
     }, [
       bbox,
