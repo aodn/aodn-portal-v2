@@ -12,6 +12,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: read
   id-token: write
   contents: read
 
@@ -42,9 +43,64 @@ jobs:
       site: ${{ matrix.site }}
     secrets: inherit
 
+  summary:
+    name: Consolidated SEO Workflow Report
+    needs: seo
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - name: Read workflow execution date
+        id: metadata
+        uses: actions/github-script@v8
+        with:
+          script: |
+            try {
+              const { data } = await github.rest.actions.getWorkflowRunAttempt({
+                ...context.repo, run_id: context.runId,
+                attempt_number: Number(process.env.GITHUB_RUN_ATTEMPT),
+              });
+              core.setOutput('date', data.run_started_at || data.created_at);
+            } catch {
+              core.warning('Execution date unavailable; see the workflow run metadata.');
+              core.setOutput('date', 'N/A (run metadata unavailable)');
+            }
+
+      - uses: actions/checkout@v5
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+
+      - name: Install reporting tooling
+        run: yarn install --immutable
+
+      - name: Download SEO reports
+        id: reports
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          pattern: seo-report-*-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .seo-reports/
+          merge-multiple: true
+
+      - name: Write consolidated Actions summary
+        if: always()
+        env:
+          SEO_WORKFLOW_RESULT: ${{ needs.seo.result }}
+          SEO_EXECUTION_DATE: ${{ steps.metadata.outputs.date }}
+        run: yarn tsx src/seo/prepareWorkflowSummary.ts
+
   notify:
     name: Email consolidated SEO results
-    needs: seo
+    needs: [seo, summary]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     # Reuse the environment trusted by Lighthouse's existing SES OIDC role.

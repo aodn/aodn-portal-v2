@@ -44,6 +44,7 @@ const script = (source: string, name: string, key = "script") => {
 const PUBLISH = section(SEO, "publish:");
 const VERIFY = section(SEO, "verify:");
 const REPORT = section(SEO, "report:");
+const SUMMARY = section(WEEKLY, "summary:");
 const NOTIFY = section(WEEKLY, "notify:");
 let directory: string;
 beforeEach(() => {
@@ -106,22 +107,30 @@ const execute = async (
   );
   return { outputs, core };
 };
-const publication = async (steps: unknown) =>
-  JSON.parse(
-    (
-      await execute(PUBLISH, "Collect publication results", {
-        SEO_STEPS: JSON.stringify(steps),
-      })
-    ).outputs.report
+const collect = async (
+  source: string,
+  name: string,
+  file: string,
+  steps: unknown,
+  environment = "edge"
+) => {
+  const { outputs } = await execute(source, name, {
+    SEO_STEPS: JSON.stringify(steps),
+    SEO_ENVIRONMENT: environment,
+  });
+  expect(outputs).not.toHaveProperty("report");
+  return JSON.parse(fs.readFileSync(path.join(directory, file), "utf8"));
+};
+const publication = (steps: unknown, environment = "edge") =>
+  collect(
+    PUBLISH,
+    "Collect publication results",
+    "publication.json",
+    steps,
+    environment
   );
-const verification = async (steps: unknown) =>
-  JSON.parse(
-    (
-      await execute(VERIFY, "Collect verification results", {
-        SEO_STEPS: JSON.stringify(steps),
-      })
-    ).outputs.report
-  );
+const verification = (steps: unknown) =>
+  collect(VERIFY, "Collect verification results", "verification.json", steps);
 const artifacts = () => {
   fs.mkdirSync(path.join(directory, "dist/prerender/details/a"), {
     recursive: true,
@@ -267,7 +276,7 @@ test("environment report uses authoritative job conclusions and tolerates missin
   expect(result.logsUrl).toContain("/attempts/2");
 });
 
-test("environment report combines publication and verification output", async () => {
+test("environment report combines artifacts without any job outputs", async () => {
   artifacts();
   const publish = await publication({
     generate: generated,
@@ -277,20 +286,32 @@ test("environment report combines publication and verification output", async ()
     },
   });
   const verify = {
+    environment: "production",
+    runId: "123",
+    runAttempt: "2",
     verification: "success",
     verified: { sitemapUrls: 3, pages: 2 },
     errors: [],
   };
+  fs.mkdirSync(path.join(directory, ".seo-job-reports"));
+  fs.writeFileSync(
+    path.join(directory, ".seo-job-reports/publication.json"),
+    JSON.stringify({ ...publish, environment: "production" })
+  );
+  fs.writeFileSync(
+    path.join(directory, ".seo-job-reports/verification.json"),
+    JSON.stringify(verify)
+  );
   await execute(REPORT, "Prepare environment report", {
     SEO_ENVIRONMENT: "production",
     SEO_NEEDS: JSON.stringify({
       publish: {
         result: "success",
-        outputs: { report: JSON.stringify(publish) },
+        outputs: {},
       },
       verify: {
         result: "success",
-        outputs: { report: JSON.stringify(verify) },
+        outputs: {},
       },
     }),
   });
@@ -348,7 +369,7 @@ test("live command logging preserves the verifier's failing exit code", () => {
 });
 
 test("notification uses one job, original SES settings and non-blocking failures", () => {
-  expect(NOTIFY).toContain("needs: seo");
+  expect(NOTIFY).toContain("needs: [seo, summary]");
   expect(NOTIFY).toContain("if: ${{ always() }}");
   expect(NOTIFY).toContain("continue-on-error: true");
   expect(NOTIFY).toContain("environment: edge");
@@ -423,7 +444,7 @@ test("execution date comes from the current run attempt", async () => {
     data: { run_started_at: "2026-10-14T00:00:00Z" },
   }));
   const result = await execute(
-    NOTIFY,
+    SUMMARY,
     "Read workflow execution date",
     {},
     { github: { rest: { actions: { getWorkflowRunAttempt } } } }
@@ -439,7 +460,7 @@ test("execution date comes from the current run attempt", async () => {
 
 test("metadata API failure does not prevent email preparation", async () => {
   const result = await execute(
-    NOTIFY,
+    SUMMARY,
     "Read workflow execution date",
     {},
     {
@@ -577,4 +598,106 @@ test("output recording failures do not interrupt generation or validation", () =
   expect(fs.readFileSync(path.join(directory, "commands"), "utf8")).toBe(
     "seo:artifacts\nseo:verify\n"
   );
+});
+
+test("summary runs independently of SES and environment approval", () => {
+  expect(SUMMARY).toContain("needs: seo");
+  expect(SUMMARY).toContain("if: ${{ always() }}");
+  expect(SUMMARY).not.toContain("LH_EMAIL");
+  expect(SUMMARY).not.toContain("environment:");
+  expect(SUMMARY).toContain("src/seo/prepareWorkflowSummary.ts");
+  expect(step(SUMMARY, "Write consolidated Actions summary")).toContain(
+    "if: always()"
+  );
+  expect(SEO).not.toContain("steps.report.outputs.report");
+  expect(REPORT).not.toContain("job.outputs.report");
+  expect(REPORT).not.toContain("addCodeBlock");
+  expect(step(REPORT, "Download job reports")).toContain(
+    "${{ github.run_attempt }}"
+  );
+  for (const stage of ["publication", "verification"]) {
+    expect(step(SEO, `Upload ${stage} results`)).toContain("if: always()");
+    expect(step(SEO, `Upload ${stage} results`)).toContain(
+      "continue-on-error: true"
+    );
+  }
+});
+
+test("indexing counts come only from a completed GSC sample; logs and credentials are excluded", async () => {
+  fs.writeFileSync(
+    path.join(directory, "seo-index-coverage.log"),
+    "Coverage of 50 sampled URLs from https://example.org/sitemap.xml:\n  40  Submitted and indexed\n  8  Crawled - currently not indexed\n  2  arbitrary-secret-state\nNot indexed:\n  sensitive URL\n"
+  );
+  const steps = {
+    search_console: { outcome: "success" },
+    credentials: { outcome: "success", outputs: { token: "sensitive-token" } },
+  };
+  const result = await publication(steps, "production");
+  expect(result.indexing).toEqual({
+    sampledUrls: 50,
+    coverage: {
+      "Submitted and indexed": 40,
+      "Crawled - currently not indexed": 8,
+      "Other coverage states": 2,
+    },
+  });
+  expect(JSON.stringify(result)).not.toMatch(/sensitive|arbitrary-secret/);
+  expect(
+    (
+      await publication(
+        { search_console: { outcome: "failure" } },
+        "production"
+      )
+    ).indexing
+  ).toBeNull();
+  expect((await publication(steps, "edge")).indexing).toBeNull();
+});
+
+test.each([
+  "not JSON",
+  JSON.stringify({ environment: "edge", runId: "123", runAttempt: "1" }),
+])(
+  "malformed or stale internal artifact %s cannot produce PASS",
+  async (content) => {
+    fs.mkdirSync(path.join(directory, ".seo-job-reports"));
+    fs.writeFileSync(
+      path.join(directory, ".seo-job-reports/publication.json"),
+      content
+    );
+    await execute(REPORT, "Prepare environment report", {
+      SEO_ENVIRONMENT: "edge",
+      SEO_NEEDS: JSON.stringify({
+        publish: { result: "success" },
+        verify: { result: "success" },
+      }),
+    });
+    const result = JSON.parse(
+      fs.readFileSync(path.join(directory, ".seo-reports/edge.json"), "utf8")
+    );
+    expect(result.generation).toBe("unknown");
+    expect(result.generated.pages).toBeNull();
+  }
+);
+
+test("disabled email is reported without SEO failure", () => {
+  const summary = path.join(directory, "summary");
+  const result = spawnSync(
+    "bash",
+    [
+      "-eo",
+      "pipefail",
+      "-c",
+      script(NOTIFY, "Report email delivery status", "run"),
+    ],
+    {
+      env: {
+        ...process.env,
+        LH_EMAIL_ENABLED: "false",
+        GITHUB_STEP_SUMMARY: summary,
+      },
+      encoding: "utf8",
+    }
+  );
+  expect(result.status).toBe(0);
+  expect(fs.readFileSync(summary, "utf8")).toContain("DISABLED");
 });
