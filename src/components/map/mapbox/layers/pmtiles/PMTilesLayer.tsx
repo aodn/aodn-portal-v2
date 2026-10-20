@@ -748,16 +748,19 @@ type HexMapFeature = NonNullable<MapMouseEvent["features"]>[number];
  * - picks the H3 cell for the tap (`latLngToCell`) among query results, not a
  *   vertex-average centroid (clipped tiles make that centroid lie in a neighbour)
  * - only clears the popup when the hex zoom band actually changes
+ * - rewrites an open popup when the caller runs `refreshPopupRef` (time filter)
  */
 const attachPmtilesHexInteraction = (
   map: Map,
   hoverCtxRef: { current: PmtilesHexHoverCtx },
   popupRef: { current: Popup | null },
-  removePopup: () => void
+  removePopup: () => void,
+  refreshPopupRef?: { current: (() => void) | null }
 ): (() => void) => {
   let hoveredId: string | number | undefined;
   let selectedId: string | number | undefined;
   let selectedGeometry: Geometry | undefined;
+  let selectedProperties: Record<string, unknown> | undefined;
   let lastZoomBandId = getActivePmtilesLayers(map.getZoom())[0]?.id;
   let lastPointerAt = 0;
 
@@ -782,8 +785,47 @@ const attachPmtilesHexInteraction = (
     hoveredId = undefined;
     selectedId = undefined;
     selectedGeometry = undefined;
+    selectedProperties = undefined;
     setHoverOutline(undefined);
     removePopup();
+  };
+
+  // Open popup HTML is a snapshot. Recompute it from the same cell when the
+  // time window changes; drop it when that cell no longer has records.
+  const refreshOpenPopup = () => {
+    const popup = popupRef.current;
+    const properties = selectedProperties;
+    if (!popup || !properties || !popup.isOpen()) return;
+
+    const ctx = hoverCtxRef.current;
+    if (!ctx.visible || !ctx.densityReady) {
+      clearInteraction();
+      return;
+    }
+
+    const { total } = sumSparseCountFromProperties(
+      properties,
+      ctx.filterStartDate,
+      ctx.filterEndDate,
+      {
+        range: ctx.countFilterRange,
+        collectMatchedKeys: false,
+      }
+    );
+    if (total <= 0) {
+      clearInteraction();
+      return;
+    }
+
+    popup.setHTML(
+      buildPopupHtml(
+        properties,
+        ctx.filterStartDate,
+        ctx.filterEndDate,
+        ctx.countFilterRange,
+        ctx.hasTime
+      )
+    );
   };
 
   const featureTotal = (feature: HexMapFeature): number => {
@@ -921,6 +963,7 @@ const attachPmtilesHexInteraction = (
     const cellGeometry = h3CellPolygon(cellId) ?? feature.geometry;
     selectedId = feature.id;
     selectedGeometry = cellGeometry;
+    selectedProperties = (feature.properties ?? {}) as Record<string, unknown>;
     setHoverOutline(cellGeometry);
 
     if (!popupRef.current) {
@@ -984,8 +1027,14 @@ const attachPmtilesHexInteraction = (
   map.on("zoomend", onZoomEnd);
   map.on("draw.modechange", onDrawInteractionChange);
   map.on("draw.selectionchange", onDrawInteractionChange);
+  if (refreshPopupRef) {
+    refreshPopupRef.current = refreshOpenPopup;
+  }
 
   return () => {
+    if (refreshPopupRef) {
+      refreshPopupRef.current = null;
+    }
     layerHandlers.forEach(({ layerId, onMouseMove }) => {
       map.off("mousemove", layerId, onMouseMove);
       map.off("mouseleave", layerId, onHexLeave);
@@ -1015,6 +1064,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
 }) => {
   const { map } = useContext(MapContext);
   const popupRef = useRef<Popup | null>(null);
+  const refreshPopupRef = useRef<(() => void) | null>(null);
 
   /** True after at least one density write against loaded tiles. */
   const [densityReady, setDensityReady] = useState(false);
@@ -1344,8 +1394,27 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   // Click popup + hover outline
   useEffect(() => {
     if (!map) return;
-    return attachPmtilesHexInteraction(map, hoverCtxRef, popupRef, removePopup);
+    return attachPmtilesHexInteraction(
+      map,
+      hoverCtxRef,
+      popupRef,
+      removePopup,
+      refreshPopupRef
+    );
   }, [map, removePopup]);
+
+  // Popup HTML is captured at click time. Rewrite it when the time window
+  // (or the metadata bounds that clamp that window) changes.
+  useEffect(() => {
+    refreshPopupRef.current?.();
+  }, [
+    filterStartDate,
+    filterEndDate,
+    countFilterRange,
+    periodBounds?.hasTime,
+    densityReady,
+    visible,
+  ]);
 
   // Visibility
   useEffect(() => {
