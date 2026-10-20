@@ -11,15 +11,7 @@
  * those imports now share this one ESM copy. TypeScript ignores the alias, so
  * types still come from "mapbox-gl" as before.
  */
-import mapboxgl from "mapbox-gl/esm";
-// eslint-disable-next-line import/extensions
-import workerUrl from "mapbox-gl/dist/mapbox-gl-csp-worker.js?url";
-
-mapboxgl.workerUrl = workerUrl;
-
-// Every class imported as a value from "mapbox-gl" anywhere in src. If a new
-// one is needed and missing here, the build fails with "is not exported".
-export const {
+import {
   AttributionControl,
   LngLat,
   LngLatBounds,
@@ -29,6 +21,36 @@ export const {
   NavigationControl,
   Popup,
   ScaleControl,
-} = mapboxgl;
+  setWorkerUrl,
+} from "mapbox-gl/esm";
+// eslint-disable-next-line import/extensions
+import workerUrl from "mapbox-gl/dist/mapbox-gl-csp-worker.js?url";
 
-export default mapboxgl;
+// The ESM build has no default export, so workerUrl cannot be assigned on it.
+setWorkerUrl(workerUrl);
+
+// Every class imported as a value from "mapbox-gl" anywhere in src. If a new
+// one is needed and missing here, the build fails with "is not exported".
+export {
+  AttributionControl,
+  LngLat,
+  LngLatBounds,
+  Map,
+  Marker,
+  MercatorCoordinate,
+  NavigationControl,
+  Popup,
+  ScaleControl,
+};
+
+export default {
+  AttributionControl,
+  LngLat,
+  LngLatBounds,
+  Map,
+  Marker,
+  MercatorCoordinate,
+  NavigationControl,
+  Popup,
+  ScaleControl,
+};
