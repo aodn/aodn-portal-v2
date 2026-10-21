@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MapEventEnum } from "@/components/map/mapbox/constants";
 import MapSection from "@/pages/search-page/layout/MapSection";
@@ -173,7 +173,9 @@ describe("zoom reset search and centroid", () => {
     expect(onMapZoomOrMove).not.toHaveBeenCalled();
     expect(screen.getByTestId("prefer-centroid")).toHaveTextContent("true");
 
-    mocks.map.emitMoveEnd();
+    act(() => {
+      mocks.map.emitMoveEnd();
+    });
 
     expect(onMapZoomOrMove).toHaveBeenCalledWith(
       expect.objectContaining({ type: MapEventEnum.MOVE_END }),
