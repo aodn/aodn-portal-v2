@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useState } from "react";
+import React, { memo, useEffect, useMemo, useState } from "react";
 import { LngLatBounds, type MapEvent } from "mapbox-gl";
 import { Box, Paper, SxProps, Theme } from "@mui/material";
 import Map, { MapBasicType } from "@/components/map/mapbox/Map";
@@ -34,6 +34,7 @@ import ReferenceLayerSwitcher, {
 import { ProgressType } from "@/components/map/mapbox/MapContext";
 import { createStaticLayers } from "@/components/map/mapbox/layers/StaticLayer";
 import { fitToDefaultExtent } from "@/utils/MapUtils";
+import { MapEventEnum } from "@/components/map/mapbox/constants";
 import MiniFooter, { MAP_FOOTER_HEIGHT } from "@/app/layout/MiniFooter";
 
 interface MapSectionProps
@@ -44,7 +45,7 @@ interface MapSectionProps
     ToggleControlProps {
   bbox?: [number, number, number, number];
   collections: OGCCollection[];
-  onMapZoomOrMove: (event: MapEvent | undefined) => void;
+  onMapZoomOrMove: (event: MapEvent | undefined, force?: boolean) => void;
   progress?: ProgressType;
   showFullMap: boolean;
   showFullList: boolean;
@@ -58,6 +59,7 @@ const createPresentationLayers = (
   collections: OGCCollection[],
   selectedUuids: string[] | undefined,
   tabNavigation: TabNavigation,
+  preferCurrentCentroid: boolean = true,
   onClickMapPoint: ((uuids: Array<string>) => void) | undefined
 ) => {
   switch (id) {
@@ -68,6 +70,7 @@ const createPresentationLayers = (
           selectedUuids={selectedUuids}
           onClickMapPoint={onClickMapPoint}
           tabNavigation={tabNavigation}
+          preferCurrentCentroid={preferCurrentCentroid}
         />
       );
 
@@ -78,6 +81,7 @@ const createPresentationLayers = (
           selectedUuids={selectedUuids}
           onClickMapPoint={onClickMapPoint}
           tabNavigation={tabNavigation}
+          preferCurrentCentroid={preferCurrentCentroid}
         />
       );
 
@@ -88,6 +92,7 @@ const createPresentationLayers = (
           selectedUuids={selectedUuids}
           onClickMapPoint={onClickMapPoint}
           tabNavigation={tabNavigation}
+          preferCurrentCentroid={preferCurrentCentroid}
         />
       );
   }
@@ -109,7 +114,15 @@ const MapSection: React.FC<MapSectionProps> = memo(
     onDeselectDataset,
   }: MapSectionProps) => {
     const { isUnderLaptop } = useBreakpoint();
-
+    const [preferCurrentCentroid, setPreferCurrentCentroid] =
+      useState<boolean>(true);
+    // Zoom reset passes false for one source update, then the following
+    // update sticks to that centroid again.
+    useEffect(() => {
+      if (!preferCurrentCentroid) {
+        setPreferCurrentCentroid(true);
+      }
+    }, [preferCurrentCentroid]);
     const [selectedLayer, setSelectedLayer] = useState<LayerName | null>(
       LayerName.Cluster
     );
@@ -161,8 +174,30 @@ const MapSection: React.FC<MapSectionProps> = memo(
               />
               <NavigationControl
                 visible={!isUnderLaptop}
-                // Reset flies back to the default Australia-wide extent
-                onReset={(map) => fitToDefaultExtent(map, undefined)}
+                // We need to rest all the centroid value when use click rest zoom. That
+                // means we do not need to set the preferCurrentCentroid to false once
+                // and reset it back to true; this helps to make the reset zoom and cluster
+                // looks like the initial state.
+                onReset={(map) => {
+                  const afterReset = () => {
+                    setPreferCurrentCentroid(false);
+                    // flyTo has no originalEvent, so the normal move handler
+                    // would ignore it. Ask for a search against the new extent.
+                    onMapZoomOrMove(
+                      {
+                        type: MapEventEnum.MOVE_END,
+                        target: map,
+                      } as MapEvent,
+                      true
+                    );
+                  };
+                  map.once(MapEventEnum.MOVE_END, afterReset);
+                  fitToDefaultExtent(map, undefined);
+                  if (!map.isMoving()) {
+                    map.off(MapEventEnum.MOVE_END, afterReset);
+                    afterReset();
+                  }
+                }}
               />
               <ScaleControl />
               <DisplayCoordinate />
@@ -230,6 +265,7 @@ const MapSection: React.FC<MapSectionProps> = memo(
                 collections,
                 selectedUuids,
                 tabNavigation,
+                preferCurrentCentroid,
                 onClickMapPoint
               )}
               {createStaticLayers(staticLayer)}
