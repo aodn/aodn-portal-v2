@@ -199,6 +199,7 @@ describe("zoom reset search and centroid", () => {
     // A moveend during flyTo is the interrupted gesture, not the reset.
     mocks.fit.mockImplementation(() => {
       mocks.map.emitMoveEnd();
+      return true;
     });
     const { onMapZoomOrMove } = renderSection([]);
 
@@ -222,8 +223,24 @@ describe("zoom reset search and centroid", () => {
     expect(mocks.listeners.size).toBe(0);
   });
 
+  it("searches immediately when the fit does not start a fly", () => {
+    mocks.moving = true;
+    mocks.fit.mockReturnValue(false);
+    const { onMapZoomOrMove } = renderSection([]);
+
+    fireEvent.click(screen.getByRole("button", { name: "Reset zoom" }));
+
+    expect(onMapZoomOrMove).toHaveBeenCalledWith(
+      expect.objectContaining({ type: MapEventEnum.MOVE_END }),
+      true
+    );
+    expect(mocks.listeners.size).toBe(0);
+    expect(mocks.map.dragPan.enable).toHaveBeenCalledOnce();
+  });
+
   it("removes the pending moveend listener when the section unmounts", () => {
     mocks.moving = true;
+    mocks.fit.mockReturnValue(true);
     const { onMapZoomOrMove, unmount } = renderSection([]);
 
     fireEvent.click(screen.getByRole("button", { name: "Reset zoom" }));

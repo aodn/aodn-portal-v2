@@ -183,8 +183,11 @@ const MapSection: React.FC<MapSectionProps> = memo(
           map.touchPitch,
         ].flatMap((handler) => (handler?.isEnabled() ? [handler] : []));
         disabledHandlersRef.current.forEach((handler) => handler.disable());
-        fitToDefaultExtent(map, undefined);
-        if (!map.isMoving()) {
+        // An early return or throw from the fit does not start a fly.
+        // isMoving() can still be true from a gesture already in progress,
+        // so only wait for moveend when this call started one.
+        const started = fitToDefaultExtent(map, undefined);
+        if (!started || !map.isMoving()) {
           afterReset();
           return;
         }
