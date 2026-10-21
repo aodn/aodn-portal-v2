@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useMemo, useState } from "react";
+import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 import { LngLatBounds, type MapEvent } from "mapbox-gl";
 import { Box, Paper, SxProps, Theme } from "@mui/material";
 import Map, { MapBasicType } from "@/components/map/mapbox/Map";
@@ -116,13 +116,14 @@ const MapSection: React.FC<MapSectionProps> = memo(
     const { isUnderLaptop } = useBreakpoint();
     const [preferCurrentCentroid, setPreferCurrentCentroid] =
       useState<boolean>(true);
-    // Zoom reset passes false for one source update, then the following
-    // update sticks to that centroid again.
+    // Collections on screen when reset was clicked. The flag stays false
+    // until the post-reset search replaces them.
+    const collectionsWhenResetRef = useRef(collections);
     useEffect(() => {
-      if (!preferCurrentCentroid) {
-        setPreferCurrentCentroid(true);
-      }
-    }, [preferCurrentCentroid]);
+      if (preferCurrentCentroid) return;
+      if (collections === collectionsWhenResetRef.current) return;
+      setPreferCurrentCentroid(true);
+    }, [collections, preferCurrentCentroid]);
     const [selectedLayer, setSelectedLayer] = useState<LayerName | null>(
       LayerName.Cluster
     );
@@ -174,12 +175,12 @@ const MapSection: React.FC<MapSectionProps> = memo(
               />
               <NavigationControl
                 visible={!isUnderLaptop}
-                // We need to rest all the centroid value when use click rest zoom. That
-                // means we do not need to set the preferCurrentCentroid to false once
-                // and reset it back to true; this helps to make the reset zoom and cluster
-                // looks like the initial state.
+                // Reset flies back to the default Australia-wide extent.
+                // preferCurrentCentroid stays false until the search started
+                // here returns a new collection.
                 onReset={(map) => {
                   const afterReset = () => {
+                    collectionsWhenResetRef.current = collections;
                     setPreferCurrentCentroid(false);
                     // flyTo has no originalEvent, so the normal move handler
                     // would ignore it. Ask for a search against the new extent.
