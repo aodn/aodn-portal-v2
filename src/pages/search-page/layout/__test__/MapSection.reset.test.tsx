@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MapEventEnum } from "@/components/map/mapbox/constants";
+import { ProgressType } from "@/components/map/mapbox/MapContext";
 import MapSection from "@/pages/search-page/layout/MapSection";
 
 const mocks = vi.hoisted(() => {
@@ -11,7 +12,7 @@ const mocks = vi.hoisted(() => {
     fit: vi.fn(),
     listeners,
     map: {
-      once: (_event: string, callback: () => void) => {
+      on: (_event: string, callback: () => void) => {
         listeners.add(callback);
       },
       off: (_event: string, callback: () => void) => {
@@ -102,13 +103,14 @@ vi.mock("@/app/layout/MiniFooter", () => ({
   MAP_FOOTER_HEIGHT: "0px",
 }));
 
-const renderSection = (collections: never[]) => {
+const renderSection = (collections: never[], progress?: ProgressType) => {
   const onMapZoomOrMove = vi.fn();
   const view = render(
     <MapSection
       showFullList={false}
       showFullMap={false}
       collections={collections}
+      progress={progress}
       onMapZoomOrMove={onMapZoomOrMove}
       onToggleClicked={() => {}}
     />
@@ -116,14 +118,29 @@ const renderSection = (collections: never[]) => {
   return { ...view, onMapZoomOrMove };
 };
 
+const section = (
+  collections: never[],
+  onMapZoomOrMove: ReturnType<typeof vi.fn>,
+  progress?: ProgressType
+) => (
+  <MapSection
+    showFullList={false}
+    showFullMap={false}
+    collections={collections}
+    progress={progress}
+    onMapZoomOrMove={onMapZoomOrMove}
+    onToggleClicked={() => {}}
+  />
+);
+
 describe("zoom reset search and centroid", () => {
   beforeEach(() => {
     mocks.moving = false;
     mocks.listeners.clear();
-    mocks.fit.mockClear();
+    mocks.fit.mockReset();
   });
 
-  it("forces a search and keeps the centroid flag false until collections change", () => {
+  it("forces a search and clears the centroid flag when that search finishes", () => {
     const current: never[] = [];
     const { onMapZoomOrMove, rerender } = renderSection(current);
 
@@ -140,26 +157,19 @@ describe("zoom reset search and centroid", () => {
     );
     expect(screen.getByTestId("prefer-centroid")).toHaveTextContent("false");
 
-    rerender(
-      <MapSection
-        showFullList={false}
-        showFullMap={false}
-        collections={current}
-        onMapZoomOrMove={onMapZoomOrMove}
-        onToggleClicked={() => {}}
-      />
-    );
+    rerender(section(current, onMapZoomOrMove));
     expect(screen.getByTestId("prefer-centroid")).toHaveTextContent("false");
 
-    rerender(
-      <MapSection
-        showFullList={false}
-        showFullMap={false}
-        collections={[]}
-        onMapZoomOrMove={onMapZoomOrMove}
-        onToggleClicked={() => {}}
-      />
-    );
+    rerender(section(current, onMapZoomOrMove, ProgressType.LINEAR));
+    expect(screen.getByTestId("prefer-centroid")).toHaveTextContent("false");
+
+    // The search resolved without replacing the collections array.
+    rerender(section(current, onMapZoomOrMove));
+    expect(screen.getByTestId("prefer-centroid")).toHaveTextContent("true");
+
+    fireEvent.click(screen.getByRole("button", { name: "Reset zoom" }));
+    expect(screen.getByTestId("prefer-centroid")).toHaveTextContent("false");
+    rerender(section([], onMapZoomOrMove));
     expect(screen.getByTestId("prefer-centroid")).toHaveTextContent("true");
   });
 
@@ -186,5 +196,22 @@ describe("zoom reset search and centroid", () => {
       true
     );
     expect(screen.getByTestId("prefer-centroid")).toHaveTextContent("false");
+    expect(mocks.listeners.size).toBe(0);
+  });
+
+  it("removes the pending moveend listener when the section unmounts", () => {
+    mocks.moving = true;
+    const { onMapZoomOrMove, unmount } = renderSection([]);
+
+    fireEvent.click(screen.getByRole("button", { name: "Reset zoom" }));
+    expect(mocks.listeners.size).toBe(1);
+
+    unmount();
+
+    expect(mocks.listeners.size).toBe(0);
+    act(() => {
+      mocks.map.emitMoveEnd();
+    });
+    expect(onMapZoomOrMove).not.toHaveBeenCalled();
   });
 });

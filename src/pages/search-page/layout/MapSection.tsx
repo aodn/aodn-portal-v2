@@ -116,14 +116,39 @@ const MapSection: React.FC<MapSectionProps> = memo(
     const { isUnderLaptop } = useBreakpoint();
     const [preferCurrentCentroid, setPreferCurrentCentroid] =
       useState<boolean>(true);
-    // Collections on screen when reset was clicked. The flag stays false
-    // until the post-reset search replaces them.
+    // Collections on screen when reset was clicked. A search that keeps
+    // this reference still finishes by clearing the linear progress.
     const collectionsWhenResetRef = useRef(collections);
+    const resetSearchStartedRef = useRef(false);
+    const pendingResetRef = useRef<{
+      map: { off: (type: string, listener: () => void) => void };
+      listener: () => void;
+    } | null>(null);
     useEffect(() => {
-      if (preferCurrentCentroid) return;
-      if (collections === collectionsWhenResetRef.current) return;
+      if (preferCurrentCentroid) {
+        resetSearchStartedRef.current = false;
+        return;
+      }
+      if (progress === ProgressType.LINEAR) {
+        resetSearchStartedRef.current = true;
+        return;
+      }
+      const searchReturned =
+        resetSearchStartedRef.current ||
+        collections !== collectionsWhenResetRef.current;
+      if (!searchReturned) return;
+      resetSearchStartedRef.current = false;
       setPreferCurrentCentroid(true);
-    }, [collections, preferCurrentCentroid]);
+    }, [collections, preferCurrentCentroid, progress]);
+    useEffect(
+      () => () => {
+        const pending = pendingResetRef.current;
+        if (!pending) return;
+        pending.map.off(MapEventEnum.MOVE_END, pending.listener);
+        pendingResetRef.current = null;
+      },
+      []
+    );
     const [selectedLayer, setSelectedLayer] = useState<LayerName | null>(
       LayerName.Cluster
     );
@@ -176,8 +201,7 @@ const MapSection: React.FC<MapSectionProps> = memo(
               <NavigationControl
                 visible={!isUnderLaptop}
                 // Reset flies back to the default Australia-wide extent.
-                // preferCurrentCentroid stays false until the search started
-                // here returns a new collection.
+                // preferCurrentCentroid stays false until that search finishes.
                 onReset={(map) => {
                   const afterReset = () => {
                     collectionsWhenResetRef.current = collections;
@@ -194,13 +218,26 @@ const MapSection: React.FC<MapSectionProps> = memo(
                   };
                   // Listen after flyTo. An animated flyTo is already moving
                   // when it returns, and any moveend it emits while starting
-                  // belongs to the interrupted camera move.
-                  fitToDefaultExtent(map, undefined);
-                  if (map.isMoving()) {
-                    map.once(MapEventEnum.MOVE_END, afterReset);
-                  } else {
-                    afterReset();
+                  // belongs to the interrupted camera move. map.on, not
+                  // map.once: once wraps the listener so off cannot remove it
+                  // if this section unmounts before the animation ends.
+                  const pending = pendingResetRef.current;
+                  if (pending) {
+                    pending.map.off(MapEventEnum.MOVE_END, pending.listener);
+                    pendingResetRef.current = null;
                   }
+                  fitToDefaultExtent(map, undefined);
+                  if (!map.isMoving()) {
+                    afterReset();
+                    return;
+                  }
+                  const listener = () => {
+                    pendingResetRef.current = null;
+                    map.off(MapEventEnum.MOVE_END, listener);
+                    afterReset();
+                  };
+                  pendingResetRef.current = { map, listener };
+                  map.on(MapEventEnum.MOVE_END, listener);
                 }}
               />
               <ScaleControl />
