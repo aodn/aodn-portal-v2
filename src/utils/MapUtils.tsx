@@ -1,4 +1,3 @@
-import { Root } from "react-dom/client";
 import {
   LngLat,
   LngLatBoundsLike,
@@ -141,7 +140,7 @@ const isWorldScale = (
  * @param map - The Mapbox map instance
  * @param bbox - Array of positions representing the bounding box
  * @param options - Additional options for fitting the bbox
- * @returns void
+ * @returns true when flyTo was called and a moveend may still be pending
  */
 export const fitToBound = (
   map: MapboxMap | null | undefined,
@@ -150,13 +149,13 @@ export const fitToBound = (
     animate?: boolean;
     baseZoom?: number;
   } = {}
-): void => {
+): boolean => {
   // Default options
   const { animate = false, baseZoom = DEFAULT_BASE_ZOOM } = options;
 
   if (!map || !bbox || !bbox.length) {
     console.error("Invalid map or bbox:", { map, bbox });
-    return;
+    return false;
   }
 
   try {
@@ -177,7 +176,7 @@ export const fitToBound = (
       });
       if (!camera) {
         console.error("cameraForBounds returned no camera for:", bounds);
-        return;
+        return false;
       }
 
       // Use flyTo for more control over the viewport
@@ -193,11 +192,13 @@ export const fitToBound = (
         zoom: camera.zoom,
         animate: animate,
       });
-    } else {
-      console.error("Invalid bounds format:", boundsArray);
+      return true;
     }
+    console.error("Invalid bounds format:", boundsArray);
+    return false;
   } catch (error) {
     console.error("Error fitting to bounds:", error);
+    return false;
   }
 };
 
@@ -212,24 +213,8 @@ export const fitToBound = (
 export const fitToDefaultExtent = (
   map: MapboxMap,
   collection: OGCCollection | undefined
-): void => {
+): boolean =>
   fitToBound(map, overallBoundingBox(collection), { animate: true });
-};
-
-export const safeRemoveControl = (
-  container: HTMLDivElement | null,
-  root: Root | null
-) => {
-  // https://github.com/facebook/react/issues/25675#issuecomment-1518272581
-  // Keep the old pointer
-  if (container?.parentNode) {
-    setTimeout(() => {
-      container?.parentNode?.removeChild(container);
-      container = null;
-      root?.unmount();
-    });
-  }
-};
 
 export const overallBoundingBox = (
   collection: OGCCollection | undefined

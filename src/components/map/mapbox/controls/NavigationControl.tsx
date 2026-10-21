@@ -7,9 +7,9 @@ import {
   Map as Mapbox,
 } from "mapbox-gl";
 import { renderToStaticMarkup } from "react-dom/server";
-import { ZoomInIcon } from "../../../../assets/icons/map/zoom_in";
-import { ZoomOutIcon } from "../../../../assets/icons/map/zoom_out";
-import { ZoomResetIcon } from "../../../../assets/icons/map/zoom_reset";
+import { ZoomInIcon } from "@/assets/icons/map/zoom_in";
+import { ZoomOutIcon } from "@/assets/icons/map/zoom_out";
+import { ZoomResetIcon } from "@/assets/icons/map/zoom_reset";
 import { MapDefaultConfig, MapEventEnum } from "../constants";
 
 interface NavigationControlProps {
