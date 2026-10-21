@@ -192,10 +192,13 @@ const MapSection: React.FC<MapSectionProps> = memo(
                       true
                     );
                   };
-                  map.once(MapEventEnum.MOVE_END, afterReset);
+                  // Listen after flyTo. An animated flyTo is already moving
+                  // when it returns, and any moveend it emits while starting
+                  // belongs to the interrupted camera move.
                   fitToDefaultExtent(map, undefined);
-                  if (!map.isMoving()) {
-                    map.off(MapEventEnum.MOVE_END, afterReset);
+                  if (map.isMoving()) {
+                    map.once(MapEventEnum.MOVE_END, afterReset);
+                  } else {
                     afterReset();
                   }
                 }}

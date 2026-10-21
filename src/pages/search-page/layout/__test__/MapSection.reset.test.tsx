@@ -165,6 +165,10 @@ describe("zoom reset search and centroid", () => {
 
   it("waits for the reset move to finish before searching", () => {
     mocks.moving = true;
+    // A moveend during flyTo is the interrupted gesture, not the reset.
+    mocks.fit.mockImplementation(() => {
+      mocks.map.emitMoveEnd();
+    });
     const { onMapZoomOrMove } = renderSection([]);
 
     fireEvent.click(screen.getByRole("button", { name: "Reset zoom" }));
