@@ -62,8 +62,8 @@ const createPresentationLayers = (
   collections: OGCCollection[],
   selectedUuids: string[] | undefined,
   tabNavigation: TabNavigation,
-  preferCurrentCentroid: boolean = true,
-  onClickMapPoint: ((uuids: Array<string>) => void) | undefined
+  onClickMapPoint: ((uuids: Array<string>) => void) | undefined,
+  preferCurrentCentroid: boolean = true
 ) => {
   switch (id) {
     case LayerName.Heatmap:
@@ -325,8 +325,8 @@ const MapSection: React.FC<MapSectionProps> = memo(
                 collections,
                 selectedUuids,
                 tabNavigation,
-                preferCurrentCentroid,
-                onClickMapPoint
+                onClickMapPoint,
+                preferCurrentCentroid
               )}
               {createStaticLayers(staticLayer)}
             </Layers>
