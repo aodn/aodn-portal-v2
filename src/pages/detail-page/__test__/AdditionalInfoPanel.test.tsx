@@ -14,6 +14,12 @@ import {
 } from "../context/detail-page-context";
 import { OGCCollection, ITheme } from "@/app/store/OGCCollectionDefinitions";
 
+vi.mock("react-router-dom", () => ({
+  ...vi.importActual("react-router-dom"),
+  useLocation: vi.fn(),
+  useParams: vi.fn(),
+}));
+
 describe("Additional Info", async () => {
   const theme = AppTheme;
   beforeAll(() => {
@@ -21,12 +27,6 @@ describe("Additional Info", async () => {
   });
 
   beforeEach(() => {
-    vi.mock("react-router-dom", () => ({
-      ...vi.importActual("react-router-dom"),
-      useLocation: vi.fn(),
-      useParams: vi.fn(),
-    }));
-
     vi.mocked(useLocation).mockReturnValue({
       state: null,
       hash: "111",

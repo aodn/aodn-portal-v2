@@ -18,6 +18,12 @@ import store from "@/app/store/store";
 import { Provider } from "react-redux";
 import { userEvent } from "@testing-library/user-event";
 
+vi.mock("react-router-dom", () => ({
+  ...vi.importActual("react-router-dom"),
+  useLocation: vi.fn(),
+  useParams: vi.fn(), // Add useParams mock
+}));
+
 describe("AssociatedRecordsPanel", () => {
   const theme = AppTheme;
   let openSpy: MockInstance<Window["open"]>;
@@ -41,12 +47,6 @@ describe("AssociatedRecordsPanel", () => {
   });
 
   beforeEach(() => {
-    vi.mock("react-router-dom", () => ({
-      ...vi.importActual("react-router-dom"),
-      useLocation: vi.fn(),
-      useParams: vi.fn(), // Add useParams mock
-    }));
-
     // Mock useParams to return the UUID
     vi.mocked(useParams).mockReturnValue({
       uuid: "5fc91100-4ade-11dc-8f56-00008a07204e",

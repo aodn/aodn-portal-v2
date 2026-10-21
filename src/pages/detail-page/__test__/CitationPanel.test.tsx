@@ -9,6 +9,13 @@ import { server } from "../../../__mocks__/server";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import CitationPanel from "../features/CitationPanel";
 
+vi.mock("react-router-dom", () => ({
+  ...vi.importActual("react-router-dom"),
+  useLocation: vi.fn(),
+  useParams: vi.fn(),
+  useNavigate: vi.fn(),
+}));
+
 describe("CitationPanel", async () => {
   const theme = AppTheme;
   beforeAll(() => {
@@ -16,13 +23,6 @@ describe("CitationPanel", async () => {
   });
 
   beforeEach(() => {
-    vi.mock("react-router-dom", () => ({
-      ...vi.importActual("react-router-dom"),
-      useLocation: vi.fn(),
-      useParams: vi.fn(),
-      useNavigate: vi.fn(),
-    }));
-
     vi.mocked(useLocation).mockReturnValue({
       state: null,
       hash: "111",
