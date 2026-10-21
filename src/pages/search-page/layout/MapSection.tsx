@@ -120,6 +120,9 @@ const MapSection: React.FC<MapSectionProps> = memo(
     // this reference still finishes by clearing the linear progress.
     const collectionsWhenResetRef = useRef(collections);
     const resetSearchStartedRef = useRef(false);
+    const disabledHandlersRef = useRef<
+      Array<{ enable: () => void; disable: () => void }>
+    >([]);
     const pendingResetRef = useRef<{
       map: { off: (type: string, listener: () => void) => void };
       listener: () => void;
@@ -139,13 +142,18 @@ const MapSection: React.FC<MapSectionProps> = memo(
       if (!searchReturned) return;
       resetSearchStartedRef.current = false;
       setPreferCurrentCentroid(true);
+      disabledHandlersRef.current.forEach((handler) => handler.enable());
+      disabledHandlersRef.current = [];
     }, [collections, preferCurrentCentroid, progress]);
     useEffect(
       () => () => {
         const pending = pendingResetRef.current;
-        if (!pending) return;
-        pending.map.off(MapEventEnum.MOVE_END, pending.listener);
-        pendingResetRef.current = null;
+        if (pending) {
+          pending.map.off(MapEventEnum.MOVE_END, pending.listener);
+          pendingResetRef.current = null;
+        }
+        disabledHandlersRef.current.forEach((handler) => handler.enable());
+        disabledHandlersRef.current = [];
       },
       []
     );
@@ -226,6 +234,23 @@ const MapSection: React.FC<MapSectionProps> = memo(
                     pending.map.off(MapEventEnum.MOVE_END, pending.listener);
                     pendingResetRef.current = null;
                   }
+                  disabledHandlersRef.current.forEach((handler) =>
+                    handler.enable()
+                  );
+                  disabledHandlersRef.current = [
+                    map.scrollZoom,
+                    map.boxZoom,
+                    map.dragPan,
+                    map.keyboard,
+                    map.doubleClickZoom,
+                    map.touchZoomRotate,
+                    map.touchPitch,
+                  ].flatMap((handler) =>
+                    handler?.isEnabled() ? [handler] : []
+                  );
+                  disabledHandlersRef.current.forEach((handler) =>
+                    handler.disable()
+                  );
                   fitToDefaultExtent(map, undefined);
                   if (!map.isMoving()) {
                     afterReset();

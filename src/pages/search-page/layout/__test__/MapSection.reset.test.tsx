@@ -12,6 +12,11 @@ const mocks = vi.hoisted(() => {
     fit: vi.fn(),
     listeners,
     map: {
+      dragPan: {
+        isEnabled: () => true,
+        disable: vi.fn(),
+        enable: vi.fn(),
+      },
       on: (_event: string, callback: () => void) => {
         listeners.add(callback);
       },
@@ -138,6 +143,8 @@ describe("zoom reset search and centroid", () => {
     mocks.moving = false;
     mocks.listeners.clear();
     mocks.fit.mockReset();
+    mocks.map.dragPan.disable.mockClear();
+    mocks.map.dragPan.enable.mockClear();
   });
 
   it("forces a search and clears the centroid flag when that search finishes", () => {
@@ -156,6 +163,7 @@ describe("zoom reset search and centroid", () => {
       true
     );
     expect(screen.getByTestId("prefer-centroid")).toHaveTextContent("false");
+    expect(mocks.map.dragPan.disable).toHaveBeenCalledOnce();
 
     rerender(section(current, onMapZoomOrMove));
     expect(screen.getByTestId("prefer-centroid")).toHaveTextContent("false");
@@ -166,6 +174,7 @@ describe("zoom reset search and centroid", () => {
     // The search resolved without replacing the collections array.
     rerender(section(current, onMapZoomOrMove));
     expect(screen.getByTestId("prefer-centroid")).toHaveTextContent("true");
+    expect(mocks.map.dragPan.enable).toHaveBeenCalledOnce();
 
     fireEvent.click(screen.getByRole("button", { name: "Reset zoom" }));
     expect(screen.getByTestId("prefer-centroid")).toHaveTextContent("false");
