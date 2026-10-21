@@ -179,13 +179,13 @@ describe("zoom reset search and centroid", () => {
     );
     expect(screen.getByTestId("prefer-centroid")).toHaveTextContent("false");
     expect(mocks.map.dragPan.disable).toHaveBeenCalledOnce();
+    expect(mocks.map.dragPan.enable).toHaveBeenCalledOnce();
 
     // A search that was already running can clear progress and replace
     // collections. That must not end this reset.
     rerender(section(current, onMapZoomOrMove, ProgressType.LINEAR));
     rerender(section([], onMapZoomOrMove));
     expect(screen.getByTestId("prefer-centroid")).toHaveTextContent("false");
-    expect(mocks.map.dragPan.enable).not.toHaveBeenCalled();
 
     await act(async () => {
       resolveSearch();
@@ -206,6 +206,7 @@ describe("zoom reset search and centroid", () => {
 
     expect(mocks.fit).toHaveBeenCalledOnce();
     expect(onMapZoomOrMove).not.toHaveBeenCalled();
+    expect(mocks.map.dragPan.enable).not.toHaveBeenCalled();
     expect(screen.getByTestId("prefer-centroid")).toHaveTextContent("true");
 
     act(() => {
@@ -216,6 +217,7 @@ describe("zoom reset search and centroid", () => {
       expect.objectContaining({ type: MapEventEnum.MOVE_END }),
       true
     );
+    expect(mocks.map.dragPan.enable).toHaveBeenCalledOnce();
     expect(screen.getByTestId("prefer-centroid")).toHaveTextContent("false");
     expect(mocks.listeners.size).toBe(0);
   });

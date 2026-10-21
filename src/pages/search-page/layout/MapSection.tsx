@@ -139,8 +139,6 @@ const MapSection: React.FC<MapSectionProps> = memo(
     const finishReset = useCallback((token: number) => {
       if (resetTokenRef.current !== token) return;
       setPreferCurrentCentroid(true);
-      disabledHandlersRef.current.forEach((handler) => handler.enable());
-      disabledHandlersRef.current = [];
     }, []);
     useEffect(
       () => () => {
@@ -210,6 +208,12 @@ const MapSection: React.FC<MapSectionProps> = memo(
                 // reset started settles, not an earlier one.
                 onReset={(map) => {
                   const afterReset = () => {
+                    // The camera move is over. Searching must not keep pan
+                    // and zoom disabled.
+                    disabledHandlersRef.current.forEach((handler) =>
+                      handler.enable()
+                    );
+                    disabledHandlersRef.current = [];
                     const token = resetTokenRef.current + 1;
                     resetTokenRef.current = token;
                     setPreferCurrentCentroid(false);
