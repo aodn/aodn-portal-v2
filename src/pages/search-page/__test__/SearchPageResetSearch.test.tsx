@@ -7,7 +7,7 @@ import {
   it,
   vi,
 } from "vitest";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import { ThemeProvider } from "@mui/material/styles";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
@@ -101,10 +101,14 @@ it("reloads the map search when zoom reset forces the same extent", async () => 
   await waitFor(() => expect(mocks.mapSearches).toBeGreaterThan(0));
   const searchesAfterLoad = mocks.mapSearches;
 
-  mocks.onMapZoomOrMove?.(defaultExtentEvent);
+  act(() => {
+    mocks.onMapZoomOrMove?.(defaultExtentEvent);
+  });
   await new Promise((resolve) => setTimeout(resolve, 30));
   expect(mocks.mapSearches).toBe(searchesAfterLoad);
 
-  mocks.onMapZoomOrMove?.(defaultExtentEvent, true);
+  act(() => {
+    mocks.onMapZoomOrMove?.(defaultExtentEvent, true);
+  });
   await waitFor(() => expect(mocks.mapSearches).toBe(searchesAfterLoad + 1));
 });
