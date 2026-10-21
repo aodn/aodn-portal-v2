@@ -275,7 +275,7 @@ const SearchPage = () => {
       const listSearch = fetchRecord(true);
       listSearchAbortRef.current = listSearch;
       if (showMapRef.current) {
-        doMapSearch(needNavigate).finally(() => {});
+        return doMapSearch(needNavigate);
       } else if (needNavigate) {
         listSearch.then(() => {
           if (listSearchAbortRef.current === listSearch) {
@@ -341,7 +341,7 @@ const SearchPage = () => {
             //setZoom(event.target.getZoom());
             dispatch(updateFilterBBox(bbox));
             dispatch(updateZoom(event.target.getZoom()));
-            doListSearch(true);
+            return doListSearch(true);
           }
         }
       }

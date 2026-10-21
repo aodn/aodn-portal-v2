@@ -45,7 +45,10 @@ interface MapSectionProps
     ToggleControlProps {
   bbox?: [number, number, number, number];
   collections: OGCCollection[];
-  onMapZoomOrMove: (event: MapEvent | undefined, force?: boolean) => void;
+  onMapZoomOrMove: (
+    event: MapEvent | undefined,
+    force?: boolean
+  ) => void | Promise<void>;
   progress?: ProgressType;
   showFullMap: boolean;
   showFullList: boolean;
@@ -116,10 +119,9 @@ const MapSection: React.FC<MapSectionProps> = memo(
     const { isUnderLaptop } = useBreakpoint();
     const [preferCurrentCentroid, setPreferCurrentCentroid] =
       useState<boolean>(true);
-    // Collections on screen when reset was clicked. A search that keeps
-    // this reference still finishes by clearing the linear progress.
-    const collectionsWhenResetRef = useRef(collections);
-    const resetSearchStartedRef = useRef(false);
+    // Identifies the search this reset started. An older search settling
+    // must not turn the centroid preference back on.
+    const resetTokenRef = useRef(0);
     const disabledHandlersRef = useRef<
       Array<{ enable: () => void; disable: () => void }>
     >([]);
@@ -127,24 +129,12 @@ const MapSection: React.FC<MapSectionProps> = memo(
       map: { off: (type: string, listener: () => void) => void };
       listener: () => void;
     } | null>(null);
-    useEffect(() => {
-      if (preferCurrentCentroid) {
-        resetSearchStartedRef.current = false;
-        return;
-      }
-      if (progress === ProgressType.LINEAR) {
-        resetSearchStartedRef.current = true;
-        return;
-      }
-      const searchReturned =
-        resetSearchStartedRef.current ||
-        collections !== collectionsWhenResetRef.current;
-      if (!searchReturned) return;
-      resetSearchStartedRef.current = false;
+    const finishReset = (token: number) => {
+      if (resetTokenRef.current !== token) return;
       setPreferCurrentCentroid(true);
       disabledHandlersRef.current.forEach((handler) => handler.enable());
       disabledHandlersRef.current = [];
-    }, [collections, preferCurrentCentroid, progress]);
+    };
     useEffect(
       () => () => {
         const pending = pendingResetRef.current;
@@ -209,20 +199,24 @@ const MapSection: React.FC<MapSectionProps> = memo(
               <NavigationControl
                 visible={!isUnderLaptop}
                 // Reset flies back to the default Australia-wide extent.
-                // preferCurrentCentroid stays false until that search finishes.
+                // preferCurrentCentroid stays false until the search this
+                // reset started settles, not an earlier one.
                 onReset={(map) => {
                   const afterReset = () => {
-                    collectionsWhenResetRef.current = collections;
+                    const token = resetTokenRef.current + 1;
+                    resetTokenRef.current = token;
                     setPreferCurrentCentroid(false);
                     // flyTo has no originalEvent, so the normal move handler
                     // would ignore it. Ask for a search against the new extent.
-                    onMapZoomOrMove(
-                      {
-                        type: MapEventEnum.MOVE_END,
-                        target: map,
-                      } as MapEvent,
-                      true
-                    );
+                    void Promise.resolve(
+                      onMapZoomOrMove(
+                        {
+                          type: MapEventEnum.MOVE_END,
+                          target: map,
+                        } as MapEvent,
+                        true
+                      )
+                    ).finally(() => finishReset(token));
                   };
                   // Listen after flyTo. An animated flyTo is already moving
                   // when it returns, and any moveend it emits while starting

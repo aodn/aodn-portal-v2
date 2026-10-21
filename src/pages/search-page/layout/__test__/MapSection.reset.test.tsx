@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { act, fireEvent, render, screen } from "@testing-library/react";
+import type { MapEvent } from "mapbox-gl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MapEventEnum } from "@/components/map/mapbox/constants";
 import { ProgressType } from "@/components/map/mapbox/MapContext";
@@ -108,8 +109,15 @@ vi.mock("@/app/layout/MiniFooter", () => ({
   MAP_FOOTER_HEIGHT: "0px",
 }));
 
+type OnMapZoomOrMove = (
+  event: MapEvent | undefined,
+  force?: boolean
+) => void | Promise<void>;
+
 const renderSection = (collections: never[], progress?: ProgressType) => {
-  const onMapZoomOrMove = vi.fn();
+  const onMapZoomOrMove = vi.fn<OnMapZoomOrMove>(
+    () => new Promise<void>(() => {})
+  );
   const view = render(
     <MapSection
       showFullList={false}
@@ -125,7 +133,7 @@ const renderSection = (collections: never[], progress?: ProgressType) => {
 
 const section = (
   collections: never[],
-  onMapZoomOrMove: ReturnType<typeof vi.fn>,
+  onMapZoomOrMove: OnMapZoomOrMove,
   progress?: ProgressType
 ) => (
   <MapSection
@@ -147,9 +155,16 @@ describe("zoom reset search and centroid", () => {
     mocks.map.dragPan.enable.mockClear();
   });
 
-  it("forces a search and clears the centroid flag when that search finishes", () => {
+  it("forces a search and clears the centroid flag when that search finishes", async () => {
     const current: never[] = [];
     const { onMapZoomOrMove, rerender } = renderSection(current);
+    let resolveSearch = () => {};
+    onMapZoomOrMove.mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveSearch = resolve;
+        })
+    );
 
     expect(screen.getByTestId("prefer-centroid")).toHaveTextContent("true");
     fireEvent.click(screen.getByRole("button", { name: "Reset zoom" }));
@@ -165,21 +180,18 @@ describe("zoom reset search and centroid", () => {
     expect(screen.getByTestId("prefer-centroid")).toHaveTextContent("false");
     expect(mocks.map.dragPan.disable).toHaveBeenCalledOnce();
 
-    rerender(section(current, onMapZoomOrMove));
-    expect(screen.getByTestId("prefer-centroid")).toHaveTextContent("false");
-
+    // A search that was already running can clear progress and replace
+    // collections. That must not end this reset.
     rerender(section(current, onMapZoomOrMove, ProgressType.LINEAR));
+    rerender(section([], onMapZoomOrMove));
     expect(screen.getByTestId("prefer-centroid")).toHaveTextContent("false");
+    expect(mocks.map.dragPan.enable).not.toHaveBeenCalled();
 
-    // The search resolved without replacing the collections array.
-    rerender(section(current, onMapZoomOrMove));
+    await act(async () => {
+      resolveSearch();
+    });
     expect(screen.getByTestId("prefer-centroid")).toHaveTextContent("true");
     expect(mocks.map.dragPan.enable).toHaveBeenCalledOnce();
-
-    fireEvent.click(screen.getByRole("button", { name: "Reset zoom" }));
-    expect(screen.getByTestId("prefer-centroid")).toHaveTextContent("false");
-    rerender(section([], onMapZoomOrMove));
-    expect(screen.getByTestId("prefer-centroid")).toHaveTextContent("true");
   });
 
   it("waits for the reset move to finish before searching", () => {
