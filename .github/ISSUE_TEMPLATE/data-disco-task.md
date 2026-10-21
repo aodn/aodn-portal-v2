@@ -5,7 +5,6 @@ title: 📋(TASK)
 labels: ""
 assignees: ""
 type: Task
-projects: aodn/57
 ---
 
 ## Acceptance Criteria

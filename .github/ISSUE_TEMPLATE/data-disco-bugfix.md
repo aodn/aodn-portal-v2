@@ -5,7 +5,6 @@ title: 🐛(BUG)
 labels: ""
 assignees: ""
 type: Bug
-projects: aodn/57
 ---
 
 ## Expected Behaviour

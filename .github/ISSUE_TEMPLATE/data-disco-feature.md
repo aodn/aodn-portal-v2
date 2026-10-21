@@ -5,7 +5,6 @@ title: ✨(FEATURE)
 labels: ""
 assignees: ""
 type: Feature
-projects: aodn/57
 ---
 
 ## User Story
