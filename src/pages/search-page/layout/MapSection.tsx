@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { LngLatBounds, type MapEvent } from "mapbox-gl";
+import { LngLatBounds, type Map as MapboxMap, type MapEvent } from "mapbox-gl";
 import { Box, Paper, SxProps, Theme } from "@mui/material";
 import Map, { MapBasicType } from "@/components/map/mapbox/Map";
 import Controls from "@/components/map/mapbox/controls/Controls";
@@ -140,6 +140,64 @@ const MapSection: React.FC<MapSectionProps> = memo(
       if (resetTokenRef.current !== token) return;
       setPreferCurrentCentroid(true);
     }, []);
+    const onReset = useCallback(
+      (map: MapboxMap) => {
+        const afterReset = () => {
+          // The camera move is over. Searching must not keep pan and zoom
+          // disabled.
+          disabledHandlersRef.current.forEach((handler) => handler.enable());
+          disabledHandlersRef.current = [];
+          const token = resetTokenRef.current + 1;
+          resetTokenRef.current = token;
+          setPreferCurrentCentroid(false);
+          // flyTo has no originalEvent, so the normal move handler would
+          // ignore it. Ask for a search against the new extent.
+          void Promise.resolve(
+            onMapZoomOrMove(
+              {
+                type: MapEventEnum.MOVE_END,
+                target: map,
+              } as MapEvent,
+              true
+            )
+          ).finally(() => finishReset(token));
+        };
+        // Listen after flyTo. An animated flyTo is already moving when it
+        // returns, and any moveend it emits while starting belongs to the
+        // interrupted camera move. map.on, not map.once: once wraps the
+        // listener so off cannot remove it if this section unmounts before
+        // the animation ends.
+        const pending = pendingResetRef.current;
+        if (pending) {
+          pending.map.off(MapEventEnum.MOVE_END, pending.listener);
+          pendingResetRef.current = null;
+        }
+        disabledHandlersRef.current.forEach((handler) => handler.enable());
+        disabledHandlersRef.current = [
+          map.scrollZoom,
+          map.boxZoom,
+          map.dragPan,
+          map.keyboard,
+          map.doubleClickZoom,
+          map.touchZoomRotate,
+          map.touchPitch,
+        ].flatMap((handler) => (handler?.isEnabled() ? [handler] : []));
+        disabledHandlersRef.current.forEach((handler) => handler.disable());
+        fitToDefaultExtent(map, undefined);
+        if (!map.isMoving()) {
+          afterReset();
+          return;
+        }
+        const listener = () => {
+          pendingResetRef.current = null;
+          map.off(MapEventEnum.MOVE_END, listener);
+          afterReset();
+        };
+        pendingResetRef.current = { map, listener };
+        map.on(MapEventEnum.MOVE_END, listener);
+      },
+      [finishReset, onMapZoomOrMove]
+    );
     useEffect(
       () => () => {
         const pending = pendingResetRef.current;
@@ -201,75 +259,7 @@ const MapSection: React.FC<MapSectionProps> = memo(
                 onToggleClicked={onToggleClicked}
                 showFullMap={showFullMap}
               />
-              <NavigationControl
-                visible={!isUnderLaptop}
-                // Reset flies back to the default Australia-wide extent.
-                // preferCurrentCentroid stays false until the search this
-                // reset started settles, not an earlier one.
-                onReset={(map) => {
-                  const afterReset = () => {
-                    // The camera move is over. Searching must not keep pan
-                    // and zoom disabled.
-                    disabledHandlersRef.current.forEach((handler) =>
-                      handler.enable()
-                    );
-                    disabledHandlersRef.current = [];
-                    const token = resetTokenRef.current + 1;
-                    resetTokenRef.current = token;
-                    setPreferCurrentCentroid(false);
-                    // flyTo has no originalEvent, so the normal move handler
-                    // would ignore it. Ask for a search against the new extent.
-                    void Promise.resolve(
-                      onMapZoomOrMove(
-                        {
-                          type: MapEventEnum.MOVE_END,
-                          target: map,
-                        } as MapEvent,
-                        true
-                      )
-                    ).finally(() => finishReset(token));
-                  };
-                  // Listen after flyTo. An animated flyTo is already moving
-                  // when it returns, and any moveend it emits while starting
-                  // belongs to the interrupted camera move. map.on, not
-                  // map.once: once wraps the listener so off cannot remove it
-                  // if this section unmounts before the animation ends.
-                  const pending = pendingResetRef.current;
-                  if (pending) {
-                    pending.map.off(MapEventEnum.MOVE_END, pending.listener);
-                    pendingResetRef.current = null;
-                  }
-                  disabledHandlersRef.current.forEach((handler) =>
-                    handler.enable()
-                  );
-                  disabledHandlersRef.current = [
-                    map.scrollZoom,
-                    map.boxZoom,
-                    map.dragPan,
-                    map.keyboard,
-                    map.doubleClickZoom,
-                    map.touchZoomRotate,
-                    map.touchPitch,
-                  ].flatMap((handler) =>
-                    handler?.isEnabled() ? [handler] : []
-                  );
-                  disabledHandlersRef.current.forEach((handler) =>
-                    handler.disable()
-                  );
-                  fitToDefaultExtent(map, undefined);
-                  if (!map.isMoving()) {
-                    afterReset();
-                    return;
-                  }
-                  const listener = () => {
-                    pendingResetRef.current = null;
-                    map.off(MapEventEnum.MOVE_END, listener);
-                    afterReset();
-                  };
-                  pendingResetRef.current = { map, listener };
-                  map.on(MapEventEnum.MOVE_END, listener);
-                }}
-              />
+              <NavigationControl visible={!isUnderLaptop} onReset={onReset} />
               <ScaleControl />
               <DisplayCoordinate />
               <MenuControlGroup>
