@@ -1,4 +1,11 @@
-import React, { memo, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { LngLatBounds, type MapEvent } from "mapbox-gl";
 import { Box, Paper, SxProps, Theme } from "@mui/material";
 import Map, { MapBasicType } from "@/components/map/mapbox/Map";
@@ -129,12 +136,12 @@ const MapSection: React.FC<MapSectionProps> = memo(
       map: { off: (type: string, listener: () => void) => void };
       listener: () => void;
     } | null>(null);
-    const finishReset = (token: number) => {
+    const finishReset = useCallback((token: number) => {
       if (resetTokenRef.current !== token) return;
       setPreferCurrentCentroid(true);
       disabledHandlersRef.current.forEach((handler) => handler.enable());
       disabledHandlersRef.current = [];
-    };
+    }, []);
     useEffect(
       () => () => {
         const pending = pendingResetRef.current;
