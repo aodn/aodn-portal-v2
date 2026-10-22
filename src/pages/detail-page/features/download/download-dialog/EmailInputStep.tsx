@@ -160,7 +160,7 @@ const EmailInputStep: React.FC<EmailInputStepProps> = ({
       placeholder="example@email.com"
       type="email"
       fullWidth
-      variant={emailHasError ? "outlined" : "standard"}
+      variant="standard"
       error={emailHasError}
       onChange={updateEmailValue}
       value={localEmail}
@@ -170,6 +170,21 @@ const EmailInputStep: React.FC<EmailInputStepProps> = ({
       sx={{
         ...textFieldStyles.container,
         "& .MuiInputBase-root": textFieldStyles.inputRoot,
+        "& .MuiInputBase-root.Mui-error": {
+          mt: 0,
+          outline: `1px solid ${portalTheme.palette.error.main}`,
+          outlineOffset: "-1px",
+          "&:before, &:hover:not(.Mui-disabled):before, &:after": {
+            borderBottom: "none",
+          },
+        },
+        "& .MuiInputLabel-root.Mui-error": {
+          zIndex: 1,
+          transform: "translate(14px, 16px) scale(1)",
+          "&.MuiInputLabel-shrink": {
+            transform: "translate(14px, -9px) scale(0.75)",
+          },
+        },
         "& .MuiInputBase-root.MuiInput-root .MuiInputBase-input": {
           ...textFieldStyles.input,
           ...portalTheme.typography.title2Regular,
