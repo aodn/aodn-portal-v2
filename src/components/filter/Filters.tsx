@@ -20,7 +20,10 @@ interface FiltersProps {
   sx?: SxProps;
 }
 
-const TAB_MAX_HEIGHT = 300;
+const TAB_CONTENT_SX: SxProps = {
+  maxHeight: { xs: 350, sm: "none" },
+  overflowY: { xs: "auto", sm: "visible" },
+};
 
 const checkBadge = (filters: FilterValues, tabName: FiltersTabs): boolean => {
   switch (tabName) {
@@ -69,7 +72,7 @@ const FiltersFC: FC<FiltersProps> = ({ sx }) => {
         <ThemeFilter
           filters={filters}
           setFilters={setFilters}
-          sx={{ maxHeight: TAB_MAX_HEIGHT, overflowY: "scroll" }}
+          sx={TAB_CONTENT_SX}
         />
       ),
       showBadge: checkBadge(filters, FiltersTabs.Parameters),
@@ -81,7 +84,7 @@ const FiltersFC: FC<FiltersProps> = ({ sx }) => {
         <PlatformFilter
           filters={filters}
           setFilters={setFilters}
-          sx={{ maxHeight: TAB_MAX_HEIGHT, overflowY: "scroll" }}
+          sx={TAB_CONTENT_SX}
         />
       ),
       showBadge: checkBadge(filters, FiltersTabs.Platform),
@@ -93,7 +96,7 @@ const FiltersFC: FC<FiltersProps> = ({ sx }) => {
         <OrganisationFilter
           filters={filters}
           setFilters={setFilters}
-          sx={{ maxHeight: TAB_MAX_HEIGHT, overflowY: "scroll" }}
+          sx={TAB_CONTENT_SX}
         />
       ),
       showBadge: checkBadge(filters, FiltersTabs.Organisation),
@@ -105,7 +108,7 @@ const FiltersFC: FC<FiltersProps> = ({ sx }) => {
         <DataSettingsFilter
           filters={filters}
           setFilters={setFilters}
-          sx={{ maxHeight: TAB_MAX_HEIGHT, overflowY: "scroll" }}
+          sx={TAB_CONTENT_SX}
         />
       ),
       showBadge: checkBadge(filters, FiltersTabs.DataSettings),
