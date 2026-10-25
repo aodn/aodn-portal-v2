@@ -288,24 +288,22 @@ describe("DateRangeFilter", () => {
     expect(screen.getByLabelText("Last 5 years")).toBeChecked();
   });
 
-  it("only counts a collection as IMOS-only when dataset_group is exactly ['imos'], even if the backend's coarse pre-filter returns more", async () => {
+  it("keeps only dataset_group exactly ['imos'] from the single collections fetch", async () => {
+    let filter = "";
     server.use(
       http.get("/api/v1/ogc/collections", ({ request }) => {
         const url = new URL(request.url);
-        const filter = url.searchParams.get("filter") ?? "";
-        if (filter.includes("dataset_group")) {
-          return HttpResponse.json({
-            collections: [
-              { id: "imos-only", properties: { dataset_group: ["imos"] } },
-              {
-                id: "imos-and-aims",
-                properties: { dataset_group: ["imos", "aims"] },
-              },
-              { id: "aims-only", properties: { dataset_group: ["aims"] } },
-            ],
-          });
-        }
-        return HttpResponse.json({ collections: [] });
+        filter = url.searchParams.get("filter") ?? "";
+        return HttpResponse.json({
+          collections: [
+            { id: "imos-only", properties: { dataset_group: ["imos"] } },
+            {
+              id: "imos-and-aims",
+              properties: { dataset_group: ["imos", "aims"] },
+            },
+            { id: "aims-only", properties: { dataset_group: ["aims"] } },
+          ],
+        });
       })
     );
 
@@ -314,5 +312,7 @@ describe("DateRangeFilter", () => {
     await waitFor(() => {
       expect(capturedImosDataIds).toEqual(["imos-only"]);
     });
+    expect(filter).not.toContain("dataset_group");
+    expect(filter).toContain("temporal after");
   });
 });
