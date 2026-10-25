@@ -109,8 +109,10 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
   );
 
   // Memoized derived dates
-  const minDate = useMemo(() => unixMsToAppDayjs(value[0]), [value]);
-  const maxDate = useMemo(() => unixMsToAppDayjs(value[1]), [value]);
+  const [minDate, maxDate] = useMemo(
+    () => [unixMsToAppDayjs(value[0]), unixMsToAppDayjs(value[1])],
+    [value]
+  );
 
   // Helper to check if given star-end period falls in any of the radio group year-range options
   const determineSelectedOption = useCallback(
