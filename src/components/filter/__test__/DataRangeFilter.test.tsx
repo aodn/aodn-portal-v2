@@ -288,12 +288,12 @@ describe("DateRangeFilter", () => {
     expect(screen.getByLabelText("Last 5 years")).toBeChecked();
   });
 
-  it("only counts a collection as IMOS-only when dataset_group is exactly ['imos'], even if the backend's coarse pre-filter returns more", async () => {
+  it("only counts a collection as IMOS-only when dataset_group is exactly ['imos']", async () => {
     server.use(
       http.get("/api/v1/ogc/collections", ({ request }) => {
         const url = new URL(request.url);
-        const filter = url.searchParams.get("filter") ?? "";
-        if (filter.includes("dataset_group")) {
+        const properties = url.searchParams.get("properties") ?? "";
+        if (properties.includes("dataset_group")) {
           return HttpResponse.json({
             collections: [
               { id: "imos-only", properties: { dataset_group: ["imos"] } },
