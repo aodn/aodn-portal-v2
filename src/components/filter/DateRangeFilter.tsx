@@ -31,11 +31,7 @@ import {
   fetchResultNoStore,
   jsonToOGCCollections,
 } from "@/app/store/searchReducer";
-import {
-  cqlDefaultFilters,
-  DatasetGroup,
-  TemporalDuring,
-} from "../common/cqlFilters";
+import { cqlDefaultFilters, TemporalDuring } from "../common/cqlFilters";
 import TimeRangeBarChart from "../common/charts/TimeRangeBarChart";
 import PlainDatePicker from "../common/datetime/PlainDatePicker";
 import PlainSlider from "../common/slider/PlainSlider";
@@ -361,35 +357,22 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
   }, [dateTimeFilterRange, determineSelectedOption, initialMaxDate]);
 
   useEffect(() => {
-    // Find all collection, with simple sort by id, query run faster then the default sort
+    // Find all collection, with simple sort by id, query run faster than the default sort
     dispatch(
       fetchResultNoStore({
-        properties: "id,temporal",
+        properties: "id,temporal,dataset_group",
         filter: `${cqlDefaultFilters.get("ALL_TIME_RANGE")}`,
         sortby: "id",
       })
     )
       .unwrap()
       .then((value: string) => {
-        // Find all id of collection from imosOnly. The CQL filter below is a
-        // coarse pre-filter (it may also match a dataset_group that merely
-        // contains "imos" alongside other groups); isImosOnly() enforces the
-        // exact ["imos"]-only rule client-side.
-        dispatch(
-          fetchResultNoStore({
-            properties: "id,dataset_group",
-            filter: `${cqlDefaultFilters.get("ALL_TIME_RANGE")} AND ${(cqlDefaultFilters.get("DATASET_GROUP") as DatasetGroup)("imos")}`,
-            sortby: "id",
-          })
-        )
-          .unwrap()
-          .then((imosOnlyCollection: string) => {
-            const ids = jsonToOGCCollections(imosOnlyCollection)
-              .collections.filter((value: OGCCollection) => value.isImosOnly())
-              .map((value: OGCCollection) => value.id);
-            setImosDataIds(ids);
-            setTotalDataset(jsonToOGCCollections(value));
-          });
+        const collections = jsonToOGCCollections(value);
+        const ids = collections.collections
+          .filter((value: OGCCollection) => value.isImosOnly())
+          .map((value: OGCCollection) => value.id);
+        setImosDataIds(ids);
+        setTotalDataset(collections);
       });
   }, [dispatch]);
 
