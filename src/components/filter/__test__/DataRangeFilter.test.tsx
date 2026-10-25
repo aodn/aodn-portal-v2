@@ -8,7 +8,7 @@ import {
   afterEach,
   afterAll,
 } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import { http, HttpResponse } from "msw";
@@ -21,8 +21,13 @@ import { dayjsToUnixMs, toAppDayjs, unixMsToAppDayjs } from "@/utils/DateUtils";
 import axios from "axios";
 import { server } from "@/__mocks__/server";
 
+let capturedImosDataIds: string[] | undefined;
+
 vi.mock("../../common/charts/TimeRangeBarChart", () => ({
-  default: () => <div data-testid="time-range-bar-chart" />,
+  default: (props: { imosDataIds: string[] }) => {
+    capturedImosDataIds = props.imosDataIds;
+    return <div data-testid="time-range-bar-chart" />;
+  },
 }));
 
 vi.mock("../../../hooks/useBreakpoint", () => ({
@@ -69,6 +74,7 @@ describe("DateRangeFilter", () => {
         HttpResponse.json({ collections: [] })
       )
     );
+    capturedImosDataIds = undefined;
   });
 
   afterEach(() => {
@@ -280,5 +286,33 @@ describe("DateRangeFilter", () => {
     renderComponent();
 
     expect(screen.getByLabelText("Last 5 years")).toBeChecked();
+  });
+
+  it("keeps only dataset_group exactly ['imos'] from the single collections fetch", async () => {
+    let filter = "";
+    server.use(
+      http.get("/api/v1/ogc/collections", ({ request }) => {
+        const url = new URL(request.url);
+        filter = url.searchParams.get("filter") ?? "";
+        return HttpResponse.json({
+          collections: [
+            { id: "imos-only", properties: { dataset_group: ["imos"] } },
+            {
+              id: "imos-and-aims",
+              properties: { dataset_group: ["imos", "aims"] },
+            },
+            { id: "aims-only", properties: { dataset_group: ["aims"] } },
+          ],
+        });
+      })
+    );
+
+    renderComponent();
+
+    await waitFor(() => {
+      expect(capturedImosDataIds).toEqual(["imos-only"]);
+    });
+    expect(filter).not.toContain("dataset_group");
+    expect(filter).toContain("temporal after");
   });
 });
