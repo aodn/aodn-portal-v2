@@ -158,6 +158,19 @@ describe("Search Reducer Function Test", () => {
     );
   });
 
+  it("includes a start timestamp of zero in the temporal range", () => {
+    const result = createSearchParamFrom({
+      dateTimeFilterRange: {
+        start: 0,
+        end: dayjs.utc("2020-01-01").valueOf(),
+      },
+    });
+
+    expect(result.filter).toContain(
+      "temporal DURING 1970-01-01T00:00:00Z/2020-01-01T23:59:59Z"
+    );
+  });
+
   it("uses BEFORE the end date when only end is set", () => {
     const param: ParameterState = {
       dateTimeFilterRange: {

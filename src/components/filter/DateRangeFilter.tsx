@@ -75,7 +75,10 @@ const dateRangeOptions: DateRangeOption[] = [
   { label: "Last 10 years", value: DateRangeOptionValues.LastTenYears },
 ];
 
-const initialMinDate: Dayjs = dateDefault.min;
+const DEFAULT_SEARCH_MIN_DATE = toAppDayjs(
+  "1970-01-01",
+  dateDefault.DATE_FORMAT
+);
 
 interface DateRangeFilterProps {}
 
@@ -89,11 +92,31 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
   const dateTimeFilterRange = useAppSelector(
     (state) => state.paramReducer.dateTimeFilterRange
   );
+  const rangeStart = dateTimeFilterRange?.start;
+  const rangeEnd = dateTimeFilterRange?.end;
+  const initialMinDate = useMemo(() => {
+    const defaultMin = dayjsToUnixMs(toUtcStartOfDay(DEFAULT_SEARCH_MIN_DATE));
+    const restoredBounds = [rangeStart, rangeEnd].filter(
+      (bound): bound is number => bound !== undefined
+    );
+    // Expand the slider for historical selections and links with only an end date.
+    const min = restoredBounds.some((bound) => bound < defaultMin)
+      ? Math.min(
+          dayjsToUnixMs(toUtcStartOfDay(dateDefault.min)),
+          ...restoredBounds
+        )
+      : defaultMin;
+    return toUtcStartOfDay(unixMsToAppDayjs(min));
+  }, [rangeStart, rangeEnd]);
+  // The initial slider range is narrower than the dates the picker accepts.
+  const pickerMinDate = initialMinDate.isBefore(dateDefault.min, "day")
+    ? initialMinDate
+    : dateDefault.min;
 
   // Local state for date-range-slider
   const [value, setValue] = useState<number[]>(() => [
-    dayjsToUnixMs(toUtcStartOfDay(initialMinDate)),
-    dayjsToUnixMs(toUtcEndOfDay(dateDefault.max)),
+    rangeStart ?? dayjsToUnixMs(toUtcStartOfDay(initialMinDate)),
+    rangeEnd ?? dayjsToUnixMs(toUtcEndOfDay(initialMaxDate)),
   ]);
 
   // Local state for radio group
@@ -210,7 +233,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
       if (
         localMinDate?.isValid() &&
         Number.isFinite(newStart) &&
-        !localMinDate.isBefore(initialMinDate, "day") &&
+        !localMinDate.isBefore(pickerMinDate, "day") &&
         !localMinDate.isAfter(maxDate, "day")
       ) {
         setValue([newStart, value[1]]);
@@ -226,7 +249,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
         setValue([value[0], value[1]]);
       }
     },
-    [determineSelectedOption, dispatch, maxDate, value]
+    [determineSelectedOption, dispatch, maxDate, pickerMinDate, value]
   );
 
   const handleMaxDateChange = useCallback(
@@ -356,7 +379,12 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
         setSelectedOption(DateRangeOptionValues.Custom);
       }
     });
-  }, [dateTimeFilterRange, determineSelectedOption, initialMaxDate]);
+  }, [
+    dateTimeFilterRange,
+    determineSelectedOption,
+    initialMaxDate,
+    initialMinDate,
+  ]);
 
   useEffect(() => {
     // Find all collection, with simple sort by id, query run faster then the default sort
@@ -442,7 +470,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                   views={["year", "month", "day"]}
                   format={dateDefault.DISPLAY_FORMAT}
                   value={minDate}
-                  minDate={initialMinDate}
+                  minDate={pickerMinDate}
                   maxDate={unixMsToAppDayjs(value[1])}
                   onChange={(date) => handleMinDateChange(date as Dayjs)}
                   slots={{

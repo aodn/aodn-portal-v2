@@ -184,6 +184,37 @@ describe("TimeRangeBarChart", () => {
     expect(buckets[0].total).toBe(2); // Both collections overlap
   });
 
+  it("counts historical intervals overlapping the visible range from 1970", () => {
+    const { determineXWithBucketsBy } = getPrivateFunctions();
+    const totalDataset = Object.assign(new OGCCollections(), {
+      collections: [
+        {
+          id: "historical",
+          extent: {
+            temporal: {
+              interval: [["1840-01-01T00:00:00Z", "2000-01-01T00:00:00Z"]],
+            },
+          },
+        },
+      ],
+    });
+    const { xValues, buckets } = determineXWithBucketsBy(
+      dayjs.utc("1970-01-01"),
+      dayjs.utc("1972-12-31"),
+      ["historical"],
+      totalDataset,
+      DividedBy.year
+    );
+
+    expect(xValues[0].getUTCFullYear()).toBe(1970);
+    expect(buckets).toHaveLength(3);
+    expect(
+      buckets.every(
+        (bucket: Bucket) => bucket.total === 1 && bucket.imosOnlyCount === 1
+      )
+    ).toBe(true);
+  });
+
   // Test createSeries
   it("createSeries generates correct series data", () => {
     const { createSeries } = getPrivateFunctions();
