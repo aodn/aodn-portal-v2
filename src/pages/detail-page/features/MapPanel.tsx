@@ -203,6 +203,8 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     downloadService,
     selectedCoKey,
     setSelectedCoKey,
+    selectionGeneration,
+    isCurrentSelectionGeneration,
     setMapSubsettingCapabilities,
     isSubsettingSupported,
   } = useDetailPageContext();
@@ -749,12 +751,14 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
                   visible={isSubsettingSupported(SubsettingType.TimeSlider)}
                   menu={
                     <DateRange
-                      // Remount when slider bounds change so thumbs reset to full coverage
-                      key={`date-range-${minDateStamp.format(dateDefault.DATE_FORMAT)}-${maxDateStamp.format(dateDefault.DATE_FORMAT)}`}
                       minDate={minDateStamp.format(dateDefault.DATE_FORMAT)}
                       maxDate={maxDateStamp.format(dateDefault.DATE_FORMAT)}
                       getAndSetDownloadConditions={getAndSetDownloadConditions}
                       downloadConditions={downloadConditions}
+                      selectionGeneration={selectionGeneration}
+                      isCurrentSelectionGeneration={
+                        isCurrentSelectionGeneration
+                      }
                     />
                   }
                 />

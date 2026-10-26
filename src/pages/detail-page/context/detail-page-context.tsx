@@ -28,7 +28,15 @@ export interface DetailPageContextType {
   selectedWmsLayer: string;
   setSelectedWmsLayer: Dispatch<SetStateAction<string>>;
   selectedCoKey: string;
-  setSelectedCoKey: Dispatch<SetStateAction<string>>;
+  /**
+   * Select a dataset. A real change (from a non-empty, different key) clears
+   * the DATE_RANGE condition and bumps `selectionGeneration`.
+   */
+  setSelectedCoKey: (key: string) => void;
+  /** Incremented on every real dataset change. */
+  selectionGeneration: number;
+  /** False when `generation` was captured before a later dataset change. */
+  isCurrentSelectionGeneration: (generation: number) => boolean;
   lastSelectedMapLayer: LayerSwitcherLayer<LayerName> | null;
   setLastSelectedMapLayer: Dispatch<
     SetStateAction<LayerSwitcherLayer<LayerName> | null>
@@ -57,6 +65,8 @@ const DetailPageContextDefault: DetailPageContextType = {
   setSelectedWmsLayer: () => {},
   selectedCoKey: "",
   setSelectedCoKey: () => {},
+  selectionGeneration: 0,
+  isCurrentSelectionGeneration: () => true,
   lastSelectedMapLayer: null,
   setLastSelectedMapLayer: () => {},
   downloadService: DownloadServiceType.Unavailable,

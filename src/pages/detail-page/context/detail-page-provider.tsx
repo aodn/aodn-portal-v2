@@ -1,6 +1,6 @@
 import { ErrorResponse } from "@/utils/ErrorBoundary";
 import { useParams } from "react-router-dom";
-import { FC, ReactNode, useCallback, useEffect, useState } from "react";
+import { FC, ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { fetchResultByUuidNoStore } from "@/app/store/searchReducer";
 import { DetailPageContext } from "./detail-page-context";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
@@ -97,6 +97,37 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
     []
   );
 
+  // Mirrors `selectedCoKey` synchronously so rapid switches compare against
+  // the latest selection, not a stale render value.
+  const selectedCoKeyRef = useRef("");
+  // Bumped on every real dataset change. Debounced time-range commits capture
+  // the generation when scheduled and are rejected if it is no longer current.
+  const selectionGenerationRef = useRef(0);
+  const [selectionGeneration, setSelectionGeneration] = useState(0);
+
+  const selectCoKey = useCallback(
+    (key: string) => {
+      const prev = selectedCoKeyRef.current;
+      if (key === prev) return;
+      selectedCoKeyRef.current = key;
+      // The initial default selection ("" → key) is not a dataset change, so
+      // keep any existing time subset. A real change invalidates it because
+      // the new dataset has its own temporal bounds.
+      if (prev) {
+        selectionGenerationRef.current += 1;
+        setSelectionGeneration(selectionGenerationRef.current);
+        clearDownloadConditions([DownloadConditionType.DATE_RANGE]);
+      }
+      setSelectedCoKey(key);
+    },
+    [clearDownloadConditions]
+  );
+
+  const isCurrentSelectionGeneration = useCallback(
+    (generation: number) => generation === selectionGenerationRef.current,
+    []
+  );
+
   useEffect(() => {
     if (!uuid) return;
     let cancelled = false;
@@ -160,7 +191,9 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         selectedWmsLayer,
         setSelectedWmsLayer,
         selectedCoKey,
-        setSelectedCoKey,
+        setSelectedCoKey: selectCoKey,
+        selectionGeneration,
+        isCurrentSelectionGeneration,
         lastSelectedMapLayer,
         setLastSelectedMapLayer,
         downloadService,

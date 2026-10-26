@@ -30,6 +30,10 @@ interface DateRangeControlProps extends ControlProps {
     conditions: IDownloadCondition[]
   ) => IDownloadCondition[];
   downloadConditions: IDownloadCondition[];
+  /** Dataset selection generation current when this render happened. */
+  selectionGeneration?: number;
+  /** Live check against the provider's latest selection generation. */
+  isCurrentSelectionGeneration?: (generation: number) => boolean;
 }
 
 const MENU_ID = "daterange-show-hide-menu-button";
@@ -39,6 +43,8 @@ const DateRange: React.FC<DateRangeControlProps> = ({
   maxDate,
   getAndSetDownloadConditions,
   downloadConditions,
+  selectionGeneration = 0,
+  isCurrentSelectionGeneration = () => true,
   map, // Map instance passed through ControlProps via cloneElement
 }) => {
   const [open, setOpen] = useState<boolean>(false);
@@ -67,6 +73,12 @@ const DateRange: React.FC<DateRangeControlProps> = ({
       _: Event | React.SyntheticEvent<Element, Event>,
       dateRangeStamps: number | number[]
     ) => {
+      // DateSlider debounces this callback, so it can fire after the dataset
+      // changed. `selectionGeneration` is the value captured when the update
+      // was scheduled; drop it if the selection has moved on since, even when
+      // the new dataset has the same bounds or its metadata is still loading.
+      if (!isCurrentSelectionGeneration(selectionGeneration)) return;
+
       const d = dateRangeStamps as number[];
       const start = unixMsToAppDayjs(d[0]).format(dateDefault.DATE_FORMAT);
       const end = unixMsToAppDayjs(d[1]).format(dateDefault.DATE_FORMAT);
@@ -98,7 +110,13 @@ const DateRange: React.FC<DateRangeControlProps> = ({
         setCurrentMaxDate(end);
       }
     },
-    [maxDate, minDate, getAndSetDownloadConditions]
+    [
+      maxDate,
+      minDate,
+      getAndSetDownloadConditions,
+      selectionGeneration,
+      isCurrentSelectionGeneration,
+    ]
   );
 
   useEffect(() => {
