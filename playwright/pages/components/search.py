@@ -42,21 +42,21 @@ class SearchComponent(BasePage):
         self.search_field.fill(search_text)
 
     def select_start_date(self, chosen_date: date) -> None:
-        """Choose a start date through the desktop or mobile calendar."""
+        """Choose a start date through the desktop field or mobile calendar."""
         field = self.start_date_picker.get_by_role('textbox')
-        if field.get_attribute('readonly') is not None:
-            field.click()
-        else:
-            self.start_date_picker.get_by_role('button').click()
+        if field.get_attribute('readonly') is None:
+            self._fill_desktop_start_date(field, chosen_date)
+            return
 
+        field.click()
         dialog = self.page.get_by_role('dialog')
         expect(dialog).to_be_visible()
-        switch_to_year = dialog.get_by_role(
+        dialog.get_by_role(
             'button',
             name='calendar view is open, switch to year view',
             exact=True,
-        )
-        switch_to_year.click()
+        ).click()
+        # Mobile year view opens at the top of the list, so 1830 is exposed.
         dialog.get_by_role(
             'radio', name=str(chosen_date.year), exact=True
         ).click()
@@ -69,6 +69,23 @@ class SearchComponent(BasePage):
         confirm = dialog.get_by_role('button', name='OK', exact=True)
         if confirm.is_visible():
             confirm.click()
+        expect(dialog).not_to_be_visible()
+
+    def _fill_desktop_start_date(
+        self, field: Locator, chosen_date: date
+    ) -> None:
+        """Type a date into the desktop field.
+
+        The desktop year list scrolls to the current year and drops earlier
+        years from the accessibility tree, so the 1830 radio cannot be clicked.
+        """
+        field.click()
+        field.press('Control+A')
+        field.press_sequentially(chosen_date.strftime('%d%b%Y'), delay=20)
+        field.press('Enter')
+        dialog = self.page.get_by_role('dialog')
+        if dialog.is_visible():
+            self.page.keyboard.press('Escape')
         expect(dialog).not_to_be_visible()
 
     def click_search_button(self) -> None:

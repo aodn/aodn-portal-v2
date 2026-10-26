@@ -1148,8 +1148,11 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   );
 
   const datasetOptions = useMemo<SelectItem<string>[]>(() => {
-    const coKeys = collection?.getAllCOKeys() ?? [];
-    return coKeys.map((key) => ({
+    const coKeys: string[] = collection?.getAllCOKeys() ?? [];
+    // This guarantees you don't accidentally mutate the underlying data
+    // structure inside the collection object. Sort the string is a must
+    // so that we can change the name to make a particular dataset appear on top
+    return [...coKeys].sort().map((key) => ({
       value: key,
       label: key.replace(/\.(zarr|parquet)$/i, ""),
     }));
