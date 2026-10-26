@@ -7,7 +7,9 @@ class Routes:
     CATEGORY = f'{PREFIX}/ext/parameter/categories'
     AUTOCOMPLETE = f'{PREFIX}/ext/autocomplete?*'
     VOCABS = f'{PREFIX}/ext/parameter/vocabs'
-    COLLECTION_TEMPORAL = f'{PREFIX}/collections?properties=id,temporal&*'
+    COLLECTION_TEMPORAL = (
+        f'{PREFIX}/collections?properties=id,temporal,dataset_group&*'
+    )
     COLLECTION_PROVIDER = f'{PREFIX}/collections?properties=id,providers&*'
     COLLECTION_CENTROID = f'{PREFIX}/collections?properties=id,centroid&*'
     COLLECTION_ALL = f'{PREFIX}/collections?properties=id,title,description,status,scope,ai_update_frequency,links,assets_summary,bbox&*'

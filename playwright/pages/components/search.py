@@ -1,3 +1,4 @@
+from datetime import date
 from typing import List
 
 from playwright.sync_api import Locator, Page, expect
@@ -24,6 +25,12 @@ class SearchComponent(BasePage):
         self.location_button = page.get_by_test_id('location-button')
         self.filter_button = page.get_by_test_id('filtersBtn')
         self.searchbar_popup = page.get_by_test_id('searchbar-popup')
+        self.start_date_slider = self.searchbar_popup.get_by_role(
+            'slider'
+        ).first
+        self.imos_histogram_bars = self.searchbar_popup.locator(
+            '.MuiBarElement-series-imos-data-id:visible'
+        )
         self.filter_parameters_tab = self.get_tab('Parameters')
         self.filter_platform_tab = self.get_tab('Platform')
         self.filter_organisation_tab = self.get_tab('Organisation')
@@ -33,6 +40,36 @@ class SearchComponent(BasePage):
     def fill_search_text(self, search_text: str) -> None:
         """Fill up search text"""
         self.search_field.fill(search_text)
+
+    def select_start_date(self, chosen_date: date) -> None:
+        """Choose a start date through the desktop or mobile calendar."""
+        field = self.start_date_picker.get_by_role('textbox')
+        if field.get_attribute('readonly') is not None:
+            field.click()
+        else:
+            self.start_date_picker.get_by_role('button').click()
+
+        dialog = self.page.get_by_role('dialog')
+        expect(dialog).to_be_visible()
+        switch_to_year = dialog.get_by_role(
+            'button',
+            name='calendar view is open, switch to year view',
+            exact=True,
+        )
+        switch_to_year.click()
+        dialog.get_by_role(
+            'radio', name=str(chosen_date.year), exact=True
+        ).click()
+        dialog.get_by_role(
+            'radio', name=chosen_date.strftime('%B'), exact=True
+        ).click()
+        dialog.get_by_role(
+            'gridcell', name=str(chosen_date.day), exact=True
+        ).click()
+        confirm = dialog.get_by_role('button', name='OK', exact=True)
+        if confirm.is_visible():
+            confirm.click()
+        expect(dialog).not_to_be_visible()
 
     def click_search_button(self) -> None:
         """Click on the search button"""

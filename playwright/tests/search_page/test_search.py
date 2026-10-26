@@ -1,3 +1,6 @@
+from datetime import date
+from urllib.parse import parse_qs, urlsplit
+
 import pytest
 from playwright.sync_api import Page, expect
 
@@ -11,6 +14,7 @@ from mocks.api.search_sort import (
 )
 from mocks.api_router import ApiRouter
 from mocks.apply import apply_mock
+from mocks.routes import Routes
 from pages.detail_page import DetailPage
 from pages.landing_page import LandingPage
 from pages.search_page import SearchPage
@@ -135,6 +139,93 @@ def test_search_input_persistence_after_navigation(
         search_page.map.wait_for_map_idle()
 
     expect(search_page.search.search_field).to_have_value(search_text)
+
+
+def test_date_filter_historical_data_and_default(responsive_page: Page) -> None:
+    """Start the thumb at 1970 while retaining the historical slider scale."""
+    api_router = ApiRouter(responsive_page)
+    api_router.route(
+        Routes.COLLECTION_TEMPORAL,
+        lambda route: route.fulfill(
+            json={
+                'collections': [
+                    {
+                        'id': 'historical',
+                        'properties': {'dataset_group': ['aims']},
+                        'extent': {
+                            'temporal': {
+                                'interval': [['1840-01-01', '2000-12-31']]
+                            }
+                        },
+                    },
+                    {
+                        'id': 'imos-only',
+                        'properties': {'dataset_group': ['imos']},
+                        'extent': {
+                            'temporal': {
+                                'interval': [['1971-01-01', '2000-12-31']]
+                            }
+                        },
+                    },
+                ]
+            }
+        ),
+    )
+    landing_page = LandingPage(responsive_page)
+    landing_page.load()
+    search = landing_page.search
+
+    with responsive_page.expect_request(Routes.COLLECTION_TEMPORAL) as request:
+        search.date_button.click()
+
+    query = parse_qs(urlsplit(request.value.url).query)
+    assert query['properties'] == ['id,temporal,dataset_group']
+    assert query['filter'] == ['temporal after 1830-01-01T00:00:00.000Z']
+    expect(search.start_date_picker.get_by_role('textbox')).to_have_value(
+        '01 Jan 1970'
+    )
+    expect(search.start_date_slider).to_have_attribute(
+        'aria-valuemin', '-4417977600000'
+    )
+    expect(search.start_date_slider).to_have_attribute('aria-valuenow', '0')
+    viewport = responsive_page.viewport_size
+    if viewport and viewport['width'] >= 768:
+        expect(search.imos_histogram_bars.first).to_be_visible()
+
+    search.start_date_slider.press('ArrowLeft')
+    expect(search.start_date_slider).not_to_have_attribute('aria-valuenow', '0')
+    assert (
+        int(search.start_date_slider.get_attribute('aria-valuenow') or '0') < 0
+    )
+    expect(search.start_date_slider).to_have_attribute(
+        'aria-valuemin', '-4417977600000'
+    )
+    search.start_date_slider.press('ArrowRight')
+    expect(search.start_date_slider).to_have_attribute(
+        'aria-valuemin', '-4417977600000'
+    )
+    expect(search.start_date_slider).to_have_attribute('aria-valuenow', '0')
+    expect(search.start_date_picker.get_by_role('textbox')).to_have_value(
+        '01 Jan 1970'
+    )
+
+    search.select_start_date(date(1830, 1, 1))
+    expect(search.start_date_slider).to_have_attribute(
+        'aria-valuenow', '-4417977600000'
+    )
+    expect(search.start_date_picker.get_by_role('textbox')).to_have_value(
+        '01 Jan 1830'
+    )
+    search.select_start_date(date(1970, 1, 1))
+    expect(search.start_date_slider).to_have_attribute('aria-valuenow', '0')
+
+    search.start_date_slider.press('Home')
+    expect(search.start_date_slider).to_have_attribute(
+        'aria-valuenow', '-4417977600000'
+    )
+    expect(search.start_date_picker.get_by_role('textbox')).to_have_value(
+        '01 Jan 1830'
+    )
 
 
 @pytest.mark.parametrize(

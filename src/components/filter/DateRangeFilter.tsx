@@ -31,11 +31,7 @@ import {
   fetchResultNoStore,
   jsonToOGCCollections,
 } from "@/app/store/searchReducer";
-import {
-  cqlDefaultFilters,
-  DatasetGroup,
-  TemporalDuring,
-} from "../common/cqlFilters";
+import { cqlDefaultFilters, TemporalDuring } from "../common/cqlFilters";
 import TimeRangeBarChart from "../common/charts/TimeRangeBarChart";
 import PlainDatePicker from "../common/datetime/PlainDatePicker";
 import PlainSlider from "../common/slider/PlainSlider";
@@ -75,7 +71,7 @@ const dateRangeOptions: DateRangeOption[] = [
   { label: "Last 10 years", value: DateRangeOptionValues.LastTenYears },
 ];
 
-const DEFAULT_SEARCH_MIN_DATE = toAppDayjs(
+const DEFAULT_SEARCH_START_DATE = toAppDayjs(
   "1970-01-01",
   dateDefault.DATE_FORMAT
 );
@@ -95,27 +91,27 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
   const rangeStart = dateTimeFilterRange?.start;
   const rangeEnd = dateTimeFilterRange?.end;
   const initialMinDate = useMemo(() => {
-    const defaultMin = dayjsToUnixMs(toUtcStartOfDay(DEFAULT_SEARCH_MIN_DATE));
     const restoredBounds = [rangeStart, rangeEnd].filter(
       (bound): bound is number => bound !== undefined
     );
-    // Expand the slider for historical selections and links with only an end date.
-    const min = restoredBounds.some((bound) => bound < defaultMin)
-      ? Math.min(
-          dayjsToUnixMs(toUtcStartOfDay(dateDefault.min)),
-          ...restoredBounds
-        )
-      : defaultMin;
+    // Keep the full historical scale, including any earlier restored bounds.
+    const min = Math.min(
+      dayjsToUnixMs(toUtcStartOfDay(dateDefault.min)),
+      ...restoredBounds
+    );
     return toUtcStartOfDay(unixMsToAppDayjs(min));
   }, [rangeStart, rangeEnd]);
-  // The initial slider range is narrower than the dates the picker accepts.
-  const pickerMinDate = initialMinDate.isBefore(dateDefault.min, "day")
-    ? initialMinDate
-    : dateDefault.min;
+  const defaultStart = dayjsToUnixMs(
+    toUtcStartOfDay(DEFAULT_SEARCH_START_DATE)
+  );
+  const fallbackStart =
+    rangeEnd !== undefined && rangeEnd < defaultStart
+      ? dayjsToUnixMs(initialMinDate)
+      : defaultStart;
 
   // Local state for date-range-slider
   const [value, setValue] = useState<number[]>(() => [
-    rangeStart ?? dayjsToUnixMs(toUtcStartOfDay(initialMinDate)),
+    rangeStart ?? fallbackStart,
     rangeEnd ?? dayjsToUnixMs(toUtcEndOfDay(initialMaxDate)),
   ]);
 
@@ -132,8 +128,10 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
   );
 
   // Memoized derived dates
-  const minDate = useMemo(() => unixMsToAppDayjs(value[0]), [value]);
-  const maxDate = useMemo(() => unixMsToAppDayjs(value[1]), [value]);
+  const [minDate, maxDate] = useMemo(
+    () => [unixMsToAppDayjs(value[0]), unixMsToAppDayjs(value[1])],
+    [value]
+  );
 
   // Helper to check if given star-end period falls in any of the radio group year-range options
   const determineSelectedOption = useCallback(
@@ -233,7 +231,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
       if (
         localMinDate?.isValid() &&
         Number.isFinite(newStart) &&
-        !localMinDate.isBefore(pickerMinDate, "day") &&
+        !localMinDate.isBefore(initialMinDate, "day") &&
         !localMinDate.isAfter(maxDate, "day")
       ) {
         setValue([newStart, value[1]]);
@@ -249,7 +247,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
         setValue([value[0], value[1]]);
       }
     },
-    [determineSelectedOption, dispatch, maxDate, pickerMinDate, value]
+    [determineSelectedOption, dispatch, initialMinDate, maxDate, value]
   );
 
   const handleMaxDateChange = useCallback(
@@ -356,7 +354,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
     // Avoid eslint error on set state in useEffect
     startTransition(() => {
       if (dateTimeFilterRange) {
-        const fallbackMin = dayjsToUnixMs(toUtcStartOfDay(initialMinDate));
+        const fallbackMin = fallbackStart;
         const fallbackMax = dayjsToUnixMs(toUtcEndOfDay(initialMaxDate));
         const newMinDate = unixMsToAppDayjs(
           dateTimeFilterRange.start ?? fallbackMin
@@ -372,50 +370,35 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
         setSelectedOption(determineSelectedOption(newMinDate, newMaxDate));
       } else {
         // Reset to initial state when dateTimeFilterRange is null or undefined
-        setValue([
-          dayjsToUnixMs(toUtcStartOfDay(initialMinDate)),
-          dayjsToUnixMs(toUtcEndOfDay(initialMaxDate)),
-        ]);
+        setValue([defaultStart, dayjsToUnixMs(toUtcEndOfDay(initialMaxDate))]);
         setSelectedOption(DateRangeOptionValues.Custom);
       }
     });
   }, [
     dateTimeFilterRange,
+    defaultStart,
     determineSelectedOption,
+    fallbackStart,
     initialMaxDate,
-    initialMinDate,
   ]);
 
   useEffect(() => {
-    // Find all collection, with simple sort by id, query run faster then the default sort
+    // Find all collection, with simple sort by id, query run faster than the default sort
     dispatch(
       fetchResultNoStore({
-        properties: "id,temporal",
+        properties: "id,temporal,dataset_group",
         filter: `${cqlDefaultFilters.get("ALL_TIME_RANGE")}`,
         sortby: "id",
       })
     )
       .unwrap()
       .then((value: string) => {
-        // Find all id of collection from imosOnly. The CQL filter below is a
-        // coarse pre-filter (it may also match a dataset_group that merely
-        // contains "imos" alongside other groups); isImosOnly() enforces the
-        // exact ["imos"]-only rule client-side.
-        dispatch(
-          fetchResultNoStore({
-            properties: "id,dataset_group",
-            filter: `${cqlDefaultFilters.get("ALL_TIME_RANGE")} AND ${(cqlDefaultFilters.get("DATASET_GROUP") as DatasetGroup)("imos")}`,
-            sortby: "id",
-          })
-        )
-          .unwrap()
-          .then((imosOnlyCollection: string) => {
-            const ids = jsonToOGCCollections(imosOnlyCollection)
-              .collections.filter((value: OGCCollection) => value.isImosOnly())
-              .map((value: OGCCollection) => value.id);
-            setImosDataIds(ids);
-            setTotalDataset(jsonToOGCCollections(value));
-          });
+        const collections = jsonToOGCCollections(value);
+        const ids = collections.collections
+          .filter((value: OGCCollection) => value.isImosOnly())
+          .map((value: OGCCollection) => value.id);
+        setImosDataIds(ids);
+        setTotalDataset(collections);
       });
   }, [dispatch]);
 
@@ -470,7 +453,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                   views={["year", "month", "day"]}
                   format={dateDefault.DISPLAY_FORMAT}
                   value={minDate}
-                  minDate={pickerMinDate}
+                  minDate={initialMinDate}
                   maxDate={unixMsToAppDayjs(value[1])}
                   onChange={(date) => handleMinDateChange(date as Dayjs)}
                   slots={{
@@ -478,6 +461,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                   }}
                   slotProps={{
                     ...DEFAULT_DATE_PICKER_SLOT,
+                    popper: { disablePortal: true },
                     openPickerIcon: {
                       color: theme.palette.grey600,
                       width: 22,
@@ -513,6 +497,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                   }}
                   slotProps={{
                     ...DEFAULT_DATE_PICKER_SLOT,
+                    popper: { disablePortal: true },
                     openPickerIcon: {
                       color: theme.palette.grey600,
                       width: 22,

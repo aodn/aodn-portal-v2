@@ -124,7 +124,7 @@ describe("DateRangeFilter", () => {
     expect(screen.getByDisplayValue("01 Jan 1970")).toBeInTheDocument();
     expect(screen.getAllByRole("slider")[0]).toHaveAttribute(
       "aria-valuemin",
-      "0"
+      dateDefault.min.valueOf().toString()
     );
     expect(screen.getAllByRole("slider")[0]).toHaveAttribute(
       "aria-valuenow",
@@ -191,14 +191,14 @@ describe("DateRangeFilter", () => {
     expect(screen.getByDisplayValue("01 Jan 1970")).toBeInTheDocument();
     expect(screen.getAllByRole("slider")[0]).toHaveAttribute(
       "aria-valuemin",
-      "0"
+      dateDefault.min.valueOf().toString()
     );
     expect(capturedChartStart?.valueOf()).toBe(0);
     expect(store.getState().paramReducer.dateTimeFilterRange).toEqual({});
   });
 
   it.each(["1830-01-01", "1850-01-01", "1969-12-31"])(
-    "accepts a historical start date and expands the slider: %s",
+    "accepts a historical start date without changing the slider scale: %s",
     (date) => {
       renderComponent();
       const selectedDate = toAppDayjs(date, dateDefault.DATE_FORMAT);
@@ -230,7 +230,27 @@ describe("DateRangeFilter", () => {
       expect(capturedChartStart?.valueOf()).toBe(0);
       expect(screen.getAllByRole("slider")[0]).toHaveAttribute(
         "aria-valuemin",
-        "0"
+        dateDefault.min.valueOf().toString()
+      );
+    }
+  );
+
+  it.each(["1830-01-01", "1960-01-01"])(
+    "lets the start thumb reach %s on the historical scale",
+    (date) => {
+      renderComponent();
+      const startThumb = screen.getAllByRole("slider")[0];
+      const historicalStart = dayjs.utc(date).valueOf();
+
+      fireEvent.change(startThumb, { target: { value: historicalStart } });
+
+      expect(store.getState().paramReducer.dateTimeFilterRange?.start).toBe(
+        historicalStart
+      );
+      expect(capturedChartStart?.valueOf()).toBe(historicalStart);
+      expect(startThumb).toHaveAttribute(
+        "aria-valuemin",
+        dateDefault.min.valueOf().toString()
       );
     }
   );
@@ -423,24 +443,22 @@ describe("DateRangeFilter", () => {
     expect(screen.getByLabelText("Last 5 years")).toBeChecked();
   });
 
-  it("only counts a collection as IMOS-only when dataset_group is exactly ['imos'], even if the backend's coarse pre-filter returns more", async () => {
+  it("keeps only dataset_group exactly ['imos'] from the single collections fetch", async () => {
+    const requests: URL[] = [];
     server.use(
       http.get("/api/v1/ogc/collections", ({ request }) => {
         const url = new URL(request.url);
-        const filter = url.searchParams.get("filter") ?? "";
-        if (filter.includes("dataset_group")) {
-          return HttpResponse.json({
-            collections: [
-              { id: "imos-only", properties: { dataset_group: ["imos"] } },
-              {
-                id: "imos-and-aims",
-                properties: { dataset_group: ["imos", "aims"] },
-              },
-              { id: "aims-only", properties: { dataset_group: ["aims"] } },
-            ],
-          });
-        }
-        return HttpResponse.json({ collections: [] });
+        requests.push(url);
+        return HttpResponse.json({
+          collections: [
+            { id: "imos-only", properties: { dataset_group: ["imos"] } },
+            {
+              id: "imos-and-aims",
+              properties: { dataset_group: ["imos", "aims"] },
+            },
+            { id: "aims-only", properties: { dataset_group: ["aims"] } },
+          ],
+        });
       })
     );
 
@@ -449,5 +467,13 @@ describe("DateRangeFilter", () => {
     await waitFor(() => {
       expect(capturedImosDataIds).toEqual(["imos-only"]);
     });
+    expect(requests).toHaveLength(1);
+    expect(requests[0].searchParams.get("properties")).toBe(
+      "id,temporal,dataset_group"
+    );
+    expect(requests[0].searchParams.get("filter")).toBe(
+      `temporal after ${dateDefault.min.toISOString()}`
+    );
+    expect(capturedChartStart?.valueOf()).toBe(0);
   });
 });
