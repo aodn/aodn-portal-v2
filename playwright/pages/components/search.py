@@ -57,12 +57,10 @@ class SearchComponent(BasePage):
             exact=True,
         )
         switch_to_year.click()
-        dialog.get_by_role(
-            'radio', name=str(chosen_date.year), exact=True
-        ).click()
-        dialog.get_by_role(
-            'radio', name=chosen_date.strftime('%B'), exact=True
-        ).click()
+        # Desktop picker is a Popper (CSS transform). Playwright will not
+        # scroll a year that sits above the focused year inside that popper.
+        self._click_calendar_radio(dialog, str(chosen_date.year))
+        self._click_calendar_radio(dialog, chosen_date.strftime('%B'))
         dialog.get_by_role(
             'gridcell', name=str(chosen_date.day), exact=True
         ).click()
@@ -70,6 +68,16 @@ class SearchComponent(BasePage):
         if confirm.is_visible():
             confirm.click()
         expect(dialog).not_to_be_visible()
+
+    def _click_calendar_radio(self, dialog: Locator, name: str) -> None:
+        """Click a year or month radio, scrolling the calendar list first."""
+        radio = dialog.get_by_role('radio', name=name, exact=True)
+        radio.evaluate(
+            """el => {
+                el.scrollIntoView({ block: 'center', inline: 'nearest' });
+            }"""
+        )
+        radio.click()
 
     def click_search_button(self) -> None:
         """Click on the search button"""
