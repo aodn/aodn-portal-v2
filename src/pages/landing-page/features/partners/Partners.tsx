@@ -6,8 +6,9 @@ import {
   updateDatasetGroup,
 } from "@/app/store/componentParamReducer";
 import useRedirectSearch from "@/hooks/useRedirectSearch";
+import useBreakpoint from "@/hooks/useBreakpoint";
 import { SearchKeys } from "@/components/search/constants";
-import { CONTRIBUTORS, PARTNERS_COLOURS, PARTNERS_MEDIA } from "./constants";
+import { CONTRIBUTORS, PARTNERS_COLOURS } from "./constants";
 import ImosDataCard from "./components/ImosDataCard";
 import ContributorCard from "./components/ContributorCard";
 import NcrisCard from "./components/NcrisCard";
@@ -15,6 +16,18 @@ import NcrisCard from "./components/NcrisCard";
 const Partners: FC = () => {
   const dispatch = useAppDispatch();
   const redirectSearch = useRedirectSearch();
+  const { isAboveDesktop, isLaptop, isMobile, isLargeMobile } = useBreakpoint();
+
+  // Fewer cards per row on smaller screens,
+  // so each card is wide enough for its hover text
+  const columns = isAboveDesktop ? 4 : isLaptop ? 3 : 2;
+  const gridGap = isAboveDesktop
+    ? "48px 26px"
+    : isLaptop
+      ? "36px 20px"
+      : isMobile
+        ? "14px 12px"
+        : "26px 18px";
 
   // Open the search page filtered by one organisation
   const searchByDatasetGroup = (datasetGroup: SearchKeys) => {
@@ -30,24 +43,17 @@ const Partners: FC = () => {
       data-testid="partners-section"
       sx={{
         width: "100%",
-        pt: "76px",
-        pb: "78px",
-        [PARTNERS_MEDIA.tablet]: { pt: "52px", pb: "56px" },
+        pt: isMobile ? "52px" : "76px",
+        pb: isMobile ? "56px" : "78px",
       }}
     >
       <ImosDataCard onExplore={() => searchByDatasetGroup(SearchKeys.IMOS)} />
 
-      <Box sx={{ mt: "64px", [PARTNERS_MEDIA.tablet]: { mt: "44px" } }}>
+      <Box sx={{ mt: isMobile ? "44px" : "64px" }}>
         <Typography
           component="h2"
-          variant="heading2"
-          sx={{
-            lineHeight: 1.3,
-            letterSpacing: "-0.2px",
-            color: PARTNERS_COLOURS.heading,
-            [PARTNERS_MEDIA.tablet]: { fontSize: "22px" },
-            [PARTNERS_MEDIA.smallPhone]: { fontSize: "20px" },
-          }}
+          variant={isLargeMobile ? "heading3" : "heading2"}
+          sx={{ color: PARTNERS_COLOURS.heading }}
         >
           AODN Contributors
         </Typography>
@@ -68,23 +74,11 @@ const Partners: FC = () => {
           data-testid="contributor-list"
           sx={{
             display: "grid",
-            gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+            gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
             // All rows as tall as the tallest card
             gridAutoRows: "1fr",
-            gap: "48px 26px",
-            mt: "22px",
-            // Fewer cards per row on smaller screens,
-            // so each card is wide enough for its hover text
-            [PARTNERS_MEDIA.belowDesktop]: {
-              gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-              gap: "36px 20px",
-            },
-            [PARTNERS_MEDIA.belowLaptop]: {
-              gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-              gap: "26px 18px",
-            },
-            [PARTNERS_MEDIA.tablet]: { mt: "18px" },
-            [PARTNERS_MEDIA.largePhone]: { gap: "14px 12px" },
+            gap: gridGap,
+            mt: isMobile ? "18px" : "22px",
           }}
         >
           {CONTRIBUTORS.map((contributor) => (

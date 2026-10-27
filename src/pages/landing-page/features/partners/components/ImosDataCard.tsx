@@ -3,8 +3,9 @@ import { Box, Button, Typography, useMediaQuery } from "@mui/material";
 import { alpha, keyframes } from "@mui/material/styles";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { portalTheme } from "@/styles";
+import useBreakpoint from "@/hooks/useBreakpoint";
 import IMOSLogoWhite from "@/assets/partners/imos-logo-white.webp";
-import { IMOS_STATS, PARTNERS_COLOURS, PARTNERS_MEDIA } from "../constants";
+import { IMOS_STATS, PARTNERS_COLOURS } from "../constants";
 import ImosWaves from "./ImosWaves";
 
 interface ImosDataCardProps {
@@ -25,6 +26,14 @@ const { palette } = portalTheme;
 const WHITE = palette.text3;
 const STAT_BORDER = `1px solid ${alpha(WHITE, 0.1)}`;
 
+// Dark layers behind the text, so it stays readable when the card is
+// narrow enough for the light band to reach the text
+const SCRIM = {
+  laptop: `linear-gradient(90deg, ${alpha(imosCard1, 0.88)} 0px, ${alpha(imosCard1, 0.8)} 900px, ${alpha(imosCard1, 0)} 1120px)`,
+  tablet: `linear-gradient(90deg, ${alpha(imosCard1, 0.9)} 0px, ${alpha(imosCard1, 0.84)} 700px, ${alpha(imosCard1, 0)} 960px)`,
+  mobile: `linear-gradient(180deg, ${alpha(imosCard1, 0.55)} 0%, ${alpha(imosCard1, 0.86)} 22%, ${alpha(imosCard1, 0.88)} 100%)`,
+};
+
 // Light band that slowly moves while the card is live
 const glowMotion = keyframes`
   from { transform: rotate(-34deg) scaleX(0.5) translate(0, 0); }
@@ -33,9 +42,25 @@ const glowMotion = keyframes`
 
 const ImosDataCard: FC<ImosDataCardProps> = ({ onExplore }) => {
   const titleId = useId();
+  const { isLaptop, isTablet, isUnderLaptop, isMobile, isLargeMobile } =
+    useBreakpoint();
   const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const [isActive, setIsActive] = useState(false);
   const isLive = isActive && !reduceMotion;
+
+  const scrim = isMobile
+    ? SCRIM.mobile
+    : isTablet
+      ? SCRIM.tablet
+      : isLaptop
+        ? SCRIM.laptop
+        : "none";
+  const statColumns = isMobile ? 2 : 4;
+  const statPadding = isLargeMobile
+    ? "18px 14px 20px 20px"
+    : isMobile
+      ? "20px 20px 22px 32px"
+      : "26px 24px 28px";
 
   const handleBlur = (event: FocusEvent<HTMLDivElement>) => {
     if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
@@ -57,28 +82,17 @@ const ImosDataCard: FC<ImosDataCardProps> = ({ onExplore }) => {
         overflow: "hidden",
         isolation: "isolate",
         color: WHITE,
-        borderRadius: portalTheme.borderRadius.xlg,
+        borderRadius: isLargeMobile
+          ? portalTheme.borderRadius.lg
+          : portalTheme.borderRadius.xlg,
         background: `linear-gradient(100deg, ${imosCard1} 0%, ${imosCard2} 40%, ${imosCard3} 68%, ${imosCard4} 100%)`,
-        // Dark layer behind the text once the card is narrow enough
-        // for the light band to reach the text
         "&::after": {
           content: '""',
           position: "absolute",
           inset: 0,
           zIndex: -1,
           pointerEvents: "none",
-          [PARTNERS_MEDIA.smallDesktop]: {
-            background: `linear-gradient(90deg, ${alpha(imosCard1, 0.88)} 0px, ${alpha(imosCard1, 0.8)} 900px, ${alpha(imosCard1, 0)} 1120px)`,
-          },
-          [PARTNERS_MEDIA.laptop]: {
-            background: `linear-gradient(90deg, ${alpha(imosCard1, 0.9)} 0px, ${alpha(imosCard1, 0.84)} 700px, ${alpha(imosCard1, 0)} 960px)`,
-          },
-          [PARTNERS_MEDIA.narrowTablet]: {
-            background: `linear-gradient(180deg, ${alpha(imosCard1, 0.55)} 0%, ${alpha(imosCard1, 0.86)} 22%, ${alpha(imosCard1, 0.88)} 100%)`,
-          },
-        },
-        [PARTNERS_MEDIA.phone]: {
-          borderRadius: portalTheme.borderRadius.lg,
+          background: scrim,
         },
       }}
     >
@@ -94,7 +108,9 @@ const ImosDataCard: FC<ImosDataCardProps> = ({ onExplore }) => {
           pointerEvents: "none",
           background: `radial-gradient(closest-side, ${alpha(imosGlow, 0.92)} 0%, ${alpha(imosGlow, 0.55)} 45%, ${alpha(imosGlow, 0)} 100%)`,
           transform: "rotate(-34deg) scaleX(0.5)",
-          animation: `${glowMotion} 7s ease-in-out infinite alternate`,
+          animation: reduceMotion
+            ? "none"
+            : `${glowMotion} 7s ease-in-out infinite alternate`,
           animationPlayState: isLive ? "running" : "paused",
           "&::after": {
             content: '""',
@@ -106,9 +122,6 @@ const ImosDataCard: FC<ImosDataCardProps> = ({ onExplore }) => {
             borderRadius: "50%",
             background: `radial-gradient(closest-side, ${alpha(imosGlow, 0.7)}, ${alpha(imosGlow, 0)})`,
           },
-          "@media (prefers-reduced-motion: reduce)": {
-            animation: "none",
-          },
         }}
       />
       <ImosWaves isLive={isLive} />
@@ -116,17 +129,18 @@ const ImosDataCard: FC<ImosDataCardProps> = ({ onExplore }) => {
       <Box
         sx={{
           maxWidth: "1080px",
-          p: "48px 56px 0",
-          [PARTNERS_MEDIA.narrowTablet]: { p: "36px 32px 0" },
-          [PARTNERS_MEDIA.phone]: { p: "28px 20px 0" },
+          p: isLargeMobile
+            ? "28px 20px 0"
+            : isMobile
+              ? "36px 32px 0"
+              : "48px 56px 0",
         }}
       >
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
-            gap: "18px",
-            [PARTNERS_MEDIA.phone]: { gap: "14px" },
+            gap: isLargeMobile ? "14px" : "18px",
           }}
         >
           <Box
@@ -138,8 +152,7 @@ const ImosDataCard: FC<ImosDataCardProps> = ({ onExplore }) => {
             sx={{
               display: "block",
               width: "auto",
-              height: "44px",
-              [PARTNERS_MEDIA.phone]: { height: "38px" },
+              height: isLargeMobile ? "38px" : "44px",
             }}
           />
           <Box
@@ -148,13 +161,8 @@ const ImosDataCard: FC<ImosDataCardProps> = ({ onExplore }) => {
           />
           <Typography
             component="p"
-            variant="heading3"
-            sx={{
-              fontWeight: 400,
-              lineHeight: 1.3,
-              color: palette.primary4,
-              [PARTNERS_MEDIA.phone]: { fontSize: "17px" },
-            }}
+            variant={isLargeMobile ? "heading4" : "heading3"}
+            sx={{ fontWeight: 400, color: palette.primary4 }}
           >
             Access to IMOS Data
           </Typography>
@@ -163,24 +171,17 @@ const ImosDataCard: FC<ImosDataCardProps> = ({ onExplore }) => {
         <Typography
           id={titleId}
           component="h2"
-          variant="heading1"
+          variant={isMobile ? "heading2" : "heading1"}
           sx={{
-            mt: "22px",
+            mt: isLargeMobile ? "18px" : "22px",
             lineHeight: 1.2,
-            letterSpacing: "-0.3px",
             color: WHITE,
-            [PARTNERS_MEDIA.laptop]: { fontSize: "34px" },
-            [PARTNERS_MEDIA.narrowTablet]: { fontSize: "32px" },
-            [PARTNERS_MEDIA.phone]: { fontSize: "26px", mt: "18px" },
           }}
         >
           Two decades of Australian ocean observations{" "}
           <Box
             component="span"
-            sx={{
-              display: "block",
-              [PARTNERS_MEDIA.laptop]: { display: "none" },
-            }}
+            sx={{ display: isUnderLaptop ? "none" : "block" }}
           />
           &ndash; free and open to everyone
         </Typography>
@@ -189,11 +190,9 @@ const ImosDataCard: FC<ImosDataCardProps> = ({ onExplore }) => {
           component="p"
           variant="title2Regular"
           sx={{
-            mt: "38px",
+            mt: isMobile ? "24px" : "38px",
             maxWidth: "940px",
             color: palette.primary6,
-            [PARTNERS_MEDIA.narrowTablet]: { mt: "24px" },
-            [PARTNERS_MEDIA.phone]: { fontSize: "15px" },
           }}
         >
           The Australian Ocean Data Network (AODN) is responsible for the
@@ -208,14 +207,10 @@ const ImosDataCard: FC<ImosDataCardProps> = ({ onExplore }) => {
           sx={{
             display: "flex",
             flexWrap: "wrap",
-            gap: "16px",
-            mt: "48px",
-            [PARTNERS_MEDIA.narrowTablet]: { mt: "32px" },
-            [PARTNERS_MEDIA.phone]: {
-              flexDirection: "column",
-              alignItems: "stretch",
-              gap: "12px",
-            },
+            flexDirection: isLargeMobile ? "column" : "row",
+            alignItems: isLargeMobile ? "stretch" : "flex-start",
+            gap: isLargeMobile ? "12px" : "16px",
+            mt: isMobile ? "32px" : "48px",
           }}
         >
           <Button
@@ -241,48 +236,34 @@ const ImosDataCard: FC<ImosDataCardProps> = ({ onExplore }) => {
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          mt: "48px",
+          gridTemplateColumns: `repeat(${statColumns}, 1fr)`,
+          mt: isMobile ? "36px" : "48px",
           bgcolor: alpha(imosStats, 0.8),
           borderTop: STAT_BORDER,
-          "& > div": { p: "26px 24px 28px" },
-          "& > div:first-of-type": { pl: "56px" },
-          "& > div + div": { borderLeft: STAT_BORDER },
-          [PARTNERS_MEDIA.narrowTablet]: {
-            gridTemplateColumns: "repeat(2, 1fr)",
-            mt: "36px",
-            "& > div, & > div:first-of-type": { p: "20px 20px 22px 32px" },
-            "& > div:nth-of-type(odd)": { borderLeft: 0 },
-            "& > div:nth-of-type(n+3)": { borderTop: STAT_BORDER },
-          },
-          [PARTNERS_MEDIA.phone]: {
-            "& > div, & > div:first-of-type": { p: "18px 14px 20px 20px" },
-          },
         }}
       >
-        {IMOS_STATS.map((stat) => (
-          <Box key={stat.value}>
+        {IMOS_STATS.map((stat, index) => (
+          <Box
+            key={stat.value}
+            sx={{
+              p: statPadding,
+              pl: !isMobile && index === 0 ? "56px" : undefined,
+              // Lines between stats, not around the outside
+              borderLeft: index % statColumns ? STAT_BORDER : undefined,
+              borderTop: index >= statColumns ? STAT_BORDER : undefined,
+            }}
+          >
             <Typography
               component="p"
-              variant="heading2"
-              sx={{
-                fontSize: "27px",
-                lineHeight: 1.15,
-                color: WHITE,
-                [PARTNERS_MEDIA.phone]: { fontSize: "22px" },
-              }}
+              variant={isLargeMobile ? "heading3" : "heading2"}
+              sx={{ color: WHITE }}
             >
               {stat.value}
             </Typography>
             <Typography
               component="p"
-              variant="body2Regular"
-              sx={{
-                mt: "6px",
-                lineHeight: 1.4,
-                color: palette.primary4,
-                [PARTNERS_MEDIA.phone]: { fontSize: "13px" },
-              }}
+              variant={isLargeMobile ? "body3Small" : "body2Regular"}
+              sx={{ mt: "6px", color: palette.primary4 }}
             >
               {stat.label}
             </Typography>

@@ -1,6 +1,5 @@
 import { portalTheme } from "@/styles";
 import { SearchKeys } from "@/components/search/constants";
-import { BREAKPOINT } from "@/app/layout/constant";
 import AADLogo from "@/assets/partners/aad-logo.webp";
 import AIMSLogo from "@/assets/partners/aims-logo.webp";
 import CSIROLogo from "@/assets/partners/csiro-logo.webp";
@@ -15,23 +14,6 @@ import WAMSILogo from "@/assets/partners/wamsi-logo.webp";
  * (mode "prod") keeps the old logo list until the new section is approved.
  */
 export const isPartnersSectionEnabled = import.meta.env.MODE !== "prod";
-
-// Max-width breakpoints, used desktop first.
-// Declare them from wide to narrow in sx, so the narrower rule wins.
-const maxWidth = (px: number) => `@media (max-width:${px}px)`;
-export const PARTNERS_MEDIA = {
-  // Below the theme lg and md breakpoints
-  belowDesktop: maxWidth(BREAKPOINT.DESKTOP - 1),
-  belowLaptop: maxWidth(BREAKPOINT.LAPTOP - 1),
-  // From the design
-  smallDesktop: maxWidth(1400),
-  laptop: maxWidth(1024),
-  narrowTablet: maxWidth(860),
-  tablet: maxWidth(760),
-  largePhone: maxWidth(600),
-  phone: maxWidth(520),
-  smallPhone: maxWidth(400),
-};
 
 export const PARTNERS_COLOURS = portalTheme.designTokens.colours.partners;
 
