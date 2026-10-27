@@ -44,7 +44,7 @@ jobs:
           DEPLOY_BUCKET: ${{ vars.BUCKET }}
         with:
           script: |
-            const environment = process.env.DEPLOY_ENVIRONMENT;
+            const environment = process.env.DEPLOY_ENVIRONMENT.replace(/-seo$/, '');
             if (!['edge', 'staging', 'production'].includes(environment)) {
               throw new Error(`Unsupported deployment environment: ${environment}`);
             }
@@ -202,7 +202,7 @@ jobs:
       # are indexed, so we notice when the number stops growing.
       - name: Submit sitemap and report index coverage in Search Console
         id: search_console
-        if: inputs.environment == 'production'
+        if: inputs.environment == 'production-seo'
         env:
           GSC_SERVICE_ACCOUNT_KEY: ${{ secrets.GSC_SERVICE_ACCOUNT_KEY }}
         run: |
