@@ -248,7 +248,7 @@ jobs:
               }
             }
             let indexing = null;
-            if (process.env.SEO_ENVIRONMENT === 'production' && steps.search_console?.outcome === 'success') {
+            if (process.env.SEO_ENVIRONMENT === 'production-seo' && steps.search_console?.outcome === 'success') {
               try {
                 const log = fs.readFileSync(path.join(process.env.RUNNER_TEMP, 'seo-index-coverage.log'), 'utf8');
                 const summary = log.match(/^Coverage of (\d+) sampled URLs from https:\/\/[^\s]+:\r?\n((?:  \d+  [^\r\n]+\r?\n?)+)/m);
