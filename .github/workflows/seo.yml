@@ -32,11 +32,13 @@ jobs:
       matrix:
         include:
           - environment: edge
-            site: https://portal-edge.aodn.org.au
-          - environment: staging
-            site: https://portal-staging.aodn.org.au
-          - environment: production
-            site: https://portal-beta.aodn.org.au
+            site: https://portal.edge.aodn.org.au
+          # Special env where we do not need manual approval
+          - environment: staging-seo
+            site: https://portal.staging.aodn.org.au
+          # Special env where we do not need manual approval
+          - environment: production-seo
+            site: https://portal.production.aodn.org.au
     uses: ./.github/workflows/seo_publish_and_verify.yml
     with:
       environment: ${{ matrix.environment }}
