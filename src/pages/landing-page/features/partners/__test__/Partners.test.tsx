@@ -53,35 +53,35 @@ describe("Partners", () => {
     });
   });
 
-  it("searches IMOS data and clears old filters on explore", () => {
+  it("searches IMOS data and clears old filters on explore", async () => {
+    const user = userEvent.setup();
     store.dispatch(updateSearchText("old search"));
     renderPartners();
 
-    userEvent.click(screen.getByTestId("explore-imos-datasets"));
+    await user.click(screen.getByTestId("explore-imos-datasets"));
 
-    return waitFor(() => {
+    await waitFor(() => {
       expect(redirectSearch).toHaveBeenCalledWith("Partners");
-    }).then(() => {
-      const params = getComponentState(store.getState());
-      expect(params.datasetGroup).toBe(SearchKeys.IMOS);
-      expect(params.searchText).toBeFalsy();
     });
+    const params = getComponentState(store.getState());
+    expect(params.datasetGroup).toBe(SearchKeys.IMOS);
+    expect(params.searchText).toBeFalsy();
   });
 
-  it("searches one contributor's data on view datasets", () => {
+  it("searches one contributor's data on view datasets", async () => {
+    const user = userEvent.setup();
     renderPartners();
 
-    userEvent.click(
+    await user.click(
       screen.getByTestId(`contributor-view-datasets-${SearchKeys.CSIRO}`)
     );
 
-    return waitFor(() => {
+    await waitFor(() => {
       expect(redirectSearch).toHaveBeenCalledWith("Partners");
-    }).then(() => {
-      expect(getComponentState(store.getState()).datasetGroup).toBe(
-        SearchKeys.CSIRO
-      );
     });
+    expect(getComponentState(store.getState()).datasetGroup).toBe(
+      SearchKeys.CSIRO
+    );
   });
 
   it("opens the contributor website in a new tab", () => {
