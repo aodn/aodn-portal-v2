@@ -6,6 +6,7 @@ Static files imported as URLs (png, jpg, raw svg). No React components.
 assets/
 ├── images/                  General images.
 ├── logos/                   Site and partner logos.
+├── partners/                Landing page partners section logos.
 ├── icons/                   PNG icons.
 ├── topics-panel-icons/      ⚠ Legacy .tsx
 ├── filter-organisations/    ⚠ Legacy .tsx

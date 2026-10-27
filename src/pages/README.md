@@ -6,7 +6,7 @@ Top-level route entries. Each page composes layout regions and features.
 
 ```
 pages/
-├── landing-page/         Public landing page (banner, topics, news, logos).
+├── landing-page/         Public landing page (banner, topics, news, partners).
 ├── search-page/          Catalogue search with map + result list.
 ├── detail-page/          Single-record metadata view.
 └── error-page/           Error / 404 / degraded fallbacks.

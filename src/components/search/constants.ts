@@ -18,6 +18,10 @@ export enum SearchKeys {
   AAD = "aad",
   CSIRO = "csiro",
   IMAS = "imas",
+  GA = "ga",
+  NCI = "nci",
+  EATLAS = "eatlas",
+  WAMSI = "wamsi",
 }
 
 export const DOUBLE_QUOTE_LABEL = "Exact match";
