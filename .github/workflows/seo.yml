@@ -9,6 +9,8 @@ on:
   schedule:
     # Weekly refresh, Monday morning Hobart time (GitHub cron is UTC)
     - cron: "0 20 * * 0"
+    # For debug, run everyday 9:00, 12, 3pm, 5 pm
+    - cron: "0 9,12,15,17 * * *"
   workflow_dispatch:
 
 permissions:
