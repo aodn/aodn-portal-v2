@@ -43,6 +43,7 @@ jobs:
     uses: ./.github/workflows/seo_publish_and_verify.yml
     with:
       environment: ${{ matrix.environment }}
+      github_environment: ${{ matrix.github_environment }}
       site: ${{ matrix.site }}
     secrets: inherit
 
