@@ -83,9 +83,14 @@ is no fallback to `main` or a tag.
 ### Concurrency and compatibility
 
 Application deployment and SEO publishing share the repository-local
-`portal-site-<environment>` concurrency group. Active jobs are not cancelled,
+`portal-site-<environment>` concurrency group, named with the deployment
+environment (`edge`, `staging`, `production`). Active jobs are not cancelled,
 and pending jobs are queued. The weekly caller also lets active runs finish.
-GitHub environment approvals remain in place.
+SEO credentials come from a separate GitHub environment: `edge`, `staging-seo`,
+and `production-seo`. `staging-seo` and `production-seo` are not the
+environments whose required reviewers gate application deploys, so the weekly
+staging and production SEO jobs are not held for that approval. Edge SEO still
+uses `edge`. Application deploys keep their own environment approvals.
 
 GitHub concurrency groups do not coordinate across repositories.
 `aodn/appdeploy` manages infrastructure and reads CloudFront function artifacts;

@@ -32,14 +32,18 @@ jobs:
       matrix:
         include:
           - environment: edge
+            github_environment: edge
             site: https://portal-edge.aodn.org.au
           - environment: staging
+            github_environment: staging-seo
             site: https://portal-staging.aodn.org.au
           - environment: production
+            github_environment: production-seo
             site: https://portal-beta.aodn.org.au
     uses: ./.github/workflows/seo_publish_and_verify.yml
     with:
       environment: ${{ matrix.environment }}
+      github_environment: ${{ matrix.github_environment }}
       site: ${{ matrix.site }}
     secrets: inherit
 

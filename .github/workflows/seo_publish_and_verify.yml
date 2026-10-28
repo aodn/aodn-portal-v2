@@ -7,11 +7,15 @@ on:
   workflow_call:
     inputs:
       environment:
-        description: GitHub environment with the AWS role, bucket and distribution
+        description: Actual deployment environment
+        required: true
+        type: string
+      github_environment:
+        description: GitHub environment used for approvals
         required: true
         type: string
       site:
-        description: Public site URL for this environment
+        description: Public site URL
         required: true
         type: string
 
@@ -19,7 +23,7 @@ jobs:
   publish:
     name: Publish SEO Artifacts
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    environment: ${{ inputs.github_environment }}
     concurrency:
       group: portal-site-${{ inputs.environment }}
       cancel-in-progress: false
