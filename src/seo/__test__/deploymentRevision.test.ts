@@ -531,8 +531,11 @@ test("application uploads and SEO share a queue without removing approval protec
     );
     expect(section(job, "concurrency:")).toContain("cancel-in-progress: false");
     expect(section(job, "concurrency:")).toContain("queue: max");
-    expect(job).toContain("environment: ${{ inputs.environment }}");
   }
+  expect(PUBLISH).toContain("environment: ${{ inputs.github_environment }}");
+  expect(section(DEPLOY, "trigger_deploy:")).toContain(
+    "environment: ${{ inputs.environment }}"
+  );
   expect(section(WEEKLY, "concurrency:")).toContain(
     "cancel-in-progress: false"
   );
