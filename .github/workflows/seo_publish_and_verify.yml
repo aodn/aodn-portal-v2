@@ -48,7 +48,7 @@ jobs:
           DEPLOY_BUCKET: ${{ vars.BUCKET }}
         with:
           script: |
-            const environment = process.env.DEPLOY_ENVIRONMENT;
+            const environment = process.env.DEPLOY_ENVIRONMENT.replace(/-seo$/, '');
             if (!['edge', 'staging', 'production'].includes(environment)) {
               throw new Error(`Unsupported deployment environment: ${environment}`);
             }
@@ -206,7 +206,7 @@ jobs:
       # are indexed, so we notice when the number stops growing.
       - name: Submit sitemap and report index coverage in Search Console
         id: search_console
-        if: inputs.environment == 'production'
+        if: inputs.environment == 'production-seo'
         env:
           GSC_SERVICE_ACCOUNT_KEY: ${{ secrets.GSC_SERVICE_ACCOUNT_KEY }}
         run: |
@@ -252,7 +252,7 @@ jobs:
               }
             }
             let indexing = null;
-            if (process.env.SEO_ENVIRONMENT === 'production' && steps.search_console?.outcome === 'success') {
+            if (process.env.SEO_ENVIRONMENT === 'production-seo' && steps.search_console?.outcome === 'success') {
               try {
                 const log = fs.readFileSync(path.join(process.env.RUNNER_TEMP, 'seo-index-coverage.log'), 'utf8');
                 const summary = log.match(/^Coverage of (\d+) sampled URLs from https:\/\/[^\s]+:\r?\n((?:  \d+  [^\r\n]+\r?\n?)+)/m);
