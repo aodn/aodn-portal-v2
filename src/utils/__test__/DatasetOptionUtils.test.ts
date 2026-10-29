@@ -11,16 +11,27 @@ describe("sortDatasetOptions", () => {
     expect(keys).toEqual(["b.zarr", "a.parquet"]);
   });
 
-  it("sorts existing select items by value and keeps their labels", () => {
+  it("sorts select items by the displayed label, then by value", () => {
     const items = [
-      { value: "layer-two", label: "Layer Two" },
-      { value: "layer-one", label: "Layer One" },
+      { value: "a-name", label: "Zebra" },
+      { value: "z-name", label: "Alpha" },
+      { value: "m-name", label: "Alpha" },
     ];
 
     expect(sortDatasetOptions(items)).toEqual([
-      { value: "layer-one", label: "Layer One" },
-      { value: "layer-two", label: "Layer Two" },
+      { value: "m-name", label: "Alpha" },
+      { value: "z-name", label: "Alpha" },
+      { value: "a-name", label: "Zebra" },
     ]);
-    expect(items.map((item) => item.value)).toEqual(["layer-two", "layer-one"]);
+    expect(items[0].value).toBe("a-name");
+  });
+
+  it("orders labels with localeCompare so accented characters stay with their letter", () => {
+    expect(
+      sortDatasetOptions([
+        { value: "f", label: "f" },
+        { value: "e", label: "é" },
+      ]).map((item) => item.label)
+    ).toEqual(["é", "f"]);
   });
 });

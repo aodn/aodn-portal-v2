@@ -17,12 +17,12 @@ const toOptions = (
   }));
 };
 
-// Copy before sorting so the caller's list is not mutated. Sort so a dataset
-// name can be chosen to appear first in both the map and download UI.
+// Copy before sorting so the caller's list is not mutated. Sort by the label
+// that is shown, then by value, so renaming a displayed dataset moves it.
 export const sortDatasetOptions = (
   keysOrItems: readonly string[] | readonly SelectItem<string>[],
   extension: RegExp = DATASET_KEY_EXTENSION
 ): SelectItem<string>[] =>
-  toOptions(keysOrItems, extension).sort((a, b) =>
-    a.value < b.value ? -1 : a.value > b.value ? 1 : 0
+  toOptions(keysOrItems, extension).sort(
+    (a, b) => a.label.localeCompare(b.label) || a.value.localeCompare(b.value)
   );
