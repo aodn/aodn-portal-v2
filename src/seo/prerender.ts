@@ -44,7 +44,7 @@ const renderDataSection = (collection: OGCCollection) => {
   const items = (collection.links ?? [])
     .filter((link) => link.href)
     .map((link) => {
-      const label = link.title || link.rel || link.href;
+      const label = link.title || link.href;
       const href = escapeEntities(link.href);
       return `<li><a href="${href}">${escapeEntities(label)}</a></li>`;
     });

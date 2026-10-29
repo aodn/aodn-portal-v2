@@ -218,8 +218,9 @@ describe("renderCrawlerPage", () => {
       '<a href="https://data.aodn.org.au/sst.nc">SST &#60;file&#62;</a>'
     );
     expect(html).toContain(
-      '<a href="https://creativecommons.org/licenses/by/4.0/">license</a>'
+      '<a href="https://creativecommons.org/licenses/by/4.0/">https://creativecommons.org/licenses/by/4.0/</a>'
     );
+    expect(html).not.toContain(">license</a>");
     expect(html).not.toContain("Missing href");
   });
 
