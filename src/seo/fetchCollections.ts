@@ -14,7 +14,7 @@ export type { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 
 // Fields the bulk collections endpoint returns for the SEO artifacts
 export const SEO_PROPERTIES =
-  "id,title,description,bbox,temporal,themes,creation,revision,citation,license,dataset_provider";
+  "id,title,description,bbox,temporal,themes,creation,revision,citation,license,dataset_provider,links";
 
 // fetchResultNoStore returns one page; walk search_after until we have them all
 const API_URL = `${OGC_API_BASE}/api/v1/ogc/collections`;

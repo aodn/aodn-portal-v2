@@ -179,6 +179,72 @@ describe("renderCrawlerPage", () => {
     expect(html).toContain("<p>Published: 2017-04-27</p>");
   });
 
+  test("lists every catalogue link in a Data section before related records", () => {
+    const html = renderCrawlerPage(
+      TEMPLATE,
+      toCollection({
+        id: "abc-123",
+        title: "Sea Surface Temperature",
+        description: "Daily SST observations around Australia.",
+        links: [
+          {
+            rel: "data",
+            href: "https://data.aodn.org.au/sst.nc",
+            type: "application/netcdf",
+            title: "SST <file>",
+          },
+          {
+            rel: "license",
+            href: "https://creativecommons.org/licenses/by/4.0/",
+            type: "text/html",
+            title: "",
+          },
+          {
+            rel: "item",
+            href: "",
+            type: "text/html",
+            title: "Missing href",
+          },
+          {
+            rel: "self",
+            href: "https://portal.aodn.org.au/api/self",
+            type: "application/json",
+            title: "Self",
+          },
+          {
+            rel: "icon",
+            href: "https://portal.aodn.org.au/icon.png",
+            type: "image/png",
+            title: "Icon",
+          },
+          {
+            rel: "preview",
+            href: "https://portal.aodn.org.au/preview.png",
+            type: "image/png",
+            title: "Preview",
+          },
+        ],
+      }),
+      [{ id: "def-456", title: "Ocean Currents" }]
+    );
+
+    const dataAt = html.indexOf('<section aria-label="Data">');
+    const relatedAt = html.indexOf('<nav aria-label="Related records">');
+    expect(dataAt).toBeGreaterThan(-1);
+    expect(relatedAt).toBeGreaterThan(dataAt);
+    expect(html).toContain(
+      '<a href="https://data.aodn.org.au/sst.nc">SST &#60;file&#62;</a>'
+    );
+    expect(html).toContain(
+      '<a href="https://creativecommons.org/licenses/by/4.0/">https://creativecommons.org/licenses/by/4.0/</a>'
+    );
+    expect(html).not.toContain(">license</a>");
+    expect(html).not.toContain("Missing href");
+    expect(html).not.toContain("/api/self");
+    expect(html).not.toContain("/icon.png");
+    expect(html).not.toContain("/preview.png");
+  });
+
   test("links related records in the body with real, escaped hrefs", () => {
     const html = renderCrawlerPage(TEMPLATE, collection, [
       { id: "def-456", title: "Chlorophyll <a> estimates" },

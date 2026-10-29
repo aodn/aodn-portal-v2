@@ -36,17 +36,41 @@ const renderDateLine = (collection: OGCCollection) => {
   return "";
 };
 
-// Static body for crawlers: title, date, abstract and related-record links —
-// crawlers only follow <a href>. stripAppBundle keeps it from being replaced.
-const renderBody = (collection: OGCCollection, related: RelatedLink[]) => {
-  const relatedItems = related
-    .map(
-      (link) =>
-        `<li><a href="/details/${link.id}">${escapeEntities(link.title)}</a></li>`
+const linkList = (items: string[]) =>
+  items.length ? `<ul>${items.join("")}</ul>` : "";
+
+// Structural relations, not destinations a crawler should follow from here.
+const NON_CONTENT_RELS = new Set(["self", "icon", "preview"]);
+
+// Catalogue links a crawler can follow. self, icon and preview are omitted.
+const renderDataSection = (collection: OGCCollection) => {
+  const items = (collection.links ?? [])
+    .filter(
+      (link) => link.href && !NON_CONTENT_RELS.has(link.rel?.toLowerCase())
     )
-    .join("");
-  const relatedNav = relatedItems
-    ? `<nav aria-label="Related records"><h2>Related records</h2><ul>${relatedItems}</ul></nav>`
+    .map((link) => {
+      const label = link.title || link.href;
+      const href = escapeEntities(link.href);
+      return `<li><a href="${href}">${escapeEntities(label)}</a></li>`;
+    });
+  if (items.length === 0) return "";
+  return `<section aria-label="Data"><h2>Data</h2>${linkList(items)}</section>`;
+};
+
+// Static body for crawlers: title, date, abstract, data links and related
+// records. Crawlers only follow <a href>. stripAppBundle keeps it from being
+// replaced.
+const renderBody = (collection: OGCCollection, related: RelatedLink[]) => {
+  const relatedItems = related.map(
+    (link) =>
+      `<li><a href="/details/${link.id}">${escapeEntities(link.title)}</a></li>`
+  );
+  const relatedNav = relatedItems.length
+    ? `<nav aria-label="Related records"><h2>Related records</h2>${linkList(relatedItems)}</nav>`
+    : "";
+  const sections = [renderDataSection(collection), relatedNav].filter(Boolean);
+  const sectionsHtml = sections.length
+    ? `\n    ${sections.join("\n    ")}`
     : "";
   // Without this link the 15k detail pages are an island: the SPA's own
   // "Back to Home" is a Box with an onClick, which a crawler cannot follow.
@@ -54,8 +78,7 @@ const renderBody = (collection: OGCCollection, related: RelatedLink[]) => {
   <main>
     <h1>${escapeEntities(collection.title ?? "")}</h1>
     ${renderDateLine(collection)}
-    <p>${escapeEntities(collection.description ?? "")}</p>
-    ${relatedNav}
+    <p>${escapeEntities(collection.description ?? "")}</p>${sectionsHtml}
   </main>`;
 };
 
