@@ -39,10 +39,15 @@ const renderDateLine = (collection: OGCCollection) => {
 const linkList = (items: string[]) =>
   items.length ? `<ul>${items.join("")}</ul>` : "";
 
-// Every catalogue link on the record. Crawlers follow these hrefs.
+// Structural relations, not destinations a crawler should follow from here.
+const NON_CONTENT_RELS = new Set(["self", "icon", "preview"]);
+
+// Catalogue links a crawler can follow. self, icon and preview are omitted.
 const renderDataSection = (collection: OGCCollection) => {
   const items = (collection.links ?? [])
-    .filter((link) => link.href)
+    .filter(
+      (link) => link.href && !NON_CONTENT_RELS.has(link.rel?.toLowerCase())
+    )
     .map((link) => {
       const label = link.title || link.href;
       const href = escapeEntities(link.href);

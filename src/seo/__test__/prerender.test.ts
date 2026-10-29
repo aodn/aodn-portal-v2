@@ -205,6 +205,24 @@ describe("renderCrawlerPage", () => {
             type: "text/html",
             title: "Missing href",
           },
+          {
+            rel: "self",
+            href: "https://portal.aodn.org.au/api/self",
+            type: "application/json",
+            title: "Self",
+          },
+          {
+            rel: "icon",
+            href: "https://portal.aodn.org.au/icon.png",
+            type: "image/png",
+            title: "Icon",
+          },
+          {
+            rel: "preview",
+            href: "https://portal.aodn.org.au/preview.png",
+            type: "image/png",
+            title: "Preview",
+          },
         ],
       }),
       [{ id: "def-456", title: "Ocean Currents" }]
@@ -222,6 +240,9 @@ describe("renderCrawlerPage", () => {
     );
     expect(html).not.toContain(">license</a>");
     expect(html).not.toContain("Missing href");
+    expect(html).not.toContain("/api/self");
+    expect(html).not.toContain("/icon.png");
+    expect(html).not.toContain("/preview.png");
   });
 
   test("links related records in the body with real, escaped hrefs", () => {
