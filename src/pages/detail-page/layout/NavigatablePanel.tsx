@@ -41,7 +41,11 @@ const VerticalIndicator: FC<VerticalIndicatorProps> = ({
   const theme = useTheme();
 
   useEffect(() => {
+    let cancelled = false;
+
     const updateMetrics = () => {
+      if (cancelled) return;
+
       let totalHeight = 0;
       let activeY = 0;
 
@@ -57,7 +61,11 @@ const VerticalIndicator: FC<VerticalIndicatorProps> = ({
         totalHeight += element.offsetHeight;
       });
 
-      setMetrics({ totalHeight, activeY });
+      setMetrics((prev) =>
+        prev.totalHeight === totalHeight && prev.activeY === activeY
+          ? prev
+          : { totalHeight, activeY }
+      );
     };
 
     // Initialize measurements
@@ -67,7 +75,9 @@ const VerticalIndicator: FC<VerticalIndicatorProps> = ({
     // resolved before the real font is requested. Combine signals so we
     // remeasure once the final layout is in place.
     const rafId = requestAnimationFrame(updateMetrics);
-    document.fonts?.ready.then(updateMetrics);
+    document.fonts?.ready.then(() => {
+      if (!cancelled) updateMetrics();
+    });
 
     const handleLoad = () => updateMetrics();
     if (document.readyState !== "complete") {
@@ -98,6 +108,7 @@ const VerticalIndicator: FC<VerticalIndicatorProps> = ({
     });
 
     return () => {
+      cancelled = true;
       cancelAnimationFrame(rafId);
       window.removeEventListener("load", handleLoad);
       observers.forEach((obs) => obs?.disconnect());

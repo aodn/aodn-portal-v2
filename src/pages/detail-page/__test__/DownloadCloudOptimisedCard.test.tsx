@@ -196,10 +196,10 @@ describe("DownloadCloudOptimisedCard", () => {
     const options = dataSelect.querySelectorAll("option");
 
     expect(options).toHaveLength(2);
-    expect(options[0].textContent).toBe("test-zarr");
-    expect(options[1].textContent).toBe("test-parquet");
-    expect(options[0].value).toBe("test-zarr.zarr");
-    expect(options[1].value).toBe("test-parquet.parquet");
+    expect(options[0].textContent).toBe("test-parquet");
+    expect(options[1].textContent).toBe("test-zarr");
+    expect(options[0].value).toBe("test-parquet.parquet");
+    expect(options[1].value).toBe("test-zarr.zarr");
   });
 
   it("should change data selection value when user selects different option", async () => {
@@ -211,12 +211,12 @@ describe("DownloadCloudOptimisedCard", () => {
     });
 
     const dataSelect = getDataSelect();
-    expect(dataSelect.value).toBe("test-zarr.zarr");
+    expect(dataSelect.value).toBe("test-parquet.parquet");
 
-    await user.selectOptions(dataSelect, "test-parquet.parquet");
+    await user.selectOptions(dataSelect, "test-zarr.zarr");
 
     await waitFor(() => {
-      expect(getDataSelect().value).toBe("test-parquet.parquet");
+      expect(getDataSelect().value).toBe("test-zarr.zarr");
     });
   });
 
@@ -292,7 +292,7 @@ describe("DownloadCloudOptimisedCard", () => {
     });
 
     await waitFor(() => {
-      expect(getDataSelect().value).toBe("test-zarr.zarr");
+      expect(getDataSelect().value).toBe("test-parquet.parquet");
     });
   });
 
@@ -590,7 +590,7 @@ describe("DownloadCloudOptimisedCard with DetailPageProvider", () => {
     await user.click(screen.getByRole("button", { name: "seed" }));
     await user.selectOptions(
       screen.getByTestId("select-data-selection"),
-      "test-parquet.parquet"
+      "test-zarr.zarr"
     );
 
     await waitFor(() => {
@@ -614,7 +614,7 @@ describe("DownloadCloudOptimisedCard with DetailPageProvider", () => {
     await user.click(screen.getByRole("button", { name: "seed" }));
     // The mocked select fires onChange even when re-selecting the same value
     fireEvent.change(screen.getByTestId("select-data-selection"), {
-      target: { value: "test-zarr.zarr" },
+      target: { value: "test-parquet.parquet" },
     });
 
     expect(conditionTypes()).toEqual(

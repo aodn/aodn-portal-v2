@@ -34,6 +34,7 @@ import {
   processWFSEstimateSize,
 } from "@/app/store/searchReducer";
 import AdminScreenContext from "@/components/admin/AdminScreenContext";
+import { sortDatasetOptions } from "@/utils/DatasetOptionUtils";
 import { formatBytes } from "@/utils/Helpers";
 import { buildDownloadFileName } from "@/utils/DownloadFileNameUtils";
 import DownloadSourceChip from "./DownloadSourceChip";
@@ -55,13 +56,13 @@ interface DownloadWFSCardProps extends DownloadCondition {
 
 const formWfsDataOptions = (
   layers: DownloadLayersResponse[] | undefined
-): SelectItem[] => {
-  if (!layers || layers.length === 0) return [];
-  return layers.map((layer) => ({
-    value: layer.name,
-    label: layer.title,
-  }));
-};
+): SelectItem[] =>
+  sortDatasetOptions(
+    (layers ?? []).map((layer) => ({
+      value: layer.name,
+      label: layer.title,
+    }))
+  );
 
 // A collection with more than one layer must carry the selected layer in the
 // file name, otherwise downloading a second layer overwrites the first. The

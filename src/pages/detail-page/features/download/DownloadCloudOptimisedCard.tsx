@@ -24,6 +24,7 @@ import DownloadSelect from "./DownloadSelect";
 import DownloadSizeWarning, { isDownloadBlocked } from "./DownloadSizeWarning";
 import useEstimateSize from "../../../../hooks/useEstimateSize";
 import { processCoEstimateSize } from "@/app/store/searchReducer";
+import { sortDatasetOptions } from "@/utils/DatasetOptionUtils";
 import DownloadSourceChip from "./DownloadSourceChip";
 
 const downloadFormats = [
@@ -82,13 +83,10 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
   const onDownload = useCallback(() => {
     setDownloadDialogOpen(true);
   }, []);
-  const dataSelectOptions = useMemo(() => {
-    const coKeys = collection?.getAllCOKeys() ?? [];
-    return coKeys.map((key) => ({
-      value: key,
-      label: key.replace(/\.(zarr|parquet)$/i, ""),
-    }));
-  }, [collection]);
+  const dataSelectOptions = useMemo(
+    () => sortDatasetOptions(collection?.getAllCOKeys() ?? []),
+    [collection]
+  );
 
   useEffect(() => {
     if (selectedCoKey && selectedDataItem !== selectedCoKey) {
