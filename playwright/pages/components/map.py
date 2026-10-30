@@ -45,6 +45,9 @@ class Map(BasePage):
             'radio', name='Spatial Extent'
         )
         self.gridded_data_layer = page.get_by_role('radio', name='Gridded Data')
+        self.uncluster_layer = page.get_by_role(
+            'radio', name='Centre points (unclustered)'
+        )
         self.gridded_raster_error = page.get_by_test_id('gridded-raster-error')
 
         self.daterange_show_hide_menu_button = page.get_by_test_id(

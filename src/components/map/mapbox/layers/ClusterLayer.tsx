@@ -328,6 +328,7 @@ const ClusterLayer: FC<ClusterLayerProps> = ({
         unclusterPointLayer={unclusterPointLayer}
         onClickMapPoint={onDatasetSelected}
         tabNavigation={tabNavigation}
+        featureCollection={featureCollection}
       />
       <TestHelper
         id={map?.getContainer().id || ""}
