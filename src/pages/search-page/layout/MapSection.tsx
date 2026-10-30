@@ -7,6 +7,7 @@ import React, {
   useState,
 } from "react";
 import { LngLatBounds, type Map as MapboxMap, type MapEvent } from "mapbox-gl";
+import { FeatureCollection, Point } from "geojson";
 import { Box, Paper, SxProps, Theme } from "@mui/material";
 import Map, { MapBasicType } from "@/components/map/mapbox/Map";
 import Controls from "@/components/map/mapbox/controls/Controls";
@@ -66,7 +67,7 @@ const mapContainerId = "result-page-main-map";
 
 const createPresentationLayers = (
   id: string | null,
-  collections: OGCCollection[],
+  featureCollection: FeatureCollection<Point>,
   selectedUuids: string[] | undefined,
   tabNavigation: TabNavigation,
   onClickMapPoint: ((uuids: Array<string>) => void) | undefined,
@@ -76,7 +77,7 @@ const createPresentationLayers = (
     case LayerName.Heatmap:
       return (
         <HeatmapLayer
-          featureCollection={generateFeatureCollectionFrom(collections)}
+          featureCollection={featureCollection}
           selectedUuids={selectedUuids}
           onClickMapPoint={onClickMapPoint}
           tabNavigation={tabNavigation}
@@ -87,7 +88,7 @@ const createPresentationLayers = (
     case LayerName.Uncluster:
       return (
         <UnclusterLayer
-          featureCollection={generateFeatureCollectionFrom(collections)}
+          featureCollection={featureCollection}
           selectedUuids={selectedUuids}
           onClickMapPoint={onClickMapPoint}
           tabNavigation={tabNavigation}
@@ -98,7 +99,7 @@ const createPresentationLayers = (
     default:
       return (
         <ClusterLayer
-          featureCollection={generateFeatureCollectionFrom(collections)}
+          featureCollection={featureCollection}
           selectedUuids={selectedUuids}
           onClickMapPoint={onClickMapPoint}
           tabNavigation={tabNavigation}
@@ -222,6 +223,11 @@ const MapSection: React.FC<MapSectionProps> = memo(
       () => (bbox ? new LngLatBounds(bbox) : undefined),
       [bbox]
     );
+    // Keep one reference per search result. The spider closes when it changes.
+    const featureCollection = useMemo(
+      () => generateFeatureCollectionFrom(collections),
+      [collections]
+    );
     // Early return if it is full list view
     if (showFullList) return null;
     return (
@@ -326,7 +332,7 @@ const MapSection: React.FC<MapSectionProps> = memo(
             <Layers>
               {createPresentationLayers(
                 selectedLayer,
-                collections,
+                featureCollection,
                 selectedUuids,
                 tabNavigation,
                 onClickMapPoint,
