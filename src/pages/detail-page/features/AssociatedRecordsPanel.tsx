@@ -19,12 +19,22 @@ const getUuid = (str: string) => {
   return str.split(":").pop();
 };
 
-const generateRecordBy = (
-  link: ILink
-): { uuid: string; title: string; abstract: string } | null => {
+// Records not exist in the portal (e.g. filtered out by the harvester) are indexed
+// with a link to their GeoNetwork record page instead of "uuid:<uuid>"
+const isExternalLink = (href: string) => /^https?:\/\//i.test(href);
+
+const generateRecordBy = (link: ILink): IAssociatedRecord | null => {
   const parsed = parseJson(link.title);
   if (parsed) {
     const { title, recordAbstract } = parsed;
+    if (isExternalLink(link.href)) {
+      return {
+        uuid: link.href.split("#/metadata/").pop() ?? "",
+        title: title,
+        abstract: recordAbstract,
+        url: link.href,
+      };
+    }
     const uuid = getUuid(link.href);
     return {
       uuid: uuid ? uuid : "",
