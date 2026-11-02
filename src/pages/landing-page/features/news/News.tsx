@@ -40,25 +40,26 @@ const News: FC = () => {
       bgcolor: alpha(white, 0.1),
     },
   };
-  const renderCount = (group: SearchKeys) => (
-    <Box
-      component="span"
-      sx={{
-        color:
-          group === SearchKeys.IMOS
-            ? portalTheme.palette.text2
-            : portalTheme.palette.primary4,
-        fontSize: portalTheme.typography.body2Regular.fontSize,
-        lineHeight: 1,
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontVariantNumeric: "tabular-nums",
-      }}
-    >
-      {FEATURED_DATASET_COUNTS[group]?.toLocaleString("en-AU")}+
-    </Box>
-  );
+  const renderCount = (group: SearchKeys) =>
+    FEATURED_DATASET_COUNTS[group] == null ? null : (
+      <Box
+        component="span"
+        sx={{
+          color:
+            group === SearchKeys.IMOS
+              ? portalTheme.palette.text2
+              : portalTheme.palette.primary4,
+          fontSize: portalTheme.typography.body2Regular.fontSize,
+          lineHeight: 1,
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontVariantNumeric: "tabular-nums",
+        }}
+      >
+        {FEATURED_DATASET_COUNTS[group]?.toLocaleString("en-AU")}+
+      </Box>
+    );
   const explore = (group?: SearchKeys) => {
     dispatch(clearComponentParam());
     if (group) dispatch(updateDatasetGroup(group));
