@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.github_environment }}
     concurrency:
-      group: portal-site-${{ inputs.environment }}
+      group: portal-site-${{ inputs.github_environment }}
       cancel-in-progress: false
       queue: max
     outputs:
