@@ -39,7 +39,14 @@ const NewsCard: FC<NewsCardProps> = ({ news }) => {
         "@media (prefers-reduced-motion: reduce)": { transition: "none" },
       }}
     >
-      <Box sx={{ position: "relative" }}>
+      <Box
+        component="a"
+        href={news.link}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={news.title}
+        sx={{ position: "relative", display: "block" }}
+      >
         <CardMedia
           component="img"
           image={news.image}
