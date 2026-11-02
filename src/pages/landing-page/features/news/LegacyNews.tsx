@@ -1,0 +1,39 @@
+import { Grid, Typography } from "@mui/material";
+
+import { fontSize, padding } from "@/styles/constants";
+import { FC } from "react";
+import { NEWS_CARDS_DATA } from "@/pages/landing-page/features/news/constants";
+import NewsCard from "@/pages/landing-page/features/news/components/LegacyNewsCard";
+
+const LegacyNews: FC = () => {
+  return (
+    <Grid container paddingY={{ xs: padding.medium, sm: padding.quadruple }}>
+      <Grid size={12}>
+        <Typography
+          color="#fff"
+          sx={{ fontSize: { xs: "24px", sm: fontSize.newsHeading } }}
+        >
+          Featured Datasets
+        </Typography>
+      </Grid>
+      <Grid paddingY={{ xs: padding.medium, sm: padding.triple }} size={12}>
+        <Grid container spacing={4}>
+          {NEWS_CARDS_DATA.map((news) => (
+            <Grid
+              key={news.id}
+              size={{
+                xs: 12,
+                sm: 6,
+                lg: 4,
+              }}
+            >
+              <NewsCard news={news} />
+            </Grid>
+          ))}
+        </Grid>
+      </Grid>
+    </Grid>
+  );
+};
+
+export default LegacyNews;

@@ -1,3 +1,6 @@
+// Keep the previous UI in production until TAG feedback is incorporated.
+export const isFeaturedDatasetsSectionEnabled = import.meta.env.MODE !== "prod";
+
 import { SearchKeys } from "@/components/search/constants";
 import { CONTRIBUTORS } from "@/pages/landing-page/features/partners/constants";
 import news1 from "@/assets/images/news1.webp";
