@@ -13,15 +13,15 @@ describe("NewsCard", () => {
             image: "/news.webp",
             imageSrcSet: "/news-card-400.webp 400w, /news.webp 600w",
             subheading: "News",
-            date: "01 Jan 2026",
             title: "Test news item",
+            description: "A highlighted ocean dataset.",
             link: "https://example.com/news",
           }}
         />
       </ThemeProvider>
     );
 
-    expect(screen.getByAltText("news image-Test news item")).toHaveAttribute(
+    expect(screen.getByAltText("Test news item")).toHaveAttribute(
       "srcset",
       "/news-card-400.webp 400w, /news.webp 600w"
     );
