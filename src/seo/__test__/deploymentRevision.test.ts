@@ -524,11 +524,14 @@ test("workflow wiring pins both checkouts and stops publishing on failed checks"
   );
 });
 
-test("application uploads and SEO share a queue without removing approval protections", () => {
+test("SEO queues apart from application uploads and keeps approval protections", () => {
+  expect(section(PUBLISH, "concurrency:")).toContain(
+    "group: portal-site-${{ inputs.github_environment }}"
+  );
+  expect(section(DEPLOY, "trigger_deploy:")).toContain(
+    "group: portal-site-${{ inputs.environment }}"
+  );
   for (const job of [PUBLISH, section(DEPLOY, "trigger_deploy:")]) {
-    expect(section(job, "concurrency:")).toContain(
-      "group: portal-site-${{ inputs.environment }}"
-    );
     expect(section(job, "concurrency:")).toContain("cancel-in-progress: false");
     expect(section(job, "concurrency:")).toContain("queue: max");
   }
