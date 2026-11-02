@@ -33,7 +33,8 @@ jobs:
   trigger_deploy:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
-    # Coordinate application uploads with SEO publishing in this repository.
+    # Queue application uploads for one site at a time. SEO uses
+    # portal-site-<github environment>, so only edge shares this group.
     # appdeploy applies infrastructure; it does not upload the application shell.
     concurrency:
       group: portal-site-${{ inputs.environment }}
