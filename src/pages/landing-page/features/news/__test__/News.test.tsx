@@ -13,7 +13,7 @@ import {
 import useRedirectSearch from "@/hooks/useRedirectSearch";
 import { SearchKeys } from "@/components/search/constants";
 import News from "@/pages/landing-page/features/news/News";
-import { FEATURED_DATASET_COUNTS } from "@/pages/landing-page/features/news/constants";
+import { FEATURED_DATASET_COUNTS } from "@/pages/landing-page/constants";
 
 vi.mock("@/hooks/useRedirectSearch", () => ({ default: vi.fn() }));
 const redirectSearch = vi.fn();

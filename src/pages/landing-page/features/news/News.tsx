@@ -4,9 +4,9 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { portalTheme } from "@/styles";
 import {
   FEATURED_CONTRIBUTORS,
-  FEATURED_DATASET_COUNTS,
   NEWS_CARDS_DATA,
 } from "@/pages/landing-page/features/news/constants";
+import { FEATURED_DATASET_COUNTS } from "@/pages/landing-page/constants";
 import NewsCard from "@/pages/landing-page/features/news/components/NewsCard";
 import { SearchKeys } from "@/components/search/constants";
 import { useAppDispatch } from "@/app/store/hooks";
