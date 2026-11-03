@@ -110,7 +110,11 @@ export enum RelationType {
   PREVIEW = "preview",
   WMS = "wms",
   WFS = "wfs",
+  FILE_LIST = "file-list",
 }
+
+// Key (link title) of the original netcdf files list. One per collection.
+export const ORIGINAL_NETCDFS_KEY = "original_netcdfs";
 
 export enum MediaType {
   TEXT_HTML = "text/html",
@@ -551,6 +555,16 @@ export class OGCCollection {
     }
     return toDatasetType(summaryLink);
   };
+  // Get the original netcdfs link, a list of the source netcdf files
+  getOriginalNetcdfsLink = (): ILink | undefined =>
+    this.links?.find(
+      (link) =>
+        link.rel === RelationType.FILE_LIST &&
+        link.title === ORIGINAL_NETCDFS_KEY
+    );
+  // Check if the collection has original netcdfs to download
+  hasOriginalNetcdfs = (): boolean =>
+    this.getOriginalNetcdfsLink() !== undefined;
 }
 
 export class SummariesProperties {

@@ -492,6 +492,46 @@ describe("OGCCollection", () => {
     );
   });
 
+  describe("original netcdfs", () => {
+    const originalNetcdfsLink = {
+      href: "http://localhost:8080/api/v1/ogc/original_netcdfs",
+      rel: "file-list",
+      type: "application/x-netcdf",
+      title: "original_netcdfs",
+    };
+
+    it("finds the file-list link titled original_netcdfs", () => {
+      const collection = new OGCCollection();
+      collection.links = [
+        { rel: "summary", href: "", type: "", title: "a.parquet" },
+        originalNetcdfsLink,
+      ];
+
+      expect(collection.hasOriginalNetcdfs()).toBe(true);
+      expect(collection.getOriginalNetcdfsLink()?.title).toBe(
+        "original_netcdfs"
+      );
+    });
+
+    it.each([
+      ["no links", undefined],
+      [
+        "a file-list link with another title",
+        [{ ...originalNetcdfsLink, title: "other" }],
+      ],
+      [
+        "an original_netcdfs title with another rel",
+        [{ ...originalNetcdfsLink, rel: "related" }],
+      ],
+    ])("returns false for %s", (_, links) => {
+      const collection = new OGCCollection();
+      collection.links = links;
+
+      expect(collection.hasOriginalNetcdfs()).toBe(false);
+      expect(collection.getOriginalNetcdfsLink()).toBeUndefined();
+    });
+  });
+
   describe("isIntegrated", () => {
     it.each([
       [["imos"], false],
