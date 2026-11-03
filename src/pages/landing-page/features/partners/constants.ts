@@ -8,6 +8,7 @@ import IMASLogo from "@/assets/partners/imas-logo.webp";
 import NCILogo from "@/assets/partners/nci-logo.webp";
 import EAtlasLogo from "@/assets/partners/eatlas-logo.webp";
 import WAMSILogo from "@/assets/partners/wamsi-logo.webp";
+import { FEATURED_DATASET_COUNTS } from "@/pages/landing-page/constants";
 
 /**
  * Shows the new partners section on the landing page. The production build
@@ -18,7 +19,10 @@ export const isPartnersSectionEnabled = import.meta.env.MODE !== "prod";
 export const PARTNERS_COLOURS = portalTheme.designTokens.colours.partners;
 
 export const IMOS_STATS = [
-  { value: "1,685+", label: "IMOS datasets in the AODN catalogue" },
+  {
+    value: `${FEATURED_DATASET_COUNTS[SearchKeys.IMOS]?.toLocaleString("en-AU")}+`,
+    label: "IMOS datasets in the AODN catalogue",
+  },
   { value: "20 years", label: "Of sustained ocean observing, since 2006" },
   { value: "Trusted", label: "Discoverable and accessible" },
   { value: "Free", label: "To search, preview and download" },

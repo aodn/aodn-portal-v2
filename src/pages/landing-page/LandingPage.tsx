@@ -5,7 +5,9 @@ import { color, padding } from "../../styles/constants";
 import Logos from "./features/partners/LogoList";
 import Partners from "./features/partners/Partners";
 import { isPartnersSectionEnabled } from "./features/partners/constants";
-import News from "./features/news/News";
+import News from "@/pages/landing-page/features/news/News";
+import LegacyNews from "@/pages/landing-page/features/news/LegacyNews";
+import { isFeaturedDatasetsSectionEnabled } from "@/pages/landing-page/features/news/constants";
 import SectionContainer from "@/components/common/container/SectionContainer";
 import { PAGE_CONTENT_WIDTH_LANDING } from "@/app/layout/constant";
 import TopicsPanel from "./features/topics-panel/TopicsPanel";
@@ -43,7 +45,7 @@ const LandingPage: FC = () => {
         sectionAreaStyle={{ backgroundColor: color.blue.extraDark }}
         contentAreaStyle={{ width: PAGE_CONTENT_WIDTH_LANDING }}
       >
-        <News />
+        {isFeaturedDatasetsSectionEnabled ? <News /> : <LegacyNews />}
       </SectionContainer>
 
       {isPartnersSectionEnabled ? (
