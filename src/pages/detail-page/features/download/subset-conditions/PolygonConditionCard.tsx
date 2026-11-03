@@ -34,6 +34,12 @@ const COORD_TEXT_COLOR = "#5B5B5B";
 
 const RANGE_HINT = "Latitude must be -90 to 90, longitude -180 to 180.";
 
+// Validate the entire decimal value: parseFloat would accept "12abc" as 12.
+const parseCoordinate = (value: string): number => {
+  const trimmed = value.trim();
+  return /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(trimmed) ? Number(trimmed) : NaN;
+};
+
 const isValidLat = (n: number) => Number.isFinite(n) && n >= -90 && n <= 90;
 const isValidLng = (n: number) => Number.isFinite(n) && n >= -180 && n <= 180;
 
@@ -421,12 +427,12 @@ const PolygonConditionCard: React.FC<PolygonConditionCardProps> = ({
     }
   }, [editingIndex]);
 
-  const editLatNum = parseFloat(editLat);
-  const editLngNum = parseFloat(editLng);
+  const editLatNum = parseCoordinate(editLat);
+  const editLngNum = parseCoordinate(editLng);
   const editValid = isValidLat(editLatNum) && isValidLng(editLngNum);
 
-  const addLatNum = parseFloat(addLat);
-  const addLngNum = parseFloat(addLng);
+  const addLatNum = parseCoordinate(addLat);
+  const addLngNum = parseCoordinate(addLng);
   const addValid =
     addLat !== "" &&
     addLng !== "" &&
