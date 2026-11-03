@@ -12,11 +12,12 @@ import {
   IDownloadConditionCallback,
 } from "@/pages/detail-page/context/DownloadDefinitions";
 import { ControlProps } from "./Definition";
-import { Box, IconButton, Stack } from "@mui/material";
+import { Box, IconButton, Stack, Typography } from "@mui/material";
 import { switcherIconButtonSx } from "./MenuControl";
 import MenuHintTooltip from "./MenuHintTooltip";
 import { dateDefault } from "@/components/common/constants";
 import { dayjsToUnixMs, toAppDayjs, unixMsToAppDayjs } from "@/utils/DateUtils";
+import { CalendarIcon } from "@/assets/icons/search/calendar";
 import { TimeRangeIcon } from "@/assets/icons/map/time_range";
 import DateSlider from "@/components/common/slider/DateSlider";
 import PlainDatePicker from "@/components/common/datetime/PlainDatePicker";
@@ -52,6 +53,9 @@ const DateRange: React.FC<DateRangeControlProps> = ({
   map, // Map instance passed through ControlProps via cloneElement
 }) => {
   const [open, setOpen] = useState<boolean>(false);
+  const [openDatePicker, setOpenDatePicker] = useState<"start" | "end" | null>(
+    null
+  );
   const [showTooltip, setShowTooltip] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [currentMinDate, setCurrentMinDate] = useState<string | undefined>(
@@ -71,6 +75,24 @@ const DateRange: React.FC<DateRangeControlProps> = ({
     currentMaxDate ?? maxDate,
     dateDefault.DATE_FORMAT
   );
+
+  const dateFieldSlotProps = (endpoint: "start" | "end", label: string) => ({
+    textField: {
+      onClick: () => setOpenDatePicker(endpoint),
+      onKeyDown: (event: React.KeyboardEvent) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          setOpenDatePicker(endpoint);
+        }
+      },
+      inputProps: {
+        readOnly: true,
+        role: "button",
+        "aria-label": label,
+        "aria-haspopup": "dialog" as const,
+      },
+    },
+  });
 
   const handleIconClick = () => {
     setOpen((prev) => !prev);
@@ -186,7 +208,7 @@ const DateRange: React.FC<DateRangeControlProps> = ({
           <Box
             sx={{
               position: "absolute",
-              bottom: "30px",
+              bottom: isMobile ? portalTheme.spacing(5) : "30px",
               left: "0", // Start from left edge of container
               right: "0", // Extend to right edge of container
               pointerEvents: "all",
@@ -199,28 +221,56 @@ const DateRange: React.FC<DateRangeControlProps> = ({
               <AppLocalizationProvider>
                 <Stack
                   direction="row"
-                  spacing={1}
+                  spacing={0.5}
                   alignItems="center"
                   onPointerDown={(event) => event.stopPropagation()}
                   onTouchStart={(event) => event.stopPropagation()}
                   onClick={(event) => event.stopPropagation()}
                   sx={{
-                    width: "100%",
-                    mx: "8px",
-                    px: 1,
-                    height: "48px",
+                    width: portalTheme.spacing(35),
+                    maxWidth: "calc(100% - 16px)",
+                    px: 1.5,
+                    height: portalTheme.spacing(5.5),
                     minWidth: 0,
-                    borderRadius: portalTheme.borderRadius.sm,
-                    backgroundColor: portalTheme.palette.primary6,
+                    borderRadius: portalTheme.spacing(0.75),
+                    backgroundColor: portalTheme.palette.background.paper,
+                    boxShadow: portalTheme.shadows[1],
+                    justifyContent: "center",
                     "& > .MuiTextField-root": {
                       flex: 1,
                       width: 0,
                       minWidth: 0,
+                      border: "none",
+                      backgroundColor: "transparent",
+                    },
+                    "& .MuiTextField-root .MuiInputBase-root": {
+                      height: portalTheme.spacing(5),
+                      p: 0,
+                    },
+                    "& .MuiTextField-root input": {
+                      ...portalTheme.typography.body2Regular,
+                      color: portalTheme.palette.text1,
+                      cursor: "pointer",
+                    },
+                    "& .MuiTextField-root input:focus-visible": {
+                      outline: `2px solid ${portalTheme.palette.primary.main}`,
+                      outlineOffset: "2px",
+                      borderRadius: portalTheme.borderRadius.sm,
                     },
                   }}
                 >
+                  <CalendarIcon
+                    aria-hidden="true"
+                    width={portalTheme.spacing(2)}
+                    height={portalTheme.spacing(2)}
+                    color={portalTheme.palette.grey600}
+                    style={{ flexShrink: 0 }}
+                  />
                   <PlainDatePicker
-                    label="Start date"
+                    disableOpenPicker
+                    open={openDatePicker === "start"}
+                    onClose={() => setOpenDatePicker(null)}
+                    slotProps={dateFieldSlotProps("start", "Start date")}
                     views={["year", "month", "day"]}
                     format={dateDefault.DISPLAY_FORMAT}
                     value={startDate}
@@ -239,8 +289,20 @@ const DateRange: React.FC<DateRangeControlProps> = ({
                       ]);
                     }}
                   />
+                  <Typography
+                    aria-hidden="true"
+                    sx={{
+                      ...portalTheme.typography.body2Regular,
+                      color: portalTheme.palette.text1,
+                    }}
+                  >
+                    –
+                  </Typography>
                   <PlainDatePicker
-                    label="End date"
+                    disableOpenPicker
+                    open={openDatePicker === "end"}
+                    onClose={() => setOpenDatePicker(null)}
+                    slotProps={dateFieldSlotProps("end", "End date")}
                     views={["year", "month", "day"]}
                     format={dateDefault.DISPLAY_FORMAT}
                     value={endDate}
