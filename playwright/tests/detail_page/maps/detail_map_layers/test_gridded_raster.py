@@ -136,10 +136,10 @@ def test_gridded_date_point_slider_coexists_with_the_range_slider(
     responsive_page: Page,
 ) -> None:
     """
-    Assertions 4, 5 and 6: the date menu shows one point thumb plus the
-    unchanged two-thumb range slider, the point defaults to the selected
-    product's latest day, and moving it requests tiles through the OGC route
-    carrying that exact day — never through a DAS path.
+    Assertions 4, 5 and 6: the date menu keeps the point slider alongside
+    date pickers on mobile or a two-thumb range slider on desktop. The point
+    defaults to the product's latest day, and moving it requests tiles through
+    the OGC route carrying that exact day — never through a DAS path.
     """
     detail_page = DetailPage(responsive_page)
     tile_urls = _collect_tile_requests(responsive_page)
@@ -150,9 +150,23 @@ def test_gridded_date_point_slider_coexists_with_the_range_slider(
 
     detail_page.detail_map.daterange_show_hide_menu_button.click()
 
-    # One point thumb plus the range slider's two thumbs.
-    expect(responsive_page.get_by_role('slider')).to_have_count(3)
-    expect(detail_page.detail_map.date_slider).to_have_count(2)
+    detail_map = detail_page.detail_map
+    if detail_page.is_mobile_viewport():
+        expect(responsive_page.get_by_role('slider')).to_have_count(1)
+        expect(detail_map.date_slider).to_have_count(1)
+        for date_button in (
+            detail_map.start_date_button,
+            detail_map.end_date_button,
+        ):
+            expect(date_button).to_be_visible()
+            date_button.click()
+            expect(detail_map.date_picker_dialog).to_be_visible()
+            detail_map.date_picker_cancel.click()
+            expect(detail_map.date_picker_dialog).not_to_be_visible()
+    else:
+        # One point thumb plus the range slider's two thumbs.
+        expect(responsive_page.get_by_role('slider')).to_have_count(3)
+        expect(detail_map.date_slider).to_have_count(2)
 
     latest = PRODUCT_ONE_DATES[-1]
     detail_page.detail_map.wait_for_map_idle()

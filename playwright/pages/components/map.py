@@ -61,6 +61,16 @@ class Map(BasePage):
             'dateslider-daterange-menu-button'
         )
         self.date_slider_rail = self.date_slider.locator('.MuiSlider-root')
+        self.start_date_button = page.get_by_role(
+            'button', name='Start date', exact=True
+        )
+        self.end_date_button = page.get_by_role(
+            'button', name='End date', exact=True
+        )
+        self.date_picker_dialog = page.get_by_role('dialog')
+        self.date_picker_cancel = self.date_picker_dialog.get_by_role(
+            'button', name='Cancel', exact=True
+        )
 
         # Scoped locators also work when the location-filter map is open
         # alongside the search map.
