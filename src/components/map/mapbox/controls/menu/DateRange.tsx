@@ -12,13 +12,17 @@ import {
   IDownloadConditionCallback,
 } from "@/pages/detail-page/context/DownloadDefinitions";
 import { ControlProps } from "./Definition";
-import { Box, IconButton } from "@mui/material";
+import { Box, IconButton, Stack } from "@mui/material";
 import { switcherIconButtonSx } from "./MenuControl";
 import MenuHintTooltip from "./MenuHintTooltip";
-import { dateDefault } from "../../../../common/constants";
-import { toAppDayjs, unixMsToAppDayjs } from "@/utils/DateUtils";
+import { dateDefault } from "@/components/common/constants";
+import { dayjsToUnixMs, toAppDayjs, unixMsToAppDayjs } from "@/utils/DateUtils";
 import { TimeRangeIcon } from "@/assets/icons/map/time_range";
-import DateSlider from "../../../../common/slider/DateSlider";
+import DateSlider from "@/components/common/slider/DateSlider";
+import PlainDatePicker from "@/components/common/datetime/PlainDatePicker";
+import { AppLocalizationProvider } from "@/app/providers/AppLocalizationProvider";
+import useBreakpoint from "@/hooks/useBreakpoint";
+import { portalTheme } from "@/styles";
 import { TimeRangeTooltipIcon } from "@/assets/icons/map/tooltip_time_range";
 import MenuTooltip from "./MenuTooltip";
 
@@ -57,7 +61,16 @@ const DateRange: React.FC<DateRangeControlProps> = ({
     undefined
   );
 
+  const { isMobile } = useBreakpoint();
   const mapContainer = map?.getContainer();
+  const startDate = toAppDayjs(
+    currentMinDate ?? minDate,
+    dateDefault.DATE_FORMAT
+  );
+  const endDate = toAppDayjs(
+    currentMaxDate ?? maxDate,
+    dateDefault.DATE_FORMAT
+  );
 
   const handleIconClick = () => {
     setOpen((prev) => !prev);
@@ -182,13 +195,82 @@ const DateRange: React.FC<DateRangeControlProps> = ({
               justifyContent: "center",
             }}
           >
-            <DateSlider
-              currentMinDate={currentMinDate}
-              currentMaxDate={currentMaxDate}
-              minDate={minDate}
-              maxDate={maxDate}
-              onDateRangeChange={onDateRangeChange}
-            />
+            {isMobile ? (
+              <AppLocalizationProvider>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  alignItems="center"
+                  onPointerDown={(event) => event.stopPropagation()}
+                  onTouchStart={(event) => event.stopPropagation()}
+                  onClick={(event) => event.stopPropagation()}
+                  sx={{
+                    width: "100%",
+                    mx: "8px",
+                    px: 1,
+                    height: "48px",
+                    minWidth: 0,
+                    borderRadius: portalTheme.borderRadius.sm,
+                    backgroundColor: portalTheme.palette.primary6,
+                    "& > .MuiTextField-root": {
+                      flex: 1,
+                      width: 0,
+                      minWidth: 0,
+                    },
+                  }}
+                >
+                  <PlainDatePicker
+                    label="Start date"
+                    views={["year", "month", "day"]}
+                    format={dateDefault.DISPLAY_FORMAT}
+                    value={startDate}
+                    minDate={toAppDayjs(minDate, dateDefault.DATE_FORMAT)}
+                    maxDate={endDate}
+                    onAccept={(date, context) => {
+                      if (!date?.isValid() || context.validationError) return;
+                      onDateRangeChange(new Event("change"), [
+                        dayjsToUnixMs(
+                          toAppDayjs(
+                            date.format(dateDefault.DATE_FORMAT),
+                            dateDefault.DATE_FORMAT
+                          )
+                        ),
+                        dayjsToUnixMs(endDate, true),
+                      ]);
+                    }}
+                  />
+                  <PlainDatePicker
+                    label="End date"
+                    views={["year", "month", "day"]}
+                    format={dateDefault.DISPLAY_FORMAT}
+                    value={endDate}
+                    minDate={startDate}
+                    maxDate={toAppDayjs(maxDate, dateDefault.DATE_FORMAT)}
+                    onAccept={(date, context) => {
+                      if (!date?.isValid() || context.validationError) return;
+                      onDateRangeChange(new Event("change"), [
+                        dayjsToUnixMs(startDate),
+                        dayjsToUnixMs(
+                          toAppDayjs(
+                            date.format(dateDefault.DATE_FORMAT),
+                            dateDefault.DATE_FORMAT
+                          ),
+                          true
+                        ),
+                      ]);
+                    }}
+                  />
+                </Stack>
+              </AppLocalizationProvider>
+            ) : (
+              <DateSlider
+                currentMinDate={currentMinDate}
+                currentMaxDate={currentMaxDate}
+                minDate={minDate}
+                maxDate={maxDate}
+                onDateRangeChange={onDateRangeChange}
+              />
+            )}
           </Box>,
           mapContainer
         )}
