@@ -1,6 +1,6 @@
 import React, { forwardRef, useCallback } from "react";
 import { InputBase } from "@mui/material";
-import { portalTheme } from "../../../../../styles";
+import { portalTheme } from "@/styles";
 
 const SOFT_SHADOW = "1px 1px 4px 0 rgba(0, 0, 0, 0.10)";
 const ERROR_BORDER = `0 0 0 1px ${portalTheme.palette.error.main}`;
@@ -114,9 +114,9 @@ const CoordInput = forwardRef<HTMLInputElement, CoordInputProps>(
           "aria-invalid": Boolean(error),
           "aria-errormessage":
             error && errorMessageId ? errorMessageId : undefined,
-          // `decimal` hints mobile keyboards to show the numeric pad with a
-          // decimal separator; desktop browsers ignore it.
-          inputMode: "decimal",
+          // iOS decimal/numeric keyboards omit the minus key. Use the full
+          // keyboard so signed coordinates can be entered on mobile.
+          inputMode: "text",
         }}
         sx={{
           ...ROOT_SX,
