@@ -2,6 +2,7 @@ import { FC, useCallback, useEffect, useMemo } from "react";
 import { useDetailPageContext } from "@/pages/detail-page/context/detail-page-context";
 import DownloadWFSCard from "./DownloadWFSCard";
 import DownloadCloudOptimisedCard from "./DownloadCloudOptimisedCard";
+import DownloadOriginalNetcdfsCard from "./DownloadOriginalNetcdfsCard";
 import SideCardContainer from "../../layout/SideCardContainer";
 import { DownloadServiceType } from "../../context/DownloadDefinitions";
 
@@ -17,22 +18,36 @@ const DownloadCard: FC = () => {
     setSelectedCoKey,
   } = useDetailPageContext();
 
-  const [wfsLinks, hasCloudOptimisedData, isImosOnly, isIntegrated] =
-    useMemo(() => {
-      const wfsLinks = collection?.getWFSLinks() || [];
-      const hasCloudOptimisedData =
-        collection?.hasCloudOptimisedData() || false;
-      const isImosOnly = collection?.isImosOnly() ?? false;
-      const isIntegrated = collection?.isIntegrated() ?? false;
-      return [wfsLinks, hasCloudOptimisedData, isImosOnly, isIntegrated];
-    }, [collection]);
+  const [
+    wfsLinks,
+    hasCloudOptimisedData,
+    hasOriginalNetcdfs,
+    isImosOnly,
+    isIntegrated,
+  ] = useMemo(() => {
+    const wfsLinks = collection?.getWFSLinks() || [];
+    const hasCloudOptimisedData = collection?.hasCloudOptimisedData() || false;
+    const hasOriginalNetcdfs = collection?.hasOriginalNetcdfs() || false;
+    const isImosOnly = collection?.isImosOnly() ?? false;
+    const isIntegrated = collection?.isIntegrated() ?? false;
+    return [
+      wfsLinks,
+      hasCloudOptimisedData,
+      hasOriginalNetcdfs,
+      isImosOnly,
+      isIntegrated,
+    ];
+  }, [collection]);
 
   const onWFSAvailabilityChange = useCallback(
     (isWFSAvailable: boolean) => {
-      // Strong preference on cloud optimized data, if collection have it
-      // then always use it regardless of what WFS told us.
+      // Cloud optimised data and original netcdfs come before WFS. If the
+      // collection has either, keep it regardless of what WFS told us.
       setDownloadService((type) => {
-        if (type !== DownloadServiceType.CloudOptimised) {
+        if (
+          type !== DownloadServiceType.CloudOptimised &&
+          type !== DownloadServiceType.OriginalNetcdfs
+        ) {
           return isWFSAvailable
             ? DownloadServiceType.WFS
             : DownloadServiceType.Unavailable;
@@ -46,15 +61,23 @@ const DownloadCard: FC = () => {
 
   useEffect(() => {
     // Set the type of download based on simple  in collection, the value
-    // may change by callback if more info available
+    // may change by callback if more info available.
+    // Priority: cloud optimised > original netcdfs > WFS
     if (hasCloudOptimisedData) {
       setDownloadService(DownloadServiceType.CloudOptimised);
+    } else if (hasOriginalNetcdfs) {
+      setDownloadService(DownloadServiceType.OriginalNetcdfs);
     } else if (wfsLinks.length > 0) {
       setDownloadService(DownloadServiceType.WFS);
     } else {
       setDownloadService(DownloadServiceType.Unavailable);
     }
-  }, [hasCloudOptimisedData, setDownloadService, wfsLinks.length]);
+  }, [
+    hasCloudOptimisedData,
+    hasOriginalNetcdfs,
+    setDownloadService,
+    wfsLinks.length,
+  ]);
 
   const downloadCard = useMemo(() => {
     if (!collection) return null;
@@ -65,6 +88,17 @@ const DownloadCard: FC = () => {
             collection={collection}
             selectedCoKey={selectedCoKey}
             setSelectedCoKey={setSelectedCoKey}
+            downloadConditions={downloadConditions}
+            getAndSetDownloadConditions={getAndSetDownloadConditions}
+            removeDownloadCondition={removeDownloadCondition}
+            isImosOnly={isImosOnly}
+            isIntegrated={isIntegrated}
+          />
+        );
+      case DownloadServiceType.OriginalNetcdfs:
+        return (
+          <DownloadOriginalNetcdfsCard
+            collection={collection}
             downloadConditions={downloadConditions}
             getAndSetDownloadConditions={getAndSetDownloadConditions}
             removeDownloadCondition={removeDownloadCondition}
@@ -85,7 +119,7 @@ const DownloadCard: FC = () => {
             isIntegrated={isIntegrated}
           />
         );
-      // hide download card if no CO download or WFS download
+      // hide download card if no CO, original netcdfs or WFS download
       default:
         return null;
     }
