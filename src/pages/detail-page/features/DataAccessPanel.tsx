@@ -8,6 +8,7 @@ import {
   DataAccessSubGroup,
   getSubgroup,
   ILink,
+  OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE,
 } from "@/app/store/OGCCollectionDefinitions";
 import SideCardContainer from "../layout/SideCardContainer";
 import NavigatablePanel, {
@@ -28,8 +29,6 @@ export enum TYPE {
   DATA_ACCESS = "DATA_ACCESS",
 }
 
-const OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE =
-  "Access to Jupyter notebook to query Cloud Optimised converted dataset";
 const PYTHON_NOTEBOOK_EXAMPLE_LINK_TITLE = "Python notebook example";
 
 // Only find optimized Python notebook links if they exist, otherwise fall back to example links
