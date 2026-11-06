@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import {
   getSubgroup,
   OGCCollection,
+  OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE,
   RelationType,
   Spatial,
 } from "../OGCCollectionDefinitions"; // Adjust the import path as needed
@@ -529,6 +530,64 @@ describe("OGCCollection", () => {
 
       expect(collection.hasOriginalNetcdfs()).toBe(false);
       expect(collection.getOriginalNetcdfsLink()).toBeUndefined();
+    });
+  });
+
+  describe("getCODatasetLabel", () => {
+    const notebookLink = (keyName: string, title: string) => ({
+      rel: "related",
+      type: "application/x-ipynb+json",
+      href: `https://github.com/aodn/aodn_cloud_optimised/blob/main/notebooks/${keyName}.ipynb`,
+      title,
+    });
+
+    it("uses the text after the dash in the key's notebook link title", () => {
+      const collection = new OGCCollection();
+      collection.links = [
+        notebookLink(
+          "animal_ctd",
+          `${OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE} - Real time - CTD profile`
+        ),
+        notebookLink(
+          "radar_wave",
+          `${OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE} - Delayed mode - Wave`
+        ),
+      ];
+
+      expect(collection.getCODatasetLabel("animal_ctd.parquet")).toBe(
+        "Real time - CTD profile"
+      );
+      expect(collection.getCODatasetLabel("radar_wave.zarr")).toBe(
+        "Delayed mode - Wave"
+      );
+    });
+
+    it.each([
+      ["no links", undefined],
+      [
+        "a notebook link with no name after the title",
+        [notebookLink("animal_ctd", OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE)],
+      ],
+      [
+        "only another key's notebook link",
+        [
+          notebookLink(
+            "animal_gps",
+            `${OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE} - Real time - GPS`
+          ),
+        ],
+      ],
+      [
+        "a notebook link with another title",
+        [notebookLink("animal_ctd", "Python notebook example - CTD")],
+      ],
+    ])("falls back to the key without its extension for %s", (_, links) => {
+      const collection = new OGCCollection();
+      collection.links = links;
+
+      expect(collection.getCODatasetLabel("animal_ctd.parquet")).toBe(
+        "animal_ctd"
+      );
     });
   });
 

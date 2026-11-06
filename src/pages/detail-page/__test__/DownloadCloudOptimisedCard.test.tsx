@@ -95,6 +95,7 @@ const createMockCollection = (datasetType: DatasetType): OGCCollection => {
     ],
     getDatasetType: () => [datasetType],
     getAllCOKeys: () => ["test-zarr.zarr", "test-parquet.parquet"],
+    getCODatasetLabel: (key: string) => key.replace(/\.(zarr|parquet)$/, ""),
     getDatasetTypeByKey: (key: string) =>
       key.endsWith(".parquet")
         ? DatasetType.PARQUET
@@ -200,6 +201,29 @@ describe("DownloadCloudOptimisedCard", () => {
     expect(options[1].textContent).toBe("test-zarr");
     expect(options[0].value).toBe("test-parquet.parquet");
     expect(options[1].value).toBe("test-zarr.zarr");
+  });
+
+  it("shows the readable name as the label and keeps the CO key as the value", async () => {
+    const readableNames: Record<string, string> = {
+      "test-zarr.zarr": "Delayed mode - Wave",
+      "test-parquet.parquet": "Real time - CTD profile",
+    };
+    renderComponent({
+      ...createMockCollection(DatasetType.ZARR),
+      getCODatasetLabel: (key: string) => readableNames[key],
+    } as OGCCollection);
+
+    await waitFor(() => {
+      expect(screen.getByText("Data Selection")).toBeInTheDocument();
+    });
+
+    const options = getDataSelect().querySelectorAll("option");
+
+    expect(options).toHaveLength(2);
+    expect(options[0].textContent).toBe("Delayed mode - Wave");
+    expect(options[0].value).toBe("test-zarr.zarr");
+    expect(options[1].textContent).toBe("Real time - CTD profile");
+    expect(options[1].value).toBe("test-parquet.parquet");
   });
 
   it("should change data selection value when user selects different option", async () => {
