@@ -24,3 +24,12 @@ jobs:
       app_name: portal
       environment: production
     secrets: inherit
+  
+  trigger_dr_production_build_deploy:
+    needs: [trigger_production_build_deploy]
+    uses: ./.github/workflows/trigger_build_deploy.yml
+    with:
+      app_name: portal
+      environment: dr-production
+    secrets: inherit
+      
