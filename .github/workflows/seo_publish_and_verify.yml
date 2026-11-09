@@ -179,7 +179,9 @@ jobs:
           echo "Publishing $(grep -c '<loc>' dist/sitemap.xml) URLs and $(find dist/prerender -type f | wc -l) pages to s3://${{ vars.BUCKET }}"
           aws s3 cp dist/sitemap.xml s3://${{ vars.BUCKET }}/sitemap.xml --region ${{ vars.AWS_REGION }}
           echo "sitemap_uploaded=true" >> "$GITHUB_OUTPUT" || true
-          aws s3 sync --delete dist/prerender s3://${{ vars.BUCKET }}/prerender --region ${{ vars.AWS_REGION }}
+          # The marker tells the viewer-response function this really is a
+          # pre-rendered page; without it a crawler gets 404 instead of the shell
+          aws s3 sync --delete dist/prerender s3://${{ vars.BUCKET }}/prerender --region ${{ vars.AWS_REGION }} --metadata prerendered=1
           echo "pages_uploaded=true" >> "$GITHUB_OUTPUT" || true
 
       - name: Clear cloudfront cache for the SEO paths
