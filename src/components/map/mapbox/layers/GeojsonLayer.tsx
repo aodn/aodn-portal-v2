@@ -24,8 +24,7 @@ import {
   getPopupTextStyle,
 } from "@/utils/ExtentPopupUtils";
 import { useTheme } from "@mui/material/styles";
-import bluePin from "@/assets/icons/blue_pin.png";
-import { MapEventEnum } from "../constants";
+import { MapEventEnum, SINGLE_POINT_SYMBOLOGY } from "../constants";
 import { TestHelper } from "../../../common/test/helper";
 import { addDataLayer } from "../layerOrder";
 
@@ -47,8 +46,6 @@ interface GeojsonLayerProps {
   // hosting popup first, so the extent popup there is unreachable
   showExtentPopup?: boolean;
 }
-
-const BLUE_PIN_NAME = "blue_pin_name";
 
 const GeojsonLayer: FC<GeojsonLayerProps> = ({
   collection,
@@ -235,12 +232,18 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
 
       addDataLayer(map, {
         id: layerPointId,
-        type: "symbol",
+        type: "circle",
         source: sourceId,
         filter: ["==", ["geometry-type"], "Point"],
+        paint: {
+          "circle-color": SINGLE_POINT_SYMBOLOGY.COLOR,
+          "circle-opacity": SINGLE_POINT_SYMBOLOGY.OPACITY,
+          "circle-radius": SINGLE_POINT_SYMBOLOGY.RADIUS,
+          "circle-stroke-width": SINGLE_POINT_SYMBOLOGY.STROKE_WIDTH,
+          "circle-stroke-color": SINGLE_POINT_SYMBOLOGY.STROKE_COLOR,
+        },
         layout: {
           visibility: visible ? "visible" : "none",
-          "icon-image": BLUE_PIN_NAME,
         },
       });
     }
@@ -282,14 +285,6 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
   useEffect(() => {
     if (map === null) return;
 
-    // Order important we want to load the image first
-    map?.once(MapEventEnum.IDLE, () => {
-      map?.loadImage(bluePin, (err, img) => {
-        if (!err && img && !map?.hasImage(BLUE_PIN_NAME))
-          map.addImage(BLUE_PIN_NAME, img);
-      });
-    });
-
     // This situation is map object created, hence not null, but not completely loaded
     // therefore you will have problem setting source and layer. Set-up a listener
     // to update the state and then this effect can be call again when map loaded.
@@ -322,7 +317,6 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
           map?.removeLayer(layerPolygonId);
           map?.removeLayer(layerPointId);
           map?.removeSource(sourceId);
-          map?.removeImage(BLUE_PIN_NAME);
         }
       } catch (error) {
         // OK to ignore error here

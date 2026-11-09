@@ -143,7 +143,7 @@ const MapLayerSelect: FC<MapLayerSelectProps> = ({
                   whiteSpace: "nowrap",
                 }}
               >
-                Dataset Selection
+                Map Layer
               </Typography>
               <Divider
                 orientation="vertical"

@@ -193,3 +193,33 @@ describe("lcpElement", () => {
     expect(lcpElement(lhrFixture())).toBeUndefined();
   });
 });
+
+test("release measurements preserve actual values without requiring audit scores", () => {
+  const lhr = lhrFixture();
+  lhr.audits["largest-contentful-paint"].numericValue = 6500.1;
+  lhr.audits["cumulative-layout-shift"].numericValue = 0.1001;
+  lhr.audits["total-blocking-time"].score = null;
+  const extracted = extractMetrics(lhr, true);
+  expect(extracted.lcp).toBe(6500.1);
+  expect(extracted.cls).toBe(0.1001);
+  expect(extracted.tbt).toBe(180.4);
+  expect(
+    medianMetrics(
+      [
+        { ...extracted, lcp: 5000, cls: 0.05 },
+        extracted,
+        { ...extracted, lcp: 10000, cls: 1 },
+      ],
+      true
+    )
+  ).toMatchObject({ lcp: 6500.1, cls: 0.1001 });
+});
+
+test.each([NaN, Infinity])(
+  "invalid metric value %s is an execution error",
+  (value) => {
+    const lhr = lhrFixture();
+    lhr.audits["total-blocking-time"].numericValue = value;
+    expect(() => extractMetrics(lhr, true)).toThrow(/total-blocking-time/);
+  }
+);

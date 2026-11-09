@@ -3,33 +3,31 @@ import { FeatureCollection, Point } from "geojson";
 import { findSuitableVisiblePoint } from "../Layers";
 import { Map as Mapbox } from "mapbox-gl";
 
-// Define the test
-describe("findMostVisiblePoint", () => {
-  beforeAll(() => {
-    // Mock the MapboxGL Map class
-    vi.mock("mapbox-gl", async () => {
-      const actual =
-        await vi.importActual<typeof import("mapbox-gl")>("mapbox-gl");
+// Mock the MapboxGL Map class.
+vi.mock("mapbox-gl", async () => {
+  const actual = await vi.importActual<typeof import("mapbox-gl")>("mapbox-gl");
 
+  return {
+    ...actual,
+    Map: vi.fn(function () {
       return {
-        ...actual,
-        Map: vi.fn().mockImplementation(() => ({
-          // This is the current visible area of the map,
-          // we mock some random value to make test work
-          getBounds: vi.fn().mockReturnValue({
-            getSouthWest: () => [-203.62, -43.828],
-            getNorthEast: () => [-142.79, -8.759],
-            contains: vi.fn().mockReturnValue(true),
-          }),
-          getCenter: vi.fn().mockReturnValue({
-            lng: 0,
-            lat: 0,
-          }),
-        })),
+        // This is the current visible area of the map,
+        // we mock some random value to make test work
+        getBounds: vi.fn().mockReturnValue({
+          getSouthWest: () => [-203.62, -43.828],
+          getNorthEast: () => [-142.79, -8.759],
+          contains: vi.fn().mockReturnValue(true),
+        }),
+        getCenter: vi.fn().mockReturnValue({
+          lng: 0,
+          lat: 0,
+        }),
       };
-    });
-  });
+    }),
+  };
+});
 
+describe("findMostVisiblePoint", () => {
   afterEach(() => {
     vi.resetAllMocks();
   });

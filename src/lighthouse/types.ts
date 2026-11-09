@@ -34,18 +34,23 @@ export type FormFactor = "mobile" | "desktop";
 export interface RouteReport {
   id: string;
   metrics: Partial<Record<FormFactor, RouteMetrics>>;
+  /** Valid measured runs for deployed audits; excludes the warm-up. */
+  measuredRuns?: Partial<Record<FormFactor, RouteMetrics[]>>;
 }
 
-/** What gets uploaded as the `lighthouse-baseline` artifact. */
+/** Median measurements for local PR builds or deployed release sites. */
 export interface LighthouseReport {
   commit: string;
   branch: string;
   generatedAt: string;
   /** Lighthouse runs per route/form factor; every value above is their median. */
   runs: number;
-  /** Upstream the recorded API responses came from. */
+  /** Recorded API upstream, or the actual site origin for deployed audits. */
   apiHost: string;
   routes: Record<string, RouteReport>;
+  /** Deployment context and execution errors are used only in release reports. */
+  environment?: string;
+  executionError?: string;
 }
 
 /** Minimal view of the Lighthouse result the scripts read. */

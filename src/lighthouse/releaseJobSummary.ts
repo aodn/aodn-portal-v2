@@ -1,0 +1,181 @@
+import {
+  ALL_FORM_FACTORS,
+  formFactorLabels,
+  lighthouseRoutes,
+} from "@/lighthouse/constants";
+import { formatMetricValue } from "@/lighthouse/metrics";
+import type { buildReleaseReport } from "@/lighthouse/releaseReport";
+
+export const pageKey = (page: {
+  id: string;
+  url: string;
+  formFactor: string;
+}) => {
+  const url = new URL(page.url);
+  if (!["http:", "https:"].includes(url.protocol))
+    throw new Error("Invalid page URL");
+  url.searchParams.sort();
+  // Origins may change within an environment; datasets, states and devices must match.
+  return `${page.id}:${page.formFactor}:${url.pathname}${url.search}${url.hash}`;
+};
+
+type Results = ReturnType<typeof buildReleaseReport>["results"];
+const statusLabel = (status: string) =>
+  `${status === "PASS" || status === "SUCCESS" ? "🟢" : "🔴"} ${status}`;
+const pageLabel = (id: string) => id.charAt(0).toUpperCase() + id.slice(1);
+const signed = (value: number) =>
+  `${value > 0 ? "+" : ""}${formatMetricValue(value)}`;
+
+/** Presentation only: validation, medians and numeric precision belong to the report. */
+export const buildReleaseJobSummary = (
+  results: Results,
+  detailedMarkdown: string,
+  previous?: Pick<Results, "environment" | "ref" | "commit"> & {
+    pages: Pick<
+      Results["pages"][number],
+      "id" | "url" | "formFactor" | "performance"
+    >[];
+  },
+  previousRunUrl?: string
+) => {
+  const failedRows: string[] = [];
+  for (const page of results.pages) {
+    const prefix = `| ${pageLabel(page.id)} | ${formFactorLabels[page.formFactor]} |`;
+    if (page.performance < page.threshold) {
+      failedRows.push(
+        `${prefix} Performance | ${formatMetricValue(page.performance)} | >= ${formatMetricValue(page.threshold)} | 🔴 ${signed(page.performance - page.threshold)} points |`
+      );
+    }
+    for (const check of page.metricChecks.filter((c) => c.status === "FAIL")) {
+      const unit = check.unit === "ms" ? " ms" : "";
+      failedRows.push(
+        `${prefix} ${check.metric.toUpperCase()}${unit ? "" : " (unitless)"} | ${formatMetricValue(check.value)}${unit} | <= ${formatMetricValue(check.threshold)}${unit} | 🔴 ${signed(check.value - check.threshold)}${unit} |`
+      );
+    }
+  }
+  const passed = results.pages.filter((page) => page.status === "PASS").length;
+  const deviceResults = ALL_FORM_FACTORS.map((factor) => {
+    const pages = results.pages.filter((page) => page.formFactor === factor);
+    const status = pages.some((page) => page.status === "FAIL")
+      ? "FAIL"
+      : results.executionStatus === "SUCCESS" &&
+          lighthouseRoutes().every(
+            (route) =>
+              pages.filter(
+                (page) => page.id === route.id && page.status === "PASS"
+              ).length === 1
+          )
+        ? "PASS"
+        : "INCOMPLETE";
+    return { factor, status };
+  });
+  const lines = [
+    "## Release Performance Audit (Lighthouse)",
+    "",
+    `Environment: **${results.environment}**`,
+    "",
+    `Release/ref: \`${results.ref}\` · SHA: \`${results.commit}\``,
+    "",
+    `**Execution status: ${statusLabel(results.executionStatus)}**`,
+    "",
+    `**Performance status: ${statusLabel(results.performanceStatus)}**`,
+    "",
+    `**${deviceResults.map(({ factor, status }) => `${formFactorLabels[factor]}: ${statusLabel(status)}`).join(" | ")}**`,
+    "",
+    "**Performance failures do not block deployment or release.** They do not fail this workflow; execution errors and incomplete audits do.",
+    "",
+    `Audits completed: **${results.pages.length}** · Passed: **${passed}** · Failed: **${results.pages.length - passed}** · Failed checks: **${failedRows.length}**`,
+    ...(results.executionStatus === "ERROR"
+      ? [
+          "",
+          "The audit did not complete. Only completed measurements are shown; unfinished audits have no final score.",
+          "",
+          "```text",
+          results.executionError || "See the failed step logs.",
+          "```",
+        ]
+      : []),
+    "",
+    "## Performance Overview",
+    "",
+    "Each result is the median of 3 measured runs after one warm-up. See below for full details.",
+    "",
+    "PASS requires Performance >= 75 AND every configured metric threshold to pass. A score of 81 can still FAIL when LCP exceeds its limit.",
+    "",
+    "Performance scores may vary between runs even when no frontend changes have been made, due to API response times, network conditions, or infrastructure variability. Significant differences should still be investigated. A separate frontend-only measurement may be considered in the future.",
+    "",
+    "| Page | Mobile Performance / status | Desktop Performance / status |",
+    "| --- | --- | --- |",
+  ];
+  for (const id of new Set(results.pages.map((page) => page.id))) {
+    const cells = (["mobile", "desktop"] as const).map((factor) => {
+      const page = results.pages.find(
+        (p) => p.id === id && p.formFactor === factor
+      );
+      return page
+        ? `${formatMetricValue(page.performance)} · ${statusLabel(page.status)}`
+        : "Unavailable";
+    });
+    lines.push(`| ${pageLabel(id)} | ${cells.join(" | ")} |`);
+  }
+  lines.push("", "## Failed Checks", "");
+  if (failedRows.length) {
+    lines.push(
+      "| Page | Device | Metric | Actual | Limit | Difference |",
+      "| --- | --- | --- | --- | --- | --- |",
+      ...failedRows
+    );
+  } else {
+    lines.push(
+      deviceResults.every(({ status }) => status === "PASS")
+        ? "🟢 All performance checks passed."
+        : "No failed checks in completed measurements; performance validation is incomplete."
+    );
+  }
+  lines.push(
+    "",
+    "## Previous release",
+    "",
+    "Score differences are informational and do not block deployment.",
+    ""
+  );
+  if (previous?.environment === results.environment) {
+    lines.push(
+      `Previous: \`${previous.ref}\` · SHA: \`${previous.commit}\`${previousRunUrl ? ` · [Actions report](${previousRunUrl})` : ""}`,
+      "",
+      "| Page | Device | Previous | Current | Difference |",
+      "| --- | --- | --- | --- | --- |"
+    );
+    for (const page of results.pages) {
+      const baseline = previous.pages.find((p) => pageKey(p) === pageKey(page));
+      const difference = baseline
+        ? page.performance - baseline.performance
+        : undefined;
+      const label =
+        difference === undefined
+          ? "Unavailable"
+          : difference > 0
+            ? `🟢 ${signed(difference)} points`
+            : difference < 0
+              ? `🔴 ${signed(difference)} points`
+              : "0 points";
+      lines.push(
+        `| ${pageLabel(page.id)} | ${formFactorLabels[page.formFactor]} | ${baseline ? formatMetricValue(baseline.performance) : "Unavailable"} | ${formatMetricValue(page.performance)} | ${label} |`
+      );
+    }
+    lines.push(
+      "",
+      "Unavailable means no equivalent previous page/device measurement exists."
+    );
+  } else lines.push("No previous release available.");
+  lines.push(
+    "",
+    "<details><summary>View all metric results</summary>",
+    "",
+    detailedMarkdown.trim(),
+    "",
+    "</details>",
+    ""
+  );
+  return lines.join("\n");
+};

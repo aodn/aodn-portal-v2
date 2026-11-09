@@ -10,15 +10,15 @@
 
 import { readFile, writeFile, mkdir } from "fs/promises";
 import path from "path";
+import { isSeoEligibleCollection } from "@/seo/collectionEligibility";
 import type { OGCCollection } from "./fetchCollections";
 import { fetchCollections } from "./fetchCollections";
-import { buildJsonLd } from "./jsonLd";
+import { buildBreadcrumbJsonLd, buildJsonLd } from "./jsonLd";
 import { buildRelatedLinks, RelatedLink } from "./relatedRecords";
 import { isSeoCli, runCli, seoDistDir } from "./cli";
 import {
   detailsUrl,
   escapeEntities,
-  isSafeCollectionId,
   PRERENDER_DETAILS_DIR,
   SHARE_IMAGE_URL,
   SITE_NAME,
@@ -39,25 +39,77 @@ const renderDateLine = (collection: OGCCollection) => {
   return "";
 };
 
-// Static body for crawlers: title, date, abstract and related-record links —
-// crawlers only follow <a href>. The SPA replaces it on mount.
-const renderBody = (collection: OGCCollection, related: RelatedLink[]) => {
-  const relatedItems = related
-    .map(
-      (link) =>
-        `<li><a href="/details/${link.id}">${escapeEntities(link.title)}</a></li>`
+const linkList = (items: string[]) =>
+  items.length ? `<ul>${items.join("")}</ul>` : "";
+
+// Structural relations, not destinations a crawler should follow from here.
+const NON_CONTENT_RELS = new Set(["self", "icon", "preview"]);
+
+// Catalogue links a crawler can follow. self, icon and preview are omitted.
+const renderDataSection = (collection: OGCCollection) => {
+  const items = (collection.links ?? [])
+    .filter(
+      (link) => link.href && !NON_CONTENT_RELS.has(link.rel?.toLowerCase())
     )
-    .join("");
-  const relatedNav = relatedItems
-    ? `<nav aria-label="Related records"><h2>Related records</h2><ul>${relatedItems}</ul></nav>`
+    .map((link) => {
+      const label = link.title || link.href;
+      const href = escapeEntities(link.href);
+      return `<li><a href="${href}">${escapeEntities(label)}</a></li>`;
+    });
+  if (items.length === 0) return "";
+  return `<section aria-label="Data"><h2>Data</h2>${linkList(items)}</section>`;
+};
+
+// Static body for crawlers: title, date, abstract, data links and related
+// records. Crawlers only follow <a href>. stripAppBundle keeps it from being
+// replaced.
+const renderBody = (collection: OGCCollection, related: RelatedLink[]) => {
+  const relatedItems = related.map(
+    (link) =>
+      `<li><a href="/details/${link.id}">${escapeEntities(link.title)}</a></li>`
+  );
+  const relatedNav = relatedItems.length
+    ? `<nav aria-label="Related records"><h2>Related records</h2>${linkList(relatedItems)}</nav>`
     : "";
-  return `<main>
+  const sections = [renderDataSection(collection), relatedNav].filter(Boolean);
+  const sectionsHtml = sections.length
+    ? `\n    ${sections.join("\n    ")}`
+    : "";
+  // Without this link the 15k detail pages are an island: the SPA's own
+  // "Back to Home" is a Box with an onClick, which a crawler cannot follow.
+  return `<nav aria-label="Breadcrumb"><a href="/">${SITE_NAME}</a></nav>
+  <main>
     <h1>${escapeEntities(collection.title ?? "")}</h1>
     ${renderDateLine(collection)}
-    <p>${escapeEntities(collection.description ?? "")}</p>
-    ${relatedNav}
+    <p>${escapeEntities(collection.description ?? "")}</p>${sectionsHtml}
   </main>`;
 };
+
+const MODULE_SCRIPT = /\s*<script[^>]*type="module"[^>]*>\s*<\/script>/g;
+const MODULE_PRELOAD = /\s*<link[^>]*rel="modulepreload"[^>]*\/?>/g;
+
+/**
+ * Drops the app bundle so the page renders the same with or without JS.
+ * Otherwise React empties #root on render and every record is indexed as the
+ * same empty shell. Only crawlers get these pages; the JSON-LD is not a
+ * module, so it survives. Each pattern repeats until nothing changes: one
+ * pass can rejoin interleaved tags into a working script.
+ */
+const stripAppBundle = (html: string) =>
+  [MODULE_SCRIPT, MODULE_PRELOAD].reduce((current, pattern) => {
+    let stripped = current;
+    let previous = "";
+    do {
+      previous = stripped;
+      stripped = stripped.replace(pattern, "");
+    } while (stripped !== previous);
+    return stripped;
+  }, html);
+
+// \u003c-escape keeps a "</script>" inside the JSON from closing the tag early;
+// JSON.stringify drops undefined-valued fields
+const toJsonLdScript = (data: unknown) =>
+  `<script type="application/ld+json">${JSON.stringify(data).replace(/</g, "\\u003c")}</script>`;
 
 // Renders what crawlers read for one record — in Google terms: the title link,
 // snippet, canonical and Dataset structured data, plus Open Graph / Twitter
@@ -82,11 +134,10 @@ export const renderCrawlerPage = (
     `<meta property="og:url" content="${pageUrl}" />`,
     `<meta property="og:image" content="${SHARE_IMAGE_URL}" />`,
     '<meta name="twitter:card" content="summary" />',
-    // \u003c-escape keeps a "</script>" inside the JSON from closing the tag early;
-    // JSON.stringify drops undefined-valued fields
-    `<script type="application/ld+json">${JSON.stringify(buildJsonLd(collection)).replace(/</g, "\\u003c")}</script>`,
+    toJsonLdScript(buildJsonLd(collection)),
+    toJsonLdScript(buildBreadcrumbJsonLd(collection)),
   ].join("\n    ");
-  return (
+  return stripAppBundle(
     template
       .replace(/<title>.*?<\/title>/s, `<title>${title} | ${SITE_NAME}</title>`)
       // The template carries site-wide description and social tags; the record's replace them
@@ -108,10 +159,6 @@ export const renderCrawlerPage = (
   );
 };
 
-const hasSeoFields = (collection: OGCCollection) =>
-  isSafeCollectionId(collection.id) &&
-  Boolean(collection.title && collection.description);
-
 export const prerenderDetailPages = async (
   outDir: string,
   prefetched?: OGCCollection[]
@@ -122,11 +169,11 @@ export const prerenderDetailPages = async (
   const detailsDir = path.join(outDir, PRERENDER_DETAILS_DIR);
   await mkdir(detailsDir, { recursive: true });
 
-  const pages = collections.filter(hasSeoFields);
+  const pages = collections.filter(isSeoEligibleCollection);
   // Name the skipped records: a bare count hides a record that is invisible
   // to crawlers, and nobody reads a number in the CI log
   const skippedIds = collections
-    .filter((collection) => !hasSeoFields(collection))
+    .filter((collection) => !isSeoEligibleCollection(collection))
     .map((collection) => collection.id ?? "(no id)");
   // Built over pages only, so related links never point at a skipped record
   const related = buildRelatedLinks(pages);

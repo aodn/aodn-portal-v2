@@ -8,24 +8,37 @@ import {
   afterEach,
   afterAll,
 } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+  act,
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+} from "@testing-library/react";
 import { Provider } from "react-redux";
-import { configureStore } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { http, HttpResponse } from "msw";
 import { AppLocalizationProvider } from "@/app/providers/AppLocalizationProvider";
-import dayjs from "@/utils/DayjsUtils";
+import dayjs, { Dayjs } from "@/utils/DayjsUtils";
 import DateRangeFilter from "../DateRangeFilter";
 import { dateDefault } from "../../common/constants";
-import { updateDateTimeFilterRange } from "@/app/store/componentParamReducer";
+import paramReducer, {
+  clearComponentParam,
+  DateTimeFilterRange,
+  ParameterState,
+  updateDateTimeFilterRange,
+  updateParameterStates,
+} from "@/app/store/componentParamReducer";
 import { dayjsToUnixMs, toAppDayjs, unixMsToAppDayjs } from "@/utils/DateUtils";
-import axios from "axios";
 import { server } from "@/__mocks__/server";
 
 let capturedImosDataIds: string[] | undefined;
+let capturedChartStart: Dayjs | undefined;
 
 vi.mock("../../common/charts/TimeRangeBarChart", () => ({
-  default: (props: { imosDataIds: string[] }) => {
+  default: (props: { imosDataIds: string[]; selectedStartDate: Dayjs }) => {
     capturedImosDataIds = props.imosDataIds;
+    capturedChartStart = props.selectedStartDate;
     return <div data-testid="time-range-bar-chart" />;
   },
 }));
@@ -42,21 +55,21 @@ vi.mock("../../../hooks/useBreakpoint", () => ({
   }),
 }));
 
-const mockInitialState = {
+const mockInitialState: { paramReducer: ParameterState } = {
   paramReducer: {
-    dateTimeFilterRange: {
-      start: dayjsToUnixMs(dateDefault.min),
-      end: dayjsToUnixMs(dateDefault.max),
-    },
+    dateTimeFilterRange: {},
   },
 };
 
-const createMockStore = (initialState = mockInitialState) =>
-  configureStore({
-    reducer: {
-      paramReducer: (state = initialState.paramReducer) => state,
-    },
+const createMockStore = (initialState = mockInitialState) => {
+  const store = configureStore({
+    reducer: combineReducers({
+      paramReducer,
+    }),
   });
+  store.dispatch(updateParameterStates(initialState.paramReducer));
+  return store;
+};
 
 describe("DateRangeFilter", () => {
   let store: ReturnType<typeof createMockStore>;
@@ -68,13 +81,13 @@ describe("DateRangeFilter", () => {
   beforeEach(() => {
     store = createMockStore();
     vi.spyOn(store, "dispatch");
-    vi.spyOn(axios, "get").mockResolvedValue({ data: { collections: [] } });
     server.use(
       http.get("/api/v1/ogc/collections", () =>
         HttpResponse.json({ collections: [] })
       )
     );
     capturedImosDataIds = undefined;
+    capturedChartStart = undefined;
   });
 
   afterEach(() => {
@@ -108,6 +121,148 @@ describe("DateRangeFilter", () => {
     const radioButtons = screen.getAllByRole("radio");
     expect(radioButtons).toHaveLength(4);
     expect(radioButtons[0]).toBeChecked();
+    expect(screen.getByDisplayValue("01 Jan 1970")).toBeInTheDocument();
+    expect(screen.getAllByRole("slider")[0]).toHaveAttribute(
+      "aria-valuemin",
+      dateDefault.min.valueOf().toString()
+    );
+    expect(screen.getAllByRole("slider")[0]).toHaveAttribute(
+      "aria-valuenow",
+      "0"
+    );
+    expect(capturedChartStart?.valueOf()).toBe(0);
+    expect(dispatchedDateRanges()).toHaveLength(0);
+  });
+
+  it.each<DateTimeFilterRange>([
+    {
+      start: dayjs.utc("1900-01-01").valueOf(),
+      end: dayjs.utc("1950-01-01").valueOf(),
+    },
+    {
+      start: dayjs.utc("1820-01-01").valueOf(),
+      end: dayjs.utc("1950-01-01").valueOf(),
+    },
+    { end: dayjs.utc("1950-01-01").valueOf() },
+  ])("preserves historical search bounds without dispatching: %j", (range) => {
+    store = createMockStore({ paramReducer: { dateTimeFilterRange: range } });
+    vi.spyOn(store, "dispatch");
+    renderComponent();
+
+    const expectedFloor = Math.min(
+      dateDefault.min.valueOf(),
+      range.start ?? Infinity,
+      range.end ?? Infinity
+    );
+    const expectedStart = range.start ?? expectedFloor;
+    const sliders = screen.getAllByRole("slider");
+    expect(Number(sliders[0].getAttribute("aria-valuemin"))).toBe(
+      expectedFloor
+    );
+    expect(Number(sliders[0].getAttribute("aria-valuenow"))).toBe(
+      expectedStart
+    );
+    expect(Number(sliders[1].getAttribute("aria-valuenow"))).toBe(range.end);
+    expect(capturedChartStart?.valueOf()).toBe(expectedStart);
+    expect(
+      screen.getByDisplayValue(
+        unixMsToAppDayjs(expectedStart).format(dateDefault.DISPLAY_FORMAT)
+      )
+    ).toBeInTheDocument();
+    expect(store.getState().paramReducer.dateTimeFilterRange).toEqual(range);
+    expect(dispatchedDateRanges()).toHaveLength(0);
+  });
+
+  it("returns to 1970 when a historical search is cleared", () => {
+    store = createMockStore({
+      paramReducer: {
+        dateTimeFilterRange: {
+          start: dayjs.utc("1900-01-01").valueOf(),
+          end: dayjs.utc("1950-01-01").valueOf(),
+        },
+      },
+    });
+    renderComponent();
+
+    act(() => {
+      store.dispatch(clearComponentParam());
+    });
+
+    expect(screen.getByDisplayValue("01 Jan 1970")).toBeInTheDocument();
+    expect(screen.getAllByRole("slider")[0]).toHaveAttribute(
+      "aria-valuemin",
+      dateDefault.min.valueOf().toString()
+    );
+    expect(capturedChartStart?.valueOf()).toBe(0);
+    expect(store.getState().paramReducer.dateTimeFilterRange).toEqual({});
+  });
+
+  it.each(["1830-01-01", "1850-01-01", "1969-12-31"])(
+    "accepts a historical start date without changing the slider scale: %s",
+    (date) => {
+      renderComponent();
+      const selectedDate = toAppDayjs(date, dateDefault.DATE_FORMAT);
+      fireEvent.change(screen.getByDisplayValue("01 Jan 1970"), {
+        target: { value: selectedDate.format(dateDefault.DISPLAY_FORMAT) },
+      });
+
+      expect(store.getState().paramReducer.dateTimeFilterRange?.start).toBe(
+        selectedDate.valueOf()
+      );
+      expect(capturedChartStart?.valueOf()).toBe(selectedDate.valueOf());
+      expect(
+        Number(screen.getAllByRole("slider")[0].getAttribute("aria-valuemin"))
+      ).toBe(dateDefault.min.valueOf());
+      expect(
+        Number(screen.getAllByRole("slider")[0].getAttribute("aria-valuenow"))
+      ).toBe(selectedDate.valueOf());
+
+      fireEvent.change(
+        screen.getByDisplayValue(
+          selectedDate.format(dateDefault.DISPLAY_FORMAT)
+        ),
+        {
+          target: { value: "01 Jan 1970" },
+        }
+      );
+
+      expect(store.getState().paramReducer.dateTimeFilterRange?.start).toBe(0);
+      expect(capturedChartStart?.valueOf()).toBe(0);
+      expect(screen.getAllByRole("slider")[0]).toHaveAttribute(
+        "aria-valuemin",
+        dateDefault.min.valueOf().toString()
+      );
+    }
+  );
+
+  it.each(["1830-01-01", "1960-01-01"])(
+    "lets the start thumb reach %s on the historical scale",
+    (date) => {
+      renderComponent();
+      const startThumb = screen.getAllByRole("slider")[0];
+      const historicalStart = dayjs.utc(date).valueOf();
+
+      fireEvent.change(startThumb, { target: { value: historicalStart } });
+
+      expect(store.getState().paramReducer.dateTimeFilterRange?.start).toBe(
+        historicalStart
+      );
+      expect(capturedChartStart?.valueOf()).toBe(historicalStart);
+      expect(startThumb).toHaveAttribute(
+        "aria-valuemin",
+        dateDefault.min.valueOf().toString()
+      );
+    }
+  );
+
+  it("rejects dates before 1830 for a new search", () => {
+    renderComponent();
+    fireEvent.change(screen.getByDisplayValue("01 Jan 1970"), {
+      target: { value: "31 Dec 1829" },
+    });
+
+    expect(screen.getByDisplayValue("01 Jan 1970")).toBeInTheDocument();
+    expect(dispatchedDateRanges()).toHaveLength(0);
   });
 
   it("updates radio selection and dispatches date range update for Last year", () => {
@@ -125,7 +280,7 @@ describe("DateRangeFilter", () => {
 
   it("updates date range when start date is changed via date picker", () => {
     renderComponent();
-    const minDate = dateDefault.min.format(dateDefault.DISPLAY_FORMAT);
+    const minDate = "01 Jan 1970";
     const startDatePicker = screen.getByDisplayValue(minDate);
     const newDate = toAppDayjs("2020-01-01", dateDefault.DATE_FORMAT);
     fireEvent.change(startDatePicker, {
@@ -288,24 +443,22 @@ describe("DateRangeFilter", () => {
     expect(screen.getByLabelText("Last 5 years")).toBeChecked();
   });
 
-  it("only counts a collection as IMOS-only when dataset_group is exactly ['imos'], even if the backend's coarse pre-filter returns more", async () => {
+  it("keeps only dataset_group exactly ['imos'] from the single collections fetch", async () => {
+    const requests: URL[] = [];
     server.use(
       http.get("/api/v1/ogc/collections", ({ request }) => {
         const url = new URL(request.url);
-        const filter = url.searchParams.get("filter") ?? "";
-        if (filter.includes("dataset_group")) {
-          return HttpResponse.json({
-            collections: [
-              { id: "imos-only", properties: { dataset_group: ["imos"] } },
-              {
-                id: "imos-and-aims",
-                properties: { dataset_group: ["imos", "aims"] },
-              },
-              { id: "aims-only", properties: { dataset_group: ["aims"] } },
-            ],
-          });
-        }
-        return HttpResponse.json({ collections: [] });
+        requests.push(url);
+        return HttpResponse.json({
+          collections: [
+            { id: "imos-only", properties: { dataset_group: ["imos"] } },
+            {
+              id: "imos-and-aims",
+              properties: { dataset_group: ["imos", "aims"] },
+            },
+            { id: "aims-only", properties: { dataset_group: ["aims"] } },
+          ],
+        });
       })
     );
 
@@ -314,5 +467,13 @@ describe("DateRangeFilter", () => {
     await waitFor(() => {
       expect(capturedImosDataIds).toEqual(["imos-only"]);
     });
+    expect(requests).toHaveLength(1);
+    expect(requests[0].searchParams.get("properties")).toBe(
+      "id,temporal,dataset_group"
+    );
+    expect(requests[0].searchParams.get("filter")).toBe(
+      `temporal after ${dateDefault.min.toISOString()}`
+    );
+    expect(capturedChartStart?.valueOf()).toBe(0);
   });
 });

@@ -266,16 +266,15 @@ def test_map_reference_layers(
     search_page.wait_for_page_stabilization()
     expect(search_page.first_result_title).to_be_visible()
 
-    search_page.map.reference_layer_menu.click()
-    search_page.click_text(layer_text)
+    search_page.map.click_reference_layer(layer_text)
     search_page.wait_for_page_stabilization()
 
     layer_id = layer_factory.get_layer_id(layer_type)
-    assert search_page.map.is_map_layer_visible(layer_id) is True
+    # Marine parks GeoJSON is large, so the fill layer appears after the
+    # menu click returns.
+    search_page.map.wait_until_map_layer_visible(layer_id)
 
-    if not search_page.get_text(layer_text).is_visible():
-        search_page.map.reference_layer_menu.click()
-    search_page.click_text(layer_text)
+    search_page.map.click_reference_layer(layer_text)
     assert search_page.map.is_map_layer_visible(layer_id) is False
 
 

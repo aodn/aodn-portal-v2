@@ -172,6 +172,19 @@ export const buildMapLayerConfig = (
   return layers;
 };
 
+/** GeoServer is the fallback layer. Mount it only after Data Density and
+ *  Gridded Data have finished probing and neither one is available. */
+export const shouldMountGeoServerLayer = (
+  isPMTilesLoading: boolean,
+  isSupportPMTiles: boolean,
+  isGriddedProductsLoading: boolean,
+  hasGriddedProducts: boolean
+): boolean =>
+  !isPMTilesLoading &&
+  !isSupportPMTiles &&
+  !isGriddedProductsLoading &&
+  !hasGriddedProducts;
+
 interface MapPanelProps {
   mapFocusArea?: LngLatBounds;
   onMapMoveEnd?: (evt: MapEvent) => void;
@@ -190,6 +203,8 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     downloadService,
     selectedCoKey,
     setSelectedCoKey,
+    selectionGeneration,
+    isCurrentSelectionGeneration,
     setMapSubsettingCapabilities,
     isSubsettingSupported,
   } = useDetailPageContext();
@@ -736,12 +751,14 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
                   visible={isSubsettingSupported(SubsettingType.TimeSlider)}
                   menu={
                     <DateRange
-                      // Remount when slider bounds change so thumbs reset to full coverage
-                      key={`date-range-${minDateStamp.format(dateDefault.DATE_FORMAT)}-${maxDateStamp.format(dateDefault.DATE_FORMAT)}`}
                       minDate={minDateStamp.format(dateDefault.DATE_FORMAT)}
                       maxDate={maxDateStamp.format(dateDefault.DATE_FORMAT)}
                       getAndSetDownloadConditions={getAndSetDownloadConditions}
                       downloadConditions={downloadConditions}
+                      selectionGeneration={selectionGeneration}
+                      isCurrentSelectionGeneration={
+                        isCurrentSelectionGeneration
+                      }
                     />
                   }
                 />
@@ -776,6 +793,9 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
                 bbox={mapFocusArea}
               />
               {createStaticLayers(staticLayer)}
+              {/* Always mounted. This layer is the only source of
+                  pmtilesSupport; gating the mount on that flag skips the
+                  probe and the switcher never leaves the loading state. */}
               <PMTilesHexLayer
                 collection={collection}
                 filterStartDate={filterStartDate}
@@ -786,17 +806,6 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
                 onMetadataPeriodChange={handlePmtilesMetadataPeriodChange}
                 onSupportChange={setPmtilesSupport}
               />
-              <GeoServerLayer
-                layerConfig={geoServerLayerConfig}
-                onLayerChange={onWmsLayerChange}
-                onWMSAvailabilityChange={onWMSAvailabilityChange}
-                setWmsFields={setWMSFields}
-                setTimeSliderSupport={setTimeSliderSupport}
-                setDiscreteTimeSliderValues={setDiscreteTimeSliderValues}
-                setDrawRectSupportSupport={setDrawRectSupportSupport}
-                collection={collection}
-                visible={selectedMapLayerId === LayerName.GeoServer}
-              />
               <GeojsonLayer
                 collection={collection}
                 visible={selectedMapLayerId === LayerName.SpatialExtent}
@@ -806,6 +815,26 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
                 <GriddedRasterLayer
                   {...griddedLayerProps}
                   visible={selectedMapLayerId === LayerName.GriddedRaster}
+                />
+              )}
+              {/* Mount only after Data Density and Gridded Data have
+                  finished probing, so a losing WMS load is never started. */}
+              {shouldMountGeoServerLayer(
+                isPMTilesLoading,
+                isSupportPMTiles,
+                isGriddedProductsLoading,
+                hasGriddedProducts
+              ) && (
+                <GeoServerLayer
+                  layerConfig={geoServerLayerConfig}
+                  onLayerChange={onWmsLayerChange}
+                  onWMSAvailabilityChange={onWMSAvailabilityChange}
+                  setWmsFields={setWMSFields}
+                  setTimeSliderSupport={setTimeSliderSupport}
+                  setDiscreteTimeSliderValues={setDiscreteTimeSliderValues}
+                  setDrawRectSupportSupport={setDrawRectSupportSupport}
+                  collection={collection}
+                  visible={selectedMapLayerId === LayerName.GeoServer}
                 />
               )}
             </Layers>

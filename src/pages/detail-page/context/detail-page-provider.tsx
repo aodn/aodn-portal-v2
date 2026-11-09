@@ -1,5 +1,6 @@
+import { ErrorResponse } from "@/utils/ErrorBoundary";
 import { useParams } from "react-router-dom";
-import { FC, ReactNode, useCallback, useEffect, useState } from "react";
+import { FC, ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { fetchResultByUuidNoStore } from "@/app/store/searchReducer";
 import { DetailPageContext } from "./detail-page-context";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
@@ -21,8 +22,6 @@ import {
   LayerName,
   LayerSwitcherLayer,
 } from "@/components/map/mapbox/controls/menu/MapLayerSwitcher";
-import { useDocumentTitle } from "@/seo/useDocumentTitle";
-import { useRobotsNoIndex } from "@/seo/useRobotsNoIndex";
 
 interface DetailPageProviderProps {
   children: ReactNode;
@@ -36,8 +35,19 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
   const [collection, setCollection] = useState<OGCCollection | undefined>(
     undefined
   );
-  const [isCollectionNotFound, setIsCollectionNotFound] =
-    useState<boolean>(false);
+  const [fetchError, setFetchError] = useState<{
+    uuid: string;
+    notFound: boolean;
+  }>();
+  const [collectionUuid, setCollectionUuid] = useState(uuid);
+  if (collectionUuid !== uuid) {
+    setCollectionUuid(uuid);
+    setCollection(undefined);
+    setFetchError(undefined);
+  }
+  const currentError = fetchError?.uuid === uuid ? fetchError : undefined;
+  const isCollectionNotFound = currentError?.notFound === true;
+  const isTemporaryError = currentError?.notFound === false;
   const [downloadConditions, _setDownloadConditions] = useState<
     IDownloadCondition[]
   >([]);
@@ -87,6 +97,37 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
     []
   );
 
+  // Mirrors `selectedCoKey` synchronously so rapid switches compare against
+  // the latest selection, not a stale render value.
+  const selectedCoKeyRef = useRef("");
+  // Bumped on every real dataset change. Debounced time-range commits capture
+  // the generation when scheduled and are rejected if it is no longer current.
+  const selectionGenerationRef = useRef(0);
+  const [selectionGeneration, setSelectionGeneration] = useState(0);
+
+  const selectCoKey = useCallback(
+    (key: string) => {
+      const prev = selectedCoKeyRef.current;
+      if (key === prev) return;
+      selectedCoKeyRef.current = key;
+      // The initial default selection ("" → key) is not a dataset change, so
+      // keep any existing time subset. A real change invalidates it because
+      // the new dataset has its own temporal bounds.
+      if (prev) {
+        selectionGenerationRef.current += 1;
+        setSelectionGeneration(selectionGenerationRef.current);
+        clearDownloadConditions([DownloadConditionType.DATE_RANGE]);
+      }
+      setSelectedCoKey(key);
+    },
+    [clearDownloadConditions]
+  );
+
+  const isCurrentSelectionGeneration = useCallback(
+    (generation: number) => generation === selectionGenerationRef.current,
+    []
+  );
+
   useEffect(() => {
     if (!uuid) return;
     let cancelled = false;
@@ -95,16 +136,19 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       .then((collection) => {
         if (cancelled) return;
         if (!collection) {
-          setIsCollectionNotFound(true);
+          setFetchError({ uuid, notFound: false });
           return;
         }
         setCollection(collection);
-        setIsCollectionNotFound(false);
+        setFetchError(undefined);
 
         // Track analytics when user views a dataset details page
         trackCustomEvent(AnalyticsEvent.DETAILS_PAGE_DATASET, {
-          details_page_dataset_group:
-            collection.properties?.dataset_group?.join(","),
+          details_page_dataset_group: Array.isArray(
+            collection.properties?.dataset_group
+          )
+            ? collection.properties.dataset_group.join(",")
+            : undefined,
           details_page_dataset_id: uuid,
           details_page_dataset_title: collection.title,
         });
@@ -112,20 +156,15 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
       .catch((error) => {
         if (cancelled) return;
         console.error("Error fetching collection by UUID:", error);
-        setIsCollectionNotFound(true);
+        setFetchError({
+          uuid,
+          notFound: error instanceof ErrorResponse && error.statusCode === 404,
+        });
       });
     return () => {
       cancelled = true;
     };
   }, [dispatch, uuid]);
-
-  // Keep this even though crawlers get the pre-rendered <title>: SPA navigation
-  // never reloads the HTML, so without it the tab would keep showing the previously loaded record's title on this record's page.
-  useDocumentTitle(
-    isCollectionNotFound ? "Record not found" : collection?.title
-  );
-  // A bad uuid still answers HTTP 200, so tell crawlers not to index it
-  useRobotsNoIndex(isCollectionNotFound);
 
   // Layer-aware: GeoServer time support does not imply PMTiles time (and vice versa).
   const isSubsettingSupported = useCallback(
@@ -144,6 +183,7 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         collection,
         setCollection,
         isCollectionNotFound,
+        isTemporaryError,
         downloadConditions,
         getAndSetDownloadConditions,
         removeDownloadCondition,
@@ -151,7 +191,9 @@ export const DetailPageProvider: FC<DetailPageProviderProps> = ({
         selectedWmsLayer,
         setSelectedWmsLayer,
         selectedCoKey,
-        setSelectedCoKey,
+        setSelectedCoKey: selectCoKey,
+        selectionGeneration,
+        isCurrentSelectionGeneration,
         lastSelectedMapLayer,
         setLastSelectedMapLayer,
         downloadService,

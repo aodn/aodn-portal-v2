@@ -17,6 +17,7 @@ export interface DetailPageContextType {
   collection: OGCCollection | undefined;
   setCollection: Dispatch<SetStateAction<OGCCollection | undefined>>;
   isCollectionNotFound: boolean;
+  isTemporaryError: boolean;
   downloadConditions: IDownloadCondition[];
   getAndSetDownloadConditions: (
     type: DownloadConditionType,
@@ -27,7 +28,15 @@ export interface DetailPageContextType {
   selectedWmsLayer: string;
   setSelectedWmsLayer: Dispatch<SetStateAction<string>>;
   selectedCoKey: string;
-  setSelectedCoKey: Dispatch<SetStateAction<string>>;
+  /**
+   * Select a dataset. A real change (from a non-empty, different key) clears
+   * the DATE_RANGE condition and bumps `selectionGeneration`.
+   */
+  setSelectedCoKey: (key: string) => void;
+  /** Incremented on every real dataset change. */
+  selectionGeneration: number;
+  /** False when `generation` was captured before a later dataset change. */
+  isCurrentSelectionGeneration: (generation: number) => boolean;
   lastSelectedMapLayer: LayerSwitcherLayer<LayerName> | null;
   setLastSelectedMapLayer: Dispatch<
     SetStateAction<LayerSwitcherLayer<LayerName> | null>
@@ -47,6 +56,7 @@ const DetailPageContextDefault: DetailPageContextType = {
   collection: {} as OGCCollection | undefined,
   setCollection: () => {},
   isCollectionNotFound: false,
+  isTemporaryError: false,
   downloadConditions: [],
   getAndSetDownloadConditions: () => [],
   removeDownloadCondition: () => {},
@@ -55,6 +65,8 @@ const DetailPageContextDefault: DetailPageContextType = {
   setSelectedWmsLayer: () => {},
   selectedCoKey: "",
   setSelectedCoKey: () => {},
+  selectionGeneration: 0,
+  isCurrentSelectionGeneration: () => true,
   lastSelectedMapLayer: null,
   setLastSelectedMapLayer: () => {},
   downloadService: DownloadServiceType.Unavailable,

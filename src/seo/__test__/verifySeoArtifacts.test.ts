@@ -3,11 +3,16 @@
  * page is built with the real generator rather than a hand-written fixture.
  */
 
-import { describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
+import { mkdtemp, mkdir, rm, writeFile } from "fs/promises";
+import { tmpdir } from "os";
+import path from "path";
+import { toSitemapXml } from "@/seo/sitemap";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { BASE_URL } from "../constants";
 import { renderCrawlerPage } from "../prerender";
 import {
+  verifyDist,
   checkDetailPage,
   checkHomePage,
   checkRobotsTxt,
@@ -104,13 +109,33 @@ describe("checkDetailPage", () => {
     );
   });
 
-  test("flags a page that lost the app shell", () => {
+  test("flags a page that lost the content container", () => {
     const page = renderCrawlerPage(template, collection).replace(
       '<div id="root">',
       "<div>"
     );
     expect(checkDetailPage(page, "abc-123")).toContain(
-      "page no longer boots the app shell"
+      "page is missing the content container"
+    );
+  });
+
+  test("flags a page that does not link back to the home page", () => {
+    const page = renderCrawlerPage(template, collection).replace(
+      '<a href="/">',
+      "<span>"
+    );
+    expect(checkDetailPage(page, "abc-123")).toContain(
+      "body does not link back to the home page"
+    );
+  });
+
+  test("flags a page that still ships the app bundle", () => {
+    const page = renderCrawlerPage(template, collection).replace(
+      "</body>",
+      '<script type="module" crossorigin src="/assets/index-abc.js"></script></body>'
+    );
+    expect(checkDetailPage(page, "abc-123")).toContain(
+      "ships the app bundle, which erases the body on render"
     );
   });
 });
@@ -204,5 +229,88 @@ describe("checkRobotsTxt", () => {
         true
       )
     ).toEqual([]);
+  });
+});
+
+describe("local artifact consistency", () => {
+  const dirs: string[] = [];
+  afterEach(async () => {
+    vi.restoreAllMocks();
+    await Promise.all(
+      dirs.splice(0).map((dir) => rm(dir, { recursive: true }))
+    );
+  });
+
+  const artifacts = async (sitemapIds: string[], pageIds: string[]) => {
+    const dir = await mkdtemp(path.join(tmpdir(), "seo-verify-"));
+    dirs.push(dir);
+    await writeFile(
+      path.join(dir, "sitemap.xml"),
+      toSitemapXml(sitemapIds.map((id) => ({ id })))
+    );
+    await Promise.all(
+      pageIds.map(async (id) => {
+        const pageDir = path.join(dir, "prerender/details", id);
+        await mkdir(pageDir, { recursive: true });
+        await writeFile(
+          path.join(pageDir, "index.html"),
+          renderCrawlerPage(
+            template,
+            Object.assign(new OGCCollection(), collection, { id })
+          )
+        );
+      })
+    );
+    return dir;
+  };
+
+  test("accepts matching sets and excludes the homepage", async () => {
+    await expect(
+      verifyDist(await artifacts(["abc-123"], ["abc-123"]), 1)
+    ).resolves.toBeUndefined();
+  });
+
+  test("rejects a sitemap URL without a prerender", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    await expect(
+      verifyDist(await artifacts(["abc-123", "missing"], ["abc-123"]), 1)
+    ).rejects.toThrow("problems found");
+    expect(error).toHaveBeenCalledWith(
+      expect.stringContaining(
+        `${BASE_URL}/details/missing has no corresponding prerender index.html`
+      )
+    );
+  });
+
+  test("rejects an unsampled prerender without a sitemap entry", async () => {
+    const ids = Array.from(
+      { length: 50 },
+      (_, i) => `record-${String(i).padStart(2, "0")}`
+    );
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    await expect(
+      verifyDist(
+        await artifacts(
+          ids.filter((id) => id !== "record-01"),
+          ids
+        ),
+        1
+      )
+    ).rejects.toThrow("problems found");
+    expect(error).toHaveBeenCalledWith(
+      expect.stringContaining(
+        `${BASE_URL}/details/record-01: prerender index.html is not listed`
+      )
+    );
+  });
+
+  test("rejects a directory without index.html", async () => {
+    const dir = await artifacts(["abc-123", "missing"], ["abc-123"]);
+    await mkdir(path.join(dir, "prerender/details/missing"));
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    await expect(verifyDist(dir, 1)).rejects.toThrow("problems found");
+    expect(error).toHaveBeenCalledWith(
+      expect.stringContaining("missing index.html or not a file")
+    );
   });
 });

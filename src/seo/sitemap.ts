@@ -6,24 +6,20 @@
 
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
+import { isSeoEligibleCollection } from "@/seo/collectionEligibility";
 import type { OGCCollection } from "./fetchCollections";
 import { isSeoCli, runCli, seoDistDir } from "./cli";
-import {
-  BASE_URL,
-  detailsUrl,
-  escapeEntities,
-  isSafeCollectionId,
-} from "./constants";
+import { BASE_URL, detailsUrl, escapeEntities } from "./constants";
 
 export const generateSitemap = async (
   outDir: string,
   collections: OGCCollection[]
 ) => {
   const entries = collections
-    .filter((collection) => isSafeCollectionId(collection.id))
+    .filter(isSeoEligibleCollection)
     .map((collection) => ({
       id: collection.id,
-      lastmod: toLastmod(collection.getRevision()),
+      lastmod: toLastmod(collection),
     }));
   if (entries.length === 0) {
     throw new Error(
@@ -48,9 +44,12 @@ export interface SitemapEntry {
   lastmod?: string;
 }
 
-// Date only: the metadata timestamps carry no timezone
-const toLastmod = (revision?: string) =>
-  revision?.match(/^\d{4}-\d{2}-\d{2}/)?.[0];
+// Date only: the metadata timestamps carry no timezone. Records with no
+// revision fall back to creation — they are unchanged since publication.
+const toLastmod = (collection: OGCCollection) =>
+  (collection.getRevision() ?? collection.getCreation())?.match(
+    /^\d{4}-\d{2}-\d{2}/
+  )?.[0];
 
 export const toSitemapXml = (
   entries: SitemapEntry[],
@@ -78,7 +77,9 @@ export const toSitemapXml = (
 if (isSeoCli("sitemap.ts")) {
   runCli(
     import("./fetchCollections")
-      .then(({ fetchCollections }) => fetchCollections("id,revision"))
+      .then(({ fetchCollections }) =>
+        fetchCollections("id,title,description,revision,creation")
+      )
       .then((collections) => generateSitemap(seoDistDir(), collections))
   );
 }

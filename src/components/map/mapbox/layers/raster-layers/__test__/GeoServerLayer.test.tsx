@@ -42,12 +42,14 @@ vi.mock("axios", async () => {
 
 // Mock mapbox-gl
 vi.mock("mapbox-gl", () => ({
-  Popup: vi.fn(() => ({
-    setLngLat: vi.fn().mockReturnThis(),
-    setDOMContent: vi.fn().mockReturnThis(),
-    addTo: vi.fn().mockReturnThis(),
-    remove: vi.fn(),
-  })),
+  Popup: vi.fn(function () {
+    return {
+      setLngLat: vi.fn().mockReturnThis(),
+      setDOMContent: vi.fn().mockReturnThis(),
+      addTo: vi.fn().mockReturnThis(),
+      remove: vi.fn(),
+    };
+  }),
 }));
 
 describe("GeoServerLayer", () => {

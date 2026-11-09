@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, beforeAll } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { AppLocalizationProvider } from "@/app/providers/AppLocalizationProvider";
@@ -36,6 +36,13 @@ vi.mock("@/hooks/useEstimateSize", async (importOriginal) => {
 });
 
 import DownloadCloudOptimisedCard from "../features/download/DownloadCloudOptimisedCard";
+import { DetailPageProvider } from "../context/detail-page-provider";
+import { useDetailPageContext } from "../context/detail-page-context";
+import {
+  BBoxCondition,
+  DateRangeCondition,
+  DownloadConditionType,
+} from "../context/DownloadDefinitions";
 import {
   DatasetType,
   OGCCollection,
@@ -88,6 +95,7 @@ const createMockCollection = (datasetType: DatasetType): OGCCollection => {
     ],
     getDatasetType: () => [datasetType],
     getAllCOKeys: () => ["test-zarr.zarr", "test-parquet.parquet"],
+    getCODatasetLabel: (key: string) => key.replace(/\.(zarr|parquet)$/, ""),
     getDatasetTypeByKey: (key: string) =>
       key.endsWith(".parquet")
         ? DatasetType.PARQUET
@@ -189,9 +197,32 @@ describe("DownloadCloudOptimisedCard", () => {
     const options = dataSelect.querySelectorAll("option");
 
     expect(options).toHaveLength(2);
-    expect(options[0].textContent).toBe("test-zarr");
-    expect(options[1].textContent).toBe("test-parquet");
+    expect(options[0].textContent).toBe("test-parquet");
+    expect(options[1].textContent).toBe("test-zarr");
+    expect(options[0].value).toBe("test-parquet.parquet");
+    expect(options[1].value).toBe("test-zarr.zarr");
+  });
+
+  it("shows the readable name as the label and keeps the CO key as the value", async () => {
+    const readableNames: Record<string, string> = {
+      "test-zarr.zarr": "Delayed mode - Wave",
+      "test-parquet.parquet": "Real time - CTD profile",
+    };
+    renderComponent({
+      ...createMockCollection(DatasetType.ZARR),
+      getCODatasetLabel: (key: string) => readableNames[key],
+    } as OGCCollection);
+
+    await waitFor(() => {
+      expect(screen.getByText("Data Selection")).toBeInTheDocument();
+    });
+
+    const options = getDataSelect().querySelectorAll("option");
+
+    expect(options).toHaveLength(2);
+    expect(options[0].textContent).toBe("Delayed mode - Wave");
     expect(options[0].value).toBe("test-zarr.zarr");
+    expect(options[1].textContent).toBe("Real time - CTD profile");
     expect(options[1].value).toBe("test-parquet.parquet");
   });
 
@@ -204,12 +235,12 @@ describe("DownloadCloudOptimisedCard", () => {
     });
 
     const dataSelect = getDataSelect();
-    expect(dataSelect.value).toBe("test-zarr.zarr");
+    expect(dataSelect.value).toBe("test-parquet.parquet");
 
-    await user.selectOptions(dataSelect, "test-parquet.parquet");
+    await user.selectOptions(dataSelect, "test-zarr.zarr");
 
     await waitFor(() => {
-      expect(getDataSelect().value).toBe("test-parquet.parquet");
+      expect(getDataSelect().value).toBe("test-zarr.zarr");
     });
   });
 
@@ -285,7 +316,7 @@ describe("DownloadCloudOptimisedCard", () => {
     });
 
     await waitFor(() => {
-      expect(getDataSelect().value).toBe("test-zarr.zarr");
+      expect(getDataSelect().value).toBe("test-parquet.parquet");
     });
   });
 
@@ -479,5 +510,142 @@ describe("DownloadCloudOptimisedCard", () => {
       });
       expect(screen.queryByTestId("label-chip-IMOS")).not.toBeInTheDocument();
     });
+  });
+});
+
+// Integration: the card wired to the real DetailPageProvider, as DownloadCard
+// does, so dataset selection goes through the shared context selector.
+describe("DownloadCloudOptimisedCard with DetailPageProvider", () => {
+  const ContextCard = ({ collection }: { collection: OGCCollection }) => {
+    const {
+      downloadConditions,
+      getAndSetDownloadConditions,
+      removeDownloadCondition,
+      selectedCoKey,
+      setSelectedCoKey,
+    } = useDetailPageContext();
+    return (
+      <>
+        <button
+          onClick={() => {
+            getAndSetDownloadConditions(DownloadConditionType.DATE_RANGE, [
+              new DateRangeCondition("date-1", "2026-09-01", "2026-10-01"),
+            ]);
+            getAndSetDownloadConditions(DownloadConditionType.BBOX, [
+              new BBoxCondition("bbox-1", [110, -40, 150, -10]),
+            ]);
+          }}
+        >
+          seed
+        </button>
+        <div data-testid="condition-types">
+          {downloadConditions.map((c) => c.type).join(",")}
+        </div>
+        <DownloadCloudOptimisedCard
+          collection={collection}
+          downloadConditions={downloadConditions}
+          getAndSetDownloadConditions={getAndSetDownloadConditions}
+          removeDownloadCondition={removeDownloadCondition}
+          selectedCoKey={selectedCoKey}
+          setSelectedCoKey={setSelectedCoKey}
+          isImosOnly
+        />
+      </>
+    );
+  };
+
+  const conditionTypes = () =>
+    (screen.getByTestId("condition-types").textContent ?? "").split(",");
+
+  const renderWithProvider = () =>
+    render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={["/details/test-uuid"]}>
+          <ThemeProvider theme={theme}>
+            <AppLocalizationProvider>
+              <DetailPageProvider>
+                <ContextCard
+                  collection={createMockCollection(DatasetType.ZARR)}
+                />
+              </DetailPageProvider>
+            </AppLocalizationProvider>
+          </ThemeProvider>
+        </MemoryRouter>
+      </Provider>
+    );
+
+  beforeEach(() => {
+    vi.mocked(useEstimateSize).mockImplementation(
+      () =>
+        ({
+          isEstimating: false,
+          estimatedSizeBytes: null,
+          estimateFailed: false,
+          estimateSize: vi.fn(),
+          cancelEstimate: vi.fn(),
+        }) as any
+    );
+  });
+
+  it("keeps the subset through the initial default selection", async () => {
+    const user = userEvent.setup();
+    renderWithProvider();
+
+    await user.click(screen.getByRole("button", { name: "seed" }));
+
+    await waitFor(() => {
+      expect(conditionTypes()).toEqual(
+        expect.arrayContaining([
+          DownloadConditionType.KEY,
+          DownloadConditionType.DATE_RANGE,
+          DownloadConditionType.BBOX,
+        ])
+      );
+    });
+  });
+
+  it("clears DATE_RANGE but keeps BBOX when another dataset is selected", async () => {
+    const user = userEvent.setup();
+    renderWithProvider();
+
+    await waitFor(() => {
+      expect(conditionTypes()).toContain(DownloadConditionType.KEY);
+    });
+    await user.click(screen.getByRole("button", { name: "seed" }));
+    await user.selectOptions(
+      screen.getByTestId("select-data-selection"),
+      "test-zarr.zarr"
+    );
+
+    await waitFor(() => {
+      expect(conditionTypes()).not.toContain(DownloadConditionType.DATE_RANGE);
+    });
+    expect(conditionTypes()).toEqual(
+      expect.arrayContaining([
+        DownloadConditionType.BBOX,
+        DownloadConditionType.KEY,
+      ])
+    );
+  });
+
+  it("keeps DATE_RANGE when the selected dataset is chosen again", async () => {
+    const user = userEvent.setup();
+    renderWithProvider();
+
+    await waitFor(() => {
+      expect(conditionTypes()).toContain(DownloadConditionType.KEY);
+    });
+    await user.click(screen.getByRole("button", { name: "seed" }));
+    // The mocked select fires onChange even when re-selecting the same value
+    fireEvent.change(screen.getByTestId("select-data-selection"), {
+      target: { value: "test-parquet.parquet" },
+    });
+
+    expect(conditionTypes()).toEqual(
+      expect.arrayContaining([
+        DownloadConditionType.DATE_RANGE,
+        DownloadConditionType.BBOX,
+      ])
+    );
   });
 });

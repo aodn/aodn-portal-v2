@@ -42,6 +42,16 @@ export const MapDefaultConfig = {
   } as PopupOptions,
 };
 
+// Blue dot used for a single dataset point, shared by the search page cluster
+// layer and the detail page spatial extents
+export const SINGLE_POINT_SYMBOLOGY = {
+  COLOR: "#56B4E9",
+  OPACITY: 1,
+  RADIUS: 8,
+  STROKE_WIDTH: 1,
+  STROKE_COLOR: "#fff",
+};
+
 export const ComponentId = {
   MapLayerSwitcher: {
     Menu: "layer-show-hide-menu",

@@ -13,6 +13,7 @@ import * as wellknown from "wellknown";
 import { SelectedStaticArea, Vocab } from "@/app/store/componentParamReducer";
 import { DatasetFrequency, DatasetStatus } from "@/app/store/datasetEnums";
 import { bbox } from "@turf/bbox";
+import { dateDefault } from "@/components/common/constants";
 
 // TODO: refactor this, naming like this is not ideal for readability,
 //  what are T, J, R, p, i , j, c, d, x, y, z, etc. actually mean?
@@ -151,7 +152,7 @@ const cqlDefaultFilters = new Map<string, FilterTypes>();
 cqlDefaultFilters
   .set("PARAMETER_VOCABS_IN", funcParameterVocabs)
   .set("DATASET_GROUP", funcUpdateDatasetGroup)
-  .set("ALL_TIME_RANGE", "temporal after 1970-01-01T00:00:00Z")
+  .set("ALL_TIME_RANGE", `temporal after ${dateDefault.min.toISOString()}`)
   .set("BETWEEN_TIME_RANGE", funcTemporalBetween)
   .set("AFTER_TIME", funcTemporalAfter)
   .set("BEFORE_TIME", funcTemporalBefore)

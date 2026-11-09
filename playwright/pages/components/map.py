@@ -35,6 +35,9 @@ class Map(BasePage):
         self.reference_layer_menu = page.get_by_test_id(
             'reference-show-hide-menu-button'
         )
+        # Menu copy such as "Australian Marine Parks" also appears in
+        # result titles, so layer toggles must stay inside this popper.
+        self.reference_layer_popper = page.locator('#reference-popper-id')
         self.layers_menu = self.get_by_id('layer-show-hide-menu-button')
         self.data_density_layer = page.get_by_role('radio', name='Data Density')
         self.geoserver_layer = page.get_by_role('radio', name='GeoServer')
@@ -42,6 +45,9 @@ class Map(BasePage):
             'radio', name='Spatial Extent'
         )
         self.gridded_data_layer = page.get_by_role('radio', name='Gridded Data')
+        self.uncluster_layer = page.get_by_role(
+            'radio', name='Centre points (unclustered)'
+        )
         self.gridded_raster_error = page.get_by_test_id('gridded-raster-error')
 
         self.daterange_show_hide_menu_button = page.get_by_test_id(
@@ -55,6 +61,16 @@ class Map(BasePage):
             'dateslider-daterange-menu-button'
         )
         self.date_slider_rail = self.date_slider.locator('.MuiSlider-root')
+        self.start_date_button = page.get_by_role(
+            'button', name='Start date', exact=True
+        )
+        self.end_date_button = page.get_by_role(
+            'button', name='End date', exact=True
+        )
+        self.date_picker_dialog = page.get_by_role('dialog')
+        self.date_picker_cancel = self.date_picker_dialog.get_by_role(
+            'button', name='Cancel', exact=True
+        )
 
         # Scoped locators also work when the location-filter map is open
         # alongside the search map.
@@ -169,6 +185,120 @@ class Map(BasePage):
         self.page.mouse.move(x, y)
         self.page.mouse.up()
 
+    def bbox_snapshot(self) -> dict:
+        """Read BBOX geometry and camera through the existing map test hook."""
+        return dict(
+            self.page.evaluate(
+                """id => {
+                const map = window.__map_functions.getMap(id);
+                const draw = map._controls.find(control => control.getAll);
+                return {
+                    center: map.getCenter().toArray(), zoom: map.getZoom(),
+                    features: draw.getAll().features, mode: draw.getMode(),
+                    selected: draw.getSelectedIds(),
+                    doubleClickZoom: map.doubleClickZoom.isEnabled(),
+                    dragPan: map.dragPan.isEnabled(),
+                    canvas: (() => {
+                        const bounds = map.getCanvas().getBoundingClientRect();
+                        return [bounds.x, bounds.y, bounds.width, bounds.height];
+                    })(),
+                };
+            }""",
+                self.map_id,
+            )
+        )
+
+    def disable_bbox_navigation(self) -> None:
+        """Set pre-existing disabled controls to check BBOX restoration."""
+        self.page.evaluate(
+            """id => {
+                const map = window.__map_functions.getMap(id);
+                map.dragPan.disable();
+                map.doubleClickZoom.disable();
+            }""",
+            self.map_id,
+        )
+
+    def bbox_point(self, x: float, y: float) -> list:
+        """Get the expected geographic corner for a canvas position."""
+        return list(
+            self.page.evaluate(
+                """({id, x, y}) => {
+                const map = window.__map_functions.getMap(id);
+                const canvas = map.getCanvasContainer();
+                const bounds = canvas.getBoundingClientRect();
+                const scale = canvas.offsetWidth / bounds.width;
+                return map.unproject([
+                    (x - bounds.x) * scale, (y - bounds.y) * scale
+                ]).toArray();
+            }""",
+                {'id': self.map_id, 'x': x, 'y': y},
+            )
+        )
+
+    def bbox_drag(self, touch: bool = False) -> tuple[list, list]:
+        """Draw with native browser input, checking the camera on every move."""
+        x, y = self.calculate_mouse_coordinates(left=40, up=40)
+        x, y = int(x), int(y)
+        start = self.bbox_point(x, y)
+        end = self.bbox_point(x + 80, y + 80)
+        before = self.bbox_snapshot()
+        session = (
+            self.page.context.new_cdp_session(self.page) if touch else None
+        )
+        if session:
+            session.send(
+                'Input.dispatchTouchEvent',
+                {
+                    'type': 'touchStart',
+                    'touchPoints': [{'x': x, 'y': y}],
+                },
+            )
+        else:
+            self.page.mouse.move(x, y)
+            self.page.mouse.down()
+        for offset in (16, 20, 40, 80) if touch else (20, 40, 80):
+            if session:
+                session.send(
+                    'Input.dispatchTouchEvent',
+                    {
+                        'type': 'touchMove',
+                        'touchPoints': [{'x': x + offset, 'y': y + offset}],
+                    },
+                )
+            else:
+                self.page.mouse.move(x + offset, y + offset)
+            # Flush camera updates as well as Draw's store rendering.
+            self.page.evaluate('() => new Promise(requestAnimationFrame)')
+            during = self.bbox_snapshot()
+            assert during['center'] == before['center']
+            assert during['zoom'] == before['zoom']
+            assert during['canvas'] == before['canvas']
+            assert during['mode'] == 'draw_rectangle'
+            assert len(during['features'][0]['geometry']['coordinates'][0]) == 5
+        if session:
+            session.send(
+                'Input.dispatchTouchEvent',
+                {
+                    'type': 'touchEnd',
+                    'touchPoints': [],
+                },
+            )
+            session.detach()
+        else:
+            self.page.mouse.up()
+        self.page.wait_for_function(
+            """id => window.__map_functions.getMap(id)._controls
+                .find(control => control.getAll).getMode() === 'simple_select'
+            """,
+            arg=self.map_id,
+        )
+        after = self.bbox_snapshot()
+        assert after['center'] == before['center']
+        assert after['zoom'] == before['zoom']
+        assert after['canvas'] == before['canvas']
+        return start, end
+
     def close_bookmark_menu(self) -> None:
         """Close the auto-open desktop bookmarks before checking idle controls."""
         button = self.container.get_by_role(
@@ -188,6 +318,17 @@ class Map(BasePage):
             # assume the search is complete and ignore the exception.
             pass
         self.progress_indicator.wait_for(state='hidden', timeout=30 * 1000)
+
+    def click_reference_layer(self, name: str) -> None:
+        """Toggle a reference layer by its menu label.
+
+        Opens the menu when it is closed. The label is matched only inside
+        the reference-layer popper so result text with the same words is
+        not clicked.
+        """
+        if not self.reference_layer_popper.is_visible():
+            self.reference_layer_menu.click()
+        self.reference_layer_popper.get_by_text(name, exact=True).click()
 
     def open_layers_menu_until_visible(
         self, locator: Locator, timeout_ms: int = 30_000

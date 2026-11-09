@@ -7,7 +7,7 @@ import {
   MockInstance,
   vi,
 } from "vitest";
-import { server } from "../../../__mocks__/server";
+import { server } from "@/__mocks__/server";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import AssociatedRecordsPanel from "../features/AssociatedRecordsPanel";
 import { ThemeProvider } from "@mui/material/styles";
@@ -17,6 +17,12 @@ import { useLocation, useParams } from "react-router-dom";
 import store from "@/app/store/store";
 import { Provider } from "react-redux";
 import { userEvent } from "@testing-library/user-event";
+
+vi.mock("react-router-dom", () => ({
+  ...vi.importActual("react-router-dom"),
+  useLocation: vi.fn(),
+  useParams: vi.fn(),
+}));
 
 describe("AssociatedRecordsPanel", async () => {
   const theme = AppTheme;
@@ -39,12 +45,6 @@ describe("AssociatedRecordsPanel", async () => {
   });
 
   beforeEach(() => {
-    vi.mock("react-router-dom", () => ({
-      ...vi.importActual("react-router-dom"),
-      useLocation: vi.fn(),
-      useParams: vi.fn(),
-    }));
-
     openSpy = vi
       .spyOn(window, "open")
       .mockImplementation((url, target, features) => {
@@ -241,13 +241,12 @@ describe("AssociatedRecordsPanel", async () => {
     const lowerRecordTitle =
       "Cape Ferguson (AIMS Wharf) Automated Marine Weather And Oceanographic Station";
 
-    await waitFor(() =>
-      screen.findByTestId("show-more-detail-btn-Associated Records")
-    ).then((showMoreRecordsBtn) => {
-      expect(showMoreRecordsBtn).to.exist;
-      expect(screen.queryByText(lowerRecordTitle)).to.not.exist;
-      userEvent.click(showMoreRecordsBtn!);
-    });
+    const showMoreRecordsBtn = await screen.findByTestId(
+      "show-more-detail-btn-Associated Records"
+    );
+    expect(showMoreRecordsBtn).to.exist;
+    expect(screen.queryByText(lowerRecordTitle)).to.not.exist;
+    await userEvent.click(showMoreRecordsBtn);
 
     await waitFor(
       () => {
@@ -260,16 +259,10 @@ describe("AssociatedRecordsPanel", async () => {
       { timeout: 5000 }
     );
 
-    await waitFor(
-      () => {
-        const showLessRecordsBtn = screen.queryByTestId(
-          "show-less-detail-btn-Associated Records"
-        );
-        expect(showLessRecordsBtn).to.exist;
-        userEvent.click(showLessRecordsBtn!);
-      },
-      { timeout: 5000 }
+    const showLessRecordsBtn = await screen.findByTestId(
+      "show-less-detail-btn-Associated Records"
     );
+    await userEvent.click(showLessRecordsBtn);
 
     await waitFor(
       () => {

@@ -3,9 +3,9 @@
  * into Google Dataset Search.
  */
 
-import type { Dataset, WithContext } from "schema-dts";
+import type { BreadcrumbList, Dataset, WithContext } from "schema-dts";
 import type { OGCCollection } from "./fetchCollections";
-import { detailsUrl } from "./constants";
+import { BASE_URL, detailsUrl, SITE_NAME } from "./constants";
 
 // https://developers.google.com/search/docs/appearance/structured-data/dataset
 export const buildJsonLd = (
@@ -29,6 +29,24 @@ export const buildJsonLd = (
   temporalCoverage: toTemporalCoverage(collection.extent?.temporal?.interval),
   license: collection.getLicense(),
   citation: collection.getCitation()?.suggestedCitation,
+});
+
+// Mirrors the visible breadcrumb in the crawler body, telling Google the page
+// sits under the home page rather than floating on its own.
+export const buildBreadcrumbJsonLd = (
+  collection: OGCCollection
+): WithContext<BreadcrumbList> => ({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: SITE_NAME, item: `${BASE_URL}/` },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: collection.title,
+      item: detailsUrl(collection.id),
+    },
+  ],
 });
 
 // schema.org GeoShape box is "south west north east"; OGC bbox is [west, south, east, north]

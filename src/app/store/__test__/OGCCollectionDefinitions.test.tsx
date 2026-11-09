@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import {
   getSubgroup,
   OGCCollection,
+  OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE,
   RelationType,
   Spatial,
 } from "../OGCCollectionDefinitions"; // Adjust the import path as needed
@@ -490,6 +491,104 @@ describe("OGCCollection", () => {
         expect(collection.isImosOnly()).toBe(expected);
       }
     );
+  });
+
+  describe("original netcdfs", () => {
+    const originalNetcdfsLink = {
+      href: "http://localhost:8080/api/v1/ogc/original_netcdfs",
+      rel: "file-list",
+      type: "application/x-netcdf",
+      title: "original_netcdfs",
+    };
+
+    it("finds the file-list link titled original_netcdfs", () => {
+      const collection = new OGCCollection();
+      collection.links = [
+        { rel: "summary", href: "", type: "", title: "a.parquet" },
+        originalNetcdfsLink,
+      ];
+
+      expect(collection.hasOriginalNetcdfs()).toBe(true);
+      expect(collection.getOriginalNetcdfsLink()?.title).toBe(
+        "original_netcdfs"
+      );
+    });
+
+    it.each([
+      ["no links", undefined],
+      [
+        "a file-list link with another title",
+        [{ ...originalNetcdfsLink, title: "other" }],
+      ],
+      [
+        "an original_netcdfs title with another rel",
+        [{ ...originalNetcdfsLink, rel: "related" }],
+      ],
+    ])("returns false for %s", (_, links) => {
+      const collection = new OGCCollection();
+      collection.links = links;
+
+      expect(collection.hasOriginalNetcdfs()).toBe(false);
+      expect(collection.getOriginalNetcdfsLink()).toBeUndefined();
+    });
+  });
+
+  describe("getCODatasetLabel", () => {
+    const notebookLink = (keyName: string, title: string) => ({
+      rel: "related",
+      type: "application/x-ipynb+json",
+      href: `https://github.com/aodn/aodn_cloud_optimised/blob/main/notebooks/${keyName}.ipynb`,
+      title,
+    });
+
+    it("uses the text after the dash in the key's notebook link title", () => {
+      const collection = new OGCCollection();
+      collection.links = [
+        notebookLink(
+          "animal_ctd",
+          `${OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE} - Real time - CTD profile`
+        ),
+        notebookLink(
+          "radar_wave",
+          `${OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE} - Delayed mode - Wave`
+        ),
+      ];
+
+      expect(collection.getCODatasetLabel("animal_ctd.parquet")).toBe(
+        "Real time - CTD profile"
+      );
+      expect(collection.getCODatasetLabel("radar_wave.zarr")).toBe(
+        "Delayed mode - Wave"
+      );
+    });
+
+    it.each([
+      ["no links", undefined],
+      [
+        "a notebook link with no name after the title",
+        [notebookLink("animal_ctd", OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE)],
+      ],
+      [
+        "only another key's notebook link",
+        [
+          notebookLink(
+            "animal_gps",
+            `${OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE} - Real time - GPS`
+          ),
+        ],
+      ],
+      [
+        "a notebook link with another title",
+        [notebookLink("animal_ctd", "Python notebook example - CTD")],
+      ],
+    ])("falls back to the key without its extension for %s", (_, links) => {
+      const collection = new OGCCollection();
+      collection.links = links;
+
+      expect(collection.getCODatasetLabel("animal_ctd.parquet")).toBe(
+        "animal_ctd"
+      );
+    });
   });
 
   describe("isIntegrated", () => {

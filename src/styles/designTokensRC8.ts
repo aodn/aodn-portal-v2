@@ -209,6 +209,38 @@ export const designTokensRC8 = {
       tag3: "#CFEAF7",
       tag4: "#DCE4FF",
     },
+
+    // Landing page partners section (IMOS data card, contributors, NCRIS)
+    partners: {
+      heading: "#12293F",
+      subtitle: "#5B7183",
+      bodyText: "#33424E",
+      cardBorder: "#D3E0E9",
+      cardText: "#41586A",
+      buttonText: "#12212C",
+      buttonHover: "#DCECF5",
+      // IMOS data card background, from dark to light
+      imosCard1: "#091B2C",
+      imosCard2: "#0B2135",
+      imosCard3: "#10334C",
+      imosCard4: "#174866",
+      imosStats: "#06111D",
+      imosGlow: "#2E8498",
+      imosWave: "#AADEEE",
+    },
+
+    // Contributor brand colours
+    // accent = card top border, brand = hover panel fill (AA with white text)
+    contributors: {
+      aad: { accent: "#4962A0", brand: "#123A63" },
+      aims: { accent: "#00868F", brand: "#00565F" },
+      csiro: { accent: "#00A9CE", brand: "#1F5A72" },
+      ga: { accent: "#21409A", brand: "#1F3D73" },
+      imas: { accent: "#005A9C", brand: "#00497E" },
+      nci: { accent: "#F9A85F", brand: "#A04D15" },
+      eatlas: { accent: "#509BE8", brand: "#22608C" },
+      wamsi: { accent: "#C07A12", brand: "#8A5A0C" },
+    },
   },
 
   // ===========================

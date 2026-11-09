@@ -6,7 +6,7 @@ To set up this project locally, follow these steps using Yarn and Vite for a smo
 
 ## Prerequisites
 
-- Node.js 20 (the required version is defined in `.nvmrc`; you can use [nvm](https://github.com/nvm-sh/nvm) to manage it).
+- Node.js 22 (the required version is defined in `.nvmrc`; you can use [nvm](https://github.com/nvm-sh/nvm) to manage it).
 - Npm installed on your system with version >=8.0.0
 
 ## Installation

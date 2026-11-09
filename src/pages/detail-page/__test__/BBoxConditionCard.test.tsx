@@ -157,6 +157,27 @@ describe("BBoxConditionCard", () => {
       fireEvent.click(screen.getByRole("button", { name: /remove bbox 1/i }));
       expect(onRemove).toHaveBeenCalledWith(c1);
     });
+
+    // jsdom has no layout, so this pins the styles that centre the coordinates
+    // between the number box and the close icon
+    it("keeps the coordinates centred between the number box and the close icon", () => {
+      const c1 = new BBoxCondition("c1", [113.25, -43.71, 154.12, -10.5]);
+
+      render(<BBoxConditionCard bboxConditions={[c1]} onRemove={onRemove} />);
+
+      const coordArea = screen.getByLabelText("bbox 1")
+        .nextElementSibling as HTMLElement;
+      const coordGrid = coordArea.firstElementChild as HTMLElement;
+      const closeButton = screen.getByRole("button", { name: "remove bbox 1" });
+
+      expect(coordArea).toHaveStyle({ paddingLeft: "16px" });
+      expect(parseFloat(getComputedStyle(coordArea).marginLeft)).toBe(0);
+      expect(getComputedStyle(coordGrid).gridTemplateColumns).toContain(
+        "max-content"
+      );
+      expect(coordGrid).toHaveStyle({ justifyContent: "center" });
+      expect(parseFloat(getComputedStyle(closeButton).marginLeft)).toBe(0);
+    });
   });
 
   describe("readOnly", () => {

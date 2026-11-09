@@ -1,0 +1,44 @@
+import { SelectItem } from "@/components/common/dropdown/CommonSelect";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+
+const DATASET_KEY_EXTENSION = /\.(zarr|parquet)$/i;
+
+const toOptions = (
+  keysOrItems: readonly string[] | readonly SelectItem<string>[],
+  extension: RegExp
+): SelectItem<string>[] => {
+  if (keysOrItems.length === 0 || typeof keysOrItems[0] === "string") {
+    return (keysOrItems as readonly string[]).map((key) => ({
+      value: key,
+      label: key.replace(extension, ""),
+    }));
+  }
+  return (keysOrItems as readonly SelectItem<string>[]).map((item) => ({
+    ...item,
+  }));
+};
+
+// Copy before sorting so the caller's list is not mutated. Sort by the label
+// that is shown, then by value, so renaming a displayed dataset moves it.
+export const sortDatasetOptions = (
+  keysOrItems: readonly string[] | readonly SelectItem<string>[],
+  extension: RegExp = DATASET_KEY_EXTENSION
+): SelectItem<string>[] =>
+  toOptions(keysOrItems, extension).sort(
+    (a, b) => a.label.localeCompare(b.label) || a.value.localeCompare(b.value)
+  );
+
+// CO dataset options of a collection, shared by the download card and the map
+// layer. The value is the CO key, used to download and to load the layer. The
+// label is the readable name, for display only.
+export const getCODatasetOptions = (
+  collection: OGCCollection | undefined
+): SelectItem<string>[] =>
+  collection
+    ? sortDatasetOptions(
+        collection.getAllCOKeys().map((key) => ({
+          value: key,
+          label: collection.getCODatasetLabel(key),
+        }))
+      )
+    : [];

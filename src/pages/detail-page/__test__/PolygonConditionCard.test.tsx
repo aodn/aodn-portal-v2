@@ -156,6 +156,56 @@ describe("PolygonConditionCard", () => {
   });
 
   describe("validation", () => {
+    it.each(["12abc", "12.3.4", "0x10", "1e1", "", "   ", "-", "Infinity"])(
+      "rejects %j when adding or editing either coordinate",
+      (invalid) => {
+        const polygon = new PolygonCondition("p1", [
+          [10, 20],
+          [10, 30],
+          [20, 30],
+        ]);
+        render(
+          <PolygonConditionCard
+            polygonCondition={polygon}
+            onUpdate={onUpdate}
+          />
+        );
+
+        typeAddVertex(invalid, "20");
+        expect(onUpdate).not.toHaveBeenCalled();
+        typeAddVertex("20", invalid);
+        expect(onUpdate).not.toHaveBeenCalled();
+
+        fireEvent.click(screen.getByRole("button", { name: "Edit vertex 1" }));
+        const lat = screen.getAllByLabelText("Latitude")[0];
+        const lng = screen.getAllByLabelText("Longitude")[0];
+        fireEvent.change(lat, { target: { value: invalid } });
+        fireEvent.keyDown(lat, { key: "Enter" });
+        expect(onUpdate).not.toHaveBeenCalled();
+        fireEvent.change(lat, { target: { value: "20" } });
+        fireEvent.change(lng, { target: { value: invalid } });
+        fireEvent.keyDown(lng, { key: "Enter" });
+        expect(onUpdate).not.toHaveBeenCalled();
+        expect(screen.getByRole("alert")).toHaveTextContent(
+          /latitude must be -90 to 90/i
+        );
+      }
+    );
+
+    it("accepts signed decimals and coordinate boundaries", () => {
+      render(<PolygonConditionCard onCreate={onCreate} />);
+
+      typeAddVertex(" -90 ", "-180");
+      typeAddVertex("+90", "+180");
+      typeAddVertex("-.5", "-123.45");
+
+      expect(onCreate).toHaveBeenCalledWith([
+        [-180, -90],
+        [180, 90],
+        [-123.45, -0.5],
+      ]);
+    });
+
     it("rejects an out-of-range coordinate with an alert and no callback", () => {
       render(<PolygonConditionCard onCreate={onCreate} />);
 

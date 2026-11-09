@@ -1,5 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import { buildMapLayerConfig } from "../features/MapPanel";
+import {
+  buildMapLayerConfig,
+  shouldMountGeoServerLayer,
+} from "../features/MapPanel";
 import {
   LayerName,
   LayerSwitcherLayer,
@@ -351,5 +354,28 @@ describe("buildMapLayerConfig", () => {
       expect(result.filter((l) => l.selected)).toHaveLength(1);
       expect(result.find((l) => l.selected)?.id).toBe(LayerName.PMTiles);
     });
+  });
+});
+
+describe("shouldMountGeoServerLayer", () => {
+  // Args: pmtiles loading, pmtiles supported, gridded loading, gridded products
+  it("stays unmounted while the PMTiles probe has not reported", () => {
+    expect(shouldMountGeoServerLayer(true, false, false, false)).toBe(false);
+  });
+
+  it("mounts only after both probes finish with nothing to show", () => {
+    expect(shouldMountGeoServerLayer(false, false, false, false)).toBe(true);
+  });
+
+  it("stays unmounted when PMTiles is supported", () => {
+    expect(shouldMountGeoServerLayer(false, true, false, false)).toBe(false);
+  });
+
+  it("stays unmounted while gridded products are loading", () => {
+    expect(shouldMountGeoServerLayer(false, false, true, false)).toBe(false);
+  });
+
+  it("stays unmounted when gridded products are available", () => {
+    expect(shouldMountGeoServerLayer(false, false, false, true)).toBe(false);
   });
 });

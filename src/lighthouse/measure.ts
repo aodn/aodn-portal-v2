@@ -1,18 +1,20 @@
 /**
- * `yarn lh` — measures the configured routes against the production build in
+ * `yarn lh:measure` — measures the configured routes against the production build in
  * dist/ and writes .lighthouse/report.json.
  *
- * Fails only when a run could not be trusted: no build, Chrome or Lighthouse
+ * Local measurements fail when a run could not be trusted: no build, Chrome or Lighthouse
  * erroring, or a page that did not actually render (wrong URL, degraded shell,
- * failed API call). Scores are never a failure — comparing them is compare.ts's
- * job. Node-only.
+ * failed API call). --url measures a deployed site and reports the release
+ * minimum Performance score without failing valid measurements below it.
+ * Local PR comparisons stay in
+ * compare.ts. Node-only.
  */
 
 import { execFileSync } from "child_process";
 import fs from "fs";
 import path from "path";
-import { createApiReplayer, type ApiReplayer } from "./apiFixtures";
-import { startAppServer } from "./appServer";
+import { createApiReplayer, type ApiReplayer } from "@/lighthouse/apiFixtures";
+import { startAppServer, type AppServer } from "@/lighthouse/appServer";
 import {
   ALL_FORM_FACTORS,
   DEFAULT_PORT,
@@ -21,7 +23,7 @@ import {
   lighthouseRoutes,
   metricOrder,
   type LighthouseRoute,
-} from "./constants";
+} from "@/lighthouse/constants";
 import {
   apiFixturesDir,
   argValue,
@@ -29,22 +31,24 @@ import {
   isLighthouseCli,
   lhrDir,
   reportJsonPath,
+  reportMarkdownPath,
   runCli,
   workDir,
-} from "./cli";
+} from "@/lighthouse/cli";
 import {
   checkRendered,
   extractMetrics,
   lcpElement,
   medianMetrics,
-} from "./metrics";
-import { runLighthouse } from "./runLighthouse";
+} from "@/lighthouse/metrics";
+import { buildReleaseReport } from "@/lighthouse/releaseReport";
+import { runLighthouse } from "@/lighthouse/runLighthouse";
 import type {
   FormFactor,
   LighthouseReport,
   RouteMetrics,
   RouteReport,
-} from "./types";
+} from "@/lighthouse/types";
 
 const git = (...args: string[]) => {
   try {
@@ -114,22 +118,35 @@ const measureRoute = async ({
   runs: number;
   formFactor: FormFactor;
   keepLhr: boolean;
-  api: ApiReplayer;
-}): Promise<RouteMetrics> => {
+  api?: ApiReplayer;
+}): Promise<{ metrics: RouteMetrics; measuredRuns: RouteMetrics[] }> => {
   const url = `${origin}${route.path}`;
 
   // Discarded: warms Chrome and the OS caches so the first measured run is
   // not the odd one out.
   console.log(`[${route.id}] warm-up run`);
-  await runLighthouse({ url, formFactor, warmup: true });
+  await runLighthouse({
+    url,
+    formFactor,
+    warmup: true,
+  });
 
   const collected: RouteMetrics[] = [];
   for (let run = 1; run <= runs; run += 1) {
-    const lhr = await runLighthouse({ url, formFactor });
+    const lhr = await runLighthouse({
+      url,
+      formFactor,
+      // Deployed runs preserve HTML as well as JSON, including invalid pages.
+      ...(!api && keepLhr
+        ? {
+            reportPath: path.join(lhrDir(), `${formFactor}-${route.id}-${run}`),
+          }
+        : {}),
+    });
 
     const problems = checkRendered(lhr, route, origin);
     if (problems.length > 0) {
-      const missing = api.missing();
+      const missing = api?.missing() ?? [];
       throw new Error(
         `${route.path} did not render a page worth measuring:\n` +
           problems.map((problem) => `  - ${problem}`).join("\n") +
@@ -142,7 +159,7 @@ const measureRoute = async ({
       );
     }
 
-    if (keepLhr) {
+    if (keepLhr && api) {
       fs.writeFileSync(
         path.join(lhrDir(), `${formFactor}-${route.id}-${run}.json`),
         JSON.stringify(lhr),
@@ -150,7 +167,7 @@ const measureRoute = async ({
       );
     }
 
-    const metrics = extractMetrics(lhr);
+    const metrics = extractMetrics(lhr, !api);
     collected.push(metrics);
     console.log(
       `[${route.id}] run ${run}/${runs} ${formatMetrics(metrics)}` +
@@ -158,9 +175,9 @@ const measureRoute = async ({
     );
   }
 
-  const medians = medianMetrics(collected);
+  const medians = medianMetrics(collected, !api);
   console.log(`[${route.id}] median ${formatMetrics(medians)}`);
-  return medians;
+  return { metrics: medians, measuredRuns: collected };
 };
 
 export const measure = async () => {
@@ -177,18 +194,32 @@ export const measure = async () => {
   const outputPath = argValue("--out") || reportJsonPath();
   const fixturesDir = argValue("--fixtures") || apiFixturesDir();
   const keepLhr = !process.argv.includes("--no-keep-lhr");
+  const deployedUrl = argValue("--url") || process.env.LH_URL;
+  const origin = deployedUrl ? new URL(deployedUrl).origin : undefined;
+  if (deployedUrl && !/^https?:$/.test(new URL(deployedUrl).protocol)) {
+    throw new Error("--url must be an HTTP or HTTPS site URL");
+  }
+  if (origin && process.argv.includes("--serve-only")) {
+    throw new Error("--serve-only cannot be used with a deployed --url");
+  }
 
   fs.mkdirSync(workDir(), { recursive: true });
   if (keepLhr) fs.mkdirSync(lhrDir(), { recursive: true });
-  // The OGC API is mocked: only the committed fixtures are served, so a
-  // missing or slow environment can never fail or skew the run.
-  const api = createApiReplayer({ fixturesDir });
-  const server = await startAppServer({ distDir: distDir(), port, api });
-  console.log(
-    `serving ${distDir()} on ${server.url}, /api replayed from ` +
-      `${api.manifest.fixtures.length} fixtures recorded from ` +
-      `${api.manifest.recordedFrom} on ${api.manifest.recordedAt}`
-  );
+  // Local measurements replay the committed API fixtures. Deployed audits
+  // bypass both the fixture replayer and the local server entirely.
+  let api: ApiReplayer | undefined;
+  let server: AppServer | undefined;
+  if (origin) {
+    console.log(`measuring deployed site ${origin} with its real API`);
+  } else {
+    api = createApiReplayer({ fixturesDir });
+    server = await startAppServer({ distDir: distDir(), port, api });
+    console.log(
+      `serving ${distDir()} on ${server.url}, /api replayed from ` +
+        `${api.manifest.fixtures.length} fixtures recorded from ` +
+        `${api.manifest.recordedFrom} on ${api.manifest.recordedAt}`
+    );
+  }
 
   // Handy when a run reports an unrendered page: serve the exact same build
   // and API data, then open it in a browser to see what Lighthouse saw.
@@ -198,26 +229,72 @@ export const measure = async () => {
   }
 
   const routes: Record<string, RouteReport> = {};
+  const report: LighthouseReport = {
+    commit: commitSha(),
+    branch: branchName(),
+    generatedAt: new Date().toISOString(),
+    runs,
+    apiHost: origin ?? api!.manifest.recordedFrom,
+    routes,
+    ...(origin ? { environment: process.env.LH_ENVIRONMENT } : {}),
+  };
+  const saveReport = () => {
+    fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+    fs.writeFileSync(
+      outputPath,
+      `${JSON.stringify(report, null, 2)}\n`,
+      "utf8"
+    );
+    if (origin) {
+      const { markdown, failures, results } = buildReleaseReport(report);
+      fs.writeFileSync(reportMarkdownPath(), markdown, "utf8");
+      fs.writeFileSync(
+        path.join(workDir(), "release-results.json"),
+        `${JSON.stringify(results, null, 2)}\n`,
+        "utf8"
+      );
+      for (const failure of failures) {
+        console.warn(
+          `::warning title=Lighthouse performance threshold::${failure}`
+        );
+      }
+    }
+  };
+  let activePage = "";
   try {
     for (const route of lighthouseRoutes(uuid)) {
+      activePage = route.path;
       const metrics: RouteReport["metrics"] = {};
+      const measuredRuns: NonNullable<RouteReport["measuredRuns"]> = {};
+      routes[route.path] = {
+        id: route.id,
+        metrics,
+        ...(origin ? { measuredRuns } : {}),
+      };
       for (const formFactor of formFactors) {
-        metrics[formFactor] = await measureRoute({
+        const measurement = await measureRoute({
           route,
-          origin: server.url,
+          origin: origin ?? server!.url,
           runs,
           formFactor,
           keepLhr,
           api,
         });
+        metrics[formFactor] = measurement.metrics;
+        measuredRuns[formFactor] = measurement.measuredRuns;
       }
-      routes[route.path] = { id: route.id, metrics };
     }
+  } catch (error) {
+    if (origin) {
+      report.executionError = `${activePage}: ${error instanceof Error ? error.message : String(error)}`;
+      saveReport();
+    }
+    throw error;
   } finally {
-    await server.close();
+    await server?.close();
   }
 
-  const missing = api.missing();
+  const missing = api?.missing() ?? [];
   if (missing.length > 0) {
     // The readiness checks above already passed, so these were requests the
     // pages tolerate — worth seeing, not worth failing on.
@@ -226,17 +303,7 @@ export const measure = async () => {
     );
   }
 
-  const report: LighthouseReport = {
-    commit: commitSha(),
-    branch: branchName(),
-    generatedAt: new Date().toISOString(),
-    runs,
-    apiHost: api.manifest.recordedFrom,
-    routes,
-  };
-
-  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-  fs.writeFileSync(outputPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  saveReport();
   console.log(`wrote ${outputPath}`);
   return report;
 };

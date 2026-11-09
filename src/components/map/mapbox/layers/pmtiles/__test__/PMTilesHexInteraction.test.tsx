@@ -23,10 +23,10 @@ const popupMocks = vi.hoisted(() => {
     setLngLat: ReturnType<typeof vi.fn>;
     addTo: ReturnType<typeof vi.fn>;
     isOpen: ReturnType<typeof vi.fn>;
-    getElement: ReturnType<typeof vi.fn>;
+    getElement: ReturnType<typeof vi.fn<() => HTMLElement>>;
     remove: ReturnType<typeof vi.fn>;
   }> = [];
-  const Popup = vi.fn(() => {
+  const Popup = vi.fn(function () {
     const el = document.createElement("div");
     const instance = {
       setHTML: vi.fn().mockReturnThis(),
@@ -150,8 +150,10 @@ describe("PMTilesLayer - click popup", () => {
   let setData: ReturnType<typeof vi.fn>;
   let queryRenderedFeatures: ReturnType<typeof vi.fn>;
   let map: Map;
-  let popupRef: { current: { remove: ReturnType<typeof vi.fn> } | null };
-  let removePopup: ReturnType<typeof vi.fn>;
+  let popupRef: {
+    current: { remove: ReturnType<typeof vi.fn<() => void>> } | null;
+  };
+  let removePopup: ReturnType<typeof vi.fn<() => void>>;
 
   const listenerKey = (event: string, layerId?: string) =>
     layerId ? `${event}:${layerId}` : event;
@@ -217,12 +219,16 @@ describe("PMTilesLayer - click popup", () => {
     } as unknown as Map;
   });
 
-  const attach = (ctx = makeCtx()) =>
+  const attach = (
+    ctx = makeCtx(),
+    refreshPopupRef?: { current: (() => void) | null }
+  ) =>
     attachPmtilesHexInteraction(
       map,
       ctx,
       popupRef as { current: null },
-      removePopup
+      removePopup,
+      refreshPopupRef
     );
 
   it("registers map click, touchend, and mousemove on every hex band", () => {
@@ -419,6 +425,61 @@ describe("PMTilesLayer - click popup", () => {
     emit("zoomend");
 
     expect(removePopup).not.toHaveBeenCalled();
+  });
+
+  it("rewrites an open popup when the time window changes", () => {
+    const ctx = makeCtx();
+    const refreshPopupRef: { current: (() => void) | null } = {
+      current: null,
+    };
+    const tree = {
+      "2024": {
+        [TOTAL_KEY]: 12,
+        "01": { [TOTAL_KEY]: 5, [DAYS_KEY]: { "01": 5 } },
+        "06": { [TOTAL_KEY]: 7, [DAYS_KEY]: { "01": 7 } },
+      },
+    };
+    attach(ctx, refreshPopupRef);
+    emit("click", undefined, makeEvent(makeFeature("hex-1", tree)));
+    const popup = popupMocks.instances[0];
+    popup.isOpen.mockReturnValue(true);
+    popup.setHTML.mockClear();
+
+    const juneStart = dayjs.tz("2024-06-01");
+    const juneEnd = dayjs.tz("2024-06-30");
+    ctx.current = {
+      ...ctx.current,
+      filterStartDate: juneStart,
+      filterEndDate: juneEnd,
+      countFilterRange: buildCountFilterRange(juneStart, juneEnd),
+    };
+    refreshPopupRef.current?.();
+
+    expect(popup.setHTML).toHaveBeenCalledWith(
+      expect.stringContaining("Data Record Count: 7")
+    );
+    expect(removePopup).not.toHaveBeenCalled();
+  });
+
+  it("closes the popup when the new time window has no records in the cell", () => {
+    const ctx = makeCtx();
+    const refreshPopupRef: { current: (() => void) | null } = {
+      current: null,
+    };
+    attach(ctx, refreshPopupRef);
+    emit("click", undefined, makeEvent(makeFeature("hex-1")));
+    popupMocks.instances[0].isOpen.mockReturnValue(true);
+
+    const later = dayjs.tz("2025-01-01");
+    ctx.current = {
+      ...ctx.current,
+      filterStartDate: later,
+      filterEndDate: later,
+      countFilterRange: buildCountFilterRange(later, later),
+    };
+    refreshPopupRef.current?.();
+
+    expect(removePopup).toHaveBeenCalled();
   });
 
   it("zoomend into another hex band clears the open popup and outline", () => {

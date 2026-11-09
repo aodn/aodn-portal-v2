@@ -112,7 +112,10 @@ const Searchbar: FC<SearchbarProps> = ({
   const handleClickButton = useCallback(
     (button: SearchbarButtonNames) => {
       scrollToElement();
-      if (open && button === activeButton) {
+      if (
+        button === SearchbarButtonNames.Search ||
+        (open && button === activeButton)
+      ) {
         setOpen(false);
       } else {
         setActiveButton(button);

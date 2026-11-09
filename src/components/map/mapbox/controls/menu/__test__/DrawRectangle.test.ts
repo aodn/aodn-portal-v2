@@ -1,7 +1,12 @@
-import { describe, it, expect, vi } from "vitest";
-import DrawRectangle from "../DrawRectangle";
+import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
+import DrawRectangle from "@/components/map/mapbox/controls/menu/DrawRectangle";
 
 describe("DrawRectangle custom MapboxDraw mode", () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => {
+    vi.clearAllTimers();
+    vi.useRealTimers();
+  });
   it("should initialize feature onSetup with empty coordinates polygon", () => {
     const mockCtx = {
       newFeature: vi.fn((f) => ({ ...f, id: "rect1" })),
@@ -10,8 +15,12 @@ describe("DrawRectangle custom MapboxDraw mode", () => {
       updateUIClasses: vi.fn(),
       setActionableState: vi.fn(),
       map: {
-        doubleClickZoom: { disable: vi.fn(), enable: vi.fn() },
-        dragPan: { disable: vi.fn(), enable: vi.fn() },
+        doubleClickZoom: {
+          disable: vi.fn(),
+          enable: vi.fn(),
+          isEnabled: () => true,
+        },
+        dragPan: { disable: vi.fn(), enable: vi.fn(), isEnabled: () => true },
       },
     };
 
@@ -167,7 +176,12 @@ describe("DrawRectangle custom MapboxDraw mode", () => {
       deleteFeature: vi.fn(),
     };
 
-    const state = { rectangle: mockRectangle };
+    const state = {
+      rectangle: mockRectangle,
+      endPoint: [145, -30],
+      dragPanEnabled: true,
+      doubleClickZoomEnabled: true,
+    };
     DrawRectangle.onStop.call(mockCtx, state);
 
     expect(mockRectangle.removeCoordinate).not.toHaveBeenCalled();
@@ -178,5 +192,119 @@ describe("DrawRectangle custom MapboxDraw mode", () => {
         features: [expect.any(Object)],
       })
     );
+  });
+  it("claims touchstart and updates even moves below Draw's tap tolerance", () => {
+    const ctx = {
+      ...DrawRectangle,
+      updateUIClasses: vi.fn(),
+      deleteFeature: vi.fn(),
+      changeMode: vi.fn(),
+    };
+    const rectangle = { id: "rect1", setCoordinates: vi.fn() };
+    const state = { rectangle };
+    const preventDefault = vi.fn();
+    DrawRectangle.onTouchStart.call(ctx, state, {
+      preventDefault,
+      lngLat: { lng: 140, lat: -35 },
+    });
+    expect(preventDefault).toHaveBeenCalledOnce();
+    const move = {
+      originalEvent: {
+        touches: [{}],
+        cancelable: true,
+        preventDefault: vi.fn(),
+      },
+      lngLat: { lng: 141, lat: -34 },
+    };
+    DrawRectangle.onTouchMove.call(ctx, state, move);
+    expect(move.originalEvent.preventDefault).toHaveBeenCalledOnce();
+    DrawRectangle.onDrag.call(ctx, state, move);
+    expect(rectangle.setCoordinates).toHaveBeenCalledOnce();
+    DrawRectangle.onTouchEnd.call(ctx, state, move);
+    DrawRectangle.onTap.call(ctx, state, move);
+    vi.runAllTimers();
+    expect(ctx.changeMode).toHaveBeenCalledExactlyOnceWith("simple_select", {
+      featureIds: ["rect1"],
+    });
+  });
+
+  it("discards a tap and completes only once", () => {
+    const ctx = {
+      ...DrawRectangle,
+      updateUIClasses: vi.fn(),
+      deleteFeature: vi.fn(),
+      changeMode: vi.fn(),
+    };
+    const state = { rectangle: { id: "rect1", setCoordinates: vi.fn() } };
+    const event = {
+      preventDefault: vi.fn(),
+      lngLat: { lng: 140, lat: -35 },
+    };
+    DrawRectangle.onTouchStart.call(ctx, state, event);
+    DrawRectangle.onTap.call(ctx, state, event);
+    vi.runAllTimers();
+    expect(ctx.deleteFeature).toHaveBeenCalledOnce();
+    expect(ctx.changeMode).toHaveBeenCalledExactlyOnceWith("simple_select");
+  });
+
+  it.each([true, false])(
+    "restores dragPan=%s after cancellation",
+    (enabled) => {
+      const ctx = {
+        map: { dragPan: { enable: vi.fn() } },
+        updateUIClasses: vi.fn(),
+        activateUIButton: vi.fn(),
+        getFeature: vi.fn(),
+      };
+      DrawRectangle.onStop.call(ctx, {
+        rectangle: { id: "rect1" },
+        dragPanEnabled: enabled,
+        dragPanOptions: { deceleration: 1000 },
+      });
+      expect(ctx.map.dragPan.enable).toHaveBeenCalledTimes(enabled ? 1 : 0);
+      if (enabled) {
+        expect(ctx.map.dragPan.enable).toHaveBeenCalledWith({
+          deceleration: 1000,
+        });
+      }
+    }
+  );
+  it("cancels a partial rectangle and clears a pending completion", () => {
+    const rectangle = {
+      id: "rect1",
+      getCoordinates: () => [
+        [
+          [140, -35],
+          [145, -35],
+          [145, -30],
+          [140, -30],
+          [140, -35],
+        ],
+      ],
+      isValid: () => true,
+    };
+    const changeMode = vi.fn();
+    const ctx = {
+      map: {
+        dragPan: { enable: vi.fn() },
+        doubleClickZoom: { enable: vi.fn(), disable: vi.fn() },
+        fire: vi.fn(),
+      },
+      updateUIClasses: vi.fn(),
+      activateUIButton: vi.fn(),
+      getFeature: () => rectangle,
+      deleteFeature: vi.fn(),
+    };
+    DrawRectangle.onStop.call(ctx, {
+      rectangle,
+      doubleClickZoomEnabled: false,
+      finishTimeout: setTimeout(changeMode, 0),
+    });
+    vi.runAllTimers();
+    expect(ctx.map.fire).not.toHaveBeenCalled();
+    expect(ctx.deleteFeature).toHaveBeenCalledWith(["rect1"], { silent: true });
+    expect(changeMode).not.toHaveBeenCalled();
+    expect(ctx.map.doubleClickZoom.disable).toHaveBeenCalledOnce();
+    expect(ctx.map.doubleClickZoom.enable).not.toHaveBeenCalled();
   });
 });

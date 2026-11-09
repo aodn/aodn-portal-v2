@@ -1,0 +1,183 @@
+name: Release Performance Audit (Lighthouse)
+run-name: Release Performance Audit (Lighthouse) — ${{ inputs.environment }} — ${{ github.ref_name }}
+
+# Dispatched by trigger_build_deploy.yml after appdeploy completes successfully.
+# The PR workflow remains independent and uses its existing mocked backend.
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Successfully deployed environment to audit
+        required: true
+        type: choice
+        options: [staging, production]
+
+permissions:
+  contents: read
+
+jobs:
+  lighthouse:
+    permissions:
+      contents: read
+      actions: read
+    if: inputs.environment == 'staging' || inputs.environment == 'production'
+    runs-on: ubuntu-latest
+    # Three pages x two form factors x (one warm-up + three measured runs).
+    timeout-minutes: 40
+    env:
+      LH_ENVIRONMENT: ${{ inputs.environment }}
+      LH_URL: ${{ inputs.environment == 'staging' && 'https://portal.staging.aodn.org.au/' || 'https://portal.production.aodn.org.au/' }}
+      LH_FORM_FACTOR: both
+      LH_RUNS: "3"
+      LH_DETAILS_UUID: ${{ vars.LH_DETAILS_UUID }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+
+      - run: yarn install --immutable
+
+      # Low scores are report failures; execution errors still fail this step.
+      - name: Audit the deployed pages and report Performance results
+        run: yarn lh:measure
+
+      - name: Compare with the previous release
+        if: always() && !cancelled()
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -f .lighthouse/release-results.json ]; then
+            yarn tsx src/lighthouse/compareRelease.ts
+          fi
+
+      - name: Add the report to the job summary
+        if: always()
+        run: |
+          if [ -f .lighthouse/job-summary.md ]; then
+            cat .lighthouse/job-summary.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            printf '%s\n' '## Release Performance Audit (Lighthouse)' '' \
+              "Environment: **$LH_ENVIRONMENT**" '' \
+              "Release/ref: $GITHUB_REF_NAME · SHA: $GITHUB_SHA" '' \
+              '**Execution status: 🔴 ERROR** — no valid job summary was produced. See the failed step logs.' '' \
+              '**Performance status: 🔴 INCOMPLETE**' '' \
+              '**Mobile: 🔴 INCOMPLETE | Desktop: 🔴 INCOMPLETE**' '' \
+              'Performance failures do not block deployment or release.' \
+              >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: lighthouse-${{ inputs.environment }}-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .lighthouse/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 90
+
+      # Fail only on execution errors or incomplete audits, after preserving reports.
+      - name: Check release audit execution
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const results = JSON.parse(fs.readFileSync('.lighthouse/release-results.json', 'utf8'));
+          if (results.executionStatus !== 'SUCCESS' || !['PASS', 'FAIL'].includes(results.performanceStatus)) {
+            throw new Error('Lighthouse execution did not complete successfully; see the job summary.');
+          }
+          if (results.performanceStatus === 'FAIL') {
+            console.warn('::warning title=Lighthouse performance thresholds::Performance thresholds were not met; see the job summary and report artifacts. Performance failures do not fail this workflow or block deployment or release.');
+          }
+          NODE
+
+  notify:
+    name: Email Lighthouse results (Edge SES validation)
+    needs: lighthouse
+    if: ${{ always() && !cancelled() && needs.lighthouse.result != 'skipped' }}
+    runs-on: ubuntu-latest
+    # Temporary: this is the environment trusted by the existing Edge OIDC role.
+    # It does not change which staging/production site the audit measures.
+    environment: edge
+    timeout-minutes: 10
+    continue-on-error: true
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+    env:
+      LH_ENVIRONMENT: ${{ inputs.environment }}
+      LH_EMAIL_ENABLED: ${{ vars.LH_EMAIL_ENABLED }}
+      LH_EMAIL_FROM: ${{ vars.LH_EMAIL_FROM }}
+      LH_EMAIL_RECIPIENTS: ${{ vars.LH_EMAIL_RECIPIENTS }}
+    steps:
+      - uses: actions/checkout@v5
+        if: env.LH_EMAIL_ENABLED == 'true'
+
+      - name: Enable Corepack
+        if: env.LH_EMAIL_ENABLED == 'true'
+        run: corepack enable
+
+      - uses: actions/setup-node@v5
+        if: env.LH_EMAIL_ENABLED == 'true'
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+
+      - name: Install notification tooling
+        if: env.LH_EMAIL_ENABLED == 'true'
+        run: yarn install --immutable
+
+      - name: Download Lighthouse reports
+        id: reports
+        if: env.LH_EMAIL_ENABLED == 'true'
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          name: lighthouse-${{ inputs.environment }}-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .lighthouse/
+
+      - name: Prepare the SES email
+        if: env.LH_EMAIL_ENABLED == 'true'
+        env:
+          LH_EMAIL_REPORTS_AVAILABLE: ${{ steps.reports.outcome == 'success' }}
+        run: yarn tsx src/lighthouse/prepareReleaseEmail.ts
+
+      - name: Authenticate with AWS through OIDC
+        if: env.LH_EMAIL_ENABLED == 'true'
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          audience: sts.amazonaws.com
+          aws-region: ${{ vars.LH_EMAIL_AWS_REGION }}
+          role-to-assume: ${{ vars.LH_EMAIL_AWS_ROLE_ARN }}
+          role-session-name: lighthouse-email-${{ github.run_id }}
+
+      - name: Send the Lighthouse email through SES
+        id: send
+        if: env.LH_EMAIL_ENABLED == 'true'
+        run: >-
+          aws ses send-email
+          --cli-input-json file://.lighthouse/email-ses.json
+          --query MessageId --output text --no-cli-pager
+
+      - name: Report email delivery status
+        if: always()
+        env:
+          DELIVERY_STATUS: ${{ steps.send.outcome }}
+        run: |
+          if [ "$LH_EMAIL_ENABLED" != 'true' ]; then
+            status='DISABLED — set LH_EMAIL_ENABLED=true in the edge environment to enable delivery.'
+          elif [ "$DELIVERY_STATUS" = 'success' ]; then
+            status='ACCEPTED by Amazon SES — check the recipient inbox to confirm delivery.'
+          else
+            status='ERROR — email was not accepted by SES. See the notification job logs.'
+            echo '::warning title=Lighthouse email notification::Email notification failed; deployment and release are unaffected.'
+          fi
+          printf '%s\n' '## Lighthouse email notification' '' "$status" >> "$GITHUB_STEP_SUMMARY"

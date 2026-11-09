@@ -82,6 +82,9 @@ const defaultBbox = new mapboxgl.LngLatBounds([
   NORTH_LAT,
 ]);
 
+// One whole world is this wide at zoom 0, and doubles every zoom level.
+const WORLD_WIDTH_AT_ZOOM_0 = 512;
+
 const progressBar = (loading: ProgressType | undefined) => {
   switch (loading) {
     case ProgressType.CIRCLE:
@@ -211,6 +214,17 @@ const ReactMap = memo(
         // Stop drag cause map to rotate.
         map.dragRotate.disable();
 
+        // No map may zoom out past one whole world, or mapbox repeats
+        // longitudes and stops keeping the view centred.
+        const applyMinZoom = () => {
+          const width = map.getContainer().offsetWidth;
+          if (!width) return;
+          map.setMinZoom(
+            Math.max(minZoom, Math.log2(width / WORLD_WIDTH_AT_ZOOM_0))
+          );
+        };
+        applyMinZoom();
+
         // If exist fit the map to this area, this useful if url pass around and
         // the bbox in the url is not the default area of the map
         // Use same function to save processing
@@ -243,6 +257,7 @@ const ReactMap = memo(
             try {
               if (container.offsetWidth > 0 || container.offsetHeight > 0) {
                 map?.resize();
+                applyMinZoom();
               }
             } catch (error: any) {
               /* empty */
@@ -302,6 +317,7 @@ const ReactMap = memo(
       panelId,
       initializeMap,
       projection,
+      minZoom,
       debounceOnZoomEvent,
       debounceOnMoveEvent,
       onMoveEvent,
@@ -326,10 +342,25 @@ const ReactMap = memo(
           zoom: zoom,
         });
       }
-      map.on(MapEventEnum.IDLE, () => {
+      // Re-attach after the programmatic move. An already-idle map never emits
+      // idle again, so drag would not start a new search. Register idle with
+      // map.on and this same function: map.once stores a wrapper, so map.off
+      // of the original callback does not remove it.
+      const onIdle = () => {
+        map.off(MapEventEnum.IDLE, onIdle);
         map.on(MapEventEnum.ZOOM_END, debounceOnZoomEvent);
         map.on(MapEventEnum.MOVE_END, debounceOnMoveEvent);
-      });
+      };
+      if (map.idle()) {
+        onIdle();
+      } else {
+        map.on(MapEventEnum.IDLE, onIdle);
+      }
+      return () => {
+        map.off(MapEventEnum.IDLE, onIdle);
+        map.off(MapEventEnum.ZOOM_END, debounceOnZoomEvent);
+        map.off(MapEventEnum.MOVE_END, debounceOnMoveEvent);
+      };
     }, [
       bbox,
       zoom,

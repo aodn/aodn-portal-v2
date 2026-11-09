@@ -21,6 +21,26 @@ import { SearchResultLayoutEnum } from "@/components/common/buttons/ResultListLa
 import { SortResultEnum } from "@/components/common/buttons/ResultListSortButton";
 import * as useRedirectSearchModule from "../../../hooks/useRedirectSearch";
 import { encodeParam } from "@/utils/UrlUtils";
+
+vi.mock("@/hooks/useBreakpoint", () => ({
+  default: () => ({
+    isUnderLaptop: false,
+    isMobile: false,
+  }),
+}));
+
+// Give AutoSizer a fixed screen size in jsdom.
+vi.mock("react-virtualized-auto-sizer", () => {
+  return {
+    __esModule: true,
+    default: ({
+      children,
+    }: {
+      children: (size: { width: number; height: number }) => JSX.Element;
+    }) => children({ width: 1280, height: 800 }), // Laptop dimensions
+  };
+});
+
 const theme = AppTheme;
 
 // Mock react-router-dom
@@ -82,26 +102,6 @@ const searchForWave = async (user: ReturnType<typeof userEvent.setup>) => {
 
 describe("SearchPage Basic", () => {
   beforeAll(() => {
-    vi.mock("../../../hooks/useBreakpoint", () => ({
-      default: () => ({
-        isUnderLaptop: false,
-        isMobile: false,
-      }),
-    }));
-
-    // With use of AutoSizer component in ResultCard, it will fail in non-UI env like vitest
-    // here we mock it so to give some screen size to let the test work.
-    vi.mock("react-virtualized-auto-sizer", () => {
-      return {
-        __esModule: true,
-        default: ({
-          children,
-        }: {
-          children: (size: { width: number; height: number }) => JSX.Element;
-        }) => children({ width: 1280, height: 800 }), // Laptop dimensions
-      };
-    });
-
     // Mock scrollIntoView
     window.HTMLElement.prototype.scrollIntoView = vi.fn();
 

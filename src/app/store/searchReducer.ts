@@ -729,9 +729,10 @@ const createSearchParamFrom = (
   }
 
   if (c.searchafter) {
+    // Escape ' as '' so a quote in the cursor does not close the CQL string literal
     p.filter = appendFilter(
       p.filter,
-      `search_after='${c.searchafter.join("||")}'`
+      `search_after='${c.searchafter.join("||").replace(/'/g, "''")}'`
     );
   }
 

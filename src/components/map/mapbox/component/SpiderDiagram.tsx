@@ -96,11 +96,18 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
   unclusterPointLayer,
   onClickMapPoint: onDatasetSelected,
   tabNavigation,
+  featureCollection,
 }) => {
   const { map } = useContext(MapContext);
   const mapPopupRef = useRef<MapPopupRef>(null);
   const [spiderifiedCluster, setSpiderifiedCluster] =
     useState<SpiderifiedClusterInfo | null>(null);
+  // Effect cleanups need the latest spider, not the one from their render.
+  const spiderifiedClusterRef = useRef<SpiderifiedClusterInfo | null>(null);
+
+  useEffect(() => {
+    spiderifiedClusterRef.current = spiderifiedCluster;
+  }, [spiderifiedCluster]);
 
   const config = useMemo(
     () => mergeWithDefaults(defaultSpiderDiagramConfig, spiderDiagramConfig),
@@ -120,8 +127,8 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
     [map]
   );
 
-  // Util function to un-spiderify a spiderified cluster given its id
-  const unspiderify = useCallback(
+  // Util function to remove the spider layers and sources from the map
+  const removeSpiderLayers = useCallback(
     (clusterCircleId: string) => {
       const spiderPinsSourceId = getSpiderPinsSourceId(clusterCircleId);
       const spiderLinesSourceId = getSpiderLinesSourceId(clusterCircleId);
@@ -141,13 +148,36 @@ const SpiderDiagram: FC<SpiderDiagramProps> = ({
       } catch (error) {
         // Do nothing
       }
+    },
+    [map]
+  );
+
+  // Util function to un-spiderify a spiderified cluster given its id
+  const unspiderify = useCallback(
+    (clusterCircleId: string) => {
+      removeSpiderLayers(clusterCircleId);
 
       // Ensure the popup is removed when the spider diagram is unspiderified, even if the mouse hasn't moved.
       mapPopupRef.current?.forceRemovePopup();
 
       setSpiderifiedCluster(null);
     },
-    [map]
+    [removeSpiderLayers]
+  );
+
+  // New search data replaces the clusters, so the open spider is out of date.
+  useEffect(() => {
+    const current = spiderifiedClusterRef.current;
+    if (current) unspiderify(current.id);
+  }, [featureCollection, unspiderify]);
+
+  // Remove the spider when this layer unmounts, e.g. on layer style change.
+  useEffect(
+    () => () => {
+      const current = spiderifiedClusterRef.current;
+      if (current) removeSpiderLayers(current.id);
+    },
+    [removeSpiderLayers]
   );
 
   // Util function to generate spider diagram layer given the clicked coordinate(must be a cluster point), dataset and the expansion zoom

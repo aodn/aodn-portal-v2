@@ -18,7 +18,7 @@ describe("MapLayerSelect", () => {
       />
     );
 
-    expect(screen.getByText("Dataset Selection")).toBeInTheDocument();
+    expect(screen.getByText("Map Layer")).toBeInTheDocument();
     expect(screen.getByTestId("layer-select-dropdown")).toBeInTheDocument();
   });
 

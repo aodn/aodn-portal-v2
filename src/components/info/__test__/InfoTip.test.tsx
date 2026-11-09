@@ -27,62 +27,48 @@ describe("InfoTip", () => {
     expect(iconButton).toBeInTheDocument();
   });
 
-  it("opens popover when icon button is clicked", () => {
+  it("opens popover when icon button is clicked", async () => {
     const user = userEvent.setup();
     render(<InfoTip infoContent={mockInfoContent} />);
 
     const iconButton = screen.getByTestId("Info-tip-icon");
-    user.click(iconButton);
+    await user.click(iconButton);
 
-    return waitFor(() => {
-      expect(screen.getByTestId("Info-tip-popup")).toBeInTheDocument();
-    }).then(() => {
-      // Check if the content is displayed
-      expect(
-        screen.getByText(mockInfoContent.title as string)
-      ).toBeInTheDocument();
-      expect(screen.getByText(mockInfoContent.body)).toBeInTheDocument();
+    expect(await screen.findByTestId("Info-tip-popup")).toBeInTheDocument();
+    expect(
+      screen.getByText(mockInfoContent.title as string)
+    ).toBeInTheDocument();
+    expect(screen.getByText(mockInfoContent.body)).toBeInTheDocument();
+  });
+
+  it("closes popover when close button is clicked", async () => {
+    const user = userEvent.setup();
+    render(<InfoTip infoContent={mockInfoContent} />);
+
+    const iconButton = screen.getByTestId("Info-tip-icon");
+    await user.click(iconButton);
+    expect(await screen.findByTestId("Info-tip-popup")).toBeInTheDocument();
+
+    const closeButton = screen.getByTestId("Info-tip-close-button");
+    await user.click(closeButton);
+
+    await waitFor(() => {
+      expect(screen.queryByTestId("Info-tip-popup")).not.toBeInTheDocument();
     });
   });
 
-  it("closes popover when close button is clicked", () => {
+  it("closes popover when clicking outside (onClose)", async () => {
     const user = userEvent.setup();
     render(<InfoTip infoContent={mockInfoContent} />);
 
-    // Open the popover
     const iconButton = screen.getByTestId("Info-tip-icon");
-    user.click(iconButton);
+    await user.click(iconButton);
+    expect(await screen.findByTestId("Info-tip-popup")).toBeInTheDocument();
 
-    return waitFor(() => {
-      expect(screen.getByTestId("Info-tip-popup")).toBeInTheDocument();
-    }).then(() => {
-      // Click the close button
-      const closeButton = screen.getByTestId("Info-tip-close-button");
-      user.click(closeButton);
+    await user.keyboard("{Escape}");
 
-      return waitFor(() => {
-        expect(screen.queryByTestId("Info-tip-popup")).not.toBeInTheDocument();
-      });
-    });
-  });
-
-  it("closes popover when clicking outside (onClose)", () => {
-    const user = userEvent.setup();
-    render(<InfoTip infoContent={mockInfoContent} />);
-
-    // Open the popover
-    const iconButton = screen.getByTestId("Info-tip-icon");
-    user.click(iconButton);
-
-    return waitFor(() => {
-      expect(screen.getByTestId("Info-tip-popup")).toBeInTheDocument();
-    }).then(() => {
-      // Click outside to close (simulate by pressing Escape)
-      user.keyboard("{Escape}");
-
-      return waitFor(() => {
-        expect(screen.queryByTestId("Info-tip-popup")).not.toBeInTheDocument();
-      });
+    await waitFor(() => {
+      expect(screen.queryByTestId("Info-tip-popup")).not.toBeInTheDocument();
     });
   });
 });

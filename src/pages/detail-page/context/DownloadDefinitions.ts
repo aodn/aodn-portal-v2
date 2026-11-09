@@ -203,6 +203,7 @@ export type DownloadCondition = {
 export enum DownloadServiceType {
   WFS = "WFS",
   CloudOptimised = "CloudOptimised",
+  OriginalNetcdfs = "OriginalNetcdfs",
   Unavailable = "Unavailable",
 }
 

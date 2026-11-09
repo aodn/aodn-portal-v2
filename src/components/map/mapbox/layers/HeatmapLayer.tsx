@@ -358,6 +358,7 @@ const HeatmapLayer: FC<HeatmapLayerProps> = ({
         unclusterPointLayer={unClusterPointLayer}
         onClickMapPoint={onDatasetSelected}
         tabNavigation={tabNavigation}
+        featureCollection={featureCollection}
       />
       <TestHelper
         id={map?.getContainer().id || ""}

@@ -275,7 +275,7 @@ const SearchPage = () => {
       const listSearch = fetchRecord(true);
       listSearchAbortRef.current = listSearch;
       if (showMapRef.current) {
-        doMapSearch(needNavigate).finally(() => {});
+        return doMapSearch(needNavigate);
       } else if (needNavigate) {
         listSearch.then(() => {
           if (listSearchAbortRef.current === listSearch) {
@@ -294,8 +294,9 @@ const SearchPage = () => {
   // The result will be changed based on the zoomed area, that is only
   // dataset where spatial extends fall into the zoomed area will be selected.
   const onMapZoomOrMove = useCallback(
-    (event: MapEvent | undefined) => {
+    (event: MapEvent | undefined, force = false) => {
       if (
+        force ||
         (event as any)?.originalEvent ||
         import.meta.env.MODE === "playwright-local"
       ) {
@@ -330,13 +331,17 @@ const SearchPage = () => {
           // Sometimes the map fire zoomend even nothing happens, this may
           // due to some redraw, so in here we check if the polygon really
           // changed, if not then there is no need to do anything
-          if (componentParam.bbox && !booleanEqual(componentParam.bbox, bbox)) {
+          // Zoom reset asks for a reload even when the extent is unchanged.
+          if (
+            force ||
+            (componentParam.bbox && !booleanEqual(componentParam.bbox, bbox))
+          ) {
             // These two lines cause flick on map move, why we need that two line?
             //setBbox(bounds);
             //setZoom(event.target.getZoom());
             dispatch(updateFilterBBox(bbox));
             dispatch(updateZoom(event.target.getZoom()));
-            doListSearch(true);
+            return doListSearch(true);
           }
         }
       }

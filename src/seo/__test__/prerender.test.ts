@@ -70,7 +70,9 @@ describe("renderCrawlerPage", () => {
   test("injects the record's title and abstract into the body", () => {
     const html = renderCrawlerPage(TEMPLATE, collection);
 
-    expect(html).toContain('<div id="root"><main>');
+    expect(html).toContain(
+      '<div id="root"><nav aria-label="Breadcrumb"><a href="/">AODN Portal</a></nav>'
+    );
     expect(html).toContain("<h1>Sea Surface Temperature</h1>");
     expect(html).toContain("<p>Daily SST observations around Australia.</p>");
     // No related records given — no nav
@@ -136,7 +138,9 @@ describe("renderCrawlerPage", () => {
     // Body: visible content plus the internal links crawlers follow,
     // exactly as a non-JS crawler receives it
     const body = html.match(/<div id="root">(.*?)<\/div><\/body>/s)?.[1];
-    expect(body).toBe(`<main>
+    expect(body)
+      .toBe(`<nav aria-label="Breadcrumb"><a href="/">AODN Portal</a></nav>
+  <main>
     <h1>Sea Surface Temperature</h1>
     <p>Updated: 2026-08-12</p>
     <p>Daily SST observations around Australia.</p>
@@ -175,6 +179,72 @@ describe("renderCrawlerPage", () => {
     expect(html).toContain("<p>Published: 2017-04-27</p>");
   });
 
+  test("lists every catalogue link in a Data section before related records", () => {
+    const html = renderCrawlerPage(
+      TEMPLATE,
+      toCollection({
+        id: "abc-123",
+        title: "Sea Surface Temperature",
+        description: "Daily SST observations around Australia.",
+        links: [
+          {
+            rel: "data",
+            href: "https://data.aodn.org.au/sst.nc",
+            type: "application/netcdf",
+            title: "SST <file>",
+          },
+          {
+            rel: "license",
+            href: "https://creativecommons.org/licenses/by/4.0/",
+            type: "text/html",
+            title: "",
+          },
+          {
+            rel: "item",
+            href: "",
+            type: "text/html",
+            title: "Missing href",
+          },
+          {
+            rel: "self",
+            href: "https://portal.aodn.org.au/api/self",
+            type: "application/json",
+            title: "Self",
+          },
+          {
+            rel: "icon",
+            href: "https://portal.aodn.org.au/icon.png",
+            type: "image/png",
+            title: "Icon",
+          },
+          {
+            rel: "preview",
+            href: "https://portal.aodn.org.au/preview.png",
+            type: "image/png",
+            title: "Preview",
+          },
+        ],
+      }),
+      [{ id: "def-456", title: "Ocean Currents" }]
+    );
+
+    const dataAt = html.indexOf('<section aria-label="Data">');
+    const relatedAt = html.indexOf('<nav aria-label="Related records">');
+    expect(dataAt).toBeGreaterThan(-1);
+    expect(relatedAt).toBeGreaterThan(dataAt);
+    expect(html).toContain(
+      '<a href="https://data.aodn.org.au/sst.nc">SST &#60;file&#62;</a>'
+    );
+    expect(html).toContain(
+      '<a href="https://creativecommons.org/licenses/by/4.0/">https://creativecommons.org/licenses/by/4.0/</a>'
+    );
+    expect(html).not.toContain(">license</a>");
+    expect(html).not.toContain("Missing href");
+    expect(html).not.toContain("/api/self");
+    expect(html).not.toContain("/icon.png");
+    expect(html).not.toContain("/preview.png");
+  });
+
   test("links related records in the body with real, escaped hrefs", () => {
     const html = renderCrawlerPage(TEMPLATE, collection, [
       { id: "def-456", title: "Chlorophyll <a> estimates" },
@@ -186,6 +256,80 @@ describe("renderCrawlerPage", () => {
     );
     expect(html).toContain('<a href="/details/ghi-789">Ocean Currents</a>');
     expect(html).toContain('<nav aria-label="Related records">');
+  });
+
+  test("removes the app bundle so rendering cannot erase the body", () => {
+    // Shaped like the built shell: Vite's hashed entry plus legacy_portal.js
+    const builtShell =
+      '<!doctype html><html lang="en"><head><title>AODN Portal</title>' +
+      '<link rel="modulepreload" crossorigin href="/assets/vendor-xyz.js" />' +
+      '<link rel="stylesheet" crossorigin href="/assets/index-abc.css" />' +
+      '<script type="module" src="/legacy_portal.js"></script>' +
+      '</head><body><div id="root"></div>' +
+      '<script type="module" crossorigin src="/assets/index-abc.js"></script>' +
+      "</body></html>";
+
+    const html = renderCrawlerPage(builtShell, collection);
+
+    expect(html).not.toContain('type="module"');
+    expect(html).not.toContain("/assets/index-abc.js");
+    expect(html).not.toContain("legacy_portal.js");
+    expect(html).not.toContain("modulepreload");
+    // The record content and its structured data survive
+    expect(html).toContain("<h1>Sea Surface Temperature</h1>");
+    expect(extractJsonLd(html).name).toBe("Sea Surface Temperature");
+    // Stylesheets are left alone — only executable code erases the body
+    expect(html).toContain('<link rel="stylesheet"');
+  });
+
+  test("strips interleaved module scripts a single pass would rejoin", () => {
+    // Removing the inner match once would splice "<scr" onto "ipt ..." and
+    // leave a working module script behind
+    const interleaved =
+      '<!doctype html><html lang="en"><head><title>AODN Portal</title></head>' +
+      '<body><div id="root"></div>' +
+      '<scr<script type="module" src="/a.js"></script>' +
+      'ipt type="module" src="/b.js"></script>' +
+      "</body></html>";
+
+    const html = renderCrawlerPage(interleaved, collection);
+
+    expect(html).not.toContain('type="module"');
+    expect(html).not.toContain("/b.js");
+  });
+
+  test("links back to the home page so the pages are not an island", () => {
+    const html = renderCrawlerPage(TEMPLATE, collection);
+
+    expect(html).toContain('<a href="/">AODN Portal</a>');
+  });
+
+  test("carries BreadcrumbList JSON-LD alongside the Dataset", () => {
+    const html = renderCrawlerPage(TEMPLATE, collection);
+    const blocks = [
+      ...html.matchAll(
+        /<script type="application\/ld\+json">(.*?)<\/script>/gs
+      ),
+    ].map((match) => JSON.parse(match[1]));
+
+    expect(blocks.map((block) => block["@type"])).toEqual([
+      "Dataset",
+      "BreadcrumbList",
+    ]);
+    expect(blocks[1].itemListElement).toEqual([
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "AODN Portal",
+        item: `${BASE_URL}/`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Sea Surface Temperature",
+        item: `${BASE_URL}/details/abc-123`,
+      },
+    ]);
   });
 
   test("removes the New Relic tracking script", () => {
@@ -246,8 +390,9 @@ describe("renderCrawlerPage", () => {
       })
     );
 
-    // Still exactly one script open/close pair, and the payload parses back intact
-    expect(html.match(/<\/script>/g)).toHaveLength(1);
+    // Still one open/close pair per JSON-LD block (Dataset + BreadcrumbList),
+    // and the payload parses back intact
+    expect(html.match(/<\/script>/g)).toHaveLength(2);
     expect(extractJsonLd(html).description).toBe(
       'Contains </script><script>alert("x")</script> inline.'
     );

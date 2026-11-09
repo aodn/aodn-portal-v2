@@ -34,7 +34,7 @@ import {
   switcherMenuContentLabelTypographySx,
 } from "./MenuControl";
 import { DataTestId, MapDefaultConfig } from "../../constants";
-import { BaseLayerIcon } from "../../../../../assets/icons/map/base_layer";
+import { BaseLayerIcon } from "@/assets/icons/map/base_layer";
 import MenuTitle from "./MenuTitle";
 import { AttributionControl } from "mapbox-gl";
 

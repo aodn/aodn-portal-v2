@@ -118,3 +118,125 @@ describe("clearDownloadConditions", () => {
     });
   });
 });
+
+const SelectionConsumer: FC = () => {
+  const {
+    selectedCoKey,
+    setSelectedCoKey,
+    selectionGeneration,
+    isCurrentSelectionGeneration,
+  } = useDetailPageContext();
+
+  return (
+    <div>
+      <TestConsumer />
+      {["A", "B", "C"].map((key) => (
+        <button key={key} onClick={() => setSelectedCoKey(key)}>
+          {`select-${key}`}
+        </button>
+      ))}
+      <button
+        onClick={() => {
+          setSelectedCoKey("B");
+          setSelectedCoKey("C");
+        }}
+      >
+        rapid-B-C
+      </button>
+      <div data-testid="selected-key">{selectedCoKey}</div>
+      <div data-testid="generation">{selectionGeneration}</div>
+      <div data-testid="generation-0-current">
+        {String(isCurrentSelectionGeneration(0))}
+      </div>
+    </div>
+  );
+};
+
+const conditionTypes = () =>
+  (screen.getByTestId("condition-types").textContent ?? "")
+    .split(",")
+    .filter(Boolean)
+    .sort();
+
+describe("setSelectedCoKey", () => {
+  beforeEach(() => {
+    vi.mocked(useParams).mockReturnValue({});
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
+
+  const renderSelection = () =>
+    render(
+      <Provider store={store}>
+        <DetailPageProvider>
+          <SelectionConsumer />
+        </DetailPageProvider>
+      </Provider>
+    );
+
+  const ALL_TYPES = [
+    DownloadConditionType.BBOX,
+    DownloadConditionType.POLYGON,
+    DownloadConditionType.DATE_RANGE,
+    DownloadConditionType.FORMAT,
+    DownloadConditionType.KEY,
+  ].sort();
+
+  it("keeps DATE_RANGE on the initial default selection", async () => {
+    const user = userEvent.setup();
+    renderSelection();
+
+    await user.click(screen.getByRole("button", { name: "seed" }));
+    await user.click(screen.getByRole("button", { name: "select-A" }));
+
+    expect(screen.getByTestId("selected-key").textContent).toBe("A");
+    expect(screen.getByTestId("generation").textContent).toBe("0");
+    expect(conditionTypes()).toEqual(ALL_TYPES);
+  });
+
+  it("clears only DATE_RANGE when the dataset actually changes", async () => {
+    const user = userEvent.setup();
+    renderSelection();
+
+    await user.click(screen.getByRole("button", { name: "select-A" }));
+    await user.click(screen.getByRole("button", { name: "seed" }));
+    await user.click(screen.getByRole("button", { name: "select-B" }));
+
+    expect(screen.getByTestId("selected-key").textContent).toBe("B");
+    expect(screen.getByTestId("generation").textContent).toBe("1");
+    expect(screen.getByTestId("generation-0-current").textContent).toBe(
+      "false"
+    );
+    expect(conditionTypes()).toEqual(
+      ALL_TYPES.filter((t) => t !== DownloadConditionType.DATE_RANGE)
+    );
+  });
+
+  it("keeps DATE_RANGE when the same dataset is selected again", async () => {
+    const user = userEvent.setup();
+    renderSelection();
+
+    await user.click(screen.getByRole("button", { name: "select-A" }));
+    await user.click(screen.getByRole("button", { name: "seed" }));
+    await user.click(screen.getByRole("button", { name: "select-A" }));
+
+    expect(screen.getByTestId("generation").textContent).toBe("0");
+    expect(screen.getByTestId("generation-0-current").textContent).toBe("true");
+    expect(conditionTypes()).toEqual(ALL_TYPES);
+  });
+
+  it("handles rapid switches within one event", async () => {
+    const user = userEvent.setup();
+    renderSelection();
+
+    await user.click(screen.getByRole("button", { name: "select-A" }));
+    await user.click(screen.getByRole("button", { name: "seed" }));
+    await user.click(screen.getByRole("button", { name: "rapid-B-C" }));
+
+    expect(screen.getByTestId("selected-key").textContent).toBe("C");
+    expect(screen.getByTestId("generation").textContent).toBe("2");
+    expect(conditionTypes()).not.toContain(DownloadConditionType.DATE_RANGE);
+  });
+});

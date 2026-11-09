@@ -3,6 +3,7 @@ import default_thumbnail from "@/assets/images/default-thumbnail.webp";
 import { OGCCollection } from "../OGCCollectionDefinitions";
 import { DateTimeFilterRange, ParameterState } from "../componentParamReducer";
 import { createSearchParamFrom, SearchParameters } from "../searchReducer";
+import { SearchControl } from "../searchTypes";
 import dayjs from "@/utils/DayjsUtils";
 
 describe("Search Reducer Function Test", () => {
@@ -157,6 +158,19 @@ describe("Search Reducer Function Test", () => {
     );
   });
 
+  it("includes a start timestamp of zero in the temporal range", () => {
+    const result = createSearchParamFrom({
+      dateTimeFilterRange: {
+        start: 0,
+        end: dayjs.utc("2020-01-01").valueOf(),
+      },
+    });
+
+    expect(result.filter).toContain(
+      "temporal DURING 1970-01-01T00:00:00Z/2020-01-01T23:59:59Z"
+    );
+  });
+
   it("uses BEFORE the end date when only end is set", () => {
     const param: ParameterState = {
       dateTimeFilterRange: {
@@ -183,6 +197,17 @@ describe("Search Reducer Function Test", () => {
     expect(result.filter).toContain("temporal AFTER 1992-01-17T00:00:00Z");
     expect(result.filter).not.toContain("temporal BEFORE");
     expect(result.filter).not.toContain("temporal DURING");
+  });
+
+  it("escapes apostrophes in search_after as doubled quotes", () => {
+    const result = createSearchParamFrom(
+      {} as ParameterState,
+      {
+        searchafter: ["O'Brien", "it's"],
+      } as SearchControl
+    );
+
+    expect(result.filter).toEqual("search_after='O''Brien||it''s'");
   });
 
   it("expands an end epoch at UTC midnight to end of that calendar day", () => {

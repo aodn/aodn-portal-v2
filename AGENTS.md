@@ -119,7 +119,9 @@ Page layout: `<Page>.tsx` composes; `layout/` = where things render;
   `aodn/common-workflow` workflow (scripts and tests live there); only
   `.github/ai-code-review/prompt.md` and `instructions.md` are local.
 - Unit tests: Vitest + jsdom + Testing Library, in a `__test__/` folder next to
-  the code.
+  the code. Keep hoisted mocks at module scope and await async assertions;
+  mock call history is cleared before each test by default.
+- Python files anywhere in the repo also need `(cd playwright && pre-commit run --all-files)` (Ruff + mypy); files outside `playwright/` do not inherit its `ruff.toml`.
 - Mock HTTP with MSW, not by mocking axios. Handlers are in
   `src/__mocks__/handlers.ts`, fixtures in `src/__mocks__/data/`, and helpers in
   `src/__mocks__/utils/`. New API behaviour needs a handler there.
@@ -150,6 +152,8 @@ yarn verify   # lint (--max-warnings 0) → typecheck → unit tests; stops at f
 
 ## Critical gotchas
 
+- **SEO deployment metadata:** application uploads must preserve the revision
+  contract on `index.html`; see [src/seo/README.md](src/seo/README.md).
 - **Dev API proxy is an allowlist.** `vite.config.ts` proxies a fixed list of
   `/api/v1/ogc/*` paths. A new backend endpoint needs an entry there or it 404s
   locally while working in production.
@@ -163,8 +167,10 @@ yarn verify   # lint (--max-warnings 0) → typecheck → unit tests; stops at f
   `console.warn`/`console.error` are allowed.
 - **Yarn 4 only.** Use `corepack yarn install`. System yarn 1 rewrites the
   whole `yarn.lock`.
-- **Node 20** (`.nvmrc`; run `nvm use` first). Other versions can fail tests
-  unrelated to your change. README's Node 18 reference is outdated.
+- **Node 22 (>=22.12.0 for Vitest)** (`.nvmrc` is the single source of truth
+  for local and CI; run `nvm use` first). Other versions can fail tests
+  unrelated to your change.
+  `playwright/Dockerfile.web` pins `node:22` by hand: keep it on the same major.
 - Pages are wrapped in `HealthChecker` except when
   `import.meta.env.MODE === "playwright-local"`.
 - E2E page objects select by `data-testid`. Renaming or removing one in `src/`

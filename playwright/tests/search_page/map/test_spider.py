@@ -76,7 +76,62 @@ def test_map_spider_disappears_on_zoom_out(
         ),
     ],
 )
-@pytest.mark.skip(reason='Feature contains a bug and is being investigated.')
+def test_map_spider_disappears_on_layer_style_change(
+    desktop_page: Page,
+    spider_lng: str,
+    spider_lat: str,
+) -> None:
+    """
+    Test that the spider closes when the layer style changes to unclustered.
+
+    Steps:
+    - Go to search results
+    - Move to known cluster location + zoom level 12
+    - Click cluster → expect spider layer
+    - Change layer style to unclustered → expect spider layer gone
+
+    Parametrized coordinates are chosen because they produce a cluster at
+    the tested zoom level in the current default mock dataset.
+    """
+    landing_page = LandingPage(desktop_page)
+    search_page = SearchPage(desktop_page)
+
+    landing_page.load()
+    landing_page.search.click_search_button()
+    search_page.wait_for_search_to_complete()
+
+    search_page.map.zoom_to_level(12)
+    search_page.map.center_map(spider_lng, spider_lat)
+    search_page.wait_for_timeout(5000)
+
+    # Try to find and click a cluster
+    cluster_found = search_page.map.find_and_click_cluster()
+    search_page.wait_for_timeout(1000)
+    assert cluster_found is True
+
+    # Verify spider is visible
+    layer_factory = LayerFactory(search_page.map)
+    layer_id = layer_factory.get_layer_id(LayerStyle.SPIDER)
+    assert search_page.map.is_map_layer_visible(layer_id) is True
+
+    # Verify spider disappears after the layer style changes
+    search_page.map.open_layers_menu_until_visible(
+        search_page.map.uncluster_layer
+    )
+    search_page.map.uncluster_layer.click()
+    search_page.wait_for_timeout(1000)
+    assert search_page.map.is_map_layer_visible(layer_id) is False
+
+
+@pytest.mark.parametrize(
+    'spider_lng, spider_lat',
+    [
+        (
+            '137.70',
+            '-33.174',
+        ),
+    ],
+)
 def test_map_spider_disappears_after_search_update(
     desktop_page: Page,
     spider_lng: str,

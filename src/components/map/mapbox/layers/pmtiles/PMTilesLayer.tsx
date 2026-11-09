@@ -45,8 +45,8 @@ import {
   LayerBasicType,
   LayerSelectable,
 } from "@/components/map/mapbox/layers/Layers";
+import { getCODatasetOptions } from "@/utils/DatasetOptionUtils";
 import { InnerHtmlBuilder } from "@/utils/HtmlUtils";
-import { SelectItem } from "@/components/common/dropdown/CommonSelect";
 import { MapDefaultConfig } from "@/components/map/mapbox/constants";
 import MapLayerSelect from "@/components/map/mapbox/component/MapLayerSelect";
 import { TestHelper } from "@/components/common/test/helper";
@@ -748,16 +748,19 @@ type HexMapFeature = NonNullable<MapMouseEvent["features"]>[number];
  * - picks the H3 cell for the tap (`latLngToCell`) among query results, not a
  *   vertex-average centroid (clipped tiles make that centroid lie in a neighbour)
  * - only clears the popup when the hex zoom band actually changes
+ * - rewrites an open popup when the caller runs `refreshPopupRef` (time filter)
  */
 const attachPmtilesHexInteraction = (
   map: Map,
   hoverCtxRef: { current: PmtilesHexHoverCtx },
   popupRef: { current: Popup | null },
-  removePopup: () => void
+  removePopup: () => void,
+  refreshPopupRef?: { current: (() => void) | null }
 ): (() => void) => {
   let hoveredId: string | number | undefined;
   let selectedId: string | number | undefined;
   let selectedGeometry: Geometry | undefined;
+  let selectedProperties: Record<string, unknown> | undefined;
   let lastZoomBandId = getActivePmtilesLayers(map.getZoom())[0]?.id;
   let lastPointerAt = 0;
 
@@ -782,6 +785,7 @@ const attachPmtilesHexInteraction = (
     hoveredId = undefined;
     selectedId = undefined;
     selectedGeometry = undefined;
+    selectedProperties = undefined;
     setHoverOutline(undefined);
     removePopup();
   };
@@ -798,6 +802,34 @@ const attachPmtilesHexInteraction = (
       }
     );
     return total;
+  };
+
+  // Popup HTML is fixed at click time. Rewrite the open popup from the same
+  // cell after the time window changes, and close it when the total hits 0.
+  const refreshOpenPopup = () => {
+    const popup = popupRef.current;
+    const properties = selectedProperties;
+    if (!popup || !properties || !popup.isOpen()) return;
+
+    const ctx = hoverCtxRef.current;
+    if (
+      !ctx.visible ||
+      !ctx.densityReady ||
+      featureTotal({ properties } as HexMapFeature) <= 0
+    ) {
+      clearInteraction();
+      return;
+    }
+
+    popup.setHTML(
+      buildPopupHtml(
+        properties,
+        ctx.filterStartDate,
+        ctx.filterEndDate,
+        ctx.countFilterRange,
+        ctx.hasTime
+      )
+    );
   };
 
   const pickHex = (
@@ -916,19 +948,20 @@ const attachPmtilesHexInteraction = (
       return;
     }
 
-    const ctx = hoverCtxRef.current;
     const cellId = featureH3CellId(feature);
     const cellGeometry = h3CellPolygon(cellId) ?? feature.geometry;
     selectedId = feature.id;
     selectedGeometry = cellGeometry;
+    selectedProperties = (feature.properties ?? {}) as Record<string, unknown>;
     setHoverOutline(cellGeometry);
 
+    const ctx = hoverCtxRef.current;
     if (!popupRef.current) {
       popupRef.current = new Popup(MapDefaultConfig.DEFAULT_POPUP);
     }
     popupRef.current.setHTML(
       buildPopupHtml(
-        feature.properties ?? {},
+        selectedProperties,
         ctx.filterStartDate,
         ctx.filterEndDate,
         ctx.countFilterRange,
@@ -984,8 +1017,14 @@ const attachPmtilesHexInteraction = (
   map.on("zoomend", onZoomEnd);
   map.on("draw.modechange", onDrawInteractionChange);
   map.on("draw.selectionchange", onDrawInteractionChange);
+  if (refreshPopupRef) {
+    refreshPopupRef.current = refreshOpenPopup;
+  }
 
   return () => {
+    if (refreshPopupRef) {
+      refreshPopupRef.current = null;
+    }
     layerHandlers.forEach(({ layerId, onMouseMove }) => {
       map.off("mousemove", layerId, onMouseMove);
       map.off("mouseleave", layerId, onHexLeave);
@@ -1015,6 +1054,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
 }) => {
   const { map } = useContext(MapContext);
   const popupRef = useRef<Popup | null>(null);
+  const refreshPopupRef = useRef<(() => void) | null>(null);
 
   /** True after at least one density write against loaded tiles. */
   const [densityReady, setDensityReady] = useState(false);
@@ -1084,6 +1124,8 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       densityReady,
       visible,
     };
+    // Same deps as the context above: rewrite an open popup for the new window.
+    refreshPopupRef.current?.();
   }, [
     filterStartDate,
     filterEndDate,
@@ -1105,13 +1147,10 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
     [onLayerChange]
   );
 
-  const datasetOptions = useMemo<SelectItem<string>[]>(() => {
-    const coKeys = collection?.getAllCOKeys() ?? [];
-    return coKeys.map((key) => ({
-      value: key,
-      label: key.replace(/\.(zarr|parquet)$/i, ""),
-    }));
-  }, [collection]);
+  const datasetOptions = useMemo(
+    () => getCODatasetOptions(collection),
+    [collection]
+  );
 
   // Probe `{key}.metadata` on S3. Support and slider bounds are reported from
   // fetch callbacks only (no synchronous parent setState at effect start).
@@ -1196,20 +1235,24 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
       }
     };
 
+    // `once("idle")` never runs if the map has already idled (style often
+    // finishes that way after BaseMapSwitcher setStyle). style.load and
+    // styledata cover that; idle is only for a map that is still working.
     if (map.isStyleLoaded()) {
       addSourceAndLayers();
     } else {
-      map.once("load", addSourceAndLayers);
+      map.once("style.load", addSourceAndLayers);
+      if (!map.idle()) {
+        map.once("idle", addSourceAndLayers);
+      }
     }
 
-    const onStyleData = () => {
-      addSourceAndLayers();
-    };
-    map.on("styledata", onStyleData);
+    map.on("styledata", addSourceAndLayers);
 
     return () => {
-      map.off("styledata", onStyleData);
-      map.off("load", addSourceAndLayers);
+      map.off("styledata", addSourceAndLayers);
+      map.off("style.load", addSourceAndLayers);
+      map.off("idle", addSourceAndLayers);
       try {
         map.getCanvas().classList.remove(CURSOR_POINTER_CLASS);
         clearPmtilesFeatureState(map);
@@ -1245,8 +1288,8 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
    *
    * No session / generation / dirty-ref machine. Effect-local flags only:
    * - `needsRefresh` is set by tile/viewport/filter events
-   * - cleared when a pass runs against a fully loaded source (all queryable
-   *   hexes were just written), so setFeatureState → idle does not loop
+   * - cleared at the start of a pass, so setFeatureState → idle does not loop
+   *   unless a sourcedata/moveend event re-arms it during the write
    */
   useEffect(() => {
     if (!map) return;
@@ -1287,19 +1330,10 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
         if (seen > 0) {
           setDensityReady(true);
         }
-
-        let sourceLoaded;
-        try {
-          sourceLoaded = map.isSourceLoaded(SOURCE_ID);
-        } catch {
-          sourceLoaded = false;
-        }
-        // More tiles may still arrive — keep refreshing on the next idle.
-        // Do not force needsRefresh=false here: a concurrent sourcedata may have
-        // already set it true for tiles that arrived mid-pass.
-        if (!sourceLoaded) {
-          needsRefresh = true;
-        }
+        // Leave needsRefresh as sourcedata/moveend set it during this pass.
+        // Forcing it true while the source is still loading retriggers
+        // setFeatureState on every idle, so the map never stays idle and
+        // clicks (detail-page return) race a permanent style update.
       } catch {
         // Source/layers may not exist yet — try again on idle/sourcedata
         needsRefresh = true;
@@ -1349,7 +1383,13 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   // Click popup + hover outline
   useEffect(() => {
     if (!map) return;
-    return attachPmtilesHexInteraction(map, hoverCtxRef, popupRef, removePopup);
+    return attachPmtilesHexInteraction(
+      map,
+      hoverCtxRef,
+      popupRef,
+      removePopup,
+      refreshPopupRef
+    );
   }, [map, removePopup]);
 
   // Visibility

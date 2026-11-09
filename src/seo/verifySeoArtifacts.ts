@@ -4,7 +4,7 @@
  *   yarn seo:verify https://<site>         checks the deployed site
  */
 
-import { readdir, readFile } from "fs/promises";
+import { readdir, readFile, stat } from "fs/promises";
 import path from "path";
 import { isSeoCli, seoDistDir } from "./cli";
 import {
@@ -103,8 +103,18 @@ export const checkDetailPage = (html: string, uuid: string): string[] => {
   if (!/<h1>[^<]/.test(html)) {
     problems.push("body is missing the visible record content (h1)");
   }
+  // Without it the detail pages link only to each other, and Google sees 15k
+  // pages that nothing links to
+  if (!html.includes('<a href="/">')) {
+    problems.push("body does not link back to the home page");
+  }
   if (!html.includes('<div id="root"')) {
-    problems.push("page no longer boots the app shell");
+    problems.push("page is missing the content container");
+  }
+  // If the bundle is back, React empties #root on render and every record is
+  // indexed as the same empty shell — see stripAppBundle in prerender.ts.
+  if (/<script[^>]*type="module"/.test(html)) {
+    problems.push("ships the app bundle, which erases the body on render");
   }
   return problems;
 };
@@ -144,7 +154,7 @@ const report = (failures: string[], okSummary: string) => {
   console.log(`OK: ${okSummary}`);
 };
 
-const verifyDist = async (distDir: string) => {
+export const verifyDist = async (distDir: string, minPages = MIN_PAGES) => {
   const failures: string[] = [];
 
   const xml = await readFile(path.join(distDir, "sitemap.xml"), "utf8").catch(
@@ -154,17 +164,51 @@ const verifyDist = async (distDir: string) => {
   if (xml === null) {
     failures.push("sitemap.xml: missing — run yarn seo:artifacts first");
   } else {
-    const sitemap = checkSitemap(xml);
+    const sitemap = checkSitemap(xml, minPages);
     urls = sitemap.urls;
     failures.push(...sitemap.problems.map((p) => `sitemap.xml: ${p}`));
   }
 
   const detailsDir = path.join(distDir, PRERENDER_DETAILS_DIR);
-  const files = await readdir(detailsDir).catch(() => [] as string[]);
-  if (files.length < MIN_PAGES) {
-    failures.push(
-      `${PRERENDER_DETAILS_DIR}: ${files.length} pages, expected at least ${MIN_PAGES}`
+  const entries = await readdir(detailsDir, { withFileTypes: true }).catch(
+    () => []
+  );
+  const directories = entries.filter((entry) => entry.isDirectory());
+  const files: string[] = [];
+  // Check every index.html, with bounded filesystem concurrency. Directory
+  // counts alone hide missing pages; Set membership keeps comparison linear.
+  const CHECK_CONCURRENCY = 64;
+  for (let i = 0; i < directories.length; i += CHECK_CONCURRENCY) {
+    await Promise.all(
+      directories.slice(i, i + CHECK_CONCURRENCY).map(async ({ name }) => {
+        const indexPath = path.join(detailsDir, name, "index.html");
+        const index = await stat(indexPath).catch(() => null);
+        if (index?.isFile()) files.push(name);
+        else failures.push(`${indexPath}: missing index.html or not a file`);
+      })
     );
+  }
+  files.sort();
+  if (files.length < minPages) {
+    failures.push(
+      `${PRERENDER_DETAILS_DIR}: ${files.length} pages, expected at least ${minPages}`
+    );
+  }
+  const sitemapDetails = new Set(urls.filter((url) => url !== `${BASE_URL}/`));
+  const prerenderUrls = new Set(files.map(detailsUrl));
+  for (const url of sitemapDetails) {
+    if (!prerenderUrls.has(url)) {
+      failures.push(
+        `sitemap.xml: ${url} has no corresponding prerender index.html`
+      );
+    }
+  }
+  for (const url of prerenderUrls) {
+    if (!sitemapDetails.has(url)) {
+      failures.push(
+        `${url}: prerender index.html is not listed in sitemap.xml`
+      );
+    }
   }
 
   const sampled = sampleEvenly(files, DIST_SAMPLE_SIZE);
@@ -178,11 +222,6 @@ const verifyDist = async (distDir: string) => {
         (p) => `${PRERENDER_DETAILS_DIR}/${uuid}: ${p}`
       )
     );
-    if (urls.length > 0 && !urls.includes(detailsUrl(uuid))) {
-      failures.push(
-        `${PRERENDER_DETAILS_DIR}/${uuid}: not listed in sitemap.xml`
-      );
-    }
   }
 
   report(

@@ -9,6 +9,8 @@ import { mkdtemp, readFile, readdir, writeFile } from "fs/promises";
 import { tmpdir } from "os";
 import path from "path";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { http, HttpResponse } from "msw";
+import { setupServer } from "msw/node";
 import { ogcAxiosWithRetry } from "@/app/store/searchReducer";
 import { fetchCollections } from "../fetchCollections";
 import { generateSitemap } from "../sitemap";
@@ -20,7 +22,7 @@ const TEMPLATE =
   '<!doctype html><html lang="en"><head><title>AODN Portal</title></head><body><div id="root"></div></body></html>';
 
 const page = {
-  total: 2,
+  total: 6,
   collections: [
     {
       id: "rec-1",
@@ -28,8 +30,12 @@ const page = {
       description: "Daily SST observations around Australia.",
       properties: { revision: "2026-08-12T15:24:43" },
     },
-    // no description: sitemap lists it, prerender skips it
+    // no description: both generators skip it
     { id: "rec-2", title: "Half-filled record" },
+    { id: "rec-3", description: "Missing title" },
+    { id: "../invalid", title: "Invalid", description: "Invalid ID" },
+    { id: "undefined", title: "Invalid", description: "Default ID" },
+    { id: "blank", title: " ", description: "Whitespace title" },
   ],
   search_after: [],
 };
@@ -59,8 +65,8 @@ describe("the artifacts pipeline on controlled data", () => {
     expect(sitemap).toContain(
       `<loc>${BASE_URL}/details/rec-1</loc><lastmod>2026-08-12</lastmod>`
     );
-    expect(sitemap).toContain(`<loc>${BASE_URL}/details/rec-2</loc></url>`);
-    expect(sitemap.match(/<loc>/g)).toHaveLength(3);
+    expect(sitemap).not.toContain(`${BASE_URL}/details/rec-2`);
+    expect(sitemap.match(/<loc>/g)).toHaveLength(2);
 
     // only the record with id, title and description becomes a page
     const detailsDir = path.join(outDir, "prerender", "details");
@@ -79,5 +85,37 @@ describe("the artifacts pipeline on controlled data", () => {
     // the same checks the publish gate runs, against this controlled output
     expect(checkSitemap(sitemap, 2).problems).toEqual([]);
     expect(checkDetailPage(detailPage, "rec-1")).toEqual([]);
+  });
+
+  test("the build entry point writes no artifacts when fetching is incomplete", async () => {
+    vi.restoreAllMocks();
+    const server = setupServer(
+      http.get("*/api/v1/ogc/collections", () =>
+        HttpResponse.json({
+          total: 3,
+          collections: page.collections.slice(0, 2),
+        })
+      )
+    );
+    server.listen({ onUnhandledRequest: "error" });
+    vi.doMock("@/seo/cli", () => ({ seoDistDir: () => outDir }));
+    vi.doMock("@/seo/constants", async () => ({
+      ...(await vi.importActual("@/seo/constants")),
+      OGC_API_BASE: "http://localhost",
+    }));
+
+    try {
+      await expect(import("@/seo/buildSeoArtifacts")).rejects.toThrow(
+        /missing required search_after cursor; fetched 2\/3/
+      );
+      expect(await readdir(outDir)).toEqual(["index.html"]);
+      expect(await readFile(path.join(outDir, "index.html"), "utf8")).toBe(
+        TEMPLATE
+      );
+    } finally {
+      server.close();
+      vi.doUnmock("@/seo/cli");
+      vi.doUnmock("@/seo/constants");
+    }
   });
 });

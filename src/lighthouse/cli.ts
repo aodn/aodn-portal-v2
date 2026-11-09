@@ -58,8 +58,7 @@ export const isLighthouseCli = (scriptFile: string) =>
   );
 
 /**
- * Surfaces the reason and exits non-zero. Only real failures reach this — a
- * score regression is reported, never thrown.
+ * Surfaces the reason and exits non-zero for execution failures and score gates.
  */
 export const runCli = (work: Promise<unknown>) => {
   work.catch((error) => {

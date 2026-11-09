@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from "react";
 import { Box, IconButton, Popper } from "@mui/material";
 import { ControlProps, EVENT_MENU, MenuClickedEvent } from "./Definition";
-import { borderRadius, zIndex } from "../../../../../styles/constants";
+import { borderRadius, zIndex } from "@/styles/constants";
 import { eventEmitter, switcherIconButtonSx } from "./MenuControl";
 import MenuHintTooltip from "./MenuHintTooltip";
 import BookmarkListAccordionGroup, {
@@ -11,7 +11,7 @@ import {
   BOOKMARK_LIST_MAP_HEIGHT_RATIO,
   BOOKMARK_LIST_WIDTH_MAP,
 } from "../../../../result/constants";
-import { BookmarkIcon } from "../../../../../assets/icons/map/bookmark";
+import { BookmarkIcon } from "@/assets/icons/map/bookmark";
 import useBreakpoint from "../../../../../hooks/useBreakpoint";
 import useElementSize from "../../../../../hooks/useElementSize";
 
@@ -87,6 +87,10 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
             overflow: "hidden",
             borderRadius: borderRadius.menu,
             backgroundColor: "#fff",
+            // Safari paints a transformed popper that is clipped with
+            // overflow + border-radius as a black layer when it overlaps
+            // the Mapbox WebGL canvas. A local 3d layer keeps the background.
+            transform: "translateZ(0)",
             zIndex: 1,
           }}
         >

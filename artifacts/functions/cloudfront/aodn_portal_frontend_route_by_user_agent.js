@@ -2,6 +2,7 @@
 // real users get the app shell. This is the only copy of the crawler list.
 const CRAWLER_TOKENS = [
   "bot", // Googlebot, Bingbot, GPTBot, ClaudeBot, DuckDuckBot, Applebot...
+  "google-inspectiontool",
   "crawler",
   "spider", // Baiduspider...
   "slurp", // Yahoo
