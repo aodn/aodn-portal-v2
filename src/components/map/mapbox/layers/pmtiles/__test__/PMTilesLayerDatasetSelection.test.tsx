@@ -33,9 +33,16 @@ const DIVE = "animal_dive_satellite_relay_tagging_location_qc_realtime_qc";
 const METADATA =
   "animal_metadata_satellite_relay_tagging_location_qc_realtime_qc";
 
+// The dropdown shows these names, but selects by the CO key
+const READABLE_NAMES: Record<string, string> = {
+  [`${DIVE}.parquet`]: "Real time - Dive profile",
+  [`${METADATA}.parquet`]: "Real time - Metadata",
+};
+
 const collection = {
   id: "b2548767-514f-4a31-b65e-36bb894382d5",
   getAllCOKeys: () => [`${DIVE}.parquet`, `${METADATA}.parquet`],
+  getCODatasetLabel: (key: string) => READABLE_NAMES[key],
   getAllParquetKeys: () => [`${DIVE}.parquet`, `${METADATA}.parquet`],
 } as unknown as OGCCollection;
 
@@ -117,7 +124,7 @@ describe("PMTilesHexLayer dataset selection", () => {
   it("clears DATE_RANGE and keeps BBOX when switching dataset on the map", async () => {
     const user = await setup();
 
-    await chooseDataset(user, METADATA);
+    await chooseDataset(user, READABLE_NAMES[`${METADATA}.parquet`]);
 
     await waitFor(() => {
       expect(screen.getByTestId("selected-key").textContent).toBe(
@@ -131,7 +138,7 @@ describe("PMTilesHexLayer dataset selection", () => {
   it("keeps DATE_RANGE when the already-selected dataset is chosen", async () => {
     const user = await setup();
 
-    await chooseDataset(user, DIVE);
+    await chooseDataset(user, READABLE_NAMES[`${DIVE}.parquet`]);
 
     expect(screen.getByTestId("selected-key").textContent).toBe(
       `${DIVE}.parquet`

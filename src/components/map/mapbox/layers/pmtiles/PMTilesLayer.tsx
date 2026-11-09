@@ -45,7 +45,7 @@ import {
   LayerBasicType,
   LayerSelectable,
 } from "@/components/map/mapbox/layers/Layers";
-import { sortDatasetOptions } from "@/utils/DatasetOptionUtils";
+import { getCODatasetOptions } from "@/utils/DatasetOptionUtils";
 import { InnerHtmlBuilder } from "@/utils/HtmlUtils";
 import { MapDefaultConfig } from "@/components/map/mapbox/constants";
 import MapLayerSelect from "@/components/map/mapbox/component/MapLayerSelect";
@@ -1148,7 +1148,7 @@ const PMTilesHexLayer: FC<PMTilesHexLayerProps> = ({
   );
 
   const datasetOptions = useMemo(
-    () => sortDatasetOptions(collection?.getAllCOKeys() ?? []),
+    () => getCODatasetOptions(collection),
     [collection]
   );
 
