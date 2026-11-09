@@ -15,7 +15,10 @@ export const OGC_API_BASE = (import.meta.env?.VITE_API_HOST ?? "").replace(
 // would be dropped by Facebook/LinkedIn.
 export const SHARE_IMAGE_URL = `${BASE_URL}/logo/og_image.png`;
 
-export const detailsUrl = (id: string) => `${BASE_URL}/details/${id}`;
+// Encoded because ids may hold characters a URL path cannot carry raw, e.g.
+// the braces in {0377A251-4E6C-48DF-95FC-720048F879B6}
+export const detailsUrl = (id: string) =>
+  `${BASE_URL}/details/${encodeURIComponent(id)}`;
 
 // Where the pre-rendered pages live: CloudFront routes crawlers here, real
 // users get the SPA shell. Keep in sync with seo.yml and the CloudFront function.
@@ -25,12 +28,18 @@ export const PRERENDER_DETAILS_DIR = "prerender/details";
 // function (artifacts/functions/cloudfront/) treat it as a crawler
 export const CRAWLER_UA = "aodn-seo-verify (compatible; Googlebot/2.1)";
 
-// Safe as an S3 object key / file name; skips the class default id "undefined"
+// The id is the folder name under PRERENDER_DETAILS_DIR, so a slash would
+// add a level and "%" would clash with the encoding detailsUrl adds
+const UNSAFE_IN_ID = /[/\\%]/;
+
+// Skips the class default id "undefined", and the two folders that escape
 export const isSafeCollectionId = (id: string | undefined): id is string =>
   Boolean(id) &&
   id !== undefined &&
   id !== "undefined" &&
-  /^[A-Za-z0-9._-]+$/.test(id);
+  id !== "." &&
+  id !== ".." &&
+  !UNSAFE_IN_ID.test(id);
 
 export const escapeEntities = (value: string) =>
   value.replace(/[<>&'"]/g, (c) => `&#${c.charCodeAt(0)};`);
