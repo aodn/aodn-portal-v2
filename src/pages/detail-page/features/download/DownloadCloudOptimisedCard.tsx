@@ -24,7 +24,7 @@ import DownloadSelect from "./DownloadSelect";
 import DownloadSizeWarning, { isDownloadBlocked } from "./DownloadSizeWarning";
 import useEstimateSize from "../../../../hooks/useEstimateSize";
 import { processCoEstimateSize } from "@/app/store/searchReducer";
-import { sortDatasetOptions } from "@/utils/DatasetOptionUtils";
+import { getCODatasetOptions } from "@/utils/DatasetOptionUtils";
 import DownloadSourceChip from "./DownloadSourceChip";
 
 const downloadFormats = [
@@ -83,15 +83,8 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
   const onDownload = useCallback(() => {
     setDownloadDialogOpen(true);
   }, []);
-  // The value is the CO key, which the download uses. The label is display only.
   const dataSelectOptions = useMemo(
-    () =>
-      sortDatasetOptions(
-        (collection?.getAllCOKeys() ?? []).map((key) => ({
-          value: key,
-          label: collection.getCODatasetLabel(key),
-        }))
-      ),
+    () => getCODatasetOptions(collection),
     [collection]
   );
 
