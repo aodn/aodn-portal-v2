@@ -24,6 +24,9 @@ import {
   SITE_NAME,
 } from "./constants";
 
+// How many skipped ids the log prints; a bad fetch can skip thousands
+const SKIPPED_IDS_SHOWN = 20;
+
 // A visible, labelled date matching the JSON-LD dates — Google's best practice
 // for controlling the date shown next to search results
 const renderDateLine = (collection: OGCCollection) => {
@@ -120,7 +123,11 @@ export const prerenderDetailPages = async (
   await mkdir(detailsDir, { recursive: true });
 
   const pages = collections.filter(hasSeoFields);
-  const skipped = collections.length - pages.length;
+  // Name the skipped records: a bare count hides a record that is invisible
+  // to crawlers, and nobody reads a number in the CI log
+  const skippedIds = collections
+    .filter((collection) => !hasSeoFields(collection))
+    .map((collection) => collection.id ?? "(no id)");
   // Built over pages only, so related links never point at a skipped record
   const related = buildRelatedLinks(pages);
   // Bound concurrency so ~15k writes do not hit EMFILE
@@ -145,8 +152,10 @@ export const prerenderDetailPages = async (
   }
   console.log(
     `Pre-rendered ${pages.length} detail pages to ${detailsDir}` +
-      (skipped
-        ? ` (skipped ${skipped} without valid id/title/description)`
+      (skippedIds.length
+        ? ` (skipped ${skippedIds.length} without valid id/title/description: ` +
+          `${skippedIds.slice(0, SKIPPED_IDS_SHOWN).join(", ")}` +
+          `${skippedIds.length > SKIPPED_IDS_SHOWN ? ", …" : ""})`
         : "")
   );
 };
