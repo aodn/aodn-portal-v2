@@ -169,7 +169,7 @@ jobs:
           retry-exempt-status-codes: 204
           script: |
             const environment = process.env.DEPLOY_ENVIRONMENT;
-            const waitForDeployment = ['staging', 'production'， 'dr-production'].includes(environment);
+            const waitForDeployment = ['staging', 'production', 'dr-production'].includes(environment);
             const { data } = await github.rest.actions.createWorkflowDispatch({
               owner: 'aodn',
               repo: 'appdeploy',
