@@ -83,8 +83,15 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
   const onDownload = useCallback(() => {
     setDownloadDialogOpen(true);
   }, []);
+  // The value is the CO key, which the download uses. The label is display only.
   const dataSelectOptions = useMemo(
-    () => sortDatasetOptions(collection?.getAllCOKeys() ?? []),
+    () =>
+      sortDatasetOptions(
+        (collection?.getAllCOKeys() ?? []).map((key) => ({
+          value: key,
+          label: collection.getCODatasetLabel(key),
+        }))
+      ),
     [collection]
   );
 

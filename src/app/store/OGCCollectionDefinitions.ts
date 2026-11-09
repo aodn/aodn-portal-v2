@@ -116,6 +116,12 @@ export enum RelationType {
 // Key (link title) of the original netcdf files list. One per collection.
 export const ORIGINAL_NETCDFS_KEY = "original_netcdfs";
 
+// Start of the title of a CO dataset's Jupyter notebook link. In a collection
+// with many CO datasets, the readable name comes after a "-", e.g.
+// "<this title> - Real time - CTD profile".
+export const OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE =
+  "Access to Jupyter notebook to query Cloud Optimised converted dataset";
+
 export enum MediaType {
   TEXT_HTML = "text/html",
   IMAGE_PNG = "image/png",
@@ -181,6 +187,9 @@ const getIcon = (link: ILink) => {
     return IconLink;
   }
 };
+
+// File extension of a CO key, e.g. "a.zarr" -> "a"
+const CO_KEY_EXTENSION = /\.(zarr|parquet)$/i;
 
 // Map a summary link to its DatasetType via media type, falling back to the
 // file extension in the link title when the media type is not recognised
@@ -554,6 +563,26 @@ export class OGCCollection {
       return undefined;
     }
     return toDatasetType(summaryLink);
+  };
+  // Get the display name of a CO key. Find the key's Jupyter notebook link (its
+  // file name is the key name) and use the text after the "-" in its title.
+  // Fall back to the key without its extension. Display only: download with
+  // the key.
+  getCODatasetLabel = (key: string): string => {
+    const keyName = key.replace(CO_KEY_EXTENSION, "");
+    const titleStart = OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE.toLowerCase();
+    const notebookTitle = this.links
+      ?.find(
+        (link) =>
+          link.title?.trim().toLowerCase().startsWith(titleStart) &&
+          link.href?.trim().endsWith(`/${keyName}.ipynb`)
+      )
+      ?.title.trim();
+    const afterTitleStart = notebookTitle?.slice(titleStart.length) ?? "";
+    const dashIndex = afterTitleStart.indexOf("-");
+    const name =
+      dashIndex >= 0 ? afterTitleStart.slice(dashIndex + 1).trim() : "";
+    return name || keyName;
   };
   // Get the original netcdfs link, a list of the source netcdf files
   getOriginalNetcdfsLink = (): ILink | undefined =>
