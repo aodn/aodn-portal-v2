@@ -28,7 +28,6 @@ import {
 import { disableScroll, enableScroll } from "@/utils/ScrollUtils";
 import { useDetailPageContext } from "../../../context/detail-page-context";
 import { pageDefault } from "@/components/common/constants";
-import { isDownloadStatusTrackingEnabled } from "@/utils/downloadFeatureFlags";
 
 interface DownloadDialogProps extends DownloadCondition {
   isOpen: boolean;
@@ -201,26 +200,28 @@ const DownloadDialog = ({
       onClose={handleIsClose}
       maxWidth={false}
       fullScreen={isUnderLaptop}
-      PaperProps={{
-        component: activeStep === 1 ? "form" : "div",
-        onSubmit: activeStep === 1 ? handleFormSubmit : undefined,
-        sx: {
-          borderRadius: 0.5,
-          position: isUnderLaptop ? "static" : "fixed",
-          transform: isUnderLaptop ? "none" : "translateY(0)",
-          width: isUnderLaptop ? "auto" : "1024px",
-          height: isUnderLaptop ? "auto" : "720px",
-          maxWidth: isUnderLaptop ? "calc(100vw - 16px)" : "1024px",
-          maxHeight: isUnderLaptop ? "85vh" : "720px",
-          minWidth: isUnderLaptop ? "auto" : "600px",
-          margin: isUnderLaptop ? "16px 8px" : "auto",
-          display: "flex",
-          flexDirection: "column",
-          [theme.breakpoints.between("md", "lg")]: {
-            width: "90vw",
-            maxWidth: "1024px",
-            height: "auto",
-            maxHeight: "80vh",
+      slotProps={{
+        paper: {
+          component: activeStep === 1 ? "form" : "div",
+          onSubmit: activeStep === 1 ? handleFormSubmit : undefined,
+          sx: {
+            borderRadius: 0.5,
+            position: isUnderLaptop ? "static" : "fixed",
+            transform: isUnderLaptop ? "none" : "translateY(0)",
+            width: isUnderLaptop ? "auto" : "1024px",
+            height: isUnderLaptop ? "auto" : "720px",
+            maxWidth: isUnderLaptop ? "calc(100vw - 16px)" : "1024px",
+            maxHeight: isUnderLaptop ? "85vh" : "720px",
+            minWidth: isUnderLaptop ? "auto" : "600px",
+            margin: isUnderLaptop ? "16px 8px" : "auto",
+            display: "flex",
+            flexDirection: "column",
+            [theme.breakpoints.between("md", "lg")]: {
+              width: "90vw",
+              maxWidth: "1024px",
+              height: "auto",
+              maxHeight: "80vh",
+            },
           },
         },
       }}
@@ -272,7 +273,7 @@ const DownloadDialog = ({
           flexShrink: 0,
         }}
       >
-        {isDownloadStatusTrackingEnabled && isSuccess && createdJobID ? (
+        {isSuccess && createdJobID ? (
           <Button component={RouterLink} to={pageDefault.downloads}>
             View download status
           </Button>
