@@ -26,6 +26,7 @@ import { openInNewTab } from "@/utils/LinkUtils";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { pageDefault } from "@/components/common/constants";
 import { useNavigate } from "react-router-dom";
+import useUrlReachable from "@/hooks/useUrlReachable";
 
 export enum HeaderMenuStyle {
   DROPDOWN_MENU = "DROPDOWN",
@@ -81,14 +82,15 @@ const DisclaimerDialog: FC<{ open: boolean; onClose: () => void }> = ({
 const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const navigate = useNavigate();
+  const legacyPortalReachable = useUrlReachable(pageDefault.url.LEGACY_PORTAL);
 
   const HEADER_MENUS: Menu[] = useMemo(
     () => [
       {
         menu: {
           name: "Legacy Portal",
-          handler: () => openInNewTab("https://portal.aodn.org.au"),
-          visible: () => false,
+          handler: () => openInNewTab(pageDefault.url.LEGACY_PORTAL),
+          visible: () => legacyPortalReachable,
         },
         items: [],
       },
@@ -163,7 +165,7 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
         ],
       },
     ],
-    [navigate]
+    [navigate, legacyPortalReachable]
   );
 
   const renderHeaderDropdownMenu = useCallback(() => {
