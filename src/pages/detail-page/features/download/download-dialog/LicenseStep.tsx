@@ -1,15 +1,15 @@
 import { Box, Typography } from "@mui/material";
 import { useMemo } from "react";
-import CopyButton from "../../../../../components/common/buttons/CopyButton";
-import { useDetailPageContext } from "../../../context/detail-page-context";
-import { portalTheme } from "../../../../../styles";
-import { trackCustomEvent } from "../../../../../analytics/customEventTracker";
-import { AnalyticsEvent } from "../../../../../analytics/analyticsEvents";
-import { resolveSuggestedCitation } from "@/utils/CitationUtils";
+import CopyButton from "@/components/common/buttons/CopyButton";
+import { useDetailPageContext } from "@/pages/detail-page/context/detail-page-context";
+import { portalTheme } from "@/styles";
+import { trackCustomEvent } from "@/analytics/customEventTracker";
+import { AnalyticsEvent } from "@/analytics/analyticsEvents";
+import {
+  getUsageConstraints,
+  resolveSuggestedCitation,
+} from "@/utils/CitationUtils";
 import { MediaType, RelationType } from "@/app/store/OGCCollectionDefinitions";
-
-const normalizeConstraint = (constraint: string) =>
-  constraint.trim().replace(/\s+/g, " ").toLowerCase();
 
 const LicenseStep = () => {
   const context = useDetailPageContext();
@@ -25,29 +25,10 @@ const LicenseStep = () => {
       link.rel === RelationType.LICENSE && link.type === MediaType.IMAGE_PNG
   )?.href;
 
-  const usageConstraints = useMemo(() => {
-    const citation = collection?.getCitation();
-    const normalizedLicense = license ? normalizeConstraint(license) : "";
-    const metadataConstraints = [
-      ...(citation?.useLimitations ?? []),
-      ...(citation?.otherConstraints ?? []),
-    ].filter(
-      (constraint) =>
-        constraint && normalizeConstraint(constraint) !== normalizedLicense
-    );
-    const uniqueConstraints = new Set<string>();
-
-    return metadataConstraints.filter((constraint) => {
-      const normalizedConstraint = normalizeConstraint(constraint);
-
-      if (uniqueConstraints.has(normalizedConstraint)) {
-        return false;
-      }
-
-      uniqueConstraints.add(normalizedConstraint);
-      return true;
-    });
-  }, [collection, license]);
+  const usageConstraints = useMemo(
+    () => getUsageConstraints(collection),
+    [collection]
+  );
 
   const citationText = useMemo(() => {
     const suggestedCitation = collection?.getCitation()?.suggestedCitation;

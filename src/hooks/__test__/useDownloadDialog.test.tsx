@@ -1,7 +1,7 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { TRACKED_DOWNLOAD_IDS_KEY } from "@/utils/DownloadStorageUtils";
-import { useDownloadDialog } from "../useDownloadDialog";
+import { useDownloadDialog } from "@/hooks/useDownloadDialog";
 
 const { mockDispatch, mockProcessDatasetDownload } = vi.hoisted(() => ({
   mockDispatch: vi.fn(),
@@ -30,9 +30,12 @@ vi.mock("@/pages/detail-page/context/detail-page-context", () => ({
     collection: {
       id: "collection-id",
       title: "Test Ocean Data Collection",
+      getLicense: () => "Licence text",
       getCitation: () => ({
         suggestedCitation:
           "IMOS [year-of-data-download], [Title], [data-access-URL], accessed [date-of-access]",
+        useLimitations: ["Use limitation"],
+        otherConstraints: ["Licence text", "Other constraint"],
       }),
     },
   }),
@@ -116,6 +119,22 @@ describe("useDownloadDialog", () => {
       })
     );
     await waitFor(() => expect(result.current.createdJobID).toBe(JOB_ID));
+  });
+
+  it("sends the same usage constraints as the dialog shows", async () => {
+    const { result } = renderHook(() => useDownloadDialog(true, vi.fn()));
+
+    submit(result);
+
+    await waitFor(() => expect(mockDispatch).toHaveBeenCalledTimes(1));
+    // The licence text is dropped, like in the dialog.
+    expect(mockProcessDatasetDownload).toHaveBeenCalledWith(
+      expect.objectContaining({
+        inputs: expect.objectContaining({
+          usage_constraints: ["Use limitation", "Other constraint"],
+        }),
+      })
+    );
   });
 
   it("does not expose an untracked job when browser storage is unavailable", async () => {

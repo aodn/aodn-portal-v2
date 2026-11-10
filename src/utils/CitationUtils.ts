@@ -1,4 +1,5 @@
 import { pageDefault, detailPageDefault } from "@/components/common/constants";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { formatDate, toAppDayjs } from "@/utils/DateUtils";
 import { Dayjs } from "@/utils/DayjsUtils";
 
@@ -30,4 +31,38 @@ export const resolveSuggestedCitation = (
       ACCESS_DATE_PLACEHOLDER,
       formatDate(accessDate, ACCESS_DATE_FORMAT)
     );
+};
+
+const normalizeConstraint = (constraint: string) =>
+  constraint.trim().replace(/\s+/g, " ").toLowerCase();
+
+// The usage constraints of a collection.
+// The download dialog shows this list. The download request sends it too,
+// so the emails show the same list as the dialog.
+// It drops empty items, the licence text, and duplicates.
+export const getUsageConstraints = (
+  collection: OGCCollection | undefined
+): string[] => {
+  const citation = collection?.getCitation();
+  const license = collection?.getLicense();
+  const normalizedLicense = license ? normalizeConstraint(license) : "";
+  const metadataConstraints = [
+    ...(citation?.useLimitations ?? []),
+    ...(citation?.otherConstraints ?? []),
+  ].filter(
+    (constraint) =>
+      constraint && normalizeConstraint(constraint) !== normalizedLicense
+  );
+  const uniqueConstraints = new Set<string>();
+
+  return metadataConstraints.filter((constraint) => {
+    const normalizedConstraint = normalizeConstraint(constraint);
+
+    if (uniqueConstraints.has(normalizedConstraint)) {
+      return false;
+    }
+
+    uniqueConstraints.add(normalizedConstraint);
+    return true;
+  });
 };

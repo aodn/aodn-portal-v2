@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { buildDataAccessUrl, resolveSuggestedCitation } from "../CitationUtils";
+import {
+  buildDataAccessUrl,
+  getUsageConstraints,
+  resolveSuggestedCitation,
+} from "@/utils/CitationUtils";
+import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { toAppDayjs } from "@/utils/DateUtils";
 
 describe("buildDataAccessUrl", () => {
@@ -59,5 +64,52 @@ describe("resolveSuggestedCitation", () => {
     expect(
       resolveSuggestedCitation("[Title]", uuid, undefined, accessDate)
     ).toBe("");
+  });
+});
+
+describe("getUsageConstraints", () => {
+  const createCollection = ({
+    license,
+    useLimitations,
+    otherConstraints,
+  }: {
+    license?: string;
+    useLimitations?: string[];
+    otherConstraints?: string[];
+  }) =>
+    ({
+      getLicense: () => license,
+      getCitation: () => ({ useLimitations, otherConstraints }),
+    }) as unknown as OGCCollection;
+
+  it("lists use limitations first, then other constraints", () => {
+    const collection = createCollection({
+      useLimitations: ["Use limitation"],
+      otherConstraints: ["Other constraint"],
+    });
+
+    expect(getUsageConstraints(collection)).toEqual([
+      "Use limitation",
+      "Other constraint",
+    ]);
+  });
+
+  it("drops empty items, the licence text, and duplicates", () => {
+    const collection = createCollection({
+      license: "Creative Commons Attribution 4.0",
+      useLimitations: [
+        "",
+        "  creative commons attribution 4.0  ",
+        "Dataset constraint",
+      ],
+      otherConstraints: ["DATASET   CONSTRAINT"],
+    });
+
+    expect(getUsageConstraints(collection)).toEqual(["Dataset constraint"]);
+  });
+
+  it("returns an empty list when there are no constraints", () => {
+    expect(getUsageConstraints(createCollection({}))).toEqual([]);
+    expect(getUsageConstraints(undefined)).toEqual([]);
   });
 });
