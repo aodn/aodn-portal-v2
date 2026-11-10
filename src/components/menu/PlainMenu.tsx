@@ -8,6 +8,7 @@ import { disableScroll, enableScroll } from "../../utils/ScrollUtils";
 interface MenuItem {
   name: string;
   handler?: (event: React.MouseEvent<HTMLElement>) => void;
+  visible?: () => boolean;
 }
 
 export interface Menu {
@@ -43,6 +44,10 @@ const PlainMenu: FC<PlainMenuProps> = ({ menu }: PlainMenuProps) => {
     [handleClose]
   );
 
+  if (menu.menu.visible?.() === false) {
+    return null;
+  }
+
   return (
     <div>
       <Button
@@ -60,11 +65,13 @@ const PlainMenu: FC<PlainMenuProps> = ({ menu }: PlainMenuProps) => {
       </Button>
       {menu.items.length > 0 && (
         <StyledMenu anchorEl={anchorEl} open={isOpen} onClose={handleClose}>
-          {menu.items.map((item, index) => (
-            <MenuItemUi onClick={handleMenuItemClick(item)} key={index}>
-              {item.name}
-            </MenuItemUi>
-          ))}
+          {menu.items
+            .filter((item) => item.visible?.() !== false)
+            .map((item) => (
+              <MenuItemUi onClick={handleMenuItemClick(item)} key={item.name}>
+                {item.name}
+              </MenuItemUi>
+            ))}
         </StyledMenu>
       )}
     </div>

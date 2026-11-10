@@ -126,7 +126,8 @@ Page layout: `<Page>.tsx` composes; `layout/` = where things render;
   `src/__mocks__/handlers.ts`, fixtures in `src/__mocks__/data/`, and helpers in
   `src/__mocks__/utils/`. New API behaviour needs a handler there.
 - `src/setupTests.ts` stubs `ResizeObserver`/`IntersectionObserver` and
-  globally mocks `analytics/customEventTracker` (`trackCustomEvent`),
+  globally mocks `hooks/useUrlReachable` (returns `false`),
+  `analytics/customEventTracker` (`trackCustomEvent`),
   `analytics/searchParamsEvent` (`trackSearchResultParameters`), and the
   static layer fetches (`fetchMarineParkOptions`,
   `fetchMarineEcoregionOptions`, `fetchAllenCoralAtlasOptions`). Override

@@ -26,6 +26,7 @@ import { openInNewTab } from "@/utils/LinkUtils";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { pageDefault } from "@/components/common/constants";
 import { useNavigate } from "react-router-dom";
+import useUrlReachable from "@/hooks/useUrlReachable";
 
 export enum HeaderMenuStyle {
   DROPDOWN_MENU = "DROPDOWN",
@@ -81,9 +82,18 @@ const DisclaimerDialog: FC<{ open: boolean; onClose: () => void }> = ({
 const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const navigate = useNavigate();
+  const legacyPortalReachable = useUrlReachable(pageDefault.url.LEGACY_PORTAL);
 
   const HEADER_MENUS: Menu[] = useMemo(
     () => [
+      {
+        menu: {
+          name: "Legacy Portal",
+          handler: () => openInNewTab(pageDefault.url.LEGACY_PORTAL),
+          visible: () => legacyPortalReachable,
+        },
+        items: [],
+      },
       {
         menu: {
           name: "IMOS Home",
@@ -155,7 +165,7 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
         ],
       },
     ],
-    [navigate]
+    [navigate, legacyPortalReachable]
   );
 
   const renderHeaderDropdownMenu = useCallback(() => {
@@ -174,43 +184,52 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
   }, [HEADER_MENUS]);
 
   const renderHeaderAccordionMenu = useCallback(() => {
-    return HEADER_MENUS.map((menu, index) => {
-      const hasItems = menu.items.length > 0;
-      return (
-        <Accordion
-          key={index}
-          data-testid="accordion-menu"
-          {...(!hasItems && {
-            expanded: false,
-            onChange: () => {},
-            onClick: (event: MouseEvent<HTMLElement>) =>
-              menu.menu?.handler && menu.menu.handler(event),
-          })}
-        >
-          <AccordionSummary
-            expandIcon={hasItems ? <ExpandMoreIcon /> : undefined}
+    return HEADER_MENUS.filter((menu) => menu.menu.visible?.() !== false).map(
+      (menu, index) => {
+        const visibleItems = menu.items.filter(
+          (item) => item.visible?.() !== false
+        );
+        const hasItems = visibleItems.length > 0;
+        return (
+          <Accordion
+            key={index}
+            data-testid="accordion-menu"
+            {...(!hasItems && {
+              expanded: false,
+              onChange: () => {},
+              onClick: (event: MouseEvent<HTMLElement>) =>
+                menu.menu?.handler && menu.menu.handler(event),
+            })}
           >
-            <Typography padding={0} color="#000" fontSize={fontSize.info}>
-              {menu.menu.name}
-            </Typography>
-          </AccordionSummary>
-          {hasItems && (
-            <AccordionDetails>
-              {menu.items.map((item) => (
-                <MenuItem
-                  key={item.name}
-                  onClick={(event) => item.handler && item.handler(event)}
-                >
-                  <Typography padding={0} color="#000" fontSize={fontSize.info}>
-                    {item.name}
-                  </Typography>
-                </MenuItem>
-              ))}
-            </AccordionDetails>
-          )}
-        </Accordion>
-      );
-    });
+            <AccordionSummary
+              expandIcon={hasItems ? <ExpandMoreIcon /> : undefined}
+            >
+              <Typography padding={0} color="#000" fontSize={fontSize.info}>
+                {menu.menu.name}
+              </Typography>
+            </AccordionSummary>
+            {hasItems && (
+              <AccordionDetails>
+                {visibleItems.map((item) => (
+                  <MenuItem
+                    key={item.name}
+                    onClick={(event) => item.handler && item.handler(event)}
+                  >
+                    <Typography
+                      padding={0}
+                      color="#000"
+                      fontSize={fontSize.info}
+                    >
+                      {item.name}
+                    </Typography>
+                  </MenuItem>
+                ))}
+              </AccordionDetails>
+            )}
+          </Accordion>
+        );
+      }
+    );
   }, [HEADER_MENUS]);
 
   return (

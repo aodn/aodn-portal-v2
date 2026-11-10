@@ -225,10 +225,12 @@ const Banner = () => {
         open={!!openImage}
         onClose={() => setOpenImage(null)}
         maxWidth={false}
-        PaperProps={{
-          sx: {
-            backgroundColor: "transparent",
-            boxShadow: "none",
+        slotProps={{
+          paper: {
+            sx: {
+              backgroundColor: "transparent",
+              boxShadow: "none",
+            },
           },
         }}
       >
