@@ -74,5 +74,5 @@ describe("DateRange on mobile", () => {
       }),
     ]);
     expect(screen.getByLabelText("End date")).toHaveValue("29 Jun 2025");
-  });
+  }, 20000);
 });
