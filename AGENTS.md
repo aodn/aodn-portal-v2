@@ -54,7 +54,8 @@ Page layout: `<Page>.tsx` composes; `layout/` = where things render;
 - Shared types/constants live in leaf modules (`searchTypes.ts`,
   `datasetEnums.ts`, `result/types.ts`, `common/constants.ts`). Imports flow
   one way. After moving shared code, check cycles with
-  `npx madge --circular --extensions ts,tsx src`.
+  `npx madge --circular --extensions ts,tsx --ts-config tsconfig.json src`
+  (without `--ts-config`, madge skips `@/` imports).
 - Analytics: add the event to `AnalyticsEvent` in
   `src/analytics/analyticsEvents.ts`, then call
   `trackCustomEvent(AnalyticsEvent.X, {...})`. Never call `window.gtag`.

@@ -17,7 +17,8 @@ Broken by moving shared types/constants into leaf modules:
 - `common/constants.ts` — `SIMPLE_FILTER_DEFAULT_HEIGHT`
 - bookmark selectors typed against local slice state instead of `store.ts`
 
-Verify with `npx madge --circular --extensions ts,tsx src`.
+Verify with
+`npx madge --circular --extensions ts,tsx --ts-config tsconfig.json src`.
 
 Optional follow-up so cycles cannot come back:
 
