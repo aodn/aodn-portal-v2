@@ -83,7 +83,7 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
           id: tileLayerId,
           type: "raster",
           source: sourceId,
-          paint: { "raster-opacity": 0.8 },
+          paint: { "raster-opacity": 1 },
           layout: { visibility: visibilityOf(visibleRef.current) },
         });
       }
