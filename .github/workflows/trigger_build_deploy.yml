@@ -15,6 +15,7 @@ on:
           - edge
           - staging
           - production
+          - dr-production
 
   workflow_call:
     inputs:
@@ -73,6 +74,9 @@ jobs:
               echo "BUILD_CMD=staging" >> $GITHUB_ENV
               ;;
             production)
+              echo "BUILD_CMD=prod" >> $GITHUB_ENV
+              ;;
+            dr-production)
               echo "BUILD_CMD=prod" >> $GITHUB_ENV
               ;;
           esac
@@ -165,7 +169,7 @@ jobs:
           retry-exempt-status-codes: 204
           script: |
             const environment = process.env.DEPLOY_ENVIRONMENT;
-            const waitForDeployment = ['staging', 'production'].includes(environment);
+            const waitForDeployment = ['staging', 'production', 'dr-production'].includes(environment);
             const { data } = await github.rest.actions.createWorkflowDispatch({
               owner: 'aodn',
               repo: 'appdeploy',
