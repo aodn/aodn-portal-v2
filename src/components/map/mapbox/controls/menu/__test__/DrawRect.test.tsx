@@ -1,10 +1,12 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import type { Map as Mapbox } from "mapbox-gl";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import DrawRect, {
   DRAW_POLYGON_MODE,
   DRAW_RECTANGLE_MODE,
 } from "@/components/map/mapbox/controls/menu/DrawRect";
+import drawStyles from "@/components/map/mapbox/controls/menu/drawStyles";
 
 const mocks = vi.hoisted(() => ({
   currentMode: "simple_select",
@@ -344,6 +346,50 @@ describe("selection labels and individual removal", () => {
     expect(mapClick).not.toHaveBeenCalled();
     unmount();
     expect(map.getContainer().children).toHaveLength(0);
+  });
+});
+
+describe("selection colours", () => {
+  afterEach(() => {
+    mocks.draw.getAll.mockReturnValue({ features: [] });
+  });
+
+  it("draws bbox and polygon selections with the accessible draw styles", () => {
+    render(<DrawRect map={createMockMap()} />);
+
+    expect(MapboxDraw).toHaveBeenLastCalledWith(
+      expect.objectContaining({ styles: drawStyles })
+    );
+  });
+
+  it("shows the selection number on the same colour as the selection line", () => {
+    mocks.draw.getAll.mockReturnValue({
+      features: [
+        {
+          id: "box",
+          type: "Feature",
+          properties: { selectionType: "bbox" },
+          geometry: {
+            type: "Polygon",
+            coordinates: [
+              [
+                [0, 0],
+                [1, 0],
+                [1, 1],
+                [0, 1],
+                [0, 0],
+              ],
+            ],
+          },
+        },
+      ],
+    });
+    render(<DrawRect map={createMockMap()} />);
+
+    // DRAW_SELECTION_SYMBOLOGY.COLOR #182C3A
+    expect(screen.getByLabelText("Selection 1").parentElement).toHaveStyle({
+      backgroundColor: "rgb(24, 44, 58)",
+    });
   });
 });
 

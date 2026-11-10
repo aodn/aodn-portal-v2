@@ -1,4 +1,5 @@
 import { PopupOptions } from "mapbox-gl";
+import { portalTheme } from "@/styles";
 
 export enum MapEventEnum {
   CLICK = "click",
@@ -50,6 +51,26 @@ export const SINGLE_POINT_SYMBOLOGY = {
   RADIUS: 8,
   STROKE_WIDTH: 1,
   STROKE_COLOR: "#fff",
+};
+
+// Two-tone outline for bounding box and polygon: the dark line and the white
+// line below it keep a 3:1 contrast on light, dark and satellite base maps (WCAG 1.4.11)
+export const EXTENT_OUTLINE_SYMBOLOGY = {
+  COLOR: "#1A1A1A",
+  WIDTH: 2,
+  CASING_COLOR: "#FFFFFF",
+  CASING_WIDTH: 4,
+};
+
+// User-drawn bbox and polygon: theme dark navy on the same white casing as
+// the extent outline; the selected one has a thicker line and a stronger fill
+export const DRAW_SELECTION_SYMBOLOGY = {
+  COLOR: portalTheme.palette.primary2,
+  WIDTH: 2,
+  SELECTED_WIDTH: 4,
+  FILL_COLOR: portalTheme.palette.secondary2,
+  FILL_OPACITY: 0.12,
+  SELECTED_FILL_OPACITY: 0.3,
 };
 
 export const ComponentId = {

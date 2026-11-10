@@ -24,7 +24,11 @@ import {
   getPopupTextStyle,
 } from "@/utils/ExtentPopupUtils";
 import { useTheme } from "@mui/material/styles";
-import { MapEventEnum, SINGLE_POINT_SYMBOLOGY } from "../constants";
+import {
+  EXTENT_OUTLINE_SYMBOLOGY,
+  MapEventEnum,
+  SINGLE_POINT_SYMBOLOGY,
+} from "../constants";
 import { TestHelper } from "../../../common/test/helper";
 import { addDataLayer } from "../layerOrder";
 
@@ -73,13 +77,29 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
   const openPopup = useRef<Popup | null>(null);
   const popupTextStyle = useMemo(() => getPopupTextStyle(theme), [theme]);
 
-  const [collectionId, sourceId, layerPolygonId, layerPointId] = useMemo(() => {
+  const [
+    collectionId,
+    sourceId,
+    layerPolygonId,
+    layerPointId,
+    layerCasingId,
+    layerOutlineId,
+  ] = useMemo(() => {
     const collectionId = collection.id;
     const containerId = map?.getContainer().id;
     const sourceId = `geojson-${containerId}-source-${collectionId}`;
     const layerPolygonId = `geojson-${containerId}-layer-${collectionId}-poly`;
     const layerPointId = `geojson-${containerId}-layer-${collectionId}-point`;
-    return [collectionId, sourceId, layerPolygonId, layerPointId];
+    const layerCasingId = `${layerPolygonId}-casing`;
+    const layerOutlineId = `${layerPolygonId}-outline`;
+    return [
+      collectionId,
+      sourceId,
+      layerPolygonId,
+      layerPointId,
+      layerCasingId,
+      layerOutlineId,
+    ];
   }, [collection.id, map]);
 
   // Function to take photo of the map for given bounding boxes
@@ -223,7 +243,35 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
         filter: ["!=", ["geometry-type"], "Point"],
         paint: {
           "fill-color": stringToColor(collectionId),
-          "fill-outline-color": "yellow",
+        },
+        layout: {
+          visibility: visible ? "visible" : "none",
+        },
+      });
+
+      // Mapbox fill outline is always 1px, so draw the outline as line layers
+      addDataLayer(map, {
+        id: layerCasingId,
+        type: "line",
+        source: sourceId,
+        filter: ["!=", ["geometry-type"], "Point"],
+        paint: {
+          "line-color": EXTENT_OUTLINE_SYMBOLOGY.CASING_COLOR,
+          "line-width": EXTENT_OUTLINE_SYMBOLOGY.CASING_WIDTH,
+        },
+        layout: {
+          visibility: visible ? "visible" : "none",
+        },
+      });
+
+      addDataLayer(map, {
+        id: layerOutlineId,
+        type: "line",
+        source: sourceId,
+        filter: ["!=", ["geometry-type"], "Point"],
+        paint: {
+          "line-color": EXTENT_OUTLINE_SYMBOLOGY.COLOR,
+          "line-width": EXTENT_OUTLINE_SYMBOLOGY.WIDTH,
         },
         layout: {
           visibility: visible ? "visible" : "none",
@@ -255,6 +303,8 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
     layerPolygonId,
     visible,
     layerPointId,
+    layerCasingId,
+    layerOutlineId,
   ]);
 
   // This is use to handle base map change that set style will default remove all layer, which is
@@ -280,7 +330,18 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
       "visibility",
       visible ? "visible" : "none"
     );
-  }, [map, layerPolygonId, visible, layerPointId]);
+    [layerCasingId, layerOutlineId].forEach((id) => {
+      if (map.getLayer(id))
+        map.setLayoutProperty(id, "visibility", visible ? "visible" : "none");
+    });
+  }, [
+    map,
+    layerPolygonId,
+    visible,
+    layerPointId,
+    layerCasingId,
+    layerOutlineId,
+  ]);
 
   useEffect(() => {
     if (map === null) return;
@@ -314,6 +375,8 @@ const GeojsonLayer: FC<GeojsonLayerProps> = ({
       // Always remember to clean up resources
       try {
         if (map?.getSource(sourceId)) {
+          map?.removeLayer(layerOutlineId);
+          map?.removeLayer(layerCasingId);
           map?.removeLayer(layerPolygonId);
           map?.removeLayer(layerPointId);
           map?.removeSource(sourceId);
