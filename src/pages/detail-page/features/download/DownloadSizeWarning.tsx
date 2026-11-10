@@ -91,8 +91,8 @@ const renderWarningMessage = (
   }
   return (
     <>
-      Download is unavailable because the selected dataset is too large (greater
-      than 180 GB). Please refine your selection to reduce the dataset size, or
+      Download is unavailable because the selected subset is too large (greater
+      than 180 GB). Please refine your selection to reduce the subset size, or
       use one of the alternative data access methods available{" "}
       <Link
         component="button"

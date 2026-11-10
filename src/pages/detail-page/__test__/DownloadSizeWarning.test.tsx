@@ -16,8 +16,8 @@ const WARNING_TEST_ID = "download-size-warning";
 const DATA_ACCESS_LINK_TEST_ID = "download-size-warning-data-access-link";
 const TEST_UUID = "test-uuid";
 
-// Assertions target the data-warning-level attribute rather than the message
-// copy, which is a first-pass wording still to be reviewed by the designer
+// Most assertions check the data-warning-level attribute, not the message copy.
+// Only the extra large copy is checked, because its wording is agreed.
 const expectWarningLevel = (level: DownloadSizeWarningLevel) =>
   expect(screen.getByTestId(WARNING_TEST_ID)).toHaveAttribute(
     "data-warning-level",
@@ -85,6 +85,17 @@ describe("DownloadSizeWarning", () => {
     renderWarning({ estimatedSizeBytes: EXTRA_LARGE_DOWNLOAD_BYTES });
 
     expectWarningLevel(DownloadSizeWarningLevel.EXTRA_LARGE);
+  });
+
+  it("should call the selection a subset in the extra large message", () => {
+    renderWarning({ estimatedSizeBytes: EXTRA_LARGE_DOWNLOAD_BYTES });
+
+    const warning = screen.getByTestId(WARNING_TEST_ID);
+    expect(warning).toHaveTextContent(
+      "Download is unavailable because the selected subset is too large"
+    );
+    expect(warning).toHaveTextContent("reduce the subset size");
+    expect(warning).not.toHaveTextContent("dataset");
   });
 
   it("should warn when the estimate failed", () => {
