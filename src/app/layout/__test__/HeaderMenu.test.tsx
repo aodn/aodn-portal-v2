@@ -64,7 +64,7 @@ describe("HeaderMenu", () => {
       const accordions = screen.getAllByTestId("accordion-menu");
       expect(accordions).toHaveLength(6);
       expect(
-        accordions[0].querySelector(".MuiAccordionSummary-content")?.textContent
+        accordions[5].querySelector(".MuiAccordionSummary-content")?.textContent
       ).toBe("Legacy Portal");
     });
 
