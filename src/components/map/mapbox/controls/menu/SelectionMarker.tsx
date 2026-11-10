@@ -5,6 +5,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Map as MapboxMap, Marker } from "mapbox-gl";
 import type MapboxDraw from "@mapbox/mapbox-gl-draw";
 import type { Feature, Polygon, MultiPolygon } from "geojson";
+import { DRAW_SELECTION_SYMBOLOGY } from "../../constants";
 
 interface Props {
   map: MapboxMap;
@@ -91,7 +92,7 @@ export default function SelectionMarker({
       sx={{
         display: "flex",
         alignItems: "center",
-        bgcolor: "primary.light",
+        bgcolor: DRAW_SELECTION_SYMBOLOGY.COLOR,
         color: "common.white",
         border: 1,
         borderColor: "divider",

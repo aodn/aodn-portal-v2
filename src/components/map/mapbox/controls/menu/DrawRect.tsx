@@ -15,6 +15,7 @@ import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import { Box, IconButton } from "@mui/material";
 import DrawRectangle from "./DrawRectangle";
 import DirectSelect from "./DirectSelect";
+import drawStyles from "./drawStyles";
 import SelectionMarker from "./SelectionMarker";
 import { ControlProps } from "./Definition";
 import { BboxSelectionIcon } from "@/assets/icons/map/bbox_selection";
@@ -69,6 +70,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
           trash: false, // Disable the default trash, handle it ourselves
         },
         defaultMode: "simple_select",
+        styles: drawStyles,
         modes: {
           ...MapboxDraw.modes,
           direct_select: DirectSelect,
