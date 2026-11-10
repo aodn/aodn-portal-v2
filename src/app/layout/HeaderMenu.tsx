@@ -88,14 +88,6 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
     () => [
       {
         menu: {
-          name: "Legacy Portal",
-          handler: () => openInNewTab(pageDefault.url.LEGACY_PORTAL),
-          visible: () => legacyPortalReachable,
-        },
-        items: [],
-      },
-      {
-        menu: {
           name: "IMOS Home",
           handler: () => openInNewTab(pageDefault.url.IMOS),
         },
@@ -163,6 +155,14 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
             handler: () => openInNewTab("mailto:info@aodn.org.au"),
           },
         ],
+      },
+      {
+        menu: {
+          name: "Legacy Portal",
+          handler: () => openInNewTab(pageDefault.url.LEGACY_PORTAL),
+          visible: () => legacyPortalReachable,
+        },
+        items: [],
       },
     ],
     [navigate, legacyPortalReachable]
