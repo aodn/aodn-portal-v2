@@ -57,6 +57,13 @@ vi.mock("./analytics/searchParamsEvent", () => ({
   trackSearchResultParameters: vi.fn(),
 }));
 
+// HeaderMenu probes the legacy portal on mount; avoid a real network call in
+// every test that renders the header. Defaults to unreachable (menu hidden).
+// Override with vi.mocked(useUrlReachable) or vi.unmock in the test file.
+vi.mock("./hooks/useUrlReachable", () => ({
+  default: vi.fn(() => false),
+}));
+
 // A global mock to avoid real layer fetch calls, if you need different return value
 // you can override in the test file
 // Mock the leaf module, not StaticLayer: StaticLayer re-exports these fetchers,

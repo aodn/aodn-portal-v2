@@ -5,10 +5,18 @@ import HeaderMenu, { HeaderMenuStyle } from "../HeaderMenu";
 import { userEvent } from "@testing-library/user-event";
 import { pageDefault } from "@/components/common/constants";
 import { MemoryRouter, useLocation } from "react-router-dom";
+import useUrlReachable from "@/hooks/useUrlReachable";
 
 vi.mock("@/utils/LinkUtils", () => ({
   openInNewTab: vi.fn(),
 }));
+
+// Also mocked globally in setupTests.ts; repeated here so this file's
+// dependency on it is explicit. Default: legacy portal unreachable.
+vi.mock("@/hooks/useUrlReachable", () => ({
+  default: vi.fn(() => false),
+}));
+const mockedUseUrlReachable = vi.mocked(useUrlReachable);
 
 describe("HeaderMenu", () => {
   const renderHeaderMenu = (menuStyle: HeaderMenuStyle) =>
@@ -20,6 +28,60 @@ describe("HeaderMenu", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockedUseUrlReachable.mockReturnValue(false);
+  });
+
+  describe("Legacy Portal visibility", () => {
+    it("checks the legacy portal URL", () => {
+      renderHeaderMenu(HeaderMenuStyle.DROPDOWN_MENU);
+      expect(mockedUseUrlReachable).toHaveBeenCalledWith(
+        pageDefault.url.LEGACY_PORTAL
+      );
+    });
+
+    it.each([HeaderMenuStyle.DROPDOWN_MENU, HeaderMenuStyle.ACCORDION_MENU])(
+      "hides Legacy Portal in %s style when unreachable",
+      (menuStyle) => {
+        renderHeaderMenu(menuStyle);
+        expect(screen.queryByText("Legacy Portal")).not.toBeInTheDocument();
+        // Other menus are unaffected
+        expect(screen.getByText("IMOS Home")).toBeInTheDocument();
+      }
+    );
+
+    it.each([HeaderMenuStyle.DROPDOWN_MENU, HeaderMenuStyle.ACCORDION_MENU])(
+      "shows Legacy Portal in %s style when reachable",
+      (menuStyle) => {
+        mockedUseUrlReachable.mockReturnValue(true);
+        renderHeaderMenu(menuStyle);
+        expect(screen.getByText("Legacy Portal")).toBeInTheDocument();
+      }
+    );
+
+    it("renders Legacy Portal as the first accordion when reachable", () => {
+      mockedUseUrlReachable.mockReturnValue(true);
+      renderHeaderMenu(HeaderMenuStyle.ACCORDION_MENU);
+      const accordions = screen.getAllByTestId("accordion-menu");
+      expect(accordions).toHaveLength(6);
+      expect(
+        accordions[0].querySelector(".MuiAccordionSummary-content")?.textContent
+      ).toBe("Legacy Portal");
+    });
+
+    it.each([HeaderMenuStyle.DROPDOWN_MENU, HeaderMenuStyle.ACCORDION_MENU])(
+      "opens the legacy portal when clicked in %s style",
+      async (menuStyle) => {
+        mockedUseUrlReachable.mockReturnValue(true);
+        const user = userEvent.setup();
+        renderHeaderMenu(menuStyle);
+
+        await user.click(screen.getByText("Legacy Portal"));
+
+        expect(openInNewTab).toHaveBeenCalledWith(
+          pageDefault.url.LEGACY_PORTAL
+        );
+      }
+    );
   });
 
   describe("DROPDOWN_MENU style", () => {
@@ -103,7 +165,7 @@ describe("HeaderMenu", () => {
   it("renders accordion menu correctly", () => {
     renderHeaderMenu(HeaderMenuStyle.ACCORDION_MENU);
 
-    // Should have five accordion menus
+    // Should have five accordion menus (Legacy Portal hidden: unreachable)
     const accordions = screen.getAllByTestId("accordion-menu");
     expect(accordions).toHaveLength(5);
 
