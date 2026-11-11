@@ -20,9 +20,25 @@ const BAR_INSET = "16px";
 // Evenly spaced ticks along the bar, as a fraction of its width.
 const TICK_POSITIONS = [0, 0.25, 0.5, 0.75, 1];
 
-/** At most one decimal place, without a trailing ".0" (268, 278.5). */
-export const formatLegendValue = (value: number): string =>
-  String(Number(value.toFixed(1)) || 0);
+// Cap for near-zero ranges, so a degenerate range can't print 20 digits.
+const MAX_DECIMALS = 6;
+
+/**
+ * Decimal places the tick labels need: one by default, more only when the gap
+ * between ticks is below 0.1, so neighbouring labels never round together
+ * (0.05 → 0.25 reads 0.05, 0.1, 0.15 — not 0.1, 0.1, 0.1).
+ */
+export const legendDecimals = ([min, max]: GriddedValueRange): number => {
+  const step = Math.abs(max - min) / (TICK_POSITIONS.length - 1);
+  if (!Number.isFinite(step) || step === 0) return 1;
+  // The epsilon keeps an exact power of ten (step 0.01) at 2, not 3.
+  const needed = Math.ceil(-Math.log10(step) - 1e-9);
+  return Math.min(MAX_DECIMALS, Math.max(1, needed));
+};
+
+/** Rounds to `decimals` places, without trailing zeros (268, 278.5). */
+export const formatLegendValue = (value: number, decimals = 1): string =>
+  String(Number(value.toFixed(decimals)) || 0);
 
 interface BarLabel {
   // Fraction of the bar's width the label is centred on.
@@ -30,11 +46,14 @@ interface BarLabel {
   text: string;
 }
 
-const rangeLabels = ([min, max]: GriddedValueRange): BarLabel[] =>
-  TICK_POSITIONS.map((position) => ({
+const rangeLabels = (range: GriddedValueRange): BarLabel[] => {
+  const [min, max] = range;
+  const decimals = legendDecimals(range);
+  return TICK_POSITIONS.map((position) => ({
     position,
-    text: formatLegendValue(min + (max - min) * position),
+    text: formatLegendValue(min + (max - min) * position, decimals),
   }));
+};
 
 // The bar draws one equal-width block per category; label each block's centre.
 const categoryLabels = (labels: string[]): BarLabel[] =>

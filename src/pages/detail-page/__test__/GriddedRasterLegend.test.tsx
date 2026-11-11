@@ -5,6 +5,7 @@ import AppTheme from "@/styles/theme";
 import { GriddedValueRange } from "@/app/store/GriddedTileDefinitions";
 import GriddedRasterLegend, {
   formatLegendValue,
+  legendDecimals,
 } from "../features/GriddedRasterLegend";
 
 const LEGEND_URL = "/api/v1/ogc/ext/tiles/colormaps/legend?colormap=viridis";
@@ -59,6 +60,13 @@ describe("GriddedRasterLegend", () => {
     expect(screen.queryByText("1.5")).not.toBeInTheDocument();
   });
 
+  it("adds decimals so a small range keeps distinct labels", () => {
+    render(legend(LEGEND_URL, [0.05, 0.25]));
+    ["0.05", "0.1", "0.15", "0.2", "0.25"].forEach((label) =>
+      expect(screen.getByText(label)).toBeInTheDocument()
+    );
+  });
+
   it("draws no labels without a range", () => {
     render(legend(LEGEND_URL));
     expect(
@@ -93,5 +101,34 @@ describe("formatLegendValue", () => {
 
   it("never shows a negative zero", () => {
     expect(formatLegendValue(-0.04)).toBe("0");
+  });
+
+  it("rounds to the given decimals without trailing zeros", () => {
+    expect(formatLegendValue(0.15, 2)).toBe("0.15");
+    expect(formatLegendValue(0.1, 2)).toBe("0.1");
+    expect(formatLegendValue(0.005, 3)).toBe("0.005");
+  });
+});
+
+describe("legendDecimals", () => {
+  it("keeps one decimal when the tick gap is 0.1 or more", () => {
+    expect(legendDecimals([268, 310])).toBe(1);
+    expect(legendDecimals([-1.2, 1.2])).toBe(1);
+    expect(legendDecimals([0, 0.4])).toBe(1);
+  });
+
+  it("adds decimals as the tick gap shrinks", () => {
+    expect(legendDecimals([0.05, 0.25])).toBe(2);
+    expect(legendDecimals([0, 0.04])).toBe(2);
+    expect(legendDecimals([0, 0.02])).toBe(3);
+  });
+
+  it("falls back to one decimal for an empty or invalid range", () => {
+    expect(legendDecimals([5, 5])).toBe(1);
+    expect(legendDecimals([0, Number.NaN])).toBe(1);
+  });
+
+  it("caps the decimals for a near-zero range", () => {
+    expect(legendDecimals([0, 1e-12])).toBe(6);
   });
 });
