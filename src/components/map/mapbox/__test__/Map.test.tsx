@@ -5,14 +5,16 @@ import { MapDefaultConfig } from "../constants";
 const mocks = vi.hoisted(() => ({
   minZoomCalls: [] as number[],
   resizeCallbacks: [] as ResizeObserverCallback[],
+  createdStyles: [] as unknown[],
 }));
 
 vi.mock("@/components/map/mapbox/mapboxgl", () => {
   class FakeMap {
     private readonly container: HTMLElement;
 
-    constructor(options: { container: string }) {
+    constructor(options: { container: string; style: unknown }) {
       this.container = document.getElementById(options.container)!;
+      mocks.createdStyles.push(options.style);
     }
 
     getContainer = () => this.container;
@@ -111,5 +113,73 @@ describe("ReactMap zoom floor", () => {
     );
 
     await waitFor(() => expect(mocks.minZoomCalls).toContain(3));
+  });
+});
+
+describe("getInitialStyle", () => {
+  const KEY = "test_base_map_id";
+  const TOPOGRAPHIC_ID = "2";
+
+  beforeEach(() => localStorage.clear());
+
+  it("uses the app default when no page preference is given", async () => {
+    localStorage.setItem(KEY, TOPOGRAPHIC_ID);
+    const { getInitialStyle, styles } = await import("../Map");
+
+    expect(getInitialStyle()).toBe(styles[MapDefaultConfig.DEFAULT_STYLE]);
+  });
+
+  it("uses the page default on the first visit", async () => {
+    const { getInitialStyle } = await import("../Map");
+
+    expect(getInitialStyle({ storageKey: KEY, defaultStyleId: "1" }).id).toBe(
+      "1"
+    );
+  });
+
+  it("uses the saved base map over the page default", async () => {
+    localStorage.setItem(KEY, TOPOGRAPHIC_ID);
+    const { getInitialStyle } = await import("../Map");
+
+    expect(getInitialStyle({ storageKey: KEY, defaultStyleId: "1" }).id).toBe(
+      TOPOGRAPHIC_ID
+    );
+  });
+
+  it("falls back to the page default when the saved id is unknown", async () => {
+    localStorage.setItem(KEY, "removed-style");
+    const { getInitialStyle } = await import("../Map");
+
+    expect(getInitialStyle({ storageKey: KEY, defaultStyleId: "1" }).id).toBe(
+      "1"
+    );
+  });
+});
+
+describe("ReactMap base map", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    mocks.createdStyles.length = 0;
+    vi.stubGlobal("ResizeObserver", TestResizeObserver);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    document.body.innerHTML = "";
+  });
+
+  it("creates the map with the saved base map so it does not load the default first", async () => {
+    localStorage.setItem("test_base_map_id", "2");
+    mountContainer(800);
+    const { default: ReactMap, styles } = await import("../Map");
+
+    render(
+      <ReactMap
+        panelId={PANEL_ID}
+        baseMap={{ storageKey: "test_base_map_id", defaultStyleId: "1" }}
+      />
+    );
+
+    expect(mocks.createdStyles).toEqual([styles[1].style]);
   });
 });
