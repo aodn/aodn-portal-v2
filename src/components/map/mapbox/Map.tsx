@@ -21,6 +21,7 @@ import ERSIWorldImagery from "./styles/ESRIWorldImagery.json";
 import debounce from "lodash/debounce";
 import { TestHelper } from "../../common/test/helper";
 import { MapDefaultConfig, MapEventEnum } from "./constants";
+import { getSavedBaseMapId } from "@/utils/BaseMapStorageUtils";
 import { CircularProgress, LinearProgress, Paper } from "@mui/material";
 import { portalTheme } from "../../../styles";
 import { InfoStatusType } from "../../info/InfoDefinition";
@@ -43,7 +44,15 @@ export interface MapBasicType {
   zoom?: number;
 }
 
-interface MapProps extends MapBasicType {}
+// A page that remembers the user's base map in localStorage under its own key
+export interface BaseMapPreference {
+  storageKey: string;
+  defaultStyleId: string;
+}
+
+interface MapProps extends MapBasicType {
+  baseMap?: BaseMapPreference;
+}
 
 // Styles can be found here https://developers.arcgis.com/rest/basemap-styles/
 // but require feeds.
@@ -72,6 +81,16 @@ const styles = [
   },
   // Add more styles as needed
 ];
+
+// The base map last picked under this key, else the page default, else the app default
+const getInitialStyle = (baseMap?: BaseMapPreference) => {
+  const savedId = baseMap && getSavedBaseMapId(baseMap.storageKey);
+  return (
+    styles.find((s) => s.id === savedId) ??
+    styles.find((s) => s.id === baseMap?.defaultStyleId) ??
+    styles[MapDefaultConfig.DEFAULT_STYLE]
+  );
+};
 
 const { WEST_LON, EAST_LON, NORTH_LAT, SOUTH_LAT } =
   MapDefaultConfig.BBOX_ENDPOINTS;
@@ -124,6 +143,7 @@ const ReactMap = memo(
   ({
     animate = false,
     announcement = undefined,
+    baseMap,
     bbox = defaultBbox,
     children,
     progress = undefined,
@@ -172,7 +192,7 @@ const ReactMap = memo(
         const newMap = new mapboxgl.Map({
           container: panelId,
           accessToken: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
-          style: styles[MapDefaultConfig.DEFAULT_STYLE].style,
+          style: getInitialStyle(baseMap).style,
           minZoom: minZoom,
           maxZoom: maxZoom,
           testMode: import.meta.env.MODE === "playwright-local",
@@ -203,7 +223,7 @@ const ReactMap = memo(
       } catch (err) {
         console.error("Map initialization failed:", err);
       }
-    }, [panelId, minZoom, maxZoom, onLoad]);
+    }, [panelId, minZoom, maxZoom, onLoad, baseMap]);
 
     useEffect(() => {
       const setupMap = () => {
@@ -426,4 +446,4 @@ const ReactMap = memo(
 ReactMap.displayName = "ReactMap";
 export default ReactMap;
 
-export { styles };
+export { styles, getInitialStyle };

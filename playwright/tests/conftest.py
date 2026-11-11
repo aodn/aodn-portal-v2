@@ -26,6 +26,16 @@ _IGNORED_CONSOLE_FRAGMENTS = (
 )
 
 
+# CI has no Mapbox token, so mapbox:// base maps fail to load. Start the
+# detail map on the local World Imagery style ('4'); key is in MapPanel.tsx.
+# Set only when missing, so a base map a test picks survives a reload.
+_DETAIL_BASE_MAP_SCRIPT = """
+if (!localStorage.getItem('detail_page_base_map_id')) {
+  localStorage.setItem('detail_page_base_map_id', '4');
+}
+"""
+
+
 def _merge_launch_args(browser_type_launch_args: dict) -> dict:
     launch_args = list(browser_type_launch_args.get('args') or [])
     for flag in _SWIFTSHADER_LAUNCH_ARGS:
@@ -55,6 +65,8 @@ def setup_page(
 
     # Create a new browser context with the device configuration
     context = browser.new_context(**context_kwargs)
+    # On the context, so tabs a test opens later get it too
+    context.add_init_script(_DETAIL_BASE_MAP_SCRIPT)
     page = context.new_page()
     page.on(
         'console',

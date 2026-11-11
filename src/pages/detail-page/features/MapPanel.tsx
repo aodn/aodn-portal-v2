@@ -12,7 +12,7 @@ import { useDetailPageContext } from "../context/detail-page-context";
 import Controls from "../../../components/map/mapbox/controls/Controls";
 import NavigationControl from "../../../components/map/mapbox/controls/NavigationControl";
 import ScaleControl from "../../../components/map/mapbox/controls/ScaleControl";
-import MapBox from "../../../components/map/mapbox/Map";
+import MapBox, { BaseMapPreference } from "../../../components/map/mapbox/Map";
 import Layers from "../../../components/map/mapbox/layers/Layers";
 import DrawRect from "../../../components/map/mapbox/controls/menu/DrawRect";
 import { LngLatBounds, MapEvent } from "mapbox-gl";
@@ -78,6 +78,12 @@ import useGriddedRasterLayer from "@/components/map/mapbox/layers/raster-layers/
 import { portalTheme } from "@/styles";
 
 const mapContainerId = "map-detail-container-id";
+
+// Street map on the first visit, then the user's last pick on every collection
+const DETAIL_BASE_MAP: BaseMapPreference = {
+  storageKey: "detail_page_base_map_id",
+  defaultStyleId: "1",
+};
 
 // Exported for unit tests
 export const buildMapLayerConfig = (
@@ -710,6 +716,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
         >
           <MapBox
             animate={false}
+            baseMap={DETAIL_BASE_MAP}
             panelId={mapContainerId}
             projection={"mercator"}
             announcement={
@@ -729,7 +736,9 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
               <ScaleControl />
               <DisplayCoordinate />
               <MenuControlGroup>
-                <MenuControl menu={<BaseMapSwitcher />} />
+                <MenuControl
+                  menu={<BaseMapSwitcher baseMap={DETAIL_BASE_MAP} />}
+                />
                 <MenuControl
                   menu={
                     <ReferenceLayerSwitcher
