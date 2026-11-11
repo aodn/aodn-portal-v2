@@ -12,7 +12,12 @@ import {
   EVENT_MENU,
   MenuClickedEvent,
 } from "./Definition";
-import { styles as mapStyles } from "../../Map";
+import {
+  styles as mapStyles,
+  getInitialStyle,
+  BaseMapPreference,
+} from "../../Map";
+import { saveBaseMapId } from "@/utils/BaseMapStorageUtils";
 import {
   Box,
   Typography,
@@ -33,7 +38,7 @@ import {
   switcherMenuContentIconSx,
   switcherMenuContentLabelTypographySx,
 } from "./MenuControl";
-import { DataTestId, MapDefaultConfig } from "../../constants";
+import { DataTestId } from "../../constants";
 import { BaseLayerIcon } from "@/assets/icons/map/base_layer";
 import MenuTitle from "./MenuTitle";
 import { AttributionControl } from "mapbox-gl";
@@ -45,13 +50,16 @@ export interface BaseMapSwitcherLayer {
   default?: boolean;
 }
 
-interface BaseMapSwitcherProps extends ControlProps {}
+interface BaseMapSwitcherProps extends ControlProps {
+  // Pass the same value as the Map so both use one remembered base map
+  baseMap?: BaseMapPreference;
+}
 
 const MENU_ID = "basemap-show-hide-menu-button";
 
-const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
+const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map, baseMap }) => {
   const [currentStyle, setCurrentStyle] = useState<string>(
-    mapStyles[MapDefaultConfig.DEFAULT_STYLE].id
+    getInitialStyle(baseMap).id
   );
   const [_, setAttributionControl] = useState<AttributionControl | undefined>(
     undefined
@@ -104,9 +112,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
 
     const handleMapEvent = () => setAnchorEl(null);
     // Make state update inside useEffect()
-    startTransition(() =>
-      updateCurrentStyle(mapStyles[MapDefaultConfig.DEFAULT_STYLE].id)
-    );
+    startTransition(() => updateCurrentStyle(getInitialStyle(baseMap).id));
 
     eventEmitter.on(EVENT_MENU.CLICKED, handleEvent);
     eventEmitter.on(EVENT_MAP.CLICKED, handleMapEvent);
@@ -117,7 +123,7 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
       eventEmitter.off(EVENT_MAP.CLICKED, handleMapEvent);
       eventEmitter.off(EVENT_MAP.MOVE_START, handleMapEvent);
     };
-  }, [updateCurrentStyle]);
+  }, [updateCurrentStyle, baseMap]);
 
   const open = Boolean(anchorEl);
   return (
@@ -159,9 +165,11 @@ const BaseMapSwitcher: React.FC<BaseMapSwitcherProps> = ({ map }) => {
             <FormControl component="fieldset">
               <RadioGroup
                 value={currentStyle}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  updateCurrentStyle(e.target.value)
-                }
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  if (baseMap)
+                    saveBaseMapId(baseMap.storageKey, e.target.value);
+                  updateCurrentStyle(e.target.value);
+                }}
               >
                 {mapStyles.map((style) => (
                   <FormControlLabel
