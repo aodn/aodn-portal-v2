@@ -152,24 +152,26 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
       : collectionDatasetTypes?.length === 1
         ? collectionDatasetTypes[0]
         : undefined;
-    if (!datasetType) {
-      return DOWNLOAD_FORMAT;
+
+    switch (datasetType) {
+      case DatasetType.PARQUET: {
+        return DOWNLOAD_FORMAT.filter(
+          (format) =>
+            format.value === DownloadFileType.CSV ||
+            format.value === DownloadFileType.EXCEL
+        );
+      }
+      case DatasetType.ZARR: {
+        return DOWNLOAD_FORMAT.filter(
+          (format) =>
+            format.value === DownloadFileType.NETCDF ||
+            format.value === DownloadFileType.GEOTIFF
+        );
+      }
+      default: {
+        return [];
+      }
     }
-    if (datasetType === DatasetType.PARQUET) {
-      return DOWNLOAD_FORMAT.filter(
-        (format) =>
-          format.value === DownloadFileType.CSV ||
-          format.value === DownloadFileType.EXCEL
-      );
-    }
-    if (datasetType === DatasetType.ZARR) {
-      return DOWNLOAD_FORMAT.filter(
-        (format) =>
-          format.value === DownloadFileType.NETCDF ||
-          format.value === DownloadFileType.GEOTIFF
-      );
-    }
-    return DOWNLOAD_FORMAT;
   }, [collection, selectedDataItem]);
 
   // Keep the selected format valid for the current data selection: fall back
