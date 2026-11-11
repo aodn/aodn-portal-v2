@@ -62,6 +62,8 @@ export interface DatasetDownloadRequest {
     collection_title?: string;
     full_metadata_link?: string;
     suggested_citation?: string;
+    // An empty list means the dataset has no usage constraints.
+    usage_constraints?: string[];
     estimated_size_bytes?: number;
   };
   outputs: object;

@@ -9,25 +9,25 @@ import {
 } from "react";
 import { useParams } from "react-router-dom";
 import { useAppDispatch } from "@/app/store/hooks";
-import { DataUsageInformation } from "../pages/detail-page/features/download/download-dialog/DataUsageForm";
-import { useDetailPageContext } from "../pages/detail-page/context/detail-page-context";
+import { DataUsageInformation } from "@/pages/detail-page/features/download/download-dialog/DataUsageForm";
+import { useDetailPageContext } from "@/pages/detail-page/context/detail-page-context";
 import {
   getDateConditionFrom,
   getFormatFrom,
   getKeyFrom,
   getMultiPolygonFrom,
-} from "../utils/DownloadConditionUtils";
+} from "@/utils/DownloadConditionUtils";
 import {
   DatasetDownloadRequest,
   DownloadConditionType,
   getValidEstimatedSizeBytes,
-} from "../pages/detail-page/context/DownloadDefinitions";
+} from "@/pages/detail-page/context/DownloadDefinitions";
 import { processDatasetDownload } from "@/app/store/searchReducer";
-import { trackCustomEvent } from "../analytics/customEventTracker";
-import { AnalyticsEvent } from "../analytics/analyticsEvents";
-import { calculateBboxes } from "../analytics/downloadCODataEvent";
+import { trackCustomEvent } from "@/analytics/customEventTracker";
+import { AnalyticsEvent } from "@/analytics/analyticsEvents";
+import { calculateBboxes } from "@/analytics/downloadCODataEvent";
 import { MultiPolygon } from "geojson";
-import { pageDefault } from "../components/common/constants";
+import { pageDefault } from "@/components/common/constants";
 import {
   DownloadExecutionResponse,
   getSubmittedDownloadJobID,
@@ -39,7 +39,10 @@ import {
   toUtcEndOfDay,
   toUtcStartOfDay,
 } from "@/utils/DateUtils";
-import { resolveSuggestedCitation } from "@/utils/CitationUtils";
+import {
+  getUsageConstraints,
+  resolveSuggestedCitation,
+} from "@/utils/CitationUtils";
 
 // ================== CONSTANTS ==================
 const STATUS_CODES = {
@@ -372,6 +375,7 @@ export const useDownloadDialog = (
             uuid,
             collection?.title
           ),
+          usage_constraints: getUsageConstraints(collection),
           ...(validEstimatedSizeBytes !== undefined && {
             estimated_size_bytes: validEstimatedSizeBytes,
           }),
