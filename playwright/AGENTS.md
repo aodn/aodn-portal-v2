@@ -59,6 +59,8 @@ not. Setup details: `README.md`.
 - In the Docker image, test deps live in `/opt/venv` (first on `PATH`) and run
   as `python3 -m pytest`. Poetry (pinned in `Dockerfile.test`) only installs;
   don't install into the system Python, where it breaks Poetry itself.
+- E2E runs with no Mapbox token, so `mapbox://` base maps fail to load;
+  `tests/conftest.py` starts the detail map on the local World Imagery style.
 - Map tests render mapbox-gl on SwiftShader (CPU-bound). Launch flags live in
   `tests/conftest.py`. Don't raise `PYTEST_WORKERS` without measuring.
 - CI shards the suite in two (`PYTEST_SPLITS`/`PYTEST_GROUP`, pytest-split,
