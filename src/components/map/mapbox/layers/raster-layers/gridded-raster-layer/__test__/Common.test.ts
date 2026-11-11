@@ -1,12 +1,19 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
+  applyRenderStyleToTemplate,
+  buildGriddedLegendUrl,
+  buildGriddedManifestUrl,
   buildGriddedTileUrl,
+  getGriddedRenderStyle,
+  toLegendRange,
+  toCategoricalLabels,
   buildTileDateMarks,
   formatProductLabel,
   shouldQueryGriddedTiles,
   toGriddedRasterProducts,
   toSelectItems,
 } from "../Common";
+import { DEFAULT_GRIDDED_COLORMAP } from "../TilerColormaps";
 import {
   TileProduct,
   TileProductsResponse,
@@ -275,26 +282,275 @@ describe("toGriddedRasterProducts", () => {
     ]);
   });
 
-  it("normalises dates and keeps the template verbatim", () => {
-    const [product] = toGriddedRasterProducts({
-      products: [
-        visualProduct({
-          available_dates: [
-            "2024-01-02T00:00:00Z",
-            "2024-01-01T00:00:00Z",
-            "2024-01-02T00:00:00Z",
-          ],
-          visual_tile_url_template: TWO_VARIABLE_TEMPLATE,
-          variable: ["UCUR", "VCUR"],
-        }),
-      ],
-    });
+  it("normalises dates and keeps the template verbatim apart from the colormap", () => {
+    const [product] = toGriddedRasterProducts(
+      {
+        products: [
+          visualProduct({
+            available_dates: [
+              "2024-01-02T00:00:00Z",
+              "2024-01-01T00:00:00Z",
+              "2024-01-02T00:00:00Z",
+            ],
+            visual_tile_url_template: TWO_VARIABLE_TEMPLATE,
+            variable: ["UCUR", "VCUR"],
+          }),
+        ],
+      },
+      {}
+    );
     expect(product.dates).toEqual([
       "2024-01-01T00:00:00Z",
       "2024-01-02T00:00:00Z",
     ]);
-    expect(product.template).toBe(TWO_VARIABLE_TEMPLATE);
+    expect(product.template).toBe(`${TWO_VARIABLE_TEMPLATE}&colormap=viridis`);
+    expect(product.template).not.toContain("%252B");
     expect(product.label).toContain("UCUR + VCUR");
+  });
+
+  it("applies the default colormap and server range to an unlisted product", () => {
+    const [product] = toGriddedRasterProducts(
+      { products: [visualProduct()] },
+      {}
+    );
+    expect(product.colormap).toBe(DEFAULT_GRIDDED_COLORMAP);
+    expect(product.rescale).toBeUndefined();
+    expect(product.template).toBe(`${VISUAL_TEMPLATE}&colormap=viridis`);
+  });
+
+  it("applies a listed product's colormap and fixed range to its tiles", () => {
+    const [product] = toGriddedRasterProducts(
+      { products: [visualProduct({ id: "a:one" })] },
+      { "a:one": { colormap: "rdbu_r", rescale: [-1, 1] } }
+    );
+    expect(product.colormap).toBe("rdbu_r");
+    expect(product.rescale).toEqual([-1, 1]);
+    expect(product.template).toBe(
+      `${VISUAL_TEMPLATE}&colormap=rdbu_r&rescale=-1,1`
+    );
+  });
+
+  it("keeps the variable name, joining a two-variable product", () => {
+    const [single, pair] = toGriddedRasterProducts({
+      products: [
+        visualProduct({ id: "a:one", variable: "GSLA" }),
+        visualProduct({ id: "b:two", variable: ["UCUR", "VCUR"] }),
+      ],
+    });
+    expect(single.variable).toBe("GSLA");
+    expect(pair.variable).toBe("UCUR + VCUR");
+  });
+
+  it("reads the categorical flag, treating null or missing as continuous", () => {
+    const [flagged, unknown, missing] = toGriddedRasterProducts({
+      products: [
+        visualProduct({ id: "a:one", categorical: true }),
+        visualProduct({ id: "b:two", categorical: null }),
+        visualProduct({ id: "c:three" }),
+      ],
+    });
+    expect(flagged.categorical).toBe(true);
+    expect(unknown.categorical).toBe(false);
+    expect(missing.categorical).toBe(false);
+  });
+
+  it("never sends a rescale for a categorical product", () => {
+    const [product] = toGriddedRasterProducts(
+      { products: [visualProduct({ id: "a:one", categorical: true })] },
+      { "a:one": { colormap: "mcs_category", rescale: [0, 3] } }
+    );
+    expect(product.rescale).toBeUndefined();
+    expect(product.template).toBe(`${VISUAL_TEMPLATE}&colormap=mcs_category`);
+  });
+
+  it("gives an unlisted categorical product the default categorical colormap", () => {
+    const [product] = toGriddedRasterProducts(
+      { products: [visualProduct({ id: "a:one", categorical: true })] },
+      {}
+    );
+    expect(product.colormap).toBe("default_categorical");
+    expect(product.template).toBe(
+      `${VISUAL_TEMPLATE}&colormap=default_categorical`
+    );
+  });
+
+  it("carries the legend and manifest templates through unresolved", () => {
+    const legend = "/api/v1/ogc/ext/tiles/colormaps/legend?colormap={colormap}";
+    const manifest =
+      "/api/v1/ogc/ext/tiles/collections/uuid-1/data_tiles/manifest" +
+      "?dataset=d&variable=v&datetime={datetime}";
+    const [withBoth, withNeither] = toGriddedRasterProducts({
+      products: [
+        visualProduct({
+          id: "a:one",
+          legend_url: legend,
+          data_manifest_url_template: manifest,
+        }),
+        visualProduct({
+          id: "b:two",
+          legend_url: "",
+          data_manifest_url_template: "",
+        }),
+      ],
+    });
+    expect(withBoth.legendTemplate).toBe(legend);
+    expect(withBoth.manifestTemplate).toBe(manifest);
+    expect(withNeither.legendTemplate).toBeUndefined();
+    expect(withNeither.manifestTemplate).toBeUndefined();
+  });
+});
+
+describe("getGriddedRenderStyle", () => {
+  it("falls back to the default colormap and no range", () => {
+    expect(getGriddedRenderStyle("x:y", false, {})).toEqual({
+      colormap: "viridis",
+      rescale: undefined,
+    });
+  });
+
+  it("keeps the default colormap when only a range is listed", () => {
+    expect(
+      getGriddedRenderStyle("x:y", false, { "x:y": { rescale: [0, 5] } })
+    ).toEqual({ colormap: "viridis", rescale: [0, 5] });
+  });
+
+  it("gives an unlisted categorical product the default categorical colormap", () => {
+    expect(getGriddedRenderStyle("x:y", true, {})).toEqual({
+      colormap: "default_categorical",
+      rescale: undefined,
+    });
+  });
+
+  it("uses a listed categorical product's colormap but never its range", () => {
+    expect(
+      getGriddedRenderStyle("x:y", true, {
+        "x:y": { colormap: "mcs_category", rescale: [0, 3] },
+      })
+    ).toEqual({ colormap: "mcs_category", rescale: undefined });
+  });
+});
+
+describe("applyRenderStyleToTemplate", () => {
+  it("starts a query string when the template has none", () => {
+    expect(applyRenderStyleToTemplate("/tiles/{z}", "viridis")).toBe(
+      "/tiles/{z}?colormap=viridis"
+    );
+  });
+});
+
+describe("buildGriddedManifestUrl", () => {
+  it("fills the datetime verbatim", () => {
+    expect(
+      buildGriddedManifestUrl(
+        "/manifest?variable=v&datetime={datetime}",
+        "2026-06-16T00:00:00Z"
+      )
+    ).toBe("/manifest?variable=v&datetime=2026-06-16T00:00:00Z");
+  });
+
+  it("returns undefined without a template or a datetime", () => {
+    expect(buildGriddedManifestUrl(undefined, "2026-06-16T00:00:00Z")).toBe(
+      undefined
+    );
+    expect(buildGriddedManifestUrl("/m?d={datetime}", undefined)).toBe(
+      undefined
+    );
+  });
+});
+
+describe("toCategoricalLabels", () => {
+  const manifest = {
+    flagValues: [0, 1, 2],
+    flagMeanings: ["none", "moderate", "strong"],
+  };
+  const inline = (values: number[]) =>
+    JSON.stringify({ mode: "categorical", values, colors: [] });
+
+  it("uses the flag meanings in value order", () => {
+    expect(toCategoricalLabels(manifest, "default_categorical")).toEqual([
+      "none",
+      "moderate",
+      "strong",
+    ]);
+  });
+
+  it("falls back to the flag values without one meaning per value", () => {
+    expect(toCategoricalLabels({ flagValues: [0, 1, 2] })).toEqual([
+      "0",
+      "1",
+      "2",
+    ]);
+    expect(
+      toCategoricalLabels({ flagValues: [0, 1], flagMeanings: ["none"] })
+    ).toEqual(["0", "1"]);
+  });
+
+  it("accepts an inline colormap with one value per flag", () => {
+    expect(toCategoricalLabels(manifest, inline([0, 1, 2]))).toHaveLength(3);
+  });
+
+  it("gives no labels when an inline colormap has a different block count", () => {
+    expect(toCategoricalLabels(manifest, inline([0, 1, 2, 3]))).toBeUndefined();
+  });
+
+  it("gives no labels for a continuous manifest", () => {
+    expect(toCategoricalLabels({ valueRange: [0, 1] })).toBeUndefined();
+    expect(toCategoricalLabels(undefined)).toBeUndefined();
+  });
+});
+
+describe("toLegendRange", () => {
+  it("reads a scalar product's valueRange", () => {
+    expect(toLegendRange({ valueRange: [-0.4, 0.9] })).toEqual([-0.4, 0.9]);
+  });
+
+  it("is undefined for a categorical product", () => {
+    expect(
+      toLegendRange({ valueRange: [0, 3], flagValues: [0, 1, 2, 3] })
+    ).toBeUndefined();
+  });
+
+  it("is undefined for an empty or malformed range", () => {
+    expect(toLegendRange({ valueRange: [null, null] })).toBeUndefined();
+    expect(toLegendRange({ valueRange: [1] })).toBeUndefined();
+    expect(toLegendRange({ valueRange: null })).toBeUndefined();
+    expect(toLegendRange({})).toBeUndefined();
+    expect(toLegendRange(undefined)).toBeUndefined();
+  });
+});
+
+describe("buildGriddedLegendUrl", () => {
+  const TEMPLATE = "/api/v1/ogc/ext/tiles/colormaps/legend?colormap={colormap}";
+
+  it("defaults the colormap to viridis", () => {
+    expect(buildGriddedLegendUrl(TEMPLATE)).toBe(
+      "/api/v1/ogc/ext/tiles/colormaps/legend?colormap=viridis"
+    );
+  });
+
+  it("fills in an explicit colormap", () => {
+    expect(buildGriddedLegendUrl(TEMPLATE, "plasma")).toBe(
+      "/api/v1/ogc/ext/tiles/colormaps/legend?colormap=plasma"
+    );
+  });
+
+  it("leaves an already-resolved url untouched", () => {
+    const resolved = "/api/v1/ogc/ext/tiles/colormaps/legend?colormap=accent";
+    expect(buildGriddedLegendUrl(resolved, "viridis")).toBe(resolved);
+  });
+
+  it("url-encodes an inline JSON colormap", () => {
+    const inline = '{"mode":"categorical","values":[0],"colors":["#8c0000"]}';
+    const url = buildGriddedLegendUrl(TEMPLATE, inline);
+    expect(url).toBe(
+      `/api/v1/ogc/ext/tiles/colormaps/legend?colormap=${encodeURIComponent(inline)}`
+    );
+    expect(url).not.toContain("#");
+  });
+
+  it("returns undefined without a url", () => {
+    expect(buildGriddedLegendUrl(undefined)).toBeUndefined();
+    expect(buildGriddedLegendUrl("")).toBeUndefined();
   });
 });
 

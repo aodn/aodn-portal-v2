@@ -55,7 +55,7 @@ import {
   DownloadLayersResponse,
 } from "./GeoserverDefinitions";
 import { Health } from "./systemDefinition";
-import { TileProductsResponse } from "./GriddedTileDefinitions";
+import { TileManifest, TileProductsResponse } from "./GriddedTileDefinitions";
 import { DownloadExecutionResponse } from "./DownloadStatusDefinitions";
 
 export { DatasetFrequency, DatasetStatus } from "./datasetEnums";
@@ -658,6 +658,26 @@ const fetchGriddedTileProducts = createAsyncThunk<
       .catch(errorHandling(thunkApi))
 );
 
+const fetchGriddedTileManifest = createAsyncThunk<
+  TileManifest,
+  { url: string },
+  { rejectValue: ErrorResponse }
+>(
+  "griddedTiles/fetchGriddedTileManifest",
+  (request: { url: string }, thunkApi: any) =>
+    ogcAxiosWithRetry
+      .get<TileManifest>(request.url, {
+        // The url is the backend's own data_manifest_url_template, already
+        // rooted at /api/v1 — don't prefix the instance baseURL again.
+        baseURL: "",
+        signal: thunkApi.signal,
+        // Only feeds legend tick labels; don't hammer DAS during warmup.
+        "axios-retry": { retries: 1, retryDelay: () => 1000 },
+      })
+      .then((response) => response.data)
+      .catch(errorHandling(thunkApi))
+);
+
 const fetchSystemHealthNoStore = createAsyncThunk<
   Health,
   void,
@@ -846,6 +866,7 @@ export {
   fetchGeoServerFieldValues,
   fetchSystemHealthNoStore,
   fetchGriddedTileProducts,
+  fetchGriddedTileManifest,
   processDatasetDownload,
   processWFSDownload,
   processWFSEstimateSize,

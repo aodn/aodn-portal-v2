@@ -64,7 +64,12 @@ def _products_payload(uuid: str) -> dict:
                     'satellite_net_primary_productivity_gsm_1day_aqua',
                     'chl_oc3',
                 ),
-                'legend_url': '/api/v1/ogc/ext/tiles/colormaps/{colormap}/legend',
+                'legend_url': '/api/v1/ogc/ext/tiles/colormaps/legend?colormap={colormap}',
+                'data_manifest_url_template': (
+                    f'/api/v1/ogc/ext/tiles/collections/{uuid}/data_tiles/manifest'
+                    '?dataset=satellite_net_primary_productivity_gsm_1day_aqua'
+                    '&variable=chl_oc3&datetime={datetime}'
+                ),
             },
             {
                 'id': PRODUCT_TWO_ID,
@@ -142,3 +147,15 @@ _TILE_PNG = _build_tile_png()
 
 def handle_gridded_tile_image_api(route: Route) -> None:
     route.fulfill(status=200, content_type='image/png', body=_TILE_PNG)
+
+
+_LEGEND_PNG = _build_tile_png(16)
+
+
+def handle_gridded_tile_manifest_api(route: Route) -> None:
+    """Per-date data-tile manifest; the legend reads valueRange from it."""
+    route.fulfill(json={'valueRange': [0.0, 10.0]})
+
+
+def handle_gridded_tile_legend_api(route: Route) -> None:
+    route.fulfill(status=200, content_type='image/png', body=_LEGEND_PNG)

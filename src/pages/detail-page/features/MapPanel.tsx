@@ -63,6 +63,7 @@ import { bbox as turfBbox } from "@turf/bbox";
 import { createStaticLayers } from "@/components/map/mapbox/layers/StaticLayer";
 
 import WmsLegend from "./WmsLegend";
+import GriddedRasterLegend from "./GriddedRasterLegend";
 import { MAP_DATASET_SELECT_SLOT_ID } from "@/components/map/mapbox/component/MapLayerSelect";
 import {
   DatasetType,
@@ -75,6 +76,8 @@ import {
 } from "@/components/map/mapbox/layers/pmtiles/Common";
 import GriddedRasterLayer from "@/components/map/mapbox/layers/raster-layers/gridded-raster-layer/GriddedRasterLayer";
 import useGriddedRasterLayer from "@/components/map/mapbox/layers/raster-layers/gridded-raster-layer/useGriddedRasterLayer";
+import useGriddedLegendRange from "@/components/map/mapbox/layers/raster-layers/gridded-raster-layer/useGriddedLegendRange";
+import { buildGriddedLegendUrl } from "@/components/map/mapbox/layers/raster-layers/gridded-raster-layer/Common";
 import { portalTheme } from "@/styles";
 
 const mapContainerId = "map-detail-container-id";
@@ -267,6 +270,23 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
     dateSliderProps: griddedDateSliderProps,
   } = useGriddedRasterLayer(collection);
 
+  const selectedGriddedProduct =
+    selectedMapLayerId === LayerName.GriddedRaster
+      ? griddedLayerProps.products.find(
+          (p) => p.id === griddedLayerProps.layerConfig
+        )
+      : undefined;
+  // Same colormap and range rule as the tiles, so the legend labels match them.
+  const griddedLegendRange = useGriddedLegendRange(
+    selectedGriddedProduct,
+    griddedLayerProps.selectedDate
+  );
+  const griddedLegendUrl = griddedLegendRange.ready
+    ? buildGriddedLegendUrl(
+        selectedGriddedProduct?.legendTemplate,
+        selectedGriddedProduct?.colormap
+      )
+    : undefined;
   // Only surface the gridded-layer's fetch error while it's the selected map
   // layer — an error in a hidden layer shouldn't announce itself.
   const griddedRasterErrorAnnouncement =
@@ -672,13 +692,17 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
   const showWmsLegend =
     mapLayerConfig.filter((m) => m?.selected)?.[0]?.id === LayerName.GeoServer;
 
+  const showGriddedRasterLegend =
+    mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
+      LayerName.GriddedRaster && !!griddedLegendUrl;
+
   return (
     <>
       <Box
         sx={{
           width: "100%",
           mt: padding.large,
-          mb: showWmsLegend ? 0 : padding.large,
+          mb: showWmsLegend || showGriddedRasterLegend ? 0 : padding.large,
           borderRadius: borderRadius.small,
           boxShadow: theme.shadows[1],
           // Visible so the date-slider value label can extend past the rail.
@@ -846,6 +870,17 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       {showWmsLegend && (
         <Box sx={{ mb: 1, backgroundColor: "white" }}>
           <WmsLegend uuid={collection.id} layerName={selectedWmsLayer} />
+        </Box>
+      )}
+      {showGriddedRasterLegend && (
+        <Box sx={{ mb: 1, backgroundColor: "white" }}>
+          <GriddedRasterLegend
+            legendUrl={griddedLegendUrl}
+            range={griddedLegendRange.range}
+            labels={griddedLegendRange.labels}
+            variable={selectedGriddedProduct?.variable}
+            layerName={selectedGriddedProduct?.label}
+          />
         </Box>
       )}
     </>
