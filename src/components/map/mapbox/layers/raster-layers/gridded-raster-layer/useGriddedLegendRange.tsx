@@ -6,12 +6,18 @@ import {
   GriddedValueRange,
 } from "@/app/store/GriddedTileDefinitions";
 import {
+  buildGriddedLegendUrl,
   buildGriddedManifestUrl,
   toCategoricalLabels,
   toLegendRange,
 } from "./Common";
 
 export interface GriddedLegendRange {
+  /**
+   * Colour-bar image for the product, set only once `ready`. Undefined while
+   * loading or when the product has no legend_url; the legend is hidden then.
+   */
+  legendUrl?: string;
   /** Range to label the legend with; undefined draws a bare colour bar. */
   range?: GriddedValueRange;
   /** Categorical products: one label per colour block, in order. */
@@ -77,15 +83,21 @@ const useGriddedLegendRange = (
   }, [dispatch, manifestUrl, productId, categorical, colormap]);
 
   if (!product) return { range: undefined, ready: false };
-  if (product.rescale) return { range: product.rescale, ready: true };
-  if (!manifestUrl) return { range: undefined, ready: true };
+  // Same colormap as the tiles, so the bar matches them.
+  const legendUrl = buildGriddedLegendUrl(
+    product.legendTemplate,
+    product.colormap
+  );
+  if (product.rescale) {
+    return { legendUrl, range: product.rescale, ready: true };
+  }
+  if (!manifestUrl) return { legendUrl, range: undefined, ready: true };
 
   const current = settled?.productId === product.id ? settled : undefined;
-  return {
-    range: current?.range,
-    labels: current?.labels,
-    ready: current !== undefined,
-  };
+  // Withheld until the labels land, so they never pop in under a shown bar.
+  return current
+    ? { legendUrl, range: current.range, labels: current.labels, ready: true }
+    : { range: undefined, ready: false };
 };
 
 export default useGriddedLegendRange;

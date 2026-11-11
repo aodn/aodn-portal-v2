@@ -49,6 +49,15 @@ class Map(BasePage):
             'radio', name='Centre points (unclustered)'
         )
         self.gridded_raster_error = page.get_by_test_id('gridded-raster-error')
+        self.gridded_raster_legend = page.get_by_test_id(
+            'gridded-raster-legend'
+        )
+        self.gridded_raster_legend_image = (
+            self.gridded_raster_legend.get_by_role('img')
+        )
+        self.gridded_raster_legend_labels = page.get_by_test_id(
+            'gridded-legend-range'
+        )
 
         self.daterange_show_hide_menu_button = page.get_by_test_id(
             'daterange-show-hide-menu-button'

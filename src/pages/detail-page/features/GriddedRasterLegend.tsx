@@ -84,6 +84,7 @@ const LegendBody: FC<GriddedRasterLegendProps & { legendUrl: string }> = ({
 
   return (
     <Box
+      data-testid="gridded-raster-legend"
       sx={{
         display: "flex",
         alignItems: "center",

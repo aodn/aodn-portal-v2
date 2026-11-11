@@ -157,5 +157,10 @@ def handle_gridded_tile_manifest_api(route: Route) -> None:
     route.fulfill(json={'valueRange': [0.0, 10.0]})
 
 
+def handle_gridded_tile_manifest_failure(route: Route) -> None:
+    """Simulates the manifest endpoint failing; the legend drops its labels."""
+    route.fulfill(status=503, body='Service Unavailable')
+
+
 def handle_gridded_tile_legend_api(route: Route) -> None:
     route.fulfill(status=200, content_type='image/png', body=_LEGEND_PNG)

@@ -77,7 +77,6 @@ import {
 import GriddedRasterLayer from "@/components/map/mapbox/layers/raster-layers/gridded-raster-layer/GriddedRasterLayer";
 import useGriddedRasterLayer from "@/components/map/mapbox/layers/raster-layers/gridded-raster-layer/useGriddedRasterLayer";
 import useGriddedLegendRange from "@/components/map/mapbox/layers/raster-layers/gridded-raster-layer/useGriddedLegendRange";
-import { buildGriddedLegendUrl } from "@/components/map/mapbox/layers/raster-layers/gridded-raster-layer/Common";
 import { portalTheme } from "@/styles";
 
 const mapContainerId = "map-detail-container-id";
@@ -276,17 +275,11 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
           (p) => p.id === griddedLayerProps.layerConfig
         )
       : undefined;
-  // Same colormap and range rule as the tiles, so the legend labels match them.
-  const griddedLegendRange = useGriddedLegendRange(
+  // Same colormap and range rule as the tiles, so the legend matches them.
+  const griddedLegend = useGriddedLegendRange(
     selectedGriddedProduct,
     griddedLayerProps.selectedDate
   );
-  const griddedLegendUrl = griddedLegendRange.ready
-    ? buildGriddedLegendUrl(
-        selectedGriddedProduct?.legendTemplate,
-        selectedGriddedProduct?.colormap
-      )
-    : undefined;
   // Only surface the gridded-layer's fetch error while it's the selected map
   // layer — an error in a hidden layer shouldn't announce itself.
   const griddedRasterErrorAnnouncement =
@@ -694,7 +687,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
 
   const showGriddedRasterLegend =
     mapLayerConfig.filter((m) => m?.selected)?.[0]?.id ===
-      LayerName.GriddedRaster && !!griddedLegendUrl;
+      LayerName.GriddedRaster && !!griddedLegend.legendUrl;
 
   return (
     <>
@@ -875,9 +868,9 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
       {showGriddedRasterLegend && (
         <Box sx={{ mb: 1, backgroundColor: "white" }}>
           <GriddedRasterLegend
-            legendUrl={griddedLegendUrl}
-            range={griddedLegendRange.range}
-            labels={griddedLegendRange.labels}
+            legendUrl={griddedLegend.legendUrl}
+            range={griddedLegend.range}
+            labels={griddedLegend.labels}
             variable={selectedGriddedProduct?.variable}
             layerName={selectedGriddedProduct?.label}
           />

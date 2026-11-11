@@ -21,6 +21,9 @@ const wrapper = ({ children }: { children: ReactNode }) => (
   <Provider store={store}>{children}</Provider>
 );
 
+const LEGEND_TEMPLATE =
+  "/api/v1/ogc/ext/tiles/colormaps/legend?colormap={colormap}";
+
 const MANIFEST_PATH =
   "/api/v1/ogc/ext/tiles/collections/uuid-1/data_tiles/manifest";
 
@@ -33,6 +36,7 @@ const product = (
   dates: ["2026-06-15T00:00:00Z", "2026-06-16T00:00:00Z"],
   colormap: "viridis",
   categorical: false,
+  legendTemplate: LEGEND_TEMPLATE,
   manifestTemplate: `${MANIFEST_PATH}?dataset=d&variable=v&datetime={datetime}`,
   ...overrides,
 });
@@ -65,7 +69,11 @@ describe("useGriddedLegendRange", () => {
         ),
       { wrapper }
     );
-    expect(result.current).toEqual({ range: [-1, 1], ready: true });
+    expect(result.current).toEqual({
+      legendUrl: "/api/v1/ogc/ext/tiles/colormaps/legend?colormap=viridis",
+      range: [-1, 1],
+      ready: true,
+    });
     expect(requested).toHaveLength(0);
   });
 
@@ -146,7 +154,11 @@ describe("useGriddedLegendRange", () => {
         ),
       { wrapper }
     );
-    expect(result.current).toEqual({ range: undefined, ready: true });
+    expect(result.current).toEqual({
+      legendUrl: "/api/v1/ogc/ext/tiles/colormaps/legend?colormap=viridis",
+      range: undefined,
+      ready: true,
+    });
     expect(requested).toHaveLength(0);
   });
 
@@ -169,8 +181,55 @@ describe("useGriddedLegendRange", () => {
     await waitFor(() => expect(result.current.range).toEqual([0, 1]));
 
     rerender({ datetime: "2026-06-16T00:00:00Z" });
-    expect(result.current).toEqual({ range: [0, 1], ready: true });
+    expect(result.current.range).toEqual([0, 1]);
+    expect(result.current.ready).toBe(true);
 
     await waitFor(() => expect(result.current.range).toEqual([2, 3]));
+  });
+
+  it("withholds the legend url until the manifest has answered", async () => {
+    const { result } = renderHook(
+      () => useGriddedLegendRange(product(), "2026-06-16T00:00:00Z"),
+      { wrapper }
+    );
+    expect(result.current.legendUrl).toBeUndefined();
+
+    await waitFor(() => expect(result.current.ready).toBe(true));
+    expect(result.current.legendUrl).toBe(
+      "/api/v1/ogc/ext/tiles/colormaps/legend?colormap=viridis"
+    );
+  });
+
+  it("builds the legend url with the product's own colormap", () => {
+    const { result } = renderHook(
+      () =>
+        useGriddedLegendRange(
+          product({ colormap: "plasma", rescale: [0, 1] }),
+          "2026-06-16T00:00:00Z"
+        ),
+      { wrapper }
+    );
+    expect(result.current.legendUrl).toBe(
+      "/api/v1/ogc/ext/tiles/colormaps/legend?colormap=plasma"
+    );
+  });
+
+  it("gives no legend url for a product without a legend template", () => {
+    const { result } = renderHook(
+      () =>
+        useGriddedLegendRange(
+          product({ legendTemplate: undefined, manifestTemplate: undefined }),
+          "2026-06-16T00:00:00Z"
+        ),
+      { wrapper }
+    );
+    expect(result.current.legendUrl).toBeUndefined();
+  });
+
+  it("gives nothing without a product", () => {
+    const { result } = renderHook(() => useGriddedLegendRange(undefined), {
+      wrapper,
+    });
+    expect(result.current).toEqual({ range: undefined, ready: false });
   });
 });

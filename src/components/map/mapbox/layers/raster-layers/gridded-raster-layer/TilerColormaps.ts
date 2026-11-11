@@ -44,6 +44,14 @@ export interface GriddedRenderStyle {
   rescale?: GriddedValueRange;
 }
 
+// Heatwave/cold-spell category flags: 0 none, 1 moderate, 2 strong,
+// 3 severe, 4 extreme.
+const HEATWAVE_CATEGORY_COLORMAP = inlineColormap({
+  mode: "categorical",
+  values: [0, 1, 2, 3, 4],
+  colors: ["#8c0000", "#ff9701", "#67ff96", "#007bff", "#00078f"],
+});
+
 /**
  * Single source of truth for how each product is coloured: both the tile
  * request and the legend request read from here. Keyed by product id
@@ -58,25 +66,13 @@ export const GRIDDED_RENDER_STYLE_BY_PRODUCT: Record<
 > = {
   // Categorical products (variables with CF flag_values), as of 2026-11-11.
   "satellite_austemp_heatwave_14day:mcs_category": {
-    colormap: inlineColormap({
-      mode: "categorical",
-      values: [0, 1, 2, 3, 4],
-      colors: ["#8c0000", "#ff9701", "#67ff96", "#007bff", "#00078f"],
-    }),
+    colormap: HEATWAVE_CATEGORY_COLORMAP,
   },
   "satellite_austemp_heatwave_14day:mcs_category_mosaic": {
-    colormap: inlineColormap({
-      mode: "categorical",
-      values: [0, 1, 2, 3, 4],
-      colors: ["#8c0000", "#ff9701", "#67ff96", "#007bff", "#00078f"],
-    }),
+    colormap: HEATWAVE_CATEGORY_COLORMAP,
   },
   "satellite_austemp_heatwave_14day:mhw_category_mosaic": {
-    colormap: inlineColormap({
-      mode: "categorical",
-      values: [0, 1, 2, 3, 4],
-      colors: ["#8c0000", "#ff9701", "#67ff96", "#007bff", "#00078f"],
-    }),
+    colormap: HEATWAVE_CATEGORY_COLORMAP,
   },
   "satellite_austemp_heatwave_14day:ssta_mosaic": {
     colormap: inlineColormap({

@@ -11,6 +11,7 @@ from mocks.api.gridded_tiles import (
     PRODUCT_TWO_DATES,
     SUPPORTED_UUID,
     UNSUPPORTED_UUID,
+    handle_gridded_tile_manifest_failure,
     handle_gridded_tile_products_failure,
 )
 from mocks.api_router import ApiRouter
@@ -330,6 +331,77 @@ def test_gridded_layer_survives_a_basemap_switch(
     expect(detail_page.detail_map.geoserver_layer).to_have_count(0)
     expect(detail_page.detail_map.spatial_extent_layer).to_have_count(0)
     expect(detail_page.detail_map.gridded_data_layer).to_be_checked()
+
+
+def test_gridded_legend_shows_the_colour_bar_and_the_manifest_range(
+    responsive_page: Page,
+) -> None:
+    """
+    With Gridded Data selected, the legend shows the colour bar in the
+    product's colormap, five values evenly spaced across the selected day's
+    manifest valueRange, and the variable. A product with no legend_url shows
+    no legend.
+    """
+    detail_page = DetailPage(responsive_page)
+    detail_map = detail_page.detail_map
+
+    with responsive_page.expect_request(
+        lambda request: '/data_tiles/manifest' in request.url,
+        timeout=_UI_TIMEOUT_MS,
+    ) as manifest_request:
+        detail_page.load(SUPPORTED_UUID)
+        _prepare_detail_map(detail_page)
+        _open_gridded_layer(detail_page)
+
+    # The range is read for the day the map is showing.
+    assert f'datetime={PRODUCT_ONE_DATES[-1]}' in manifest_request.value.url
+
+    expect(detail_map.gridded_raster_legend).to_be_visible(
+        timeout=_UI_TIMEOUT_MS
+    )
+    expect(detail_map.gridded_raster_legend_image).to_have_attribute(
+        'src', '/api/v1/ogc/ext/tiles/colormaps/legend?colormap=viridis'
+    )
+    # The mock manifest's valueRange is [0, 10].
+    for label in ('0', '2.5', '5', '7.5', '10'):
+        expect(
+            detail_map.gridded_raster_legend_labels.get_by_text(
+                label, exact=True
+            )
+        ).to_be_visible()
+    expect(
+        detail_map.gridded_raster_legend.get_by_text('CHL_OC3')
+    ).to_be_visible()
+
+    # Product two has no legend_url, so its legend is hidden.
+    detail_page.dataset_selection_dropdown.click()
+    responsive_page.get_by_role('option').nth(1).click()
+    detail_map.wait_for_map_idle()
+    expect(detail_map.gridded_raster_legend).to_have_count(0)
+
+
+def test_gridded_legend_falls_back_to_a_bare_bar_when_the_manifest_fails(
+    responsive_page: Page,
+) -> None:
+    """
+    A failed manifest lookup still shows the colour bar, just without values.
+    """
+    api_router = ApiRouter(responsive_page)
+    responsive_page.unroute(Routes.GRIDDED_TILE_MANIFEST)
+    api_router.route_gridded_tile_manifest(handle_gridded_tile_manifest_failure)
+
+    detail_page = DetailPage(responsive_page)
+    detail_map = detail_page.detail_map
+
+    detail_page.load(SUPPORTED_UUID)
+    _prepare_detail_map(detail_page)
+    _open_gridded_layer(detail_page)
+
+    expect(detail_map.gridded_raster_legend).to_be_visible(
+        timeout=_UI_TIMEOUT_MS
+    )
+    expect(detail_map.gridded_raster_legend_image).to_be_visible()
+    expect(detail_map.gridded_raster_legend_labels).to_have_count(0)
 
 
 @pytest.mark.parametrize('uuid', [SUPPORTED_UUID])
