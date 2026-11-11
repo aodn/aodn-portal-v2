@@ -169,7 +169,7 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
         );
       }
       default: {
-        return [];
+        return DOWNLOAD_FORMAT;
       }
     }
   }, [collection, selectedDataItem]);
