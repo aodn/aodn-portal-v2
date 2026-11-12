@@ -6,6 +6,8 @@ import { userEvent } from "@testing-library/user-event";
 import { pageDefault } from "@/components/common/constants";
 import { MemoryRouter, useLocation } from "react-router-dom";
 import useUrlReachable from "@/hooks/useUrlReachable";
+import { trackCustomEvent } from "@/analytics/customEventTracker";
+import { AnalyticsEvent } from "@/analytics/analyticsEvents";
 
 vi.mock("@/utils/LinkUtils", () => ({
   openInNewTab: vi.fn(),
@@ -79,6 +81,21 @@ describe("HeaderMenu", () => {
 
         expect(openInNewTab).toHaveBeenCalledWith(
           pageDefault.url.LEGACY_PORTAL
+        );
+      }
+    );
+
+    it.each([HeaderMenuStyle.DROPDOWN_MENU, HeaderMenuStyle.ACCORDION_MENU])(
+      "tracks the legacy portal click in %s style",
+      async (menuStyle) => {
+        mockedUseUrlReachable.mockReturnValue(true);
+        const user = userEvent.setup();
+        renderHeaderMenu(menuStyle);
+
+        await user.click(screen.getByText("Legacy Portal"));
+
+        expect(trackCustomEvent).toHaveBeenCalledWith(
+          AnalyticsEvent.LEGACY_PORTAL_CLICK
         );
       }
     );
