@@ -353,7 +353,7 @@ export const buildGriddedTileUrl = (
     .join("{x}");
 };
 
-const COORDINATE_DECIMALS = 4;
+const COORDINATE_DECIMALS = 2;
 const VALUE_SIGNIFICANT_DIGITS = 4;
 
 /** Mapbox reports unwrapped longitudes past ±180 on world copies; the backend rejects them. */

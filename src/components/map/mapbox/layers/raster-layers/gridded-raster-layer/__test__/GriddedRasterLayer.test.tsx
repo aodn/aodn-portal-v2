@@ -401,8 +401,8 @@ describe("GriddedRasterLayer", () => {
       expect(popup.isOpen()).toBe(true);
       expect(popup.element.dataset.testid).toBe("map-popup");
       await waitFor(() => expect(popup.html).toContain("UCUR: 0.06317 m/s"));
-      expect(popup.html).toContain("Lat: -44.2000");
-      expect(popup.html).toContain("Lon: 132.0000");
+      expect(popup.html).toContain("Lat: -44.20<br>");
+      expect(popup.html).toContain("Lon: 132.00<br>");
       expect(popup.html).toContain("VCUR: No data");
     });
 

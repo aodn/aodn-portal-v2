@@ -160,7 +160,7 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
       if (!current.isOpen()) current.addTo(map);
       const element = current.getElement();
       if (element) element.dataset.testid = playwrightTestIds.DETAIL_MAP_POPUP;
-
+      // TODO: for categorical products, show flagMeanings instead of the numeric value in flagValues.
       const pending = dispatch(fetchGriddedTilePointValue({ url }));
       request = pending;
       pending

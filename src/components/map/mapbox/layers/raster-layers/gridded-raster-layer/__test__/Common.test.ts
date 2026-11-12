@@ -654,15 +654,15 @@ describe("buildPointValuePopupHtml", () => {
       },
       { lat: -44.27, lon: 132.01 }
     );
-    expect(html).toContain("Lat: -44.2000");
-    expect(html).toContain("Lon: 132.0000");
+    expect(html).toContain("Lat: -44.20<br>");
+    expect(html).toContain("Lon: 132.00<br>");
     expect(html).toContain("GSLA: 0.04685 m");
   });
 
   it("falls back to the clicked point and shows no data without variables", () => {
     const html = buildPointValuePopupHtml({}, { lat: -10, lon: 20 });
-    expect(html).toContain("Lat: -10.0000");
-    expect(html).toContain("Lon: 20.0000");
+    expect(html).toContain("Lat: -10.00<br>");
+    expect(html).toContain("Lon: 20.00<br>");
     expect(html).toContain("No data");
   });
 });
