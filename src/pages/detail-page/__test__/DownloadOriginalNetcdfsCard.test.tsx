@@ -75,13 +75,13 @@ describe("DownloadOriginalNetcdfsCard", () => {
     vi.clearAllMocks();
   });
 
-  it("shows the link title as the only data option and CSV as the only format", () => {
+  it("shows one data option named List of NetCDF and CSV as the only format", () => {
     renderCard();
 
     const dataOptions = getOptions("select-data-selection");
     expect(dataOptions).toHaveLength(1);
     expect(dataOptions[0].value).toBe("original_netcdfs");
-    expect(dataOptions[0].textContent).toBe("original_netcdfs");
+    expect(dataOptions[0].textContent).toBe("List of NetCDF");
 
     const formatOptions = getOptions("select-format-selection");
     expect(formatOptions).toHaveLength(1);
