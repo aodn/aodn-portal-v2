@@ -308,8 +308,10 @@ describe("toGriddedRasterProducts", () => {
       "2024-01-01T00:00:00Z",
       "2024-01-02T00:00:00Z",
     ]);
-    expect(product.template).toBe(`${TWO_VARIABLE_TEMPLATE}&colormap=viridis`);
-    expect(product.template).not.toContain("%252B");
+    expect(product.tileTemplate).toBe(
+      `${TWO_VARIABLE_TEMPLATE}&colormap=viridis`
+    );
+    expect(product.tileTemplate).not.toContain("%252B");
     expect(product.label).toContain("UCUR + VCUR");
   });
 
@@ -320,7 +322,7 @@ describe("toGriddedRasterProducts", () => {
     );
     expect(product.colormap).toBe(DEFAULT_GRIDDED_COLORMAP);
     expect(product.rescale).toBeUndefined();
-    expect(product.template).toBe(`${VISUAL_TEMPLATE}&colormap=viridis`);
+    expect(product.tileTemplate).toBe(`${VISUAL_TEMPLATE}&colormap=viridis`);
   });
 
   it("applies a listed product's colormap and fixed range to its tiles", () => {
@@ -330,7 +332,7 @@ describe("toGriddedRasterProducts", () => {
     );
     expect(product.colormap).toBe("rdbu_r");
     expect(product.rescale).toEqual([-1, 1]);
-    expect(product.template).toBe(
+    expect(product.tileTemplate).toBe(
       `${VISUAL_TEMPLATE}&colormap=rdbu_r&rescale=-1,1`
     );
   });
@@ -365,7 +367,9 @@ describe("toGriddedRasterProducts", () => {
       { "a:one": { colormap: "mcs_category", rescale: [0, 3] } }
     );
     expect(product.rescale).toBeUndefined();
-    expect(product.template).toBe(`${VISUAL_TEMPLATE}&colormap=mcs_category`);
+    expect(product.tileTemplate).toBe(
+      `${VISUAL_TEMPLATE}&colormap=mcs_category`
+    );
   });
 
   it("gives an unlisted categorical product the default categorical colormap", () => {
@@ -374,7 +378,7 @@ describe("toGriddedRasterProducts", () => {
       {}
     );
     expect(product.colormap).toBe("default_categorical");
-    expect(product.template).toBe(
+    expect(product.tileTemplate).toBe(
       `${VISUAL_TEMPLATE}&colormap=default_categorical`
     );
   });

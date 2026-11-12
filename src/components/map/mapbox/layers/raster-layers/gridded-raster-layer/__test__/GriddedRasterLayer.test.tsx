@@ -65,7 +65,7 @@ const PRODUCTS: GriddedRasterProduct[] = [
   {
     id: "a:one",
     label: "a — one",
-    template: TEMPLATE,
+    tileTemplate: TEMPLATE,
     dates: ["2024-01-01", "2024-01-02", "2024-01-03"],
     pointTemplate:
       "/api/v1/ogc/ext/tiles/collections/uuid-1/data_tiles/point" +
@@ -76,7 +76,7 @@ const PRODUCTS: GriddedRasterProduct[] = [
   {
     id: "b:two",
     label: "b — two",
-    template: TEMPLATE.replace("uuid-1", "uuid-2"),
+    tileTemplate: TEMPLATE.replace("uuid-1", "uuid-2"),
     dates: ["2024-02-01"],
     colormap: "viridis",
     categorical: false,

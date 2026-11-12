@@ -56,7 +56,10 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
   const sourceId = getSourceId(mapContainerId);
   const tileLayerId = getGriddedRasterLayerId(mapContainerId);
   const selectedProduct = products.find((p) => p.id === layerConfig);
-  const tileUrl = buildGriddedTileUrl(selectedProduct?.template, selectedDate);
+  const tileUrl = buildGriddedTileUrl(
+    selectedProduct?.tileTemplate,
+    selectedDate
+  );
   const pointTemplate = selectedProduct?.pointTemplate;
   const hasTileUrl = tileUrl !== undefined;
 

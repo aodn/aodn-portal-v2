@@ -203,8 +203,6 @@ export interface GriddedRasterLayerControls extends LayerSelectable<string> {
   onLayerChange: (id: string) => void;
   /** Full UTC datetime, round-tripped verbatim from the listing — never derived from a Date. */
   selectedDate?: string;
-  /** Collection the point-value query is scoped to. */
-  uuid?: string;
   /** A refetch failed while this layer was selected. */
   error?: boolean;
   onRetry?: () => void;
@@ -305,7 +303,7 @@ export const toGriddedRasterProducts = (
       variable: Array.isArray(product.variable)
         ? product.variable.join(" + ")
         : nonEmptyString(product.variable),
-      template: applyRenderStyleToTemplate(template, colormap, rescale),
+      tileTemplate: applyRenderStyleToTemplate(template, colormap, rescale),
       dates: marks.dates,
       colormap,
       categorical,
