@@ -18,7 +18,7 @@ import DownloadSourceChip from "./DownloadSourceChip";
 const formatOptions = [{ label: "CSV", value: "csv" }];
 
 // Shown to the user instead of the raw link title
-const DATA_SELECTION_LABEL = "List of NetCDF";
+const DATA_SELECTION_LABEL = "List of NetCDFs";
 
 interface DownloadOriginalNetcdfsCardProps extends DownloadCondition {
   collection: OGCCollection;
