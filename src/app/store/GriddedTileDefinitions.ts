@@ -25,4 +25,28 @@ export interface GriddedRasterProduct {
   template: string;
   // Full UTC datetimes, e.g. "2024-01-01T00:00:00Z", ascending, de-duplicated by calendar day, non-empty.
   dates: string[];
+  // Raw "dataset=...&variable=..." taken verbatim from the visual template
+  // (keeps %2B intact) for the point-value query. Absent if the template has neither.
+  pointQuery?: string;
+}
+
+export interface TilePointValueRequest {
+  uuid: string;
+  pointQuery: string;
+  datetime: string;
+  lat: number;
+  lon: number;
+}
+
+export interface TilePointVariableValue {
+  // null where the grid cell has no data (e.g. land)
+  value: number | null;
+  units?: string;
+}
+
+export interface TilePointValueResponse {
+  // Snapped to the nearest grid cell, not the clicked point.
+  lat?: number;
+  lon?: number;
+  variables?: Record<string, TilePointVariableValue>;
 }

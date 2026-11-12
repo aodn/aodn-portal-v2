@@ -1,7 +1,11 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   buildGriddedTileUrl,
+  buildPointValuePopupHtml,
   buildTileDateMarks,
+  extractPointQuery,
+  formatPointValue,
+  wrapLongitude,
   formatProductLabel,
   shouldQueryGriddedTiles,
   toGriddedRasterProducts,
@@ -310,5 +314,67 @@ describe("toSelectItems", () => {
       { value: "b_dataset:bbb", label: "b dataset — GSLA" },
       { value: "a_dataset:aaa", label: "a dataset — GSLA" },
     ]);
+  });
+});
+
+describe("extractPointQuery", () => {
+  it("keeps dataset and variable verbatim, including %2B", () => {
+    expect(extractPointQuery(TWO_VARIABLE_TEMPLATE)).toBe(
+      "dataset=model_currents&variable=ucur%2Bvcur"
+    );
+  });
+
+  it("is undefined when the template has no dataset or variable", () => {
+    expect(extractPointQuery(undefined)).toBeUndefined();
+    expect(extractPointQuery("/tiles/{z}")).toBeUndefined();
+    expect(extractPointQuery("/tiles/{z}?f=png")).toBeUndefined();
+  });
+
+  it("is attached to each product by toGriddedRasterProducts", () => {
+    const [product] = toGriddedRasterProducts({ products: [visualProduct()] });
+    expect(product.pointQuery).toBe(
+      "dataset=model_sea_level_anomaly_gridded_realtime&variable=gsla"
+    );
+  });
+});
+
+describe("wrapLongitude", () => {
+  it("wraps world-copy longitudes into -180..180", () => {
+    expect(wrapLongitude(132)).toBe(132);
+    expect(wrapLongitude(190)).toBe(-170);
+    expect(wrapLongitude(-190)).toBe(170);
+    expect(wrapLongitude(540)).toBe(-180);
+  });
+});
+
+describe("formatPointValue", () => {
+  it("rounds to 4 significant digits and reports missing values", () => {
+    expect(formatPointValue(0.046846628)).toBe("0.04685");
+    expect(formatPointValue(1234.5678)).toBe("1235");
+    expect(formatPointValue(null)).toBe("No data");
+    expect(formatPointValue(Number.NaN)).toBe("No data");
+  });
+});
+
+describe("buildPointValuePopupHtml", () => {
+  it("prefers the snapped grid coordinates and lists each variable", () => {
+    const html = buildPointValuePopupHtml(
+      {
+        lat: -44.20000076,
+        lon: 132,
+        variables: { GSLA: { value: 0.046846628, units: "m" } },
+      },
+      { lat: -44.27, lon: 132.01 }
+    );
+    expect(html).toContain("Lat: -44.2000");
+    expect(html).toContain("Lon: 132.0000");
+    expect(html).toContain("GSLA: 0.04685 m");
+  });
+
+  it("falls back to the clicked point and shows no data without variables", () => {
+    const html = buildPointValuePopupHtml({}, { lat: -10, lon: 20 });
+    expect(html).toContain("Lat: -10.0000");
+    expect(html).toContain("Lon: 20.0000");
+    expect(html).toContain("No data");
   });
 });

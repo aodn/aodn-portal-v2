@@ -55,7 +55,11 @@ import {
   DownloadLayersResponse,
 } from "./GeoserverDefinitions";
 import { Health } from "./systemDefinition";
-import { TileProductsResponse } from "./GriddedTileDefinitions";
+import {
+  TilePointValueRequest,
+  TilePointValueResponse,
+  TileProductsResponse,
+} from "./GriddedTileDefinitions";
 import { DownloadExecutionResponse } from "./DownloadStatusDefinitions";
 
 export { DatasetFrequency, DatasetStatus } from "./datasetEnums";
@@ -658,6 +662,30 @@ const fetchGriddedTileProducts = createAsyncThunk<
       .catch(errorHandling(thunkApi))
 );
 
+const fetchGriddedTilePointValue = createAsyncThunk<
+  TilePointValueResponse,
+  TilePointValueRequest,
+  { rejectValue: ErrorResponse }
+>(
+  "griddedTiles/fetchGriddedTilePointValue",
+  (request: TilePointValueRequest, thunkApi: any) =>
+    ogcAxiosWithRetry
+      .get<TilePointValueResponse>(
+        // Built as a raw string, not via `params`: axios would re-encode the
+        // %2B in a multi-variable pointQuery into %252B.
+        `/ogc/ext/tiles/collections/${request.uuid}/data_tiles/point?` +
+          `${request.pointQuery}&datetime=${request.datetime}` +
+          `&lat=${request.lat}&lon=${request.lon}`,
+        {
+          signal: thunkApi.signal,
+          // Interactive click: fail fast rather than back off 10x.
+          "axios-retry": { retries: 1 },
+        }
+      )
+      .then((response) => response.data)
+      .catch(errorHandling(thunkApi))
+);
+
 const fetchSystemHealthNoStore = createAsyncThunk<
   Health,
   void,
@@ -846,6 +874,7 @@ export {
   fetchGeoServerFieldValues,
   fetchSystemHealthNoStore,
   fetchGriddedTileProducts,
+  fetchGriddedTilePointValue,
   processDatasetDownload,
   processWFSDownload,
   processWFSEstimateSize,

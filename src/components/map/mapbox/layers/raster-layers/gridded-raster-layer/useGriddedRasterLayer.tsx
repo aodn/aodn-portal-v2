@@ -82,6 +82,7 @@ const useGriddedRasterLayer = (
         layerConfig: selectedProduct?.id ?? "",
         onLayerChange: setProductOverride,
         selectedDate,
+        uuid: collection?.id,
         error,
         onRetry: retry,
       },
@@ -93,6 +94,7 @@ const useGriddedRasterLayer = (
       },
     }),
     [
+      collection?.id,
       products,
       loading,
       marks,

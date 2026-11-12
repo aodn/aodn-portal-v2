@@ -5,9 +5,11 @@ import {
 } from "@/app/store/OGCCollectionDefinitions";
 import {
   GriddedRasterProduct,
+  TilePointValueResponse,
   TileProduct,
   TileProductsResponse,
 } from "@/app/store/GriddedTileDefinitions";
+import { InnerHtmlBuilder } from "@/utils/HtmlUtils";
 import { utcDayKeyToUnixMs, utcIsoToDayKey } from "@/utils/DateUtils";
 import { LayerSelectable } from "@/components/map/mapbox/layers/Layers";
 
@@ -45,6 +47,8 @@ export interface GriddedRasterLayerControls extends LayerSelectable<string> {
   onLayerChange: (id: string) => void;
   /** Full UTC datetime, round-tripped verbatim from the listing — never derived from a Date. */
   selectedDate?: string;
+  /** Collection the point-value query is scoped to. */
+  uuid?: string;
   /** A refetch failed while this layer was selected. */
   error?: boolean;
   onRetry?: () => void;
@@ -99,6 +103,22 @@ export const formatProductLabel = (product: TileProduct): string => {
   return `${dataset} — ${variables}`;
 };
 
+const POINT_QUERY_KEYS = ["dataset", "variable"];
+
+/**
+ * Picks `dataset=...&variable=...` out of a tile template's query string,
+ * verbatim. Plain string splitting (not URLSearchParams) for the same reason
+ * as buildGriddedTileUrl: `ucur%2Bvcur` must reach the wire unchanged.
+ */
+export const extractPointQuery = (template?: string): string | undefined => {
+  const query = template?.split("?")[1];
+  if (!query) return undefined;
+  const picked = query
+    .split("&")
+    .filter((pair) => POINT_QUERY_KEYS.includes(pair.split("=")[0]));
+  return picked.length > 0 ? picked.join("&") : undefined;
+};
+
 export const toGriddedRasterProducts = (
   response?: TileProductsResponse
 ): GriddedRasterProduct[] => {
@@ -131,11 +151,13 @@ export const toGriddedRasterProducts = (
     const marks = buildTileDateMarks(product.available_dates);
     if (marks.dates.length === 0) return;
 
+    const pointQuery = extractPointQuery(template);
     result.push({
       id: product.id,
       label: formatProductLabel(product),
       template,
       dates: marks.dates,
+      ...(pointQuery ? { pointQuery } : {}),
     });
   });
   return result;
@@ -177,3 +199,50 @@ export const buildGriddedTileUrl = (
     .split("{tileCol}")
     .join("{x}");
 };
+
+const COORDINATE_DECIMALS = 4;
+const VALUE_SIGNIFICANT_DIGITS = 4;
+
+/** Mapbox reports unwrapped longitudes past ±180 on world copies; the backend rejects them. */
+export const wrapLongitude = (lon: number): number =>
+  ((((lon + 180) % 360) + 360) % 360) - 180;
+
+export const formatPointValue = (value: number | null | undefined): string =>
+  typeof value === "number" && Number.isFinite(value)
+    ? String(Number(value.toPrecision(VALUE_SIGNIFICANT_DIGITS)))
+    : "No data";
+
+const formatCoordinate = (value: number): string =>
+  value.toFixed(COORDINATE_DECIMALS);
+
+/**
+ * Popup body for a point-value lookup. Coordinates are the grid cell the
+ * backend snapped to, falling back to the clicked point.
+ */
+export const buildPointValuePopupHtml = (
+  response: TilePointValueResponse | undefined,
+  clicked: { lat: number; lon: number }
+): string => {
+  const lat = response?.lat ?? clicked.lat;
+  const lon = response?.lon ?? clicked.lon;
+  const builder = new InnerHtmlBuilder()
+    .addTitle("Gridded Data Value")
+    .addText(`Lat: ${formatCoordinate(lat)}`)
+    .addText(`Lon: ${formatCoordinate(lon)}`);
+
+  const variables = Object.entries(response?.variables ?? {});
+  if (variables.length === 0) return builder.addText("No data").getHtml();
+
+  variables.forEach(([name, entry]) => {
+    const value = formatPointValue(entry?.value);
+    const units = entry?.units && value !== "No data" ? ` ${entry.units}` : "";
+    builder.addText(`${name}: ${value}${units}`);
+  });
+  return builder.getHtml();
+};
+
+export const buildPointValueMessageHtml = (message: string): string =>
+  new InnerHtmlBuilder()
+    .addTitle("Gridded Data Value")
+    .addText(message)
+    .getHtml();
