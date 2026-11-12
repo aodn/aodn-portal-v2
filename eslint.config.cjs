@@ -14,7 +14,7 @@ module.exports = [
     "dist/**",
     "coverage/**",
     "html-reports/**",
-    "playwright/.venv/**",
+    "**/.venv/",
     "playwright/pages/js_scripts/**",
   ]),
 
