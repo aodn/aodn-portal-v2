@@ -5,11 +5,16 @@ import { padding } from "../../../../styles/constants";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 import bannerImage1 from "@/assets/images/banner_image_1.webp";
 import bannerImage1Small from "@/assets/images/banner_image_1_320.webp";
+import bannerImage1Full from "@/assets/images/banner_image_1_full.webp";
 import bannerImage2 from "@/assets/images/banner_image_2.webp";
+import bannerImage2Full from "@/assets/images/banner_image_2_full.webp";
 import bannerImage3 from "@/assets/images/banner_image_3.webp";
 import bannerImage3Small from "@/assets/images/banner_image_3_120.webp";
 import { portalTheme } from "../../../../styles";
 import FeedbackButton from "@/components/feedback/FeedbackButton";
+
+// Title size from the design, used from tablet up
+const titleSx = { fontSize: "56px", fontWeight: 500, lineHeight: "68px" };
 
 const renderBannerText = (isMobile: boolean) => {
   return (
@@ -37,9 +42,10 @@ const renderBannerText = (isMobile: boolean) => {
               color: portalTheme.palette.text2,
               textAlign: "left",
               p: padding.nil,
+              [portalTheme.breakpoints.up("sm")]: titleSx,
             }}
           >
-            IMOS Australian
+            Australian Ocean
           </Typography>
           {/* Without this space the h1 text reads "AustralianOcean" */}{" "}
           <Typography
@@ -48,9 +54,10 @@ const renderBannerText = (isMobile: boolean) => {
               color: portalTheme.palette.text2,
               textAlign: "left",
               p: padding.nil,
+              [portalTheme.breakpoints.up("sm")]: titleSx,
             }}
           >
-            Ocean Data Portal
+            Data Portal
           </Typography>
         </Box>
         <Typography
@@ -59,6 +66,7 @@ const renderBannerText = (isMobile: boolean) => {
             color: portalTheme.palette.text2,
             whiteSpace: "wrap",
             p: padding.nil,
+            mt: 2,
           }}
         >
           &quot;Open access to Australian marine and climate science
@@ -91,7 +99,7 @@ const renderBannerImages = (
         <Box sx={{ position: "relative", display: "inline-block" }}>
           <button
             type="button"
-            onClick={() => onImageClick(bannerImage2)}
+            onClick={() => onImageClick(bannerImage2Full)}
             style={{
               padding: 0,
               border: "none",
@@ -116,19 +124,6 @@ const renderBannerImages = (
               }}
             />
           </button>
-          <Tooltip title="Nick Thake" placement="right">
-            <InfoIcon
-              sx={{
-                position: "absolute",
-                top: 8,
-                left: 8,
-                zIndex: 1,
-                fontSize: 20,
-                color: "rgba(255, 255, 255, 0.7)",
-                cursor: "pointer",
-              }}
-            />
-          </Tooltip>
         </Box>
       </Box>
       <Box
@@ -138,7 +133,7 @@ const renderBannerImages = (
       >
         <button
           type="button"
-          onClick={() => onImageClick(bannerImage1)}
+          onClick={() => onImageClick(bannerImage1Full)}
           style={{
             padding: 0,
             border: "none",
@@ -167,6 +162,20 @@ const renderBannerImages = (
             }}
           />
         </button>
+        <Tooltip title="Nick Thake" placement="right">
+          <InfoIcon
+            sx={{
+              position: "absolute",
+              top: 8,
+              left: 8,
+              zIndex: 1,
+              fontSize: 20,
+              color: "rgba(255, 255, 255, 0.7)",
+              cursor: "pointer",
+              pointerEvents: "auto",
+            }}
+          />
+        </Tooltip>
       </Box>
       <Box mt="-15%" pl="70%">
         <button
