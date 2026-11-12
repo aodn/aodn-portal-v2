@@ -7,6 +7,7 @@ import {
   getGriddedRenderStyle,
   toLegendRange,
   toCategoricalLabels,
+  toLegendUnit,
   buildTileDateMarks,
   formatProductLabel,
   shouldQueryGriddedTiles,
@@ -377,19 +378,19 @@ describe("toGriddedRasterProducts", () => {
   it("carries the legend and manifest templates through unresolved", () => {
     const legend = "/api/v1/ogc/ext/tiles/colormaps/legend?colormap={colormap}";
     const manifest =
-      "/api/v1/ogc/ext/tiles/collections/uuid-1/data_tiles/manifest" +
+      "/api/v1/ogc/ext/tiles/collections/uuid-1/visual_tiles/manifest" +
       "?dataset=d&variable=v&datetime={datetime}";
     const [withBoth, withNeither] = toGriddedRasterProducts({
       products: [
         visualProduct({
           id: "a:one",
           legend_url: legend,
-          data_manifest_url_template: manifest,
+          visual_manifest_url_template: manifest,
         }),
         visualProduct({
           id: "b:two",
           legend_url: "",
-          data_manifest_url_template: "",
+          visual_manifest_url_template: "",
         }),
       ],
     });
@@ -455,6 +456,19 @@ describe("buildGriddedManifestUrl", () => {
     expect(buildGriddedManifestUrl("/m?d={datetime}", undefined)).toBe(
       undefined
     );
+  });
+});
+
+describe("toLegendUnit", () => {
+  it("reads the manifest's valueUnit, trimmed", () => {
+    expect(toLegendUnit({ valueUnit: " m " })).toBe("m");
+  });
+
+  it("is undefined when the unit is absent, null or blank", () => {
+    expect(toLegendUnit({ valueRange: [0, 1] })).toBeUndefined();
+    expect(toLegendUnit({ valueUnit: null })).toBeUndefined();
+    expect(toLegendUnit({ valueUnit: "  " })).toBeUndefined();
+    expect(toLegendUnit(undefined)).toBeUndefined();
   });
 });
 

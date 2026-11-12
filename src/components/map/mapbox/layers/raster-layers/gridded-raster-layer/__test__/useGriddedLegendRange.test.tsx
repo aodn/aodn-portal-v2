@@ -25,7 +25,7 @@ const LEGEND_TEMPLATE =
   "/api/v1/ogc/ext/tiles/colormaps/legend?colormap={colormap}";
 
 const MANIFEST_PATH =
-  "/api/v1/ogc/ext/tiles/collections/uuid-1/data_tiles/manifest";
+  "/api/v1/ogc/ext/tiles/collections/uuid-1/visual_tiles/manifest";
 
 const product = (
   overrides: Partial<GriddedRasterProduct> = {}
@@ -60,7 +60,7 @@ describe("useGriddedLegendRange", () => {
   });
   afterAll(() => server.close());
 
-  it("uses the product's fixed range without fetching the manifest", () => {
+  it("labels a fixed range with the manifest's unit, not its valueRange", async () => {
     const { result } = renderHook(
       () =>
         useGriddedLegendRange(
@@ -69,12 +69,34 @@ describe("useGriddedLegendRange", () => {
         ),
       { wrapper }
     );
+    await waitFor(() => expect(result.current.ready).toBe(true));
     expect(result.current).toEqual({
       legendUrl: "/api/v1/ogc/ext/tiles/colormaps/legend?colormap=viridis",
       range: [-1, 1],
+      labels: undefined,
+      unit: "m",
       ready: true,
     });
-    expect(requested).toHaveLength(0);
+    expect(requested).toHaveLength(1);
+  });
+
+  it("keeps a fixed range when the manifest request fails", async () => {
+    server.use(
+      http.get(MANIFEST_PATH, () =>
+        HttpResponse.json({ message: "nope" }, { status: 404 })
+      )
+    );
+    const { result } = renderHook(
+      () =>
+        useGriddedLegendRange(
+          product({ rescale: [-1, 1] }),
+          "2026-06-16T00:00:00Z"
+        ),
+      { wrapper }
+    );
+    await waitFor(() => expect(result.current.ready).toBe(true));
+    expect(result.current.range).toEqual([-1, 1]);
+    expect(result.current.unit).toBeUndefined();
   });
 
   it("reads the selected date's valueRange from the manifest", async () => {
@@ -86,6 +108,7 @@ describe("useGriddedLegendRange", () => {
 
     await waitFor(() => expect(result.current.ready).toBe(true));
     expect(result.current.range).toEqual([-0.5, 1.5]);
+    expect(result.current.unit).toBe("m");
     expect(requested).toHaveLength(1);
     expect(requested[0]).toContain(
       `${MANIFEST_PATH}?dataset=d&variable=v&datetime=2026-06-16T00:00:00Z`
@@ -204,11 +227,16 @@ describe("useGriddedLegendRange", () => {
     const { result } = renderHook(
       () =>
         useGriddedLegendRange(
-          product({ colormap: "plasma", rescale: [0, 1] }),
+          product({
+            colormap: "plasma",
+            rescale: [0, 1],
+            manifestTemplate: undefined,
+          }),
           "2026-06-16T00:00:00Z"
         ),
       { wrapper }
     );
+    expect(result.current.range).toEqual([0, 1]);
     expect(result.current.legendUrl).toBe(
       "/api/v1/ogc/ext/tiles/colormaps/legend?colormap=plasma"
     );

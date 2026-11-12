@@ -11,6 +11,8 @@ interface GriddedRasterLegendProps {
   labels?: string[];
   // Shown to the right of the bar, e.g. "GSLA".
   variable?: string;
+  // The variable's units, appended to it, e.g. "GSLA (m)".
+  unit?: string;
   layerName?: string;
 }
 
@@ -55,6 +57,15 @@ const rangeLabels = (range: GriddedValueRange): BarLabel[] => {
   }));
 };
 
+/** "GSLA (m)", "GSLA", or "m" when only the unit is known. */
+export const legendTitle = (
+  variable?: string,
+  unit?: string
+): string | undefined => {
+  if (variable && unit) return `${variable} (${unit})`;
+  return variable || unit || undefined;
+};
+
 // The bar draws one equal-width block per category; label each block's centre.
 const categoryLabels = (labels: string[]): BarLabel[] =>
   labels.map((text, i) => ({ position: (i + 0.5) / labels.length, text }));
@@ -91,9 +102,11 @@ const LegendBody: FC<GriddedRasterLegendProps & { legendUrl: string }> = ({
   range,
   labels,
   variable,
+  unit,
   layerName,
 }) => {
   const theme = useTheme();
+  const title = legendTitle(variable, unit);
   const barLabels = labels?.length
     ? categoryLabels(labels)
     : range && rangeLabels(range);
@@ -144,15 +157,15 @@ const LegendBody: FC<GriddedRasterLegendProps & { legendUrl: string }> = ({
             />
             {barLabels && <BarLabels labels={barLabels} />}
           </Box>
-          {variable && (
+          {title && (
             <Typography
               variant="body2Regular"
               color={theme.palette.text1}
               noWrap
-              title={variable}
+              title={title}
               sx={{ flexShrink: 1, maxWidth: "30%" }}
             >
-              {variable}
+              {title}
             </Typography>
           )}
         </>

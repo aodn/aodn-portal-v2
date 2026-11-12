@@ -88,7 +88,7 @@ export const buildGriddedLegendUrl = (
     ? legendTemplate.split("{colormap}").join(encodeURIComponent(colormap))
     : undefined;
 
-/** Fills `{datetime}` in a product's data_manifest_url_template, verbatim. */
+/** Fills `{datetime}` in a product's manifest template, verbatim. */
 export const buildGriddedManifestUrl = (
   manifestTemplate?: string,
   datetime?: string
@@ -145,6 +145,16 @@ export const toCategoricalLabels = (
   return Array.isArray(meanings) && meanings.length === values.length
     ? meanings
     : values.map(String);
+};
+
+/** The variable's units for the legend title; undefined when blank or absent. */
+export const toLegendUnit = (
+  manifest?: TileManifest | null
+): string | undefined => {
+  const unit = manifest?.valueUnit;
+  return typeof unit === "string" && unit.trim() !== ""
+    ? unit.trim()
+    : undefined;
 };
 
 const nonEmptyString = (value?: string): string | undefined =>
@@ -277,7 +287,7 @@ export const toGriddedRasterProducts = (
       categorical,
       rescale,
       legendTemplate: nonEmptyString(product.legend_url),
-      manifestTemplate: nonEmptyString(product.data_manifest_url_template),
+      manifestTemplate: nonEmptyString(product.visual_manifest_url_template),
     });
   });
   return result;

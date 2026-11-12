@@ -339,14 +339,14 @@ def test_gridded_legend_shows_the_colour_bar_and_the_manifest_range(
     """
     With Gridded Data selected, the legend shows the colour bar in the
     product's colormap, five values evenly spaced across the selected day's
-    manifest valueRange, and the variable. A product with no legend_url shows
-    no legend.
+    visual manifest valueRange, and the variable with the manifest's unit. A
+    product with no legend_url shows no legend.
     """
     detail_page = DetailPage(responsive_page)
     detail_map = detail_page.detail_map
 
     with responsive_page.expect_request(
-        lambda request: '/data_tiles/manifest' in request.url,
+        lambda request: '/visual_tiles/manifest' in request.url,
         timeout=_UI_TIMEOUT_MS,
     ) as manifest_request:
         detail_page.load(SUPPORTED_UUID)
@@ -370,7 +370,7 @@ def test_gridded_legend_shows_the_colour_bar_and_the_manifest_range(
             )
         ).to_be_visible()
     expect(
-        detail_map.gridded_raster_legend.get_by_text('CHL_OC3')
+        detail_map.gridded_raster_legend.get_by_text('CHL_OC3 (mg m-3)')
     ).to_be_visible()
 
     # Product two has no legend_url, so its legend is hidden.

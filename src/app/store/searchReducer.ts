@@ -667,7 +667,7 @@ const fetchGriddedTileManifest = createAsyncThunk<
   (request: { url: string }, thunkApi: any) =>
     ogcAxiosWithRetry
       .get<TileManifest>(request.url, {
-        // The url is the backend's own data_manifest_url_template, already
+        // The url is the backend's own visual_manifest_url_template, already
         // rooted at /api/v1 — don't prefix the instance baseURL again.
         baseURL: "",
         signal: thunkApi.signal,

@@ -10,21 +10,22 @@ export interface TileProduct {
   // Full UTC datetimes, e.g. "2024-01-01T00:00:00Z"
   available_dates?: string[];
   full_date_range?: { start?: string; end?: string };
-  // Present only when tile_types includes "visual".
   visual_tile_url_template?: string;
   legend_url?: string;
-  data_tile_url_template?: string;
-  data_manifest_url_template?: string;
+  visual_manifest_url_template?: string;
+  point_url_template?: string;
 }
 
 export interface TileProductsResponse {
   products?: TileProduct[];
 }
 
-// Per-date data-tile manifest; only the fields the portal reads.
+// Per-date visual-tile manifest
 export interface TileManifest {
   // Scalar products only: [min, max] of the date's data, entries null when empty.
   valueRange?: (number | null)[] | null;
+  // Variable units, e.g. "m"; absent for categorical or unitless variables.
+  valueUnit?: string | null;
   // Categorical products only.
   flagValues?: number[] | null;
   // Categorical products only, one per flag value when the dataset has them.

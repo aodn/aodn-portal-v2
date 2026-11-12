@@ -28,7 +28,7 @@ class Routes:
     GRIDDED_TILE_PRODUCTS = f'{PREFIX}/ext/tiles/collections/*/products'
     GRIDDED_TILE_IMAGE = f'{PREFIX}/collections/*/map/tiles/**'
     GRIDDED_TILE_MANIFEST = (
-        f'{PREFIX}/ext/tiles/collections/*/data_tiles/manifest?*'
+        f'{PREFIX}/ext/tiles/collections/*/visual_tiles/manifest?*'
     )
     GRIDDED_TILE_LEGEND = f'{PREFIX}/ext/tiles/colormaps/legend*'
 

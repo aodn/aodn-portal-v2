@@ -6,6 +6,7 @@ import { GriddedValueRange } from "@/app/store/GriddedTileDefinitions";
 import GriddedRasterLegend, {
   formatLegendValue,
   legendDecimals,
+  legendTitle,
 } from "../features/GriddedRasterLegend";
 
 const LEGEND_URL = "/api/v1/ogc/ext/tiles/colormaps/legend?colormap=viridis";
@@ -130,5 +131,27 @@ describe("legendDecimals", () => {
 
   it("caps the decimals for a near-zero range", () => {
     expect(legendDecimals([0, 1e-12])).toBe(6);
+  });
+});
+
+describe("GriddedRasterLegend unit", () => {
+  afterEach(cleanup);
+
+  it("appends the unit to the variable", () => {
+    render(
+      <ThemeProvider theme={AppTheme}>
+        <GriddedRasterLegend legendUrl={LEGEND_URL} variable="SST" unit="K" />
+      </ThemeProvider>
+    );
+    expect(screen.getByText("SST (K)")).toBeInTheDocument();
+  });
+});
+
+describe("legendTitle", () => {
+  it("combines whichever of variable and unit are known", () => {
+    expect(legendTitle("SST", "K")).toBe("SST (K)");
+    expect(legendTitle("SST")).toBe("SST");
+    expect(legendTitle(undefined, "K")).toBe("K");
+    expect(legendTitle()).toBeUndefined();
   });
 });

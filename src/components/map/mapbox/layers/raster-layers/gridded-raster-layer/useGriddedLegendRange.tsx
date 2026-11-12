@@ -10,6 +10,7 @@ import {
   buildGriddedManifestUrl,
   toCategoricalLabels,
   toLegendRange,
+  toLegendUnit,
 } from "./Common";
 
 export interface GriddedLegendRange {
@@ -22,6 +23,8 @@ export interface GriddedLegendRange {
   range?: GriddedValueRange;
   /** Categorical products: one label per colour block, in order. */
   labels?: string[];
+  /** The variable's units from the manifest, e.g. "m". */
+  unit?: string;
   /**
    * False only while the first range for this product is still being fetched,
    * so the legend never shows a bar whose labels are about to change. On a
@@ -35,22 +38,25 @@ interface SettledRange {
   url: string;
   range?: GriddedValueRange;
   labels?: string[];
+  unit?: string;
 }
 
 /**
  * The labels the legend should carry. Continuous: the same range rule the
  * server uses for the tiles — the product's fixed `rescale` when it has one,
- * otherwise the selected date's `valueRange` from the data-tile manifest.
+ * otherwise the selected date's `valueRange` from the visual-tile manifest.
  * Categorical: the manifest's flag meanings (or values), one per block.
+ * The manifest is fetched even with a fixed `rescale`, for its `valueUnit`.
  */
 const useGriddedLegendRange = (
   product?: GriddedRasterProduct,
   datetime?: string
 ): GriddedLegendRange => {
   const dispatch = useAppDispatch();
-  const manifestUrl = product?.rescale
-    ? undefined
-    : buildGriddedManifestUrl(product?.manifestTemplate, datetime);
+  const manifestUrl = buildGriddedManifestUrl(
+    product?.manifestTemplate,
+    datetime
+  );
   const productId = product?.id;
   const categorical = product?.categorical;
   const colormap = product?.colormap;
@@ -67,6 +73,7 @@ const useGriddedLegendRange = (
         setSettled({
           productId,
           url: manifestUrl,
+          unit: toLegendUnit(manifest),
           ...(categorical
             ? { labels: toCategoricalLabels(manifest, colormap) }
             : { range: toLegendRange(manifest) }),
@@ -88,15 +95,20 @@ const useGriddedLegendRange = (
     product.legendTemplate,
     product.colormap
   );
-  if (product.rescale) {
+  if (!manifestUrl) {
     return { legendUrl, range: product.rescale, ready: true };
   }
-  if (!manifestUrl) return { legendUrl, range: undefined, ready: true };
 
   const current = settled?.productId === product.id ? settled : undefined;
   // Withheld until the labels land, so they never pop in under a shown bar.
   return current
-    ? { legendUrl, range: current.range, labels: current.labels, ready: true }
+    ? {
+        legendUrl,
+        range: product.rescale ?? current.range,
+        labels: current.labels,
+        unit: current.unit,
+        ready: true,
+      }
     : { range: undefined, ready: false };
 };
 
