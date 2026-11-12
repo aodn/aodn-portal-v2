@@ -92,7 +92,7 @@ export default function SelectionMarker({
       sx={{
         display: "flex",
         alignItems: "center",
-        bgcolor: DRAW_SELECTION_SYMBOLOGY.COLOR,
+        bgcolor: DRAW_SELECTION_SYMBOLOGY.BADGE_COLOR,
         color: "common.white",
         border: 1,
         borderColor: "divider",

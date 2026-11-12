@@ -7,7 +7,10 @@ import {
   CURSOR_HINT_BUBBLE_HEIGHT,
 } from "../assets/icons/map/cursor_hint_bubble";
 
-interface UsePolygonCursorHintProps {
+// Bubble width of the bbox hint in the Figma design
+const BBOX_HINT_WIDTH = 125;
+
+interface UseDrawCursorHintProps {
   map: MapboxMap | undefined;
   activeTool: string;
   isDrawingMode: boolean;
@@ -16,18 +19,20 @@ interface UsePolygonCursorHintProps {
 }
 
 /**
- * Manages the crosshair cursor and cursor-following hint bubble
- * when the polygon selection tool is active.
+ * Manages the crosshair cursor for the polygon tool and the
+ * cursor-following hint bubble for the polygon and bbox tools.
  */
-const usePolygonCursorHint = ({
+const useDrawCursorHint = ({
   map,
   activeTool,
   isDrawingMode,
   isDirectSelectMode,
   hasSelectedFeatures,
-}: UsePolygonCursorHintProps) => {
+}: UseDrawCursorHintProps) => {
   const cursorHintRef = useRef<HTMLDivElement | null>(null);
   const isPolygonActiveRef = useRef(false);
+  const isBboxActiveRef = useRef(false);
+  const hasDrawStartedRef = useRef(false);
   const hasSelectedRef = useRef(false);
   const cursorStyleRef = useRef<HTMLStyleElement | null>(null);
 
@@ -41,7 +46,13 @@ const usePolygonCursorHint = ({
     isPolygonActiveRef.current =
       activeTool === "polygon" &&
       (isDrawingMode || (hasSelectedFeatures && !isDirectSelectMode));
-    if (!isPolygonActiveRef.current && cursorHintRef.current) {
+    isBboxActiveRef.current = activeTool === "bbox" && isDrawingMode;
+    hasDrawStartedRef.current = false;
+    if (
+      !isPolygonActiveRef.current &&
+      !isBboxActiveRef.current &&
+      cursorHintRef.current
+    ) {
       cursorHintRef.current.style.display = "none";
     }
   }, [activeTool, isDrawingMode, isDirectSelectMode, hasSelectedFeatures]);
@@ -114,18 +125,32 @@ const usePolygonCursorHint = ({
           textSpan.textContent = "Click to adjust vertices.";
           cursorHintRef.current.style.width = CURSOR_HINT_BUBBLE_WIDTH + "px";
         } else {
-          textSpan.textContent = "Click to add points, double-click to finish.";
-          cursorHintRef.current.style.width = "200px";
+          textSpan.textContent = hasDrawStartedRef.current
+            ? "Click to continue drawing shape."
+            : "Click to start drawing shape.";
+          cursorHintRef.current.style.width = CURSOR_HINT_BUBBLE_WIDTH + "px";
         }
-        cursorHintRef.current.style.display = "block";
-        // Arrow tip in SVG is at (0, 15), align with cursor
-        cursorHintRef.current.style.left = e.point.x + 10 + "px";
-        cursorHintRef.current.style.top = e.point.y - 15 + "px";
+      } else if (isBboxActiveRef.current && !hasDrawStartedRef.current) {
+        textSpan.textContent = "Click to start drawing box.";
+        cursorHintRef.current.style.width = BBOX_HINT_WIDTH + "px";
       } else {
+        cursorHintRef.current.style.display = "none";
+        return;
+      }
+      cursorHintRef.current.style.display = "block";
+      // Arrow tip in SVG is at (0, 15), align with cursor
+      cursorHintRef.current.style.left = e.point.x + 10 + "px";
+      cursorHintRef.current.style.top = e.point.y - 15 + "px";
+    };
+    // First click while drawing: the polygon hint changes, the bbox hint hides
+    const onDrawStart = () => {
+      if (!cursorHintRef.current) return;
+      if (isPolygonActiveRef.current) hasDrawStartedRef.current = true;
+      if (isBboxActiveRef.current) {
+        hasDrawStartedRef.current = true;
         cursorHintRef.current.style.display = "none";
       }
     };
-
     const onMouseLeave = () => {
       if (cursorHintRef.current) {
         cursorHintRef.current.style.display = "none";
@@ -133,10 +158,14 @@ const usePolygonCursorHint = ({
     };
 
     map.on("mousemove", onMouseMove);
+    map.on("mousedown", onDrawStart);
+    map.on("touchstart", onDrawStart);
     container.addEventListener("mouseleave", onMouseLeave);
 
     return () => {
       map.off("mousemove", onMouseMove);
+      map.off("mousedown", onDrawStart);
+      map.off("touchstart", onDrawStart);
       container.removeEventListener("mouseleave", onMouseLeave);
       hint.remove();
       cursorHintRef.current = null;
@@ -146,4 +175,4 @@ const usePolygonCursorHint = ({
   return { syncHasSelected };
 };
 
-export default usePolygonCursorHint;
+export default useDrawCursorHint;
