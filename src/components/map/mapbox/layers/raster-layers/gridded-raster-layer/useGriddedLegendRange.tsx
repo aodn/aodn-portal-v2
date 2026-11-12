@@ -15,8 +15,9 @@ import {
 
 export interface GriddedLegendRange {
   /**
-   * Colour-bar image for the product, set only once `ready`. Undefined while
-   * loading or when the product has no legend_url; the legend is hidden then.
+   * Colour-bar image for the product, set straight away so it loads alongside
+   * the manifest. Undefined when the product has no legend_url; the legend is
+   * hidden then.
    */
   legendUrl?: string;
   /** Range to label the legend with; undefined draws a bare colour bar. */
@@ -26,9 +27,9 @@ export interface GriddedLegendRange {
   /** The variable's units from the manifest, e.g. "m". */
   unit?: string;
   /**
-   * False only while the first range for this product is still being fetched,
-   * so the legend never shows a bar whose labels are about to change. On a
-   * later date change the previous range is kept until the new one lands.
+   * False only while the first range for this product is still being fetched;
+   * the legend shows a skeleton until then. On a later date change the
+   * previous range is kept until the new one lands.
    */
   ready: boolean;
 }
@@ -100,7 +101,7 @@ const useGriddedLegendRange = (
   }
 
   const current = settled?.productId === product.id ? settled : undefined;
-  // Withheld until the labels land, so they never pop in under a shown bar.
+  // Labels withheld until they land; the legend shows a skeleton meanwhile.
   return current
     ? {
         legendUrl,
@@ -109,7 +110,7 @@ const useGriddedLegendRange = (
         unit: current.unit,
         ready: true,
       }
-    : { range: undefined, ready: false };
+    : { legendUrl, range: undefined, ready: false };
 };
 
 export default useGriddedLegendRange;

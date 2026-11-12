@@ -882,6 +882,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
             labels={griddedLegend.labels}
             unit={griddedLegend.unit}
             categorical={selectedGriddedProduct?.categorical}
+            loading={!griddedLegend.ready}
             variable={selectedGriddedProduct?.variable}
             layerName={selectedGriddedProduct?.label}
           />

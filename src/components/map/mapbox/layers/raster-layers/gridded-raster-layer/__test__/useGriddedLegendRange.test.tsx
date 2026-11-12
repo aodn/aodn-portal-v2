@@ -210,17 +210,20 @@ describe("useGriddedLegendRange", () => {
     await waitFor(() => expect(result.current.range).toEqual([2, 3]));
   });
 
-  it("withholds the legend url until the manifest has answered", async () => {
+  it("gives the legend url before the manifest has answered", async () => {
     const { result } = renderHook(
       () => useGriddedLegendRange(product(), "2026-06-16T00:00:00Z"),
       { wrapper }
     );
-    expect(result.current.legendUrl).toBeUndefined();
+    // Set straight away so the image loads under the legend's skeleton.
+    expect(result.current).toEqual({
+      legendUrl: "/api/v1/ogc/ext/tiles/colormaps/legend?colormap=viridis",
+      range: undefined,
+      ready: false,
+    });
 
     await waitFor(() => expect(result.current.ready).toBe(true));
-    expect(result.current.legendUrl).toBe(
-      "/api/v1/ogc/ext/tiles/colormaps/legend?colormap=viridis"
-    );
+    expect(result.current.range).toEqual([-0.5, 1.5]);
   });
 
   it("builds the legend url with the product's own colormap", () => {

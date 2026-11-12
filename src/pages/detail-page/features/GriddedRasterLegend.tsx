@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import { Box, Divider, Typography, useTheme } from "@mui/material";
+import { Box, Divider, Skeleton, Typography, useTheme } from "@mui/material";
 import { GriddedValueRange } from "@/app/store/GriddedTileDefinitions";
 
 interface GriddedRasterLegendProps {
@@ -16,12 +16,18 @@ interface GriddedRasterLegendProps {
   // The variable's units, appended to it, e.g. "GSLA (m)".
   unit?: string;
   layerName?: string;
+  // Labels/unit still being fetched: show a skeleton in their place.
+  loading?: boolean;
 }
 
 const BAR_HEIGHT = "12px";
 // Tick marks hang from the bar's bottom edge down to each label.
 const TICK_HEIGHT = "4px";
 const TICK_GAP = "2px";
+// Ticks plus one line of labels.
+const LABEL_ROW_HEIGHT = `calc(${TICK_HEIGHT} + ${TICK_GAP} + 20px)`;
+
+const CONTENT_HEIGHT = `calc(${BAR_HEIGHT} + ${LABEL_ROW_HEIGHT})`;
 // Keeps the centred end labels inside the bar's column.
 const BAR_INSET = "16px";
 // Evenly spaced ticks along the bar, as a fraction of its width.
@@ -87,7 +93,7 @@ const BarLabels: FC<{ labels: BarLabel[]; ticks: boolean }> = ({
       data-testid="gridded-legend-range"
       sx={{
         position: "relative",
-        height: ticks ? `calc(${TICK_HEIGHT} + ${TICK_GAP} + 20px)` : "20px",
+        height: ticks ? LABEL_ROW_HEIGHT : "20px",
         mt: ticks ? 0 : "4px",
       }}
     >
@@ -137,6 +143,7 @@ const LegendBody: FC<GriddedRasterLegendProps & { legendUrl: string }> = ({
   variable,
   unit,
   layerName,
+  loading = false,
 }) => {
   const theme = useTheme();
   const title = legendTitle(variable, unit);
@@ -147,7 +154,10 @@ const LegendBody: FC<GriddedRasterLegendProps & { legendUrl: string }> = ({
     : range && rangeLabels(range);
   // Tied to the url: a different colormap is a new image that may well load.
   const [failedUrl, setFailedUrl] = useState<string | undefined>(undefined);
+  const [loadedUrl, setLoadedUrl] = useState<string | undefined>(undefined);
   const imageFailed = failedUrl === legendUrl;
+  // Bar and unit skeletons until both the labels and the image are in.
+  const pending = loading || loadedUrl !== legendUrl;
 
   return (
     <Box
@@ -173,35 +183,69 @@ const LegendBody: FC<GriddedRasterLegendProps & { legendUrl: string }> = ({
         <Typography
           variant="body2Regular"
           color={theme.palette.text1}
-          sx={{ flex: 1 }}
+          sx={{
+            flex: 1,
+            minHeight: CONTENT_HEIGHT,
+            display: "flex",
+            alignItems: "center",
+          }}
         >
           No legend available for this layer
         </Typography>
       ) : (
         <>
-          <Box sx={{ flex: 1, minWidth: 0, px: BAR_INSET }}>
-            <img
-              src={legendUrl}
-              alt={
-                layerName
-                  ? `Color scale for the ${layerName} map layer`
-                  : "Color scale for the gridded map layer"
-              }
-              onError={() => setFailedUrl(legendUrl)}
-              style={{ display: "block", width: "100%", height: BAR_HEIGHT }}
-            />
-            {barLabels && <BarLabels labels={barLabels} ticks={!categorical} />}
+          <Box
+            aria-busy={pending}
+            aria-label={pending ? "Legend loading" : undefined}
+            sx={{ flex: 1, minWidth: 0, px: BAR_INSET, height: CONTENT_HEIGHT }}
+          >
+            <Box sx={{ position: "relative", height: BAR_HEIGHT }}>
+              {/* Kept mounted (just hidden) so it loads under the skeleton. */}
+              <img
+                src={legendUrl}
+                alt={
+                  layerName
+                    ? `Color scale for the ${layerName} map layer`
+                    : "Color scale for the gridded map layer"
+                }
+                onLoad={() => setLoadedUrl(legendUrl)}
+                onError={() => setFailedUrl(legendUrl)}
+                style={{
+                  display: "block",
+                  width: "100%",
+                  height: BAR_HEIGHT,
+                  visibility: pending ? "hidden" : "visible",
+                }}
+              />
+              {pending && (
+                <Skeleton
+                  data-testid="gridded-legend-skeleton"
+                  variant="rectangular"
+                  width="100%"
+                  height={BAR_HEIGHT}
+                  sx={{ position: "absolute", inset: 0 }}
+                />
+              )}
+            </Box>
+            {/* Shown once loaded, into space CONTENT_HEIGHT already holds. */}
+            {!pending && barLabels && (
+              <BarLabels labels={barLabels} ticks={!categorical} />
+            )}
           </Box>
-          {title && (
-            <Typography
-              variant="body2Regular"
-              color={theme.palette.text1}
-              noWrap
-              title={title}
-              sx={{ flexShrink: 1, maxWidth: "30%" }}
-            >
-              {title}
-            </Typography>
+          {pending ? (
+            <Skeleton variant="text" width="64px" aria-hidden />
+          ) : (
+            title && (
+              <Typography
+                variant="body2Regular"
+                color={theme.palette.text1}
+                noWrap
+                title={title}
+                sx={{ flexShrink: 1, maxWidth: "30%" }}
+              >
+                {title}
+              </Typography>
+            )
           )}
         </>
       )}
