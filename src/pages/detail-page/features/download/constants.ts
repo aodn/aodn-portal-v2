@@ -12,7 +12,7 @@ const EXTRA_LARGE_DOWNLOAD_BYTES = 180 * 1024 ** 3;
 enum DownloadFileType {
   NETCDF = "netcdf",
   CSV = "csv",
-  EXCEL = "xlsx",
+  EXCEL = "excel",
   GEOTIFF = "geotiff",
 }
 
