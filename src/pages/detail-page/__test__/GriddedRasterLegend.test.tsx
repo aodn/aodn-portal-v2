@@ -14,13 +14,15 @@ const LEGEND_URL = "/api/v1/ogc/ext/tiles/colormaps/legend?colormap=viridis";
 const legend = (
   legendUrl: string | undefined,
   range?: GriddedValueRange,
-  labels?: string[]
+  labels?: string[],
+  categorical?: boolean
 ) => (
   <ThemeProvider theme={AppTheme}>
     <GriddedRasterLegend
       legendUrl={legendUrl}
       range={range}
       labels={labels}
+      categorical={categorical}
       variable="SST"
       layerName="test product"
     />
@@ -58,9 +60,17 @@ describe("GriddedRasterLegend", () => {
     );
   });
 
-  it("ticks every categorical block", () => {
-    render(legend(LEGEND_URL, undefined, ["none", "moderate", "strong"]));
-    expect(screen.getAllByTestId("gridded-legend-tick")).toHaveLength(3);
+  it("draws no ticks for a categorical legend", () => {
+    render(legend(LEGEND_URL, undefined, ["none", "moderate", "strong"], true));
+    expect(screen.getByText("moderate")).toBeInTheDocument();
+    expect(screen.queryAllByTestId("gridded-legend-tick")).toHaveLength(0);
+  });
+
+  it("never labels a categorical bar with a range", () => {
+    render(legend(LEGEND_URL, [0, 3], undefined, true));
+    expect(
+      screen.queryByTestId("gridded-legend-range")
+    ).not.toBeInTheDocument();
   });
 
   it("draws no ticks without labels", () => {
@@ -70,7 +80,7 @@ describe("GriddedRasterLegend", () => {
 
   it("centres one label under each categorical block", () => {
     render(
-      legend(LEGEND_URL, [0, 3], ["none", "moderate", "strong", "severe"])
+      legend(LEGEND_URL, [0, 3], ["none", "moderate", "strong", "severe"], true)
     );
     const positions = ["12.5%", "37.5%", "62.5%", "87.5%"];
     ["none", "moderate", "strong", "severe"].forEach((label, i) =>

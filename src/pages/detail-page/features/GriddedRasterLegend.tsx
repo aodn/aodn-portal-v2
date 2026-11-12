@@ -7,8 +7,10 @@ interface GriddedRasterLegendProps {
   legendUrl?: string;
   // Colour range the tiles were rendered with; labelled under the bar.
   range?: GriddedValueRange;
-  // Categorical: one label per colour block, in order. Takes precedence.
+  // Categorical: one label per colour block, in order.
   labels?: string[];
+  // The product's own flag: blocks get `labels` and no ticks, never `range`.
+  categorical?: boolean;
   // Shown to the right of the bar, e.g. "GSLA".
   variable?: string;
   // The variable's units, appended to it, e.g. "GSLA (m)".
@@ -73,7 +75,11 @@ export const legendTitle = (
 const categoryLabels = (labels: string[]): BarLabel[] =>
   labels.map((text, i) => ({ position: (i + 0.5) / labels.length, text }));
 
-const BarLabels: FC<{ labels: BarLabel[] }> = ({ labels }) => {
+// Ticks mark points on a continuous scale; categorical blocks need none.
+const BarLabels: FC<{ labels: BarLabel[]; ticks: boolean }> = ({
+  labels,
+  ticks,
+}) => {
   const theme = useTheme();
 
   return (
@@ -81,11 +87,12 @@ const BarLabels: FC<{ labels: BarLabel[] }> = ({ labels }) => {
       data-testid="gridded-legend-range"
       sx={{
         position: "relative",
-        height: `calc(${TICK_HEIGHT} + ${TICK_GAP} + 20px)`,
+        height: ticks ? `calc(${TICK_HEIGHT} + ${TICK_GAP} + 20px)` : "20px",
+        mt: ticks ? 0 : "4px",
       }}
     >
       {/* No ticks on the bar's own ends; its edges already mark them. */}
-      {labels
+      {(ticks ? labels : [])
         .filter(({ position }) => position > 0 && position < 1)
         .map(({ position }) => (
           <Box
@@ -109,7 +116,7 @@ const BarLabels: FC<{ labels: BarLabel[] }> = ({ labels }) => {
           color={theme.palette.text1}
           sx={{
             position: "absolute",
-            top: `calc(${TICK_HEIGHT} + ${TICK_GAP})`,
+            top: ticks ? `calc(${TICK_HEIGHT} + ${TICK_GAP})` : 0,
             left: `${position * 100}%`,
             transform: "translateX(-50%)",
             whiteSpace: "nowrap",
@@ -126,14 +133,17 @@ const LegendBody: FC<GriddedRasterLegendProps & { legendUrl: string }> = ({
   legendUrl,
   range,
   labels,
+  categorical = false,
   variable,
   unit,
   layerName,
 }) => {
   const theme = useTheme();
   const title = legendTitle(variable, unit);
-  const barLabels = labels?.length
-    ? categoryLabels(labels)
+  const barLabels = categorical
+    ? labels?.length
+      ? categoryLabels(labels)
+      : undefined
     : range && rangeLabels(range);
   // Tied to the url: a different colormap is a new image that may well load.
   const [failedUrl, setFailedUrl] = useState<string | undefined>(undefined);
@@ -180,7 +190,7 @@ const LegendBody: FC<GriddedRasterLegendProps & { legendUrl: string }> = ({
               onError={() => setFailedUrl(legendUrl)}
               style={{ display: "block", width: "100%", height: BAR_HEIGHT }}
             />
-            {barLabels && <BarLabels labels={barLabels} />}
+            {barLabels && <BarLabels labels={barLabels} ticks={!categorical} />}
           </Box>
           {title && (
             <Typography
