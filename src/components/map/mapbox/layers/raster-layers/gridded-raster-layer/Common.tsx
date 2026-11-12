@@ -4,12 +4,20 @@ import {
   OGCCollection,
 } from "@/app/store/OGCCollectionDefinitions";
 import {
+  TileManifest,
   GriddedRasterProduct,
+  GriddedValueRange,
   TileProduct,
   TileProductsResponse,
 } from "@/app/store/GriddedTileDefinitions";
 import { utcDayKeyToUnixMs, utcIsoToDayKey } from "@/utils/DateUtils";
 import { LayerSelectable } from "@/components/map/mapbox/layers/Layers";
+import {
+  DEFAULT_CATEGORICAL_COLORMAP,
+  DEFAULT_GRIDDED_COLORMAP,
+  GRIDDED_RENDER_STYLE_BY_PRODUCT,
+  GriddedRenderStyle,
+} from "./TilerColormaps";
 
 /**
  * The placeholders a template must still carry. `{tileRow}`/`{tileCol}` are the
@@ -23,6 +31,134 @@ const REQUIRED_TEMPLATE_TOKENS = [
   "{tileRow}",
   "{tileCol}",
 ];
+
+export const getGriddedRenderStyle = (
+  productId: string,
+  categorical: boolean = false,
+  styles: Record<string, GriddedRenderStyle> = GRIDDED_RENDER_STYLE_BY_PRODUCT
+): { colormap: string; rescale?: GriddedValueRange } => {
+  const style = styles[productId];
+  return {
+    colormap:
+      style?.colormap ||
+      (categorical ? DEFAULT_CATEGORICAL_COLORMAP : DEFAULT_GRIDDED_COLORMAP),
+    // DAS rejects rescale for a categorical product.
+    rescale: categorical ? undefined : style?.rescale,
+  };
+};
+
+const formatRescale = ([min, max]: GriddedValueRange) => `${min},${max}`;
+
+/**
+ * Appends raw query params. Plain string concatenation for the same reason as
+ * buildGriddedTileUrl: the template's `{placeholders}` and `%2B` must survive.
+ */
+const appendQueryParams = (
+  url: string,
+  params: Record<string, string | undefined>
+): string => {
+  const query = Object.entries(params)
+    .filter((entry): entry is [string, string] => entry[1] !== undefined)
+    .map(([key, value]) => `${key}=${value}`)
+    .join("&");
+  if (!query) return url;
+  return `${url}${url.includes("?") ? "&" : "?"}${query}`;
+};
+
+/** Applies the product's colormap (and fixed range, if any) to its tile template. */
+export const applyRenderStyleToTemplate = (
+  template: string,
+  colormap: string,
+  rescale?: GriddedValueRange
+): string =>
+  appendQueryParams(template, {
+    colormap: encodeURIComponent(colormap),
+    rescale: rescale ? formatRescale(rescale) : undefined,
+  });
+
+/**
+ * Fills `{colormap}` in a product's legend_url. The tiler only ever returns
+ * the bare colour bar; GriddedRasterLegend draws the range labels itself.
+ */
+export const buildGriddedLegendUrl = (
+  legendTemplate?: string,
+  colormap: string = DEFAULT_GRIDDED_COLORMAP
+): string | undefined =>
+  legendTemplate
+    ? legendTemplate.split("{colormap}").join(encodeURIComponent(colormap))
+    : undefined;
+
+/** Fills `{datetime}` in a product's manifest template, verbatim. */
+export const buildGriddedManifestUrl = (
+  manifestTemplate?: string,
+  datetime?: string
+): string | undefined =>
+  manifestTemplate && datetime
+    ? manifestTemplate.split("{datetime}").join(datetime)
+    : undefined;
+
+/**
+ * The range DAS coloured the date's tiles with when no rescale was sent.
+ * Undefined for categorical products (the legend rejects a range) and for
+ * empty/malformed ranges.
+ */
+export const toLegendRange = (
+  manifest?: TileManifest | null
+): GriddedValueRange | undefined => {
+  if (!manifest) return undefined;
+  if (Array.isArray(manifest.flagValues) && manifest.flagValues.length > 0) {
+    return undefined;
+  }
+  const range = manifest.valueRange;
+  if (!Array.isArray(range) || range.length !== 2) return undefined;
+  const [min, max] = range;
+  if (typeof min !== "number" || typeof max !== "number") return undefined;
+  if (!Number.isFinite(min) || !Number.isFinite(max)) return undefined;
+  return [min, max];
+};
+
+/** Flag values in an inline categorical colormap; undefined for a name. */
+const inlineColormapValues = (colormap?: string): unknown[] | undefined => {
+  try {
+    const values = JSON.parse(colormap ?? "")?.values;
+    return Array.isArray(values) ? values : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+/**
+ * One label per block of a categorical legend bar, in flag-value order: the
+ * flag meanings, or the values themselves when the dataset has no meanings.
+ * Undefined for continuous products, and when an inline colormap draws a
+ * different number of blocks than there are flags (labels would misalign).
+ */
+export const toCategoricalLabels = (
+  manifest?: TileManifest | null,
+  colormap?: string
+): string[] | undefined => {
+  const values = manifest?.flagValues;
+  if (!Array.isArray(values) || values.length === 0) return undefined;
+  const blocks = inlineColormapValues(colormap);
+  if (blocks && blocks.length !== values.length) return undefined;
+  const meanings = manifest?.flagMeanings;
+  return Array.isArray(meanings) && meanings.length === values.length
+    ? meanings
+    : values.map(String);
+};
+
+/** The variable's units for the legend title; undefined when blank or absent. */
+export const toLegendUnit = (
+  manifest?: TileManifest | null
+): string | undefined => {
+  const unit = manifest?.valueUnit;
+  return typeof unit === "string" && unit.trim() !== ""
+    ? unit.trim()
+    : undefined;
+};
+
+const nonEmptyString = (value?: string): string | undefined =>
+  typeof value === "string" && value !== "" ? value : undefined;
 
 export interface TileDateMarks {
   values: number[];
@@ -100,7 +236,8 @@ export const formatProductLabel = (product: TileProduct): string => {
 };
 
 export const toGriddedRasterProducts = (
-  response?: TileProductsResponse
+  response?: TileProductsResponse,
+  styles: Record<string, GriddedRenderStyle> = GRIDDED_RENDER_STYLE_BY_PRODUCT
 ): GriddedRasterProduct[] => {
   const products = response?.products;
   if (products === undefined) return [];
@@ -131,11 +268,26 @@ export const toGriddedRasterProducts = (
     const marks = buildTileDateMarks(product.available_dates);
     if (marks.dates.length === 0) return;
 
+    const categorical = product.categorical === true;
+    const { colormap, rescale } = getGriddedRenderStyle(
+      product.id,
+      categorical,
+      styles
+    );
+
     result.push({
       id: product.id,
       label: formatProductLabel(product),
-      template,
+      variable: Array.isArray(product.variable)
+        ? product.variable.join(" + ")
+        : nonEmptyString(product.variable),
+      template: applyRenderStyleToTemplate(template, colormap, rescale),
       dates: marks.dates,
+      colormap,
+      categorical,
+      rescale,
+      legendTemplate: nonEmptyString(product.legend_url),
+      manifestTemplate: nonEmptyString(product.visual_manifest_url_template),
     });
   });
   return result;

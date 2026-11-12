@@ -20,6 +20,22 @@ import { SearchKeys } from "../components/search/constants";
 const PREFIX = "/api/v1/ogc";
 
 export const handlers = [
+  // Per-date visual-tile manifest; only the fields the portal reads. A
+  // variable named "flag" stands in for a categorical product.
+  http.get(
+    PREFIX + "/ext/tiles/collections/:uuid/visual_tiles/manifest",
+    ({ request }) => {
+      const variable = new URL(request.url).searchParams.get("variable");
+      if (variable === "flag") {
+        return HttpResponse.json({
+          valueRange: [0, 3],
+          flagValues: [0, 1, 2, 3],
+          flagMeanings: ["none", "moderate", "strong", "severe"],
+        });
+      }
+      return HttpResponse.json({ valueRange: [-0.5, 1.5], valueUnit: "m" });
+    }
+  ),
   http.get(PREFIX + "/ext/parameter/vocabs", () => {
     console.log("Called /ext/parameter/vocabs");
     return HttpResponse.json(PARAMETER_VOCABS);

@@ -1,0 +1,254 @@
+import { ReactElement } from "react";
+import { afterEach, describe, expect, it } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { ThemeProvider } from "@mui/material/styles";
+import AppTheme from "@/styles/theme";
+import { GriddedValueRange } from "@/app/store/GriddedTileDefinitions";
+import GriddedRasterLegend, {
+  formatLegendValue,
+  legendDecimals,
+  legendTitle,
+} from "../features/GriddedRasterLegend";
+
+const LEGEND_URL = "/api/v1/ogc/ext/tiles/colormaps/legend?colormap=viridis";
+
+const legend = (
+  legendUrl: string | undefined,
+  range?: GriddedValueRange,
+  labels?: string[],
+  categorical?: boolean
+) => (
+  <ThemeProvider theme={AppTheme}>
+    <GriddedRasterLegend
+      legendUrl={legendUrl}
+      range={range}
+      labels={labels}
+      categorical={categorical}
+      variable="SST"
+      layerName="test product"
+    />
+  </ThemeProvider>
+);
+
+// jsdom never loads images; fire the load the legend waits for.
+const barImage = () => screen.getByRole("img", { hidden: true });
+const renderLoaded = (ui: ReactElement) => {
+  const result = render(ui);
+  fireEvent.load(barImage());
+  return result;
+};
+
+describe("GriddedRasterLegend", () => {
+  afterEach(cleanup);
+
+  it("renders nothing without a legend url", () => {
+    const { container } = render(legend(""));
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it("shows the title, the colour bar and the variable", () => {
+    renderLoaded(legend(LEGEND_URL));
+    expect(screen.getByText("Legends")).toBeInTheDocument();
+    expect(barImage()).toHaveAttribute("src", LEGEND_URL);
+    expect(screen.getByText("SST")).toBeInTheDocument();
+  });
+
+  it("labels five evenly spaced values across the range", () => {
+    renderLoaded(legend(LEGEND_URL, [268, 310]));
+    ["268", "278.5", "289", "299.5", "310"].forEach((label) =>
+      expect(screen.getByText(label)).toBeInTheDocument()
+    );
+  });
+
+  it("draws a tick above each inner label, none at the bar's ends", () => {
+    renderLoaded(legend(LEGEND_URL, [268, 310]));
+    const ticks = screen.getAllByTestId("gridded-legend-tick");
+    expect(ticks).toHaveLength(3);
+    ["25%", "50%", "75%"].forEach((left, i) =>
+      expect(ticks[i]).toHaveStyle({ left })
+    );
+  });
+
+  it("draws no ticks for a categorical legend", () => {
+    renderLoaded(
+      legend(LEGEND_URL, undefined, ["none", "moderate", "strong"], true)
+    );
+    expect(screen.getByText("moderate")).toBeInTheDocument();
+    expect(screen.queryAllByTestId("gridded-legend-tick")).toHaveLength(0);
+  });
+
+  it("never labels a categorical bar with a range", () => {
+    renderLoaded(legend(LEGEND_URL, [0, 3], undefined, true));
+    expect(
+      screen.queryByTestId("gridded-legend-range")
+    ).not.toBeInTheDocument();
+  });
+
+  it("draws no ticks without labels", () => {
+    renderLoaded(legend(LEGEND_URL));
+    expect(screen.queryAllByTestId("gridded-legend-tick")).toHaveLength(0);
+  });
+
+  it("centres one label under each categorical block", () => {
+    renderLoaded(
+      legend(LEGEND_URL, [0, 3], ["none", "moderate", "strong", "severe"], true)
+    );
+    const positions = ["12.5%", "37.5%", "62.5%", "87.5%"];
+    ["none", "moderate", "strong", "severe"].forEach((label, i) =>
+      expect(screen.getByText(label)).toHaveStyle({ left: positions[i] })
+    );
+    // Categorical labels replace the range ticks.
+    expect(screen.queryByText("1.5")).not.toBeInTheDocument();
+  });
+
+  it("adds decimals so a small range keeps distinct labels", () => {
+    renderLoaded(legend(LEGEND_URL, [0.05, 0.25]));
+    ["0.05", "0.1", "0.15", "0.2", "0.25"].forEach((label) =>
+      expect(screen.getByText(label)).toBeInTheDocument()
+    );
+  });
+
+  it("draws no labels without a range", () => {
+    renderLoaded(legend(LEGEND_URL));
+    expect(
+      screen.queryByTestId("gridded-legend-range")
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows a fallback message when the legend image fails to load", () => {
+    render(legend(LEGEND_URL));
+    fireEvent.error(barImage());
+    expect(
+      screen.getByText("No legend available for this layer")
+    ).toBeInTheDocument();
+  });
+
+  it("retries the image when a failed url is replaced", () => {
+    const { rerender } = render(legend(LEGEND_URL));
+    fireEvent.error(barImage());
+
+    const nextUrl = LEGEND_URL.replace("viridis", "plasma");
+    rerender(legend(nextUrl));
+    expect(barImage()).toHaveAttribute("src", nextUrl);
+  });
+
+  it("shows a skeleton until the bar image has loaded", () => {
+    render(legend(LEGEND_URL, [268, 310]));
+    expect(screen.getByTestId("gridded-legend-skeleton")).toBeInTheDocument();
+    expect(screen.getByLabelText("Legend loading")).toBeInTheDocument();
+    expect(screen.queryByText("268")).not.toBeInTheDocument();
+    expect(screen.queryByText("SST")).not.toBeInTheDocument();
+
+    fireEvent.load(barImage());
+    expect(
+      screen.queryByTestId("gridded-legend-skeleton")
+    ).not.toBeInTheDocument();
+    expect(screen.getByText("268")).toBeInTheDocument();
+    expect(screen.getByText("SST")).toBeInTheDocument();
+  });
+
+  it("keeps the skeleton while loading, even once the image is in", () => {
+    const ui = (loading: boolean) => (
+      <ThemeProvider theme={AppTheme}>
+        <GriddedRasterLegend
+          legendUrl={LEGEND_URL}
+          range={loading ? undefined : [268, 310]}
+          variable="SST"
+          loading={loading}
+        />
+      </ThemeProvider>
+    );
+    const { rerender } = renderLoaded(ui(true));
+    expect(screen.getByTestId("gridded-legend-skeleton")).toBeInTheDocument();
+
+    rerender(ui(false));
+    expect(
+      screen.queryByTestId("gridded-legend-skeleton")
+    ).not.toBeInTheDocument();
+    expect(screen.getByText("268")).toBeInTheDocument();
+  });
+
+  it("reserves the same bar-and-labels height while loading and once loaded", () => {
+    const column = () => screen.getByLabelText("Legend loading");
+    const { rerender } = render(legend(LEGEND_URL, [268, 310]));
+    const loadingHeight = getComputedStyle(column()).height;
+    expect(loadingHeight).not.toBe("");
+
+    fireEvent.load(barImage());
+    const loaded = barImage().parentElement?.parentElement as HTMLElement;
+    expect(getComputedStyle(loaded).height).toBe(loadingHeight);
+
+    // A legend with no labels keeps the space too.
+    rerender(legend(LEGEND_URL));
+    expect(getComputedStyle(loaded).height).toBe(loadingHeight);
+  });
+
+  it("shows the skeleton again for a new colormap's image", () => {
+    const { rerender } = renderLoaded(legend(LEGEND_URL));
+    rerender(legend(LEGEND_URL.replace("viridis", "plasma")));
+    expect(screen.getByTestId("gridded-legend-skeleton")).toBeInTheDocument();
+  });
+});
+
+describe("formatLegendValue", () => {
+  it("keeps at most one decimal place and drops a trailing .0", () => {
+    expect(formatLegendValue(268)).toBe("268");
+    expect(formatLegendValue(278.5)).toBe("278.5");
+    expect(formatLegendValue(-12.34)).toBe("-12.3");
+  });
+
+  it("never shows a negative zero", () => {
+    expect(formatLegendValue(-0.04)).toBe("0");
+  });
+
+  it("rounds to the given decimals without trailing zeros", () => {
+    expect(formatLegendValue(0.15, 2)).toBe("0.15");
+    expect(formatLegendValue(0.1, 2)).toBe("0.1");
+    expect(formatLegendValue(0.005, 3)).toBe("0.005");
+  });
+});
+
+describe("legendDecimals", () => {
+  it("keeps one decimal when the tick gap is 0.1 or more", () => {
+    expect(legendDecimals([268, 310])).toBe(1);
+    expect(legendDecimals([-1.2, 1.2])).toBe(1);
+    expect(legendDecimals([0, 0.4])).toBe(1);
+  });
+
+  it("adds decimals as the tick gap shrinks", () => {
+    expect(legendDecimals([0.05, 0.25])).toBe(2);
+    expect(legendDecimals([0, 0.04])).toBe(2);
+    expect(legendDecimals([0, 0.02])).toBe(3);
+  });
+
+  it("falls back to one decimal for an empty or invalid range", () => {
+    expect(legendDecimals([5, 5])).toBe(1);
+    expect(legendDecimals([0, Number.NaN])).toBe(1);
+  });
+
+  it("caps the decimals for a near-zero range", () => {
+    expect(legendDecimals([0, 1e-12])).toBe(6);
+  });
+});
+
+describe("GriddedRasterLegend unit", () => {
+  afterEach(cleanup);
+
+  it("appends the unit to the variable", () => {
+    renderLoaded(
+      <ThemeProvider theme={AppTheme}>
+        <GriddedRasterLegend legendUrl={LEGEND_URL} variable="SST" unit="K" />
+      </ThemeProvider>
+    );
+    expect(screen.getByText("SST (K)")).toBeInTheDocument();
+  });
+});
+
+describe("legendTitle", () => {
+  it("combines whichever of variable and unit are known", () => {
+    expect(legendTitle("SST", "K")).toBe("SST (K)");
+    expect(legendTitle("SST")).toBe("SST");
+    expect(legendTitle(undefined, "K")).toBe("K");
+    expect(legendTitle()).toBeUndefined();
+  });
+});
