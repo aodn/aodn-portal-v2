@@ -58,7 +58,6 @@ import {
 import { Health } from "./systemDefinition";
 import {
   TileManifest,
-  TilePointValueRequest,
   TilePointValueResponse,
   TileProductsResponse,
 } from "./GriddedTileDefinitions";
@@ -670,24 +669,18 @@ const fetchGriddedTileProducts = createAsyncThunk<
 
 const fetchGriddedTilePointValue = createAsyncThunk<
   TilePointValueResponse,
-  TilePointValueRequest,
+  { url: string },
   { rejectValue: ErrorResponse }
 >(
   "griddedTiles/fetchGriddedTilePointValue",
-  (request: TilePointValueRequest, thunkApi: any) =>
+  (request: { url: string }, thunkApi: any) =>
     ogcAxiosWithRetry
-      .get<TilePointValueResponse>(
-        // Built as a raw string, not via `params`: axios would re-encode the
-        // %2B in a multi-variable pointQuery into %252B.
-        `/ogc/ext/tiles/collections/${request.uuid}/data_tiles/point?` +
-          `${request.pointQuery}&datetime=${request.datetime}` +
-          `&lat=${request.lat}&lon=${request.lon}`,
-        {
-          signal: thunkApi.signal,
-          // Interactive click: fail fast rather than back off 10x.
-          "axios-retry": { retries: 1 },
-        }
-      )
+      .get<TilePointValueResponse>(request.url, {
+        baseURL: "",
+        signal: thunkApi.signal,
+        // Interactive click: fail fast rather than back off 10x.
+        "axios-retry": { retries: 1 },
+      })
       .then((response) => response.data)
       .catch(errorHandling(thunkApi))
 );

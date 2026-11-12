@@ -3,6 +3,7 @@ import {
   applyRenderStyleToTemplate,
   buildGriddedLegendUrl,
   buildGriddedManifestUrl,
+  buildGriddedPointUrl,
   buildGriddedTileUrl,
   buildPointValuePopupHtml,
   getGriddedRenderStyle,
@@ -10,7 +11,6 @@ import {
   toCategoricalLabels,
   toLegendUnit,
   buildTileDateMarks,
-  extractPointQuery,
   formatPointValue,
   wrapLongitude,
   formatProductLabel,
@@ -587,24 +587,38 @@ describe("toSelectItems", () => {
   });
 });
 
-describe("extractPointQuery", () => {
-  it("keeps dataset and variable verbatim, including %2B", () => {
-    expect(extractPointQuery(TWO_VARIABLE_TEMPLATE)).toBe(
-      "dataset=model_currents&variable=ucur%2Bvcur"
+describe("buildGriddedPointUrl", () => {
+  const POINT_TEMPLATE =
+    "/api/v1/ogc/ext/tiles/collections/uuid-2/data_tiles/point" +
+    "?dataset=model_currents&variable=ucur%2Bvcur" +
+    "&datetime={datetime}&lat={lat}&lon={lon}";
+
+  it("fills datetime, lat and lon, keeping %2B verbatim", () => {
+    expect(
+      buildGriddedPointUrl(POINT_TEMPLATE, "2024-01-01T00:00:00Z", -44.27, 132)
+    ).toBe(
+      "/api/v1/ogc/ext/tiles/collections/uuid-2/data_tiles/point" +
+        "?dataset=model_currents&variable=ucur%2Bvcur" +
+        "&datetime=2024-01-01T00:00:00Z&lat=-44.27&lon=132"
     );
   });
 
-  it("is undefined when the template has no dataset or variable", () => {
-    expect(extractPointQuery(undefined)).toBeUndefined();
-    expect(extractPointQuery("/tiles/{z}")).toBeUndefined();
-    expect(extractPointQuery("/tiles/{z}?f=png")).toBeUndefined();
+  it("is undefined without a template or a date", () => {
+    expect(buildGriddedPointUrl(undefined, "2024-01-01", 0, 0)).toBeUndefined();
+    expect(
+      buildGriddedPointUrl(POINT_TEMPLATE, undefined, 0, 0)
+    ).toBeUndefined();
   });
 
-  it("is attached to each product by toGriddedRasterProducts", () => {
-    const [product] = toGriddedRasterProducts({ products: [visualProduct()] });
-    expect(product.pointQuery).toBe(
-      "dataset=model_sea_level_anomaly_gridded_realtime&variable=gsla"
-    );
+  it("is taken from point_url_template by toGriddedRasterProducts", () => {
+    const [product] = toGriddedRasterProducts({
+      products: [visualProduct({ point_url_template: POINT_TEMPLATE })],
+    });
+    expect(product.pointTemplate).toBe(POINT_TEMPLATE);
+    const [withoutPoint] = toGriddedRasterProducts({
+      products: [visualProduct()],
+    });
+    expect(withoutPoint.pointTemplate).toBeUndefined();
   });
 });
 

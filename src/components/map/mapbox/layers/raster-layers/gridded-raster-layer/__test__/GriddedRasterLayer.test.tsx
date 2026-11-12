@@ -67,7 +67,9 @@ const PRODUCTS: GriddedRasterProduct[] = [
     label: "a — one",
     template: TEMPLATE,
     dates: ["2024-01-01", "2024-01-02", "2024-01-03"],
-    pointQuery: "dataset=d&variable=ucur%2Bvcur",
+    pointTemplate:
+      "/api/v1/ogc/ext/tiles/collections/uuid-1/data_tiles/point" +
+      "?dataset=d&variable=ucur%2Bvcur&datetime={datetime}&lat={lat}&lon={lon}",
     colormap: "viridis",
     categorical: false,
   },
@@ -97,7 +99,6 @@ describe("GriddedRasterLayer", () => {
           layerConfig="a:one"
           onLayerChange={vi.fn()}
           selectedDate="2024-01-03"
-          uuid="uuid-1"
           visible
           {...props}
         />
@@ -391,7 +392,7 @@ describe("GriddedRasterLayer", () => {
       click(132.01, -44.27);
 
       expect(spy).toHaveBeenCalledWith(
-        "/ogc/ext/tiles/collections/uuid-1/data_tiles/point?" +
+        "/api/v1/ogc/ext/tiles/collections/uuid-1/data_tiles/point?" +
           "dataset=d&variable=ucur%2Bvcur&datetime=2024-01-03" +
           "&lat=-44.27&lon=132.01",
         expect.anything()
@@ -455,7 +456,6 @@ describe("GriddedRasterLayer", () => {
             layerConfig="a:one"
             onLayerChange={vi.fn()}
             selectedDate="2024-01-02"
-            uuid="uuid-1"
             visible
           />
         </MapContext.Provider>

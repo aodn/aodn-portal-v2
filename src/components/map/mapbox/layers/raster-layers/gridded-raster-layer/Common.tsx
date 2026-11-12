@@ -90,6 +90,26 @@ export const buildGriddedLegendUrl = (
     ? legendTemplate.split("{colormap}").join(encodeURIComponent(colormap))
     : undefined;
 
+/**
+ * Fills `{datetime}`, `{lat}` and `{lon}` in a product's point template,
+ * verbatim, so the `%2B` in a multi-variable product reaches the wire as-is.
+ */
+export const buildGriddedPointUrl = (
+  pointTemplate: string | undefined,
+  datetime: string | undefined,
+  lat: number,
+  lon: number
+): string | undefined =>
+  pointTemplate && datetime
+    ? pointTemplate
+        .split("{datetime}")
+        .join(datetime)
+        .split("{lat}")
+        .join(String(lat))
+        .split("{lon}")
+        .join(String(lon))
+    : undefined;
+
 /** Fills `{datetime}` in a product's manifest template, verbatim. */
 export const buildGriddedManifestUrl = (
   manifestTemplate?: string,
@@ -239,22 +259,6 @@ export const formatProductLabel = (product: TileProduct): string => {
   return `${dataset} — ${variables}`;
 };
 
-const POINT_QUERY_KEYS = ["dataset", "variable"];
-
-/**
- * Picks `dataset=...&variable=...` out of a tile template's query string,
- * verbatim. Plain string splitting (not URLSearchParams) for the same reason
- * as buildGriddedTileUrl: `ucur%2Bvcur` must reach the wire unchanged.
- */
-export const extractPointQuery = (template?: string): string | undefined => {
-  const query = template?.split("?")[1];
-  if (!query) return undefined;
-  const picked = query
-    .split("&")
-    .filter((pair) => POINT_QUERY_KEYS.includes(pair.split("=")[0]));
-  return picked.length > 0 ? picked.join("&") : undefined;
-};
-
 export const toGriddedRasterProducts = (
   response?: TileProductsResponse,
   styles: Record<string, GriddedRenderStyle> = GRIDDED_RENDER_STYLE_BY_PRODUCT
@@ -288,7 +292,6 @@ export const toGriddedRasterProducts = (
     const marks = buildTileDateMarks(product.available_dates);
     if (marks.dates.length === 0) return;
 
-    const pointQuery = extractPointQuery(template);
     const categorical = product.categorical === true;
     const { colormap, rescale } = getGriddedRenderStyle(
       product.id,
@@ -304,12 +307,12 @@ export const toGriddedRasterProducts = (
         : nonEmptyString(product.variable),
       template: applyRenderStyleToTemplate(template, colormap, rescale),
       dates: marks.dates,
-      ...(pointQuery ? { pointQuery } : {}),
       colormap,
       categorical,
       rescale,
       legendTemplate: nonEmptyString(product.legend_url),
       manifestTemplate: nonEmptyString(product.visual_manifest_url_template),
+      pointTemplate: nonEmptyString(product.point_url_template),
     });
   });
   return result;

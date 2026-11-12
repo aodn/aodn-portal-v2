@@ -11,6 +11,7 @@ import { addDataLayer } from "../../../layerOrder";
 import MapLayerSelect from "../../../component/MapLayerSelect";
 import { TestHelper } from "../../../../../common/test/helper";
 import {
+  buildGriddedPointUrl,
   buildGriddedTileUrl,
   buildPointValueMessageHtml,
   buildPointValuePopupHtml,
@@ -47,7 +48,6 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
   layerConfig,
   onLayerChange,
   selectedDate,
-  uuid,
   visible = false,
 }) => {
   const dispatch = useAppDispatch();
@@ -57,7 +57,7 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
   const tileLayerId = getGriddedRasterLayerId(mapContainerId);
   const selectedProduct = products.find((p) => p.id === layerConfig);
   const tileUrl = buildGriddedTileUrl(selectedProduct?.template, selectedDate);
-  const pointQuery = selectedProduct?.pointQuery;
+  const pointTemplate = selectedProduct?.pointTemplate;
   const hasTileUrl = tileUrl !== undefined;
 
   // Latest values for STYLEDATA rebuilds — that effect must not depend on
@@ -135,7 +135,7 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
   // Re-subscribes (and closes any open popup) when the product or date
   // changes, so a popup never shows a value from a different layer state.
   useEffect(() => {
-    if (!map || !visible || !uuid || !pointQuery || !selectedDate) return;
+    if (!map || !visible || !pointTemplate || !selectedDate) return;
 
     let popup: Popup | null = null;
     let request: { abort: () => void } | null = null;
@@ -146,6 +146,8 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
       request?.abort();
       const lat = e.lngLat.lat;
       const lon = wrapLongitude(e.lngLat.lng);
+      const url = buildGriddedPointUrl(pointTemplate, selectedDate, lat, lon);
+      if (!url) return;
 
       if (!popup) popup = new Popup(MapDefaultConfig.DEFAULT_POPUP);
       const current = popup;
@@ -156,15 +158,7 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
       const element = current.getElement();
       if (element) element.dataset.testid = playwrightTestIds.DETAIL_MAP_POPUP;
 
-      const pending = dispatch(
-        fetchGriddedTilePointValue({
-          uuid,
-          pointQuery,
-          datetime: selectedDate,
-          lat,
-          lon,
-        })
-      );
+      const pending = dispatch(fetchGriddedTilePointValue({ url }));
       request = pending;
       pending
         .unwrap()
@@ -186,7 +180,7 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
       request?.abort();
       popup?.remove();
     };
-  }, [dispatch, map, pointQuery, selectedDate, uuid, visible]);
+  }, [dispatch, map, pointTemplate, selectedDate, visible]);
 
   return (
     <>
