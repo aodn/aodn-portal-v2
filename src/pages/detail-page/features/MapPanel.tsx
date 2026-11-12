@@ -866,7 +866,16 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
         </Box>
       )}
       {showGriddedRasterLegend && (
-        <Box sx={{ mb: 1, backgroundColor: "white" }}>
+        <Box
+          sx={{
+            mb: 1,
+            backgroundColor: "white",
+            // Longhand radius keys aren't theme-scaled: a bare 1 is 1px.
+            borderBottomLeftRadius: borderRadius.small,
+            borderBottomRightRadius: borderRadius.small,
+            overflow: "hidden",
+          }}
+        >
           <GriddedRasterLegend
             legendUrl={griddedLegend.legendUrl}
             range={griddedLegend.range}

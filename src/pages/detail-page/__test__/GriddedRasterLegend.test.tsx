@@ -49,6 +49,25 @@ describe("GriddedRasterLegend", () => {
     );
   });
 
+  it("draws a tick above each inner label, none at the bar's ends", () => {
+    render(legend(LEGEND_URL, [268, 310]));
+    const ticks = screen.getAllByTestId("gridded-legend-tick");
+    expect(ticks).toHaveLength(3);
+    ["25%", "50%", "75%"].forEach((left, i) =>
+      expect(ticks[i]).toHaveStyle({ left })
+    );
+  });
+
+  it("ticks every categorical block", () => {
+    render(legend(LEGEND_URL, undefined, ["none", "moderate", "strong"]));
+    expect(screen.getAllByTestId("gridded-legend-tick")).toHaveLength(3);
+  });
+
+  it("draws no ticks without labels", () => {
+    render(legend(LEGEND_URL));
+    expect(screen.queryAllByTestId("gridded-legend-tick")).toHaveLength(0);
+  });
+
   it("centres one label under each categorical block", () => {
     render(
       legend(LEGEND_URL, [0, 3], ["none", "moderate", "strong", "severe"])

@@ -17,6 +17,9 @@ interface GriddedRasterLegendProps {
 }
 
 const BAR_HEIGHT = "12px";
+// Tick marks hang from the bar's bottom edge down to each label.
+const TICK_HEIGHT = "4px";
+const TICK_GAP = "2px";
 // Keeps the centred end labels inside the bar's column.
 const BAR_INSET = "16px";
 // Evenly spaced ticks along the bar, as a fraction of its width.
@@ -76,8 +79,29 @@ const BarLabels: FC<{ labels: BarLabel[] }> = ({ labels }) => {
   return (
     <Box
       data-testid="gridded-legend-range"
-      sx={{ position: "relative", height: "20px", mt: "4px" }}
+      sx={{
+        position: "relative",
+        height: `calc(${TICK_HEIGHT} + ${TICK_GAP} + 20px)`,
+      }}
     >
+      {/* No ticks on the bar's own ends; its edges already mark them. */}
+      {labels
+        .filter(({ position }) => position > 0 && position < 1)
+        .map(({ position }) => (
+          <Box
+            key={`tick-${position}`}
+            data-testid="gridded-legend-tick"
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: `${position * 100}%`,
+              transform: "translateX(-50%)",
+              width: "1px",
+              height: TICK_HEIGHT,
+              backgroundColor: theme.palette.text1,
+            }}
+          />
+        ))}
       {labels.map(({ position, text }) => (
         <Typography
           key={position}
@@ -85,6 +109,7 @@ const BarLabels: FC<{ labels: BarLabel[] }> = ({ labels }) => {
           color={theme.palette.text1}
           sx={{
             position: "absolute",
+            top: `calc(${TICK_HEIGHT} + ${TICK_GAP})`,
             left: `${position * 100}%`,
             transform: "translateX(-50%)",
             whiteSpace: "nowrap",
@@ -121,8 +146,8 @@ const LegendBody: FC<GriddedRasterLegendProps & { legendUrl: string }> = ({
         display: "flex",
         alignItems: "center",
         gap: "16px",
-        px: "16px",
-        py: "8px",
+        px: "20px",
+        py: "12px",
       }}
     >
       <Typography
