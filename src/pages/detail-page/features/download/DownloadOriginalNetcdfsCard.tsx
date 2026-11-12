@@ -17,6 +17,9 @@ import DownloadSourceChip from "./DownloadSourceChip";
 // The user gets an email with a csv list of the netcdf file links
 const formatOptions = [{ label: "CSV", value: "csv" }];
 
+// Shown to the user instead of the raw link title
+const DATA_SELECTION_LABEL = "List of NetCDFs";
+
 interface DownloadOriginalNetcdfsCardProps extends DownloadCondition {
   collection: OGCCollection;
   isImosOnly?: boolean;
@@ -35,10 +38,10 @@ const DownloadOriginalNetcdfsCard: FC<DownloadOriginalNetcdfsCardProps> = ({
 }) => {
   const [downloadDialogOpen, setDownloadDialogOpen] = useState<boolean>(false);
 
-  // One option only: the link title, which is also the key
+  // One option only: the link title is the key sent to the backend
   const dataSelectOptions = useMemo<SelectItem[]>(() => {
     const title = collection.getOriginalNetcdfsLink()?.title;
-    return title ? [{ value: title, label: title }] : [];
+    return title ? [{ value: title, label: DATA_SELECTION_LABEL }] : [];
   }, [collection]);
   const selectedDataItem = dataSelectOptions[0]?.value;
   const selectedFormat = formatOptions[0].value;
