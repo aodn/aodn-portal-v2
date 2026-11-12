@@ -10,6 +10,7 @@ export enum AnalyticsEvent {
   SEARCH_TOPIC_CLICK = "search_topic_click",
   DETAILS_PAGE_DATASET = "details_page_dataset",
   COPY_CITATION_CLICK = "copy_citation_click",
+  LEGACY_PORTAL_CLICK = "legacy_portal_click",
   DATA_ACCESS_CLICK = "data_access_click",
   DOWNLOAD_CO_DATA = "download_co_data",
   DOWNLOAD_WFS_DATA = "download_wfs_data",

@@ -27,6 +27,8 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { pageDefault } from "@/components/common/constants";
 import { useNavigate } from "react-router-dom";
 import useUrlReachable from "@/hooks/useUrlReachable";
+import { trackCustomEvent } from "@/analytics/customEventTracker";
+import { AnalyticsEvent } from "@/analytics/analyticsEvents";
 
 export enum HeaderMenuStyle {
   DROPDOWN_MENU = "DROPDOWN",
@@ -159,7 +161,10 @@ const HeaderMenu: FC<HeaderMenuProps> = ({ menuStyle }) => {
       {
         menu: {
           name: "Legacy Portal",
-          handler: () => openInNewTab(pageDefault.url.LEGACY_PORTAL),
+          handler: () => {
+            trackCustomEvent(AnalyticsEvent.LEGACY_PORTAL_CLICK);
+            openInNewTab(pageDefault.url.LEGACY_PORTAL);
+          },
           visible: () => legacyPortalReachable,
         },
         items: [],

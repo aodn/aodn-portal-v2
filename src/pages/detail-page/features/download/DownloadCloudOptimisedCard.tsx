@@ -26,12 +26,10 @@ import useEstimateSize from "../../../../hooks/useEstimateSize";
 import { processCoEstimateSize } from "@/app/store/searchReducer";
 import { getCODatasetOptions } from "@/utils/DatasetOptionUtils";
 import DownloadSourceChip from "./DownloadSourceChip";
-
-const downloadFormats = [
-  { label: "NetCDFs", value: "netcdf" },
-  { label: "CSV", value: "csv" },
-  { label: "GeoTIFF", value: "geotiff" },
-];
+import {
+  DOWNLOAD_FORMAT,
+  DownloadFileType,
+} from "@/pages/detail-page/features/download/constants";
 
 // The CO `estimate-complete` payload reports the size of the actual download
 // output in `estimated_output_bytes` (vs `estimated_uncompressed_bytes`)
@@ -154,18 +152,26 @@ const DownloadCloudOptimisedCard: FC<DownloadCardProps> = ({
       : collectionDatasetTypes?.length === 1
         ? collectionDatasetTypes[0]
         : undefined;
-    if (!datasetType) {
-      return downloadFormats;
+
+    switch (datasetType) {
+      case DatasetType.PARQUET: {
+        return DOWNLOAD_FORMAT.filter(
+          (format) =>
+            format.value === DownloadFileType.CSV ||
+            format.value === DownloadFileType.EXCEL
+        );
+      }
+      case DatasetType.ZARR: {
+        return DOWNLOAD_FORMAT.filter(
+          (format) =>
+            format.value === DownloadFileType.NETCDF ||
+            format.value === DownloadFileType.GEOTIFF
+        );
+      }
+      default: {
+        return DOWNLOAD_FORMAT;
+      }
     }
-    if (datasetType === DatasetType.PARQUET) {
-      return downloadFormats.filter((format) => format.value === "csv");
-    }
-    if (datasetType === DatasetType.ZARR) {
-      return downloadFormats.filter(
-        (format) => format.value === "netcdf" || format.value === "geotiff"
-      );
-    }
-    return downloadFormats;
   }, [collection, selectedDataItem]);
 
   // Keep the selected format valid for the current data selection: fall back

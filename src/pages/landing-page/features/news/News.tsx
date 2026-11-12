@@ -1,12 +1,10 @@
 import { FC } from "react";
 import { Box, Button, Grid, Stack, Typography, alpha } from "@mui/material";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { portalTheme } from "@/styles";
 import {
   FEATURED_CONTRIBUTORS,
   NEWS_CARDS_DATA,
 } from "@/pages/landing-page/features/news/constants";
-import { FEATURED_DATASET_COUNTS } from "@/pages/landing-page/constants";
 import NewsCard from "@/pages/landing-page/features/news/components/NewsCard";
 import { SearchKeys } from "@/components/search/constants";
 import { useAppDispatch } from "@/app/store/hooks";
@@ -40,26 +38,6 @@ const News: FC = () => {
       bgcolor: alpha(white, 0.1),
     },
   };
-  const renderCount = (group: SearchKeys) =>
-    FEATURED_DATASET_COUNTS[group] == null ? null : (
-      <Box
-        component="span"
-        sx={{
-          color:
-            group === SearchKeys.IMOS
-              ? portalTheme.palette.text2
-              : portalTheme.palette.primary4,
-          fontSize: portalTheme.typography.body2Regular.fontSize,
-          lineHeight: 1,
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontVariantNumeric: "tabular-nums",
-        }}
-      >
-        {FEATURED_DATASET_COUNTS[group]?.toLocaleString("en-AU")}+
-      </Box>
-    );
   const explore = (group?: SearchKeys) => {
     dispatch(clearComponentParam());
     if (group) dispatch(updateDatasetGroup(group));
@@ -103,36 +81,6 @@ const News: FC = () => {
             catalogue.
           </Typography>
         </Box>
-        <Button
-          variant="outlined"
-          onClick={() => explore()}
-          endIcon={<ArrowForwardIcon />}
-          sx={{
-            color: white,
-            border: `1px solid ${white}`,
-            borderRadius: portalTheme.borderRadius.sm,
-            minWidth: 173,
-            height: 50,
-            px: 2.5,
-            py: 1.5,
-            gap: 1,
-            "& .MuiButton-endIcon": { m: 0 },
-            transition: portalTheme.transitions.create(
-              ["background-color", "border-color"],
-              { duration: portalTheme.transitions.duration.short }
-            ),
-            "&:hover, &:focus-visible": {
-              border: `1px solid ${white}`,
-              bgcolor: alpha(white, 0.1),
-            },
-            "@media (prefers-reduced-motion: reduce)": { transition: "none" },
-            flexShrink: 0,
-            textTransform: "none",
-            fontSize: portalTheme.typography.title2Regular.fontSize,
-          }}
-        >
-          More datasets
-        </Button>
       </Stack>
       <Stack
         direction="row"
@@ -155,7 +103,6 @@ const News: FC = () => {
           }}
         >
           <span>IMOS</span>
-          {renderCount(SearchKeys.IMOS)}
         </Button>
         {FEATURED_CONTRIBUTORS.map((organisation) => (
           <Button
@@ -164,7 +111,6 @@ const News: FC = () => {
             sx={tabSx}
           >
             <span>{organisation.shortName}</span>
-            {renderCount(organisation.datasetGroup)}
           </Button>
         ))}
       </Stack>

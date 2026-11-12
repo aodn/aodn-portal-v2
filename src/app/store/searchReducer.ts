@@ -45,6 +45,7 @@ import {
   getKeyFrom,
   getMultiPolygonFrom,
 } from "@/utils/DownloadConditionUtils";
+import { DownloadFileType } from "@/pages/detail-page/features/download/constants";
 import { trackSearchResultParameters } from "@/analytics/searchParamsEvent";
 import { trackHttpRequestError } from "@/analytics/httpRequestErrEvent";
 import {
@@ -56,6 +57,7 @@ import {
 } from "./GeoserverDefinitions";
 import { Health } from "./systemDefinition";
 import {
+  TileManifest,
   TilePointValueRequest,
   TilePointValueResponse,
   TileProductsResponse,
@@ -486,6 +488,10 @@ const processCoEstimateSize = createAsyncThunk<
       const multiPolygon = getMultiPolygonFrom(request.downloadConditions);
       const format = getFormatFrom(request.downloadConditions);
       const key = getKeyFrom(request.downloadConditions);
+      // Temporary: the estimate endpoint returns no size for Excel, so show
+      // the CSV estimate. The download itself still requests Excel.
+      const estimateFormat =
+        format === DownloadFileType.EXCEL ? DownloadFileType.CSV : format;
 
       const requestBody = {
         inputs: {
@@ -493,7 +499,7 @@ const processCoEstimateSize = createAsyncThunk<
           key,
           start_date: toIsoDateOrUnspecified(dateRange.start),
           end_date: toIsoDateOrUnspecified(dateRange.end, true),
-          output_format: format,
+          output_format: estimateFormat,
           multi_polygon: multiPolygon,
         },
       };
@@ -682,6 +688,26 @@ const fetchGriddedTilePointValue = createAsyncThunk<
           "axios-retry": { retries: 1 },
         }
       )
+      .then((response) => response.data)
+      .catch(errorHandling(thunkApi))
+);
+
+const fetchGriddedTileManifest = createAsyncThunk<
+  TileManifest,
+  { url: string },
+  { rejectValue: ErrorResponse }
+>(
+  "griddedTiles/fetchGriddedTileManifest",
+  (request: { url: string }, thunkApi: any) =>
+    ogcAxiosWithRetry
+      .get<TileManifest>(request.url, {
+        // The url is the backend's own visual_manifest_url_template, already
+        // rooted at /api/v1 — don't prefix the instance baseURL again.
+        baseURL: "",
+        signal: thunkApi.signal,
+        // Only feeds legend tick labels; don't hammer DAS during warmup.
+        "axios-retry": { retries: 1, retryDelay: () => 1000 },
+      })
       .then((response) => response.data)
       .catch(errorHandling(thunkApi))
 );
@@ -875,6 +901,7 @@ export {
   fetchSystemHealthNoStore,
   fetchGriddedTileProducts,
   fetchGriddedTilePointValue,
+  fetchGriddedTileManifest,
   processDatasetDownload,
   processWFSDownload,
   processWFSEstimateSize,

@@ -30,95 +30,68 @@ describe("SearchbarButtonGroup Component", () => {
   });
 
   describe("Popup Interactions", () => {
-    it("should expand the button and show text when date button is clicked", () => {
+    const renderGroup = (activeButton: SearchbarButtonNames) =>
       render(
         <Provider store={store}>
-          <SearchbarButtonGroup
-            {...defaultProps}
-            activeButton={SearchbarButtonNames.Date}
-          />
+          <SearchbarButtonGroup {...defaultProps} activeButton={activeButton} />
         </Provider>
       );
 
-      const dateButton = screen.getByTestId("date-range-button");
-      user.click(dateButton);
+    it("should expand the button and show text when date button is clicked", async () => {
+      renderGroup(SearchbarButtonNames.Date);
 
-      return waitFor(() =>
+      await user.click(screen.getByTestId("date-range-button"));
+
+      await waitFor(() =>
         expect(mockHandleClickButton).toHaveBeenCalledWith(
           SearchbarButtonNames.Date
         )
-      ).then(() => expect(screen.getByText("Date")).toBeInTheDocument());
+      );
+      expect(screen.getByText("Date")).toBeInTheDocument();
     });
 
-    it("should expand the button and show text when location button is clicked", () => {
-      render(
-        <Provider store={store}>
-          <SearchbarButtonGroup
-            {...defaultProps}
-            activeButton={SearchbarButtonNames.Location}
-          />
-        </Provider>
-      );
+    it("should expand the button and show text when location button is clicked", async () => {
+      renderGroup(SearchbarButtonNames.Location);
 
-      const locationButton = screen.getByTestId("location-button");
-      user.click(locationButton);
+      await user.click(screen.getByTestId("location-button"));
 
-      return waitFor(() =>
+      await waitFor(() =>
         expect(mockHandleClickButton).toHaveBeenCalledWith(
           SearchbarButtonNames.Location
         )
-      ).then(() => expect(screen.getByText("Location")).toBeInTheDocument());
+      );
+      expect(screen.getByText("Location")).toBeInTheDocument();
     });
 
-    it("should expand the button and show text when filter button is clicked", () => {
-      render(
-        <Provider store={store}>
-          <SearchbarButtonGroup
-            {...defaultProps}
-            activeButton={SearchbarButtonNames.Filter}
-          />
-        </Provider>
-      );
+    it("should expand the button and show text when filter button is clicked", async () => {
+      renderGroup(SearchbarButtonNames.Filter);
 
-      const filterButton = screen.getByTestId("filtersBtn");
-      user.click(filterButton);
+      await user.click(screen.getByTestId("filtersBtn"));
 
-      return waitFor(() =>
+      await waitFor(() =>
         expect(mockHandleClickButton).toHaveBeenCalledWith(
           SearchbarButtonNames.Filter
         )
-      ).then(() => expect(screen.getByText("Filter")).toBeInTheDocument());
+      );
+      expect(screen.getByText("Filter")).toBeInTheDocument();
     });
 
-    it("should handle switching between different popups", () => {
-      render(
-        <Provider store={store}>
-          <SearchbarButtonGroup
-            {...defaultProps}
-            activeButton={SearchbarButtonNames.Date}
-          />
-        </Provider>
-      );
+    it("should handle switching between different popups", async () => {
+      renderGroup(SearchbarButtonNames.Date);
 
-      // Click date button first
-      const dateButton = screen.getByTestId("date-range-button");
-      user.click(dateButton);
-
-      return waitFor(() =>
+      await user.click(screen.getByTestId("date-range-button"));
+      await waitFor(() =>
         expect(mockHandleClickButton).toHaveBeenCalledWith(
           SearchbarButtonNames.Date
         )
-      ).then(() => {
-        // Then click location button
-        const locationButton = screen.getByTestId("location-button");
-        user.click(locationButton);
+      );
 
-        return waitFor(() =>
-          expect(mockHandleClickButton).toHaveBeenCalledWith(
-            SearchbarButtonNames.Location
-          )
-        );
-      });
+      await user.click(screen.getByTestId("location-button"));
+      await waitFor(() =>
+        expect(mockHandleClickButton).toHaveBeenCalledWith(
+          SearchbarButtonNames.Location
+        )
+      );
     });
   });
 });

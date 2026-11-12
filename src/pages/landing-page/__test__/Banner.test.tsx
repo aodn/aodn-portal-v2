@@ -19,7 +19,7 @@ describe("Banner", () => {
     expect(
       screen.getByRole("heading", {
         level: 1,
-        name: "IMOS Australian Ocean Data Portal",
+        name: "Australian Ocean Data Portal",
       })
     ).to.exist;
   });
