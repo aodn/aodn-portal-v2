@@ -34,7 +34,7 @@ const pageDefault = {
   url: {
     IMOS: "https://imos.org.au",
     AODN: "https://www.aodn.org.au",
-    LEGACY_PORTAL: "https://portal.legacy.aodn.org.au",
+    LEGACY_PORTAL: "https://portal-legacy.aodn.org.au",
   },
 };
 
