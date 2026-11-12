@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import { vi, beforeEach, describe, expect, afterAll, afterEach } from "vitest";
 import store from "@/app/store/store";
 import {
@@ -10,9 +10,9 @@ import {
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import BookmarkListAccordionGroup from "../BookmarkListAccordionGroup";
 import { userEvent } from "@testing-library/user-event";
-import { server } from "../../../__mocks__/server";
+import { server } from "@/__mocks__/server";
 import * as bookmarkListReducer from "@/app/store/bookmarkListReducer";
-import { COLLECTIONS_WAVE } from "../../../__mocks__/data/COLLECTIONS_WAVE";
+import { COLLECTIONS_WAVE } from "@/__mocks__/data/COLLECTIONS_WAVE";
 import fs from "fs/promises";
 import path from "path";
 import { marineParkDefault } from "../../common/constants";
@@ -132,7 +132,7 @@ describe("Bookmark List Accordion Group", () => {
     );
   });
 
-  it("renders bookmark list and clear all", () => {
+  it("renders bookmark list and clear all", async () => {
     // Store value in store will result in the bookmark contains two items
     store.dispatch(addItem(collection1));
     store.dispatch(addItem(collection2));
@@ -147,18 +147,17 @@ describe("Bookmark List Accordion Group", () => {
     expect(clearAllButton).toBeInTheDocument();
 
     // Click the clear all button
-    userEvent.click(clearAllButton);
+    await userEvent.click(clearAllButton);
 
-    return waitFor(() =>
+    await waitFor(() =>
       expect(
         screen.queryByTestId("bookmark-list-head-count")
       ).not.toBeInTheDocument()
-    ).then(() => {
-      expect(store.getState().bookmarkList.temporaryItem).toBeUndefined();
-    });
+    );
+    expect(store.getState().bookmarkList.temporaryItem).toBeUndefined();
   });
 
-  it("renders bookmark list with two items and add temp record, then bookmark", () => {
+  it("renders bookmark list with two items and add temp record, then bookmark", async () => {
     // Store value in store will result in the bookmark contains two items
     store.dispatch(addItem(collection1));
     store.dispatch(addItem(collection2));
@@ -172,7 +171,9 @@ describe("Bookmark List Accordion Group", () => {
     expect(store.getState().bookmarkList.temporaryItem).toBeUndefined();
 
     // This cause a fetch to test server above and get the collection by the id
-    store.dispatch(setTemporaryItem(collection3));
+    act(() => {
+      store.dispatch(setTemporaryItem(collection3));
+    });
 
     expect(store.getState().bookmarkList.temporaryItem).not.toBeUndefined();
 
@@ -181,19 +182,16 @@ describe("Bookmark List Accordion Group", () => {
       "2"
     );
 
-    return waitFor(() => screen.getByTestId("item3-iconbutton")).then(
-      (button) => {
-        // Now if you click the bookmark button of the temp record it will become bookmark record
-        userEvent.click(button);
+    const button = await screen.findByTestId("item3-iconbutton");
 
-        return waitFor(() =>
-          expect(store.getState().bookmarkList.temporaryItem).toBeUndefined()
-        ).then(() => {
-          expect(
-            screen.getByTestId("bookmark-list-head-count")
-          ).toHaveTextContent("3");
-        });
-      }
+    // Now if you click the bookmark button of the temp record it will become bookmark record
+    await userEvent.click(button);
+
+    await waitFor(() =>
+      expect(store.getState().bookmarkList.temporaryItem).toBeUndefined()
+    );
+    expect(screen.getByTestId("bookmark-list-head-count")).toHaveTextContent(
+      "3"
     );
   });
 

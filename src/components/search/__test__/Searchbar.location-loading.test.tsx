@@ -65,21 +65,27 @@ describe("Location filter loading", () => {
     await userEvent.click(screen.getByTestId("location-button"));
     await waitFor(() => expect(popup).not.toBeVisible());
 
+    // The popper unmounts after its exit transition, so reopening may create a
+    // new popup element. Re-query it instead of reusing the stale reference.
     await userEvent.click(screen.getByTestId("date-range-button"));
-    expect(await within(popup).findByText("Date filter loaded")).toBeVisible();
+    const datePopup = await screen.findByTestId("searchbar-popup");
+    expect(
+      await within(datePopup).findByText("Date filter loaded")
+    ).toBeVisible();
 
     await act(async () => {
       locationImport.resolve();
     });
-    expect(within(popup).getByText("Date filter loaded")).toBeVisible();
-    expect(within(popup).queryByText("Location filter loaded")).toBeNull();
+    expect(within(datePopup).getByText("Date filter loaded")).toBeVisible();
+    expect(within(datePopup).queryByText("Location filter loaded")).toBeNull();
 
     await userEvent.click(screen.getByTestId("location-button"));
+    const locationPopup = await screen.findByTestId("searchbar-popup");
     expect(
-      await within(popup).findByText("Location filter loaded")
+      await within(locationPopup).findByText("Location filter loaded")
     ).toBeVisible();
     expect(
-      within(popup).queryByRole("status", {
+      within(locationPopup).queryByRole("status", {
         name: "Loading filter",
       })
     ).not.toBeInTheDocument();
