@@ -53,8 +53,8 @@ export const SINGLE_POINT_SYMBOLOGY = {
   STROKE_COLOR: "#fff",
 };
 
-// Two-tone outline for bounding box and polygon: the dark line and the white
-// line below it keep a 3:1 contrast on light, dark and satellite base maps (WCAG 1.4.11)
+// Two-tone outline for the dataset extent: the dark line and the white line
+// below it keep a 3:1 contrast on light, dark and satellite base maps (WCAG 1.4.11)
 export const EXTENT_OUTLINE_SYMBOLOGY = {
   COLOR: "#1A1A1A",
   WIDTH: 2,
@@ -62,15 +62,45 @@ export const EXTENT_OUTLINE_SYMBOLOGY = {
   CASING_WIDTH: 4,
 };
 
-// User-drawn bbox and polygon: theme dark navy on the same white casing as
-// the extent outline; the selected one has a thicker line and a stronger fill
+const { palette } = portalTheme;
+
+// User-drawn bbox and polygon, as in the Figma detail page design.
+// Hex values are design colours that are not in the portal theme.
 export const DRAW_SELECTION_SYMBOLOGY = {
-  COLOR: portalTheme.palette.primary2,
-  WIDTH: 2,
-  SELECTED_WIDTH: 4,
-  FILL_COLOR: portalTheme.palette.secondary2,
-  FILL_OPACITY: 0.12,
-  SELECTED_FILL_OPACITY: 0.3,
+  BADGE_COLOR: palette.primary1,
+  // Bounding box: white dashed line on an amber fill
+  BBOX: {
+    COLOR: palette.common.white,
+    WIDTH: 1.5,
+    DASH_PX: [4, 4],
+    FILL_COLOR: "#E9BD6A",
+    FILL_OPACITY: 0.4,
+  },
+  // Polygon while drawing: edges up to the cursor are solid, the closing edge is dashed
+  POLYGON_DRAWING: {
+    COLOR: "#FFEBA1",
+    WIDTH: 3,
+    CLOSING_DASH_PX: [6, 6],
+    FILL_COLOR: "#FFEBA1",
+    FILL_OPACITY: 0.4,
+  },
+  // Polygon when finished: light blue line, purple fill on top of the drawing fill
+  POLYGON_DONE: {
+    COLOR: "#C1F0F9",
+    WIDTH: 3,
+    FILL_COLOR: "#756AE9",
+    FILL_OPACITY: 0.4,
+  },
+  // Corner handles shown while drawing or editing
+  CORNER: {
+    RADIUS: 6.78,
+    COLOR: "#4C5DB2",
+    STROKE_COLOR: palette.common.white,
+    STROKE_WIDTH: 1.8,
+    SHADOW_COLOR: palette.common.black,
+    SHADOW_OPACITY: 0.25,
+    SHADOW_BLUR: 7.2,
+  },
 };
 
 export const ComponentId = {

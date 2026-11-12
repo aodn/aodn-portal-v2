@@ -354,7 +354,7 @@ describe("selection colours", () => {
     mocks.draw.getAll.mockReturnValue({ features: [] });
   });
 
-  it("draws bbox and polygon selections with the accessible draw styles", () => {
+  it("draws bbox and polygon selections with the draw styles", () => {
     render(<DrawRect map={createMockMap()} />);
 
     expect(MapboxDraw).toHaveBeenLastCalledWith(
@@ -362,7 +362,7 @@ describe("selection colours", () => {
     );
   });
 
-  it("shows the selection number on the same colour as the selection line", () => {
+  it("shows the selection number on the badge colour", () => {
     mocks.draw.getAll.mockReturnValue({
       features: [
         {
@@ -386,9 +386,9 @@ describe("selection colours", () => {
     });
     render(<DrawRect map={createMockMap()} />);
 
-    // DRAW_SELECTION_SYMBOLOGY.COLOR #182C3A
+    // DRAW_SELECTION_SYMBOLOGY.BADGE_COLOR is palette.primary1 #3B6E8F
     expect(screen.getByLabelText("Selection 1").parentElement).toHaveStyle({
-      backgroundColor: "rgb(24, 44, 58)",
+      backgroundColor: "rgb(59, 110, 143)",
     });
   });
 });

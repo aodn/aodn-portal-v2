@@ -14,6 +14,7 @@ import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 
 import { Box, IconButton } from "@mui/material";
 import DrawRectangle from "./DrawRectangle";
+import DrawPolygon from "./DrawPolygon";
 import DirectSelect from "./DirectSelect";
 import drawStyles from "./drawStyles";
 import SelectionMarker from "./SelectionMarker";
@@ -25,7 +26,7 @@ import { BboxTooltipIcon } from "@/assets/icons/map/tooltip_bbox";
 import MenuTooltip from "./MenuTooltip";
 import { PolygonSelectionTooltipIcon } from "@/assets/icons/map/tooltip_polygon_selection";
 import { PolygonSelectionIcon } from "@/assets/icons/map/polygon_selection";
-import usePolygonCursorHint from "../../../../../hooks/usePolygonCursorHint";
+import useDrawCursorHint from "../../../../../hooks/useDrawCursorHint";
 import { IControl } from "mapbox-gl";
 import { isValidPolygonFeature } from "@/utils/GeoJsonUtils";
 import { setMapDrawInteractionActive } from "@/utils/MapUtils";
@@ -71,10 +72,13 @@ const DrawRect: React.FC<DrawControlProps> = ({
         },
         defaultMode: "simple_select",
         styles: drawStyles,
+        // Pass selectionType to the styles as user_selectionType
+        userProperties: true,
         modes: {
           ...MapboxDraw.modes,
           direct_select: DirectSelect,
           draw_rectangle: DrawRectangle,
+          draw_polygon: DrawPolygon,
         },
       }),
     []
@@ -173,7 +177,7 @@ const DrawRect: React.FC<DrawControlProps> = ({
     useState<HTMLButtonElement | null>(null);
   const popperRef = useRef<HTMLDivElement>(null);
 
-  const { syncHasSelected } = usePolygonCursorHint({
+  const { syncHasSelected } = useDrawCursorHint({
     map,
     activeTool,
     isDrawingMode,
