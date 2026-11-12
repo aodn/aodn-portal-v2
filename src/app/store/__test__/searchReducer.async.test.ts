@@ -2,6 +2,7 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import {
   processWFSDownload,
   processWFSEstimateSize,
+  processCoEstimateSize,
   fetchGriddedTileProducts,
   processDatasetDownload,
   ogcAxiosWithRetry,
@@ -9,9 +10,11 @@ import {
 import {
   WFSDownloadRequest,
   DatasetDownloadRequest,
+  CoEstimateRequest,
   DateRangeCondition,
   FormatCondition,
 } from "@/pages/detail-page/context/DownloadDefinitions";
+import { DownloadFileType } from "@/pages/detail-page/features/download/constants";
 import { configureStore } from "@reduxjs/toolkit";
 
 describe("searchReducer async thunks", () => {
@@ -180,6 +183,37 @@ describe("searchReducer async thunks", () => {
           output_format: "CSV",
           multi_polygon: "non-specified",
         },
+      }),
+      expect.objectContaining({
+        adapter: "fetch",
+        responseType: "stream",
+      })
+    );
+  });
+
+  it("processCoEstimateSize uses the CSV size when the format is Excel", async () => {
+    const spy = vi
+      .spyOn(ogcAxiosWithRetry, "post")
+      .mockResolvedValue({ data: {} } as any);
+
+    const mockRequest: CoEstimateRequest = {
+      uuid: "test-uuid",
+      downloadConditions: [new FormatCondition("f1", DownloadFileType.EXCEL)],
+    };
+
+    const store = configureStore({
+      reducer: (state = {}) => state,
+    });
+
+    await store.dispatch(processCoEstimateSize(mockRequest) as any);
+
+    expect(spy).toHaveBeenCalledWith(
+      "/ogc/processes/estimateCOdownload/execution",
+      expect.objectContaining({
+        inputs: expect.objectContaining({
+          uuid: "test-uuid",
+          output_format: DownloadFileType.CSV,
+        }),
       }),
       expect.objectContaining({
         adapter: "fetch",

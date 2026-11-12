@@ -45,6 +45,7 @@ import {
   getKeyFrom,
   getMultiPolygonFrom,
 } from "@/utils/DownloadConditionUtils";
+import { DownloadFileType } from "@/pages/detail-page/features/download/constants";
 import { trackSearchResultParameters } from "@/analytics/searchParamsEvent";
 import { trackHttpRequestError } from "@/analytics/httpRequestErrEvent";
 import {
@@ -482,6 +483,10 @@ const processCoEstimateSize = createAsyncThunk<
       const multiPolygon = getMultiPolygonFrom(request.downloadConditions);
       const format = getFormatFrom(request.downloadConditions);
       const key = getKeyFrom(request.downloadConditions);
+      // Temporary: the estimate endpoint returns no size for Excel, so show
+      // the CSV estimate. The download itself still requests Excel.
+      const estimateFormat =
+        format === DownloadFileType.EXCEL ? DownloadFileType.CSV : format;
 
       const requestBody = {
         inputs: {
@@ -489,7 +494,7 @@ const processCoEstimateSize = createAsyncThunk<
           key,
           start_date: toIsoDateOrUnspecified(dateRange.start),
           end_date: toIsoDateOrUnspecified(dateRange.end, true),
-          output_format: format,
+          output_format: estimateFormat,
           multi_polygon: multiPolygon,
         },
       };
