@@ -253,6 +253,14 @@ export const designTokensRC8 = {
     lg: "10px",
     xlg: "15px",
     xxlg: "20px",
+    card: "12px",
+  },
+
+  // ===========================
+  // Elevation (box shadows)
+  // ===========================
+  elevation: {
+    card: "4px 4px 4px 0px rgba(0, 0, 0, 0.05)",
   },
 };
 
