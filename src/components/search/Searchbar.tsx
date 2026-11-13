@@ -36,6 +36,7 @@ import { pageDefault, pageReferer } from "../common/constants";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import useScrollToElement from "../../hooks/useScrollToElement";
 import { HEADER_HEIGHT, HEADER_HEIGHT_MOBILE } from "@/app/layout/constant";
+import { portalTheme } from "@/styles";
 import {
   clearComponentParam,
   ParameterState,
@@ -67,6 +68,7 @@ const Searchbar: FC<SearchbarProps> = ({
   setShouldExpandSearchbar,
 }) => {
   const location = useLocation();
+  const isLandingPage = location.pathname === pageDefault.landing;
   const dispatch = useAppDispatch();
   const { isMobile, isTablet } = useBreakpoint();
   const [open, setOpen] = useState(false);
@@ -161,8 +163,13 @@ const Searchbar: FC<SearchbarProps> = ({
           flexDirection: "row",
           alignItems: "center",
           height: "100%",
-          border: `${border.sm} ${color.blue.dark}`,
-          borderRadius: borderRadius.small,
+          // Landing bar follows Figma 8314-35701; header bar keeps its style
+          border: isLandingPage
+            ? `${border.xs} ${portalTheme.palette.primary1}`
+            : `${border.sm} ${color.blue.dark}`,
+          borderRadius: isLandingPage
+            ? portalTheme.designTokens.borderRadius.md
+            : borderRadius.small,
           backgroundColor: { xs: "transparent", sm: "#fff" },
           paddingY: "1px",
         }}

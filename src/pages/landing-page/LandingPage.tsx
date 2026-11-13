@@ -16,6 +16,10 @@ import {
   TOPICS_SECTION_PADDING_TOP,
 } from "./features/topics-panel/constants";
 import { portalTheme } from "@/styles";
+import {
+  HERO_PADDING_BOTTOM,
+  HERO_PADDING_TOP,
+} from "@/pages/landing-page/constants";
 
 const LandingPage: FC = () => {
   return (
@@ -25,7 +29,8 @@ const LandingPage: FC = () => {
           backgroundColor: "#fff",
         }}
         contentAreaStyle={{
-          paddingY: padding.double,
+          pt: { xs: padding.double, md: HERO_PADDING_TOP },
+          pb: { xs: padding.double, md: HERO_PADDING_BOTTOM },
           width: PAGE_CONTENT_WIDTH_LANDING,
         }}
       >

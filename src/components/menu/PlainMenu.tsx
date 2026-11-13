@@ -4,6 +4,7 @@ import MenuItemUi from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import StyledMenu from "./StyledMenu";
 import { disableScroll, enableScroll } from "../../utils/ScrollUtils";
+import { portalTheme } from "@/styles";
 
 interface MenuItem {
   name: string;
@@ -57,8 +58,9 @@ const PlainMenu: FC<PlainMenuProps> = ({ menu }: PlainMenuProps) => {
           backgroundColor: "transparent",
           border: "none",
           color: "#090C02",
+          fontFamily: portalTheme.designTokens.typography.fontFamily.openSans,
           fontSize: "16px",
-          fontWeight: 400,
+          fontWeight: 500,
         }}
       >
         {menu.menu.name}
