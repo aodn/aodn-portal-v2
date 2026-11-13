@@ -17,7 +17,13 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import traditional from "@/assets/icons/traditional_80.webp";
-import { borderRadius, color, fontSize, padding } from "@/styles/constants";
+import {
+  borderRadius,
+  color,
+  fontSize,
+  fontWeight,
+  padding,
+} from "@/styles/constants";
 import AODNSiteLogo from "./AODNSiteLogo";
 import SectionContainer from "@/components/common/container/SectionContainer";
 import { openInNewTab } from "@/utils/LinkUtils";
@@ -50,6 +56,8 @@ const handleClickContactUs = () => {
 };
 
 const version = import.meta.env.VITE_APP_VERSION;
+
+const linkButtonSx = { px: 0, minWidth: 0 };
 
 const Footer: FC = () => {
   const { pathname } = useLocation();
@@ -123,7 +131,7 @@ const Footer: FC = () => {
                 borderColor: color.blue.dark,
               }}
             />
-            <Grid paddingY={{ xs: padding.small, sm: "16px" }} size={12}>
+            <Grid paddingY={{ xs: padding.small, sm: 2 }} size={12}>
               <Box
                 display="flex"
                 flexDirection={{ xs: "column", sm: "row" }}
@@ -143,7 +151,7 @@ const Footer: FC = () => {
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
-                        gap: "8px",
+                        gap: 1,
                         width: "100%",
                         height: "44px",
                       }}
@@ -172,35 +180,50 @@ const Footer: FC = () => {
                   display="flex"
                   flexDirection={{ xs: "column", sm: "row" }}
                   justifyContent="end"
-                  gap={{ xs: 0, sm: 2 }}
+                  gap={{ xs: 0, sm: 3 }}
                 >
                   <Button
+                    sx={linkButtonSx}
                     onClick={() =>
                       openInNewTab(`${pageDefault.url.IMOS}/terms-of-use`)
                     }
                   >
-                    <Typography color="#000" paddingTop={0}>
+                    <Typography
+                      paddingTop={0}
+                      color={portalTheme.palette.text2}
+                      fontWeight={fontWeight.medium}
+                    >
                       Terms of Use
                     </Typography>
                   </Button>
                   <Button
+                    sx={linkButtonSx}
+                    onClick={() =>
+                      openInNewTab(`${pageDefault.url.IMOS}/conditions-of-use`)
+                    }
+                  >
+                    <Typography
+                      paddingTop={0}
+                      color={portalTheme.palette.text2}
+                      fontWeight={fontWeight.medium}
+                    >
+                      Conditions of Use
+                    </Typography>
+                  </Button>
+                  <Button
+                    sx={linkButtonSx}
                     onClick={() =>
                       openInNewTab(
                         `${pageDefault.url.IMOS}/resources/acknowledging-us`
                       )
                     }
                   >
-                    <Typography color="#000" paddingTop={0}>
-                      Acknowledge Us
-                    </Typography>
-                  </Button>
-                  <Button
-                    onClick={() =>
-                      openInNewTab(`${pageDefault.url.IMOS}/conditions-of-use`)
-                    }
-                  >
-                    <Typography color="#000" paddingTop={0}>
-                      Conditions of Use
+                    <Typography
+                      paddingTop={0}
+                      color={portalTheme.palette.text2}
+                      fontWeight={fontWeight.medium}
+                    >
+                      Acknowledging Us
                     </Typography>
                   </Button>
                 </Box>
@@ -222,7 +245,7 @@ const Footer: FC = () => {
                 >
                   <Stack
                     direction="row"
-                    gap={{ xs: 2, sm: "20px" }}
+                    gap={{ xs: 2, sm: 2.5 }}
                     alignItems="center"
                     marginBottom={2}
                   >
