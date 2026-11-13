@@ -13,6 +13,7 @@ import {
   ogcAxiosWithRetry,
 } from "@/app/store/searchReducer";
 import { response1 } from "./data";
+import { getSearchSessionId } from "@/utils/SearchSession";
 
 // Wrapper to provide Redux store to renderHook
 const wrapper = ({ children }: { children: ReactNode }) => (
@@ -46,8 +47,7 @@ describe("useFetchData", () => {
     // We should expect a call to
     expect(ogcAxiosWithRetry.get).toHaveBeenCalledWith("/ogc/collections", {
       params: {
-        filter:
-          "page_size=11 AND (BBOX(geometry,104,-43,163,-8) OR geometry IS NULL)",
+        filter: `preference='${getSearchSessionId()}' AND page_size=11 AND (BBOX(geometry,104,-43,163,-8) OR geometry IS NULL)`,
         properties:
           "id,title,description,status,scope,ai_update_frequency,links,assets_summary,bbox",
         q: "testing",
@@ -85,8 +85,7 @@ describe("useFetchData", () => {
 
     expect(ogcAxiosWithRetry.get).toHaveBeenCalledWith("/ogc/collections", {
       params: {
-        filter:
-          "page_size=11 AND search_after='1.0||88||str:ffe8f19c-de4a-4362-89be-7605b2dd6b8c' AND (BBOX(geometry,104,-43,163,-8) OR geometry IS NULL)",
+        filter: `preference='${getSearchSessionId()}' AND page_size=11 AND search_after='1.0||88||str:ffe8f19c-de4a-4362-89be-7605b2dd6b8c' AND (BBOX(geometry,104,-43,163,-8) OR geometry IS NULL)`,
         properties:
           "id,title,description,status,scope,ai_update_frequency,links,assets_summary,bbox",
         q: "testing",

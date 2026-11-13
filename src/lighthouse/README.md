@@ -328,7 +328,9 @@ so a refresh can be reviewed in the PR diff.
 
 Refresh them when the OGC API response format changes, or when a PR changes
 the requests the app makes — `yarn lh:measure` then fails with the requests
-that have no fixture and tells you to do this:
+that have no fixture and tells you to do this. The per-tab `preference` session
+id on a collections filter is ignored when matching, so that clause alone does
+not need a new recording:
 
 ```bash
 yarn lh:build

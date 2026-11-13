@@ -28,6 +28,7 @@ import {
   ErrorResponse,
 } from "@/utils/ErrorBoundary";
 import { mergeWithDefaults } from "@/utils/ObjectUtils";
+import { getSearchSessionId } from "@/utils/SearchSession";
 import {
   CoEstimateRequest,
   DatasetDownloadRequest,
@@ -769,6 +770,13 @@ const createSearchParamFrom = (
   // some text search only hit the filter which cause score become null
   // if you set score you got nothing.
   // p.filter = `score>=${calculateScore(c.score, p.text)}`;
+
+  // One value per tab so Elasticsearch keeps this session on the same shards.
+  // Escape ' as '' so a quote cannot close the CQL string literal.
+  p.filter = appendFilter(
+    p.filter,
+    `preference='${getSearchSessionId().replace(/'/g, "''")}'`
+  );
 
   // Control how many record return in 1 page.
   if (c.pagesize) {

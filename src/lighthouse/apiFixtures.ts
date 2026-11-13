@@ -14,6 +14,11 @@
  * pretty-printed so a fixtures refresh can be reviewed in a PR, and served
  * compact again.
  *
+ * The collections filter starts with `preference='<tab session id>'`. That id
+ * changes every browser session and does not change the response, so it is
+ * removed before a request is matched or recorded. Existing fixtures stay
+ * valid without a re-record.
+ *
  * Node-only — never import in app code.
  */
 
@@ -50,12 +55,31 @@ export const MANIFEST_FILE = "manifest.json";
 const UPSTREAM_TIMEOUT_MS = 30_000;
 const MAX_REDIRECTS = 3;
 
+const SESSION_PREFERENCE =
+  "preference%3D%27[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}%27";
+
+/**
+ * Drop the per-tab search preference. Axios encodes `preference='<uuid>' AND `
+ * as `preference%3D%27<uuid>%27+AND+`, and a new uuid would otherwise miss
+ * every recorded collections fixture.
+ */
+const canonicalFixtureUrl = (url: string) =>
+  url
+    .replace(
+      new RegExp(`${SESSION_PREFERENCE}(?:\\+|%20)AND(?:\\+|%20)`, "gi"),
+      ""
+    )
+    .replace(
+      new RegExp(`(?:\\+|%20)AND(?:\\+|%20)${SESSION_PREFERENCE}`, "gi"),
+      ""
+    );
+
 /**
  * Requests are told apart by method and URL. The body of a POST is not part of
  * the key: the routes measured always send the same body for a given URL.
  */
 const fixtureKey = (method: string, url: string) =>
-  `${method.toUpperCase()} ${url}`;
+  `${method.toUpperCase()} ${canonicalFixtureUrl(url)}`;
 
 const isJson = (contentType?: string) => (contentType ?? "").includes("json");
 
@@ -267,7 +291,7 @@ export const createApiRecorder = ({
         fs.writeFileSync(path.join(fixturesDir, file), contents);
         return {
           method: recording.method,
-          url: recording.url,
+          url: canonicalFixtureUrl(recording.url),
           status: recording.status,
           contentType: recording.contentType,
           file,
