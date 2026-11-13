@@ -88,6 +88,28 @@ describe("createApiRecorder", () => {
     expect(upstream.calls).toEqual(["GET /api/v1/ogc/collections?q=wave"]);
   });
 
+  test("records one collections response for every search session preference", async () => {
+    const upstream = await startUpstream();
+    const recorder = createApiRecorder({ upstream: upstream.url });
+    const origin = await serve(recorder);
+    const filter =
+      "page_size%3D11+AND+(BBOX(geometry,104,-43,163,-8)+OR+geometry+IS+NULL)";
+    const withPreference = (id: string) =>
+      `${origin}/api/v1/ogc/collections?filter=preference%3D%27${id}%27+AND+${filter}`;
+
+    await fetch(withPreference("588f1750-e910-4751-abe7-8cf74b4fdd38"));
+    await fetch(withPreference("40566ac9-54dc-41a5-a04d-50af53899200"));
+
+    expect(upstream.calls).toEqual([
+      `GET /api/v1/ogc/collections?filter=preference%3D%27588f1750-e910-4751-abe7-8cf74b4fdd38%27+AND+${filter}`,
+    ]);
+    expect(recorder.save(tempDir()).fixtures).toEqual([
+      expect.objectContaining({
+        url: `/api/v1/ogc/collections?filter=${filter}`,
+      }),
+    ]);
+  });
+
   test("forwards a POST body to the upstream", async () => {
     const upstream = await startUpstream();
     const origin = await serve(createApiRecorder({ upstream: upstream.url }));
@@ -221,6 +243,45 @@ describe("createApiReplayer", () => {
 
     expect(await post.json()).toEqual({ size: 42 });
     expect(get.status).toBe(504);
+  });
+
+  test("matches a collections fixture whatever the search session preference is", async () => {
+    const dir = tempDir();
+    const filter =
+      "page_size%3D11+AND+(BBOX(geometry,104,-43,163,-8)+OR+geometry+IS+NULL)";
+    fs.writeFileSync(
+      path.join(dir, "get-collections.json"),
+      '{\n  "collections": []\n}\n'
+    );
+    const manifest: ApiFixtureManifest = {
+      recordedFrom: "https://portal-edge.aodn.org.au",
+      recordedAt: "2026-09-17T00:00:00.000Z",
+      fixtures: [
+        {
+          method: "GET",
+          url: `/api/v1/ogc/collections?filter=${filter}`,
+          status: 200,
+          contentType: "application/json",
+          file: "get-collections.json",
+        },
+      ],
+    };
+    fs.writeFileSync(path.join(dir, MANIFEST_FILE), JSON.stringify(manifest));
+    const replayer = createApiReplayer({ fixturesDir: dir });
+    const origin = await serve(replayer);
+
+    const withPreference = (id: string) =>
+      `${origin}/api/v1/ogc/collections?filter=preference%3D%27${id}%27+AND+${filter}`;
+    const first = await fetch(
+      withPreference("588f1750-e910-4751-abe7-8cf74b4fdd38")
+    );
+    const second = await fetch(
+      withPreference("40566ac9-54dc-41a5-a04d-50af53899200")
+    );
+
+    expect(first.status).toBe(200);
+    expect(await second.json()).toEqual({ collections: [] });
+    expect(replayer.missing()).toEqual([]);
   });
 
   test("a request with no fixture is a 504 and is reported, never a network call", async () => {
