@@ -9,7 +9,16 @@ import useRedirectSearch from "../../../../hooks/useRedirectSearch";
 import useTopicsPanelSize from "../../../../hooks/useTopicsPanelSize";
 import { useDebounce } from "../../../../hooks/useDebounce";
 import { gap } from "../../../../styles/constants";
-import { TOPICS_PANEL_GAP, SCROLL_BUTTON_SIZE } from "./constants";
+import {
+  TOPICS_PANEL_ROW_GAP,
+  TOPICS_PANEL_ROWS_DEFAULT,
+  TOPICS_CARD_HEIGHT,
+  TOPICS_CARD_ICON_BOX_SIZE,
+  TOPICS_CARD_SHADOW_SPACE,
+  SCROLL_BUTTON_GAP,
+  SCROLL_BUTTON_ICON_SIZE,
+  SCROLL_BUTTON_SIZE,
+} from "./constants";
 import TopicCard, { TopicCardType } from "./TopicCard";
 import {
   clearComponentParam,
@@ -50,6 +59,28 @@ import IconTide from "@/assets/topics-panel-icons/icon_tide.svg";
 import IconReef from "@/assets/topics-panel-icons/icon_reef.svg";
 
 interface TopicsPanelProps {}
+
+// Centre the arrows on the tiles, not on the whole grid: the labels under
+// the last row would otherwise push them down
+const SCROLL_BUTTON_CENTRE_Y =
+  ((TOPICS_PANEL_ROWS_DEFAULT - 1) *
+    (TOPICS_CARD_HEIGHT + TOPICS_PANEL_ROW_GAP) +
+    TOPICS_CARD_ICON_BOX_SIZE) /
+  2;
+
+const scrollButtonSx = {
+  position: "absolute",
+  top: SCROLL_BUTTON_CENTRE_Y,
+  transform: "translateY(-50%)",
+  zIndex: 1,
+  width: SCROLL_BUTTON_SIZE,
+  height: SCROLL_BUTTON_SIZE,
+  borderRadius: "50%",
+  backgroundColor: portalTheme.palette.common.white,
+  "&:hover, &:focus, &:active": {
+    backgroundColor: portalTheme.palette.common.white,
+  },
+} as const;
 
 const TopicsPanel: FC<TopicsPanelProps> = () => {
   const dispatch = useAppDispatch();
@@ -96,6 +127,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       {
         title: "IMOS",
         icon: IconImos,
+        iconSize: 88,
         handler: () => {
           // Clear the component states
           dispatch(clearComponentParam());
@@ -112,56 +144,67 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       {
         title: "Water Temperature",
         icon: IconWaterTemperature,
+        iconSize: 52,
         handler: () => handleClickParameterTopicCard("Temperature"),
       },
       {
         title: "Moorings",
         icon: IconMoorings,
+        iconSize: 52,
         handler: () => handleClickTopicCard("Moorings"),
       },
       {
         title: "Argo Floats",
         icon: IconArgoFloats,
+        iconSize: 64,
         handler: () => handleClickTopicCard("Argo Floats"),
       },
       {
         title: "Gliders",
         icon: IconGliders,
+        iconSize: 64,
         handler: () => handleClickTopicCard("Gliders"),
       },
       {
         title: "Satellite",
         icon: IconSatellite,
+        iconSize: 58,
         handler: () => handleClickTopicCard("Satellite"),
       },
       {
         title: "Waves",
         icon: IconWaves,
+        iconSize: 72,
         handler: () => handleClickTopicCard("Waves"),
       },
       {
         title: "Vessels",
         icon: IconVessels,
+        iconSize: 66,
         handler: () => handleClickTopicCard("Vessels"),
       },
       {
         title: "Animal Tracking",
         icon: IconAnimalTracking,
+        iconSize: 50,
         handler: () => handleClickTopicCard("Animal Tracking"),
       },
       {
         title: "Currents",
         icon: IconCurrents,
+        iconSize: 66,
         handler: () => handleClickTopicCard("Currents"),
       },
       {
         title: "Water Quality",
         icon: IconWaterQuality,
+        iconSize: 62,
         handler: () => handleClickTopicCard("Water Quality"),
       },
       {
         title: "Ocean Biota",
         icon: IconOceanBiota,
+        iconSize: 58,
         handler: () => handleClickParameterTopicCard("Ocean Biota"),
       },
       {
@@ -172,31 +215,37 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       {
         title: "Weather",
         icon: IconWeather,
+        iconSize: 78,
         handler: () => handleClickTopicCard("Weather"),
       },
       {
         title: "Climate",
         icon: IconClimate,
+        iconSize: 84,
         handler: () => handleClickTopicCard("Climate"),
       },
       {
         title: "Acidification",
         icon: IconAcidification,
+        iconSize: 60,
         handler: () => handleClickTopicCard("Acidification"),
       },
       {
         title: "Tides",
         icon: IconTide,
+        iconSize: 88,
         handler: () => handleClickTopicCard("Tides"),
       },
       {
         title: "Fisheries",
         icon: IconFisheries,
+        iconSize: 55,
         handler: () => handleClickTopicCard("Fisheries"),
       },
       {
         title: "Reef",
         icon: IconReef,
+        iconSize: 60,
         handler: () => handleClickTopicCard("Reef"),
       },
       {
@@ -212,16 +261,19 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
       {
         title: "Plankton",
         icon: IconPlankton,
+        iconSize: 64,
         handler: () => handleClickTopicCard("Plankton"),
       },
       {
         title: "Ocean Colour",
         icon: IconOceanColor,
+        iconSize: 66,
         handler: () => handleClickTopicCard("Ocean Colour"),
       },
       {
         title: "Benthic",
         icon: IconBenthic,
+        iconSize: 60,
         handler: () => handleClickTopicCard("Benthic"),
       },
     ],
@@ -239,6 +291,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
     topicsPanelHeight,
     topicsPanelWidth,
     topicsPanelContainerWidth,
+    topicsPanelColumnGap,
   } = useTopicsPanelSize({ topicCardsCount: TOPICS_CARDS.length + 1 });
   // Reference to the scrollable container element
   const containerRef = useRef<HTMLDivElement>(null);
@@ -315,114 +368,92 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
     checkPosition();
   }, 150);
 
+  const showScrollButtons = !showAllTopics && !isMobile;
+  // Arrows sit outside the grid so they don't take layout width
+  const scrollButtonOffset = `-${SCROLL_BUTTON_GAP + SCROLL_BUTTON_SIZE}px`;
+
   return (
-    <Box display="flex" justifyContent="space-between" alignItems="center">
-      {!showAllTopics && !isMobile && (
-        <Box
-          sx={{
-            transform: "translate(-50%, -50%)",
-          }}
-        >
+    <Box display="flex" justifyContent="center">
+      <Box position="relative" width={topicsPanelContainerWidth}>
+        {showScrollButtons && (
           <IconButton
             aria-label="Previous topics"
             onClick={() => handleScroll(-topicsPanelContainerWidth)}
             disabled={isLeftDisabled}
             sx={{
+              ...scrollButtonSx,
+              left: scrollButtonOffset,
               visibility: isLeftDisabled ? "hidden" : "visible",
-              backgroundColor: "#FFF",
-              borderRadius: "50%",
-              height: "32px",
-              width: "32px",
-              "&:hover": {
-                backgroundColor: "#FFF",
-              },
-              "&:focus": {
-                backgroundColor: "#FFF",
-              },
-              "&:active": {
-                backgroundColor: "#FFF",
-              },
             }}
           >
             <ArrowBackIosNewIcon
               sx={{
                 pr: gap.sm,
-                height: SCROLL_BUTTON_SIZE,
-                width: SCROLL_BUTTON_SIZE,
+                height: SCROLL_BUTTON_ICON_SIZE,
+                width: SCROLL_BUTTON_ICON_SIZE,
                 color: portalTheme.palette.grey700,
               }}
             />
           </IconButton>
-        </Box>
-      )}
-      <Box
-        ref={containerRef}
-        sx={{
-          width: topicsPanelContainerWidth,
-          height: topicsPanelHeight,
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-          msOverflowStyle: "none",
-          scrollbarWidth: "none",
-          overflow: "hidden",
-          overflowX: "scroll",
-        }}
-        onScroll={handleManualScroll}
-      >
-        <Stack
-          ref={topicsPanelRef}
-          direction="row"
-          flexWrap="wrap"
-          gap={`${TOPICS_PANEL_GAP}px`}
-          width={showAllTopics ? topicsPanelContainerWidth : topicsPanelWidth}
-        >
-          <TopicCard
-            cardData={showAllTopics ? LESS_TOPICS_CARD : ALL_TOPICS_CARD}
-          />
-          {TOPICS_CARDS.map((item) => (
-            <TopicCard key={item.title} cardData={item} />
-          ))}
-        </Stack>
-      </Box>
-      {!showAllTopics && !isMobile && (
+        )}
         <Box
+          ref={containerRef}
           sx={{
-            transform: "translate(50%, -50%)",
+            // Extra room on the right so the last visible column's tile
+            // shadow isn't clipped; the negative margin keeps the grid centred
+            width: topicsPanelContainerWidth + TOPICS_CARD_SHADOW_SPACE,
+            mr: `-${TOPICS_CARD_SHADOW_SPACE}px`,
+            pr: `${TOPICS_CARD_SHADOW_SPACE}px`,
+            boxSizing: "border-box",
+            height: topicsPanelHeight,
+            "&::-webkit-scrollbar": {
+              display: "none",
+            },
+            msOverflowStyle: "none",
+            scrollbarWidth: "none",
+            overflow: "hidden",
+            overflowX: "scroll",
           }}
+          onScroll={handleManualScroll}
         >
+          <Stack
+            ref={topicsPanelRef}
+            direction="row"
+            flexWrap="wrap"
+            rowGap={`${TOPICS_PANEL_ROW_GAP}px`}
+            columnGap={`${topicsPanelColumnGap}px`}
+            width={showAllTopics ? topicsPanelContainerWidth : topicsPanelWidth}
+          >
+            <TopicCard
+              cardData={showAllTopics ? LESS_TOPICS_CARD : ALL_TOPICS_CARD}
+            />
+            {TOPICS_CARDS.map((item) => (
+              <TopicCard key={item.title} cardData={item} />
+            ))}
+          </Stack>
+        </Box>
+        {showScrollButtons && (
           <IconButton
             aria-label="Next topics"
             onClick={() => handleScroll(topicsPanelContainerWidth)}
             disabled={isRightDisabled}
             sx={{
+              ...scrollButtonSx,
+              right: scrollButtonOffset,
               visibility: isRightDisabled ? "hidden" : "visible",
-              backgroundColor: "#FFF",
-              borderRadius: "50%",
-              height: "32px",
-              width: "32px",
-              "&:hover": {
-                backgroundColor: "#FFF",
-              },
-              "&:focus": {
-                backgroundColor: "#FFF",
-              },
-              "&:active": {
-                backgroundColor: "#FFF",
-              },
             }}
           >
             <ArrowForwardIosIcon
               sx={{
                 pl: gap.sm,
-                height: SCROLL_BUTTON_SIZE,
-                width: SCROLL_BUTTON_SIZE,
+                height: SCROLL_BUTTON_ICON_SIZE,
+                width: SCROLL_BUTTON_ICON_SIZE,
                 color: portalTheme.palette.grey700,
               }}
             />
           </IconButton>
-        </Box>
-      )}
+        )}
+      </Box>
     </Box>
   );
 };

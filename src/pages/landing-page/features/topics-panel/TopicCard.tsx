@@ -1,6 +1,5 @@
 import { FC, useState } from "react";
 import { Box, Paper, Typography } from "@mui/material";
-import { borderRadius, shadow } from "../../../../styles/constants";
 import {
   TOPICS_CARD_HEIGHT,
   TOPICS_CARD_ICON_BOX_SIZE,
@@ -20,6 +19,8 @@ interface TopicCardProps {
   cardData: TopicCardType;
 }
 
+const { designTokens } = portalTheme;
+
 const TopicCard: FC<TopicCardProps> = ({ cardData }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const iconSize = cardData.iconSize ?? TOPICS_CARD_DEFAULT_ICON_SIZE;
@@ -28,9 +29,8 @@ const TopicCard: FC<TopicCardProps> = ({ cardData }) => {
     <Box
       display="flex"
       flexDirection="column"
-      justifyContent="center"
+      justifyContent="flex-start"
       alignItems="center"
-      borderRadius={borderRadius.small}
       height={TOPICS_CARD_HEIGHT}
       sx={{
         cursor: "pointer",
@@ -41,10 +41,11 @@ const TopicCard: FC<TopicCardProps> = ({ cardData }) => {
     >
       <Paper
         sx={{
+          flex: "none",
           width: TOPICS_CARD_ICON_BOX_SIZE,
           height: TOPICS_CARD_ICON_BOX_SIZE,
-          borderRadius: borderRadius.small,
-          boxShadow: shadow.bottom,
+          borderRadius: designTokens.borderRadius.card,
+          boxShadow: designTokens.elevation.card,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -52,6 +53,7 @@ const TopicCard: FC<TopicCardProps> = ({ cardData }) => {
       >
         <Box
           sx={{
+            flex: "none",
             width: iconSize,
             height: iconSize,
             opacity: cardData.iconOpacity ?? 0.9,
@@ -65,11 +67,7 @@ const TopicCard: FC<TopicCardProps> = ({ cardData }) => {
           role="presentation"
         />
       </Paper>
-      <Box
-        width={TOPICS_CARD_ICON_BOX_SIZE}
-        height={TOPICS_CARD_HEIGHT - TOPICS_CARD_ICON_BOX_SIZE}
-        textAlign="center"
-      >
+      <Box width={TOPICS_CARD_ICON_BOX_SIZE} textAlign="center">
         <Typography
           variant="body3Small"
           color={portalTheme.palette.text2}

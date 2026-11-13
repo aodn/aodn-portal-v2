@@ -11,6 +11,10 @@ import { isFeaturedDatasetsSectionEnabled } from "@/pages/landing-page/features/
 import SectionContainer from "@/components/common/container/SectionContainer";
 import { PAGE_CONTENT_WIDTH_LANDING } from "@/app/layout/constant";
 import TopicsPanel from "./features/topics-panel/TopicsPanel";
+import {
+  TOPICS_SECTION_PADDING_BOTTOM,
+  TOPICS_SECTION_PADDING_TOP,
+} from "./features/topics-panel/constants";
 import { portalTheme } from "@/styles";
 
 const LandingPage: FC = () => {
@@ -34,7 +38,8 @@ const LandingPage: FC = () => {
           backgroundColor: color.blue.xLight,
         }}
         contentAreaStyle={{
-          paddingY: padding.double,
+          pt: TOPICS_SECTION_PADDING_TOP,
+          pb: TOPICS_SECTION_PADDING_BOTTOM,
           width: PAGE_CONTENT_WIDTH_LANDING,
         }}
       >

@@ -7,7 +7,9 @@ import {
   TOPICS_PANEL_COLS_LAPTOP,
   TOPICS_PANEL_COLS_MOBILE,
   TOPICS_PANEL_COLS_TABLET,
-  TOPICS_PANEL_GAP,
+  TOPICS_PANEL_COLUMN_GAP,
+  TOPICS_PANEL_COLUMN_GAP_DESKTOP,
+  TOPICS_PANEL_ROW_GAP,
   TOPICS_PANEL_ROWS_DEFAULT,
 } from "../pages/landing-page/features/topics-panel/constants";
 interface UseTopicsPanelSizeProps {
@@ -39,30 +41,35 @@ const useTopicsPanelSize = ({ topicCardsCount }: UseTopicsPanelSizeProps) => {
     [topicCardsCount]
   );
 
+  const topicsPanelColumnGap = isAboveDesktop
+    ? TOPICS_PANEL_COLUMN_GAP_DESKTOP
+    : TOPICS_PANEL_COLUMN_GAP;
+
   const topicsPanelHeight = useMemo(() => {
     const topicsPanelRows = calcRows(topicCardsCount);
     return (
       TOPICS_CARD_HEIGHT * topicsPanelRows +
-      TOPICS_PANEL_GAP * (topicsPanelRows - 1)
+      TOPICS_PANEL_ROW_GAP * (topicsPanelRows - 1)
     );
   }, [calcRows, topicCardsCount]);
 
   const topicsPanelWidth = useMemo(() => {
     return (
-      TOPICS_CARD_ICON_BOX_SIZE * totalCols + TOPICS_PANEL_GAP * (totalCols - 1)
+      TOPICS_CARD_ICON_BOX_SIZE * totalCols +
+      topicsPanelColumnGap * (totalCols - 1)
     );
-  }, [totalCols]);
+  }, [totalCols, topicsPanelColumnGap]);
 
   const topicsPanelContainerWidth = useMemo(() => {
     const getWidth = (cols: number) =>
-      TOPICS_CARD_ICON_BOX_SIZE * cols + TOPICS_PANEL_GAP * (cols - 1);
+      TOPICS_CARD_ICON_BOX_SIZE * cols + topicsPanelColumnGap * (cols - 1);
     if (isMobile) return getWidth(TOPICS_PANEL_COLS_MOBILE);
     if (isTablet) return getWidth(TOPICS_PANEL_COLS_TABLET);
     if (isLaptop) return getWidth(TOPICS_PANEL_COLS_LAPTOP);
     if (isAboveDesktop) return getWidth(TOPICS_PANEL_COLS_DESKTOP);
 
     return getWidth(TOPICS_PANEL_COLS_MOBILE);
-  }, [isMobile, isTablet, isLaptop, isAboveDesktop]);
+  }, [isMobile, isTablet, isLaptop, isAboveDesktop, topicsPanelColumnGap]);
 
   return {
     showAllTopics,
@@ -70,6 +77,7 @@ const useTopicsPanelSize = ({ topicCardsCount }: UseTopicsPanelSizeProps) => {
     topicsPanelHeight,
     topicsPanelWidth,
     topicsPanelContainerWidth,
+    topicsPanelColumnGap,
   };
 };
 
