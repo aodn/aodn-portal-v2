@@ -32,7 +32,7 @@ const product = (
 ): GriddedRasterProduct => ({
   id: "d:v",
   label: "d — v",
-  template: "/tiles/{z}/{tileRow}/{tileCol}?datetime={datetime}",
+  tileTemplate: "/tiles/{z}/{tileRow}/{tileCol}?datetime={datetime}",
   dates: ["2026-06-15T00:00:00Z", "2026-06-16T00:00:00Z"],
   colormap: "viridis",
   categorical: false,
@@ -165,6 +165,7 @@ describe("useGriddedLegendRange", () => {
       "strong",
       "severe",
     ]);
+    expect(result.current.flagMeanings?.get(1)).toBe("moderate");
     expect(result.current.range).toBeUndefined();
   });
 

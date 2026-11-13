@@ -840,6 +840,7 @@ const MapPanel: FC<MapPanelProps> = ({ mapFocusArea, onMapMoveEnd }) => {
               {hasGriddedProducts && (
                 <GriddedRasterLayer
                   {...griddedLayerProps}
+                  flagMeanings={griddedLegend.flagMeanings}
                   visible={selectedMapLayerId === LayerName.GriddedRaster}
                 />
               )}

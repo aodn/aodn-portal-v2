@@ -9,6 +9,7 @@ import {
   buildGriddedLegendUrl,
   buildGriddedManifestUrl,
   toCategoricalLabels,
+  toFlagMeanings,
   toLegendRange,
   toLegendUnit,
 } from "./Common";
@@ -26,6 +27,8 @@ export interface GriddedLegendRange {
   labels?: string[];
   /** The variable's units from the manifest, e.g. "m". */
   unit?: string;
+  /** Categorical products: flag value -> meaning, for the click popup. */
+  flagMeanings?: ReadonlyMap<number, string>;
   /**
    * False only while the first range for this product is still being fetched;
    * the legend shows a skeleton until then. On a later date change the
@@ -40,6 +43,7 @@ interface SettledRange {
   range?: GriddedValueRange;
   labels?: string[];
   unit?: string;
+  flagMeanings?: ReadonlyMap<number, string>;
 }
 
 /**
@@ -76,7 +80,10 @@ const useGriddedLegendRange = (
           url: manifestUrl,
           unit: toLegendUnit(manifest),
           ...(categorical
-            ? { labels: toCategoricalLabels(manifest, colormap) }
+            ? {
+                labels: toCategoricalLabels(manifest, colormap),
+                flagMeanings: toFlagMeanings(manifest),
+              }
             : { range: toLegendRange(manifest) }),
         })
       )
@@ -108,6 +115,7 @@ const useGriddedLegendRange = (
         range: product.rescale ?? current.range,
         labels: current.labels,
         unit: current.unit,
+        flagMeanings: current.flagMeanings,
         ready: true,
       }
     : { legendUrl, range: undefined, ready: false };

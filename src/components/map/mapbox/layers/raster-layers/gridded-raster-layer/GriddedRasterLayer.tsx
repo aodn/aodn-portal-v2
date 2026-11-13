@@ -1,5 +1,9 @@
 import { FC, useContext, useEffect, useRef } from "react";
-import { RasterTileSource } from "mapbox-gl";
+import { MapMouseEvent, Popup, RasterTileSource } from "mapbox-gl";
+import { useAppDispatch } from "@/app/store/hooks";
+import { fetchGriddedTilePointValue } from "@/app/store/searchReducer";
+import { playwrightTestIds } from "@/components/common/constants";
+import { isMapDrawModeActive } from "@/utils/MapUtils";
 import MapContext from "../../../MapContext";
 import { LayerBasicType } from "../../Layers";
 import { MapDefaultConfig, MapEventEnum } from "../../../constants";
@@ -7,9 +11,13 @@ import { addDataLayer } from "../../../layerOrder";
 import MapLayerSelect from "../../../component/MapLayerSelect";
 import { TestHelper } from "../../../../../common/test/helper";
 import {
+  buildGriddedPointUrl,
   buildGriddedTileUrl,
+  buildPointValueMessageHtml,
+  buildPointValuePopupHtml,
   GriddedRasterLayerControls,
   toSelectItems,
+  wrapLongitude,
 } from "./Common";
 
 enum LAYER_VISIBILITY {
@@ -30,7 +38,10 @@ export const getGriddedRasterLayerId = (id: string | undefined) =>
   `${id}-gridded-raster-layer`;
 
 interface GriddedRasterLayerProps
-  extends LayerBasicType, GriddedRasterLayerControls {}
+  extends LayerBasicType, GriddedRasterLayerControls {
+  /** Categorical products: flag value -> meaning, shown in the click popup. */
+  flagMeanings?: ReadonlyMap<number, string>;
+}
 
 const visibilityOf = (visible: boolean) =>
   visible ? LAYER_VISIBILITY.VISIBLE : LAYER_VISIBILITY.NONE;
@@ -40,25 +51,32 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
   layerConfig,
   onLayerChange,
   selectedDate,
+  flagMeanings,
   visible = false,
 }) => {
+  const dispatch = useAppDispatch();
   const { map } = useContext(MapContext);
   const mapContainerId = map?.getContainer().id;
   const sourceId = getSourceId(mapContainerId);
   const tileLayerId = getGriddedRasterLayerId(mapContainerId);
+  const selectedProduct = products.find((p) => p.id === layerConfig);
   const tileUrl = buildGriddedTileUrl(
-    products.find((p) => p.id === layerConfig)?.template,
+    selectedProduct?.tileTemplate,
     selectedDate
   );
+  const pointTemplate = selectedProduct?.pointTemplate;
   const hasTileUrl = tileUrl !== undefined;
 
   // Latest values for STYLEDATA rebuilds — that effect must not depend on
   // tileUrl/visible or a date change would tear down the source.
   const visibleRef = useRef(visible);
   const tileUrlRef = useRef(tileUrl);
+  const flagMeaningsRef = useRef(flagMeanings);
+
   useEffect(() => {
     visibleRef.current = visible;
     tileUrlRef.current = tileUrl;
+    flagMeaningsRef.current = flagMeanings;
   });
 
   useEffect(() => {
@@ -122,6 +140,62 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
     }, SET_TILES_DEBOUNCE_MS);
     return () => clearTimeout(timer);
   }, [map, sourceId, tileUrl]);
+
+  // Click anywhere on the visible raster -> look up that grid cell's value.
+  // Re-subscribes (and closes any open popup) when the product or date
+  // changes, so a popup never shows a value from a different layer state.
+  useEffect(() => {
+    if (!map || !visible || !pointTemplate || !selectedDate) return;
+
+    let popup: Popup | null = null;
+    let request: { abort: () => void } | null = null;
+
+    const onClick = (e: MapMouseEvent) => {
+      if (isMapDrawModeActive(map)) return;
+
+      request?.abort();
+      const lat = e.lngLat.lat;
+      const lon = wrapLongitude(e.lngLat.lng);
+      const url = buildGriddedPointUrl(pointTemplate, selectedDate, lat, lon);
+      if (!url) return;
+
+      if (!popup) popup = new Popup(MapDefaultConfig.DEFAULT_POPUP);
+      const current = popup;
+      current
+        .setLngLat(e.lngLat)
+        .setHTML(buildPointValueMessageHtml("Loading..."));
+      if (!current.isOpen()) current.addTo(map);
+      const element = current.getElement();
+      if (element) element.dataset.testid = playwrightTestIds.DETAIL_MAP_POPUP;
+      const pending = dispatch(fetchGriddedTilePointValue({ url }));
+      request = pending;
+      pending
+        .unwrap()
+        .then((response) =>
+          current.setHTML(
+            buildPointValuePopupHtml(
+              response,
+              { lat, lon },
+              flagMeaningsRef.current
+            )
+          )
+        )
+        .catch((error) => {
+          if (error?.name === "AbortError") return;
+          // Out-of-bounds clicks come back as 404 — expected, not an outage.
+          current.setHTML(
+            buildPointValueMessageHtml("No data available at this location")
+          );
+        });
+    };
+
+    map.on("click", onClick);
+    return () => {
+      map.off("click", onClick);
+      request?.abort();
+      popup?.remove();
+    };
+  }, [dispatch, map, pointTemplate, selectedDate, visible]);
 
   return (
     <>

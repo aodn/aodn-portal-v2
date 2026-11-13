@@ -56,7 +56,11 @@ import {
   DownloadLayersResponse,
 } from "./GeoserverDefinitions";
 import { Health } from "./systemDefinition";
-import { TileManifest, TileProductsResponse } from "./GriddedTileDefinitions";
+import {
+  TileManifest,
+  TilePointValueResponse,
+  TileProductsResponse,
+} from "./GriddedTileDefinitions";
 import { DownloadExecutionResponse } from "./DownloadStatusDefinitions";
 
 export { DatasetFrequency, DatasetStatus } from "./datasetEnums";
@@ -663,6 +667,24 @@ const fetchGriddedTileProducts = createAsyncThunk<
       .catch(errorHandling(thunkApi))
 );
 
+const fetchGriddedTilePointValue = createAsyncThunk<
+  TilePointValueResponse,
+  { url: string },
+  { rejectValue: ErrorResponse }
+>(
+  "griddedTiles/fetchGriddedTilePointValue",
+  (request: { url: string }, thunkApi: any) =>
+    ogcAxiosWithRetry
+      .get<TilePointValueResponse>(request.url, {
+        baseURL: "",
+        signal: thunkApi.signal,
+        // Interactive click: fail fast rather than back off 10x.
+        "axios-retry": { retries: 1 },
+      })
+      .then((response) => response.data)
+      .catch(errorHandling(thunkApi))
+);
+
 const fetchGriddedTileManifest = createAsyncThunk<
   TileManifest,
   { url: string },
@@ -871,6 +893,7 @@ export {
   fetchGeoServerFieldValues,
   fetchSystemHealthNoStore,
   fetchGriddedTileProducts,
+  fetchGriddedTilePointValue,
   fetchGriddedTileManifest,
   processDatasetDownload,
   processWFSDownload,

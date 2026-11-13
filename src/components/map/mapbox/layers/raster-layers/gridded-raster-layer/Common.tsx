@@ -6,10 +6,12 @@ import {
 import {
   TileManifest,
   GriddedRasterProduct,
+  TilePointValueResponse,
   GriddedValueRange,
   TileProduct,
   TileProductsResponse,
 } from "@/app/store/GriddedTileDefinitions";
+import { InnerHtmlBuilder } from "@/utils/HtmlUtils";
 import { utcDayKeyToUnixMs, utcIsoToDayKey } from "@/utils/DateUtils";
 import { LayerSelectable } from "@/components/map/mapbox/layers/Layers";
 import {
@@ -88,6 +90,26 @@ export const buildGriddedLegendUrl = (
     ? legendTemplate.split("{colormap}").join(encodeURIComponent(colormap))
     : undefined;
 
+/**
+ * Fills `{datetime}`, `{lat}` and `{lon}` in a product's point template,
+ * verbatim, so the `%2B` in a multi-variable product reaches the wire as-is.
+ */
+export const buildGriddedPointUrl = (
+  pointTemplate: string | undefined,
+  datetime: string | undefined,
+  lat: number,
+  lon: number
+): string | undefined =>
+  pointTemplate && datetime
+    ? pointTemplate
+        .split("{datetime}")
+        .join(datetime)
+        .split("{lat}")
+        .join(String(lat))
+        .split("{lon}")
+        .join(String(lon))
+    : undefined;
+
 /** Fills `{datetime}` in a product's manifest template, verbatim. */
 export const buildGriddedManifestUrl = (
   manifestTemplate?: string,
@@ -145,6 +167,23 @@ export const toCategoricalLabels = (
   return Array.isArray(meanings) && meanings.length === values.length
     ? meanings
     : values.map(String);
+};
+
+/**
+ * Flag value -> meaning, for naming a categorical point value in the click
+ * popup. Undefined for continuous products, and when the dataset has no
+ * meanings or they don't pair one-to-one with the values.
+ */
+export const toFlagMeanings = (
+  manifest?: TileManifest | null
+): ReadonlyMap<number, string> | undefined => {
+  const values = manifest?.flagValues;
+  const meanings = manifest?.flagMeanings;
+  if (!Array.isArray(values) || values.length === 0) return undefined;
+  if (!Array.isArray(meanings) || meanings.length !== values.length) {
+    return undefined;
+  }
+  return new Map(values.map((value, i) => [value, meanings[i]]));
 };
 
 /** The variable's units for the legend title; undefined when blank or absent. */
@@ -281,13 +320,14 @@ export const toGriddedRasterProducts = (
       variable: Array.isArray(product.variable)
         ? product.variable.join(" + ")
         : nonEmptyString(product.variable),
-      template: applyRenderStyleToTemplate(template, colormap, rescale),
+      tileTemplate: applyRenderStyleToTemplate(template, colormap, rescale),
       dates: marks.dates,
       colormap,
       categorical,
       rescale,
       legendTemplate: nonEmptyString(product.legend_url),
       manifestTemplate: nonEmptyString(product.visual_manifest_url_template),
+      pointTemplate: nonEmptyString(product.point_url_template),
     });
   });
   return result;
@@ -329,3 +369,60 @@ export const buildGriddedTileUrl = (
     .split("{tileCol}")
     .join("{x}");
 };
+
+const COORDINATE_DECIMALS = 2;
+const VALUE_SIGNIFICANT_DIGITS = 4;
+
+/** Mapbox reports unwrapped longitudes past ±180 on world copies; the backend rejects them. */
+export const wrapLongitude = (lon: number): number =>
+  ((((lon + 180) % 360) + 360) % 360) - 180;
+
+export const formatPointValue = (value: number | null | undefined): string =>
+  typeof value === "number" && Number.isFinite(value)
+    ? String(Number(value.toPrecision(VALUE_SIGNIFICANT_DIGITS)))
+    : "No data";
+
+const formatCoordinate = (value: number): string =>
+  value.toFixed(COORDINATE_DECIMALS);
+
+/**
+ * Popup body for a point-value lookup. Coordinates are the grid cell the
+ * backend snapped to, falling back to the clicked point. Categorical values
+ * show their flag meaning when one is known, else the number.
+ */
+export const buildPointValuePopupHtml = (
+  response: TilePointValueResponse | undefined,
+  clicked: { lat: number; lon: number },
+  flagMeanings?: ReadonlyMap<number, string>
+): string => {
+  const lat = response?.lat ?? clicked.lat;
+  const lon = response?.lon ?? clicked.lon;
+  const builder = new InnerHtmlBuilder()
+    .addTitle("Gridded Data Value")
+    .addText(`Lat: ${formatCoordinate(lat)}`)
+    .addText(`Lon: ${formatCoordinate(lon)}`);
+
+  const variables = Object.entries(response?.variables ?? {});
+  if (variables.length === 0) return builder.addText("No data").getHtml();
+
+  variables.forEach(([name, entry]) => {
+    const meaning =
+      typeof entry?.value === "number"
+        ? flagMeanings?.get(entry.value)
+        : undefined;
+    if (meaning !== undefined) {
+      builder.addText(`${name}: ${meaning}`);
+      return;
+    }
+    const value = formatPointValue(entry?.value);
+    const units = entry?.units && value !== "No data" ? ` ${entry.units}` : "";
+    builder.addText(`${name}: ${value}${units}`);
+  });
+  return builder.getHtml();
+};
+
+export const buildPointValueMessageHtml = (message: string): string =>
+  new InnerHtmlBuilder()
+    .addTitle("Gridded Data Value")
+    .addText(message)
+    .getHtml();

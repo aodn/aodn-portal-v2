@@ -3,12 +3,17 @@ import {
   applyRenderStyleToTemplate,
   buildGriddedLegendUrl,
   buildGriddedManifestUrl,
+  buildGriddedPointUrl,
   buildGriddedTileUrl,
+  buildPointValuePopupHtml,
   getGriddedRenderStyle,
   toLegendRange,
   toCategoricalLabels,
+  toFlagMeanings,
   toLegendUnit,
   buildTileDateMarks,
+  formatPointValue,
+  wrapLongitude,
   formatProductLabel,
   shouldQueryGriddedTiles,
   toGriddedRasterProducts,
@@ -304,8 +309,10 @@ describe("toGriddedRasterProducts", () => {
       "2024-01-01T00:00:00Z",
       "2024-01-02T00:00:00Z",
     ]);
-    expect(product.template).toBe(`${TWO_VARIABLE_TEMPLATE}&colormap=viridis`);
-    expect(product.template).not.toContain("%252B");
+    expect(product.tileTemplate).toBe(
+      `${TWO_VARIABLE_TEMPLATE}&colormap=viridis`
+    );
+    expect(product.tileTemplate).not.toContain("%252B");
     expect(product.label).toContain("UCUR + VCUR");
   });
 
@@ -316,7 +323,7 @@ describe("toGriddedRasterProducts", () => {
     );
     expect(product.colormap).toBe(DEFAULT_GRIDDED_COLORMAP);
     expect(product.rescale).toBeUndefined();
-    expect(product.template).toBe(`${VISUAL_TEMPLATE}&colormap=viridis`);
+    expect(product.tileTemplate).toBe(`${VISUAL_TEMPLATE}&colormap=viridis`);
   });
 
   it("applies a listed product's colormap and fixed range to its tiles", () => {
@@ -326,7 +333,7 @@ describe("toGriddedRasterProducts", () => {
     );
     expect(product.colormap).toBe("rdbu_r");
     expect(product.rescale).toEqual([-1, 1]);
-    expect(product.template).toBe(
+    expect(product.tileTemplate).toBe(
       `${VISUAL_TEMPLATE}&colormap=rdbu_r&rescale=-1,1`
     );
   });
@@ -361,7 +368,9 @@ describe("toGriddedRasterProducts", () => {
       { "a:one": { colormap: "mcs_category", rescale: [0, 3] } }
     );
     expect(product.rescale).toBeUndefined();
-    expect(product.template).toBe(`${VISUAL_TEMPLATE}&colormap=mcs_category`);
+    expect(product.tileTemplate).toBe(
+      `${VISUAL_TEMPLATE}&colormap=mcs_category`
+    );
   });
 
   it("gives an unlisted categorical product the default categorical colormap", () => {
@@ -370,7 +379,7 @@ describe("toGriddedRasterProducts", () => {
       {}
     );
     expect(product.colormap).toBe("default_categorical");
-    expect(product.template).toBe(
+    expect(product.tileTemplate).toBe(
       `${VISUAL_TEMPLATE}&colormap=default_categorical`
     );
   });
@@ -513,6 +522,26 @@ describe("toCategoricalLabels", () => {
   });
 });
 
+describe("toFlagMeanings", () => {
+  it("pairs each flag value with its meaning", () => {
+    const meanings = toFlagMeanings({
+      flagValues: [0, 1, 2],
+      flagMeanings: ["none", "moderate", "strong"],
+    });
+    expect(meanings?.get(0)).toBe("none");
+    expect(meanings?.get(2)).toBe("strong");
+  });
+
+  it("is undefined without one meaning per value", () => {
+    expect(toFlagMeanings({ flagValues: [0, 1] })).toBeUndefined();
+    expect(
+      toFlagMeanings({ flagValues: [0, 1], flagMeanings: ["none"] })
+    ).toBeUndefined();
+    expect(toFlagMeanings({ valueRange: [0, 1] })).toBeUndefined();
+    expect(toFlagMeanings(undefined)).toBeUndefined();
+  });
+});
+
 describe("toLegendRange", () => {
   it("reads a scalar product's valueRange", () => {
     expect(toLegendRange({ valueRange: [-0.4, 0.9] })).toEqual([-0.4, 0.9]);
@@ -580,5 +609,103 @@ describe("toSelectItems", () => {
       { value: "b_dataset:bbb", label: "b dataset — GSLA" },
       { value: "a_dataset:aaa", label: "a dataset — GSLA" },
     ]);
+  });
+});
+
+describe("buildGriddedPointUrl", () => {
+  const POINT_TEMPLATE =
+    "/api/v1/ogc/ext/tiles/collections/uuid-2/data_tiles/point" +
+    "?dataset=model_currents&variable=ucur%2Bvcur" +
+    "&datetime={datetime}&lat={lat}&lon={lon}";
+
+  it("fills datetime, lat and lon, keeping %2B verbatim", () => {
+    expect(
+      buildGriddedPointUrl(POINT_TEMPLATE, "2024-01-01T00:00:00Z", -44.27, 132)
+    ).toBe(
+      "/api/v1/ogc/ext/tiles/collections/uuid-2/data_tiles/point" +
+        "?dataset=model_currents&variable=ucur%2Bvcur" +
+        "&datetime=2024-01-01T00:00:00Z&lat=-44.27&lon=132"
+    );
+  });
+
+  it("is undefined without a template or a date", () => {
+    expect(buildGriddedPointUrl(undefined, "2024-01-01", 0, 0)).toBeUndefined();
+    expect(
+      buildGriddedPointUrl(POINT_TEMPLATE, undefined, 0, 0)
+    ).toBeUndefined();
+  });
+
+  it("is taken from point_url_template by toGriddedRasterProducts", () => {
+    const [product] = toGriddedRasterProducts({
+      products: [visualProduct({ point_url_template: POINT_TEMPLATE })],
+    });
+    expect(product.pointTemplate).toBe(POINT_TEMPLATE);
+    const [withoutPoint] = toGriddedRasterProducts({
+      products: [visualProduct()],
+    });
+    expect(withoutPoint.pointTemplate).toBeUndefined();
+  });
+});
+
+describe("wrapLongitude", () => {
+  it("wraps world-copy longitudes into -180..180", () => {
+    expect(wrapLongitude(132)).toBe(132);
+    expect(wrapLongitude(190)).toBe(-170);
+    expect(wrapLongitude(-190)).toBe(170);
+    expect(wrapLongitude(540)).toBe(-180);
+  });
+});
+
+describe("formatPointValue", () => {
+  it("rounds to 4 significant digits and reports missing values", () => {
+    expect(formatPointValue(0.046846628)).toBe("0.04685");
+    expect(formatPointValue(1234.5678)).toBe("1235");
+    expect(formatPointValue(null)).toBe("No data");
+    expect(formatPointValue(Number.NaN)).toBe("No data");
+  });
+});
+
+describe("buildPointValuePopupHtml", () => {
+  it("prefers the snapped grid coordinates and lists each variable", () => {
+    const html = buildPointValuePopupHtml(
+      {
+        lat: -44.20000076,
+        lon: 132,
+        variables: { GSLA: { value: 0.046846628, units: "m" } },
+      },
+      { lat: -44.27, lon: 132.01 }
+    );
+    expect(html).toContain("Lat: -44.20<br>");
+    expect(html).toContain("Lon: 132.00<br>");
+    expect(html).toContain("GSLA: 0.04685 m");
+  });
+
+  it("falls back to the clicked point and shows no data without variables", () => {
+    const html = buildPointValuePopupHtml({}, { lat: -10, lon: 20 });
+    expect(html).toContain("Lat: -10.00<br>");
+    expect(html).toContain("Lon: 20.00<br>");
+    expect(html).toContain("No data");
+  });
+
+  it("shows a categorical value's flag meaning instead of the number", () => {
+    const html = buildPointValuePopupHtml(
+      { variables: { MCS_category: { value: 1.0, units: "1" } } },
+      { lat: 0, lon: 0 },
+      new Map([
+        [0, "none"],
+        [1, "moderate"],
+      ])
+    );
+    expect(html).toContain("MCS_category: moderate<br>");
+  });
+
+  it("falls back to the number when a value has no flag meaning", () => {
+    const html = buildPointValuePopupHtml(
+      { variables: { MCS_category: { value: 7 }, OTHER: { value: null } } },
+      { lat: 0, lon: 0 },
+      new Map([[0, "none"]])
+    );
+    expect(html).toContain("MCS_category: 7<br>");
+    expect(html).toContain("OTHER: No data<br>");
   });
 });

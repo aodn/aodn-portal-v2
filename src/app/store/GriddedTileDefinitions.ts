@@ -37,10 +37,8 @@ export type GriddedValueRange = [number, number];
 export interface GriddedRasterProduct {
   id: string;
   label: string;
-  // Variable name(s) as listed, e.g. "GSLA"; shown beside the legend.
   variable?: string;
-  // Visual tile template with this product's colormap (and rescale) applied.
-  template: string;
+  tileTemplate: string;
   // Full UTC datetimes, e.g. "2024-01-01T00:00:00Z", ascending, de-duplicated by calendar day, non-empty.
   dates: string[];
   // Colormap used for both the tiles and the legend.
@@ -51,4 +49,16 @@ export interface GriddedRasterProduct {
   rescale?: GriddedValueRange;
   legendTemplate?: string;
   manifestTemplate?: string;
+  pointTemplate?: string;
+}
+
+export interface TilePointVariableValue {
+  value: number | null;
+  units?: string;
+}
+
+export interface TilePointValueResponse {
+  lat?: number;
+  lon?: number;
+  variables?: Record<string, TilePointVariableValue>;
 }
