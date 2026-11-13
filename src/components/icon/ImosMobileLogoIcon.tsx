@@ -3,7 +3,7 @@ import mobileLogo from "@/assets/logos/imos-logo-mobile.webp";
 
 // Mobile header logo. The desktop header composes the mark, divider and text
 // in AODNSiteLogo so the spacing follows Figma.
-export const IconImosLogoWithTitle = (
+export const ImosMobileLogoIcon = (
   props: ImgHTMLAttributes<HTMLImageElement>
 ) => (
   <img

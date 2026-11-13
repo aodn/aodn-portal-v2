@@ -7,7 +7,7 @@ import {
   AODN_SITE_LOGO_HEIGHT_MOBILE,
 } from "@/app/layout/constant";
 import { pageDefault } from "@/components/common/constants";
-import { IconImosLogoWithTitle } from "@/components/icon/IconImosLogoWithTitle";
+import { ImosMobileLogoIcon } from "@/components/icon/ImosMobileLogoIcon";
 import imosLogoMark from "@/assets/logos/imos-logo-mark.webp";
 import { portalTheme } from "@/styles";
 
@@ -90,7 +90,7 @@ const AODNSiteLogo = () => {
       data-testid="aodn-home-link"
     >
       {isMobile ? (
-        <IconImosLogoWithTitle data-testid="imos-logo" />
+        <ImosMobileLogoIcon data-testid="imos-logo" />
       ) : (
         <DesktopLogo />
       )}
