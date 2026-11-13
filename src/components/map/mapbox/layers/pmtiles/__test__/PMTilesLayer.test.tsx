@@ -34,7 +34,7 @@ import {
   ZERO_COUNT_FILL_OPACITY,
   ZERO_COUNT_OUTLINE_COLOR,
   DENSITY_COLOR_STOPS,
-  DENSITY_FILL_OPACITY,
+  DENSITY_OPACITY_STOPS,
 } from "../PMTilesLayer";
 import {
   COUNTS_PROPERTY,
@@ -795,16 +795,6 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     expect(colorJson).toContain("case");
     expect(colorJson).toContain(ZERO_COUNT_FILL_COLOR);
     expect(opacityJson).toContain(String(ZERO_COUNT_FILL_OPACITY));
-    // Non-zero totals are fully opaque (last case branch), not interpolated
-    expect(density["fill-opacity"]).toEqual(
-      expect.arrayContaining(["case", DENSITY_FILL_OPACITY])
-    );
-    expect(
-      (density["fill-opacity"] as unknown[])[
-        (density["fill-opacity"] as unknown[]).length - 1
-      ]
-    ).toBe(1);
-    expect(opacityJson).not.toContain("interpolate");
     expect(outlineJson).toContain("feature-state");
     expect(outlineJson).toContain(ZERO_COUNT_OUTLINE_COLOR);
     expect(colorJson).toContain("#1E293B");
@@ -845,6 +835,14 @@ describe("PMTilesLayer - sparse sum and feature-state", () => {
     for (let i = 2; i < pairs.length; i += 2) {
       expect(pairs[i] as number).toBeGreaterThan(pairs[i - 2] as number);
     }
+    const opacityPairs = buildDensityInterpolateStops(
+      DENSITY_OPACITY_STOPS.map(({ ratio, opacity }) => ({
+        ratio,
+        value: opacity,
+      })),
+      DENSITY_TOTAL_CAP
+    );
+    expect(opacityPairs).toEqual([0, 0, 1, 0.4, 100, 0.65, 1000, 0.8]);
     expect(densityStopValue(1)).toBe(DENSITY_TOTAL_CAP);
     expect(densityStopValue(0)).toBe(0);
   });

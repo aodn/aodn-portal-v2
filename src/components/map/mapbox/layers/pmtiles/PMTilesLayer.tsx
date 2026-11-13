@@ -125,6 +125,15 @@ const DENSITY_COLOR_STOPS: ReadonlyArray<{
   { ratio: 1, color: "#14B8A6" }, // cap
 ];
 
+const DENSITY_OPACITY_STOPS: ReadonlyArray<{
+  ratio: number;
+  opacity: number;
+}> = [
+  { ratio: 0, opacity: 0 },
+  { ratio: 0.0001, opacity: 0.4 }, // 1 @ cap 10000 — readable on dark water
+  { ratio: 0.01, opacity: 0.65 }, // 100
+  { ratio: 0.1, opacity: 0.8 }, // 1000
+];
 /**
  * Flatten ratio-based stops into Mapbox `interpolate` input/output pairs,
  * dropping any non-increasing values after rounding so the expression stays valid.
@@ -301,8 +310,6 @@ const DENSITY_OUTLINE_COLOR = "#FFFFFF";
 const ZERO_COUNT_FILL_COLOR = "rgba(0, 0, 0, 0)";
 const ZERO_COUNT_OUTLINE_COLOR = "rgba(0, 0, 0, 0)";
 const ZERO_COUNT_FILL_OPACITY = 0;
-/** Hexes with a non-zero total are fully opaque; density is shown by colour. */
-const DENSITY_FILL_OPACITY = 1;
 
 /** Neutral style while feature-state totals are computed in the background. */
 const getPlaceholderPaintProperties = (): HexFillPaint => ({
@@ -319,9 +326,8 @@ const getPlaceholderPaintProperties = (): HexFillPaint => ({
  * A real total of 0 paints fully transparent fill **and** outline (hexes with
  * no records in the time-slider window must not appear as empty polygons).
  *
- * Hexes with a non-zero total use {@link DENSITY_FILL_OPACITY}; density is
- * encoded by colour only, with breakpoints scaling with
- * {@link DENSITY_TOTAL_CAP} via {@link DENSITY_COLOR_STOPS}.
+ * Color and opacity breakpoints scale with {@link DENSITY_TOTAL_CAP} via
+ * {@link DENSITY_COLOR_STOPS} / {@link DENSITY_OPACITY_STOPS}.
  */
 const getFeatureStatePaintProperties = (
   cap: number = DENSITY_TOTAL_CAP
@@ -331,6 +337,13 @@ const getFeatureStatePaintProperties = (
   const sumExpr = buildFeatureStateTotalExpression();
   const colorStops = buildDensityInterpolateStops(
     DENSITY_COLOR_STOPS.map(({ ratio, color }) => ({ ratio, value: color })),
+    cap
+  );
+  const opacityStops = buildDensityInterpolateStops(
+    DENSITY_OPACITY_STOPS.map(({ ratio, opacity }) => ({
+      ratio,
+      value: opacity,
+    })),
     cap
   );
   return {
@@ -348,7 +361,7 @@ const getFeatureStatePaintProperties = (
       PLACEHOLDER_FILL_OPACITY,
       ["!", hasCount],
       ZERO_COUNT_FILL_OPACITY,
-      DENSITY_FILL_OPACITY,
+      ["interpolate", ["linear"], sumExpr, ...opacityStops],
     ] as ExpressionSpecification,
     // Fully opaque white border when total > 0; transparent when total is 0
     // so empty hexes (after time filter) leave no ghost edges.
@@ -1433,7 +1446,7 @@ export default PMTilesHexLayer;
 export {
   FEATURE_STATE_TOTAL,
   DENSITY_COLOR_STOPS,
-  DENSITY_FILL_OPACITY,
+  DENSITY_OPACITY_STOPS,
   PMTILE_LAYERS,
   pmtilesHitLayerId,
   ZERO_COUNT_FILL_OPACITY,
