@@ -5,6 +5,13 @@ import { DateTimeFilterRange, ParameterState } from "../componentParamReducer";
 import { createSearchParamFrom, SearchParameters } from "../searchReducer";
 import { SearchControl } from "../searchTypes";
 import dayjs from "@/utils/DayjsUtils";
+import { getSearchSessionId } from "@/utils/SearchSession";
+
+// preference is prepended to every filter; pin the expected clause to this tab
+const withPreference = (filter?: string) => {
+  const preference = `preference='${getSearchSessionId()}'`;
+  return filter ? `${preference} AND ${filter}` : preference;
+};
 
 describe("Search Reducer Function Test", () => {
   it("Empty links return default thumbnail", () => {
@@ -90,7 +97,9 @@ describe("Search Reducer Function Test", () => {
     const sp: SearchParameters = createSearchParamFrom(parameterState);
 
     expect(sp.filter).equals(
-      "((parameter_vocabs='temperature' OR ai_parameter_vocabs='temperature') OR (parameter_vocabs='salinity' OR ai_parameter_vocabs='salinity'))"
+      withPreference(
+        "((parameter_vocabs='temperature' OR ai_parameter_vocabs='temperature') OR (parameter_vocabs='salinity' OR ai_parameter_vocabs='salinity'))"
+      )
     );
   });
 
@@ -101,7 +110,7 @@ describe("Search Reducer Function Test", () => {
 
     const sp: SearchParameters = createSearchParamFrom(parameterState);
 
-    expect(sp.filter).equals("dataset_group='imos'");
+    expect(sp.filter).equals(withPreference("dataset_group='imos'"));
   });
 
   it("uses dataset_group IN for non-IMOS organisations", () => {
@@ -111,7 +120,7 @@ describe("Search Reducer Function Test", () => {
 
     const sp: SearchParameters = createSearchParamFrom(parameterState);
 
-    expect(sp.filter).equals("dataset_group IN('aims')");
+    expect(sp.filter).equals(withPreference("dataset_group IN('aims')"));
   });
 
   it("should exclude document scope when excludeDocument is true", () => {
@@ -121,7 +130,7 @@ describe("Search Reducer Function Test", () => {
 
     const result = createSearchParamFrom(param);
 
-    expect(result.filter).toEqual("NOT (scope='document')");
+    expect(result.filter).toEqual(withPreference("NOT (scope='document')"));
   });
 
   it("should include both assets_summary and links_airole_contains filter when hasCOData is true", () => {
@@ -207,7 +216,17 @@ describe("Search Reducer Function Test", () => {
       } as SearchControl
     );
 
-    expect(result.filter).toEqual("search_after='O''Brien||it''s'");
+    expect(result.filter).toEqual(
+      withPreference("search_after='O''Brien||it''s'")
+    );
+  });
+
+  it("reuses the same preference for every search in the tab", () => {
+    const first = createSearchParamFrom({} as ParameterState);
+    const second = createSearchParamFrom({ datasetGroup: "imos" });
+
+    expect(first.filter).toEqual(withPreference());
+    expect(second.filter).toEqual(withPreference("dataset_group='imos'"));
   });
 
   it("expands an end epoch at UTC midnight to end of that calendar day", () => {

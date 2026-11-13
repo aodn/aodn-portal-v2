@@ -59,6 +59,8 @@ export function trackSearchResultParameters(searchParams: SearchParameters) {
       .replace(/\s+AND\s+BBOX[^)]+\)/g, "") // Remove BBOX
       .replace(/\s+AND\s+INTERSECTS[^)]+\)\)\)/g, "") // Remove INTERSECTS
       .replace(/page_size=\d+\s+AND\s+/g, "") // Remove page_size
+      .replace(/preference='(?:[^']|'')*'\s+AND\s+/g, "") // Remove preference
+      .replace(/\s+AND\s+preference='(?:[^']|'')*'/g, "")
       .replace(/\s+AND\s+/g, " AND ") // Clean up multiple ANDs
       .replace(/^AND\s+|AND\s+$/g, "") // Remove leading/trailing AND
       .trim();

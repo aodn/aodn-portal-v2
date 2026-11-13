@@ -275,20 +275,20 @@ describe("Search Analytics Tracking", () => {
       expect(mockTrack).toHaveBeenCalledTimes(2);
     });
 
-    // Tests: extractUserFilters() removes BBOX, INTERSECTS, page_size
+    // Tests: extractUserFilters() removes BBOX, INTERSECTS, page_size, preference
     it("ignores technical parameters in deduplication key", () => {
       const params1 = {
         properties: "id,centroid",
         text: "test",
         filter:
-          "page_size=1500 AND BBOX(geometry,1,2,3,4) AND dataset_group='test'",
+          "preference='11111111-1111-4111-8111-111111111111' AND page_size=1500 AND BBOX(geometry,1,2,3,4) AND dataset_group='test'",
       } as SearchParameters;
 
       const params2 = {
         properties: "id,centroid",
         text: "test",
         filter:
-          "page_size=2000 AND BBOX(geometry,5,6,7,8) AND dataset_group='test'",
+          "preference='22222222-2222-4222-8222-222222222222' AND page_size=2000 AND BBOX(geometry,5,6,7,8) AND dataset_group='test'",
       } as SearchParameters;
 
       // Both should have same deduplication key (ignoring page_size and BBOX)

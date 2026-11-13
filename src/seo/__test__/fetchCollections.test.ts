@@ -18,6 +18,7 @@ import {
   SEO_PROPERTIES,
 } from "../fetchCollections";
 import { BASE_URL, OGC_API_BASE } from "../constants";
+import { getSearchSessionId } from "@/utils/SearchSession";
 
 const singlePage = { total: 1, collections: [{ id: "abc-123" }] };
 
@@ -78,7 +79,7 @@ describe("fetchCollections uses fetchResultNoStore", () => {
       expect.objectContaining({
         params: expect.objectContaining({
           properties: SEO_PROPERTIES,
-          filter: "page_size=1000",
+          filter: `preference='${getSearchSessionId()}' AND page_size=1000`,
         }),
       })
     );
@@ -180,7 +181,7 @@ describe("fetchCollections walks every page", () => {
     );
 
     await expect(fetchCollections()).rejects.toThrow(
-      /Failed to fetch collections from .* — HTTP 500 — Invalid properties in query \[creation, revision, citation, license\], check \?properties=xx — uri=/
+      /Failed to fetch collections from .* — HTTP 500 — Invalid properties in query \[creation, revision, citation, license], check \?properties=xx — uri=/
     );
   });
 
