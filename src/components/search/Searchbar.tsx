@@ -191,8 +191,11 @@ const Searchbar: FC<SearchbarProps> = ({
           shouldExpandAllButtons={shouldExpandAllButtons}
           shouldShrinkAllButtons={isMobile}
           isPopupOpen={open}
-          // Landing button gap follows Figma 8314-35701
+          // Landing button gap and search button radius follow Figma 8314-35701
           spacing={isLandingPage ? gap.lg : undefined}
+          searchButtonSx={
+            isLandingPage ? { borderRadius: borderRadius.small } : undefined
+          }
           sx={{
             pr: gap.md,
             width: "auto",

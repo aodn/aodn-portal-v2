@@ -34,6 +34,7 @@ interface SearchbarButtonGroupProps {
   // Gap between all buttons (MUI Stack spacing). When unset, the default gap
   // plus a 2px nudge before the search button is kept.
   spacing?: number | string;
+  searchButtonSx?: SxProps;
   sx?: SxProps;
 }
 
@@ -106,6 +107,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
   shouldShrinkAllButtons = false,
   isPopupOpen,
   spacing,
+  searchButtonSx,
   sx,
 }) => {
   const { isUnderLaptop } = useBreakpoint();
@@ -295,6 +297,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
             backgroundColor: portalTheme.palette.secondary1,
             ml: searchButtonMl,
           },
+          ...searchButtonSx,
         }}
         data-testid="search-button"
       />
