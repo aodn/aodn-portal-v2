@@ -21,8 +21,7 @@ import {
   borderRadius,
   color,
   fontSize,
-  gap,
-  margin,
+  fontWeight,
   padding,
 } from "@/styles/constants";
 import AODNSiteLogo from "./AODNSiteLogo";
@@ -36,6 +35,7 @@ import {
   pageDefault,
 } from "@/components/common/constants";
 import { NorthIcon } from "@/components/icon/NorthIcon";
+import { portalTheme } from "@/styles";
 import { BlueskyLogoIcon } from "@/components/icon/BlueskyLogoIcon";
 import { PAGE_CONTENT_WIDTH_LANDING } from "@/app/layout/constant";
 import React from "react";
@@ -57,6 +57,8 @@ const handleClickContactUs = () => {
 
 const version = import.meta.env.VITE_APP_VERSION;
 
+const linkButtonSx = { px: 0, minWidth: 0 };
+
 const Footer: FC = () => {
   const { pathname } = useLocation();
 
@@ -73,7 +75,8 @@ const Footer: FC = () => {
         >
           <Grid
             container
-            paddingY={{ xs: padding.medium, sm: padding.quadruple }}
+            paddingTop={{ xs: padding.medium, sm: "38px" }}
+            paddingBottom={{ xs: padding.medium, sm: padding.quadruple }}
           >
             <Grid
               display="flex"
@@ -96,7 +99,11 @@ const Footer: FC = () => {
                 </Typography>
               </Button>
             </Grid>
-            <Grid paddingY={padding.large} size={12}>
+            <Grid
+              paddingTop={{ xs: padding.large, sm: "27px" }}
+              paddingBottom={padding.large}
+              size={12}
+            >
               <Typography
                 color="#000"
                 fontSize={fontSize.subscription}
@@ -124,19 +131,19 @@ const Footer: FC = () => {
                 borderColor: color.blue.dark,
               }}
             />
-            <Grid paddingY={padding.small} size={12}>
+            <Grid paddingY={{ xs: padding.small, sm: 2 }} size={12}>
               <Box
                 display="flex"
                 flexDirection={{ xs: "column", sm: "row" }}
                 justifyContent="space-between"
+                alignItems={{ xs: "stretch", sm: "center" }}
               >
                 <Tooltip title="Contact us by email" placement="top">
                   <Box
                     sx={{
-                      height: "100%",
-                      width: { xs: "100%", sm: "180px" },
-                      bgcolor: color.blue.extraDark,
-                      borderRadius: borderRadius.small,
+                      width: { xs: "100%", sm: "200px" },
+                      bgcolor: portalTheme.palette.primary2,
+                      borderRadius: borderRadius.medium,
                     }}
                   >
                     <Button
@@ -144,22 +151,24 @@ const Footer: FC = () => {
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
-                        height: "100%",
+                        gap: 1,
                         width: "100%",
+                        height: "44px",
                       }}
                       onClick={handleClickContactUs}
                     >
-                      <IconContainer
-                        sx={{ marginRight: margin.lg, color: "#fff" }}
-                      >
-                        <MailOutlineIcon />
-                      </IconContainer>
+                      <MailOutlineIcon
+                        sx={{
+                          fontSize: "26px",
+                          color: portalTheme.palette.common.white,
+                        }}
+                      />
                       <Typography
-                        color="#fff"
-                        paddingTop={0}
-                        fontSize={fontSize.info}
-                        letterSpacing={1}
-                        textAlign="center"
+                        sx={{
+                          ...portalTheme.typography.title2Regular,
+                          color: portalTheme.palette.common.white,
+                          padding: 0,
+                        }}
                       >
                         Contact Us
                       </Typography>
@@ -171,35 +180,50 @@ const Footer: FC = () => {
                   display="flex"
                   flexDirection={{ xs: "column", sm: "row" }}
                   justifyContent="end"
-                  gap={{ xs: 0, sm: 2 }}
+                  gap={{ xs: 0, sm: 3 }}
                 >
                   <Button
+                    sx={linkButtonSx}
                     onClick={() =>
                       openInNewTab(`${pageDefault.url.IMOS}/terms-of-use`)
                     }
                   >
-                    <Typography color="#000" paddingTop={gap.md}>
+                    <Typography
+                      paddingTop={0}
+                      color={portalTheme.palette.text2}
+                      fontWeight={fontWeight.medium}
+                    >
                       Terms of Use
                     </Typography>
                   </Button>
                   <Button
+                    sx={linkButtonSx}
+                    onClick={() =>
+                      openInNewTab(`${pageDefault.url.IMOS}/conditions-of-use`)
+                    }
+                  >
+                    <Typography
+                      paddingTop={0}
+                      color={portalTheme.palette.text2}
+                      fontWeight={fontWeight.medium}
+                    >
+                      Conditions of Use
+                    </Typography>
+                  </Button>
+                  <Button
+                    sx={linkButtonSx}
                     onClick={() =>
                       openInNewTab(
                         `${pageDefault.url.IMOS}/resources/acknowledging-us`
                       )
                     }
                   >
-                    <Typography color="#000" paddingTop={gap.md}>
-                      Acknowledge Us
-                    </Typography>
-                  </Button>
-                  <Button
-                    onClick={() =>
-                      openInNewTab(`${pageDefault.url.IMOS}/conditions-of-use`)
-                    }
-                  >
-                    <Typography color="#000" paddingTop={gap.md}>
-                      Conditions of Use
+                    <Typography
+                      paddingTop={0}
+                      color={portalTheme.palette.text2}
+                      fontWeight={fontWeight.medium}
+                    >
+                      Acknowledging Us
                     </Typography>
                   </Button>
                 </Box>
@@ -216,25 +240,35 @@ const Footer: FC = () => {
                 <Grid
                   size={{
                     xs: 12,
-                    sm: 7,
+                    sm: "grow",
                   }}
                 >
                   <Stack
                     direction="row"
-                    gap={2}
+                    gap={{ xs: 2, sm: 2.5 }}
                     alignItems="center"
-                    justifyContent="center"
                     marginBottom={2}
                   >
                     {/* Decorative: the acknowledgement text alongside carries the meaning */}
                     <Avatar
                       src={traditional}
                       alt=""
+                      sx={{
+                        width: { xs: "40px", sm: "56px" },
+                        height: { xs: "40px", sm: "56px" },
+                      }}
                       slotProps={{
                         img: { loading: "lazy", decoding: "async" },
                       }}
                     />
-                    <Typography color="#000" fontSize={fontSize.subscription}>
+                    <Typography
+                      sx={{
+                        ...portalTheme.typography.body2Regular,
+                        color: portalTheme.palette.text2,
+                        maxWidth: "940px",
+                        padding: 0,
+                      }}
+                    >
                       IMOS acknowledges the Traditional Custodians and Elders of
                       the land and sea on which we work and observe, and
                       recognise them as Australia’s first marine scientists and
@@ -258,7 +292,7 @@ const Footer: FC = () => {
                   alignItems="center"
                   size={{
                     xs: 12,
-                    sm: 5,
+                    sm: "auto",
                   }}
                 >
                   <Box>
