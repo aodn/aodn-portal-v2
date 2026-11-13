@@ -192,21 +192,26 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
         handler: () => handleClickTopicCard("Currents"),
       },
       {
-        title: "Water Quality",
-        icon: IconWaterQuality,
-        iconSize: 62,
-        handler: () => handleClickTopicCard("Water Quality"),
-      },
-      {
-        title: "Ocean Biota",
-        icon: IconOceanBiota,
-        iconSize: 58,
-        handler: () => handleClickParameterTopicCard("Ocean Biota"),
-      },
-      {
         title: "Molecular",
         icon: IconMolecular,
         handler: () => handleClickTopicCard("Molecular"),
+      },
+      {
+        title: "Industry",
+        icon: IconIndustry,
+        handler: () => handleClickTopicCard("Industry"),
+      },
+      {
+        title: "Reef",
+        icon: IconReef,
+        iconSize: 60,
+        handler: () => handleClickTopicCard("Reef"),
+      },
+      {
+        title: "Plankton",
+        icon: IconPlankton,
+        iconSize: 64,
+        handler: () => handleClickTopicCard("Plankton"),
       },
       {
         title: "Weather",
@@ -227,10 +232,10 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
         handler: () => handleClickTopicCard("Acidification"),
       },
       {
-        title: "Tides",
-        icon: IconTide,
-        iconSize: 88,
-        handler: () => handleClickTopicCard("Tides"),
+        title: "Ocean Biota",
+        icon: IconOceanBiota,
+        iconSize: 58,
+        handler: () => handleClickParameterTopicCard("Ocean Biota"),
       },
       {
         title: "Fisheries",
@@ -239,38 +244,33 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
         handler: () => handleClickTopicCard("Fisheries"),
       },
       {
-        title: "Reef",
-        icon: IconReef,
-        iconSize: 60,
-        handler: () => handleClickTopicCard("Reef"),
-      },
-      {
-        title: "Industry",
-        icon: IconIndustry,
-        handler: () => handleClickTopicCard("Industry"),
-      },
-      {
-        title: "Autonomous Underwater Vehicles",
-        icon: IconAutonomousUnderwaterVehicles,
-        handler: () => handleClickTopicCard("Autonomous underwater vehicles"),
-      },
-      {
-        title: "Plankton",
-        icon: IconPlankton,
-        iconSize: 64,
-        handler: () => handleClickTopicCard("Plankton"),
-      },
-      {
         title: "Ocean Colour",
         icon: IconOceanColor,
         iconSize: 66,
         handler: () => handleClickTopicCard("Ocean Colour"),
       },
       {
+        title: "Tides",
+        icon: IconTide,
+        iconSize: 88,
+        handler: () => handleClickTopicCard("Tides"),
+      },
+      {
         title: "Benthic",
         icon: IconBenthic,
         iconSize: 60,
         handler: () => handleClickTopicCard("Benthic"),
+      },
+      {
+        title: "Water Quality",
+        icon: IconWaterQuality,
+        iconSize: 62,
+        handler: () => handleClickTopicCard("Water Quality"),
+      },
+      {
+        title: "Autonomous Underwater Vehicles",
+        icon: IconAutonomousUnderwaterVehicles,
+        handler: () => handleClickTopicCard("Autonomous underwater vehicles"),
       },
     ],
     [
