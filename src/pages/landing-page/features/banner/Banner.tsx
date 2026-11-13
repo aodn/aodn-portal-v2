@@ -12,18 +12,14 @@ import bannerImage3 from "@/assets/images/banner_image_3.webp";
 import bannerImage3Small from "@/assets/images/banner_image_3_120.webp";
 import { portalTheme } from "../../../../styles";
 import FeedbackButton from "@/components/feedback/FeedbackButton";
-import {
-  HERO_SEARCHBAR_GAP,
-  HERO_TEXT_INSET,
-  HERO_TITLE_TO_QUOTE_GAP,
-} from "@/pages/landing-page/constants";
 
 // Title size from the design, used from tablet up
 const titleSx = { fontSize: "56px", fontWeight: 500, lineHeight: "68px" };
 
 const renderBannerText = (isMobile: boolean) => {
   return (
-    <Box flex={1} sx={{ pl: { lg: HERO_TEXT_INSET } }}>
+    // Text inset from Figma 8316-46882
+    <Box flex={1} sx={{ pl: { lg: "60px" } }}>
       <Stack
         direction="column"
         justifyContent="center"
@@ -71,7 +67,7 @@ const renderBannerText = (isMobile: boolean) => {
             color: portalTheme.palette.text2,
             whiteSpace: "wrap",
             p: padding.nil,
-            mt: { xs: 2, md: HERO_TITLE_TO_QUOTE_GAP },
+            mt: { xs: 2, md: "40px" }, // title to quote, Figma 8316-46882
           }}
         >
           &quot;Open access to Australian marine and climate science
@@ -232,7 +228,7 @@ const Banner = () => {
         pb: {
           xs: padding.medium,
           sm: padding.large,
-          md: HERO_SEARCHBAR_GAP,
+          md: "47px", // hero images to search bar, Figma 8316-46882
         },
       }}
       gap={2}
