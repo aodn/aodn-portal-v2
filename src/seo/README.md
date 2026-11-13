@@ -27,10 +27,12 @@ record ID and nonblank title and description. Local verification checks every
 sitemap detail URL against every prerendered `index.html` in both directions;
 HTML content checks remain sampled. Any mismatch blocks the existing upload step.
 
-A CloudFront function (in `artifacts/`) rewrites crawler requests for
-`/details/<uuid>` to the pre-rendered pages; real users always get the latest
-SPA shell. The `prerender/` folder never appears in a public URL, sitemap or
-canonical, and robots.txt disallows crawling it directly.
+Two CloudFront functions (in `artifacts/`) handle `/details/*`: on the way in
+crawlers go to the pre-rendered pages and real users to the SPA shell; on the
+way out a crawler response without the `prerendered` marker (set by the publish
+workflow) becomes 404 instead of the shell. The `prerender/` folder never
+appears in a public URL, sitemap or canonical, and robots.txt disallows
+crawling it directly.
 
 ## Deployed source revision
 
