@@ -9,6 +9,7 @@ import {
   getGriddedRenderStyle,
   toLegendRange,
   toCategoricalLabels,
+  toFlagMeanings,
   toLegendUnit,
   buildTileDateMarks,
   formatPointValue,
@@ -521,6 +522,26 @@ describe("toCategoricalLabels", () => {
   });
 });
 
+describe("toFlagMeanings", () => {
+  it("pairs each flag value with its meaning", () => {
+    const meanings = toFlagMeanings({
+      flagValues: [0, 1, 2],
+      flagMeanings: ["none", "moderate", "strong"],
+    });
+    expect(meanings?.get(0)).toBe("none");
+    expect(meanings?.get(2)).toBe("strong");
+  });
+
+  it("is undefined without one meaning per value", () => {
+    expect(toFlagMeanings({ flagValues: [0, 1] })).toBeUndefined();
+    expect(
+      toFlagMeanings({ flagValues: [0, 1], flagMeanings: ["none"] })
+    ).toBeUndefined();
+    expect(toFlagMeanings({ valueRange: [0, 1] })).toBeUndefined();
+    expect(toFlagMeanings(undefined)).toBeUndefined();
+  });
+});
+
 describe("toLegendRange", () => {
   it("reads a scalar product's valueRange", () => {
     expect(toLegendRange({ valueRange: [-0.4, 0.9] })).toEqual([-0.4, 0.9]);
@@ -664,5 +685,27 @@ describe("buildPointValuePopupHtml", () => {
     expect(html).toContain("Lat: -10.00<br>");
     expect(html).toContain("Lon: 20.00<br>");
     expect(html).toContain("No data");
+  });
+
+  it("shows a categorical value's flag meaning instead of the number", () => {
+    const html = buildPointValuePopupHtml(
+      { variables: { MCS_category: { value: 1.0, units: "1" } } },
+      { lat: 0, lon: 0 },
+      new Map([
+        [0, "none"],
+        [1, "moderate"],
+      ])
+    );
+    expect(html).toContain("MCS_category: moderate<br>");
+  });
+
+  it("falls back to the number when a value has no flag meaning", () => {
+    const html = buildPointValuePopupHtml(
+      { variables: { MCS_category: { value: 7 }, OTHER: { value: null } } },
+      { lat: 0, lon: 0 },
+      new Map([[0, "none"]])
+    );
+    expect(html).toContain("MCS_category: 7<br>");
+    expect(html).toContain("OTHER: No data<br>");
   });
 });

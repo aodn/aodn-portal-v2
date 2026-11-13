@@ -169,6 +169,23 @@ export const toCategoricalLabels = (
     : values.map(String);
 };
 
+/**
+ * Flag value -> meaning, for naming a categorical point value in the click
+ * popup. Undefined for continuous products, and when the dataset has no
+ * meanings or they don't pair one-to-one with the values.
+ */
+export const toFlagMeanings = (
+  manifest?: TileManifest | null
+): ReadonlyMap<number, string> | undefined => {
+  const values = manifest?.flagValues;
+  const meanings = manifest?.flagMeanings;
+  if (!Array.isArray(values) || values.length === 0) return undefined;
+  if (!Array.isArray(meanings) || meanings.length !== values.length) {
+    return undefined;
+  }
+  return new Map(values.map((value, i) => [value, meanings[i]]));
+};
+
 /** The variable's units for the legend title; undefined when blank or absent. */
 export const toLegendUnit = (
   manifest?: TileManifest | null
@@ -370,11 +387,13 @@ const formatCoordinate = (value: number): string =>
 
 /**
  * Popup body for a point-value lookup. Coordinates are the grid cell the
- * backend snapped to, falling back to the clicked point.
+ * backend snapped to, falling back to the clicked point. Categorical values
+ * show their flag meaning when one is known, else the number.
  */
 export const buildPointValuePopupHtml = (
   response: TilePointValueResponse | undefined,
-  clicked: { lat: number; lon: number }
+  clicked: { lat: number; lon: number },
+  flagMeanings?: ReadonlyMap<number, string>
 ): string => {
   const lat = response?.lat ?? clicked.lat;
   const lon = response?.lon ?? clicked.lon;
@@ -387,6 +406,14 @@ export const buildPointValuePopupHtml = (
   if (variables.length === 0) return builder.addText("No data").getHtml();
 
   variables.forEach(([name, entry]) => {
+    const meaning =
+      typeof entry?.value === "number"
+        ? flagMeanings?.get(entry.value)
+        : undefined;
+    if (meaning !== undefined) {
+      builder.addText(`${name}: ${meaning}`);
+      return;
+    }
     const value = formatPointValue(entry?.value);
     const units = entry?.units && value !== "No data" ? ` ${entry.units}` : "";
     builder.addText(`${name}: ${value}${units}`);

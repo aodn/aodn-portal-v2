@@ -165,6 +165,7 @@ describe("useGriddedLegendRange", () => {
       "strong",
       "severe",
     ]);
+    expect(result.current.flagMeanings?.get(1)).toBe("moderate");
     expect(result.current.range).toBeUndefined();
   });
 

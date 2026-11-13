@@ -38,7 +38,10 @@ export const getGriddedRasterLayerId = (id: string | undefined) =>
   `${id}-gridded-raster-layer`;
 
 interface GriddedRasterLayerProps
-  extends LayerBasicType, GriddedRasterLayerControls {}
+  extends LayerBasicType, GriddedRasterLayerControls {
+  /** Categorical products: flag value -> meaning, shown in the click popup. */
+  flagMeanings?: ReadonlyMap<number, string>;
+}
 
 const visibilityOf = (visible: boolean) =>
   visible ? LAYER_VISIBILITY.VISIBLE : LAYER_VISIBILITY.NONE;
@@ -48,6 +51,7 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
   layerConfig,
   onLayerChange,
   selectedDate,
+  flagMeanings,
   visible = false,
 }) => {
   const dispatch = useAppDispatch();
@@ -67,9 +71,12 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
   // tileUrl/visible or a date change would tear down the source.
   const visibleRef = useRef(visible);
   const tileUrlRef = useRef(tileUrl);
+  const flagMeaningsRef = useRef(flagMeanings);
+
   useEffect(() => {
     visibleRef.current = visible;
     tileUrlRef.current = tileUrl;
+    flagMeaningsRef.current = flagMeanings;
   });
 
   useEffect(() => {
@@ -160,13 +167,18 @@ const GriddedRasterLayer: FC<GriddedRasterLayerProps> = ({
       if (!current.isOpen()) current.addTo(map);
       const element = current.getElement();
       if (element) element.dataset.testid = playwrightTestIds.DETAIL_MAP_POPUP;
-      // TODO: for categorical products, show flagMeanings instead of the numeric value in flagValues.
       const pending = dispatch(fetchGriddedTilePointValue({ url }));
       request = pending;
       pending
         .unwrap()
         .then((response) =>
-          current.setHTML(buildPointValuePopupHtml(response, { lat, lon }))
+          current.setHTML(
+            buildPointValuePopupHtml(
+              response,
+              { lat, lon },
+              flagMeaningsRef.current
+            )
+          )
         )
         .catch((error) => {
           if (error?.name === "AbortError") return;

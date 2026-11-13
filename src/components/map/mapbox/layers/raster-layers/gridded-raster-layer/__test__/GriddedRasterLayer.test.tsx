@@ -406,6 +406,38 @@ describe("GriddedRasterLayer", () => {
       expect(popup.html).toContain("VCUR: No data");
     });
 
+    it("shows a categorical value's flag meaning, read when the lookup lands", async () => {
+      let resolve: (value: unknown) => void = () => {};
+      vi.spyOn(ogcAxiosWithRetry, "get").mockReturnValue(
+        new Promise((r) => {
+          resolve = r;
+        }) as any
+      );
+      const { rerender } = renderLayer();
+      click(132, -44);
+      const popup = popupMock.instances[0];
+
+      // The manifest's meanings arrive after the click: no re-subscribe.
+      rerender(
+        <MapContext.Provider value={{ map: mockMap } as any}>
+          <GriddedRasterLayer
+            products={PRODUCTS}
+            layerConfig="a:one"
+            onLayerChange={vi.fn()}
+            selectedDate="2024-01-03"
+            flagMeanings={new Map([[2, "strong"]])}
+            visible
+          />
+        </MapContext.Provider>
+      );
+      expect(popup.isOpen()).toBe(true);
+
+      resolve({ data: { variables: { MCS_category: { value: 2 } } } });
+      await waitFor(() =>
+        expect(popup.html).toContain("MCS_category: strong<br>")
+      );
+    });
+
     it("wraps world-copy longitudes into -180..180", () => {
       const spy = vi
         .spyOn(ogcAxiosWithRetry, "get")
