@@ -25,8 +25,6 @@ const LandingPage: FC = () => {
           backgroundColor: "#fff",
         }}
         contentAreaStyle={{
-          // Figma 8316-46882 from laptop up: header to images, search bar
-          // to topics
           pt: { xs: padding.double, md: "40px" },
           pb: { xs: padding.double, md: "52px" },
           width: PAGE_CONTENT_WIDTH_LANDING,

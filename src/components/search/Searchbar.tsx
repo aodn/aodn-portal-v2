@@ -163,7 +163,6 @@ const Searchbar: FC<SearchbarProps> = ({
           flexDirection: "row",
           alignItems: "center",
           height: "100%",
-          // Landing bar follows Figma 8314-35701; header bar keeps its style
           border: isLandingPage
             ? `${border.xs} ${portalTheme.palette.primary1}`
             : `${border.sm} ${color.blue.dark}`,
@@ -191,7 +190,6 @@ const Searchbar: FC<SearchbarProps> = ({
           shouldExpandAllButtons={shouldExpandAllButtons}
           shouldShrinkAllButtons={isMobile}
           isPopupOpen={open}
-          // Landing button gap and search button radius follow Figma 8314-35701
           spacing={isLandingPage ? gap.lg : undefined}
           searchButtonSx={
             isLandingPage ? { borderRadius: borderRadius.small } : undefined

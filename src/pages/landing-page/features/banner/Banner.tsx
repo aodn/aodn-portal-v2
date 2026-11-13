@@ -18,7 +18,6 @@ const titleSx = { fontSize: "56px", fontWeight: 500, lineHeight: "68px" };
 
 const renderBannerText = (isMobile: boolean) => {
   return (
-    // Text inset from Figma 8316-46882
     <Box flex={1} sx={{ pl: { lg: "60px" } }}>
       <Stack
         direction="column"
@@ -67,7 +66,7 @@ const renderBannerText = (isMobile: boolean) => {
             color: portalTheme.palette.text2,
             whiteSpace: "wrap",
             p: padding.nil,
-            mt: { xs: 2, md: "40px" }, // title to quote, Figma 8316-46882
+            mt: { xs: 2, md: "40px" },
           }}
         >
           &quot;Open access to Australian marine and climate science
@@ -228,7 +227,7 @@ const Banner = () => {
         pb: {
           xs: padding.medium,
           sm: padding.large,
-          md: "47px", // hero images to search bar, Figma 8316-46882
+          md: "47px",
         },
       }}
       gap={2}

@@ -11,7 +11,6 @@ import { ImosMobileLogoIcon } from "@/components/icon/ImosMobileLogoIcon";
 import imosLogoMark from "@/assets/logos/imos-logo-mark.webp";
 import { portalTheme } from "@/styles";
 
-// Figma 8314-35722: mark, 1px divider, then the logotype text
 const LOGO_MARK_TO_DIVIDER_GAP = "18px";
 const LOGO_DIVIDER_TO_TEXT_GAP = "16px";
 const LOGO_DIVIDER_HEIGHT = "64px";

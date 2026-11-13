@@ -31,8 +31,6 @@ interface SearchbarButtonGroupProps {
   shouldExpandAllButtons: boolean;
   shouldShrinkAllButtons?: boolean;
   isPopupOpen: boolean;
-  // Gap between all buttons (MUI Stack spacing). When unset, the default gap
-  // plus a 2px nudge before the search button is kept.
   spacing?: number | string;
   searchButtonSx?: SxProps;
   sx?: SxProps;
