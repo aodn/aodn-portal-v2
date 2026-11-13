@@ -18,7 +18,7 @@ const titleSx = { fontSize: "56px", fontWeight: 500, lineHeight: "68px" };
 
 const renderBannerText = (isMobile: boolean) => {
   return (
-    <Box flex={1}>
+    <Box flex={1} sx={{ pl: { lg: "60px" } }}>
       <Stack
         direction="column"
         justifyContent="center"
@@ -66,7 +66,7 @@ const renderBannerText = (isMobile: boolean) => {
             color: portalTheme.palette.text2,
             whiteSpace: "wrap",
             p: padding.nil,
-            mt: 2,
+            mt: { xs: 2, md: "40px" },
           }}
         >
           &quot;Open access to Australian marine and climate science
@@ -224,7 +224,11 @@ const Banner = () => {
         justifyContent: "center",
         alignItems: "center",
         width: "100%",
-        pb: { xs: padding.medium, sm: padding.large },
+        pb: {
+          xs: padding.medium,
+          sm: padding.large,
+          md: "47px",
+        },
       }}
       gap={2}
     >

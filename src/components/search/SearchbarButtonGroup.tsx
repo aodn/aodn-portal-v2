@@ -31,6 +31,8 @@ interface SearchbarButtonGroupProps {
   shouldExpandAllButtons: boolean;
   shouldShrinkAllButtons?: boolean;
   isPopupOpen: boolean;
+  spacing?: number | string;
+  searchButtonSx?: SxProps;
   sx?: SxProps;
 }
 
@@ -102,9 +104,12 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
   shouldExpandAllButtons = false,
   shouldShrinkAllButtons = false,
   isPopupOpen,
+  spacing,
+  searchButtonSx,
   sx,
 }) => {
   const { isUnderLaptop } = useBreakpoint();
+  const searchButtonMl = isUnderLaptop || spacing !== undefined ? "0" : "2px";
   const filterButtonWidth = isUnderLaptop ? "100%" : "120px";
   const buttonStyleOnDropdownOpen = {
     color: "#fff",
@@ -153,7 +158,7 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
       direction="row"
       justifyContent="end"
       alignItems="center"
-      spacing={0.5}
+      spacing={spacing ?? 0.5}
       padding={gap.sm}
       paddingLeft={gap.md}
       sx={sx}
@@ -285,11 +290,12 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
           color: "#FFF",
           backgroundColor: portalTheme.palette.primary2,
           borderRadius: "8px",
-          ml: isUnderLaptop ? "0" : "2px",
+          ml: searchButtonMl,
           "&:hover": {
             backgroundColor: portalTheme.palette.secondary1,
-            ml: isUnderLaptop ? "0" : "2px",
+            ml: searchButtonMl,
           },
+          ...searchButtonSx,
         }}
         data-testid="search-button"
       />

@@ -25,7 +25,8 @@ const LandingPage: FC = () => {
           backgroundColor: "#fff",
         }}
         contentAreaStyle={{
-          paddingY: padding.double,
+          pt: { xs: padding.double, md: "40px" },
+          pb: { xs: padding.double, md: "52px" },
           width: PAGE_CONTENT_WIDTH_LANDING,
         }}
       >
