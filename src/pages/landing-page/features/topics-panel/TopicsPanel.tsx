@@ -11,13 +11,12 @@ import { useDebounce } from "../../../../hooks/useDebounce";
 import { gap } from "../../../../styles/constants";
 import {
   TOPICS_PANEL_ROW_GAP,
-  TOPICS_PANEL_ROWS_DEFAULT,
-  TOPICS_CARD_HEIGHT,
-  TOPICS_CARD_ICON_BOX_SIZE,
   TOPICS_CARD_SHADOW_SPACE,
   SCROLL_BUTTON_GAP,
+  SCROLL_BUTTON_GAP_DESKTOP,
   SCROLL_BUTTON_ICON_SIZE,
   SCROLL_BUTTON_SIZE,
+  SCROLL_BUTTON_TOP,
 } from "./constants";
 import TopicCard, { TopicCardType } from "./TopicCard";
 import {
@@ -60,23 +59,17 @@ import IconReef from "@/assets/topics-panel-icons/icon_reef.svg";
 
 interface TopicsPanelProps {}
 
-// Centre the arrows on the tiles, not on the whole grid: the labels under
-// the last row would otherwise push them down
-const SCROLL_BUTTON_CENTRE_Y =
-  ((TOPICS_PANEL_ROWS_DEFAULT - 1) *
-    (TOPICS_CARD_HEIGHT + TOPICS_PANEL_ROW_GAP) +
-    TOPICS_CARD_ICON_BOX_SIZE) /
-  2;
+const { designTokens } = portalTheme;
 
 const scrollButtonSx = {
   position: "absolute",
-  top: SCROLL_BUTTON_CENTRE_Y,
-  transform: "translateY(-50%)",
+  top: SCROLL_BUTTON_TOP,
   zIndex: 1,
   width: SCROLL_BUTTON_SIZE,
   height: SCROLL_BUTTON_SIZE,
   borderRadius: "50%",
   backgroundColor: portalTheme.palette.common.white,
+  boxShadow: designTokens.elevation.card,
   "&:hover, &:focus, &:active": {
     backgroundColor: portalTheme.palette.common.white,
   },
@@ -85,7 +78,10 @@ const scrollButtonSx = {
 const TopicsPanel: FC<TopicsPanelProps> = () => {
   const dispatch = useAppDispatch();
   const redirectSearch = useRedirectSearch();
-  const { isMobile } = useBreakpoint();
+  const { isMobile, isAboveDesktop } = useBreakpoint();
+  const scrollButtonGap = isAboveDesktop
+    ? SCROLL_BUTTON_GAP_DESKTOP
+    : SCROLL_BUTTON_GAP;
   // This is a simple click topic card function that with updates search input text and clear all the filters
   // Can be changed to a function-switcher if any other functions are designed in the future
   const handleClickTopicCard = useCallback(
@@ -370,7 +366,7 @@ const TopicsPanel: FC<TopicsPanelProps> = () => {
 
   const showScrollButtons = !showAllTopics && !isMobile;
   // Arrows sit outside the grid so they don't take layout width
-  const scrollButtonOffset = `-${SCROLL_BUTTON_GAP + SCROLL_BUTTON_SIZE}px`;
+  const scrollButtonOffset = `-${scrollButtonGap + SCROLL_BUTTON_SIZE}px`;
 
   return (
     <Box display="flex" justifyContent="center">

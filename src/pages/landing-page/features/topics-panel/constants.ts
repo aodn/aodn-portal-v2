@@ -1,6 +1,8 @@
-export const SCROLL_BUTTON_SIZE = 32;
-export const SCROLL_BUTTON_ICON_SIZE = 18;
+export const SCROLL_BUTTON_SIZE = 44;
+export const SCROLL_BUTTON_ICON_SIZE = 22;
+export const SCROLL_BUTTON_GAP_DESKTOP = 37;
 export const SCROLL_BUTTON_GAP = 12;
+export const SCROLL_BUTTON_TOP = 100;
 
 export const TOPICS_PANEL_COLUMN_GAP_DESKTOP = 20;
 export const TOPICS_PANEL_COLUMN_GAP = 12;
