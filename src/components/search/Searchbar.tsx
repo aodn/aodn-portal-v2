@@ -218,7 +218,7 @@ const Searchbar: FC<SearchbarProps> = ({
           ]}
           style={{
             width: searchbarWidth,
-            borderRadius: borderRadius.small,
+            borderRadius: portalTheme.designTokens.borderRadius.md,
             zIndex: 99,
             ...(isMobile
               ? { minWidth: searchbarWidth }
@@ -247,7 +247,7 @@ const Searchbar: FC<SearchbarProps> = ({
               <Paper
                 elevation={location.pathname === pageDefault.search ? 2 : 1}
                 sx={{
-                  borderRadius: borderRadius.small,
+                  borderRadius: portalTheme.designTokens.borderRadius.md,
                   bgcolor: "#fff",
                 }}
                 data-testid="searchbar-popup"
