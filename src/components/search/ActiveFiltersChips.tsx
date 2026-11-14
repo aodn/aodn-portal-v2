@@ -32,6 +32,10 @@ import {
 } from "../map/mapbox/layers/staticLayerOptions";
 import { DATA_SETTINGS } from "../filter/tab-filters/DataSettingsFilter";
 import useElementSize from "../../hooks/useElementSize";
+import {
+  ADDED_FILTERS_LABEL,
+  CLEAR_ALL_FILTERS_LABEL,
+} from "@/components/search/constants";
 
 const ActiveFiltersChips: FC = () => {
   const dispatch = useAppDispatch();
@@ -316,7 +320,7 @@ const ActiveFiltersChips: FC = () => {
           display: { xs: "none", sm: "block" },
         }}
       >
-        Added filters:
+        {ADDED_FILTERS_LABEL}
       </Typography>
       <Stack
         ref={scrollRef}
@@ -348,7 +352,6 @@ const ActiveFiltersChips: FC = () => {
             size="small"
             sx={{
               height: 34,
-              // The 14px close icon's glyph is 8px wide, inset 3px each side
               pl: "14px",
               pr: "11px",
               backgroundColor: portalTheme.palette.primary5,
@@ -361,7 +364,7 @@ const ActiveFiltersChips: FC = () => {
               "& .MuiChip-deleteIcon": {
                 fontSize: 14,
                 m: 0,
-                ml: "9px",
+                ml: 1,
                 color: portalTheme.palette.primary1,
                 backgroundColor: "transparent",
                 "&:hover": {
@@ -387,7 +390,7 @@ const ActiveFiltersChips: FC = () => {
           minWidth: "auto",
           textTransform: "none",
           color: portalTheme.palette.text2,
-          "& .MuiButton-startIcon": { ml: 0, mr: "10px" },
+          "& .MuiButton-startIcon": { ml: 0, mr: 1 },
           "&:hover": {
             backgroundColor: "transparent",
             color: portalTheme.palette.primary1,
@@ -395,7 +398,7 @@ const ActiveFiltersChips: FC = () => {
         }}
         data-testid="clear-all-filters"
       >
-        Clear All
+        {CLEAR_ALL_FILTERS_LABEL}
       </Button>
     </Box>
   );

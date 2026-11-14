@@ -28,3 +28,6 @@ export const DOUBLE_QUOTE_LABEL = "Exact match";
 
 // Marks a suggestion that matched the input by meaning rather than by spelling
 export const SEMANTIC_LABEL = "Related";
+
+export const ADDED_FILTERS_LABEL = "Added filters:";
+export const CLEAR_ALL_FILTERS_LABEL = "Clear All";

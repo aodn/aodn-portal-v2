@@ -4,7 +4,6 @@ import { portalTheme } from "../../../styles";
 
 interface StyledTabProps extends TabProps {
   showBadge?: boolean;
-  // A number shows a count badge instead of the dot; 0 hides it
   badgeContent?: number;
   badgePosition?: Position;
   badgeColor?: string;
@@ -42,7 +41,7 @@ const StyledTab = styled((props: StyledTabProps) => {
                 border: "none",
                 borderRadius: "50%",
                 fontFamily: portalTheme.typography.body2Regular.fontFamily,
-                fontSize: "14.4px",
+                fontSize: "14px",
                 fontWeight: 600,
               },
             }
@@ -68,7 +67,7 @@ const StyledTab = styled((props: StyledTabProps) => {
           }),
           ...(isMobileText && {
             ...portalTheme.typography.body2Regular,
-            fontSize: "14.4px",
+            fontSize: "14px",
             height: "39px",
             minHeight: "39px",
             py: "9.5px",

@@ -65,7 +65,6 @@ import { SearchKeys } from "../constants";
 
 const FILTER_CHUNK_TIMEOUT_MS = 5000;
 
-// The Filter button shows a dot; the count is on each filter tab
 const getFilterButtonDot = () =>
   screen
     .getByTestId("searchbar-button-badge-Filter")
