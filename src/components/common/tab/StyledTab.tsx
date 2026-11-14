@@ -4,6 +4,8 @@ import { portalTheme } from "../../../styles";
 
 interface StyledTabProps extends TabProps {
   showBadge?: boolean;
+  // A number shows a count badge instead of the dot; 0 hides it
+  badgeContent?: number;
   badgePosition?: Position;
   badgeColor?: string;
   isMobileText?: boolean;
@@ -12,6 +14,7 @@ interface StyledTabProps extends TabProps {
 const StyledTab = styled((props: StyledTabProps) => {
   const {
     showBadge = false,
+    badgeContent,
     badgePosition = Position.TopRight,
     badgeColor = portalTheme.palette.secondary1,
     isMobileText = false,
@@ -19,13 +22,32 @@ const StyledTab = styled((props: StyledTabProps) => {
   } = props;
 
   const isIconOnly = !!tabProps.icon && !tabProps.label;
+  const isCount = badgeContent !== undefined;
 
   return (
     <StyledBadge
-      variant="dot"
+      variant={isCount ? "standard" : "dot"}
+      badgeContent={badgeContent}
       position={badgePosition}
       badgeColor={badgeColor}
-      invisible={!showBadge}
+      invisible={isCount ? !badgeContent : !showBadge}
+      sx={
+        isCount
+          ? {
+              "& .MuiBadge-badge": {
+                width: 20,
+                minWidth: 20,
+                height: 20,
+                p: 0,
+                border: "none",
+                borderRadius: "50%",
+                fontFamily: portalTheme.typography.body2Regular.fontFamily,
+                fontSize: "14.4px",
+                fontWeight: 600,
+              },
+            }
+          : undefined
+      }
     >
       <Tab
         {...tabProps}

@@ -11,6 +11,7 @@ export interface Tab {
   value: string;
   component: React.ReactNode;
   showBadge?: boolean;
+  badgeContent?: number;
   icon?: React.ReactNode;
 }
 
@@ -113,6 +114,7 @@ const TabsPanelContainer: FC<TabsPanelContainerProps> = ({
               {...a11yProps(index)}
               sx={{ textTransform: "none" }}
               showBadge={tab.showBadge}
+              badgeContent={tab.badgeContent}
               isMobileText={isMobile && !showIconOnly}
             />
           );

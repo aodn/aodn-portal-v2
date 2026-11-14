@@ -65,6 +65,17 @@ import { SearchKeys } from "../constants";
 
 const FILTER_CHUNK_TIMEOUT_MS = 5000;
 
+// The Filter button shows a dot; the count is on each filter tab
+const getFilterButtonDot = () =>
+  screen
+    .getByTestId("searchbar-button-badge-Filter")
+    .querySelector(".MuiBadge-badge");
+
+const getTabBadge = (tabName: string) =>
+  screen
+    .getByRole("tab", { name: tabName })
+    .parentElement?.querySelector(".MuiBadge-badge");
+
 const openParameterFilters = async () => {
   await userEvent.click(screen.getByTestId("filtersBtn"));
   // Popper mounts first; Filters is a lazy chunk (Suspense fallback is null).
@@ -190,12 +201,11 @@ describe("Searchbar", () => {
       expect(parameterButton2).toHaveAttribute("aria-pressed", "true");
     });
 
-    // Check if the filter button badge is updated with the correct number of selected parameters
-    const filterButtonBadge = screen.getByTestId(
-      "searchbar-button-badge-Filter"
+    // The filter button shows a dot and the Parameters tab counts the selection
+    expect(getFilterButtonDot()).not.toHaveClass("MuiBadge-invisible");
+    await waitFor(() =>
+      expect(getTabBadge("Parameters")).toHaveTextContent("2")
     );
-    expect(filterButtonBadge).toBeInTheDocument();
-    expect(filterButtonBadge).toHaveTextContent("2");
   });
 
   // Redux to UI flow: make sure the searchbar states are updated correctly across pages given redux states
@@ -218,14 +228,17 @@ describe("Searchbar", () => {
       ])
     );
 
-    const filterButtonBadge = screen.getByTestId(
-      "searchbar-button-badge-Filter"
+    // The filter button shows a dot once filters are selected
+    await waitFor(() =>
+      expect(getFilterButtonDot()).not.toHaveClass("MuiBadge-invisible")
     );
 
-    // Check if the filter button badge is updated with the correct number of selected parameters
-    await waitFor(() => expect(filterButtonBadge).toHaveTextContent("2"));
-
     const { parameterPanel } = await openParameterFilters();
+
+    // The Parameters tab counts the selected parameters
+    await waitFor(() =>
+      expect(getTabBadge("Parameters")).toHaveTextContent("2")
+    );
 
     // Get the parameter buttons "Air pressure" and "Visibility" which are selected
     const parameterButton1 = await within(parameterPanel).findByRole("button", {
