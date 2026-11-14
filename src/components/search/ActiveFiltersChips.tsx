@@ -1,5 +1,5 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
-import { Box, Chip, Typography, Button, Stack, useTheme } from "@mui/material";
+import { Box, Chip, Typography, Button, Stack } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import CloseIcon from "@mui/icons-material/Close";
@@ -20,7 +20,8 @@ import {
 import { pageDefault, pageReferer } from "../common/constants";
 import { formatDateRange } from "@/utils/DateUtils";
 import useRedirectSearch from "../../hooks/useRedirectSearch";
-import { borderRadius, color } from "@/styles/constants";
+import { borderRadius } from "@/styles/constants";
+import { portalTheme } from "@/styles";
 import { TrashIcon } from "../../assets/icons/search/trash";
 import {
   BoundaryName,
@@ -31,11 +32,14 @@ import {
 } from "../map/mapbox/layers/staticLayerOptions";
 import { DATA_SETTINGS } from "../filter/tab-filters/DataSettingsFilter";
 import useElementSize from "../../hooks/useElementSize";
+import {
+  ADDED_FILTERS_LABEL,
+  CLEAR_ALL_FILTERS_LABEL,
+} from "@/components/search/constants";
 
 const ActiveFiltersChips: FC = () => {
   const dispatch = useAppDispatch();
   const redirectSearch = useRedirectSearch();
-  const theme = useTheme();
   const params = useAppSelector((state) => state.paramReducer);
   const { pathname } = useLocation();
   const isSearchPage = pathname === pageDefault.search;
@@ -307,20 +311,21 @@ const ActiveFiltersChips: FC = () => {
       }}
     >
       <Typography
-        variant="body2"
         sx={{
+          ...portalTheme.typography.title2Regular,
+          pt: 0,
           whiteSpace: "nowrap",
-          mr: 1.5,
-          color: color.gray.dark,
+          mr: "14px",
+          color: portalTheme.palette.text2,
           display: { xs: "none", sm: "block" },
         }}
       >
-        Added filters:
+        {ADDED_FILTERS_LABEL}
       </Typography>
       <Stack
         ref={scrollRef}
         direction="row"
-        spacing={1}
+        spacing="14px"
         onMouseDown={handleMouseDown}
         onMouseLeave={handleMouseLeave}
         onMouseUp={handleMouseUp}
@@ -346,15 +351,24 @@ const ActiveFiltersChips: FC = () => {
             deleteIcon={<CloseIcon />}
             size="small"
             sx={{
-              backgroundColor: theme.palette.primary5,
+              height: 34,
+              pl: "14px",
+              pr: "11px",
+              backgroundColor: portalTheme.palette.primary5,
               borderRadius: borderRadius.small,
               "& .MuiChip-label": {
-                color: theme.palette.text2,
+                ...portalTheme.typography.body2Regular,
+                color: portalTheme.palette.text2,
+                p: 0,
               },
               "& .MuiChip-deleteIcon": {
-                color: theme.palette.primary1,
+                fontSize: 14,
+                m: 0,
+                ml: 1,
+                color: portalTheme.palette.primary1,
                 backgroundColor: "transparent",
                 "&:hover": {
+                  color: portalTheme.palette.primary1,
                   backgroundColor: "transparent",
                 },
               },
@@ -366,19 +380,25 @@ const ActiveFiltersChips: FC = () => {
         variant="text"
         size="small"
         onClick={handleClearAll}
-        startIcon={<TrashIcon />}
+        startIcon={<TrashIcon color={portalTheme.palette.primary1} />}
         sx={{
+          ...portalTheme.typography.title2Regular,
           ml: 1,
+          px: 0,
           flexShrink: 0,
           whiteSpace: "nowrap",
           minWidth: "auto",
           textTransform: "none",
-          color: theme.palette.primary1,
-          "&:hover": { backgroundColor: "transparent", color: color.blue.dark },
+          color: portalTheme.palette.text2,
+          "& .MuiButton-startIcon": { ml: 0, mr: 1 },
+          "&:hover": {
+            backgroundColor: "transparent",
+            color: portalTheme.palette.primary1,
+          },
         }}
         data-testid="clear-all-filters"
       >
-        Clear all
+        {CLEAR_ALL_FILTERS_LABEL}
       </Button>
     </Box>
   );

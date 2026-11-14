@@ -12,6 +12,7 @@ interface SearchbarExpandableButtonProps {
   showText?: boolean;
   badgeContent?: number;
   dotBadge?: boolean;
+  badgeColor?: string;
   buttonSx?: SxProps;
   containerSx?: SxProps;
   "data-testid"?: string | undefined;
@@ -24,6 +25,7 @@ const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
   onClick = () => {},
   badgeContent,
   dotBadge,
+  badgeColor,
   showText,
   buttonSx,
   containerSx,
@@ -59,6 +61,7 @@ const SearchbarExpandableButton: FC<SearchbarExpandableButtonProps> = ({
       badgeContent={badgeContent}
       variant={dotBadge ? "dot" : "standard"}
       position={Position.TopRight}
+      badgeColor={badgeColor}
       sx={{ padding: 0, ...containerSx }}
       data-testid={`searchbar-button-badge-${text}`}
     >
