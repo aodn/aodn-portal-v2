@@ -80,7 +80,9 @@ const Searchbar: FC<SearchbarProps> = ({
     location.pathname === pageDefault.landing
   );
   const [pendingSearch, setPendingSearch] = useState<boolean>(false);
-  const { ref, width: searchbarWidth } = useElementSize();
+  // Measure the box the popups anchor to; the paper's border would make
+  // them narrower than the bar
+  const { width: searchbarWidth } = useElementSize(boxRef);
   const redirectSearch = useRedirectSearch();
   const popperRef = useRef<any>(null);
   const params = useAppSelector((state) => state.paramReducer);
@@ -156,7 +158,6 @@ const Searchbar: FC<SearchbarProps> = ({
     <Box width="100%" ref={boxRefCallback}>
       <Paper
         id="searchbar-paper"
-        ref={ref}
         elevation={0}
         sx={{
           display: "flex",
