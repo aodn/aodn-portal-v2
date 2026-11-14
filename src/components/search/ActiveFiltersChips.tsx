@@ -309,6 +309,7 @@ const ActiveFiltersChips: FC = () => {
       <Typography
         sx={{
           ...portalTheme.typography.title2Regular,
+          pt: 0,
           whiteSpace: "nowrap",
           mr: "14px",
           color: portalTheme.palette.text2,
