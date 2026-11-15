@@ -251,6 +251,12 @@ const SearchbarButtonGroup: FC<SearchbarButtonGroupProps> = ({
         }}
         text={capitalizeFirstLetter(SearchbarButtonNames.Filter)}
         badgeContent={filterCount}
+        dotBadge
+        badgeColor={
+          isPopupOpen && activeButton === SearchbarButtonNames.Filter
+            ? portalTheme.palette.text3
+            : undefined
+        }
         onClick={() => handleClickButton(SearchbarButtonNames.Filter)}
         showText={
           shouldShrinkAllButtons
