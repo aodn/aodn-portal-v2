@@ -16,9 +16,9 @@ const NewsCard: FC<NewsCardProps> = ({ news }) => {
         height: "100%",
         overflow: "hidden",
         borderRadius: 1,
-        bgcolor: alpha(white, 0.06),
+        bgcolor: alpha(white, 0.04),
         minHeight: 252,
-        border: `1px solid ${alpha(white, 0.12)}`,
+        border: `1px solid ${alpha(white, 0.14)}`,
         display: "flex",
         flexDirection: "column",
         color: white,
@@ -111,7 +111,9 @@ const NewsCard: FC<NewsCardProps> = ({ news }) => {
           component="h4"
           variant="subtitle1"
           sx={{
-            my: "11px",
+            mt: "13px",
+            mb: "11px",
+            fontFamily: portalTheme.typography.heading3.fontFamily,
             fontSize: 20,
             lineHeight: "26px",
             fontWeight: 500,
@@ -140,9 +142,11 @@ const NewsCard: FC<NewsCardProps> = ({ news }) => {
           sx={{
             alignSelf: "flex-end",
             mt: "auto",
-            color: alpha(white, 0.8),
+            color: portalTheme.palette.primary6,
             fontSize: portalTheme.typography.title2Regular.fontSize,
+            fontWeight: 400,
             lineHeight: "24px",
+            "& .MuiButton-endIcon svg": { fontSize: 18 },
             textTransform: "none",
             px: 0,
           }}

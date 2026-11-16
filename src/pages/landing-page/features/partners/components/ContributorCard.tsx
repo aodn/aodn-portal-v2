@@ -74,8 +74,8 @@ const ContributorCard: FC<ContributorCardProps> = ({
         bgcolor: palette.neutral2,
         border: `1px solid ${PARTNERS_COLOURS.cardBorder}`,
         borderTop: `5px solid ${accent}`,
-        borderRadius: portalTheme.borderRadius.lg,
-        boxShadow: `0 1px 3px ${alpha(SHADOW_COLOUR, 0.06)}`,
+        borderRadius: portalTheme.borderRadius.xlg,
+        boxShadow: `0 1px 2px ${alpha(SHADOW_COLOUR, 0.06)}, 0 2px 8px ${alpha(SHADOW_COLOUR, 0.06)}`,
         outlineOffset: "3px",
         transition: "transform .18s, box-shadow .18s",
         "&:hover, &:focus-within": {
@@ -149,8 +149,14 @@ const ContributorCard: FC<ContributorCardProps> = ({
         >
           <Typography
             component="h3"
-            variant={isMobile ? "heading4" : "heading3"}
-            sx={{ color: PARTNERS_COLOURS.heading }}
+            variant="heading3"
+            sx={{
+              fontFamily: portalTheme.typography.title2Regular.fontFamily,
+              fontWeight: 700,
+              fontSize: isMobile ? "16px" : "23px",
+              lineHeight: isMobile ? "22px" : "26px",
+              color: PARTNERS_COLOURS.heading,
+            }}
           >
             {shortName}
           </Typography>
@@ -160,7 +166,7 @@ const ContributorCard: FC<ContributorCardProps> = ({
             sx={{
               ...lineClamp(2),
               mt: isMobile ? "3px" : "6px",
-              color: PARTNERS_COLOURS.cardText,
+              color: palette.text2,
             }}
           >
             {fullName}

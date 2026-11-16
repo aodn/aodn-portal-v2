@@ -210,14 +210,19 @@ export const designTokensRC8 = {
       tag4: "#DCE4FF",
     },
 
+    // Landing page Featured Datasets section: base and the two swoosh shapes
+    featuredDatasets: {
+      background: "#002B45",
+      swoosh1: "#00354D",
+      swoosh2: "#003354",
+    },
+
     // Landing page partners section (IMOS data card, contributors, NCRIS)
     partners: {
       heading: "#12293F",
       subtitle: "#5B7183",
-      bodyText: "#33424E",
+      bodyText: "#33505F",
       cardBorder: "#D3E0E9",
-      cardText: "#41586A",
-      buttonText: "#12212C",
       buttonHover: "#DCECF5",
       // IMOS data card background, from dark to light
       imosCard1: "#091B2C",
