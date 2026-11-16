@@ -153,7 +153,6 @@ const determineXWithBucketsBy = (
   return { xValues, buckets };
 };
 
-// SVG text styles from the theme variants (16px axis/legend, 14px ticks)
 const chartTextStyle = (
   variant: "title2Regular" | "body2Regular"
 ): ChartsTextStyle => {
@@ -163,7 +162,6 @@ const chartTextStyle = (
     fontSize,
     fontWeight,
     fill: portalTheme.palette.text2,
-    // x-charts copies the older theme's body1 colour onto axis labels
     color: portalTheme.palette.text2,
   };
 };
@@ -192,7 +190,6 @@ const createSeries = (buckets: Bucket[]) => {
     stack: "total",
     label: "All Records",
     data: buckets.map((m: Bucket) => m.total - m.imosOnlyCount),
-    // Solid tint of primary1 (#B4C8D4), so IMOS bars stand out against it
     color: lighten(portalTheme.palette.primary1, 0.62),
   };
 

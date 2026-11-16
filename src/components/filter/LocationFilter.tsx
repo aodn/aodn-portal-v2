@@ -162,22 +162,22 @@ const LocationCheckboxList: FC<{
     data-testid={testId}
     sx={{
       width: "100%",
-      maxHeight: isMobile ? "calc(100vh - 360px)" : "400px",
+      maxHeight: isMobile ? "calc(100vh - 360px)" : "420px",
       minHeight: 0,
       overflowY: "auto",
       overflowX: "hidden",
-      // Chrome ignores the ::-webkit-scrollbar styles (8px global width from
-      // ScrollBar.tsx) when scrollbar-color is set, so only Firefox gets it.
+      // Chrome ignores ::-webkit-scrollbar styles (including the global 8px
+      // width from ScrollBar.tsx) once scrollbar-color is set, so
+      // scrollbar-color is limited to browsers without ::-webkit-scrollbar
+      // (Firefox).
       "@supports not selector(::-webkit-scrollbar)": {
         scrollbarColor: `${alpha(theme.palette.primary1, 0.7)} ${alpha(theme.palette.primary1, 0.1)}`,
       },
       "&::-webkit-scrollbar-thumb": {
         backgroundColor: alpha(theme.palette.primary1, 0.7),
-        borderRadius: "7px",
       },
       "&::-webkit-scrollbar-track": {
         backgroundColor: alpha(theme.palette.primary1, 0.1),
-        borderRadius: "7px",
       },
     }}
   >
@@ -651,8 +651,14 @@ const LocationFilter: FC<LocationFilterProps> = () => {
         value={modeRadios.findIndex((m) => m.value === filterMode)}
         onChange={handleFilterModeChange}
         sx={{
-          backgroundColor: theme.palette.primary6,
+          backgroundColor: alpha(theme.palette.primary6, 0.8),
+          boxShadow:
+            "inset 0 2px 8px rgba(0, 0, 0, 0.1), inset 0 -2px 8px rgba(0, 0, 0, 0.1)",
+          borderTopLeftRadius: theme.designTokens.borderRadius.md,
+          borderTopRightRadius: theme.designTokens.borderRadius.md,
+          borderBottom: "none",
           px: isMobile ? "12px" : "28px",
+          "& .MuiTab-root": { my: 2 },
         }}
       >
         {modeRadios.map((m) => {
@@ -681,6 +687,7 @@ const LocationFilter: FC<LocationFilterProps> = () => {
           flexDirection: isMobile ? "column" : "row",
           width: "100%",
           padding: padding.large,
+          py: isMobile ? padding.large : 1.25,
           pl: isMobile ? padding.large : 4,
           pr: isMobile ? padding.large : 1.5,
           gap: 2,
@@ -728,7 +735,7 @@ const LocationFilter: FC<LocationFilterProps> = () => {
         {!isMobile && (
           <Box
             id={MAP_ID}
-            sx={{ flex: 1, minHeight: "400px", position: "relative" }}
+            sx={{ flex: 1, minHeight: "420px", position: "relative" }}
           >
             {!mapReady && (
               <Box

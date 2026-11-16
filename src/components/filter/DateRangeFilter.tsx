@@ -77,7 +77,6 @@ const DEFAULT_SEARCH_START_DATE = toAppDayjs(
   dateDefault.DATE_FORMAT
 );
 
-// Start and End date fields
 const DATE_PICKER_SX = {
   width: "240px",
   maxWidth: { xs: "216px", sm: "240px" },
@@ -87,7 +86,6 @@ const DATE_PICKER_SX = {
   "& .MuiInputBase-root": { height: "46px", pl: { xs: 1, sm: 2 }, pr: 1.5 },
   "& input": {
     ...theme.typography.title2Regular,
-    // 14px on phones so the full date fits beside the label
     fontSize: { xs: "14px", sm: theme.typography.title2Regular.fontSize },
     color: theme.palette.grey700,
   },
@@ -554,10 +552,24 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                   formatDate(unixMsToAppDayjs(value))
                 }
                 sx={{
-                  // PlainSlider's 16px side margin pushed the full-width rail
-                  // 16px past the right edge; keep it inside this box.
                   mx: 0,
-                  "& .MuiSlider-rail": { height: "8px", opacity: 1 },
+                  "& .MuiSlider-rail": {
+                    height: "8px",
+                    opacity: 1,
+                    "&::before, &::after": {
+                      content: '""',
+                      position: "absolute",
+                      top: "50%",
+                      width: "9px",
+                      height: "9px",
+                      borderRadius: "50%",
+                      backgroundColor: theme.palette.common.white,
+                      boxShadow: "0 0 4px rgba(0, 0, 0, 0.5)",
+                      transform: "translate(-50%, -50%)",
+                    },
+                    "&::before": { left: 0 },
+                    "&::after": { left: "100%" },
+                  },
                   "& .MuiSlider-valueLabel, & .MuiSlider-valueLabelLabel": {
                     ...theme.typography.title2Regular,
                   },
@@ -572,7 +584,6 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                   },
                 }}
               />
-              {/* Centred under the two ends of the rail */}
               <Box
                 sx={{
                   display: "flex",
