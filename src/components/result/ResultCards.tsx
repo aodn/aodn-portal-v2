@@ -21,13 +21,14 @@ import { SearchResultLayoutEnum } from "../common/buttons/ResultListLayoutButton
 import useFetchData from "../../hooks/useFetchData";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import { GRID_CARD_HEIGHT, LIST_CARD_HEIGHT } from "./constants";
-import { ResultCardBasicType } from "./types";
+import { ResultCardBasicEvent, ResultCardBasicProps } from "./types";
 import { detailPageDefault, pageReferer } from "../common/constants";
 import ShowMoreDetailBtn from "../common/buttons/ShowMoreDetailBtn";
 
 export type { ResultCardBasicType } from "./types";
 
-interface ResultCardsListType extends ResultCardBasicType {
+interface ResultCardsListType
+  extends ResultCardBasicEvent, ResultCardBasicProps {
   count: number;
   total: number;
   contents: CollectionsQueryType;
@@ -38,20 +39,14 @@ interface ResultCardsListType extends ResultCardBasicType {
     | undefined;
 }
 
-export interface ResultCardsType {
+export interface ResultCardsType
+  extends ResultCardBasicEvent, ResultCardBasicProps {
   scrollRootRef?: RefObject<HTMLDivElement>;
   layout:
     | Exclude<SearchResultLayoutEnum, SearchResultLayoutEnum.FULL_MAP>
     | undefined;
   contents: CollectionsQueryType;
-  onClickCard?: ((item: OGCCollection | undefined) => void) | undefined;
-  onClickDetail?: ((uuid: string | undefined) => void) | undefined;
-  onClickDownload?: ((uuid: string | undefined) => void) | undefined;
-  onClickLinks?: ((uuid: string | undefined) => void) | undefined;
   selectedUuids: string[] | undefined;
-}
-interface ResultCardsProps extends ResultCardsType {
-  sx?: SxProps;
 }
 
 const renderListCards: FC<ResultCardsListType> = ({
@@ -62,6 +57,8 @@ const renderListCards: FC<ResultCardsListType> = ({
   renderLoadMoreButton,
   loadMoreRef,
   onClickCard,
+  onMouseEnterCard,
+  onMouseLeaveCard,
   onClickDetail,
   onClickLinks,
   onClickDownload,
@@ -74,7 +71,16 @@ const renderListCards: FC<ResultCardsListType> = ({
   const isFullListView = layout === SearchResultLayoutEnum.FULL_LIST;
 
   return (
-    <Box sx={sx} data-testid="resultcard-result-list">
+    <Box
+      sx={sx}
+      data-testid="resultcard-result-list"
+      // Clear only after the pointer leaves the list. Leaving one card for
+      // the next was dispatching a clear that the bookmark EXPAND replay
+      // applied after the next card had already been selected.
+      onMouseLeave={() => {
+        if (!isSimplified) onMouseLeaveCard?.(undefined);
+      }}
+    >
       <Grid container spacing={1} sx={{ width: "100%" }}>
         {contents.result.collections.map(
           (collection: OGCCollection, index: number) => (
@@ -95,6 +101,7 @@ const renderListCards: FC<ResultCardsListType> = ({
               <ListResultCard
                 content={collection}
                 onClickCard={onClickCard}
+                onMouseEnterCard={onMouseEnterCard}
                 onClickDetail={onClickDetail}
                 onClickLinks={onClickLinks}
                 onClickDownload={
@@ -128,6 +135,8 @@ const renderGridCards: FC<ResultCardsListType> = ({
   total,
   renderLoadMoreButton,
   onClickCard,
+  onMouseEnterCard,
+  onMouseLeaveCard,
   onClickDetail,
   onClickLinks,
   onClickDownload,
@@ -137,7 +146,13 @@ const renderGridCards: FC<ResultCardsListType> = ({
   if (!count || !total || !contents) return;
 
   return (
-    <Box sx={sx} data-testid="resultcard-result-grid">
+    <Box
+      sx={sx}
+      data-testid="resultcard-result-grid"
+      onMouseLeave={() => {
+        if (!isSimplified) onMouseLeaveCard?.(undefined);
+      }}
+    >
       <Grid container spacing={1} sx={{ width: "100%" }}>
         {contents.result.collections.map(
           (collection: OGCCollection, index: number) => (
@@ -157,6 +172,7 @@ const renderGridCards: FC<ResultCardsListType> = ({
               <GridResultCard
                 content={collection}
                 onClickCard={onClickCard}
+                onMouseEnterCard={onMouseEnterCard}
                 onClickDetail={onClickDetail}
                 onClickLinks={onClickLinks}
                 onClickDownload={
@@ -180,11 +196,13 @@ const renderGridCards: FC<ResultCardsListType> = ({
   );
 };
 
-const ResultCards: FC<ResultCardsProps> = ({
+const ResultCards: FC<ResultCardsType> = ({
   scrollRootRef,
   layout,
   contents,
   onClickCard,
+  onMouseEnterCard,
+  onMouseLeaveCard,
   onClickDetail,
   onClickLinks,
   onClickDownload,
@@ -320,6 +338,8 @@ const ResultCards: FC<ResultCardsProps> = ({
       renderLoadMoreButton,
       loadMoreRef: setLoadMoreNode,
       onClickCard: onClickBtnCard,
+      onMouseEnterCard,
+      onMouseLeaveCard,
       onClickDetail: onClickBtnDetail,
       onClickLinks: onClickBtnLinks,
       onClickDownload: onClickBtnDownload,
@@ -336,6 +356,8 @@ const ResultCards: FC<ResultCardsProps> = ({
       total,
       renderLoadMoreButton,
       onClickCard: onClickBtnCard,
+      onMouseEnterCard: onMouseEnterCard,
+      onMouseLeaveCard: onMouseLeaveCard,
       onClickDetail: onClickBtnDetail,
       onClickLinks: onClickBtnLinks,
       onClickDownload: onClickBtnDownload,
@@ -352,6 +374,8 @@ const ResultCards: FC<ResultCardsProps> = ({
       total,
       renderLoadMoreButton,
       onClickCard: onClickBtnCard,
+      onMouseEnterCard: onMouseEnterCard,
+      onMouseLeaveCard: onMouseLeaveCard,
       onClickDetail: onClickBtnDetail,
       onClickLinks: onClickBtnLinks,
       onClickDownload: onClickBtnDownload,

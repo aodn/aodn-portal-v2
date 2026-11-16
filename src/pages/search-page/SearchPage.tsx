@@ -484,6 +484,11 @@ const SearchPage = () => {
   const onClickResultCard = useCallback(
     (item: OGCCollection | undefined) => {
       if (item) {
+        // setExpandedItem emits EXPAND, and that listener calls this again.
+        // Skip the replay so moving across cards does not select twice.
+        if (selectedUuids.length === 1 && selectedUuids[0] === item.id) {
+          return;
+        }
         setSelectedUuids([item.id]);
 
         const temporaryItemExisting = findTemporaryItemExisting(item.id);
@@ -494,9 +499,15 @@ const SearchPage = () => {
           dispatch(setTemporaryItem(item));
           dispatch(setExpandedItem(item));
         }
+      } else if (selectedUuids.length > 0) {
+        // Reset selection. The EXPAND replay of this clear is ignored above
+        // once selectedUuids has been emptied.
+        setSelectedUuids([]);
+        dispatch(setExpandedItem(undefined));
+        dispatch(setTemporaryItem(undefined));
       }
     },
-    [dispatch, findTemporaryItemExisting]
+    [dispatch, findTemporaryItemExisting, selectedUuids]
   );
 
   const onDeselectDataset = useCallback(() => {
@@ -573,9 +584,13 @@ const SearchPage = () => {
 
   useEffect(() => {
     const bookmarkSelected = (event: BookmarkEvent) => {
-      if (event.action === EVENT_BOOKMARK.EXPAND) {
-        onClickResultCard(event.value);
-      }
+      if (event.action !== EVENT_BOOKMARK.EXPAND) return;
+      // setExpandedItem emits the payload it was called with, after a timeout.
+      // A fast move from one card to the next leaves the previous emit stale,
+      // and applying it reselects the card the pointer already left.
+      const expandedId = store.getState().bookmarkList.expandedItem?.id;
+      if (event.value?.id !== expandedId) return;
+      onClickResultCard(event.value);
     };
     on(EVENT_BOOKMARK.EXPAND, bookmarkSelected);
 
@@ -668,7 +683,8 @@ const SearchPage = () => {
         <ResultSection
           showFullMap={layout === SearchResultLayoutEnum.FULL_MAP}
           showFullList={layout === SearchResultLayoutEnum.FULL_LIST}
-          onClickCard={onClickResultCard}
+          onMouseEnterCard={onClickResultCard}
+          onMouseLeaveCard={onClickResultCard}
           selectedUuids={selectedUuids}
           currentSort={currentSort}
           onChangeSorting={onChangeSorting}
