@@ -19,7 +19,6 @@ const {
   imosCard4,
   imosStats,
   imosGlow,
-  buttonText,
   buttonHover,
 } = PARTNERS_COLOURS;
 const { palette } = portalTheme;
@@ -152,7 +151,7 @@ const ImosDataCard: FC<ImosDataCardProps> = ({ onExplore }) => {
             sx={{
               display: "block",
               width: "auto",
-              height: isLargeMobile ? "38px" : "44px",
+              height: isLargeMobile ? "38px" : "53px",
             }}
           />
           <Box
@@ -162,7 +161,7 @@ const ImosDataCard: FC<ImosDataCardProps> = ({ onExplore }) => {
           <Typography
             component="p"
             variant={isLargeMobile ? "heading4" : "heading3"}
-            sx={{ fontWeight: 400, color: palette.primary4 }}
+            sx={{ color: palette.primary4 }}
           >
             Access to IMOS Data
           </Typography>
@@ -219,11 +218,12 @@ const ImosDataCard: FC<ImosDataCardProps> = ({ onExplore }) => {
             endIcon={<ArrowForwardIcon />}
             sx={{
               ...portalTheme.typography.title2Regular,
+              fontWeight: 500,
               height: "48px",
               px: "24px",
-              color: buttonText,
+              color: palette.text2,
               bgcolor: WHITE,
-              borderRadius: portalTheme.borderRadius.sm,
+              borderRadius: portalTheme.borderRadius.md,
               textTransform: "none",
               "&:hover": { bgcolor: buttonHover },
             }}
@@ -256,7 +256,10 @@ const ImosDataCard: FC<ImosDataCardProps> = ({ onExplore }) => {
             <Typography
               component="p"
               variant={isLargeMobile ? "heading3" : "heading2"}
-              sx={{ color: WHITE }}
+              sx={{
+                color: WHITE,
+                ...(!isUnderLaptop && { fontSize: "28px", lineHeight: "34px" }),
+              }}
             >
               {stat.value}
             </Typography>

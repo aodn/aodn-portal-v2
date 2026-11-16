@@ -21,7 +21,7 @@ const NcrisCard: FC = () => {
         p: isMobile ? "20px" : "22px 40px",
         bgcolor: portalTheme.palette.neutral2,
         border: `1px solid ${PARTNERS_COLOURS.cardBorder}`,
-        borderRadius: portalTheme.borderRadius.lg,
+        borderRadius: portalTheme.designTokens.borderRadius.card,
         boxShadow: `0 1px 3px ${alpha(PARTNERS_COLOURS.imosCard1, 0.06)}`,
       }}
     >
@@ -40,7 +40,11 @@ const NcrisCard: FC = () => {
       <Typography
         component="p"
         variant="title2Regular"
-        sx={{ maxWidth: "1070px", color: PARTNERS_COLOURS.bodyText }}
+        sx={{
+          maxWidth: "1070px",
+          fontWeight: 500,
+          color: PARTNERS_COLOURS.bodyText,
+        }}
       >
         Australia&rsquo;s Integrated Marine Observing System (IMOS) is enabled
         by the National Collaborative Research Infrastructure Strategy (NCRIS).

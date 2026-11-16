@@ -14,6 +14,13 @@ import {
 } from "@/app/store/componentParamReducer";
 import useRedirectSearch from "@/hooks/useRedirectSearch";
 
+const { swoosh1, swoosh2 } = portalTheme.designTokens.colours.featuredDatasets;
+// Background shapes in a 1920 × 877 box (the section size at 1920px)
+const SWOOSH_LEFT =
+  "M-363 230.219C-363 230.219 -103.97 807.924 431.806 854.792C967.888 901.328 1269.38 505.111 1335.36 381.459C1335.36 381.459 1258.69 261.132 1112.98 260.467C967.277 259.802 922.374 318.969 756.204 471.539C590.034 624.109 123.597 951.852 -363 230.551V230.219Z";
+const SWOOSH_RIGHT =
+  "M463.95 517.353C463.95 517.353 722.933 -60.3527 1258.92 -107.221C1794.6 -153.756 2096.03 242.461 2162 366.112C2162 366.112 1809.56 124.792 1787.57 275.7C1764.67 432.259 1749.4 428.603 1583.26 275.7C1417.12 123.13 950.46 -204.613 463.645 516.688L463.95 517.353Z";
+
 const News: FC = () => {
   const dispatch = useAppDispatch();
   const redirectSearch = useRedirectSearch();
@@ -53,16 +60,27 @@ const News: FC = () => {
         color: white,
         position: "relative",
         isolation: "isolate",
-        "&::before": {
-          content: '""',
-          position: "absolute",
-          zIndex: -1,
-          inset: "0 calc((100% - 100vw) / 2)",
-          pointerEvents: "none",
-          background: `radial-gradient(ellipse at 25% 10%, transparent 48%, ${alpha(portalTheme.palette.primary.main, 0.15)} 48.2%, ${alpha(portalTheme.palette.primary.main, 0.15)} 57%, transparent 57.2%), radial-gradient(ellipse at 85% 90%, transparent 46%, ${alpha(portalTheme.palette.primary.main, 0.12)} 46.2%, ${alpha(portalTheme.palette.primary.main, 0.12)} 59%, transparent 59.2%)`,
-        },
       }}
     >
+      {/* Two swoosh shapes across the full section width */}
+      <Box
+        component="svg"
+        aria-hidden
+        viewBox="0 0 1920 877"
+        preserveAspectRatio="xMidYMid slice"
+        sx={{
+          position: "absolute",
+          zIndex: -1,
+          top: 0,
+          left: "calc((100% - 100vw) / 2)",
+          width: "100vw",
+          height: "100%",
+          pointerEvents: "none",
+        }}
+      >
+        <path d={SWOOSH_LEFT} fill={swoosh1} />
+        <path d={SWOOSH_RIGHT} fill={swoosh2} />
+      </Box>
       <Stack
         direction="row"
         justifyContent="space-between"

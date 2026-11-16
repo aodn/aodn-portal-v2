@@ -48,7 +48,12 @@ const LandingPage: FC = () => {
       </SectionContainer>
 
       <SectionContainer
-        sectionAreaStyle={{ backgroundColor: color.blue.extraDark }}
+        sectionAreaStyle={{
+          backgroundColor: isFeaturedDatasetsSectionEnabled
+            ? portalTheme.designTokens.colours.featuredDatasets.background
+            : color.blue.extraDark,
+          overflow: "hidden",
+        }}
         contentAreaStyle={{ width: PAGE_CONTENT_WIDTH_LANDING }}
       >
         {isFeaturedDatasetsSectionEnabled ? <News /> : <LegacyNews />}
