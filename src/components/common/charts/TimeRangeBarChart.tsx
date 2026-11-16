@@ -1,8 +1,10 @@
 import React, { useCallback, useMemo } from "react";
 import { axisClasses, BarSeriesType, BarChart } from "@mui/x-charts";
 import { OGCCollections } from "@/app/store/OGCCollectionDefinitions";
-import { color } from "@/styles/constants";
+import { lighten } from "@mui/material";
+import { portalTheme } from "@/styles";
 import { legendClasses } from "@mui/x-charts/ChartsLegend";
+import { ChartsTextStyle } from "@mui/x-charts/ChartsText";
 import dayjs, { Dayjs } from "@/utils/DayjsUtils";
 import { dateDefault } from "@/components/common/constants";
 import { toUtcStartOfDay } from "@/utils/DateUtils";
@@ -151,6 +153,21 @@ const determineXWithBucketsBy = (
   return { xValues, buckets };
 };
 
+const chartTextStyle = (
+  variant: "title2Regular" | "body2Regular"
+): ChartsTextStyle => {
+  const { fontFamily, fontSize, fontWeight } = portalTheme.typography[variant];
+  return {
+    fontFamily,
+    fontSize,
+    fontWeight,
+    fill: portalTheme.palette.text2,
+    color: portalTheme.palette.text2,
+  };
+};
+const AXIS_LABEL_STYLE = chartTextStyle("title2Regular");
+const TICK_LABEL_STYLE = chartTextStyle("body2Regular");
+
 const seriesFormatter = (value: number | null): string => {
   return value == null ? "" : `${value}`;
 };
@@ -164,7 +181,7 @@ const createSeries = (buckets: Bucket[]) => {
     stack: "total",
     label: "IMOS Records",
     data: buckets.map((m: Bucket) => m.imosOnlyCount),
-    color: color.blue.dark,
+    color: portalTheme.palette.primary1,
   };
   const others: BarSeriesType = {
     id: "others-data-id",
@@ -173,7 +190,7 @@ const createSeries = (buckets: Bucket[]) => {
     stack: "total",
     label: "All Records",
     data: buckets.map((m: Bucket) => m.total - m.imosOnlyCount),
-    color: color.blue.darkSemiTransparent,
+    color: lighten(portalTheme.palette.primary1, 0.62),
   };
 
   series.push(imos);
@@ -220,7 +237,7 @@ const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
 
   return (
     <BarChart
-      height={180}
+      height={266}
       margin={{
         right: 50,
         left: 80,
@@ -234,13 +251,11 @@ const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
             vertical: "top", // Changed to top for better responsiveness
             horizontal: "middle",
           },
-          itemMarkWidth: 15,
-          itemMarkHeight: 15,
-          markGap: 10,
-          itemGap: 20,
-          labelStyle: {
-            fontSize: 12,
-          },
+          itemMarkWidth: 16,
+          itemMarkHeight: 16,
+          markGap: 14,
+          itemGap: 40,
+          labelStyle: AXIS_LABEL_STYLE,
         },
       }}
       xAxis={[
@@ -253,27 +268,21 @@ const TimeRangeBarChart: React.FC<TimeRangeBarChartProps> = ({
             selectedStartDate,
             selectedEndDate
           ).toString(), // x-axis label
-          labelStyle: {
-            fontSize: 12,
-            fontWeight: "bold",
-          },
+          labelStyle: AXIS_LABEL_STYLE,
+          tickLabelStyle: TICK_LABEL_STYLE,
         },
       ]}
       yAxis={[
         {
           label: "Count of Records", // y-axis label
-          labelStyle: {
-            fontSize: 12,
-            fontWeight: "bold",
-          },
-          tickLabelStyle: {
-            fontSize: 12,
-          },
+          labelStyle: AXIS_LABEL_STYLE,
+          tickLabelStyle: TICK_LABEL_STYLE,
         },
       ]}
       sx={{
         [`.${axisClasses.left} .${axisClasses.label}`]: {
-          transform: "translate(-20px, 0)",
+          // 13px clear of 5-character tick labels such as "6,000"
+          transform: "translate(-33px, 0)",
         },
         [`.${legendClasses.mark}`]: {
           rx: 4,
