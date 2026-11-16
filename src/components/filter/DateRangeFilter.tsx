@@ -10,6 +10,7 @@ import {
 } from "react";
 import { Dayjs } from "@/utils/DayjsUtils";
 import {
+  alpha,
   Box,
   Divider,
   FormControl,
@@ -75,6 +76,22 @@ const DEFAULT_SEARCH_START_DATE = toAppDayjs(
   "1970-01-01",
   dateDefault.DATE_FORMAT
 );
+
+// Start and End date fields
+const DATE_PICKER_SX = {
+  width: "240px",
+  maxWidth: { xs: "216px", sm: "240px" },
+  border: "none",
+  borderRadius: theme.borderRadius.sm,
+  boxShadow: "0 0 4px 1px rgba(0, 0, 0, 0.15)",
+  "& .MuiInputBase-root": { height: "46px", pl: { xs: 1, sm: 2 }, pr: 1.5 },
+  "& input": {
+    ...theme.typography.title2Regular,
+    // 14px on phones so the full date fits beside the label
+    fontSize: { xs: "14px", sm: theme.typography.title2Regular.fontSize },
+    color: theme.palette.grey700,
+  },
+};
 
 interface DateRangeFilterProps {}
 
@@ -306,7 +323,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
           pt={isMobile || isTablet ? padding.large : padding.triple}
           width="100%"
         >
-          <Typography mb={2} variant="title1Medium">
+          <Typography mb={2} variant="title2Regular">
             Filter by
           </Typography>
           <FormControl sx={{ paddingLeft: "20px" }}>
@@ -324,8 +341,10 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                   control={
                     <Radio
                       sx={{
+                        color: alpha(theme.palette.text1, 0.38),
+                        "& .MuiSvgIcon-root": { fontSize: 22 },
                         "&.Mui-checked": {
-                          color: theme.palette.secondary2,
+                          color: theme.palette.primary1,
                         },
                       }}
                     />
@@ -335,7 +354,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                   data-testid={`radio-${item.label}`}
                   slotProps={{
                     typography: {
-                      variant: "body2Regular",
+                      variant: "title2Regular",
                       sx: { padding: 0 },
                     },
                   }}
@@ -421,8 +440,8 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
           <Box
             sx={{
               width: "100%",
-              pt: padding.triple,
-              pb: padding.large,
+              pt: isMobile ? padding.triple : 4.5,
+              pb: isMobile ? padding.large : 6,
               pl: padding.triple,
               pr: padding.triple,
             }}
@@ -439,17 +458,17 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                 alignItems="center"
                 justifyContent="space-between"
                 width={{ xs: "100%", md: "auto" }}
-                gap={2}
+                gap={{ xs: 2, sm: 3.5 }}
                 data-testid="start-date-picker"
               >
                 <Typography
-                  variant="title1Medium"
-                  sx={{ textAlign: "left", minWidth: "85px" }}
+                  variant="title2Regular"
+                  sx={{ textAlign: "left", minWidth: "85px", padding: 0 }}
                 >
                   Start&nbsp;Date
                 </Typography>
                 <PlainDatePicker
-                  sx={{ maxWidth: { xs: "216px", sm: "none" } }}
+                  sx={DATE_PICKER_SX}
                   views={["year", "month", "day"]}
                   format={dateDefault.DISPLAY_FORMAT}
                   value={minDate}
@@ -463,9 +482,9 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                     ...DEFAULT_DATE_PICKER_SLOT,
                     popper: { disablePortal: true },
                     openPickerIcon: {
-                      color: theme.palette.grey600,
-                      width: 22,
-                      height: 22,
+                      color: theme.palette.secondary1,
+                      width: 24,
+                      height: 24,
                     },
                   }}
                 />
@@ -475,17 +494,17 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                 alignItems="center"
                 justifyContent="space-between"
                 width={{ xs: "100%", md: "auto" }}
-                gap={2}
+                gap={{ xs: 2, sm: 3.5 }}
                 data-testid="end-date-picker"
               >
                 <Typography
-                  variant="title1Medium"
-                  sx={{ textAlign: "left", minWidth: "85px" }}
+                  variant="title2Regular"
+                  sx={{ textAlign: "left", minWidth: "85px", padding: 0 }}
                 >
                   End&nbsp;Date
                 </Typography>
                 <PlainDatePicker
-                  sx={{ maxWidth: { xs: "216px", sm: "none" } }}
+                  sx={DATE_PICKER_SX}
                   views={["year", "month", "day"]}
                   format={dateDefault.DISPLAY_FORMAT}
                   value={maxDate}
@@ -499,9 +518,9 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                     ...DEFAULT_DATE_PICKER_SLOT,
                     popper: { disablePortal: true },
                     openPickerIcon: {
-                      color: theme.palette.grey600,
-                      width: 22,
-                      height: 22,
+                      color: theme.palette.secondary1,
+                      width: 24,
+                      height: 24,
                     },
                   }}
                 />
@@ -521,7 +540,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
               sx={{
                 width: "90%",
                 mx: "auto",
-                paddingTop: padding.extraLarge,
+                paddingTop: isMobile ? padding.extraLarge : 8,
               }}
             >
               <PlainSlider
@@ -534,7 +553,26 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                 valueLabelFormat={(value: number) =>
                   formatDate(unixMsToAppDayjs(value))
                 }
+                sx={{
+                  // PlainSlider's 16px side margin pushed the full-width rail
+                  // 16px past the right edge; keep it inside this box.
+                  mx: 0,
+                  "& .MuiSlider-rail": { height: "8px", opacity: 1 },
+                  "& .MuiSlider-valueLabel, & .MuiSlider-valueLabelLabel": {
+                    ...theme.typography.title2Regular,
+                  },
+                  "& .MuiSlider-valueLabel": {
+                    backgroundColor: theme.palette.common.white,
+                    border: "none",
+                    borderRadius: "6px",
+                    boxShadow: "1px 1px 4px rgba(0, 0, 0, 0.1)",
+                    padding: theme.spacing(0.5, 1),
+                    backdropFilter: "none",
+                    WebkitBackdropFilter: "none",
+                  },
+                }}
               />
+              {/* Centred under the two ends of the rail */}
               <Box
                 sx={{
                   display: "flex",
@@ -542,10 +580,18 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                   alignItems: "center",
                 }}
               >
-                <Typography padding={0} variant="body2Regular">
+                <Typography
+                  padding={0}
+                  variant="title2Regular"
+                  sx={{ transform: "translateX(-50%)" }}
+                >
                   {formatDate(initialMinDate)}
                 </Typography>
-                <Typography padding={0} variant="body2Regular">
+                <Typography
+                  padding={0}
+                  variant="title2Regular"
+                  sx={{ transform: "translateX(50%)" }}
+                >
                   {formatDate(initialMaxDate)}
                 </Typography>
               </Box>

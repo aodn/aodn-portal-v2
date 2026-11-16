@@ -14,6 +14,7 @@ interface AIGenTagProps {
   cardSx?: SxProps; // InfoCard surface
   headerSx?: SxProps; // Star and title row
   contentSx?: SxProps; // Body text
+  iconSize?: number; // AI icon width and height; AIGenIcon default when unset
 }
 
 const AIGenTag: FC<AIGenTagProps> = ({
@@ -21,6 +22,7 @@ const AIGenTag: FC<AIGenTagProps> = ({
   cardSx,
   headerSx,
   contentSx,
+  iconSize,
 }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
@@ -46,7 +48,11 @@ const AIGenTag: FC<AIGenTagProps> = ({
         sx={{ padding: 0, bgcolor: "transparent" }}
         data-testid="AIGenTag-icon"
       >
-        <AIGenIcon color={portalTheme.palette.primary1} />
+        <AIGenIcon
+          color={portalTheme.palette.primary1}
+          width={iconSize}
+          height={iconSize}
+        />
       </IconButton>
       <Popover
         elevation={2}

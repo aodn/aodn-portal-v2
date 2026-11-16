@@ -70,7 +70,7 @@ const ThemeFilter: FC<ThemeFilterProps> = ({ filters, setFilters, sx }) => {
           "& .MuiToggleButton-root": {
             borderRadius: "6px",
             textTransform: "capitalize",
-            ...portalTheme.typography.title2Regular,
+            ...portalTheme.typography.body2Regular,
             color: portalTheme.palette.text1,
             bgcolor: portalTheme.palette.primary6,
             px: "24px",

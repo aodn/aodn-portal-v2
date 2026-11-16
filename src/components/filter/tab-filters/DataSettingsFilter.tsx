@@ -385,9 +385,10 @@ const DataSettingsFilter: FC<DataSettingsFilterProps> = ({
 
   return (
     <Box sx={{ position: "relative" }}>
-      <Box sx={{ position: "absolute", top: "8px", right: "20px", zIndex: 1 }}>
+      <Box sx={{ position: "absolute", top: 0, right: 0, zIndex: 1 }}>
         <AIGenTag
           infoContent={AI_SUPPORTED_CONTENTS_INFO}
+          iconSize={32}
           cardSx={{
             width: "340px",
             height: "220px",

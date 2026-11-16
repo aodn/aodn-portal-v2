@@ -166,12 +166,18 @@ const LocationCheckboxList: FC<{
       minHeight: 0,
       overflowY: "auto",
       overflowX: "hidden",
-      scrollbarColor: `${theme.palette.primary1} ${alpha(theme.palette.primary1, 0.1)}`,
+      // Chrome ignores the ::-webkit-scrollbar styles (8px global width from
+      // ScrollBar.tsx) when scrollbar-color is set, so only Firefox gets it.
+      "@supports not selector(::-webkit-scrollbar)": {
+        scrollbarColor: `${alpha(theme.palette.primary1, 0.7)} ${alpha(theme.palette.primary1, 0.1)}`,
+      },
       "&::-webkit-scrollbar-thumb": {
-        backgroundColor: theme.palette.primary1,
+        backgroundColor: alpha(theme.palette.primary1, 0.7),
+        borderRadius: "7px",
       },
       "&::-webkit-scrollbar-track": {
         backgroundColor: alpha(theme.palette.primary1, 0.1),
+        borderRadius: "7px",
       },
     }}
   >
@@ -209,9 +215,8 @@ const LocationCheckboxList: FC<{
             alignItems: "flex-start",
             width: "100%",
             ".MuiFormControlLabel-label": {
-              fontFamily: theme.typography.fontFamily,
-              fontSize: theme.typography.fontSize,
-              color: theme.palette.neutral1,
+              ...theme.typography.title2Regular,
+              color: theme.palette.text2,
               whiteSpace: "normal",
               wordBreak: "break-word",
             },
@@ -676,14 +681,16 @@ const LocationFilter: FC<LocationFilterProps> = () => {
           flexDirection: isMobile ? "column" : "row",
           width: "100%",
           padding: padding.large,
-          gap: padding.large,
+          pl: isMobile ? padding.large : 4,
+          pr: isMobile ? padding.large : 1.5,
+          gap: 2,
         }}
       >
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
-            flex: isMobile ? 1 : "0 0 280px",
+            flex: isMobile ? 1 : { xs: "0 0 280px", lg: "0 0 376px" },
             gap: gap.md,
             minWidth: 0,
             minHeight: 0,

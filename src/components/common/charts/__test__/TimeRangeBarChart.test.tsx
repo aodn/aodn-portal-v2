@@ -26,16 +26,6 @@ vi.mock("@mui/x-charts", () => ({
   },
 }));
 
-// Mock the color constants
-vi.mock("../../../styles/constants", () => ({
-  color: {
-    blue: {
-      dark: "#0000FF",
-      darkSemiTransparent: "rgba(0, 0, 255, 0.5)",
-    },
-  },
-}));
-
 // Sample test data
 const mockImosDataIds = ["imos-1", "imos-2"];
 const mockTotalDataset: OGCCollections = Object.assign(new OGCCollections(), {
