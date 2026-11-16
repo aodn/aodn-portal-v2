@@ -9,12 +9,17 @@ import { CloseIcon } from "../../assets/icons/download/close";
 import AIGenStarIcon from "../icon/AIGenStarIcon";
 import TextRender from "../common/text/TextRender";
 
+const ICON_VIEWBOX = 40;
+const ICON_BOX_LEFT = 5;
+const ICON_BOX_TOP = 8.5;
+const POPUP_GAP = 15;
+
 interface AIGenTagProps {
   infoContent?: InfoContentType;
   cardSx?: SxProps; // InfoCard surface
   headerSx?: SxProps; // Star and title row
   contentSx?: SxProps; // Body text
-  iconSize?: number; // AI icon width and height; AIGenIcon default when unset
+  iconSize?: number; // AI icon width and height
 }
 
 const AIGenTag: FC<AIGenTagProps> = ({
@@ -22,8 +27,9 @@ const AIGenTag: FC<AIGenTagProps> = ({
   cardSx,
   headerSx,
   contentSx,
-  iconSize,
+  iconSize = 28,
 }) => {
+  const iconScale = iconSize / ICON_VIEWBOX;
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   const handleClick = useCallback((event: MouseEvent<HTMLButtonElement>) => {
@@ -66,6 +72,14 @@ const AIGenTag: FC<AIGenTagProps> = ({
         transformOrigin={{
           vertical: "top",
           horizontal: "right",
+        }}
+        slotProps={{
+          paper: {
+            sx: {
+              mt: `${Math.round(ICON_BOX_TOP * iconScale)}px`,
+              ml: `${Math.round(ICON_BOX_LEFT * iconScale) - POPUP_GAP}px`,
+            },
+          },
         }}
         data-testid="AIGenTag-popup"
       >
