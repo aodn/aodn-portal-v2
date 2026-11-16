@@ -200,7 +200,6 @@ const ResultCards: FC<ResultCardsType> = ({
   scrollRootRef,
   layout,
   contents,
-  onClickCard,
   onMouseEnterCard,
   onMouseLeaveCard,
   onClickDetail,
@@ -237,11 +236,6 @@ const ResultCards: FC<ResultCardsType> = ({
       isLoadingMoreRef.current = false;
     }
   }, [fetchRecord, layout]);
-
-  const onClickBtnCard = useCallback(
-    (item: OGCCollection | undefined) => onClickCard?.(item),
-    [onClickCard]
-  );
 
   const onClickBtnDetail = useCallback(
     (uuid: string, type: OpenType | undefined) => {
@@ -337,9 +331,8 @@ const ResultCards: FC<ResultCardsType> = ({
       total,
       renderLoadMoreButton,
       loadMoreRef: setLoadMoreNode,
-      onClickCard: onClickBtnCard,
-      onMouseEnterCard,
-      onMouseLeaveCard,
+      onMouseEnterCard: onMouseEnterCard,
+      onMouseLeaveCard: onMouseLeaveCard,
       onClickDetail: onClickBtnDetail,
       onClickLinks: onClickBtnLinks,
       onClickDownload: onClickBtnDownload,
@@ -355,7 +348,6 @@ const ResultCards: FC<ResultCardsType> = ({
       count,
       total,
       renderLoadMoreButton,
-      onClickCard: onClickBtnCard,
       onMouseEnterCard: onMouseEnterCard,
       onMouseLeaveCard: onMouseLeaveCard,
       onClickDetail: onClickBtnDetail,
@@ -373,7 +365,6 @@ const ResultCards: FC<ResultCardsType> = ({
       count,
       total,
       renderLoadMoreButton,
-      onClickCard: onClickBtnCard,
       onMouseEnterCard: onMouseEnterCard,
       onMouseLeaveCard: onMouseLeaveCard,
       onClickDetail: onClickBtnDetail,
