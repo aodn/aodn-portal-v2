@@ -152,7 +152,7 @@ describe("OGCCollection", () => {
       expect(match).not.toBeNull();
       expect(decodeURIComponent(match![1])).toBe(
         '{"type":"FeatureCollection","features":[' +
-          '{"type":"Feature","properties":{"stroke":"#ffff00","stroke-width":1,"fill":"#ffffff","fill-opacity":0.4},' +
+          '{"type":"Feature","properties":{"stroke":"#FFDF6C","stroke-width":1,"fill":"#ffffff","fill-opacity":0.4},' +
           '"geometry":{"type":"Polygon","coordinates":[[[147,-20],[148,-20],[148,-19],[147,-19],[147,-20]]]}},' +
           '{"type":"Feature","properties":{"marker-size":"small","marker-color":"#3B6E8F"},' +
           '"geometry":{"type":"Point","coordinates":[151.5,-24.5]}}]}'
