@@ -124,9 +124,20 @@ const BookmarkListAccordionGroup: FC<BookmarkListAccordionGroupProps> = ({
       // a add temp event triggered
       const updateTempInItems = (currentId: string | undefined): void => {
         setItems((items) => {
-          // Only one temporary item so remove it first
-          const tempRemoved = items.filter((i) => i.id !== currentId);
-          return event.value ? [event.value, ...tempRemoved] : tempRemoved;
+          const savedIds = new Set(
+            getBookmarkList(store.getState()).items.map((item) => item.id)
+          );
+          // Drop the previous temporary row unless that dataset is saved.
+          // Bookmarking the hovered card clears the temporary copy and adds
+          // the same id; a late clear must not remove the saved row.
+          const withoutPrevious = items.filter(
+            (item) => item.id !== currentId || savedIds.has(item.id)
+          );
+          if (!event.value) return withoutPrevious;
+          return [
+            event.value,
+            ...withoutPrevious.filter((item) => item.id !== event.value.id),
+          ];
         });
       };
 

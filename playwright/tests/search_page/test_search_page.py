@@ -267,7 +267,8 @@ def test_data_bookmark_persistence(desktop_page: Page, data_id: str) -> None:
     search_page.wait_for_search_to_complete()
     search_page.map.wait_for_map_idle()
 
-    # Click result card bookmark icon
+    # Click result card bookmark icon. The pointer also hovers the card,
+    # which selects it before the click.
     search_page.get_bookmark_icon(data_id, search_page.result_card_list).click()
     search_page.assert_bookmark_state(data_id, True)
 
