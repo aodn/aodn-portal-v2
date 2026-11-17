@@ -25,6 +25,7 @@ interface GridResultCardProps extends ResultCardBasicType {}
 const GridResultCard: FC<GridResultCardProps> = ({
   content,
   onClickCard = undefined,
+  onMouseEnterCard = undefined,
   onClickDetail = undefined,
   onClickLinks = undefined,
   onClickDownload = undefined,
@@ -56,8 +57,13 @@ const GridResultCard: FC<GridResultCardProps> = ({
         borderRadius: borderRadius.small,
         ...sx,
       }}
-      onMouseEnter={() => setShowButtons(true)}
-      onMouseLeave={() => setShowButtons(false)}
+      onMouseEnter={() => {
+        !isSimplified && onMouseEnterCard?.(content);
+        setShowButtons(true);
+      }}
+      onMouseLeave={() => {
+        setShowButtons(false);
+      }}
       data-testid="result-card-grid"
     >
       <ContextMenu

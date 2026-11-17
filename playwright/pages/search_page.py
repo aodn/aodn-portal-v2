@@ -77,6 +77,22 @@ class SearchPage(BasePage):
         self.result_list.hover()
         self.page.mouse.wheel(0, delta_y)
 
+    def click_map_toggle(self) -> None:
+        """Open or close the full map without hovering result cards.
+
+        A normal click walks the pointer in steps. Those steps hover result
+        cards, which selects a dataset and lets the map rewrite the URL
+        over the toggle.
+        """
+        box = self.map_toggle_button.bounding_box()
+        assert box is not None, 'Map toggle button has no bounding box'
+        self.page.mouse.move(
+            box['x'] + box['width'] / 2,
+            box['y'] + box['height'] / 2,
+            steps=1,
+        )
+        self.map_toggle_button.click()
+
     def click_show_more_results(self) -> None:
         """Update api route and then click "Show more results" button"""
         api_router = ApiRouter(page=self.page)

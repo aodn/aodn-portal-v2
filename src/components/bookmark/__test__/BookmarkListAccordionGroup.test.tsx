@@ -193,6 +193,7 @@ describe("Bookmark List Accordion Group", () => {
     expect(screen.getByTestId("bookmark-list-head-count")).toHaveTextContent(
       "3"
     );
+    expect(screen.getByTestId("item3-iconbutton")).toBeInTheDocument();
   });
 
   it("initializes with correct items from initialization", async () => {

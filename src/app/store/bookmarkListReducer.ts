@@ -41,6 +41,8 @@ const initialState: BookmarkListState = {
   expandedItem: undefined,
 };
 
+const DELAY = 0.0;
+
 const bookmarkListSlice = createSlice({
   name: "bookmarkList",
   initialState,
@@ -62,7 +64,7 @@ const bookmarkListSlice = createSlice({
             action: EVENT_BOOKMARK.TEMP,
             value: action.payload,
           });
-        }, 0.1);
+        }, DELAY);
       }
     },
     setExpandedItem: (
@@ -79,7 +81,7 @@ const bookmarkListSlice = createSlice({
             action: EVENT_BOOKMARK.EXPAND,
             value: action.payload,
           });
-        }, 0.1);
+        }, DELAY);
       }
     },
     addItem: (state, action: PayloadAction<OGCCollection>) => {
@@ -95,7 +97,7 @@ const bookmarkListSlice = createSlice({
             action: EVENT_BOOKMARK.ADD,
             value: action.payload,
           });
-        }, 0.1);
+        }, DELAY);
       }
     },
     removeItem: (state, action: PayloadAction<string>) => {
@@ -110,7 +112,7 @@ const bookmarkListSlice = createSlice({
             id: action.payload,
             action: EVENT_BOOKMARK.REMOVE,
           });
-        }, 0.1);
+        }, DELAY);
       }
     },
     removeAllItems: (state) => {
@@ -125,7 +127,7 @@ const bookmarkListSlice = createSlice({
           id: "",
           action: EVENT_BOOKMARK.REMOVE_ALL,
         });
-      }, 0.1);
+      }, DELAY);
     },
   },
 });
@@ -170,7 +172,7 @@ export const initializeBookmarkList = createAsyncThunk<
               action: EVENT_BOOKMARK.INIT,
               value: collections,
             });
-          }, 0.1);
+          }, DELAY);
         });
     } else {
       // Even with no bookmarks, still emit INIT with empty array
@@ -180,7 +182,7 @@ export const initializeBookmarkList = createAsyncThunk<
           action: EVENT_BOOKMARK.INIT,
           value: [],
         });
-      }, 0.1);
+      }, DELAY);
     }
   } catch (error) {
     errorHandling(thunkAPI);
@@ -191,7 +193,7 @@ export const initializeBookmarkList = createAsyncThunk<
         action: EVENT_BOOKMARK.INIT,
         value: [],
       });
-    }, 0.1);
+    }, DELAY);
   }
 });
 

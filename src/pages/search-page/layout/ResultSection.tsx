@@ -42,6 +42,8 @@ const ResultSection: FC<ResultSectionProps> = ({
   onChangeSorting,
   onChangeLayout,
   onClickCard,
+  onMouseEnterCard,
+  onMouseLeaveCard,
   onDeselectDataset,
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -109,6 +111,8 @@ const ResultSection: FC<ResultSectionProps> = ({
           layout={currentLayout}
           contents={reduxContents}
           onClickCard={onClickCard}
+          onMouseEnterCard={onMouseEnterCard}
+          onMouseLeaveCard={onMouseLeaveCard}
           onClickDetail={cancelLoading}
           onClickLinks={cancelLoading}
           onClickDownload={cancelLoading}
