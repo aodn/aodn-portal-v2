@@ -153,8 +153,7 @@ const FiltersFC: FC<FiltersProps> = ({ sx }) => {
           width: "100%",
           "& .MuiTabs-root": {
             backgroundColor: alpha(portalTheme.palette.primary6, 0.8),
-            boxShadow:
-              "inset 0 2px 8px rgba(0, 0, 0, 0.08), inset 0 -2px 8px rgba(0, 0, 0, 0.08)",
+            boxShadow: portalTheme.designTokens.elevation.tabBarInset,
             borderTopLeftRadius: portalTheme.designTokens.borderRadius.md,
             borderTopRightRadius: portalTheme.designTokens.borderRadius.md,
             borderBottom: "none",
