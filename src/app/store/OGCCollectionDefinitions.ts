@@ -16,6 +16,7 @@ import { IconWMS } from "@/components/icon/IconWMS";
 import { IconWFS } from "@/components/icon/IconWFS";
 import { IconLink } from "@/components/icon/IconLink";
 import { SearchKeys } from "@/components/search/constants";
+import { EXTENT_OUTLINE_SYMBOLOGY } from "@/components/map/mapbox/constants";
 
 // interfaces:
 export interface IKeyword {
@@ -223,10 +224,10 @@ const staticMapDefault = {
   coordPrecision: 3, // keep urls short and cache keys stable
   maxUrlLength: 7500, // the api rejects urls over ~8kb
   worldSpanLimit: 300, // skip overlay when extent covers most of the world
-  // Same polygon paint as the map view extents (SpatialExtents.tsx):
-  // white fill at 0.4 opacity with a yellow outline
+  // Same fill as the search map extents (SpatialExtents.tsx) and the same line
+  // colour as every map; the Static Images API draws one stroke, so no casing
   extentStyle: {
-    stroke: "#ffff00",
+    stroke: EXTENT_OUTLINE_SYMBOLOGY.COLOR,
     "stroke-width": 1,
     fill: "#ffffff",
     "fill-opacity": 0.4,
