@@ -78,8 +78,8 @@ const DEFAULT_SEARCH_START_DATE = toAppDayjs(
 );
 
 const DATE_PICKER_SX = {
-  width: "240px",
-  maxWidth: { xs: "216px", sm: "240px" },
+  width: { xs: "240px", sm: "auto", md: "240px" },
+  maxWidth: { xs: "216px", sm: "none", md: "240px" },
   border: "none",
   borderRadius: theme.borderRadius.sm,
   boxShadow: "0 0 4px 1px rgba(0, 0, 0, 0.15)",
@@ -456,7 +456,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                 alignItems="center"
                 justifyContent="space-between"
                 width={{ xs: "100%", md: "auto" }}
-                gap={{ xs: 2, sm: 3.5 }}
+                gap={{ xs: 2, md: 3.5 }}
                 data-testid="start-date-picker"
               >
                 <Typography
@@ -492,7 +492,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                 alignItems="center"
                 justifyContent="space-between"
                 width={{ xs: "100%", md: "auto" }}
-                gap={{ xs: 2, sm: 3.5 }}
+                gap={{ xs: 2, md: 3.5 }}
                 data-testid="end-date-picker"
               >
                 <Typography
