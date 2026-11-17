@@ -44,8 +44,8 @@ export interface GriddedRenderStyle {
   rescale?: GriddedValueRange;
 }
 
-// Heatwave/cold-spell category flags: 0 none, 1 moderate, 2 strong,
-// 3 severe, 4 extreme.
+// values length and colours length must match the CF flag_values length and flag_meanings length in the
+// dataset.
 const HEATWAVE_CATEGORY_COLORMAP = inlineColormap({
   mode: "categorical",
   values: [0, 1, 2, 3, 4],
@@ -190,5 +190,25 @@ export const GRIDDED_RENDER_STYLE_BY_PRODUCT: Record<
       ],
     }),
     rescale: [-1.2, 1.2],
+  },
+  "radar_CapricornBunkerGroup_wind_delayed_qc:wdir": {
+    colormap: "phase",
+    rescale: [0, 360],
+  },
+  "radar_CoffsHarbour_wind_delayed_qc:wdir": {
+    colormap: "phase",
+    rescale: [0, 360],
+  },
+  "radar_RottnestShelf_wind_delayed_qc:wdir": {
+    colormap: "phase",
+    rescale: [0, 360],
+  },
+  "radar_SouthAustraliaGulfs_wind_delayed_qc:wdir": {
+    colormap: "phase",
+    rescale: [0, 360],
+  },
+  "satellite_wind_altimeter_delayed_qc:wdir": {
+    colormap: "phase",
+    rescale: [0, 360],
   },
 };
