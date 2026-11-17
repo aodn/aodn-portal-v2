@@ -652,8 +652,7 @@ const LocationFilter: FC<LocationFilterProps> = () => {
         onChange={handleFilterModeChange}
         sx={{
           backgroundColor: alpha(theme.palette.primary6, 0.8),
-          boxShadow:
-            "inset 0 2px 8px rgba(0, 0, 0, 0.1), inset 0 -2px 8px rgba(0, 0, 0, 0.1)",
+          boxShadow: theme.designTokens.elevation.tabBarInset,
           borderTopLeftRadius: theme.designTokens.borderRadius.md,
           borderTopRightRadius: theme.designTokens.borderRadius.md,
           borderBottom: "none",
