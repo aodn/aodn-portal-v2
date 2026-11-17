@@ -503,8 +503,8 @@ const SearchPage = () => {
         // Reset selection. The EXPAND replay of this clear is ignored above
         // once selectedUuids has been emptied.
         setSelectedUuids([]);
-        dispatch(setExpandedItem(undefined));
         dispatch(setTemporaryItem(undefined));
+        dispatch(setExpandedItem(undefined));
       }
     },
     [dispatch, findTemporaryItemExisting, selectedUuids]
@@ -587,7 +587,7 @@ const SearchPage = () => {
       if (event.action !== EVENT_BOOKMARK.EXPAND) return;
       // setExpandedItem emits the payload it was called with, after a timeout.
       // A fast move from one card to the next leaves the previous emit stale,
-      // and applying it reselects the card the pointer already left.
+      // and applying it selects the card the pointer already left.
       const expandedId = store.getState().bookmarkList.expandedItem?.id;
       if (event.value?.id !== expandedId) return;
       onClickResultCard(event.value);
