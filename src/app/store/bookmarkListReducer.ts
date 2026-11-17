@@ -41,7 +41,7 @@ const initialState: BookmarkListState = {
   expandedItem: undefined,
 };
 
-const DELAY = 0.1;
+const DELAY = 0.0;
 
 const bookmarkListSlice = createSlice({
   name: "bookmarkList",
