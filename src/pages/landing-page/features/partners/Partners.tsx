@@ -63,10 +63,8 @@ const Partners: FC = () => {
           sx={{ mt: "6px", color: PARTNERS_COLOURS.subtitle }}
         >
           The AODN brings together metadata from organisations across Australia
-          describing their marine and climate science data. Data providers
-          retain responsibility for their datasets, while AODN provides a
-          central portal that makes these data discoverable and connects users
-          to available data access services.
+          describing their marine and climate science data, including metadata
+          hosted on behalf of other organisations.
         </Typography>
         <Box
           role="list"
