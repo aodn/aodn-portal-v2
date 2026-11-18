@@ -30,13 +30,6 @@ vi.mock("@/pages/detail-page/context/detail-page-context", () => ({
     collection: {
       id: "collection-id",
       title: "Test Ocean Data Collection",
-      getLicense: () => "Licence text",
-      getCitation: () => ({
-        suggestedCitation:
-          "IMOS [year-of-data-download], [Title], [data-access-URL], accessed [date-of-access]",
-        useLimitations: ["Use limitation"],
-        otherConstraints: ["Licence text", "Other constraint"],
-      }),
     },
   }),
 }));
@@ -112,29 +105,23 @@ describe("useDownloadDialog", () => {
           output_format: "netcdf",
           full_metadata_link: "http://localhost:3000/details/collection-id",
           estimated_size_bytes: 987654,
-          suggested_citation: expect.stringMatching(
-            /^IMOS \d{4}, Test Ocean Data Collection, http:\/\/localhost:3000\/details\/collection-id\?tab=summary, accessed \d{2}-[A-Za-z]{3}-\d{4}$/
-          ),
         }),
       })
     );
     await waitFor(() => expect(result.current.createdJobID).toBe(JOB_ID));
   });
 
-  it("sends the same usage constraints as the dialog shows", async () => {
+  it("does not send the citation or usage constraints", async () => {
     const { result } = renderHook(() => useDownloadDialog(true, vi.fn()));
 
     submit(result);
 
     await waitFor(() => expect(mockDispatch).toHaveBeenCalledTimes(1));
-    // The licence text is dropped, like in the dialog.
-    expect(mockProcessDatasetDownload).toHaveBeenCalledWith(
-      expect.objectContaining({
-        inputs: expect.objectContaining({
-          usage_constraints: ["Use limitation", "Other constraint"],
-        }),
-      })
-    );
+    // ogcapi looks them up by uuid.
+    const { inputs } = mockProcessDatasetDownload.mock.calls[0][0];
+    expect(inputs.uuid).toBe("collection-id");
+    expect(inputs).not.toHaveProperty("suggested_citation");
+    expect(inputs).not.toHaveProperty("usage_constraints");
   });
 
   it("does not expose an untracked job when browser storage is unavailable", async () => {

@@ -37,8 +37,9 @@ const normalizeConstraint = (constraint: string) =>
   constraint.trim().replace(/\s+/g, " ").toLowerCase();
 
 // The usage constraints of a collection.
-// The download dialog shows this list. The download request sends it too,
-// so the emails show the same list as the dialog.
+// The download dialog shows this list.
+// ogcapi builds the same list for the download emails.
+// Keep the two rules the same.
 // It drops empty items, the licence text, and duplicates.
 export const getUsageConstraints = (
   collection: OGCCollection | undefined
