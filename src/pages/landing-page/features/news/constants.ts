@@ -50,6 +50,6 @@ export const NEWS_CARDS_DATA: NewsCardData[] = [
     image: news3,
     imageSrcSet: `${news3Card} 400w, ${news3} 373w`,
     title: "Fisheries vessels real-time data collection",
-    link: `${window.location.origin}/details/d810b8cb-2af9-412c-8d21-aa1e9a78edc2?tab=summary`,
+    link: `${window.location.origin}/details/bdb84466-dc53-49ad-a60f-83d9fa0baed5?tab=summary`,
   },
 ];
