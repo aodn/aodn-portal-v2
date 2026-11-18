@@ -55,7 +55,7 @@ const NewsCard: FC<NewsCardProps> = ({ news }) => {
           alt={news.title}
           loading="lazy"
           decoding="async"
-          data-testid={news.subheading}
+          data-testid={`news-card-${news.id}`}
           sx={{ aspectRatio: "1.9", objectFit: "cover" }}
         />
         <Typography
@@ -96,22 +96,9 @@ const NewsCard: FC<NewsCardProps> = ({ news }) => {
         }}
       >
         <Typography
-          variant="overline"
-          sx={{
-            color: portalTheme.palette.primary4,
-            fontSize: 13,
-            lineHeight: "18px",
-            letterSpacing: "1.3px",
-            alignSelf: "stretch",
-          }}
-        >
-          {news.subheading}
-        </Typography>
-        <Typography
           component="h4"
           variant="subtitle1"
           sx={{
-            mt: "13px",
             mb: "11px",
             fontFamily: portalTheme.typography.heading3.fontFamily,
             fontSize: 20,

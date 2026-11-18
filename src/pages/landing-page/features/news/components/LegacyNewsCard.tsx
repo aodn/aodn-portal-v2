@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { NewsCardData } from "@/pages/landing-page/features/news/constants";
 import { Box, CardActionArea, CardMedia, Typography } from "@mui/material";
-import { borderRadius, color, fontSize, fontWeight } from "@/styles/constants";
+import { borderRadius, color, fontSize } from "@/styles/constants";
 import ReadMoreButton from "@/pages/landing-page/features/news/components/ReadMoreButton";
 import { openInNewTab } from "@/utils/LinkUtils";
 
@@ -29,7 +29,7 @@ const LegacyNewsCard: FC<NewsCardProps> = ({ news }) => {
           alt={`news image-${news.title}`}
           loading="lazy"
           decoding="async"
-          data-testid={news.subheading}
+          data-testid={`news-card-${news.id}`}
           sx={{
             borderRadius: borderRadius.large,
             objectFit: "cover",
@@ -38,14 +38,6 @@ const LegacyNewsCard: FC<NewsCardProps> = ({ news }) => {
         />
       </CardActionArea>
       <Box bgcolor={color.blue.extraDark}>
-        <Typography
-          color="#fff"
-          fontSize={fontSize.newsInfo}
-          fontWeight={fontWeight.extraLight}
-          textAlign="left"
-        >
-          {news.subheading}
-        </Typography>
         <Typography
           color="#fff"
           fontSize={fontSize.newsTitle}
