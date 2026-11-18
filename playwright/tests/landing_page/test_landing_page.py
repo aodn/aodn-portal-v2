@@ -35,7 +35,7 @@ def test_feedback_button_in_mobile_hero(mobile_page: Page) -> None:
     'dataset_id, dataset_title',
     [
         (
-            'Coastal Wave Buoys',
+            'news-card-2',
             'Wave buoys Observations - Australia - near real-time',
         ),
     ],
