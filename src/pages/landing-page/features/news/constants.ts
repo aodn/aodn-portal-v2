@@ -16,8 +16,20 @@ export const FEATURED_CONTRIBUTORS = CONTRIBUTORS.filter(({ datasetGroup }) =>
   )
 );
 
+// Reads the ?featured= value (case-insensitive); returns undefined if unknown
+export const getFeaturedGroup = (value: string | null) => {
+  const requestedGroup = value?.toLowerCase();
+  const featuredGroups = [
+    SearchKeys.IMOS,
+    ...FEATURED_CONTRIBUTORS.map((contributor) => contributor.datasetGroup),
+  ];
+  return featuredGroups.find((group) => group === requestedGroup);
+};
+
 export interface NewsCardData {
   id: number;
+  // The Featured Datasets tab this card belongs to
+  tab: SearchKeys;
   image: string;
   imageSrcSet: string;
   description: string;
@@ -27,6 +39,7 @@ export interface NewsCardData {
 export const NEWS_CARDS_DATA: NewsCardData[] = [
   {
     id: 1,
+    tab: SearchKeys.IMOS,
     description:
       "Satellite observations supporting the calibration and validation of ocean altimetry measurements.",
     image: news1,
@@ -36,6 +49,7 @@ export const NEWS_CARDS_DATA: NewsCardData[] = [
   },
   {
     id: 2,
+    tab: SearchKeys.IMOS,
     description:
       "Near real-time wave observations from coastal buoys around Australia.",
     image: news2,
@@ -45,6 +59,7 @@ export const NEWS_CARDS_DATA: NewsCardData[] = [
   },
   {
     id: 3,
+    tab: SearchKeys.IMOS,
     description:
       "Ocean observations collected by fishing vessels through the Ships of Opportunity program.",
     image: news3,
@@ -53,3 +68,14 @@ export const NEWS_CARDS_DATA: NewsCardData[] = [
     link: `${window.location.origin}/details/bdb84466-dc53-49ad-a60f-83d9fa0baed5?tab=summary`,
   },
 ];
+
+// Cards of one tab; a tab without its own cards yet shows the IMOS ones
+export const getNewsCards = (
+  tab: SearchKeys,
+  cards: NewsCardData[] = NEWS_CARDS_DATA
+) => {
+  const tabCards = cards.filter((card) => card.tab === tab);
+  return tabCards.length > 0
+    ? tabCards
+    : cards.filter((card) => card.tab === SearchKeys.IMOS);
+};
