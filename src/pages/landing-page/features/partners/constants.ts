@@ -119,17 +119,16 @@ export const CONTRIBUTORS: Contributor[] = [
     description:
       "Australia’s national research computing facility, hosting and serving the large gridded marine and climate collections.",
     logo: NCILogo,
-    logoAspectRatio: 2.115,
+    logoAspectRatio: 2.353,
     logoScale: 0.94,
     ...contributors.nci,
   },
   {
     datasetGroup: SearchKeys.EATLAS,
     shortName: "eAtlas",
-    fullName: "eAtlas — Tropical Marine Data Portal",
+    fullName: "eAtlas",
     website: "https://eatlas.org.au",
-    description:
-      "A tropical marine data portal publishing mapping and monitoring products for the Great Barrier Reef, Torres Strait and north-west shelf.",
+    description: "Environmental research, maps and data for tropical Australia",
     logo: EAtlasLogo,
     logoAspectRatio: 2.723,
     logoScale: 1.06,
@@ -138,10 +137,10 @@ export const CONTRIBUTORS: Contributor[] = [
   {
     datasetGroup: SearchKeys.WAMSI,
     shortName: "WAMSI",
-    fullName: "Western Australian Marine Science Institution",
+    fullName: "Western Australian Marine Research Institution",
     website: "https://wamsi.org.au",
     description:
-      "A partnership of Western Australian marine research institutions delivering independent science for the state’s coast and marine estate.",
+      "A collaboration of state and federal government and academic science organisations, working together to deliver independent marine research for Western Australia.",
     logo: WAMSILogo,
     logoAspectRatio: 3.338,
     logoScale: 0.96,

@@ -8,6 +8,7 @@ import store, { getComponentState } from "@/app/store/store";
 import { updateSearchText } from "@/app/store/componentParamReducer";
 import useRedirectSearch from "@/hooks/useRedirectSearch";
 import { SearchKeys } from "@/components/search/constants";
+import { pageDefault } from "@/components/common/constants";
 import Partners from "../Partners";
 import { CONTRIBUTORS } from "../constants";
 
@@ -51,6 +52,31 @@ describe("Partners", () => {
         screen.getByTestId(`contributor-card-${datasetGroup}`)
       ).toBeInTheDocument();
     });
+  });
+
+  it("shows the updated WAMSI name and description", () => {
+    const wamsi = CONTRIBUTORS.find(
+      ({ datasetGroup }) => datasetGroup === SearchKeys.WAMSI
+    );
+    expect(wamsi?.fullName).toBe(
+      "Western Australian Marine Research Institution"
+    );
+    expect(wamsi?.description).toBe(
+      "A collaboration of state and federal government and academic science organisations, working together to deliver independent marine research for Western Australia."
+    );
+  });
+
+  it("links IMOS in the funding sentence to the IMOS website", () => {
+    renderPartners();
+
+    const link = screen.getByTestId("imos-website-link");
+    expect(link).toHaveAttribute("href", pageDefault.url.IMOS);
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    expect(link).toHaveTextContent("Integrated Marine Observing System (IMOS)");
+    expect(link.parentElement).toHaveTextContent(
+      "The AODN is funded and operated by the Integrated Marine Observing System (IMOS), an unincorporated joint venture of institutions led by the University of Tasmania."
+    );
   });
 
   it("searches IMOS data and clears old filters on explore", async () => {
