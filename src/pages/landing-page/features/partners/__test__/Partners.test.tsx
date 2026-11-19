@@ -5,7 +5,10 @@ import { Provider } from "react-redux";
 import { ThemeProvider } from "@mui/material/styles";
 import AppTheme from "@/styles/theme";
 import store, { getComponentState } from "@/app/store/store";
-import { updateSearchText } from "@/app/store/componentParamReducer";
+import {
+  updateDatasetGroup,
+  updateSearchText,
+} from "@/app/store/componentParamReducer";
 import useRedirectSearch from "@/hooks/useRedirectSearch";
 import { SearchKeys } from "@/components/search/constants";
 import { pageDefault } from "@/components/common/constants";
@@ -109,6 +112,32 @@ describe("Partners", () => {
       SearchKeys.CSIRO
     );
   });
+
+  it.each([
+    [SearchKeys.GA, "Geoscience Australia"],
+    [SearchKeys.NCI, "NCI"],
+    [SearchKeys.EATLAS, "eAtlas"],
+    [SearchKeys.WAMSI, "WAMSI"],
+  ])(
+    "runs a text search for %s on view datasets",
+    async (datasetGroup, searchText) => {
+      const user = userEvent.setup();
+      store.dispatch(updateDatasetGroup(SearchKeys.IMOS));
+      renderPartners();
+
+      await user.click(
+        screen.getByTestId(`contributor-view-datasets-${datasetGroup}`)
+      );
+
+      await waitFor(() => {
+        expect(redirectSearch).toHaveBeenCalledWith("Partners");
+      });
+      // The old filter is cleared and no dataset group is set
+      const params = getComponentState(store.getState());
+      expect(params.searchText).toBe(searchText);
+      expect(params.datasetGroup).toBeUndefined();
+    }
+  );
 
   it("opens the contributor website in a new tab", () => {
     renderPartners();
