@@ -34,6 +34,9 @@ export const LOGO_SIZE_POWER = 0.62;
 
 export interface Contributor {
   datasetGroup: SearchKeys;
+  // Set for organisations with no dataset group filter.
+  // Their "View datasets" link runs a text search instead.
+  searchText?: string;
   shortName: string;
   fullName: string;
   website: string;
@@ -88,6 +91,7 @@ export const CONTRIBUTORS: Contributor[] = [
   },
   {
     datasetGroup: SearchKeys.GA,
+    searchText: "Geoscience Australia",
     shortName: "GA",
     fullName: "Geoscience Australia",
     website: "https://www.ga.gov.au",
@@ -113,6 +117,7 @@ export const CONTRIBUTORS: Contributor[] = [
   },
   {
     datasetGroup: SearchKeys.NCI,
+    searchText: "NCI",
     shortName: "NCI",
     fullName: "National Computational Infrastructure",
     website: "https://nci.org.au",
@@ -125,6 +130,7 @@ export const CONTRIBUTORS: Contributor[] = [
   },
   {
     datasetGroup: SearchKeys.EATLAS,
+    searchText: "eAtlas",
     shortName: "eAtlas",
     fullName: "eAtlas",
     website: "https://eatlas.org.au",
@@ -136,6 +142,7 @@ export const CONTRIBUTORS: Contributor[] = [
   },
   {
     datasetGroup: SearchKeys.WAMSI,
+    searchText: "WAMSI",
     shortName: "WAMSI",
     fullName: "Western Australian Marine Research Institution",
     website: "https://wamsi.org.au",
