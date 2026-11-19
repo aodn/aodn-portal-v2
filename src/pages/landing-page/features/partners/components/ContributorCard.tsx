@@ -78,11 +78,13 @@ const ContributorCard: FC<ContributorCardProps> = ({
         boxShadow: `0 1px 2px ${alpha(SHADOW_COLOUR, 0.06)}, 0 2px 8px ${alpha(SHADOW_COLOUR, 0.06)}`,
         outlineOffset: "3px",
         transition: "transform .18s, box-shadow .18s",
-        "&:hover, &:focus-within": {
+        // Keyboard focus (not a mouse click) opens the card, so a clicked
+        // link does not keep it open after the mouse leaves
+        "&:hover, &:focus-visible, &:has(:focus-visible)": {
           transform: "translateY(-3px)",
           boxShadow: `0 14px 32px ${alpha(SHADOW_COLOUR, 0.18)}`,
         },
-        [`&:hover .${HOVER_PANEL_CLASS}, &:focus-within .${HOVER_PANEL_CLASS}`]:
+        [`&:hover .${HOVER_PANEL_CLASS}, &:focus-visible .${HOVER_PANEL_CLASS}, &:has(:focus-visible) .${HOVER_PANEL_CLASS}`]:
           {
             opacity: 1,
             visibility: "visible",
@@ -90,7 +92,19 @@ const ContributorCard: FC<ContributorCardProps> = ({
             transitionDelay: "0s",
           },
         // Touch screens have no hover, so a tap focuses the card instead
-        "@media (hover: none)": { cursor: "pointer" },
+        "@media (hover: none)": {
+          cursor: "pointer",
+          "&:focus-within": {
+            transform: "translateY(-3px)",
+            boxShadow: `0 14px 32px ${alpha(SHADOW_COLOUR, 0.18)}`,
+          },
+          [`&:focus-within .${HOVER_PANEL_CLASS}`]: {
+            opacity: 1,
+            visibility: "visible",
+            transform: "none",
+            transitionDelay: "0s",
+          },
+        },
         "@media (prefers-reduced-motion: reduce)": { transition: "none" },
       }}
     >
