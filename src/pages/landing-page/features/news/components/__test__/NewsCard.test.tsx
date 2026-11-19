@@ -24,8 +24,10 @@ describe("NewsCard", () => {
 
     const imageLink = screen.getByRole("link", { name: "Test news item" });
     expect(imageLink).toHaveAttribute("href", "https://example.com/news");
-    expect(imageLink).toHaveAttribute("target", "_blank");
-    expect(imageLink).toHaveAttribute("rel", "noopener noreferrer");
+    expect(imageLink).not.toHaveAttribute("target");
+    expect(screen.getByRole("link", { name: "Read more" })).not.toHaveAttribute(
+      "target"
+    );
     expect(imageLink).toContainElement(screen.getByTestId("news-card-1"));
 
     expect(screen.getByAltText("Test news item")).toHaveAttribute(

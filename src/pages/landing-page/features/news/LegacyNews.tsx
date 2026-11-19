@@ -2,7 +2,8 @@ import { Grid, Typography } from "@mui/material";
 
 import { fontSize, padding } from "@/styles/constants";
 import { FC } from "react";
-import { NEWS_CARDS_DATA } from "@/pages/landing-page/features/news/constants";
+import { SearchKeys } from "@/components/search/constants";
+import { getNewsCards } from "@/pages/landing-page/features/news/constants";
 import NewsCard from "@/pages/landing-page/features/news/components/LegacyNewsCard";
 
 const LegacyNews: FC = () => {
@@ -18,7 +19,7 @@ const LegacyNews: FC = () => {
       </Grid>
       <Grid paddingY={{ xs: padding.medium, sm: padding.triple }} size={12}>
         <Grid container spacing={4}>
-          {NEWS_CARDS_DATA.map((news) => (
+          {getNewsCards(SearchKeys.IMOS).map((news) => (
             <Grid
               key={news.id}
               size={{

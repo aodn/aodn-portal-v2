@@ -42,8 +42,6 @@ const NewsCard: FC<NewsCardProps> = ({ news }) => {
       <Box
         component="a"
         href={news.link}
-        target="_blank"
-        rel="noopener noreferrer"
         aria-label={news.title}
         sx={{ position: "relative", display: "block" }}
       >
@@ -124,8 +122,6 @@ const NewsCard: FC<NewsCardProps> = ({ news }) => {
         <Button
           component="a"
           href={news.link}
-          target="_blank"
-          rel="noopener noreferrer"
           endIcon={<EastIcon />}
           sx={{
             alignSelf: "flex-end",

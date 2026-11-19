@@ -7,19 +7,38 @@ import { ThemeProvider } from "@mui/material/styles";
 import { portalTheme } from "@/styles";
 import store from "@/app/store/store";
 import { SearchKeys } from "@/components/search/constants";
-import { getNewsCards } from "@/pages/landing-page/features/news/constants";
+import {
+  NEWS_CARDS_DATA,
+  NewsCardData,
+} from "@/pages/landing-page/features/news/constants";
 import News from "@/pages/landing-page/features/news/News";
 
-const renderNews = (url = "/") =>
+const imosCard: NewsCardData = {
+  ...NEWS_CARDS_DATA[0],
+  id: 1,
+  tab: SearchKeys.IMOS,
+  title: "IMOS test card",
+};
+const aadCard: NewsCardData = {
+  ...NEWS_CARDS_DATA[0],
+  id: 2,
+  tab: SearchKeys.AAD,
+  title: "AAD test card",
+};
+
+const renderNews = (url = "/", cards?: NewsCardData[]) =>
   render(
     <Provider store={store}>
       <ThemeProvider theme={portalTheme}>
         <MemoryRouter initialEntries={[url]}>
-          <News />
+          <News cards={cards} />
         </MemoryRouter>
       </ThemeProvider>
     </Provider>
   );
+
+const getPill = (label: string) =>
+  screen.getByRole("button", { name: new RegExp(`^${label}$`) });
 
 beforeEach(() => {
   Element.prototype.scrollIntoView = vi.fn();
@@ -29,50 +48,61 @@ afterEach(() => {
 });
 
 describe("News", () => {
-  it.each(["IMOS", "AAD", "AIMS", "CSIRO", "IMAS"])(
-    "selects the %s tab on click without leaving the page",
-    async (label) => {
-      renderNews("/?featured=IMAS");
-      await userEvent
-        .setup()
-        .click(screen.getByRole("button", { name: new RegExp(`^${label}$`) }));
-      expect(
-        screen.getByRole("button", { name: new RegExp(`^${label}$`) })
-      ).toHaveAttribute("aria-current", "true");
-      expect(screen.getAllByRole("button", { current: true })).toHaveLength(1);
-    }
-  );
+  it("shows a pill for IMOS and every contributor", () => {
+    renderNews();
+    ["IMOS", "AAD", "AIMS", "CSIRO", "GA", "IMAS", "NCI", "eAtlas", "WAMSI"]
+      .map(getPill)
+      .forEach((pill) => expect(pill).toBeInTheDocument());
+  });
+
+  it("disables only the pills without cards", () => {
+    renderNews("/", [imosCard, aadCard]);
+    expect(getPill("IMOS")).toBeEnabled();
+    expect(getPill("AAD")).toBeEnabled();
+    expect(getPill("AIMS")).toBeDisabled();
+    expect(getPill("WAMSI")).toBeDisabled();
+  });
+
+  it("switches the cards when a pill is clicked", async () => {
+    renderNews("/", [imosCard, aadCard]);
+    expect(screen.getByText("IMOS test card")).toBeInTheDocument();
+    await userEvent.setup().click(getPill("AAD"));
+    expect(getPill("AAD")).toHaveAttribute("aria-current", "true");
+    expect(screen.getAllByRole("button", { current: true })).toHaveLength(1);
+    expect(screen.getAllByText("AAD test card")).not.toHaveLength(0);
+    expect(screen.queryByText("IMOS test card")).not.toBeInTheDocument();
+  });
 
   it.each([
     ["/?featured=AAD", "AAD"],
     ["/?featured=aad", "AAD"],
+    ["/?featured=AIMS", "IMOS"],
     ["/?featured=unknown", "IMOS"],
     ["/", "IMOS"],
-  ])("opens %s with the %s tab selected", (url, label) => {
-    renderNews(url);
-    expect(
-      screen.getByRole("button", { name: new RegExp(`^${label}$`) })
-    ).toHaveAttribute("aria-current", "true");
+  ])("opens %s with the %s pill selected", (url, label) => {
+    renderNews(url, [imosCard, aadCard]);
+    expect(getPill(label)).toHaveAttribute("aria-current", "true");
     expect(screen.getAllByRole("button", { current: true })).toHaveLength(1);
   });
 
-  it("shows the cards of the selected tab", () => {
-    renderNews("/?featured=AAD");
-    getNewsCards(SearchKeys.AAD).forEach((card) => {
-      expect(screen.getAllByText(card.title.trim())).not.toHaveLength(0);
-    });
+  it("scrolls to the section only for a featured tab with cards", () => {
+    renderNews("/?featured=AIMS", [imosCard, aadCard]);
+    expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
+    cleanup();
+    renderNews("/?featured=AAD", [imosCard, aadCard]);
+    expect(Element.prototype.scrollIntoView).toHaveBeenCalledOnce();
   });
 
-  it("scrolls to the section when featured is set", () => {
-    renderNews("/?featured=AAD");
-    expect(Element.prototype.scrollIntoView).toHaveBeenCalledOnce();
+  it("does not show the select organisation prompt", () => {
+    renderNews();
+    expect(
+      screen.queryByText(/Select a contributing organisation/)
+    ).not.toBeInTheDocument();
   });
 
   it("shows no dataset counts or more datasets button", () => {
     renderNews();
-    expect(screen.getByRole("button", { name: "AAD" })).toHaveTextContent(
-      /^AAD$/
-    );
+    expect(getPill("IMOS")).toHaveTextContent(/^IMOS$/);
     expect(
       screen.queryByRole("button", { name: "More datasets" })
     ).not.toBeInTheDocument();
