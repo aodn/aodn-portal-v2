@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+      - "hotfix/**"
 
 # cancel currently running workflows from the same PR
 concurrency:
