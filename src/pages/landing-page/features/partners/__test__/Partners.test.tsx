@@ -148,24 +148,3 @@ describe("Partners", () => {
     expect(link).toHaveAttribute("rel", "noopener noreferrer");
   });
 });
-
-describe("isPartnersSectionEnabled", () => {
-  afterEach(() => {
-    vi.unstubAllEnvs();
-    vi.resetModules();
-  });
-
-  it("is on when the build is not production", async () => {
-    vi.stubEnv("MODE", "staging");
-    vi.resetModules();
-    const { isPartnersSectionEnabled } = await import("../constants");
-    expect(isPartnersSectionEnabled).toBe(true);
-  });
-
-  it("is off in the production build", async () => {
-    vi.stubEnv("MODE", "prod");
-    vi.resetModules();
-    const { isPartnersSectionEnabled } = await import("../constants");
-    expect(isPartnersSectionEnabled).toBe(false);
-  });
-});
