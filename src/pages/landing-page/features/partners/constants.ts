@@ -10,12 +10,6 @@ import EAtlasLogo from "@/assets/partners/eatlas-logo.webp";
 import WAMSILogo from "@/assets/partners/wamsi-logo.webp";
 import { FEATURED_DATASET_COUNTS } from "@/pages/landing-page/constants";
 
-/**
- * Shows the new partners section on the landing page. The production build
- * (mode "prod") keeps the old logo list until the new section is approved.
- */
-export const isPartnersSectionEnabled = import.meta.env.MODE !== "prod";
-
 export const PARTNERS_COLOURS = portalTheme.designTokens.colours.partners;
 
 export const IMOS_STATS = [
