@@ -35,7 +35,9 @@ import {
 import { cqlDefaultFilters, TemporalDuring } from "../common/cqlFilters";
 import TimeRangeBarChart from "../common/charts/TimeRangeBarChart";
 import PlainDatePicker from "../common/datetime/PlainDatePicker";
-import PlainSlider from "../common/slider/PlainSlider";
+import PlainSlider, {
+  valueLabelOpenSelectors,
+} from "../common/slider/PlainSlider";
 import {
   dayjsToUnixMs,
   formatDate,
@@ -581,6 +583,10 @@ const DateRangeFilter: FC<DateRangeFilterProps> = memo(() => {
                     padding: theme.spacing(0.5, 1),
                     backdropFilter: "none",
                     WebkitBackdropFilter: "none",
+                  },
+                  [`& .MuiSlider-valueLabel, ${valueLabelOpenSelectors}`]: {
+                    top: "auto",
+                    bottom: "calc(100% + 12px)",
                   },
                 }}
               />
