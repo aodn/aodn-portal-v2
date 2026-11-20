@@ -24,6 +24,12 @@ import eatlas2 from "@/assets/images/eatlas2.webp";
 import eatlas2Card from "@/assets/images/eatlas2-card-400.webp";
 import eatlas3 from "@/assets/images/eatlas3.webp";
 import eatlas3Card from "@/assets/images/eatlas3-card-400.webp";
+import ga1 from "@/assets/images/ga1.webp";
+import ga1Card from "@/assets/images/ga1-card-400.webp";
+import ga2 from "@/assets/images/ga2.webp";
+import ga2Card from "@/assets/images/ga2-card-400.webp";
+import ga3 from "@/assets/images/ga3.webp";
+import ga3Card from "@/assets/images/ga3-card-400.webp";
 
 export const FEATURED_CONTRIBUTORS = CONTRIBUTORS;
 
@@ -164,6 +170,38 @@ export const NEWS_CARDS_DATA: NewsCardData[] = [
     title:
       "Four Decades of Seagrass Data from Torres Strait and Gulf of Carpentaria (NESP MaC 1.13, TropWATER JCU)",
     link: `${window.location.origin}/details/d9a67694-d803-46ca-8f4b-63fc12d51bd1?tab=summary`,
+  },
+  {
+    id: 13,
+    tab: SearchKeys.GA,
+    description:
+      "A 250m resolution grid of Australia’s bathymetry and elevation, derived from surveys and satellite observations.",
+    image: ga1,
+    imageSrcSet: `${ga1Card} 400w, ${ga1} 600w`,
+    title:
+      "AusBathyTopo 250m (Australia) 2026 Grid: A national-scale depth and elevation dataset and derived terrain variables",
+    link: `${window.location.origin}/details/7ff1f558-8ef4-427b-9696-007b76aab2c6?tab=summary`,
+  },
+  {
+    id: 15,
+    tab: SearchKeys.GA,
+    description:
+      "A 30m resolution seamless grid of the bathymetry and elevation of the Perth region, derived from surveys and satellite observations.",
+    image: ga3,
+    imageSrcSet: `${ga3Card} 400w, ${ga3} 600w`,
+    title:
+      "AusBathyTopo 30m (Perth) 2026 Grid - A regional-scale depth and elevation dataset and derived terrain variables",
+    link: `${window.location.origin}/details/61a348f7-077f-476a-b8a2-b8e3feb2a304?tab=summary`,
+  },
+  {
+    id: 14,
+    tab: SearchKeys.GA,
+    description:
+      "Marine sediment grain size, carbonate content, mineralogy, geochemistry and age from samples around Australia’s coasts, oceans and Antarctic.",
+    image: ga2,
+    imageSrcSet: `${ga2Card} 400w, ${ga2} 600w`,
+    title: "Marine Sediments (MARS) Database",
+    link: `${window.location.origin}/details/a05f7892-eef2-7506-e044-00144fdd4fa6?tab=summary`,
   },
 ];
 

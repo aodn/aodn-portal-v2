@@ -10,12 +10,6 @@ import EAtlasLogo from "@/assets/partners/eatlas-logo.webp";
 import WAMSILogo from "@/assets/partners/wamsi-logo.webp";
 import { FEATURED_DATASET_COUNTS } from "@/pages/landing-page/constants";
 
-/**
- * Shows the new partners section on the landing page. The production build
- * (mode "prod") keeps the old logo list until the new section is approved.
- */
-export const isPartnersSectionEnabled = import.meta.env.MODE !== "prod";
-
 export const PARTNERS_COLOURS = portalTheme.designTokens.colours.partners;
 
 export const IMOS_STATS = [
@@ -94,9 +88,9 @@ export const CONTRIBUTORS: Contributor[] = [
     searchText: "Geoscience Australia",
     shortName: "GA",
     fullName: "Geoscience Australia",
-    website: "https://www.ga.gov.au",
+    website: "https://www.ga.gov.au/scientific-topics/marine-and-coastal/",
     description:
-      "The Australian Government’s geoscience agency, mapping the seabed, coastline and marine jurisdiction of the continent.",
+      "Providing trusted national information and insights about the land, marine and coastal geography of Australia including its external territories.",
     logo: GALogo,
     logoAspectRatio: 4.043,
     logoScale: 1.1,
