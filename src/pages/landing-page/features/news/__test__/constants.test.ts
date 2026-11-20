@@ -28,9 +28,12 @@ describe("getFeaturedGroup", () => {
     expect(getFeaturedGroup("IMOS")).toBe(SearchKeys.IMOS);
   });
 
-  it.each(["aims", "WAMSI", "eAtlas"])("opens %s, which has cards", (value) => {
-    expect(getFeaturedGroup(value)).toBe(value.toLowerCase());
-  });
+  it.each(["aims", "WAMSI", "eAtlas", "ga"])(
+    "opens %s, which has cards",
+    (value) => {
+      expect(getFeaturedGroup(value)).toBe(value.toLowerCase());
+    }
+  );
 });
 
 describe("getNewsCards", () => {
@@ -46,7 +49,7 @@ describe("getNewsCards", () => {
   });
 
   it("returns no cards for a tab without content", () => {
-    expect(getNewsCards(SearchKeys.GA)).toEqual([]);
+    expect(getNewsCards(SearchKeys.NCI)).toEqual([]);
   });
 
   it("has unique card ids", () => {
@@ -59,6 +62,7 @@ describe("getNewsCards", () => {
     [SearchKeys.AIMS, 3],
     [SearchKeys.WAMSI, 3],
     [SearchKeys.EATLAS, 3],
+    [SearchKeys.GA, 3],
   ])("has the featured datasets of %s", (tab, count) => {
     const cards = getNewsCards(tab);
     expect(cards).toHaveLength(count);

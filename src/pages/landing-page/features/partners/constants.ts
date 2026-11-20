@@ -88,9 +88,9 @@ export const CONTRIBUTORS: Contributor[] = [
     searchText: "Geoscience Australia",
     shortName: "GA",
     fullName: "Geoscience Australia",
-    website: "https://www.ga.gov.au",
+    website: "https://www.ga.gov.au/scientific-topics/marine-and-coastal/",
     description:
-      "The Australian Government’s geoscience agency, mapping the seabed, coastline and marine jurisdiction of the continent.",
+      "Providing trusted national information and insights about the land, marine and coastal geography of Australia including its external territories.",
     logo: GALogo,
     logoAspectRatio: 4.043,
     logoScale: 1.1,
