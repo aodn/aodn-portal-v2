@@ -4,7 +4,7 @@ on:
   push:
     branches: ["main"]
   pull_request:
-    branches: ["main"]
+    branches: ["main", "hotfix/**"]
 
 # cancel currently running workflow from the same PR or branch
 concurrency:
