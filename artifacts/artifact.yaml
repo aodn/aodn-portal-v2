@@ -3,3 +3,7 @@ cloudfront_functions:
     description: Route requests based on user agent to different origins
     source_key: functions/cloudfront/aodn_portal_frontend_route_by_user_agent.js
     runtime: cloudfront-js-2.0
+  - name: aodn_portal_frontend_404_on_missing_page
+    description: Answer 404 to crawlers when the pre-rendered page is missing
+    source_key: functions/cloudfront/aodn_portal_frontend_404_on_missing_page.js
+    runtime: cloudfront-js-2.0
