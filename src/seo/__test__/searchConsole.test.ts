@@ -107,15 +107,15 @@ describe("fetchSitemapUrls", () => {
         text: async () =>
           '<?xml version="1.0" encoding="UTF-8"?>\n' +
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
-          "  <url><loc>https://portal-beta.aodn.org.au/</loc></url>\n" +
-          "  <url><loc>https://portal-beta.aodn.org.au/details/abc-123</loc></url>\n" +
+          "  <url><loc>https://portal.aodn.org.au/</loc></url>\n" +
+          "  <url><loc>https://portal.aodn.org.au/details/abc-123</loc></url>\n" +
           "</urlset>",
       })
     );
 
     await expect(fetchSitemapUrls()).resolves.toEqual([
-      "https://portal-beta.aodn.org.au/",
-      "https://portal-beta.aodn.org.au/details/abc-123",
+      "https://portal.aodn.org.au/",
+      "https://portal.aodn.org.au/details/abc-123",
     ]);
   });
 
