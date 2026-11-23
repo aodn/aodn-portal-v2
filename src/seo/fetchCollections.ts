@@ -12,9 +12,10 @@ import { OGC_API_BASE } from "./constants";
 // The rest of src/seo stays free of app-store imports by getting the type here
 export type { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 
-// Fields the bulk collections endpoint returns for the SEO artifacts
+// Names must be backend CQLFields enum names: ogcapi validates ?properties= and
+// answers 500 to unknown ones. ai_description comes back as properties["ai:description"].
 export const SEO_PROPERTIES =
-  "id,title,description,bbox,temporal,themes,creation,revision,citation,license,dataset_provider,links";
+  "id,title,description,bbox,temporal,themes,creation,revision,citation,license,dataset_provider,links,statement,contacts,ai_description";
 
 // fetchResultNoStore returns one page; walk search_after until we have them all
 const API_URL = `${OGC_API_BASE}/api/v1/ogc/collections`;

@@ -49,7 +49,88 @@ describe("buildJsonLd", () => {
       temporalCoverage: "2010-01-01T00:00:00Z/..",
       license: "Creative Commons Attribution 4.0 International License",
       citation: "IMOS (2017). Sea Surface Temperature.",
+      includedInDataCatalog: {
+        "@type": "DataCatalog",
+        name: "AODN Portal",
+        url: `${BASE_URL}/`,
+      },
     });
+  });
+  test("describes the record with the enhanced description when present", () => {
+    const jsonLd = buildJsonLd(
+      toCollection({
+        id: "abc-123",
+        title: "Enhanced",
+        description: "Plain.",
+        properties: { "ai:description": "Enhanced." },
+      })
+    );
+    expect(jsonLd.description).toBe("Enhanced.");
+  });
+  test("lists only the keywords the Detail_Page shows", () => {
+    const jsonLd = buildJsonLd(
+      toCollection({
+        id: "abc-123",
+        title: "Keywords",
+        properties: {
+          themes: [
+            {
+              scheme: "theme",
+              concepts: [
+                { id: " Oceans " },
+                { id: "Oceans" },
+                { id: "Predicted", "ai:description": "AI" },
+              ],
+            },
+            { scheme: "Categories", concepts: [{ id: "category" }] },
+          ],
+        },
+      })
+    );
+    expect(jsonLd.keywords).toEqual(["Oceans"]);
+  });
+  test("takes the creator from contacts, the download links and the license URL from links", () => {
+    const jsonLd = buildJsonLd(
+      toCollection({
+        id: "abc-123",
+        title: "Links",
+        links: [
+          {
+            rel: "license",
+            href: "https://creativecommons.org/licenses/by/4.0/",
+          },
+          {
+            rel: "related",
+            href: "https://example.org/sst.nc",
+            type: "application/netcdf",
+            title: "SST",
+            "ai:role": ["download"],
+          },
+          { rel: "related", href: "https://example.org/page" },
+        ],
+        properties: {
+          license: "CC BY 4.0",
+          dataset_provider: "Provider",
+          contacts: [
+            { organization: "Distributor", roles: ["distributor"] },
+            { organization: "Author Org", roles: ["author"] },
+          ],
+        },
+      })
+    );
+    expect(jsonLd.creator).toEqual({
+      "@type": "Organization",
+      name: "Author Org",
+    });
+    expect(jsonLd.license).toBe("https://creativecommons.org/licenses/by/4.0/");
+    expect(jsonLd.distribution).toEqual([
+      {
+        "@type": "DataDownload",
+        contentUrl: "https://example.org/sst.nc",
+        encodingFormat: "application/netcdf",
+        name: "SST",
+      },
+    ]);
   });
 
   test("omits optional fields the record does not have", () => {

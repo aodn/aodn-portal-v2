@@ -14,9 +14,9 @@ crawlers need, delivered two ways:
   `fetchCollections.ts` pulls every record — the only module here that imports
   app-store code — and feeds two builders. `sitemap.ts` writes `sitemap.xml`.
   `prerender.ts` writes ~15k pages at `prerender/details/<uuid>/index.html`,
-  each carrying `jsonLd.ts` structured data and a static body of title,
-  abstract, a breadcrumb link home and `relatedRecords.ts` links — crawlers
-  discover pages only through `<a href>`.
+  each carrying `jsonLd.ts` structured data and a static body built from
+  `crawlerContent()` (its structure is pinned in `__test__/prerender.test.ts`)
+  — crawlers discover pages only through `<a href>`.
 
 The pre-rendered pages ship **without the app bundle**. Google indexes a page
 after running its JavaScript, so if the bundle is left in, React mounts, empties
