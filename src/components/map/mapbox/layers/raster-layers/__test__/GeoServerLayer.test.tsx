@@ -1,4 +1,4 @@
-import { render, waitFor } from "@testing-library/react";
+import { act, render, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
@@ -50,6 +50,9 @@ vi.mock("mapbox-gl", () => ({
       remove: vi.fn(),
     };
   }),
+  MercatorCoordinate: {
+    fromLngLat: () => ({ x: 0.5, y: 0.5 }),
+  },
 }));
 
 describe("GeoServerLayer", () => {
@@ -117,6 +120,54 @@ describe("GeoServerLayer", () => {
       </Provider>
     );
   };
+
+  it("sends CSS pixel size when the canvas backing store is retina", async () => {
+    mockMap.getCanvas = () => ({
+      width: 1928,
+      height: 1176,
+      clientWidth: 964,
+      clientHeight: 588,
+    });
+    mockMap.getBounds = () => ({
+      getSouthWest: () => ({ lng: 144.82, lat: -38.21 }),
+      getNorthEast: () => ({ lng: 145.31, lat: -37.98 }),
+    });
+    mocks.axiosInstance.get.mockImplementation((url: string) => {
+      if (url.includes("wms_layers")) {
+        return Promise.resolve({
+          data: [{ name: "test_layer", title: "Test Layer", queryable: "0" }],
+        });
+      }
+      if (url.includes("wms_fields")) {
+        return Promise.resolve({ data: [] });
+      }
+      return Promise.resolve({ data: {} });
+    });
+
+    renderComponent();
+
+    const click = mockMap.on.mock.calls
+      .filter((call: unknown[]) => call[0] === MapEventEnum.CLICK)
+      .at(-1)?.[1] as (event: { point: { x: number; y: number } }) => void;
+
+    act(() => {
+      click({ point: { x: 474.4, y: 29.2 } });
+    });
+
+    await waitFor(() => {
+      expect(mocks.axiosInstance.get).toHaveBeenCalledWith(
+        expect.stringContaining("wms_map_feature"),
+        expect.objectContaining({
+          params: expect.objectContaining({
+            width: 964,
+            height: 588,
+            x: 474,
+            y: 29,
+          }),
+        })
+      );
+    });
+  });
 
   it("should fetch layers and fields and add mapbox layer", async () => {
     mocks.axiosInstance.get.mockImplementation((url: string) => {
