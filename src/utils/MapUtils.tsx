@@ -323,9 +323,6 @@ export const isMapDrawModeActive = (
     return false;
   }
 };
-
-/** @deprecated Prefer {@link isMapDrawModeActive} (draw + edit + selection). */
-export const isDrawModeRectangle = isMapDrawModeActive;
 // Mapbox do not create a bbox box align with EPSG:3857 if you use the bounds value, you need to adjust it
 // with functions, however, if you use the url directly with "{bbox-epsg-3857}", then mapbox will do the cal for you.
 // in case you are not able to use the "{bbox-epsg-3857}" then you need to do the cal yourself
