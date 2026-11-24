@@ -13,7 +13,13 @@ import path from "path";
 import { isSeoEligibleCollection } from "@/seo/collectionEligibility";
 import type { OGCCollection } from "./fetchCollections";
 import { fetchCollections } from "./fetchCollections";
-import { buildBreadcrumbJsonLd, buildJsonLd } from "./jsonLd";
+import {
+  abstractOf,
+  buildBreadcrumbJsonLd,
+  buildJsonLd,
+  visibleKeywords,
+} from "./jsonLd";
+import type { ILink } from "@/app/store/OGCCollectionDefinitions";
 import { buildRelatedLinks, RelatedLink } from "./relatedRecords";
 import { isSeoCli, runCli, seoDistDir } from "./cli";
 import {
@@ -27,51 +33,249 @@ import {
 // How many skipped ids the log prints; a bad fetch can skip thousands
 const SKIPPED_IDS_SHOWN = 20;
 
-// A visible, labelled date matching the JSON-LD dates — Google's best practice
-// for controlling the date shown next to search results
-const renderDateLine = (collection: OGCCollection) => {
+// Relations that point at another record in this catalogue
+const RECORD_RELS = new Set(["parent", "child", "sibling"]);
+
+// Metadata points at a sibling record as "uuid:<id>", which is not an address
+// a crawler can follow; turn it into that record's page instead.
+const RECORD_REFERENCE = /^uuid:(.+)$/i;
+
+// A relative href (articleId=8084) would resolve to an invented
+// /details/articleId=8084, so only absolute URLs and record references stay.
+const toCrawlableHref = (href: string) => {
+  if (RECORD_REFERENCE.test(href)) {
+    return `/details/${encodeURIComponent(href.replace(RECORD_REFERENCE, "$1"))}`;
+  }
+  return /^[a-z][a-z0-9+.-]*:/i.test(href) ? href : "";
+};
+
+interface CrawlerLink {
+  href: string;
+  text: string;
+}
+
+/**
+ * What the crawler page says, one field per Detail_Page tab. Plain data: the
+ * HTML is made from it by renderBody. The shape is pinned in
+ * __test__/prerender.test.ts.
+ */
+export interface CrawlerContent {
+  title: string;
+  date?: { label: "Updated" | "Published"; value: string };
+  summary: {
+    abstract: string[];
+    temporalCoverage?: string;
+    spatialCoverage?: string;
+  };
+  dataAccess: {
+    data: CrawlerLink[];
+    documents: CrawlerLink[];
+    codeTutorials: CrawlerLink[];
+    other: CrawlerLink[];
+  };
+  citationAndUsage: {
+    suggestedCitation?: string;
+    citedResponsibleParties: string[];
+    dataContact: string[];
+    license?: { name: string; url?: string };
+  };
+  additionalInformation: { lineage: string[]; keywords: string[] };
+  relatedRecords: { id: string; title: string }[];
+}
+
+// One entry per blank-line separated paragraph
+const splitParagraphs = (text: string) =>
+  text
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+
+const isoDay = (iso: string) => iso.slice(0, 10);
+
+// A labelled date matching the JSON-LD dates — Google's best practice for
+// controlling the date shown next to search results
+const dateOf = (collection: OGCCollection): CrawlerContent["date"] => {
   const revision = collection.getRevision();
   const creation = collection.getCreation();
-  if (revision)
-    return `<p>Updated: ${escapeEntities(revision.slice(0, 10))}</p>`;
-  if (creation)
-    return `<p>Published: ${escapeEntities(creation.slice(0, 10))}</p>`;
-  return "";
+  if (revision) return { label: "Updated", value: isoDay(revision) };
+  if (creation) return { label: "Published", value: isoDay(creation) };
+};
+
+const temporalCoverageOf = (collection: OGCCollection) => {
+  const [start, end] = collection.extent?.temporal?.interval?.[0] ?? [];
+  return start
+    ? `${isoDay(start)} to ${end ? isoDay(end) : "Present"}`
+    : undefined;
+};
+
+const spatialCoverageOf = (collection: OGCCollection) => {
+  const box = collection.getBBox()?.[0];
+  if (box?.length !== 4) return undefined;
+  const [west, south, east, north] = box;
+  return `West ${west}°, South ${south}°, East ${east}°, North ${north}°`;
+};
+
+const crawlerLinks = (links: ILink[] = []): CrawlerLink[] =>
+  links.flatMap((link) => {
+    const href = toCrawlableHref(link.href ?? "");
+    return href
+      ? [{ href, text: link.title?.replace(/_/g, " ") || link.href }]
+      : [];
+  });
+
+// Organisation names only: contact names, emails, phones and addresses are
+// personal data and stay off the page.
+const organisations = (collection: OGCCollection, role: string) => [
+  ...new Set(
+    (collection.getContacts() ?? [])
+      .filter((contact) => contact.roles?.includes(role))
+      .map((contact) => contact.organization?.trim())
+      .filter((name): name is string => !!name)
+  ),
+];
+
+// The licence a record is published under, with its URL when it has one.
+const licenseOf = (collection: OGCCollection) => {
+  const name = collection.getLicense();
+  if (!name) return undefined;
+  const url = collection.links?.find(
+    (link) => link.rel?.toLowerCase() === "license"
+  )?.href;
+  return { name, url };
+};
+
+// The Detail_Page stores '{"title":…,"recordAbstract":…}' in a record link's
+// title; fall back to a plain title, then the record id.
+const recordTitle = (link: ILink) => {
+  let title = link.title;
+  try {
+    title = JSON.parse(title).title ?? title;
+  } catch {
+    // not JSON: already a plain title
+  }
+  return title || link.href.replace(RECORD_REFERENCE, "$1");
+};
+
+const isRecordLink = (link: ILink) =>
+  RECORD_RELS.has(link.rel?.toLowerCase() ?? "") &&
+  RECORD_REFERENCE.test(link.href ?? "");
+
+// Records this one names as its parent, sibling or child, in the metadata's
+// own order. Theme-derived suggestions follow them.
+const recordLinks = (collection: OGCCollection): RelatedLink[] =>
+  (collection.links ?? []).filter(isRecordLink).map((link) => ({
+    id: link.href.replace(RECORD_REFERENCE, "$1"),
+    title: recordTitle(link),
+  }));
+
+// Google left many detail pages "Crawled - currently not indexed" while the
+// crawler page carried only a title, an abstract and a few links. So it now
+// carries what the Detail_Page shows, tab by tab, and nothing the page does not
+// show (that would be cloaking). Left out: interactive parts (map, downloads),
+// personal contact details, and fields the page does not display.
+export const crawlerContent = (
+  collection: OGCCollection,
+  related: RelatedLink[] = []
+): CrawlerContent => {
+  const named = recordLinks(collection);
+  const namedIds = new Set(named.map((link) => link.id));
+  return {
+    title: collection.title ?? "",
+    date: dateOf(collection),
+    summary: {
+      abstract: splitParagraphs(abstractOf(collection)),
+      temporalCoverage: temporalCoverageOf(collection),
+      spatialCoverage: spatialCoverageOf(collection),
+    },
+    dataAccess: {
+      data: crawlerLinks(collection.getDataAccessLinks()),
+      documents: crawlerLinks(collection.getDocumentLinks()),
+      codeTutorials: crawlerLinks(collection.getCodeTutorialLinks()),
+      other: crawlerLinks(collection.getOtherLinks()),
+    },
+    citationAndUsage: {
+      suggestedCitation: collection.getCitation()?.suggestedCitation,
+      citedResponsibleParties: organisations(collection, "citation"),
+      dataContact: organisations(collection, "about"),
+      license: licenseOf(collection),
+    },
+    additionalInformation: {
+      lineage: splitParagraphs(collection.getStatement() ?? ""),
+      keywords: visibleKeywords(collection.getThemes()),
+    },
+    relatedRecords: [
+      ...named,
+      ...related.filter((link) => !namedIds.has(link.id)),
+    ],
+  };
 };
 
 const linkList = (items: string[]) =>
   items.length ? `<ul>${items.join("")}</ul>` : "";
 
-// Structural relations, not destinations a crawler should follow from here.
-const NON_CONTENT_RELS = new Set(["self", "icon", "preview"]);
-
-// Catalogue links a crawler can follow. self, icon and preview are omitted.
-const renderDataSection = (collection: OGCCollection) => {
-  const items = (collection.links ?? [])
-    .filter(
-      (link) => link.href && !NON_CONTENT_RELS.has(link.rel?.toLowerCase())
-    )
-    .map((link) => {
-      const label = link.title || link.href;
-      const href = escapeEntities(link.href);
-      return `<li><a href="${href}">${escapeEntities(label)}</a></li>`;
-    });
-  if (items.length === 0) return "";
-  return `<section aria-label="Data"><h2>Data</h2>${linkList(items)}</section>`;
-};
-
-// Static body for crawlers: title, date, abstract, data links and related
-// records. Crawlers only follow <a href>. stripAppBundle keeps it from being
-// replaced.
-const renderBody = (collection: OGCCollection, related: RelatedLink[]) => {
-  const relatedItems = related.map(
-    (link) =>
-      `<li><a href="/details/${link.id}">${escapeEntities(link.title)}</a></li>`
-  );
-  const relatedNav = relatedItems.length
-    ? `<nav aria-label="Related records"><h2>Related records</h2>${linkList(relatedItems)}</nav>`
+const section = (label: string, content: string) =>
+  content
+    ? `<section aria-label="${label}"><h2>${label}</h2>${content}</section>`
     : "";
-  const sections = [renderDataSection(collection), relatedNav].filter(Boolean);
+
+const textList = (texts: string[]) =>
+  linkList(texts.map((text) => `<li>${escapeEntities(text)}</li>`));
+
+const paragraphs = (texts: string[]) =>
+  texts.map((text) => `<p>${escapeEntities(text)}</p>`).join("");
+
+const anchor = (href: string, text: string) =>
+  `<a href="${escapeEntities(href)}">${escapeEntities(text)}</a>`;
+
+const linksSection = (label: string, links: CrawlerLink[]) =>
+  section(
+    label,
+    linkList(links.map(({ href, text }) => `<li>${anchor(href, text)}</li>`))
+  );
+
+// Static body for crawlers, in the order of the Detail_Page tabs. Crawlers
+// only follow <a href>. stripAppBundle keeps it from being replaced.
+const renderBody = (content: CrawlerContent) => {
+  const { summary, dataAccess, citationAndUsage, additionalInformation } =
+    content;
+  const { license } = citationAndUsage;
+  const dateLine = content.date
+    ? `<p>${content.date.label}: ${escapeEntities(content.date.value)}</p>`
+    : "";
+  const textSection = (label: string, text?: string) =>
+    section(label, text ? paragraphs([text]) : "");
+  const related = content.relatedRecords.length
+    ? `<nav aria-label="Related records"><h2>Related records</h2>${linkList(
+        content.relatedRecords.map(
+          ({ id, title }) =>
+            `<li>${anchor(`/details/${encodeURIComponent(id)}`, title)}</li>`
+        )
+      )}</nav>`
+    : "";
+  const sections = [
+    section("Summary", paragraphs(summary.abstract)),
+    textSection("Temporal coverage", summary.temporalCoverage),
+    textSection("Spatial coverage", summary.spatialCoverage),
+    linksSection("Data", dataAccess.data),
+    linksSection("Documents", dataAccess.documents),
+    linksSection("Code Tutorials", dataAccess.codeTutorials),
+    linksSection("Other", dataAccess.other),
+    textSection("Suggested Citation", citationAndUsage.suggestedCitation),
+    section(
+      "Cited Responsible Parties",
+      textList(citationAndUsage.citedResponsibleParties)
+    ),
+    section("Data Contact", textList(citationAndUsage.dataContact)),
+    section(
+      "License",
+      license
+        ? `<p>${license.url ? anchor(license.url, license.name) : escapeEntities(license.name)}</p>`
+        : ""
+    ),
+    section("Lineage", paragraphs(additionalInformation.lineage)),
+    section("Keywords", textList(additionalInformation.keywords)),
+    related,
+  ].filter(Boolean);
   const sectionsHtml = sections.length
     ? `\n    ${sections.join("\n    ")}`
     : "";
@@ -79,9 +283,8 @@ const renderBody = (collection: OGCCollection, related: RelatedLink[]) => {
   // "Back to Home" is a Box with an onClick, which a crawler cannot follow.
   return `<nav aria-label="Breadcrumb"><a href="/">${SITE_NAME}</a></nav>
   <main>
-    <h1>${escapeEntities(collection.title ?? "")}</h1>
-    ${renderDateLine(collection)}
-    <p>${escapeEntities(collection.description ?? "")}</p>${sectionsHtml}
+    <h1>${escapeEntities(content.title)}</h1>
+    ${dateLine}${sectionsHtml}
   </main>`;
 };
 
@@ -120,9 +323,7 @@ export const renderCrawlerPage = (
   related: RelatedLink[] = []
 ) => {
   const title = escapeEntities(collection.title ?? "");
-  const description = escapeEntities(
-    (collection.description ?? "").slice(0, 160)
-  );
+  const description = escapeEntities(abstractOf(collection).slice(0, 160));
   const pageUrl = detailsUrl(collection.id);
   const headTags = [
     `<link rel="canonical" href="${pageUrl}" />`,
@@ -154,7 +355,8 @@ export const renderCrawlerPage = (
       // The shell's #root is empty; the record body goes in its place
       .replace(
         /<div id="root">.*?<\/div>/s,
-        () => `<div id="root">${renderBody(collection, related)}</div>`
+        () =>
+          `<div id="root">${renderBody(crawlerContent(collection, related))}</div>`
       )
   );
 };

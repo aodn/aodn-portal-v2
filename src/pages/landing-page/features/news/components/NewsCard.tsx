@@ -42,8 +42,6 @@ const NewsCard: FC<NewsCardProps> = ({ news }) => {
       <Box
         component="a"
         href={news.link}
-        target="_blank"
-        rel="noopener noreferrer"
         aria-label={news.title}
         sx={{ position: "relative", display: "block" }}
       >
@@ -55,7 +53,7 @@ const NewsCard: FC<NewsCardProps> = ({ news }) => {
           alt={news.title}
           loading="lazy"
           decoding="async"
-          data-testid={news.subheading}
+          data-testid={`news-card-${news.id}`}
           sx={{ aspectRatio: "1.9", objectFit: "cover" }}
         />
         <Typography
@@ -65,7 +63,8 @@ const NewsCard: FC<NewsCardProps> = ({ news }) => {
             top: 14,
             right: 13,
             px: 1.5,
-            py: "4.5px",
+            pt: 0,
+            pb: "3px",
             minWidth: 77,
             height: 28,
             boxSizing: "border-box",
@@ -96,22 +95,9 @@ const NewsCard: FC<NewsCardProps> = ({ news }) => {
         }}
       >
         <Typography
-          variant="overline"
-          sx={{
-            color: portalTheme.palette.primary4,
-            fontSize: 13,
-            lineHeight: "18px",
-            letterSpacing: "1.3px",
-            alignSelf: "stretch",
-          }}
-        >
-          {news.subheading}
-        </Typography>
-        <Typography
           component="h4"
           variant="subtitle1"
           sx={{
-            mt: "13px",
             mb: "11px",
             fontFamily: portalTheme.typography.heading3.fontFamily,
             fontSize: 20,
@@ -136,8 +122,6 @@ const NewsCard: FC<NewsCardProps> = ({ news }) => {
         <Button
           component="a"
           href={news.link}
-          target="_blank"
-          rel="noopener noreferrer"
           endIcon={<EastIcon />}
           sx={{
             alignSelf: "flex-end",

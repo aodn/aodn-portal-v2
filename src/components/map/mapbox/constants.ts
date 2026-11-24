@@ -53,13 +53,14 @@ export const SINGLE_POINT_SYMBOLOGY = {
   STROKE_COLOR: "#fff",
 };
 
-// Two-tone outline for the dataset extent: the dark line and the white line
-// below it keep a 3:1 contrast on light, dark and satellite base maps (WCAG 1.4.11)
+// Dataset extent outline on every map: the Figma yellow line on a dark line
+// below it, so it stays readable on light, dark and satellite base maps (WCAG 1.4.11)
 export const EXTENT_OUTLINE_SYMBOLOGY = {
-  COLOR: "#1A1A1A",
-  WIDTH: 2,
-  CASING_COLOR: "#FFFFFF",
-  CASING_WIDTH: 4,
+  // Figma design colour, not in the portal theme
+  COLOR: "#FFDF6C",
+  WIDTH: 1.5,
+  CASING_COLOR: portalTheme.palette.primary2,
+  CASING_WIDTH: 3.5,
 };
 
 const { palette } = portalTheme;

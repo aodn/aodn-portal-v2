@@ -307,3 +307,14 @@ describe("fetchCollections rejects unsafe pagination", () => {
     await expect(fetchCollections()).resolves.toEqual([]);
   });
 });
+
+describe("SEO_PROPERTIES", () => {
+  test("asks for contacts and the AI abstract by backend enum name", () => {
+    const names = SEO_PROPERTIES.split(",");
+    expect(names).toEqual(
+      expect.arrayContaining(["ai_description", "contacts", "statement"])
+    );
+    // ogcapi enum names cannot contain ':', and unknown names answer 500
+    expect(SEO_PROPERTIES).not.toContain(":");
+  });
+});

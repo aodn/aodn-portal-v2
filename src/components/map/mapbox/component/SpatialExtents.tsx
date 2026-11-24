@@ -8,6 +8,7 @@ import {
 import { MapMouseEvent } from "mapbox-gl";
 import { useAppDispatch } from "@/app/store/hooks";
 import { addDataLayer, getDataLayerBeforeId } from "../layerOrder";
+import { EXTENT_OUTLINE_SYMBOLOGY } from "../constants";
 
 interface SpatialExtentsProps {
   layerId: string;
@@ -77,7 +78,13 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
       layerIds.push(lineLayerId);
 
       const polygonLayerId = createPolygonLayerId(sourceId);
-      layerIds.push(polygonLayerId);
+      const polygonCasingLayerId = `${polygonLayerId}-casing`;
+      const polygonOutlineLayerId = `${polygonLayerId}-outline`;
+      layerIds.push(
+        polygonLayerId,
+        polygonCasingLayerId,
+        polygonOutlineLayerId
+      );
 
       getCollectionData(uuid).then((collection) => {
         if (cancelled || !map) return;
@@ -138,7 +145,29 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
           paint: {
             "fill-color": "#fff",
             "fill-opacity": 0.4,
-            "fill-outline-color": "yellow",
+          },
+        });
+
+        // Same outline as the detail page maps; a fill outline is always 1px
+        addLayerIfNotExists(polygonCasingLayerId, {
+          id: polygonCasingLayerId,
+          type: "line",
+          source: sourceId,
+          filter: ["==", "$type", "Polygon"],
+          paint: {
+            "line-color": EXTENT_OUTLINE_SYMBOLOGY.CASING_COLOR,
+            "line-width": EXTENT_OUTLINE_SYMBOLOGY.CASING_WIDTH,
+          },
+        });
+
+        addLayerIfNotExists(polygonOutlineLayerId, {
+          id: polygonOutlineLayerId,
+          type: "line",
+          source: sourceId,
+          filter: ["==", "$type", "Polygon"],
+          paint: {
+            "line-color": EXTENT_OUTLINE_SYMBOLOGY.COLOR,
+            "line-width": EXTENT_OUTLINE_SYMBOLOGY.WIDTH,
           },
         });
       });

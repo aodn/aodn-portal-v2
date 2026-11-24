@@ -10,12 +10,6 @@ import EAtlasLogo from "@/assets/partners/eatlas-logo.webp";
 import WAMSILogo from "@/assets/partners/wamsi-logo.webp";
 import { FEATURED_DATASET_COUNTS } from "@/pages/landing-page/constants";
 
-/**
- * Shows the new partners section on the landing page. The production build
- * (mode "prod") keeps the old logo list until the new section is approved.
- */
-export const isPartnersSectionEnabled = import.meta.env.MODE !== "prod";
-
 export const PARTNERS_COLOURS = portalTheme.designTokens.colours.partners;
 
 export const IMOS_STATS = [
@@ -34,6 +28,9 @@ export const LOGO_SIZE_POWER = 0.62;
 
 export interface Contributor {
   datasetGroup: SearchKeys;
+  // Set for organisations with no dataset group filter.
+  // Their "View datasets" link runs a text search instead.
+  searchText?: string;
   shortName: string;
   fullName: string;
   website: string;
@@ -88,11 +85,12 @@ export const CONTRIBUTORS: Contributor[] = [
   },
   {
     datasetGroup: SearchKeys.GA,
+    searchText: "Geoscience Australia",
     shortName: "GA",
     fullName: "Geoscience Australia",
-    website: "https://www.ga.gov.au",
+    website: "https://www.ga.gov.au/scientific-topics/marine-and-coastal/",
     description:
-      "The Australian Government’s geoscience agency, mapping the seabed, coastline and marine jurisdiction of the continent.",
+      "Providing trusted national information and insights about the land, marine and coastal geography of Australia including its external territories.",
     logo: GALogo,
     logoAspectRatio: 4.043,
     logoScale: 1.1,
@@ -113,23 +111,24 @@ export const CONTRIBUTORS: Contributor[] = [
   },
   {
     datasetGroup: SearchKeys.NCI,
+    searchText: "NCI",
     shortName: "NCI",
     fullName: "National Computational Infrastructure",
     website: "https://nci.org.au",
     description:
       "Australia’s national research computing facility, hosting and serving the large gridded marine and climate collections.",
     logo: NCILogo,
-    logoAspectRatio: 2.115,
+    logoAspectRatio: 2.353,
     logoScale: 0.94,
     ...contributors.nci,
   },
   {
     datasetGroup: SearchKeys.EATLAS,
+    searchText: "eAtlas",
     shortName: "eAtlas",
-    fullName: "eAtlas — Tropical Marine Data Portal",
+    fullName: "eAtlas",
     website: "https://eatlas.org.au",
-    description:
-      "A tropical marine data portal publishing mapping and monitoring products for the Great Barrier Reef, Torres Strait and north-west shelf.",
+    description: "Environmental research, maps and data for tropical Australia",
     logo: EAtlasLogo,
     logoAspectRatio: 2.723,
     logoScale: 1.06,
@@ -137,11 +136,12 @@ export const CONTRIBUTORS: Contributor[] = [
   },
   {
     datasetGroup: SearchKeys.WAMSI,
+    searchText: "WAMSI",
     shortName: "WAMSI",
     fullName: "Western Australian Marine Science Institution",
     website: "https://wamsi.org.au",
     description:
-      "A partnership of Western Australian marine research institutions delivering independent science for the state’s coast and marine estate.",
+      "A collaboration of state and federal government and academic science organisations, working together to deliver independent marine research for Western Australia.",
     logo: WAMSILogo,
     logoAspectRatio: 3.338,
     logoScale: 0.96,

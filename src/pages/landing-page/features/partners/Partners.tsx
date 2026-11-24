@@ -4,11 +4,12 @@ import { useAppDispatch } from "@/app/store/hooks";
 import {
   clearComponentParam,
   updateDatasetGroup,
+  updateSearchText,
 } from "@/app/store/componentParamReducer";
 import useRedirectSearch from "@/hooks/useRedirectSearch";
 import useBreakpoint from "@/hooks/useBreakpoint";
 import { SearchKeys } from "@/components/search/constants";
-import { CONTRIBUTORS, PARTNERS_COLOURS } from "./constants";
+import { Contributor, CONTRIBUTORS, PARTNERS_COLOURS } from "./constants";
 import ImosDataCard from "./components/ImosDataCard";
 import ContributorCard from "./components/ContributorCard";
 import NcrisCard from "./components/NcrisCard";
@@ -33,6 +34,20 @@ const Partners: FC = () => {
   const searchByDatasetGroup = (datasetGroup: SearchKeys) => {
     dispatch(clearComponentParam());
     dispatch(updateDatasetGroup(datasetGroup));
+    redirectSearch("Partners");
+  };
+
+  // Use a text search when the organisation has no dataset group filter
+  const viewContributorDatasets = ({
+    datasetGroup,
+    searchText,
+  }: Contributor) => {
+    if (!searchText) {
+      searchByDatasetGroup(datasetGroup);
+      return;
+    }
+    dispatch(clearComponentParam());
+    dispatch(updateSearchText(searchText));
     redirectSearch("Partners");
   };
 
@@ -63,10 +78,8 @@ const Partners: FC = () => {
           sx={{ mt: "6px", color: PARTNERS_COLOURS.subtitle }}
         >
           The AODN brings together metadata from organisations across Australia
-          describing their marine and climate science data. Data providers
-          retain responsibility for their datasets, while AODN provides a
-          central portal that makes these data discoverable and connects users
-          to available data access services.
+          describing their marine and climate science data, including metadata
+          hosted on behalf of other organisations.
         </Typography>
         <Box
           role="list"
@@ -85,9 +98,7 @@ const Partners: FC = () => {
             <ContributorCard
               key={contributor.datasetGroup}
               contributor={contributor}
-              onViewDatasets={() =>
-                searchByDatasetGroup(contributor.datasetGroup)
-              }
+              onViewDatasets={() => viewContributorDatasets(contributor)}
             />
           ))}
         </Box>

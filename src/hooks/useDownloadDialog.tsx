@@ -39,10 +39,6 @@ import {
   toUtcEndOfDay,
   toUtcStartOfDay,
 } from "@/utils/DateUtils";
-import {
-  getUsageConstraints,
-  resolveSuggestedCitation,
-} from "@/utils/CitationUtils";
 
 // ================== CONSTANTS ==================
 const STATUS_CODES = {
@@ -370,12 +366,6 @@ export const useDownloadDialog = (
           data_usage: dataUsage,
           collection_title: collection?.title || "",
           full_metadata_link: `${window.location.origin}${pageDefault.details}/${uuid}`,
-          suggested_citation: resolveSuggestedCitation(
-            collection?.getCitation()?.suggestedCitation,
-            uuid,
-            collection?.title
-          ),
-          usage_constraints: getUsageConstraints(collection),
           ...(validEstimatedSizeBytes !== undefined && {
             estimated_size_bytes: validEstimatedSizeBytes,
           }),

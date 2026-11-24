@@ -3,5 +3,5 @@
      The real one lists every /details page and carries a "generated" date; run the
      Publish SEO Artifacts workflow to replace this. Last reviewed 2026-08-04. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://portal-beta.aodn.org.au/</loc></url>
+  <url><loc>https://portal.aodn.org.au/</loc></url>
 </urlset>

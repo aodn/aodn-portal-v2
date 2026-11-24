@@ -41,7 +41,7 @@ jobs:
             site: https://portal-staging.aodn.org.au
           - environment: production
             github_environment: production-seo
-            site: https://portal-beta.aodn.org.au
+            site: https://portal.aodn.org.au
     uses: ./.github/workflows/seo_publish_and_verify.yml
     with:
       environment: ${{ matrix.environment }}

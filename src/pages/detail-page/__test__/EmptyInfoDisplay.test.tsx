@@ -89,29 +89,31 @@ describe("AssociatedRecordsPanel", () => {
     });
   });
 
-  it("should render parent record section and allow interaction", () => {
+  it("should render parent record section and allow interaction", async () => {
     // Wait for the parent record to be rendered
-    return waitFor(() =>
-      screen.findAllByText(
-        "Northern Australia Automated Marine Weather and Oceanographic Stations"
-      )
-    ).then(() => {
-      return waitFor(() =>
-        screen.findByTestId(
-          `link-card-${window.location.origin}/details/0887cb5b-b443-4e08-a169-038208109466`
-        )
-      ).then((parentTitle) => {
-        expect(parentTitle).to.exist;
+    await screen.findAllByText(
+      "Northern Australia Automated Marine Weather and Oceanographic Stations",
+      {},
+      { timeout: 5000 }
+    );
 
-        userEvent.click(parentTitle);
-        return waitFor(() => {
-          const parentAbstract = screen.queryByText(
-            /weather stations have been/i
-          );
-          expect(parentAbstract).to.exist;
-        });
-      });
-    });
+    const parentTitle = await screen.findByTestId(
+      `link-card-${window.location.origin}/details/0887cb5b-b443-4e08-a169-038208109466`,
+      {},
+      { timeout: 5000 }
+    );
+    expect(parentTitle).to.exist;
+
+    await userEvent.click(parentTitle);
+    await waitFor(
+      () => {
+        const parentAbstract = screen.queryByText(
+          /weather stations have been/i
+        );
+        expect(parentAbstract).to.exist;
+      },
+      { timeout: 5000 }
+    );
   });
 
   it("should render associated records section", async () => {

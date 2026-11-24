@@ -1,8 +1,9 @@
 import { FC, FocusEvent, useId, useState } from "react";
-import { Box, Button, Typography, useMediaQuery } from "@mui/material";
+import { Box, Button, Link, Typography, useMediaQuery } from "@mui/material";
 import { alpha, keyframes } from "@mui/material/styles";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { portalTheme } from "@/styles";
+import { pageDefault } from "@/components/common/constants";
 import useBreakpoint from "@/hooks/useBreakpoint";
 import IMOSLogoWhite from "@/assets/partners/imos-logo-white.webp";
 import { IMOS_STATS, PARTNERS_COLOURS } from "../constants";
@@ -199,7 +200,18 @@ const ImosDataCard: FC<ImosDataCardProps> = ({ onExplore }) => {
           IMOS Facilities and data providers to ensure these data are
           quality-assured, well described, discoverable and accessible through
           the AODN Portal and associated services. The AODN is funded and
-          operated by the Integrated Marine Observing System (IMOS).
+          operated by the{" "}
+          <Link
+            href={pageDefault.url.IMOS}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-testid="imos-website-link"
+            sx={{ color: "inherit", textDecorationColor: "currentcolor" }}
+          >
+            Integrated Marine Observing System (IMOS)
+          </Link>
+          , an unincorporated joint venture of institutions led by the
+          University of Tasmania.
         </Typography>
 
         <Box

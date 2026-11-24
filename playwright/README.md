@@ -15,7 +15,7 @@ This is a suite of automated end-to-end UI tests for the AODN Portal v2. The tes
 
 ### Python version:
 
-Python 3.10.x is required. **UNIX/MacOS** users can use [Pyenv](https://github.com/pyenv/pyenv) for Python version management.
+Python 3.12.x is required. **UNIX/MacOS** users can use [Pyenv](https://github.com/pyenv/pyenv) for Python version management.
 
 However, This guide provides instructions for setting up your working environment using [Conda](https://conda.io/projects/conda/en/latest/user-guide/install/index.html) to create a virtual [environment](https://docs.conda.io/projects/conda/en/latest/user-guide/concepts/environments.html) with the required Python version that should work on both **UNIX/MacOS** and **Windows**. Additionally, we'll utilize [Poetry](https://python-poetry.org/docs/) to manage packages within the `conda` environment.
 

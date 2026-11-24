@@ -5,9 +5,13 @@ import { Provider } from "react-redux";
 import { ThemeProvider } from "@mui/material/styles";
 import AppTheme from "@/styles/theme";
 import store, { getComponentState } from "@/app/store/store";
-import { updateSearchText } from "@/app/store/componentParamReducer";
+import {
+  updateDatasetGroup,
+  updateSearchText,
+} from "@/app/store/componentParamReducer";
 import useRedirectSearch from "@/hooks/useRedirectSearch";
 import { SearchKeys } from "@/components/search/constants";
+import { pageDefault } from "@/components/common/constants";
 import Partners from "../Partners";
 import { CONTRIBUTORS } from "../constants";
 
@@ -53,6 +57,31 @@ describe("Partners", () => {
     });
   });
 
+  it("shows the updated WAMSI name and description", () => {
+    const wamsi = CONTRIBUTORS.find(
+      ({ datasetGroup }) => datasetGroup === SearchKeys.WAMSI
+    );
+    expect(wamsi?.fullName).toBe(
+      "Western Australian Marine Science Institution"
+    );
+    expect(wamsi?.description).toBe(
+      "A collaboration of state and federal government and academic science organisations, working together to deliver independent marine research for Western Australia."
+    );
+  });
+
+  it("links IMOS in the funding sentence to the IMOS website", () => {
+    renderPartners();
+
+    const link = screen.getByTestId("imos-website-link");
+    expect(link).toHaveAttribute("href", pageDefault.url.IMOS);
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    expect(link).toHaveTextContent("Integrated Marine Observing System (IMOS)");
+    expect(link.parentElement).toHaveTextContent(
+      "The AODN is funded and operated by the Integrated Marine Observing System (IMOS), an unincorporated joint venture of institutions led by the University of Tasmania."
+    );
+  });
+
   it("searches IMOS data and clears old filters on explore", async () => {
     const user = userEvent.setup();
     store.dispatch(updateSearchText("old search"));
@@ -84,6 +113,32 @@ describe("Partners", () => {
     );
   });
 
+  it.each([
+    [SearchKeys.GA, "Geoscience Australia"],
+    [SearchKeys.NCI, "NCI"],
+    [SearchKeys.EATLAS, "eAtlas"],
+    [SearchKeys.WAMSI, "WAMSI"],
+  ])(
+    "runs a text search for %s on view datasets",
+    async (datasetGroup, searchText) => {
+      const user = userEvent.setup();
+      store.dispatch(updateDatasetGroup(SearchKeys.IMOS));
+      renderPartners();
+
+      await user.click(
+        screen.getByTestId(`contributor-view-datasets-${datasetGroup}`)
+      );
+
+      await waitFor(() => {
+        expect(redirectSearch).toHaveBeenCalledWith("Partners");
+      });
+      // The old filter is cleared and no dataset group is set
+      const params = getComponentState(store.getState());
+      expect(params.searchText).toBe(searchText);
+      expect(params.datasetGroup).toBeUndefined();
+    }
+  );
+
   it("opens the contributor website in a new tab", () => {
     renderPartners();
 
@@ -91,26 +146,5 @@ describe("Partners", () => {
     expect(link).toHaveAttribute("href", "https://www.aims.gov.au");
     expect(link).toHaveAttribute("target", "_blank");
     expect(link).toHaveAttribute("rel", "noopener noreferrer");
-  });
-});
-
-describe("isPartnersSectionEnabled", () => {
-  afterEach(() => {
-    vi.unstubAllEnvs();
-    vi.resetModules();
-  });
-
-  it("is on when the build is not production", async () => {
-    vi.stubEnv("MODE", "staging");
-    vi.resetModules();
-    const { isPartnersSectionEnabled } = await import("../constants");
-    expect(isPartnersSectionEnabled).toBe(true);
-  });
-
-  it("is off in the production build", async () => {
-    vi.stubEnv("MODE", "prod");
-    vi.resetModules();
-    const { isPartnersSectionEnabled } = await import("../constants");
-    expect(isPartnersSectionEnabled).toBe(false);
   });
 });

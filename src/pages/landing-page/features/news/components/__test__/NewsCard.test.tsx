@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { ThemeProvider } from "@mui/material/styles";
 import NewsCard from "@/pages/landing-page/features/news/components/NewsCard";
+import { SearchKeys } from "@/components/search/constants";
 import AppTheme from "@/styles/theme";
 
 describe("NewsCard", () => {
@@ -10,9 +11,9 @@ describe("NewsCard", () => {
         <NewsCard
           news={{
             id: 1,
+            tab: SearchKeys.IMOS,
             image: "/news.webp",
             imageSrcSet: "/news-card-400.webp 400w, /news.webp 600w",
-            subheading: "News",
             title: "Test news item",
             description: "A highlighted ocean dataset.",
             link: "https://example.com/news",
@@ -23,9 +24,11 @@ describe("NewsCard", () => {
 
     const imageLink = screen.getByRole("link", { name: "Test news item" });
     expect(imageLink).toHaveAttribute("href", "https://example.com/news");
-    expect(imageLink).toHaveAttribute("target", "_blank");
-    expect(imageLink).toHaveAttribute("rel", "noopener noreferrer");
-    expect(imageLink).toContainElement(screen.getByTestId("News"));
+    expect(imageLink).not.toHaveAttribute("target");
+    expect(screen.getByRole("link", { name: "Read more" })).not.toHaveAttribute(
+      "target"
+    );
+    expect(imageLink).toContainElement(screen.getByTestId("news-card-1"));
 
     expect(screen.getByAltText("Test news item")).toHaveAttribute(
       "srcset",

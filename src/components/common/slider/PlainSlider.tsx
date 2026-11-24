@@ -248,5 +248,10 @@ const ConcentrationSlider = ({
   );
 };
 
-export { ConcentrationSlider, createDensityGradient, ThumbType };
+export {
+  ConcentrationSlider,
+  createDensityGradient,
+  ThumbType,
+  valueLabelOpenSelectors,
+};
 export default PlainSlider;

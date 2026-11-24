@@ -266,6 +266,9 @@ export const designTokensRC8 = {
   // ===========================
   elevation: {
     card: "4px 4px 4px 0px rgba(0, 0, 0, 0.05)",
+    // Filter popup tab bars (Filters tabs, Location sub-tabs)
+    tabBarInset:
+      "inset 0 2px 8px rgba(0, 0, 0, 0.08), inset 0 -2px 8px rgba(0, 0, 0, 0.08)",
   },
 };
 

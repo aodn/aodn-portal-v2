@@ -529,11 +529,18 @@ const GeoServerLayer: FC<GeoServerLayerProps> = ({
       // Suppress feature popup while drawing bbox/polygon selection
       if (!map || isMapDrawModeActive(map)) return;
 
+      // canvas.width is the backing store (CSS size × devicePixelRatio).
+      // event.point and the EPSG:3857 bbox are CSS pixels. On a retina
+      // screen those widths are doubled and the click is read too far
+      // toward the top-left. clientWidth stays in CSS pixels.
+      const canvas = map.getCanvas();
+      const width = canvas.clientWidth || canvas.width;
+      const height = canvas.clientHeight || canvas.height;
       const request: MapFeatureRequest = {
         uuid: config.uuid || "",
         layerName: config.urlParams.LAYERS?.join(",") || "",
-        width: map.getCanvas().width,
-        height: map.getCanvas().height,
+        width,
+        height,
         x: Math.round(event.point.x),
         y: Math.round(event.point.y),
         bbox: boundingBoxInEpsg3857(map),
