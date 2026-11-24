@@ -1,6 +1,6 @@
-// v2 is currently served from portal-beta. When it takes over the production
-// domain, update this and robots.prod.txt together.
-export const BASE_URL = "https://portal-beta.aodn.org.au";
+// v2 is served from portal.aodn.org.au. If the production domain changes,
+// update this, public/robots.prod.txt, public/sitemap.xml and seo.yml together.
+export const BASE_URL = "https://portal.aodn.org.au";
 
 export const SITE_NAME = "AODN Portal";
 
