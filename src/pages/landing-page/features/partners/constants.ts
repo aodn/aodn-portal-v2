@@ -138,7 +138,7 @@ export const CONTRIBUTORS: Contributor[] = [
     datasetGroup: SearchKeys.WAMSI,
     searchText: "WAMSI",
     shortName: "WAMSI",
-    fullName: "Western Australian Marine Research Institution",
+    fullName: "Western Australian Marine Science Institution",
     website: "https://wamsi.org.au",
     description:
       "A collaboration of state and federal government and academic science organisations, working together to deliver independent marine research for Western Australia.",

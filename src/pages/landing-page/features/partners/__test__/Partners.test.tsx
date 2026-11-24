@@ -62,7 +62,7 @@ describe("Partners", () => {
       ({ datasetGroup }) => datasetGroup === SearchKeys.WAMSI
     );
     expect(wamsi?.fullName).toBe(
-      "Western Australian Marine Research Institution"
+      "Western Australian Marine Science Institution"
     );
     expect(wamsi?.description).toBe(
       "A collaboration of state and federal government and academic science organisations, working together to deliver independent marine research for Western Australia."
