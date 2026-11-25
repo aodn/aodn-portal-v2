@@ -42,6 +42,24 @@ describe("resolveSuggestedCitation", () => {
     );
   });
 
+  it("fills the URL and download date in both attribution blocks", () => {
+    const suggestedCitation =
+      "Before 1 July 2024: UNSW Sydney [year-of-data-download]. " +
+      "Downloaded from [url] on [date-of-download].\n\n" +
+      "After 1 July 2024: UNSW Sydney; IMOS [year-of-data-download]. " +
+      "Downloaded from [URL] on [Date-of-Download].";
+    const url = `http://localhost:3000/details/${uuid}?tab=summary`;
+
+    expect(
+      resolveSuggestedCitation(suggestedCitation, uuid, title, accessDate)
+    ).toBe(
+      "Before 1 July 2024: UNSW Sydney 2026. " +
+        `Downloaded from ${url} on 07-Aug-2026.\n\n` +
+        "After 1 July 2024: UNSW Sydney; IMOS 2026. " +
+        `Downloaded from ${url} on 07-Aug-2026.`
+    );
+  });
+
   it("returns an empty string when there is nothing to resolve", () => {
     expect(resolveSuggestedCitation(undefined, uuid, title, accessDate)).toBe(
       ""

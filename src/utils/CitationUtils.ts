@@ -5,8 +5,8 @@ import { Dayjs } from "@/utils/DayjsUtils";
 
 const YEAR_PLACEHOLDER = /\[year-of-data-download(?:ed)?\]/gi;
 const TITLE_PLACEHOLDER = /\[title\]/gi;
-const ACCESS_URL_PLACEHOLDER = /\[data-access-url\]/gi;
-const ACCESS_DATE_PLACEHOLDER = /\[date-of-access\]/gi;
+const ACCESS_URL_PLACEHOLDER = /\[(?:data-access-url|url)\]/gi;
+const ACCESS_DATE_PLACEHOLDER = /\[(?:date-of-access|date-of-download)\]/gi;
 
 const ACCESS_DATE_FORMAT = "DD-MMM-YYYY";
 
