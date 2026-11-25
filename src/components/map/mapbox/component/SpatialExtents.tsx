@@ -62,8 +62,12 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
   const addSpatialExtentsLayer = useCallback(() => {
     const sourceIds = new Array<string>();
     const layerIds = new Array<string>();
+    // The geometry fetch outlives this callback. Cleanup runs on the next
+    // selection, often before the response arrives, so a late response must
+    // not add the dataset that was just removed.
+    let cancelled = false;
 
-    selectedUuids?.forEach(async (uuid: string) => {
+    selectedUuids?.forEach((uuid: string) => {
       const sourceId = createSourceId(layerId, uuid);
       sourceIds.push(sourceId);
 
@@ -83,8 +87,10 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
       );
 
       getCollectionData(uuid).then((collection) => {
-        if (!map?.getSource(sourceId)) {
-          map?.addSource(sourceId, {
+        if (cancelled || !map) return;
+
+        if (!map.getSource(sourceId)) {
+          map.addSource(sourceId, {
             type: "geojson",
             data: collection?.getGeometry(),
           });
@@ -168,6 +174,8 @@ const SpatialExtents: FC<SpatialExtentsProps> = ({
     });
 
     return () => {
+      cancelled = true;
+
       layerIds.forEach((id) => {
         try {
           if (map?.getLayer(id)) map?.removeLayer(id);

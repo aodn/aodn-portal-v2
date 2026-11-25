@@ -4,9 +4,16 @@ import { getSearchSessionId, SEARCH_SESSION_KEY } from "../SearchSession";
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+const originalRandomUUID = crypto.randomUUID.bind(crypto);
+
 describe("getSearchSessionId", () => {
   afterEach(() => {
     sessionStorage.removeItem(SEARCH_SESSION_KEY);
+    Object.defineProperty(crypto, "randomUUID", {
+      configurable: true,
+      writable: true,
+      value: originalRandomUUID,
+    });
     vi.restoreAllMocks();
   });
 
@@ -33,6 +40,20 @@ describe("getSearchSessionId", () => {
 
     expect(id).toMatch(UUID_PATTERN);
     expect(id).not.toBe("not-a-uuid");
+    expect(sessionStorage.getItem(SEARCH_SESSION_KEY)).toBe(id);
+  });
+
+  it("builds a uuid when randomUUID is unavailable", () => {
+    Object.defineProperty(crypto, "randomUUID", {
+      configurable: true,
+      value: undefined,
+    });
+
+    const id = getSearchSessionId();
+
+    expect(id).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+    );
     expect(sessionStorage.getItem(SEARCH_SESSION_KEY)).toBe(id);
   });
 

@@ -87,11 +87,12 @@ const renderTagChip = (text: string) => (
   </Box>
 );
 
-// links here may need to be changed, because only html links are wanted
+// links here may need to be changed, because only HTML links are wanted
 const ListResultCard: FC<ListResultCardProps> = ({
   content,
   onClickCard = undefined,
   onClickDetail = undefined,
+  onMouseEnterCard = undefined,
   onClickLinks = undefined,
   onClickDownload = undefined,
   selectedUuid,
@@ -151,8 +152,13 @@ const ListResultCard: FC<ListResultCardProps> = ({
         padding: "12px 12px 12px 20px",
         ...sx,
       }}
-      onMouseEnter={() => setShowButtons(true)}
-      onMouseLeave={() => setShowButtons(false)}
+      onMouseEnter={() => {
+        !isSimplified && onMouseEnterCard?.(content);
+        setShowButtons(true);
+      }}
+      onMouseLeave={() => {
+        setShowButtons(false);
+      }}
       data-testid="result-card-list"
     >
       <ContextMenu
