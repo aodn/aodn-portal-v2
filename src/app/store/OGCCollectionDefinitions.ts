@@ -17,6 +17,7 @@ import { IconWFS } from "@/components/icon/IconWFS";
 import { IconLink } from "@/components/icon/IconLink";
 import { SearchKeys } from "@/components/search/constants";
 import { EXTENT_OUTLINE_SYMBOLOGY } from "@/components/map/mapbox/constants";
+import { DownloadServiceType } from "./datasetEnums";
 
 // interfaces:
 export interface IKeyword {
@@ -595,6 +596,14 @@ export class OGCCollection {
   // Check if the collection has original netcdfs to download
   hasOriginalNetcdfs = (): boolean =>
     this.getOriginalNetcdfsLink() !== undefined;
+  // Get the download type from the links, first match wins. WFS here only means
+  // there is a WFS link, GeoServer still needs to confirm it has the layer.
+  getDownloadServiceType = (): DownloadServiceType => {
+    if (this.hasCloudOptimisedData()) return DownloadServiceType.CloudOptimised;
+    if (this.hasOriginalNetcdfs()) return DownloadServiceType.OriginalNetcdfs;
+    if (this.getWFSLinks()) return DownloadServiceType.WFS;
+    return DownloadServiceType.Unavailable;
+  };
 }
 
 export class SummariesProperties {

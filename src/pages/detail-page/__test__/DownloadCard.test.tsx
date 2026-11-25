@@ -111,4 +111,12 @@ describe("DownloadCard", () => {
 
     expect(await screen.findByTestId("wfs-card")).toBeInTheDocument();
   });
+
+  it("renders nothing when there is no download type", () => {
+    const { container } = renderCard([
+      { rel: "related", href: "", type: "", title: "" },
+    ]);
+
+    expect(container).toBeEmptyDOMElement();
+  });
 });
