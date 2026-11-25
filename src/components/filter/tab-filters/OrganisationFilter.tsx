@@ -22,7 +22,7 @@ interface OrganisationFilterProps extends TabFilterType {
 
 // TODO: comment items below and wait for ogcapi, can restore it in the future
 // TODO: fetch from ogcapi or align with ogcapi keywords
-const ORGANISATION = [
+export const ORGANISATION = [
   {
     value: SearchKeys.IMOS,
     label: "IMOS",
