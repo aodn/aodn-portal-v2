@@ -10,6 +10,9 @@ import AustraliaAntarcticProgramIcon from "../../icon/organisation/AustraliaAnta
 import AIMSIcon from "../../icon/organisation/AIMSIcon";
 import CSIROIcon from "../../icon/organisation/CSIROIcon";
 import IMASIcon from "../../icon/organisation/IMASIcon";
+import EAtlasIcon from "@/components/icon/organisation/EAtlasIcon";
+import GAIcon from "@/components/icon/organisation/GAIcon";
+import NCIIcon from "@/components/icon/organisation/NCIIcon";
 import { portalTheme } from "../../../styles";
 import { SearchKeys } from "../../search/constants";
 
@@ -19,16 +22,11 @@ interface OrganisationFilterProps extends TabFilterType {
 
 // TODO: comment items below and wait for ogcapi, can restore it in the future
 // TODO: fetch from ogcapi or align with ogcapi keywords
-const ORGANISATION = [
+export const ORGANISATION = [
   {
     value: SearchKeys.IMOS,
     label: "IMOS",
     icon: <IMOSIcon />,
-  },
-  {
-    value: SearchKeys.AIMS,
-    label: "AIMS",
-    icon: <AIMSIcon />,
   },
   {
     value: SearchKeys.AAD,
@@ -36,14 +34,34 @@ const ORGANISATION = [
     icon: <AustraliaAntarcticProgramIcon />,
   },
   {
+    value: SearchKeys.AIMS,
+    label: "AIMS",
+    icon: <AIMSIcon />,
+  },
+  {
     value: SearchKeys.CSIRO,
     label: "CSIRO",
     icon: <CSIROIcon />,
   },
   {
+    value: SearchKeys.EATLAS,
+    label: "eAtlas",
+    icon: <EAtlasIcon />,
+  },
+  {
+    value: SearchKeys.GA,
+    label: "GA",
+    icon: <GAIcon />,
+  },
+  {
     value: SearchKeys.IMAS,
     label: "IMAS",
     icon: <IMASIcon />,
+  },
+  {
+    value: SearchKeys.NCI,
+    label: "NCI",
+    icon: <NCIIcon />,
   },
   // {
   //   value: "Australian-Universities",
@@ -135,6 +153,7 @@ const OrganisationFilter: FC<OrganisationFilterProps> = ({
               <StyledToggleButton
                 value={value}
                 aria-label={label}
+                data-testid={`organisation-filter-${value}`}
                 sx={{
                   boxShadow: theme.shadows[7],
                   backgroundColor: theme.palette.common.white,
