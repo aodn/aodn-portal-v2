@@ -91,7 +91,6 @@ export const CONTRIBUTORS: Contributor[] = [
   },
   {
     datasetGroup: SearchKeys.GA,
-    searchText: "Geoscience Australia",
     shortName: "GA",
     fullName: "Geoscience Australia",
     website: "https://www.ga.gov.au",
@@ -117,7 +116,6 @@ export const CONTRIBUTORS: Contributor[] = [
   },
   {
     datasetGroup: SearchKeys.NCI,
-    searchText: "NCI",
     shortName: "NCI",
     fullName: "National Computational Infrastructure",
     website: "https://nci.org.au",
@@ -130,7 +128,6 @@ export const CONTRIBUTORS: Contributor[] = [
   },
   {
     datasetGroup: SearchKeys.EATLAS,
-    searchText: "eAtlas",
     shortName: "eAtlas",
     fullName: "eAtlas",
     website: "https://eatlas.org.au",
