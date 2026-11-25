@@ -4,11 +4,11 @@ import { FC, ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { fetchResultByUuidNoStore } from "@/app/store/searchReducer";
 import { DetailPageContext } from "./detail-page-context";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { DownloadServiceType } from "@/app/store/datasetEnums";
 import { useAppDispatch } from "@/app/store/hooks";
 import {
   defaultMapSubsettingCapabilities,
   DownloadConditionType,
-  DownloadServiceType,
   evaluateSubsettingSupport,
   IDownloadCondition,
   MapSubsettingCapabilities,

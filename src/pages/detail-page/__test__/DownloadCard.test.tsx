@@ -27,7 +27,7 @@ vi.mock("@/pages/detail-page/features/download/DownloadWFSCard", () => ({
 
 import DownloadCard from "@/pages/detail-page/features/download/DownloadCard";
 import { useDetailPageContext } from "@/pages/detail-page/context/detail-page-context";
-import { DownloadServiceType } from "@/pages/detail-page/context/DownloadDefinitions";
+import { DownloadServiceType } from "@/app/store/datasetEnums";
 import { ILink, OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 
 const coLink: ILink = {

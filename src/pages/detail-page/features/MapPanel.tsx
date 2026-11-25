@@ -25,10 +25,10 @@ import {
   BBoxCondition,
   DateRangeCondition,
   DownloadConditionType,
-  DownloadServiceType,
   PolygonCondition,
   SubsettingType,
 } from "../context/DownloadDefinitions";
+import { DownloadServiceType } from "@/app/store/datasetEnums";
 import { isValidPolygonFeature } from "@/utils/GeoJsonUtils";
 import {
   hasResettableDownloadConditions,

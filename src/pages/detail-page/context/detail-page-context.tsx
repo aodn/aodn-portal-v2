@@ -1,9 +1,9 @@
 import { createContext, Dispatch, SetStateAction, useContext } from "react";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
+import { DownloadServiceType } from "@/app/store/datasetEnums";
 import {
   defaultMapSubsettingCapabilities,
   DownloadConditionType,
-  DownloadServiceType,
   IDownloadCondition,
   MapSubsettingCapabilities,
   SubsettingType,

@@ -4,7 +4,7 @@ import DownloadWFSCard from "./DownloadWFSCard";
 import DownloadCloudOptimisedCard from "./DownloadCloudOptimisedCard";
 import DownloadOriginalNetcdfsCard from "./DownloadOriginalNetcdfsCard";
 import SideCardContainer from "../../layout/SideCardContainer";
-import { DownloadServiceType } from "../../context/DownloadDefinitions";
+import { DownloadServiceType } from "@/app/store/datasetEnums";
 
 const DownloadCard: FC = () => {
   const {
