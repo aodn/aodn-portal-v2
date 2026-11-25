@@ -31,6 +31,7 @@ import {
   fetchMarineParkOptions,
 } from "../map/mapbox/layers/staticLayerOptions";
 import { DATA_SETTINGS } from "../filter/tab-filters/DataSettingsFilter";
+import { ORGANISATION } from "@/components/filter/tab-filters/OrganisationFilter";
 import useElementSize from "../../hooks/useElementSize";
 import {
   ADDED_FILTERS_LABEL,
@@ -161,7 +162,7 @@ const ActiveFiltersChips: FC = () => {
     // Dataset Group
     if (params.datasetGroup) {
       chips.push({
-        label: `Organisation: ${params.datasetGroup.toUpperCase()}`,
+        label: `Organisation: ${ORGANISATION.find((o) => o.value === params.datasetGroup)?.label || params.datasetGroup}`,
         onDelete: () => {
           dispatch(updateDatasetGroup(undefined));
           triggerRedirectIfOnSearchPage();
