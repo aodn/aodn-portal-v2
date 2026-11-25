@@ -97,32 +97,11 @@ describe("Partners", () => {
     expect(params.searchText).toBeFalsy();
   });
 
-  it("searches one contributor's data on view datasets", async () => {
-    const user = userEvent.setup();
-    renderPartners();
-
-    await user.click(
-      screen.getByTestId(`contributor-view-datasets-${SearchKeys.CSIRO}`)
-    );
-
-    await waitFor(() => {
-      expect(redirectSearch).toHaveBeenCalledWith("Partners");
-    });
-    expect(getComponentState(store.getState()).datasetGroup).toBe(
-      SearchKeys.CSIRO
-    );
-  });
-
-  it.each([
-    [SearchKeys.GA, "Geoscience Australia"],
-    [SearchKeys.NCI, "NCI"],
-    [SearchKeys.EATLAS, "eAtlas"],
-    [SearchKeys.WAMSI, "WAMSI"],
-  ])(
-    "runs a text search for %s on view datasets",
-    async (datasetGroup, searchText) => {
+  it.each([SearchKeys.CSIRO, SearchKeys.GA, SearchKeys.NCI, SearchKeys.EATLAS])(
+    "searches %s data by organisation on view datasets",
+    async (datasetGroup) => {
       const user = userEvent.setup();
-      store.dispatch(updateDatasetGroup(SearchKeys.IMOS));
+      store.dispatch(updateSearchText("old search"));
       renderPartners();
 
       await user.click(
@@ -132,12 +111,30 @@ describe("Partners", () => {
       await waitFor(() => {
         expect(redirectSearch).toHaveBeenCalledWith("Partners");
       });
-      // The old filter is cleared and no dataset group is set
+      // The old search text is cleared
       const params = getComponentState(store.getState());
-      expect(params.searchText).toBe(searchText);
-      expect(params.datasetGroup).toBeUndefined();
+      expect(params.datasetGroup).toBe(datasetGroup);
+      expect(params.searchText).toBeFalsy();
     }
   );
+
+  it("runs a text search for WAMSI on view datasets", async () => {
+    const user = userEvent.setup();
+    store.dispatch(updateDatasetGroup(SearchKeys.IMOS));
+    renderPartners();
+
+    await user.click(
+      screen.getByTestId(`contributor-view-datasets-${SearchKeys.WAMSI}`)
+    );
+
+    await waitFor(() => {
+      expect(redirectSearch).toHaveBeenCalledWith("Partners");
+    });
+    // The old filter is cleared and no dataset group is set
+    const params = getComponentState(store.getState());
+    expect(params.searchText).toBe("WAMSI");
+    expect(params.datasetGroup).toBeUndefined();
+  });
 
   it("opens the contributor website in a new tab", () => {
     renderPartners();
