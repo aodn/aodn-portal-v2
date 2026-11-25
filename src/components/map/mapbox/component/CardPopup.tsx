@@ -2,6 +2,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -31,6 +32,8 @@ import { MapEventEnum } from "../constants";
 import FitToSpatialExtentsLayer from "../layers/FitToSpatialExtentsLayer";
 import ContextMenu, { ContextMenuRef } from "../../../menu/ContextMenu";
 import { ResultCardButtonSize } from "@/components/common/buttons/ResultCardButton";
+import AdminScreenContext from "@/components/admin/AdminScreenContext";
+import useDownloadAvailability from "@/hooks/useDownloadAvailability";
 
 interface CardPopupProps {
   layerId: string;
@@ -49,6 +52,12 @@ const CardPopup: React.FC<CardPopupProps> = ({
   const panel = useRef<HTMLDivElement>(null);
   const [content, setContent] = useState<OGCCollection>(new OGCCollection());
   const menuRef = useRef<ContextMenuRef>(null);
+  const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
+  const collections = useMemo(() => [content], [content]);
+  const isDownloadable = useDownloadAvailability(
+    collections,
+    enableGeoServerWhiteList
+  );
 
   const onLinks = useCallback(
     (collection: OGCCollection, type: OpenType | undefined) =>
@@ -279,7 +288,7 @@ const CardPopup: React.FC<CardPopupProps> = ({
                 resultCardButtonConfig={{ size: ResultCardButtonSize.SMALL }}
                 onLinks={(type: OpenType | undefined) => onLinks(content, type)}
                 onDownload={
-                  content.hasCloudOptimisedData()
+                  isDownloadable(content)
                     ? (type: OpenType | undefined) => onDownload(content, type)
                     : undefined
                 }

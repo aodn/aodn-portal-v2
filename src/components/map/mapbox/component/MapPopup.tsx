@@ -20,6 +20,7 @@ import { TabNavigation } from "@/hooks/useTabNavigation";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 import { isMapDrawModeActive } from "@/utils/MapUtils";
 import { zIndex } from "@/styles/constants";
+import AdminScreenContext from "@/components/admin/AdminScreenContext";
 
 interface MapPopupProps {
   layerId: string;
@@ -58,6 +59,7 @@ const renderLoadingBox = ({ popupHeight, popupWidth }: PopupConfig) => (
 const MapPopup: React.FC<MapPopupProps> = memo(
   ({ layerId, tabNavigation }: MapPopupProps) => {
     const { map } = useContext(MapContext);
+    const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
     const dispatch = useAppDispatch();
     const { isUnderLaptop } = useBreakpoint();
 
@@ -103,6 +105,7 @@ const MapPopup: React.FC<MapPopupProps> = memo(
               >
                 <ComplexMapHoverTip
                   collection={collection}
+                  enableGeoServerWhiteList={enableGeoServerWhiteList}
                   tabNavigation={tabNavigation}
                 />
               </CardContent>
@@ -110,7 +113,7 @@ const MapPopup: React.FC<MapPopupProps> = memo(
           </ThemeProvider>
         );
       },
-      [tabNavigation]
+      [enableGeoServerWhiteList, tabNavigation]
     );
 
     useEffect(() => {
