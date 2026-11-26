@@ -215,6 +215,7 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
     check
       .unwrap()
       .then((layers: DownloadLayersResponse[]) => {
+        if (isCancelled) return;
         // If there are layers available for download, we consider WFS download is available
         // We display all fetched wfs layers in the dropdown for user to select
         if (layers && layers.length > 0) {

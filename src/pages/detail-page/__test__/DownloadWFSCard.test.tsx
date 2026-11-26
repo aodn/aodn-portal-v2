@@ -236,6 +236,24 @@ describe("DownloadWFSCard", () => {
     });
   });
 
+  it("should ignore layers that come back after the card is gone", async () => {
+    let answer: (layers: typeof mockLayers) => void = () => {};
+    const abort = vi.fn();
+    mockDispatch.mockReturnValue({
+      abort,
+      unwrap: () => new Promise((resolve) => (answer = resolve)),
+    });
+
+    const { unmount } = renderComponent();
+    unmount();
+    // The request already finished, so abort cannot stop it
+    answer(mockLayers);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(abort).toHaveBeenCalled();
+    expect(mockOnWFSAvailabilityChange).not.toHaveBeenCalled();
+  });
+
   it("should show no warning and keep the download enabled for a small estimate", async () => {
     estimateState.estimatedSizeBytes = 1024;
 
