@@ -1,5 +1,7 @@
 import { FC, useEffect, useState } from "react";
+import { Provider } from "react-redux";
 import { Box, IconButton, Popper } from "@mui/material";
+import store from "@/app/store/store";
 import { ControlProps, EVENT_MENU, MenuClickedEvent } from "./Definition";
 import { borderRadius, zIndex } from "@/styles/constants";
 import { eventEmitter, switcherIconButtonSx } from "./MenuControl";
@@ -94,10 +96,15 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
             zIndex: 1,
           }}
         >
-          <BookmarkListAccordionGroup
-            onDeselectDataset={onDeselectDataset}
-            tabNavigation={tabNavigation}
-          />
+          {/* MenuControl renders this menu in its own React root, outside the
+              app's redux Provider. The bookmark cards need redux to check
+              WFS downloads. */}
+          <Provider store={store}>
+            <BookmarkListAccordionGroup
+              onDeselectDataset={onDeselectDataset}
+              tabNavigation={tabNavigation}
+            />
+          </Provider>
         </Box>
       </Popper>
     </>
