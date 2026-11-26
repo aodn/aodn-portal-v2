@@ -1,4 +1,4 @@
-import { FC, useCallback } from "react";
+import { FC, useCallback, useContext, useMemo } from "react";
 import { Box, Stack, SxProps, Typography } from "@mui/material";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import Map from "@/components/map/mapbox/Map";
@@ -10,6 +10,8 @@ import { OpenType, TabNavigation } from "@/hooks/useTabNavigation";
 import { detailPageDefault, pageReferer } from "@/components/common/constants";
 import { portalTheme } from "@/styles";
 import FitToSpatialExtentsLayer from "@/components/map/mapbox/layers/FitToSpatialExtentsLayer";
+import AdminScreenContext from "@/components/admin/AdminScreenContext";
+import useDownloadAvailability from "@/hooks/useDownloadAvailability";
 
 export interface BookmarkListCardType {
   dataset: OGCCollection;
@@ -26,6 +28,12 @@ const BookmarkListCard: FC<BookmarkListCardProps> = ({
   sx,
 }) => {
   const mapContainerId = `bookmark-list-map-${dataset.id}`;
+  const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
+  const collections = useMemo(() => [dataset], [dataset]);
+  const isDownloadable = useDownloadAvailability(
+    collections,
+    enableGeoServerWhiteList
+  );
   const handleNavigation = useCallback(
     (uuid: string, tab: string, type: OpenType | undefined) => {
       tabNavigation?.(
@@ -77,7 +85,7 @@ const BookmarkListCard: FC<BookmarkListCardProps> = ({
               handleNavigation(dataset.id, detailPageDefault.DATA_ACCESS, type)
             }
             onDownload={
-              dataset.hasCloudOptimisedData()
+              isDownloadable(dataset)
                 ? (type: OpenType | undefined) =>
                     handleNavigation(
                       dataset.id,

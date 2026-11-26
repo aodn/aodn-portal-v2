@@ -133,6 +133,15 @@ export const handlers = [
     }
   }),
 
+  // WFS layers to download. Same answer as ogcapi-java for a collection without
+  // any layer, override it in the test that needs layers.
+  http.get(PREFIX + "/collections/:uuid/items/wfs_layers", ({ params }) =>
+    HttpResponse.json(
+      { message: `No WFS layer is found for uuid ${params.uuid}` },
+      { status: 404 }
+    )
+  ),
+
   http.get(PREFIX + "/collections/:uuid", ({ params }) => {
     const { uuid } = params;
 

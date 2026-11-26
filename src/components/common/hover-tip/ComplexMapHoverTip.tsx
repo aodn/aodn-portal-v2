@@ -1,4 +1,4 @@
-import { FC, useCallback, useRef } from "react";
+import { FC, useCallback, useMemo, useRef } from "react";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { Box, Stack, SxProps, Tooltip, Typography } from "@mui/material";
 import {
@@ -19,6 +19,7 @@ import { OpenType, TabNavigation } from "@/hooks/useTabNavigation";
 import { detailPageDefault, pageReferer } from "../constants";
 import FitToSpatialExtentsLayer from "../../map/mapbox/layers/FitToSpatialExtentsLayer";
 import ContextMenu, { ContextMenuRef } from "../../menu/ContextMenu";
+import useDownloadAvailability from "@/hooks/useDownloadAvailability";
 
 interface BasicMapHoverTipProps {
   content?: string | undefined | null;
@@ -29,16 +30,25 @@ interface BasicMapHoverTipProps {
 
 interface ComplexMapHoverTipProps extends BasicMapHoverTipProps {
   collection: OGCCollection;
+  // Passed in because this tip renders in its own React root, where
+  // AdminScreenContext is not available
+  enableGeoServerWhiteList?: boolean;
 }
 
 const mapContainerId = "map-popup-spatial-extend-overview";
 
 const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
   collection,
+  enableGeoServerWhiteList,
   tabNavigation = () => {},
   sx,
 }) => {
   const menuRef = useRef<ContextMenuRef>(null);
+  const collections = useMemo(() => [collection], [collection]);
+  const isDownloadable = useDownloadAvailability(
+    collections,
+    enableGeoServerWhiteList
+  );
   const onLinks = useCallback(
     (type: OpenType | undefined) =>
       tabNavigation(
@@ -125,9 +135,7 @@ const ComplexMapHoverTip: FC<ComplexMapHoverTipProps> = ({
           isGridView
           resultCardButtonConfig={{ size: ResultCardButtonSize.SMALL }}
           onLinks={onLinks}
-          onDownload={
-            collection.hasCloudOptimisedData() ? onDownload : undefined
-          }
+          onDownload={isDownloadable(collection) ? onDownload : undefined}
           onDetail={onDetail}
         />
         <Box>

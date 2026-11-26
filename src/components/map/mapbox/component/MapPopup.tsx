@@ -6,6 +6,7 @@ import React, {
   memo,
 } from "react";
 import { createRoot } from "react-dom/client";
+import { Provider } from "react-redux";
 import { ThemeProvider } from "@mui/material/styles";
 import { Box, Card, CardContent, CircularProgress } from "@mui/material";
 import { MapEvent, MapMouseEvent, Popup } from "mapbox-gl";
@@ -15,11 +16,13 @@ import { fetchResultByUuidNoStore } from "@/app/store/searchReducer";
 import AppTheme from "@/styles/theme";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "@/app/store/hooks";
+import store from "@/app/store/store";
 import ComplexMapHoverTip from "../../../common/hover-tip/ComplexMapHoverTip";
 import { TabNavigation } from "@/hooks/useTabNavigation";
 import useBreakpoint from "../../../../hooks/useBreakpoint";
 import { isMapDrawModeActive } from "@/utils/MapUtils";
 import { zIndex } from "@/styles/constants";
+import AdminScreenContext from "@/components/admin/AdminScreenContext";
 
 interface MapPopupProps {
   layerId: string;
@@ -58,6 +61,7 @@ const renderLoadingBox = ({ popupHeight, popupWidth }: PopupConfig) => (
 const MapPopup: React.FC<MapPopupProps> = memo(
   ({ layerId, tabNavigation }: MapPopupProps) => {
     const { map } = useContext(MapContext);
+    const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
     const dispatch = useAppDispatch();
     const { isUnderLaptop } = useBreakpoint();
 
@@ -84,33 +88,38 @@ const MapPopup: React.FC<MapPopupProps> = memo(
           return null;
         }
 
+        // The popup has its own React root, outside the app's redux Provider.
+        // The tip needs redux to check WFS downloads.
         return (
-          <ThemeProvider theme={AppTheme}>
-            <Card
-              elevation={0}
-              sx={{
-                height: defaultPopupConfig.popupHeight,
-                width: defaultPopupConfig.popupWidth,
-                borderRadius: 0,
-                zIndex: zIndex.MAP_POPUP,
-              }}
-              onMouseLeave={onMouseLeave}
-            >
-              <CardContent
+          <Provider store={store}>
+            <ThemeProvider theme={AppTheme}>
+              <Card
+                elevation={0}
                 sx={{
-                  padding: 0,
+                  height: defaultPopupConfig.popupHeight,
+                  width: defaultPopupConfig.popupWidth,
+                  borderRadius: 0,
+                  zIndex: zIndex.MAP_POPUP,
                 }}
+                onMouseLeave={onMouseLeave}
               >
-                <ComplexMapHoverTip
-                  collection={collection}
-                  tabNavigation={tabNavigation}
-                />
-              </CardContent>
-            </Card>
-          </ThemeProvider>
+                <CardContent
+                  sx={{
+                    padding: 0,
+                  }}
+                >
+                  <ComplexMapHoverTip
+                    collection={collection}
+                    enableGeoServerWhiteList={enableGeoServerWhiteList}
+                    tabNavigation={tabNavigation}
+                  />
+                </CardContent>
+              </Card>
+            </ThemeProvider>
+          </Provider>
         );
       },
-      [tabNavigation]
+      [enableGeoServerWhiteList, tabNavigation]
     );
 
     useEffect(() => {

@@ -201,13 +201,6 @@ export type DownloadCondition = {
   removeDownloadCondition: (condition: IDownloadCondition) => void;
 };
 
-export enum DownloadServiceType {
-  WFS = "WFS",
-  CloudOptimised = "CloudOptimised",
-  OriginalNetcdfs = "OriginalNetcdfs",
-  Unavailable = "Unavailable",
-}
-
 /** Live map-layer subsetting capabilities published by MapPanel. */
 export type MapSubsettingCapabilities = {
   selectedLayerId: string | null;

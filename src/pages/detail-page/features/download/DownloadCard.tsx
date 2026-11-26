@@ -4,7 +4,7 @@ import DownloadWFSCard from "./DownloadWFSCard";
 import DownloadCloudOptimisedCard from "./DownloadCloudOptimisedCard";
 import DownloadOriginalNetcdfsCard from "./DownloadOriginalNetcdfsCard";
 import SideCardContainer from "../../layout/SideCardContainer";
-import { DownloadServiceType } from "../../context/DownloadDefinitions";
+import { DownloadServiceType } from "@/app/store/datasetEnums";
 
 const DownloadCard: FC = () => {
   const {
@@ -18,25 +18,12 @@ const DownloadCard: FC = () => {
     setSelectedCoKey,
   } = useDetailPageContext();
 
-  const [
-    wfsLinks,
-    hasCloudOptimisedData,
-    hasOriginalNetcdfs,
-    isImosOnly,
-    isIntegrated,
-  ] = useMemo(() => {
-    const wfsLinks = collection?.getWFSLinks() || [];
-    const hasCloudOptimisedData = collection?.hasCloudOptimisedData() || false;
-    const hasOriginalNetcdfs = collection?.hasOriginalNetcdfs() || false;
+  const [linkedDownloadService, isImosOnly, isIntegrated] = useMemo(() => {
+    const linkedDownloadService =
+      collection?.getDownloadServiceType() ?? DownloadServiceType.Unavailable;
     const isImosOnly = collection?.isImosOnly() ?? false;
     const isIntegrated = collection?.isIntegrated() ?? false;
-    return [
-      wfsLinks,
-      hasCloudOptimisedData,
-      hasOriginalNetcdfs,
-      isImosOnly,
-      isIntegrated,
-    ];
+    return [linkedDownloadService, isImosOnly, isIntegrated];
   }, [collection]);
 
   const onWFSAvailabilityChange = useCallback(
@@ -60,24 +47,10 @@ const DownloadCard: FC = () => {
   );
 
   useEffect(() => {
-    // Set the type of download based on simple  in collection, the value
+    // Set the type of download based on the links in the collection, the value
     // may change by callback if more info available.
-    // Priority: cloud optimised > original netcdfs > WFS
-    if (hasCloudOptimisedData) {
-      setDownloadService(DownloadServiceType.CloudOptimised);
-    } else if (hasOriginalNetcdfs) {
-      setDownloadService(DownloadServiceType.OriginalNetcdfs);
-    } else if (wfsLinks.length > 0) {
-      setDownloadService(DownloadServiceType.WFS);
-    } else {
-      setDownloadService(DownloadServiceType.Unavailable);
-    }
-  }, [
-    hasCloudOptimisedData,
-    hasOriginalNetcdfs,
-    setDownloadService,
-    wfsLinks.length,
-  ]);
+    setDownloadService(linkedDownloadService);
+  }, [linkedDownloadService, setDownloadService]);
 
   const downloadCard = useMemo(() => {
     if (!collection) return null;

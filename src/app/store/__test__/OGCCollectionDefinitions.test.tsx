@@ -6,6 +6,7 @@ import {
   RelationType,
   Spatial,
 } from "../OGCCollectionDefinitions"; // Adjust the import path as needed
+import { DownloadServiceType } from "../datasetEnums";
 
 // Mock the imported icons and default thumbnail
 vi.mock("@/assets/images/default-thumbnail.webp", () => ({
@@ -530,6 +531,53 @@ describe("OGCCollection", () => {
 
       expect(collection.hasOriginalNetcdfs()).toBe(false);
       expect(collection.getOriginalNetcdfsLink()).toBeUndefined();
+    });
+  });
+
+  describe("getDownloadServiceType", () => {
+    const summary = { rel: "summary", href: "", type: "", title: "a.parquet" };
+    const fileList = {
+      rel: "file-list",
+      href: "",
+      type: "",
+      title: "original_netcdfs",
+    };
+    const wfs = { rel: "wfs", href: "", type: "", title: "layer" };
+    const wfsByAIGroup = {
+      rel: "related",
+      href: "",
+      type: "",
+      title: "layer",
+      "ai:group": "Data Access > wfs",
+    };
+    const wms = { rel: "wms", href: "", type: "", title: "layer" };
+    const otherFileList = { ...fileList, title: "other" };
+
+    it.each([
+      [
+        "cloud optimised first",
+        [wfs, fileList, summary],
+        DownloadServiceType.CloudOptimised,
+      ],
+      [
+        "original netcdfs before WFS",
+        [wfs, fileList],
+        DownloadServiceType.OriginalNetcdfs,
+      ],
+      ["WFS from rel", [wms, wfs], DownloadServiceType.WFS],
+      ["WFS from ai:group", [wfsByAIGroup], DownloadServiceType.WFS],
+      [
+        "unavailable for other links",
+        [wms, otherFileList],
+        DownloadServiceType.Unavailable,
+      ],
+      ["unavailable for empty links", [], DownloadServiceType.Unavailable],
+      ["unavailable for no links", undefined, DownloadServiceType.Unavailable],
+    ])("returns %s", (_, links, expected) => {
+      const collection = new OGCCollection();
+      collection.links = links;
+
+      expect(collection.getDownloadServiceType()).toBe(expected);
     });
   });
 

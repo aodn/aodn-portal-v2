@@ -1,6 +1,7 @@
 import React, {
   memo,
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -31,6 +32,7 @@ import MapLayerSwitcher, {
   LayerName,
   LayerSwitcherLayer,
 } from "@/components/map/mapbox/controls/menu/MapLayerSwitcher";
+import AdminScreenContext from "@/components/admin/AdminScreenContext";
 import BookmarkListMenu, {
   BookmarkListMenuBasicType,
 } from "@/components/map/mapbox/controls/menu/BookmarkListMenu";
@@ -125,6 +127,7 @@ const MapSection: React.FC<MapSectionProps> = memo(
     onDeselectDataset,
   }: MapSectionProps) => {
     const { isUnderLaptop } = useBreakpoint();
+    const adminScreen = useContext(AdminScreenContext);
     const [preferCurrentCentroid, setPreferCurrentCentroid] =
       useState<boolean>(true);
     // Identifies the search this reset started. An older search settling
@@ -278,6 +281,7 @@ const MapSection: React.FC<MapSectionProps> = memo(
                     <BookmarkListMenu
                       onDeselectDataset={onDeselectDataset}
                       tabNavigation={tabNavigation}
+                      adminScreen={adminScreen}
                     />
                   }
                 />

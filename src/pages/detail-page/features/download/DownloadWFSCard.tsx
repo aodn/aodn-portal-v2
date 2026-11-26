@@ -210,9 +210,12 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
       enableGeoServerWhiteList: enableGeoServerWhiteList,
     };
 
-    dispatch(fetchGeoServerDownloadLayers(wfsLayersRequest))
+    let isCancelled = false;
+    const check = dispatch(fetchGeoServerDownloadLayers(wfsLayersRequest));
+    check
       .unwrap()
       .then((layers: DownloadLayersResponse[]) => {
+        if (isCancelled) return;
         // If there are layers available for download, we consider WFS download is available
         // We display all fetched wfs layers in the dropdown for user to select
         if (layers && layers.length > 0) {
@@ -227,9 +230,13 @@ const DownloadWFSCard: FC<DownloadWFSCardProps> = ({
         }
       })
       .catch(() => {
-        // If any error happens (e.g. 401 due to whitelist. 404 due to not found fields), we consider WFS download is not available
-        onWFSAvailabilityChange?.(false);
+        // The check failed (e.g. GeoServer down), we consider WFS download is not available
+        if (!isCancelled) onWFSAvailabilityChange?.(false);
       });
+    return () => {
+      isCancelled = true;
+      check.abort();
+    };
   }, [dispatch, enableGeoServerWhiteList, onWFSAvailabilityChange, uuid]);
 
   const renderProgressMessage = useCallback(

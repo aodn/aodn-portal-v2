@@ -2,6 +2,7 @@ import {
   FC,
   RefObject,
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -20,6 +21,8 @@ import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { SearchResultLayoutEnum } from "../common/buttons/ResultListLayoutButton";
 import useFetchData from "../../hooks/useFetchData";
 import useBreakpoint from "../../hooks/useBreakpoint";
+import useDownloadAvailability from "@/hooks/useDownloadAvailability";
+import AdminScreenContext from "@/components/admin/AdminScreenContext";
 import { GRID_CARD_HEIGHT, LIST_CARD_HEIGHT } from "./constants";
 import { ResultCardBasicType } from "./types";
 import { detailPageDefault, pageReferer } from "../common/constants";
@@ -31,6 +34,7 @@ interface ResultCardsListType extends ResultCardBasicType {
   count: number;
   total: number;
   contents: CollectionsQueryType;
+  isDownloadable: (collection: OGCCollection) => boolean;
   renderLoadMoreButton: () => JSX.Element;
   loadMoreRef?: (node: HTMLDivElement | null) => void;
   layout?:
@@ -54,11 +58,15 @@ interface ResultCardsProps extends ResultCardsType {
   sx?: SxProps;
 }
 
+// Simplified cards have no buttons, so there is nothing to check
+const NO_COLLECTIONS: OGCCollection[] = [];
+
 const renderListCards: FC<ResultCardsListType> = ({
   sx = {} as SxProps,
   contents,
   count,
   total,
+  isDownloadable,
   renderLoadMoreButton,
   loadMoreRef,
   onClickCard,
@@ -98,9 +106,7 @@ const renderListCards: FC<ResultCardsListType> = ({
                 onClickDetail={onClickDetail}
                 onClickLinks={onClickLinks}
                 onClickDownload={
-                  collection.hasCloudOptimisedData()
-                    ? onClickDownload
-                    : undefined
+                  isDownloadable(collection) ? onClickDownload : undefined
                 }
                 selectedUuid={selectedUuid}
                 isSimplified={isSimplified}
@@ -126,6 +132,7 @@ const renderGridCards: FC<ResultCardsListType> = ({
   contents,
   count,
   total,
+  isDownloadable,
   renderLoadMoreButton,
   onClickCard,
   onClickDetail,
@@ -160,9 +167,7 @@ const renderGridCards: FC<ResultCardsListType> = ({
                 onClickDetail={onClickDetail}
                 onClickLinks={onClickLinks}
                 onClickDownload={
-                  collection.hasCloudOptimisedData()
-                    ? onClickDownload
-                    : undefined
+                  isDownloadable(collection) ? onClickDownload : undefined
                 }
                 selectedUuid={selectedUuid}
                 isSimplified={isSimplified}
@@ -196,6 +201,11 @@ const ResultCards: FC<ResultCardsProps> = ({
   const { fetchRecord } = useFetchData();
   const [loadMoreNode, setLoadMoreNode] = useState<HTMLDivElement | null>(null);
   const isLoadingMoreRef = useRef(false);
+  const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
+  const isDownloadable = useDownloadAvailability(
+    isUnderLaptop ? NO_COLLECTIONS : contents.result.collections,
+    enableGeoServerWhiteList
+  );
 
   const [count, total] = useMemo(() => {
     const count = contents.result.collections.length;
@@ -317,6 +327,7 @@ const ResultCards: FC<ResultCardsProps> = ({
       contents,
       count,
       total,
+      isDownloadable,
       renderLoadMoreButton,
       loadMoreRef: setLoadMoreNode,
       onClickCard: onClickBtnCard,
@@ -334,6 +345,7 @@ const ResultCards: FC<ResultCardsProps> = ({
       contents,
       count,
       total,
+      isDownloadable,
       renderLoadMoreButton,
       onClickCard: onClickBtnCard,
       onClickDetail: onClickBtnDetail,
@@ -350,6 +362,7 @@ const ResultCards: FC<ResultCardsProps> = ({
       contents,
       count,
       total,
+      isDownloadable,
       renderLoadMoreButton,
       onClickCard: onClickBtnCard,
       onClickDetail: onClickBtnDetail,
