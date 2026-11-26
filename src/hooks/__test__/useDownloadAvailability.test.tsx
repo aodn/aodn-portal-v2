@@ -45,6 +45,25 @@ const blocked = new Set<string>();
 
 const settle = () => new Promise((resolve) => setTimeout(resolve, 50));
 
+// Holds every check until the returned function is called
+const holdAnswers = () => {
+  let release: () => void = () => {};
+  const released = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  server.use(
+    http.get(
+      "/api/v1/ogc/collections/:uuid/items/wfs_layers",
+      async ({ params }) => {
+        requested.push(params.uuid as string);
+        await released;
+        return HttpResponse.json([{ name: "imos:layer", title: "Layer" }]);
+      }
+    )
+  );
+  return release;
+};
+
 beforeAll(() => server.listen());
 beforeEach(() => {
   requested.length = 0;
@@ -118,6 +137,27 @@ describe("useDownloadAvailability", () => {
     expect(result.current(first)).toBe(true);
     await waitFor(() => expect(result.current(second)).toBe(true));
     expect(requested).toEqual([first.id, second.id]);
+  });
+
+  it("stops the checks of collections no longer in the results", async () => {
+    const release = holdAnswers();
+    const first = createCollection([wfsLink]);
+    const second = createCollection([wfsLink]);
+
+    const { result, rerender } = renderHook(
+      ({ collections }) => useDownloadAvailability(collections),
+      { wrapper, initialProps: { collections: [first] } }
+    );
+    await waitFor(() => expect(requested).toEqual([first.id]));
+
+    // e.g. a new search
+    rerender({ collections: [second] });
+    await waitFor(() => expect(requested).toEqual([first.id, second.id]));
+    release();
+
+    await waitFor(() => expect(result.current(second)).toBe(true));
+    await settle();
+    expect(result.current(first)).toBe(false);
   });
 
   it("checks again on the next mount", async () => {

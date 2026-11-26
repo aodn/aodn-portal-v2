@@ -87,7 +87,11 @@ const MapPopup: React.FC<MapPopupProps> = memo(
     const checkWfsLayers = useCallback(
       (uuid: string) =>
         dispatch(
-          fetchGeoServerDownloadLayers({ uuid, enableGeoServerWhiteList })
+          fetchGeoServerDownloadLayers({
+            uuid,
+            enableGeoServerWhiteList,
+            skipRetries: true,
+          })
         ),
       [dispatch, enableGeoServerWhiteList]
     );

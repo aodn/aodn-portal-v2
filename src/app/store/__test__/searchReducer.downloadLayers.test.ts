@@ -2,15 +2,15 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { http, HttpResponse } from "msw";
 import { server } from "@/__mocks__/server";
 import { trackCustomEvent } from "@/analytics/customEventTracker";
-import { MapFeatureRequest } from "../GeoserverDefinitions";
 import { fetchGeoServerDownloadLayers } from "../searchReducer";
 import store from "../store";
 
 const layers = [{ name: "imos:layer", title: "Layer" }];
 let requestedUrl: URL | undefined;
 
-const fetchLayers = (request: MapFeatureRequest) =>
-  store.dispatch(fetchGeoServerDownloadLayers(request));
+const fetchLayers = (
+  request: Parameters<typeof fetchGeoServerDownloadLayers>[0]
+) => store.dispatch(fetchGeoServerDownloadLayers(request));
 
 const answerWith = (response: () => Response) =>
   server.use(
@@ -59,6 +59,39 @@ describe("fetchGeoServerDownloadLayers", () => {
       expect(trackCustomEvent).not.toHaveBeenCalled();
     }
   );
+
+  it("makes one request on 503 when retries are skipped", async () => {
+    let requests = 0;
+    answerWith(() => {
+      requests++;
+      return new HttpResponse(null, { status: 503 });
+    });
+
+    await expect(
+      fetchLayers({
+        uuid: "abc",
+        enableGeoServerWhiteList: true,
+        skipRetries: true,
+      }).unwrap()
+    ).rejects.toBeDefined();
+    expect(requests).toBe(1);
+    expect(requestedUrl?.searchParams.has("skipRetries")).toBe(false);
+  });
+
+  it("retries a transient 503 by default", async () => {
+    let requests = 0;
+    answerWith(() => {
+      requests++;
+      return requests === 1
+        ? new HttpResponse(null, { status: 503 })
+        : HttpResponse.json(layers);
+    });
+
+    await expect(
+      fetchLayers({ uuid: "abc", enableGeoServerWhiteList: true }).unwrap()
+    ).resolves.toEqual(layers);
+    expect(requests).toBe(2);
+  });
 
   it("rejects when aborted", async () => {
     answerWith(() => HttpResponse.json(layers));

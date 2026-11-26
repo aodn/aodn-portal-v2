@@ -57,7 +57,11 @@ const useDownloadAvailability = (
       const key = toCheckKey(uuid, enableGeoServerWhiteList);
       if (answeredKeys.current.has(key)) return [];
       const check = dispatch(
-        fetchGeoServerDownloadLayers({ uuid, enableGeoServerWhiteList })
+        fetchGeoServerDownloadLayers({
+          uuid,
+          enableGeoServerWhiteList,
+          skipRetries: true,
+        })
       );
       check
         .unwrap()
