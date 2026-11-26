@@ -539,7 +539,7 @@ const DateSliderRange: React.FC<DateSliderRangeProps> = ({
                 display: { xs: "none", sm: "block" },
               }}
             >
-              Ongoing
+              Last Date
             </Typography>
             <Typography sx={sliderCaptionSx}>
               {formatDate(unixMsToAppDayjs(maxValue))}
