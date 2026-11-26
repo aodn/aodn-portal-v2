@@ -49,7 +49,7 @@ vi.mock("@/hooks/useBreakpoint", () => ({
 
 const LAYER_ID = "points";
 
-// Results are remembered, so each test needs its own ids
+// Each test has its own ids, so the requests are easy to tell apart
 let idCount = 0;
 const newId = () => `map-popup-${idCount++}`;
 
@@ -124,7 +124,8 @@ afterEach(() => {
 });
 afterAll(() => server.close());
 
-// The hover tip renders in its own React root, without redux or admin context
+// The hover tip renders in its own React root, without redux or admin context,
+// so MapPopup checks WFS and passes the answer in
 describe("MapPopup hover tip Download", () => {
   it.each([
     ["cloud optimised", "summary", "a.parquet", true],
@@ -140,7 +141,7 @@ describe("MapPopup hover tip Download", () => {
     expect(requested).toEqual([]);
   });
 
-  it("checks WFS when shown, and only once for the same dataset", async () => {
+  it("checks WFS each time it is shown", async () => {
     const id = newId();
     mockApi("wfs", "layer");
     const { hoverDataset, moveMap } = renderPopup();
@@ -153,8 +154,8 @@ describe("MapPopup hover tip Download", () => {
     );
     await hoverDataset(id);
 
-    expect(getDownload()).toBeEnabled();
-    expect(requested).toEqual([`${id} true`]);
+    await waitFor(() => expect(getDownload()).toBeEnabled());
+    expect(requested).toEqual([`${id} true`, `${id} true`]);
   });
 
   it("stays disabled when the WFS check says no", async () => {

@@ -11,7 +11,10 @@ import { Box, Card, CardContent, CircularProgress } from "@mui/material";
 import { MapEvent, MapMouseEvent, Popup } from "mapbox-gl";
 import MapContext from "../MapContext";
 import { Feature, Point } from "geojson";
-import { fetchResultByUuidNoStore } from "@/app/store/searchReducer";
+import {
+  fetchGeoServerDownloadLayers,
+  fetchResultByUuidNoStore,
+} from "@/app/store/searchReducer";
 import AppTheme from "@/styles/theme";
 import { OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import { useAppDispatch } from "@/app/store/hooks";
@@ -21,6 +24,7 @@ import useBreakpoint from "../../../../hooks/useBreakpoint";
 import { isMapDrawModeActive } from "@/utils/MapUtils";
 import { zIndex } from "@/styles/constants";
 import AdminScreenContext from "@/components/admin/AdminScreenContext";
+import { isDownloadableByLinks } from "@/hooks/useDownloadAvailability";
 
 interface MapPopupProps {
   layerId: string;
@@ -59,7 +63,8 @@ const renderLoadingBox = ({ popupHeight, popupWidth }: PopupConfig) => (
 const MapPopup: React.FC<MapPopupProps> = memo(
   ({ layerId, tabNavigation }: MapPopupProps) => {
     const { map } = useContext(MapContext);
-    const { enableGeoServerWhiteList } = useContext(AdminScreenContext);
+    // Same default as useDownloadAvailability
+    const { enableGeoServerWhiteList = true } = useContext(AdminScreenContext);
     const dispatch = useAppDispatch();
     const { isUnderLaptop } = useBreakpoint();
 
@@ -77,10 +82,21 @@ const MapPopup: React.FC<MapPopupProps> = memo(
       [dispatch]
     );
 
+    // The hover tip renders in its own React root without redux, so the WFS
+    // check of useDownloadAvailability is done here
+    const checkWfsLayers = useCallback(
+      (uuid: string) =>
+        dispatch(
+          fetchGeoServerDownloadLayers({ uuid, enableGeoServerWhiteList })
+        ),
+      [dispatch, enableGeoServerWhiteList]
+    );
+
     const renderContentBox = useCallback(
       (
         collection: null | OGCCollection,
-        onMouseLeave: MouseEventHandler<HTMLDivElement>
+        onMouseLeave: MouseEventHandler<HTMLDivElement>,
+        isDownloadable: boolean
       ) => {
         if (!collection) {
           return null;
@@ -105,7 +121,7 @@ const MapPopup: React.FC<MapPopupProps> = memo(
               >
                 <ComplexMapHoverTip
                   collection={collection}
-                  enableGeoServerWhiteList={enableGeoServerWhiteList}
+                  isDownloadable={isDownloadable}
                   tabNavigation={tabNavigation}
                 />
               </CardContent>
@@ -113,7 +129,7 @@ const MapPopup: React.FC<MapPopupProps> = memo(
           </ThemeProvider>
         );
       },
-      [enableGeoServerWhiteList, tabNavigation]
+      [tabNavigation]
     );
 
     useEffect(() => {
@@ -130,6 +146,28 @@ const MapPopup: React.FC<MapPopupProps> = memo(
 
       const container = document.createElement("div");
       const root = createRoot(container);
+      // Of the dataset shown now, stopped when another one is hovered
+      let wfsCheck: ReturnType<typeof checkWfsLayers> | undefined;
+
+      const renderCollection = (collection: OGCCollection) => {
+        const render = (isDownloadable: boolean) =>
+          root.render(
+            renderContentBox(collection, onPopupMouseLeave, isDownloadable)
+          );
+        const isKnown = isDownloadableByLinks(collection);
+        render(isKnown ?? false);
+        if (isKnown !== undefined) return;
+
+        const check = checkWfsLayers(collection.id);
+        wfsCheck = check;
+        check
+          .unwrap()
+          .then((layers) => {
+            if (layers.length > 0 && wfsCheck === check) render(true);
+          })
+          // Aborted, or failed and already logged: not downloadable
+          .catch(() => {});
+      };
 
       const onPointMouseLeave = (event: MapMouseEvent) => {
         const element = popup.getElement();
@@ -166,6 +204,8 @@ const MapPopup: React.FC<MapPopupProps> = memo(
           const geometry = feature.geometry;
           const coordinates = geometry.coordinates.slice();
 
+          wfsCheck?.abort();
+          wfsCheck = undefined;
           // Render a loading state in the popup
           root.render(
             renderLoadingBox({
@@ -178,7 +218,7 @@ const MapPopup: React.FC<MapPopupProps> = memo(
           getCollectionData(uuid).then((collection) => {
             if (collection) {
               popup.remove();
-              root.render(renderContentBox(collection, onPopupMouseLeave));
+              renderCollection(collection);
               // Set the popup's position and content, then add it to the map
               // subscribe to close event to clean up resource.
               // Must show popup after data load, so that the position
@@ -205,7 +245,11 @@ const MapPopup: React.FC<MapPopupProps> = memo(
       // Mapbox detaches the popup content from the DOM as soon as the popup is
       // removed, but the React tree stays mounted. Any portaled child (e.g. the
       // MUI tooltip on the title) would then lose its anchor.
-      const onPopupClose = () => root.render(null);
+      const onPopupClose = () => {
+        wfsCheck?.abort();
+        wfsCheck = undefined;
+        root.render(null);
+      };
 
       // We do not need to show the MapPopup for small screen
       // without the event, the popup will not show but instance still
@@ -242,7 +286,14 @@ const MapPopup: React.FC<MapPopupProps> = memo(
         popup?.off("close", onPopupClose);
         setTimeout(() => root?.unmount(), 500);
       };
-    }, [getCollectionData, isUnderLaptop, layerId, map, renderContentBox]);
+    }, [
+      checkWfsLayers,
+      getCollectionData,
+      isUnderLaptop,
+      layerId,
+      map,
+      renderContentBox,
+    ]);
 
     return null;
   }

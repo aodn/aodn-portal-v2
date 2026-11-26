@@ -154,6 +154,7 @@ describe("DownloadWFSCard", () => {
     };
 
     mockDispatch.mockReturnValue({
+      abort: vi.fn(),
       unwrap: () => Promise.resolve(mockLayers),
     });
     vi.mocked(useAppDispatch).mockReturnValue(mockDispatch as any);
@@ -210,7 +211,10 @@ describe("DownloadWFSCard", () => {
   });
 
   it("should report WFS as unavailable when no layers come back", async () => {
-    mockDispatch.mockReturnValue({ unwrap: () => Promise.resolve([]) });
+    mockDispatch.mockReturnValue({
+      abort: vi.fn(),
+      unwrap: () => Promise.resolve([]),
+    });
 
     renderComponent();
 
@@ -221,7 +225,8 @@ describe("DownloadWFSCard", () => {
 
   it("should report WFS as unavailable when the layers fetch fails", async () => {
     mockDispatch.mockReturnValue({
-      unwrap: () => Promise.reject(new Error("401 not whitelisted")),
+      abort: vi.fn(),
+      unwrap: () => Promise.reject(new Error("GeoServer is down")),
     });
 
     renderComponent();
@@ -373,6 +378,7 @@ describe("DownloadWFSCard", () => {
 
     it("should use the collection title alone when the collection has a single layer", () => {
       mockDispatch.mockReturnValue({
+        abort: vi.fn(),
         unwrap: () => Promise.resolve([{ name: "only-layer", title: "Only" }]),
       });
 
@@ -394,6 +400,7 @@ describe("DownloadWFSCard", () => {
 
     it("should fall back to the layer name when two layers share a title, so the file names still differ", () => {
       mockDispatch.mockReturnValue({
+        abort: vi.fn(),
         unwrap: () =>
           Promise.resolve([
             { name: "imos:layer_one", title: "Shared title" },

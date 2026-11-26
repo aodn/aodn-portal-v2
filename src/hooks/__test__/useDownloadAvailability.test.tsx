@@ -11,8 +11,15 @@ import {
 import { renderHook, waitFor } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import { server } from "@/__mocks__/server";
+import { ReactNode } from "react";
+import { Provider } from "react-redux";
+import store from "@/app/store/store";
 import { ILink, OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import useDownloadAvailability from "../useDownloadAvailability";
+
+const wrapper = ({ children }: { children: ReactNode }) => (
+  <Provider store={store}>{children}</Provider>
+);
 
 const createLink = (rel: string, title: string): ILink => ({
   rel,
@@ -24,7 +31,7 @@ const coLink = createLink("summary", "a.parquet");
 const netcdfsLink = createLink("file-list", "original_netcdfs");
 const wfsLink = createLink("wfs", "layer");
 
-// Results are remembered, so each collection needs its own id
+// Each collection has its own id, so the requests are easy to tell apart
 let idCount = 0;
 const createCollection = (links: ILink[]): OGCCollection =>
   Object.assign(new OGCCollection(), {
@@ -70,7 +77,9 @@ describe("useDownloadAvailability", () => {
     const collection = createCollection(links);
     const collections = [collection];
 
-    const { result } = renderHook(() => useDownloadAvailability(collections));
+    const { result } = renderHook(() => useDownloadAvailability(collections), {
+      wrapper,
+    });
     expect(result.current(collection)).toBe(expected);
     await settle();
 
@@ -84,8 +93,9 @@ describe("useDownloadAvailability", () => {
     blocked.add(notAllowed.id);
     const collections = [available, notAllowed];
 
-    // No wrapper: it must work without any provider
-    const { result } = renderHook(() => useDownloadAvailability(collections));
+    const { result } = renderHook(() => useDownloadAvailability(collections), {
+      wrapper,
+    });
     expect(result.current(available)).toBe(false);
 
     await waitFor(() => expect(result.current(available)).toBe(true));
@@ -100,7 +110,7 @@ describe("useDownloadAvailability", () => {
 
     const { result, rerender } = renderHook(
       ({ collections }) => useDownloadAvailability(collections),
-      { initialProps: { collections: [first] } }
+      { wrapper, initialProps: { collections: [first] } }
     );
     await waitFor(() => expect(result.current(first)).toBe(true));
 
@@ -110,18 +120,22 @@ describe("useDownloadAvailability", () => {
     expect(requested).toEqual([first.id, second.id]);
   });
 
-  it("uses the remembered result at the first render", async () => {
+  it("checks again on the next mount", async () => {
     const collection = createCollection([wfsLink]);
     const collections = [collection];
-    const first = renderHook(() => useDownloadAvailability(collections));
+    const first = renderHook(() => useDownloadAvailability(collections), {
+      wrapper,
+    });
     await waitFor(() => expect(first.result.current(collection)).toBe(true));
     first.unmount();
 
-    const { result } = renderHook(() => useDownloadAvailability(collections));
+    const { result } = renderHook(() => useDownloadAvailability(collections), {
+      wrapper,
+    });
 
-    expect(result.current(collection)).toBe(true);
-    await settle();
-    expect(requested).toEqual([collection.id]);
+    expect(result.current(collection)).toBe(false);
+    await waitFor(() => expect(result.current(collection)).toBe(true));
+    expect(requested).toEqual([collection.id, collection.id]);
   });
 
   it("checks again when the allow list setting changes", async () => {
@@ -133,7 +147,7 @@ describe("useDownloadAvailability", () => {
       ({ allowList }: { allowList?: boolean }) =>
         useDownloadAvailability(collections, allowList),
       // The setting is undefined outside the admin screen
-      { initialProps: { allowList: undefined as boolean | undefined } }
+      { wrapper, initialProps: { allowList: undefined as boolean | undefined } }
     );
     await waitFor(() => expect(requested).toHaveLength(1));
     await settle();
@@ -155,11 +169,16 @@ describe("useDownloadAvailability", () => {
     const otherCollections = [available];
     const onRender = vi.fn();
 
-    renderHook(() => {
-      onRender();
-      return useDownloadAvailability(collections);
+    renderHook(
+      () => {
+        onRender();
+        return useDownloadAvailability(collections);
+      },
+      { wrapper }
+    );
+    const other = renderHook(() => useDownloadAvailability(otherCollections), {
+      wrapper,
     });
-    const other = renderHook(() => useDownloadAvailability(otherCollections));
     await waitFor(() => expect(other.result.current(available)).toBe(true));
     await waitFor(() => expect(requested).toContain(notAllowed.id));
     await settle();

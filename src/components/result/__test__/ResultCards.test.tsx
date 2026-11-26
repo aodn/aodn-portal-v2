@@ -2,12 +2,19 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { afterAll, afterEach, beforeAll, expect, it, vi } from "vitest";
 import { http, HttpResponse } from "msw";
 import { server } from "@/__mocks__/server";
+import { ReactNode } from "react";
+import { Provider } from "react-redux";
+import store from "@/app/store/store";
 import { CollectionsQueryType } from "@/app/store/searchReducer";
 import { ILink, OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import AdminScreenContext from "@/components/admin/AdminScreenContext";
 import { SearchResultLayoutEnum } from "@/components/common/buttons/ResultListLayoutButton";
 import ResultCards from "../ResultCards";
 import { ResultCardBasicType } from "../types";
+
+const wrapper = ({ children }: { children: ReactNode }) => (
+  <Provider store={store}>{children}</Provider>
+);
 
 const breakpoint = vi.hoisted(() => ({ isUnderLaptop: true }));
 
@@ -31,7 +38,7 @@ vi.mock("../GridResultCard", () => ({
   default: (props: ResultCardBasicType) => <MockCard {...props} />,
 }));
 
-// Results are remembered, so each collection needs its own id
+// Each collection has its own id, so the requests are easy to tell apart
 let idCount = 0;
 const createCollection = (title: string, links: Partial<ILink>[]) =>
   Object.assign(new OGCCollection(), {
@@ -98,7 +105,7 @@ it("observes the viewport on mobile and the list scroller on desktop", () => {
   };
 
   breakpoint.isUnderLaptop = true;
-  const { rerender } = render(<ResultCards {...props} />);
+  const { rerender } = render(<ResultCards {...props} />, { wrapper });
   expect(IntersectionObserver).toHaveBeenLastCalledWith(expect.any(Function), {
     root: null,
     rootMargin: "200px 0px",
@@ -138,7 +145,8 @@ it.each([
       layout={layout}
       contents={contents}
       selectedUuids={undefined}
-    />
+    />,
+    { wrapper }
   );
   expect(getDownload("CO")).toBeEnabled();
   expect(getDownload("NetCDFs")).toBeEnabled();
@@ -162,7 +170,8 @@ it("checks nothing for simplified cards", async () => {
       layout={SearchResultLayoutEnum.LIST}
       contents={createContents([wfs])}
       selectedUuids={undefined}
-    />
+    />,
+    { wrapper }
   );
   await settle();
 
@@ -181,7 +190,8 @@ it("uses the allow list setting of the admin screen", async () => {
         contents={createContents([wfs])}
         selectedUuids={undefined}
       />
-    </AdminScreenContext.Provider>
+    </AdminScreenContext.Provider>,
+    { wrapper }
   );
 
   await waitFor(() => expect(getDownload("WFS")).toBeEnabled());

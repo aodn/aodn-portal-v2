@@ -629,6 +629,13 @@ const fetchGeoServerMapLayers = createAsyncThunk<
   }
 );
 
+/**
+ * WFS layers a collection can download, none if it cannot. A WFS link alone
+ * does not mean it can be downloaded.
+ *
+ * Rejects when the check fails (5xx, network error or timeout, after retries)
+ * or is aborted.
+ */
 const fetchGeoServerDownloadLayers = createAsyncThunk<
   Array<DownloadLayersResponse>,
   MapFeatureRequest,
@@ -637,11 +644,23 @@ const fetchGeoServerDownloadLayers = createAsyncThunk<
   "geoserver/fetchGeoServerDownloadLayers",
   (request: MapFeatureRequest, thunkApi: any) => {
     return ogcAxiosWithRetry
-      .get<DownloadLayersResponse>(
+      .get<DownloadLayersResponse[]>(
         `/ogc/collections/${request.uuid}/items/wfs_layers`,
-        { params: request, timeout: TIMEOUT, signal: thunkApi.signal }
+        {
+          params: request,
+          timeout: TIMEOUT,
+          signal: thunkApi.signal,
+          // 401 (not on the allow list) and 404 (no layer) are normal answers,
+          // do not log them as HTTP errors
+          validateStatus: (status) =>
+            (status >= 200 && status < 300) || status === 401 || status === 404,
+        }
       )
-      .then((response) => response.data)
+      .then((response) =>
+        response.status === 200 && Array.isArray(response.data)
+          ? response.data
+          : []
+      )
       .catch(errorHandling(thunkApi));
   }
 );

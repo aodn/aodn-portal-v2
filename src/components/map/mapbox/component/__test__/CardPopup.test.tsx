@@ -25,7 +25,7 @@ vi.mock("@/hooks/useBreakpoint", () => ({
 
 const LAYER_ID = "points";
 
-// Results are remembered, so each test needs its own ids
+// Each test has its own ids, so the requests are easy to tell apart
 let idCount = 0;
 const newId = () => `card-popup-${idCount++}`;
 

@@ -11,14 +11,21 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { server } from "@/__mocks__/server";
+import { ReactNode } from "react";
+import { Provider } from "react-redux";
+import store from "@/app/store/store";
 import { ILink, OGCCollection } from "@/app/store/OGCCollectionDefinitions";
 import AdminScreenContext from "@/components/admin/AdminScreenContext";
 import { detailPageDefault, pageReferer } from "@/components/common/constants";
 import BookmarkListCard from "../BookmarkListCard";
 
+const wrapper = ({ children }: { children: ReactNode }) => (
+  <Provider store={store}>{children}</Provider>
+);
+
 vi.mock("@/components/map/mapbox/Map", () => ({ default: () => null }));
 
-// Results are remembered, so each collection needs its own id
+// Each collection has its own id, so the requests are easy to tell apart
 let idCount = 0;
 const createCollection = (rel: string, title: string): OGCCollection =>
   Object.assign(new OGCCollection(), {
@@ -60,7 +67,9 @@ describe("BookmarkListCard Download", () => {
     ["no download type", "wms", "layer", false],
   ])("needs no check for %s", async (_, rel, title, enabled) => {
     mockWfsLayers(200);
-    render(<BookmarkListCard dataset={createCollection(rel, title)} />);
+    render(<BookmarkListCard dataset={createCollection(rel, title)} />, {
+      wrapper,
+    });
     await settle();
 
     expect(getDownload()).toHaveProperty("disabled", !enabled);
@@ -73,7 +82,8 @@ describe("BookmarkListCard Download", () => {
     mockWfsLayers(200);
 
     render(
-      <BookmarkListCard dataset={dataset} tabNavigation={tabNavigation} />
+      <BookmarkListCard dataset={dataset} tabNavigation={tabNavigation} />,
+      { wrapper }
     );
     expect(getDownload()).toBeDisabled();
     await waitFor(() => expect(getDownload()).toBeEnabled());
@@ -91,7 +101,9 @@ describe("BookmarkListCard Download", () => {
 
   it("stays disabled when the WFS check says no", async () => {
     mockWfsLayers(401);
-    render(<BookmarkListCard dataset={createCollection("wfs", "layer")} />);
+    render(<BookmarkListCard dataset={createCollection("wfs", "layer")} />, {
+      wrapper,
+    });
 
     await waitFor(() => expect(requested).toHaveLength(1));
     await settle();
@@ -105,7 +117,8 @@ describe("BookmarkListCard Download", () => {
     render(
       <AdminScreenContext.Provider value={{ enableGeoServerWhiteList: false }}>
         <BookmarkListCard dataset={dataset} />
-      </AdminScreenContext.Provider>
+      </AdminScreenContext.Provider>,
+      { wrapper }
     );
 
     await waitFor(() => expect(getDownload()).toBeEnabled());
