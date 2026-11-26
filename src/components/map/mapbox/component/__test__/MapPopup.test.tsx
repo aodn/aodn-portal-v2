@@ -124,8 +124,8 @@ afterEach(() => {
 });
 afterAll(() => server.close());
 
-// The hover tip renders in its own React root, without redux or admin context,
-// so MapPopup checks WFS and passes the answer in
+// The hover tip renders in its own React root, MapPopup gives it redux and the
+// allow list setting of the admin screen
 describe("MapPopup hover tip Download", () => {
   it.each([
     ["cloud optimised", "summary", "a.parquet", true],
@@ -141,7 +141,7 @@ describe("MapPopup hover tip Download", () => {
     expect(requested).toEqual([]);
   });
 
-  it("checks WFS each time it is shown", async () => {
+  it("checks WFS once and uses the answer when shown again", async () => {
     const id = newId();
     mockApi("wfs", "layer");
     const { hoverDataset, moveMap } = renderPopup();
@@ -154,8 +154,9 @@ describe("MapPopup hover tip Download", () => {
     );
     await hoverDataset(id);
 
-    await waitFor(() => expect(getDownload()).toBeEnabled());
-    expect(requested).toEqual([`${id} true`, `${id} true`]);
+    expect(getDownload()).toBeEnabled();
+    await settle();
+    expect(requested).toEqual([`${id} true`]);
   });
 
   it("stays disabled when the WFS check says no", async () => {

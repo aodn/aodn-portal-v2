@@ -4,6 +4,7 @@ import { logger } from "redux-logger";
 import searchReducer from "./searchReducer";
 import paramReducer from "./componentParamReducer";
 import bookmarkListReducer from "./bookmarkListReducer";
+import downloadAvailabilityReducer from "./downloadAvailabilityReducer";
 
 // redux-logger deep-clones and console-logs state on every dispatched action.
 // It used to be concatenated unconditionally, so production shipped it and ran
@@ -27,6 +28,7 @@ const store = configureStore({
     searcher: searchReducer,
     paramReducer: paramReducer,
     bookmarkList: bookmarkListReducer,
+    downloadAvailability: downloadAvailabilityReducer,
   }),
 });
 

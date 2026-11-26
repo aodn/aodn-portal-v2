@@ -139,7 +139,7 @@ describe("useDownloadAvailability", () => {
     expect(requested).toEqual([first.id, second.id]);
   });
 
-  it("stops the checks of collections no longer in the results", async () => {
+  it("keeps the answer of collections no longer in the results", async () => {
     const release = holdAnswers();
     const first = createCollection([wfsLink]);
     const second = createCollection([wfsLink]);
@@ -150,17 +150,19 @@ describe("useDownloadAvailability", () => {
     );
     await waitFor(() => expect(requested).toEqual([first.id]));
 
-    // e.g. a new search
+    // e.g. a new search, the check of first is not stopped
     rerender({ collections: [second] });
     await waitFor(() => expect(requested).toEqual([first.id, second.id]));
     release();
-
     await waitFor(() => expect(result.current(second)).toBe(true));
-    await settle();
-    expect(result.current(first)).toBe(false);
+
+    // e.g. back to the first search
+    rerender({ collections: [first] });
+    expect(result.current(first)).toBe(true);
+    expect(requested).toEqual([first.id, second.id]);
   });
 
-  it("checks again on the next mount", async () => {
+  it("shares the answer with the next mount", async () => {
     const collection = createCollection([wfsLink]);
     const collections = [collection];
     const first = renderHook(() => useDownloadAvailability(collections), {
@@ -173,9 +175,55 @@ describe("useDownloadAvailability", () => {
       wrapper,
     });
 
+    expect(result.current(collection)).toBe(true);
+    await settle();
+    expect(requested).toEqual([collection.id]);
+  });
+
+  it("shares one check between places showing the same collection", async () => {
+    const release = holdAnswers();
+    const collection = createCollection([wfsLink]);
+    const collections = [collection];
+    // e.g. the result list and a bookmark card
+    const list = renderHook(() => useDownloadAvailability(collections), {
+      wrapper,
+    });
+    const bookmark = renderHook(() => useDownloadAvailability(collections), {
+      wrapper,
+    });
+    await waitFor(() => expect(requested).toEqual([collection.id]));
+    release();
+
+    await waitFor(() => expect(list.result.current(collection)).toBe(true));
+    expect(bookmark.result.current(collection)).toBe(true);
+    expect(requested).toEqual([collection.id]);
+  });
+
+  it("checks a failed collection again when the results change", async () => {
+    const collection = createCollection([wfsLink]);
+    let answers = 0;
+    server.use(
+      http.get("/api/v1/ogc/collections/:uuid/items/wfs_layers", () => {
+        requested.push(collection.id);
+        // GeoServer is down for the first check, which is not retried
+        return answers++ === 0
+          ? new HttpResponse(null, { status: 503 })
+          : HttpResponse.json([{ name: "imos:layer", title: "Layer" }]);
+      })
+    );
+
+    const { result, rerender } = renderHook(
+      ({ collections }) => useDownloadAvailability(collections),
+      { wrapper, initialProps: { collections: [collection] } }
+    );
+    await waitFor(() => expect(requested).toHaveLength(1));
+    await settle();
     expect(result.current(collection)).toBe(false);
+
+    // e.g. "load more"
+    rerender({ collections: [collection] });
     await waitFor(() => expect(result.current(collection)).toBe(true));
-    expect(requested).toEqual([collection.id, collection.id]);
+    expect(requested).toHaveLength(2);
   });
 
   it("checks again when the allow list setting changes", async () => {
