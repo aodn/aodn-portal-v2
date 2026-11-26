@@ -34,6 +34,71 @@ afterEach(() => {
 afterAll(() => server.close());
 
 describe("downloadAvailabilityReducer", () => {
+  it("ignores an older result that arrives after the detail page result", () => {
+    const request = { uuid: newId() };
+    const { pending, fulfilled } = fetchGeoServerDownloadLayers;
+    store.dispatch(pending("background", request));
+    store.dispatch(pending("detail", request));
+    store.dispatch(fulfilled([], "detail", request));
+    store.dispatch(
+      fulfilled([{ name: "imos:layer", title: "Layer" }], "background", request)
+    );
+
+    expect(
+      store.getState().downloadAvailability.wfsChecks[`true:${request.uuid}`]
+    ).toEqual({ status: "unavailable" });
+  });
+
+  it("uses an older result that arrives first, until the newer one arrives", () => {
+    const request = { uuid: newId() };
+    const { pending, fulfilled } = fetchGeoServerDownloadLayers;
+    const wfsCheck = () =>
+      store.getState().downloadAvailability.wfsChecks[`true:${request.uuid}`];
+    store.dispatch(pending("background", request));
+    store.dispatch(pending("detail", request));
+    store.dispatch(
+      fulfilled([{ name: "imos:layer", title: "Layer" }], "background", request)
+    );
+    expect(wfsCheck()?.status).toBe("available");
+
+    store.dispatch(fulfilled([], "detail", request));
+    expect(wfsCheck()).toEqual({ status: "unavailable" });
+  });
+
+  it("keeps an older result that arrives first when the newer check fails", () => {
+    const request = { uuid: newId() };
+    const { pending, fulfilled, rejected } = fetchGeoServerDownloadLayers;
+    store.dispatch(pending("background", request));
+    store.dispatch(pending("detail", request));
+    store.dispatch(
+      fulfilled([{ name: "imos:layer", title: "Layer" }], "background", request)
+    );
+    store.dispatch(
+      rejected(new Error("Service unavailable"), "detail", request)
+    );
+
+    expect(
+      store.getState().downloadAvailability.wfsChecks[`true:${request.uuid}`]
+    ).toEqual({ status: "available" });
+  });
+
+  it("keeps the known answer when a refresh fails", () => {
+    const request = { uuid: newId() };
+    const { pending, fulfilled, rejected } = fetchGeoServerDownloadLayers;
+    store.dispatch(pending("background", request));
+    store.dispatch(
+      fulfilled([{ name: "imos:layer", title: "Layer" }], "background", request)
+    );
+    store.dispatch(pending("detail", request));
+    store.dispatch(
+      rejected(new Error("Service unavailable"), "detail", request)
+    );
+
+    expect(
+      store.getState().downloadAvailability.wfsChecks[`true:${request.uuid}`]
+    ).toEqual({ status: "available" });
+  });
+
   it("keeps the answer while the detail page checks again, then uses its answer", async () => {
     const uuid = newId();
     answerWith(200);

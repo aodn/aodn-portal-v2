@@ -9,7 +9,7 @@ import { fetchGeoServerDownloadLayers } from "./searchReducer";
 
 type WfsCheck =
   | { status: "checking"; requestId: string }
-  | { status: "available" | "unavailable" };
+  | { status: "available" | "unavailable"; requestId?: string };
 
 interface DownloadAvailabilityState {
   // By toWfsCheckKey. Failed checks are not kept, so they are tried again.
@@ -42,27 +42,30 @@ const downloadAvailabilitySlice = createSlice({
       .addCase(fetchGeoServerDownloadLayers.pending, (state, action) => {
         const key = keyOf(action.meta.arg);
         // Keep a known answer while it is checked again, e.g. by the detail page
-        if (!state.wfsChecks[key]) {
-          state.wfsChecks[key] = {
-            status: "checking",
-            requestId: action.meta.requestId,
-          };
-        }
+        state.wfsChecks[key] = {
+          status: state.wfsChecks[key]?.status ?? "checking",
+          requestId: action.meta.requestId,
+        };
       })
       .addCase(fetchGeoServerDownloadLayers.fulfilled, (state, action) => {
-        state.wfsChecks[keyOf(action.meta.arg)] = {
-          status: action.payload.length > 0 ? "available" : "unavailable",
-        };
+        const key = keyOf(action.meta.arg);
+        const check = state.wfsChecks[key];
+        const status = action.payload.length > 0 ? "available" : "unavailable";
+        if (check?.requestId === action.meta.requestId) {
+          state.wfsChecks[key] = { status };
+        } else if (check?.status === "checking") {
+          // An older check answered first, use it until the newer one answers
+          state.wfsChecks[key] = { status, requestId: check.requestId };
+        }
       })
       .addCase(fetchGeoServerDownloadLayers.rejected, (state, action) => {
         const key = keyOf(action.meta.arg);
         const check = state.wfsChecks[key];
-        // Failed or aborted, forget it so it can be checked again
-        if (
-          check?.status === "checking" &&
-          check.requestId === action.meta.requestId
-        ) {
+        if (check?.requestId !== action.meta.requestId) return;
+        if (check.status === "checking") {
           delete state.wfsChecks[key];
+        } else {
+          delete check.requestId;
         }
       });
   },
