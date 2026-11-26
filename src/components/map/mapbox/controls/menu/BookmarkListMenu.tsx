@@ -2,6 +2,9 @@ import { FC, useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import { Box, IconButton, Popper } from "@mui/material";
 import store from "@/app/store/store";
+import AdminScreenContext, {
+  AdminScreenContextType,
+} from "@/components/admin/AdminScreenContext";
 import { ControlProps, EVENT_MENU, MenuClickedEvent } from "./Definition";
 import { borderRadius, zIndex } from "@/styles/constants";
 import { eventEmitter, switcherIconButtonSx } from "./MenuControl";
@@ -20,11 +23,18 @@ import useElementSize from "../../../../../hooks/useElementSize";
 export interface BookmarkListMenuBasicType
   extends ControlProps, BookmarkListAccordionGroupBasicType {}
 
-interface BookmarkListMenuProps extends BookmarkListMenuBasicType {}
+// Stable, so the context does not change on every render
+const NO_ADMIN_SCREEN: Partial<AdminScreenContextType> = {};
+
+interface BookmarkListMenuProps extends BookmarkListMenuBasicType {
+  // Passed in, as AdminScreenContext does not reach the MenuControl root
+  adminScreen?: Partial<AdminScreenContextType>;
+}
 
 const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
   onDeselectDataset,
   tabNavigation,
+  adminScreen = NO_ADMIN_SCREEN,
 }) => {
   const { isAboveDesktop } = useBreakpoint();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -97,13 +107,15 @@ const BookmarkListMenu: FC<BookmarkListMenuProps> = ({
           }}
         >
           {/* MenuControl renders this menu in its own React root, outside the
-              app's redux Provider. The bookmark cards need redux to check
-              WFS downloads. */}
+              app's redux and admin screen providers. The bookmark cards need
+              both to check WFS downloads with the allow list setting. */}
           <Provider store={store}>
-            <BookmarkListAccordionGroup
-              onDeselectDataset={onDeselectDataset}
-              tabNavigation={tabNavigation}
-            />
+            <AdminScreenContext.Provider value={adminScreen}>
+              <BookmarkListAccordionGroup
+                onDeselectDataset={onDeselectDataset}
+                tabNavigation={tabNavigation}
+              />
+            </AdminScreenContext.Provider>
           </Provider>
         </Box>
       </Popper>
