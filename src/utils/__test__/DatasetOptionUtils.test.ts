@@ -68,6 +68,40 @@ describe("getCODatasetOptions", () => {
     ]);
   });
 
+  it("uses the notebook link description as the label", () => {
+    const collection = new OGCCollection();
+    collection.links = [
+      {
+        rel: "summary",
+        href: "",
+        type: "",
+        title: "radar_Newcastle_velocity_hourly_averaged_delayed_qc.zarr",
+      },
+      {
+        rel: "related",
+        href: "https://github.com/aodn/aodn_cloud_optimised/blob/main/notebooks/radar_Newcastle_velocity_hourly_averaged_delayed_qc.ipynb",
+        type: "application/x-ipynb+json",
+        title: OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE,
+        description:
+          "Ocean Radar - Newcastle site - Sea water velocity - Delayed mode",
+      },
+      {
+        rel: "related",
+        href: "https://github.com/aodn/aodn_cloud_optimised/blob/main/notebooks/radar_Newcastle_velocity_hourly_averaged_delayed_qc.ipynb",
+        type: "application/x-ipynb+json",
+        title: "Python notebook example",
+      },
+    ];
+
+    expect(getCODatasetOptions(collection)).toEqual([
+      {
+        value: "radar_Newcastle_velocity_hourly_averaged_delayed_qc.zarr",
+        label:
+          "Ocean Radar - Newcastle site - Sea water velocity - Delayed mode",
+      },
+    ]);
+  });
+
   it("returns no options without a collection", () => {
     expect(getCODatasetOptions(undefined)).toEqual([]);
   });
