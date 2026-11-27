@@ -71,14 +71,18 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
     const suggestedCitation =
       collection?.getCitation()?.suggestedCitation ?? "";
 
+    const normalizedLicense = license.trim().toLowerCase();
     const otherConstraints = collection
       ?.getCitation()
-      ?.otherConstraints?.filter(
-        // Some organizations put license in "other constraints".
-        // So if a constraint is considered as license by es-indexer,
-        // we should not show it in "other constraints".
-        (cons) => cons.toLowerCase().trim() !== license?.toLowerCase().trim()
-      );
+      ?.otherConstraints?.filter((constraint) => {
+        const normalizedConstraint = constraint.trim().toLowerCase();
+        // "Unknown" marks missing metadata. Some records also repeat the license here.
+        return (
+          normalizedConstraint !== "" &&
+          normalizedConstraint !== "unknown" &&
+          normalizedConstraint !== normalizedLicense
+        );
+      });
 
     const useLimitations = collection?.getCitation()?.useLimitations;
 
@@ -90,9 +94,6 @@ const CitationPanel: FC<CitationPanelProps> = ({ mode = MODE.NORMAL }) => {
       });
     });
     otherConstraints?.forEach((constraint) => {
-      if (!constraint) {
-        return;
-      }
       constraints.push({
         title: "Other Constraint",
         content: [constraint],
