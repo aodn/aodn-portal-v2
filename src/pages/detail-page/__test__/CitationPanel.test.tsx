@@ -8,6 +8,8 @@ import { DetailPageProvider } from "../context/detail-page-provider";
 import { server } from "../../../__mocks__/server";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import CitationPanel from "../features/CitationPanel";
+import { http, HttpResponse } from "msw";
+import { NORMAL_COLLECTION } from "@/__mocks__/data/COLLECTIONS";
 
 vi.mock("react-router-dom", () => ({
   ...vi.importActual("react-router-dom"),
@@ -47,7 +49,7 @@ describe("CitationPanel", async () => {
     server.close();
   });
 
-  beforeEach(() => {
+  const renderPanel = () => {
     render(
       <Provider store={store}>
         <ThemeProvider theme={theme}>
@@ -57,9 +59,11 @@ describe("CitationPanel", async () => {
         </ThemeProvider>
       </Provider>
     );
-  });
+  };
 
   test("should render CitationPanel", async () => {
+    renderPanel();
+
     // the panel is rendered
     await waitFor(() => {
       expect(screen.queryAllByText("License")).toHaveLength(2);
@@ -91,5 +95,25 @@ describe("CitationPanel", async () => {
         screen.getByText("Use Limitation: All AIMS data", { exact: false })
       ).toBeInTheDocument();
     });
+  });
+
+  test("shows the empty constraints message when the only constraint is Unknown", async () => {
+    server.use(
+      http.get(`/api/v1/ogc/collections/${NORMAL_COLLECTION.id}`, () =>
+        HttpResponse.json({
+          ...NORMAL_COLLECTION,
+          properties: {
+            ...NORMAL_COLLECTION.properties,
+            citation: { otherConstraints: ["Unknown"] },
+          },
+        })
+      )
+    );
+
+    renderPanel();
+
+    expect(
+      await screen.findByText("Constraints not available")
+    ).toBeInTheDocument();
   });
 });
