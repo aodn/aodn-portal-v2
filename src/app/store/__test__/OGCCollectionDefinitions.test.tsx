@@ -582,11 +582,92 @@ describe("OGCCollection", () => {
   });
 
   describe("getCODatasetLabel", () => {
-    const notebookLink = (keyName: string, title: string) => ({
+    const notebookLink = (
+      keyName: string,
+      title: string,
+      description?: string
+    ) => ({
       rel: "related",
       type: "application/x-ipynb+json",
       href: `https://github.com/aodn/aodn_cloud_optimised/blob/main/notebooks/${keyName}.ipynb`,
       title,
+      description,
+    });
+
+    it("uses the description of the key's notebook link", () => {
+      const collection = new OGCCollection();
+      collection.links = [
+        notebookLink(
+          "radar_newcastle",
+          OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE,
+          "  Ocean Radar - Newcastle site - Sea water velocity - Delayed mode "
+        ),
+      ];
+
+      expect(collection.getCODatasetLabel("radar_newcastle.zarr")).toBe(
+        "Ocean Radar - Newcastle site - Sea water velocity - Delayed mode"
+      );
+    });
+
+    it("prefers the description over the text after the dash in the title", () => {
+      const collection = new OGCCollection();
+      collection.links = [
+        notebookLink(
+          "animal_ctd",
+          `${OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE} - Real time - CTD profile`,
+          "Animal tracking - CTD profile - Real time"
+        ),
+      ];
+
+      expect(collection.getCODatasetLabel("animal_ctd.parquet")).toBe(
+        "Animal tracking - CTD profile - Real time"
+      );
+    });
+
+    it("ignores the description of another notebook link to the same file", () => {
+      const collection = new OGCCollection();
+      collection.links = [
+        notebookLink(
+          "radar_newcastle",
+          "Python notebook example",
+          "Not the dataset name"
+        ),
+        notebookLink("radar_newcastle", OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE),
+      ];
+
+      expect(collection.getCODatasetLabel("radar_newcastle.zarr")).toBe(
+        "radar_newcastle"
+      );
+    });
+
+    it("does not use another key's notebook link description", () => {
+      const collection = new OGCCollection();
+      collection.links = [
+        notebookLink(
+          "animal_gps",
+          OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE,
+          "Animal tracking - GPS"
+        ),
+      ];
+
+      expect(collection.getCODatasetLabel("animal_ctd.parquet")).toBe(
+        "animal_ctd"
+      );
+    });
+
+    it("falls back to the text after the dash for a blank description", () => {
+      const collection = new OGCCollection();
+      collection.links = [
+        notebookLink(
+          "animal_ctd",
+          `${OPTIMIZED_PYTHON_NOTEBOOK_LINK_TITLE} - Real time - CTD profile`,
+          "   "
+        ),
+      ];
+
+      expect(collection.getCODatasetLabel("animal_ctd.parquet")).toBe(
+        "Real time - CTD profile"
+      );
     });
 
     it("uses the text after the dash in the key's notebook link title", () => {
